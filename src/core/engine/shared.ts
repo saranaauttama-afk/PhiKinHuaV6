@@ -31,6 +31,9 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   let gained = EXP_KILL_NORMAL;
   let tier: 'normal' | 'elite' | 'boss' = 'normal';
   
+  // Increment fight count for boss timing
+  s.fightCount = (s.fightCount || 0) + 1;
+  
   // Determine enemy tier for rewards
   if (s.pages?.current && s.pages._activeOfferIndex != null) {
     // Pages mode - get tier from active offer

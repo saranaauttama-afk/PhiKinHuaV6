@@ -24,6 +24,7 @@ export function baseNewState(seed: string): GameState {
       maxEnergy: START_ENERGY, maxHandSize: HAND_SIZE,
     },
     enemy: undefined,
+    fightCount: 0, // Track fights for boss encounters
     piles: { draw: [], hand: [], discard: [], exhaust: [] },
     log: [],
     // ✅ ฟิลด์ที่เพิ่มใน M2

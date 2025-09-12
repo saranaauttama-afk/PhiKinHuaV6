@@ -114,8 +114,8 @@ export function qaSpawnEquippedEnemy(s: GameState, cmd: Extract<Command, { type:
   const enemyId = cmd.enemyId || 'phi_pong';
   
   // โหลด enemy data จากระบบไทยใหม่
-  const { getEnemyById } = require('../../enemies/thai/data');
-  const thaiEnemyTemplate = getEnemyById(enemyId);
+  const { getMonsterById } = require('../../monsters/thai-ghosts');
+  const thaiEnemyTemplate = getMonsterById(enemyId);
   
   if (!thaiEnemyTemplate) {
     s.log.push(`QA: Enemy ${enemyId} not found`);

@@ -2,7 +2,7 @@
 
 import type { GameState } from './types';
 import type { MinionData } from './types_extended';
-import { THAI_MINIONS } from './thai_enemy_system';
+import { THAI_MINIONS } from './combat/minions/thai-minions';
 import { applyStatusEffect } from './statusEffectsRuntime';
 
 // ===== Global Minion State =====
@@ -77,9 +77,8 @@ export function summonMinion(
 function getEnemyMaxMinions(state: GameState): number {
   if (!state.enemy) return 3;
   
-  const { THAI_ENEMIES } = require('./thai_enemy_system');
-  const enemyData = THAI_ENEMIES[state.enemy.id];
-  return enemyData?.maxMinions || 3;
+  // Default max minions for enemies - can be customized later
+  return 3;
 }
 
 // ===== Minion Management =====

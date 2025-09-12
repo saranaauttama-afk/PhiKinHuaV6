@@ -13,8 +13,8 @@ import blessingsJson from '../data/packs/base/blessings.json';
 import EQUIP_LIST from '../data/packs/base/equipment.json';
 
 // === ใช้ระบบศัตรูไทยใหม่แทน ===
-import { THAI_ENEMIES, getRandomEnemyByTier } from './enemies/thai/data';
-import type { EnhancedEnemyData } from './types_extended';
+import { THAI_GHOST_POOLS, getMonsterById, getRandomMonsterFromTier } from './monsters/thai-ghosts';
+import type { ThaiGhostData } from './monsters/thai-ghosts';
 
 type CardJson = CardData & { starter?: number; inRewards?: boolean; inShop?: boolean };
 type EnemyJson = EnemyState & { tier: 'normal' | 'elite' | 'boss' };
@@ -47,41 +47,37 @@ export const BY_RARITY: Record<Rarity, CardData[]> = {
 export function pickEnemy(rng: RNG, tier: 'normal' | 'elite' | 'boss'): { rng: RNG; enemy: EnemyState } {
   let r = rng;
   
-  // ดึงศัตรูไทยจากระบบใหม่
-  const thaiEnemies = Object.values(THAI_ENEMIES).filter(e => e.tier === tier);
-  const pool = thaiEnemies.length > 0 ? thaiEnemies : Object.values(THAI_ENEMIES);
+  // แปลง tier เป็นรูปแบบใหม่
+  let ghostTier: keyof typeof THAI_GHOST_POOLS = 'T1';
+  if (tier === 'elite') {
+    ghostTier = 'Elite';
+  } else if (tier === 'boss') {
+    ghostTier = 'BossFinal'; // default boss
+  } else {
+    ghostTier = 'T1'; // default normal
+  }
   
+  const pool = THAI_GHOST_POOLS[ghostTier];
   const roll = int(r, 0, pool.length - 1); 
   r = roll.rng;
-  const thaiEnemy = pool[roll.value];
+  const thaiGhost = pool[roll.value];
   
-  // แปลงจาก EnhancedEnemyData เป็น EnemyState (ระบบเก่า)
-  const enemy: EnemyState & { 
-    tier?: string, 
-    behaviors?: any[], 
-    aiPersonality?: string 
-  } = {
-    id: thaiEnemy.id,
-    name: thaiEnemy.name,
-    hp: thaiEnemy.hp,
-    maxHp: thaiEnemy.maxHp,
-    dmg: thaiEnemy.dmg || thaiEnemy.scaling?.dmgPerAct || 2, // Optional fallback for legacy system
-    block: thaiEnemy.block,
-    
-    // สร้าง AI cycle จาก signature cards (backward compatibility)
+  // สร้าง EnemyState แบบเรียบง่าย
+  const enemy: EnemyState = {
+    id: thaiGhost.id,
+    name: thaiGhost.name,
+    hp: thaiGhost.hp,
+    maxHp: thaiGhost.hp,
+    dmg: Math.floor(thaiGhost.hp / 5), // เรียบง่าย: dmg = hp/5
+    block: 0,
     ai: {
-      cycle: thaiEnemy.signatureCards || ['claw', 'guard', 'claw'],
+      cycle: ['claw', 'guard'], // default AI pattern
       index: 0
     },
-    intentCardId: (thaiEnemy.signatureCards && thaiEnemy.signatureCards[0]) || 'claw',
-    
-    // เพิ่มข้อมูลพิเศษจากระบบไทย (สำหรับระบบอื่น ๆ ที่อาจใช้)
-    tier: thaiEnemy.tier,
-    behaviors: thaiEnemy.behaviors,
-    aiPersonality: thaiEnemy.aiPersonality
+    intentCardId: 'claw'
   };
   
-  return { rng: r, enemy: JSON.parse(JSON.stringify(enemy)) };
+  return { rng: r, enemy };
 }
 
 // ----- Blessings (metadata จาก JSON + mapping id → behavior ในโค้ด)

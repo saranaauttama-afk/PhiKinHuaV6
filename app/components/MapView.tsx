@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { GameState, Command } from '../../src/core/types';
+import { getMonsterById } from '../../src/core/monsters/thai-ghosts';
 
 interface MapViewProps {
   state: GameState;
@@ -52,6 +53,27 @@ function MapView({ state, dispatch }: MapViewProps) {
         Page {(state.pages?.pageIndex ?? 0) + 1} / {state.pages?.totalPages ?? 0}
       </Text>
 
+      {/* Fight Progress */}
+      {state.fightCount !== undefined && (
+        <View style={{ marginBottom: 16, padding: 12, borderRadius: 8, backgroundColor: 'rgba(63, 63, 70, 0.5)' }}>
+          <Text style={{ color: 'white', fontWeight: '600', marginBottom: 8 }}>⚔️ Fight Progress</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <Text style={{ color: '#60a5fa' }}>
+              Fights: {state.fightCount}/15
+            </Text>
+            {state.fightCount === 6 && (
+              <Text style={{ color: '#ef4444', fontWeight: 'bold' }}>👑 Next: Mid Boss (Fight 7)</Text>
+            )}
+            {state.fightCount === 14 && (
+              <Text style={{ color: '#ef4444', fontWeight: 'bold' }}>👑 Next: Final Boss (Fight 15)</Text>
+            )}
+            {state.fightCount === 7 && (
+              <Text style={{ color: '#10b981' }}>✅ Part 1 Complete!</Text>
+            )}
+          </View>
+        </View>
+      )}
+
       {/* Pools Status */}
       {state.pages && (
         <View style={{ marginBottom: 16, padding: 12, borderRadius: 8, backgroundColor: 'rgba(63, 63, 70, 0.5)' }}>
@@ -77,26 +99,47 @@ function MapView({ state, dispatch }: MapViewProps) {
             <View style={{ flexDirection: 'column', gap: 12 }}>
               {page.offers.map((o, i) => {
                 const isResolved = page.resolved[i];
-                const offerName = o.kind === 'monster' ? `👹 ${o.tier} Monster` :
-                                o.kind === 'shop_card' ? '🛒 Card Shop' :
-                                o.kind === 'shop_equipment' ? '⚔️ Equipment Shop' :
-                                o.kind === 'shop_remove' ? '🗑️ Remove Cards' :
-                                o.kind === 'shop_upgrade' ? '⬆️ Upgrade Cards' :
-                                o.kind === 'well' ? '🏞️ Mystical Well' :
-                                o.kind === 'healing_shrine' ? '🏥 Healing Shrine' :
-                                o.kind === 'treasure' ? '📦 Treasure Chest' :
-                                o.kind === 'treasure_single' ? '💎 Single Treasure' :
-                                o.kind === 'next_event' ? '📄 Next Page' :
-                                o.kind === 'boss' ? '👑 Boss Fight' : '❓ Unknown';
+                
+                let offerName = '❓ Unknown';
+                if (o.kind === 'monster') {
+                  const monster = getMonsterById(o.enemyId);
+                  offerName = monster ? `👹 ${monster.name}` : `👹 ${o.tier} Monster`;
+                } else if (o.kind === 'boss') {
+                  const boss = getMonsterById(o.enemyId);
+                  offerName = boss ? `👑 ${boss.name}` : '👑 Boss Fight';
+                } else {
+                  offerName = o.kind === 'shop_card' ? '🛒 Card Shop' :
+                              o.kind === 'shop_equipment' ? '⚔️ Equipment Shop' :
+                              o.kind === 'shop_remove' ? '🗑️ Remove Cards' :
+                              o.kind === 'shop_upgrade' ? '⬆️ Upgrade Cards' :
+                              o.kind === 'well' ? '🏞️ Mystical Well' :
+                              o.kind === 'healing_shrine' ? '🏥 Healing Shrine' :
+                              o.kind === 'treasure' ? '📦 Treasure Chest' :
+                              o.kind === 'treasure_single' ? '💎 Single Treasure' :
+                              o.kind === 'next_event' ? '📄 Next Page' : '❓ Unknown';
+                }
+
+                // Check if this is a boss encounter for special styling
+                const isBoss = o.kind === 'boss';
+                const borderColor = isBoss ? 'rgba(239, 68, 68, 0.8)' : 'rgba(255, 255, 255, 0.1)';
+                const backgroundColor = isBoss ? 'rgba(239, 68, 68, 0.1)' : 'rgba(63, 63, 70, 0.3)';
+                const borderWidth = isBoss ? 2 : 1;
 
                 return (
-                  <View key={i} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 8, backgroundColor: 'rgba(63, 63, 70, 0.3)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+                  <View key={i} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 8, backgroundColor, borderWidth, borderColor }}>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 18, fontWeight: '600', color: isResolved ? '#4ade80' : 'white' }}>
                         {offerName} {isResolved ? '✅' : ''}
                       </Text>
                       <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14 }}>
-                        {o.kind === 'monster' && `Face a ${o.tier} enemy`}
+                        {o.kind === 'monster' && (() => {
+                          const monster = getMonsterById(o.enemyId);
+                          return monster?.description || `Face a ${o.tier} enemy`;
+                        })()}
+                        {o.kind === 'boss' && (() => {
+                          const boss = getMonsterById(o.enemyId);
+                          return boss?.description || 'Final challenge';
+                        })()}
                         {o.kind === 'shop_card' && 'Buy new cards'}
                         {o.kind === 'shop_equipment' && 'Buy equipment'}
                         {o.kind === 'shop_remove' && 'Remove unwanted cards'}
@@ -106,7 +149,6 @@ function MapView({ state, dispatch }: MapViewProps) {
                         {o.kind === 'treasure' && 'Free cards (choose 1 of 2)'}
                         {o.kind === 'treasure_single' && 'Free card + random option'}
                         {o.kind === 'next_event' && 'Continue to next page'}
-                        {o.kind === 'boss' && 'Final challenge'}
                       </Text>
                     </View>
                     

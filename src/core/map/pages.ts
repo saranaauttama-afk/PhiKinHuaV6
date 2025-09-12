@@ -3,9 +3,10 @@ import type { RNG } from '../rng';
 import { int } from '../rng';
 import { PAGES_TOTAL, POOL_DEFAULT, WEIGHTS } from '../balance/weights';
 import type { GameState } from '../types';
+import { getTierForFight, getRandomMonsterFromTier, THAI_GHOST_POOLS } from '../monsters/thai-ghosts';
 
 export type PageOffer =
-  | { kind: 'monster', tier: 'normal' | 'elite' }
+  | { kind: 'monster', tier: 'normal' | 'elite', enemyId: string }
   | { kind: 'shop_card'; shopId: string }
   | { kind: 'shop_equipment'; shopId: string }
   | { kind: 'shop_remove'; shopId: string; phase: 1 | 2 }
@@ -15,7 +16,7 @@ export type PageOffer =
   | { kind: 'treasure'; shopId: string }
   | { kind: 'treasure_single'; shopId: string }
   | { kind: 'next_event' } // ไปหน้าถัดไปแบบเหตุการณ์พิเศษ
-  | { kind: 'boss' };
+  | { kind: 'boss', bossType: 'mid' | 'final' | 'secret', enemyId: string };
 
 export type MapStatePages = {
   totalPages: number;
@@ -88,13 +89,69 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
 
   // inject boss เมื่อไม่มีมอนเหลือ
   if (monsLeft <= 0) {
-    offers.push({ kind: 'boss' });
+    // Determine boss type based on progress (simplified logic)
+    const fightIndex = Math.max(1, Math.min(15, mp.pageIndex + 1));
+    let bossType: 'mid' | 'final' | 'secret' = 'final';
+    let ghostTier: keyof typeof THAI_GHOST_POOLS = 'BossFinal';
+    
+    if (fightIndex === 7) {
+      bossType = 'mid';
+      ghostTier = 'BossMid';
+    } else if (fightIndex === 15) {
+      bossType = 'final';
+      ghostTier = 'BossFinal';
+    } else if (fightIndex > 15) {
+      bossType = 'secret';
+      ghostTier = 'SecretBoss';
+    }
+    
+    const boss = getRandomMonsterFromTier(ghostTier);
+    offers.push({ kind: 'boss', bossType, enemyId: boss.id });
   }
 
+  // Track used monsters to avoid duplicates in same page
+  const usedMonsterIds = new Set<string>();
+  
+  // Helper function to create monster offer with specific enemy (avoiding duplicates)
+  const createMonsterOffer = (tier: 'normal' | 'elite', rngRef: { rng: RNG }): PageOffer => {
+    // Calculate fight index based on current progress (simplified - would be more complex in real system)
+    const fightIndex = Math.max(1, Math.min(15, mp.pageIndex + 1));
+    
+    let ghostTier: keyof typeof THAI_GHOST_POOLS;
+    if (tier === 'elite') {
+      ghostTier = 'Elite';
+    } else {
+      ghostTier = getTierForFight(fightIndex);
+      // If getTierForFight returns Elite or Boss, fallback to appropriate normal tier
+      if (ghostTier === 'Elite' || ghostTier.includes('Boss') || ghostTier === 'SecretBoss') {
+        ghostTier = fightIndex <= 2 ? 'T1' : fightIndex <= 4 ? 'T2' : fightIndex <= 6 ? 'T3' : fightIndex <= 9 ? 'T4' : 'T5';
+      }
+    }
+    
+    // Get available monsters (excluding already used ones)
+    const availableMonsters = THAI_GHOST_POOLS[ghostTier].filter(m => !usedMonsterIds.has(m.id));
+    
+    // If no available monsters, reset and use all
+    const monstersToChoose = availableMonsters.length > 0 ? availableMonsters : THAI_GHOST_POOLS[ghostTier];
+    
+    // Use deterministic RNG to pick monster
+    const roll = int(rngRef.rng, 0, monstersToChoose.length - 1);
+    rngRef.rng = roll.rng;
+    const monster = monstersToChoose[roll.value];
+    
+    // Mark this monster as used
+    usedMonsterIds.add(monster.id);
+    
+    return { kind: 'monster', tier, enemyId: monster.id };
+  };
+
+  // Create RNG reference for sharing between calls
+  const rngRef = { rng: r };
+  
   // บังคับมีมอนอย่างน้อย 1 ถ้ายังมีมอน
   if (monsLeft > 0) {
-    if (mp.pools.normal > 0) offers.push({ kind: 'monster', tier: 'normal' });
-    else if (allowElite)     offers.push({ kind: 'monster', tier: 'elite'  });
+    if (mp.pools.normal > 0) offers.push(createMonsterOffer('normal', rngRef));
+    else if (allowElite)     offers.push(createMonsterOffer('elite', rngRef));
   }
 
   // Ensure deletedShops exists (fallback for existing saves) - MUST BE FIRST
@@ -110,9 +167,9 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
     return `${part}_${pageNum}_${slot}_${type}`;
   };
 
-  // สร้าง candidate ตาม pool+weight with static IDs
-  if (mp.pools.normal > 0)        cand.push({ offer: { kind: 'monster', tier: 'normal' }, w: WEIGHTS.monsterNormal });
-  if (allowElite)                 cand.push({ offer: { kind: 'monster', tier: 'elite'  }, w: WEIGHTS.monsterElite });
+  // สร้าง candidate ตาม pool+weight with specific monsters
+  if (mp.pools.normal > 0)        cand.push({ offer: createMonsterOffer('normal', rngRef), w: WEIGHTS.monsterNormal });
+  if (allowElite)                 cand.push({ offer: createMonsterOffer('elite', rngRef), w: WEIGHTS.monsterElite });
   
   // Try to respawn persistent shops from registry (carry-over) with higher priority
   try {
@@ -211,5 +268,8 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
     }
   });
 
+  // Update RNG from reference
+  r = rngRef.rng;
+  
   return { offers, rng: r };
 }

@@ -161,6 +161,9 @@ export type GameState = {
 
   player: PlayerState;
   enemy?: EnemyState;
+  
+  // Fight tracking for boss encounters
+  fightCount?: number; // Total fights completed (for boss timing)
   enemyPiles?: {
     draw: string[];
     hand: string[];

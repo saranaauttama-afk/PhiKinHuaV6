@@ -187,10 +187,25 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       // Set temporary equipment slots during combat  
       s.equipmentTempSlots = 5; // Allow 5 additional equipment during combat
 
-      // เลือกศัตรู + สร้างเด็คศัตรู
-      const res = pickEnemy(rng, offer.tier);
-      rng = res.rng;
-      s.enemy = res.enemy;
+      // ใช้ศัตรูที่กำหนดไว้ใน offer แทนการ random
+      const { getMonsterById } = require('../../monsters/thai-ghosts');
+      const thaiMonster = getMonsterById(offer.enemyId);
+      if (!thaiMonster) {
+        s.log.push(`❌ Monster ${offer.enemyId} not found`);
+        return { state: s, rng };
+      }
+      
+      // สร้าง EnemyState จาก Thai monster data
+      s.enemy = {
+        id: thaiMonster.id,
+        name: thaiMonster.name,
+        hp: thaiMonster.hp,
+        maxHp: thaiMonster.hp,
+        dmg: Math.floor(thaiMonster.hp / 5),
+        block: 0,
+        ai: { cycle: ['claw', 'guard'], index: 0 },
+        intentCardId: 'claw'
+      };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
       
       // Initialize enemy behaviors and minions
@@ -238,9 +253,25 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       // Set temporary equipment slots during combat  
       s.equipmentTempSlots = 5; // Allow 5 additional equipment during combat
 
-      const res = pickEnemy(rng, 'boss');
-      rng = res.rng;
-      s.enemy = res.enemy;
+      // ใช้บอสที่กำหนดไว้ใน offer แทนการ random
+      const { getMonsterById } = require('../../monsters/thai-ghosts');
+      const thaiBoss = getMonsterById(offer.enemyId);
+      if (!thaiBoss) {
+        s.log.push(`❌ Boss ${offer.enemyId} not found`);
+        return { state: s, rng };
+      }
+      
+      // สร้าง EnemyState จาก Thai boss data
+      s.enemy = {
+        id: thaiBoss.id,
+        name: thaiBoss.name,
+        hp: thaiBoss.hp,
+        maxHp: thaiBoss.hp,
+        dmg: Math.floor(thaiBoss.hp / 4), // บอสแรงกว่า
+        block: 0,
+        ai: { cycle: ['claw', 'guard', 'spell'], index: 0 },
+        intentCardId: 'claw'
+      };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
       
       // Initialize boss behaviors and minions
