@@ -1,0 +1,86 @@
+[
+  {
+    "id": "ancestral_blessing",
+    "name": "พรบรรพบุรุษ",
+    "rarity": "Common",
+    "desc": "ฟื้นฟู 1 HP ท้ายเทิร์น (วิญญาณบรรพบุรุษคุ้มครอง)",
+    "tags": ["thai", "healing"]
+  },
+  {
+    "id": "spirit_energy",
+    "name": "พลังวิญญาณ",
+    "rarity": "Uncommon",
+    "desc": "การ์ดใบแรกแต่ละเทิร์น ได้ +1 Energy (ผีช่วยเสริมพลัง)",
+    "tags": ["thai", "energy"]
+  },
+  {
+    "id": "ghost_protection",
+    "name": "ผีป้องกัน",
+    "rarity": "Common",
+    "desc": "เมื่อเล่นการ์ดโจมตี ได้ Block 2 (ผีช่วยป้องกัน)",
+    "tags": ["thai", "defense"]
+  },
+  {
+    "id": "meditation_peace",
+    "name": "สมาธิสงบ",
+    "rarity": "Uncommon",
+    "desc": "ต้นเทิร์น ได้ Block 3 (จิตใจสงบ ผีไม่รบกวน)",
+    "tags": ["thai", "meditation"]
+  },
+  {
+    "id": "herbal_wisdom",
+    "name": "ปัญญาสมุนไพร",
+    "rarity": "Uncommon",
+    "desc": "การ์ด Skill ใบแรกแต่ละเทิร์น ได้ +1 Energy",
+    "tags": ["thai", "wisdom"]
+  },
+  {
+    "id": "sacred_cloth",
+    "name": "ผ้าศักดิ์สิทธิ์",
+    "rarity": "Common",
+    "desc": "ท้ายเทิร์น ได้ Block 1 (ผ้าเย็นป้องกัน)",
+    "tags": ["thai", "defense"]
+  },
+  {
+    "id": "life_steal_spirit",
+    "name": "ดูดพลังชีวิต",
+    "rarity": "Uncommon",
+    "desc": "เมื่อเล่นการ์ดโจมตี ฟื้นฟู 1 HP (ดูดวิญญาณศัตรู)",
+    "tags": ["thai", "vampire"]
+  },
+  {
+    "id": "bamboo_dart_power",
+    "name": "พลังปาไผ่",
+    "rarity": "Common",
+    "desc": "การ์ดโจมตีใบแรกแต่ละเทิร์น ได้ +1 Energy",
+    "tags": ["thai", "attack"]
+  },
+  {
+    "id": "ritual_shield",
+    "name": "โล่พิธีกรรม",
+    "rarity": "Common",
+    "desc": "เมื่อเล่นการ์ด Skill ได้ Block 1 (พิธีกรรมป้องกัน)",
+    "tags": ["thai", "ritual"]
+  },
+  {
+    "id": "free_card_energy",
+    "name": "พลังการ์ดฟรี",
+    "rarity": "Rare",
+    "desc": "การ์ดฟรี (0 cost) ใบแรกแต่ละเทิร์น คืน +1 Energy",
+    "tags": ["thai", "special"]
+  },
+  {
+    "id": "luang_pu_protection",
+    "name": "เครื่องรางหลวงปู่",
+    "rarity": "Rare",
+    "desc": "ลดดาเมจที่รับ 1 แต้ม (เครื่องรางศักดิ์สิทธิ์)",
+    "tags": ["thai", "protection"]
+  },
+  {
+    "id": "naga_blessing",
+    "name": "พรพญานาค",
+    "rarity": "Legendary",
+    "desc": "ต้นเทิร์น จั่วการ์ด 1 ใบ และได้ Energy +1 (พรจากพญานาค)",
+    "tags": ["thai", "naga", "legendary"]
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "PhiKinHua",
+    "slug": "PhiKinHua",
+    "scheme": "phikinhua",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-router"],
+    "extra": { "router": { "origin": false } }
+  }
+}

@@ -1,0 +1,56 @@
+// src/core/balance/weights.ts
+export const ENABLE_PAGES = true;        // เปิดถาวร (ตอนนี้ปิดไว้ เผื่อยังใช้ UI เดิม)
+export const PAGES_TOTAL = 16;
+// === Card Shop size rule ===
+// จำกัดจำนวนการ์ดที่ร้านแสดง = 3 เพื่อให้เลือกเร็ว กระชับ
+export const SHOP_STOCK_SIZE = 3;
+export const SHOP_POWER_BIAS = 1.15;
+
+export const POOL_DEFAULT = {
+  normal: 9,
+  elite: 3,
+  shopCard: 4,
+  shopEquipment: 2,
+  shopRemove1: 1, // Phase 1: early game
+  shopRemove2: 1, // Phase 2: late game (after phase 1 deleted)
+  shopUpgrade1: 1, // Phase 1: early game
+  shopUpgrade2: 1, // Phase 2: late game (after phase 1 deleted)
+  wells: 2,
+  healingShrine: 2,
+  treasure: 3, // Free card treasures per part
+  treasureSingle: 2, // Single card treasure with random option
+  nextEvent: 2, // next_page แบบ event พิเศษ
+};
+
+export const WEIGHTS = {
+  monsterNormal: 5,
+  monsterElite: 2,
+  shopCard: 3,
+  shopEquipment: 2,
+  shopRemove1: 2,
+  shopRemove2: 2,
+  shopUpgrade1: 2,
+  shopUpgrade2: 2,
+  well: 1,
+  healingShrine: 2,
+  treasure: 2, // Medium chance for treasure chest
+  treasureSingle: 2, // Medium chance for single treasure
+  nextEvent: 1,
+  boss: 10, // ใช้เมื่อถึงเวลา spawn บอส (inject)
+};
+
+// ===== Pages / MTOM-style =====
+export const PAGES_OFFERS_PER_PAGE = 3;
+
+// จำนวนมอนที่ต้องสู้ทั้งรัน (normal ก่อน, หมดแล้วค่อยปล่อย elite)
+export const RUN_NORMAL_MONSTERS = 9;
+export const RUN_ELITE_MONSTERS  = 3;
+
+// โอกาสใส่ next_event เป็น “ช่องทางลัด” บางหน้า (0..1)
+export const NEXT_EVENT_RATE = 0.25;
+
+// === Page Budget / Split Rules (high-level) ===
+// สัดส่วน encounter ต่อหน้า ก่อนบังคับเปลี่ยนหน้า
+export const PAGE_MIN_BEFORE_SPLIT = 3;   // soft guideline
+export const PAGE_FORCE_SPLIT_AT   = 7;   // hard cap per page
+

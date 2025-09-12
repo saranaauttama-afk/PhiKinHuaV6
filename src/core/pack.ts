@@ -1,0 +1,133 @@
+// src/core/pack.ts
+import type { CardData, Rarity, EnemyState, BlessingDef, EquipmentData } from './types';
+import type { RNG } from './rng';
+import { int } from './rng';
+
+// เปลี่ยนแพ็กโดยแก้ค่าเดียว (อนาคต: อ่านจาก config ก็ได้)
+export const ACTIVE_PACK = 'base' as const;
+
+// --- JSON imports (ต้องเปิด resolveJsonModule ใน tsconfig)
+import cardsJson from '../data/packs/base/cards.json';
+// import enemiesJson from '../data/packs/base/enemies.json'; // เปลี่ยนใช้ระบบไทยใหม่
+import blessingsJson from '../data/packs/base/blessings.json';
+import EQUIP_LIST from '../data/packs/base/equipment.json';
+
+// === ใช้ระบบศัตรูไทยใหม่แทน ===
+import { THAI_ENEMIES, getRandomEnemyByTier } from './enemies/thai/data';
+import type { EnhancedEnemyData } from './types_extended';
+
+type CardJson = CardData & { starter?: number; inRewards?: boolean; inShop?: boolean };
+type EnemyJson = EnemyState & { tier: 'normal' | 'elite' | 'boss' };
+type BlessingMeta = { id: string; name: string; rarity: Rarity; desc?: string; oncePerTurn?: boolean };
+
+const CARD_LIST: CardJson[] = cardsJson as any;
+// const ENEMY_LIST: EnemyJson[] = enemiesJson as any; // ใช้ระบบไทยแทน
+const BLESSING_LIST: BlessingMeta[] = blessingsJson as any;
+
+// การ์ดทั้งหมด (ลอกเฉพาะฟิลด์ runtime)
+export const ALL_CARDS: CardData[] = CARD_LIST.map(({ starter, inRewards, inShop, ...c }) => c);
+
+// เด็คเริ่มจากค่า "starter" ใน JSON (จำนวนซ้ำ)
+export const START_DECK: CardData[] = CARD_LIST.flatMap(c =>
+  new Array(c.starter ?? 0).fill(0).map(() => {
+    const { starter, inRewards, inShop, ...rest } = c;
+    return { ...rest } as CardData;
+  })
+);
+
+// พูลตาม rarity (ใช้ทำ rewards/shop)
+export const BY_RARITY: Record<Rarity, CardData[]> = {
+  Common: ALL_CARDS.filter(c => c.rarity === 'Common' && (CARD_LIST.find(x => x.id === c.id)?.inRewards ?? true)),
+  Uncommon: ALL_CARDS.filter(c => c.rarity === 'Uncommon' && (CARD_LIST.find(x => x.id === c.id)?.inRewards ?? true)),
+  Rare: ALL_CARDS.filter(c => c.rarity === 'Rare' && (CARD_LIST.find(x => x.id === c.id)?.inRewards ?? true)),
+  Legendary: ALL_CARDS.filter(c => c.rarity === 'Legendary' && (CARD_LIST.find(x => x.id === c.id)?.inRewards ?? true)),
+};
+
+// สุ่มศัตรูไทยตาม tier ด้วย RNG (deterministic) - ใช้ระบบใหม่
+export function pickEnemy(rng: RNG, tier: 'normal' | 'elite' | 'boss'): { rng: RNG; enemy: EnemyState } {
+  let r = rng;
+  
+  // ดึงศัตรูไทยจากระบบใหม่
+  const thaiEnemies = Object.values(THAI_ENEMIES).filter(e => e.tier === tier);
+  const pool = thaiEnemies.length > 0 ? thaiEnemies : Object.values(THAI_ENEMIES);
+  
+  const roll = int(r, 0, pool.length - 1); 
+  r = roll.rng;
+  const thaiEnemy = pool[roll.value];
+  
+  // แปลงจาก EnhancedEnemyData เป็น EnemyState (ระบบเก่า)
+  const enemy: EnemyState & { 
+    tier?: string, 
+    behaviors?: any[], 
+    aiPersonality?: string 
+  } = {
+    id: thaiEnemy.id,
+    name: thaiEnemy.name,
+    hp: thaiEnemy.hp,
+    maxHp: thaiEnemy.maxHp,
+    dmg: thaiEnemy.dmg || thaiEnemy.scaling?.dmgPerAct || 2, // Optional fallback for legacy system
+    block: thaiEnemy.block,
+    
+    // สร้าง AI cycle จาก signature cards (backward compatibility)
+    ai: {
+      cycle: thaiEnemy.signatureCards || ['claw', 'guard', 'claw'],
+      index: 0
+    },
+    intentCardId: (thaiEnemy.signatureCards && thaiEnemy.signatureCards[0]) || 'claw',
+    
+    // เพิ่มข้อมูลพิเศษจากระบบไทย (สำหรับระบบอื่น ๆ ที่อาจใช้)
+    tier: thaiEnemy.tier,
+    behaviors: thaiEnemy.behaviors,
+    aiPersonality: thaiEnemy.aiPersonality
+  };
+  
+  return { rng: r, enemy: JSON.parse(JSON.stringify(enemy)) };
+}
+
+// ----- Blessings (metadata จาก JSON + mapping id → behavior ในโค้ด)
+export function materializeBlessing(id: string): BlessingDef | undefined {
+  const meta = BLESSING_LIST.find(b => b.id === id);
+  if (!meta) return undefined;
+  switch (id) {
+    case 'bl_energy_first':
+      return { ...meta, oncePerTurn: true, on_card_played: (tc) => { tc.state.player.energy += 1; } };
+    case 'bl_start_block':
+      return { ...meta, on_turn_start: (tc) => { tc.state.player.block += 3; } };
+    case 'bl_attack_block':
+      return { ...meta, on_card_played: { tag: 'attack', once_per_turn: false, effects: [(tc) => { tc.state.player.block += 2; }] } };
+    case 'bl_end_heal':
+      return { ...meta, on_turn_end: (tc) => { tc.state.player.hp = Math.min(tc.state.player.maxHp, tc.state.player.hp + 1); } };
+    case 'bl_big_energy_first':
+      return { ...meta, oncePerTurn: true, on_card_played: (tc) => { tc.state.player.energy += 2; } };
+    default:
+      return { ...meta }; // meta only (ไม่มี behavior)
+  }
+}
+
+export const BLESSING_POOL: BlessingDef[] =
+  BLESSING_LIST.map(b => materializeBlessing(b.id)).filter((x): x is BlessingDef => !!x);
+
+export const BLESSINGS_BY_RARITY: Record<Rarity, BlessingDef[]> = {
+  Common: BLESSING_POOL.filter(b => b.rarity === 'Common'),
+  Uncommon: BLESSING_POOL.filter(b => b.rarity === 'Uncommon'),
+  Rare: BLESSING_POOL.filter(b => b.rarity === 'Rare'),
+  Legendary: BLESSING_POOL.filter(b => b.rarity === 'Legendary'),
+};
+
+// === Equipment (base pack) ===
+// NOTE: path นี้สัมพันธ์กับไฟล์จริงใน repo: src/data/packs/base/equipment.json
+// pack.ts อยู่ใต้ src/core → ขึ้นหนึ่งชั้นแล้วค่อยเข้า data
+// หากโปรเจกต์คุณตั้ง resolve ต่างไป ให้ปรับ path ให้ตรง
+// @ts-ignore
+
+const EQUIPMENT_BY_ID: Record<string, EquipmentData> =
+  Object.fromEntries((EQUIP_LIST as EquipmentData[]).map(e => [e.id, e]));
+
+export function getEquipmentById(id: string): EquipmentData | undefined {
+  const e = EQUIPMENT_BY_ID[id];
+  return e ? JSON.parse(JSON.stringify(e)) : undefined;
+}
+
+export function listAllEquipment(): EquipmentData[] {
+  return JSON.parse(JSON.stringify(EQUIP_LIST as EquipmentData[]));
+}
