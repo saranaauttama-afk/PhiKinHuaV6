@@ -81,8 +81,8 @@ export type EquipmentData = {
 };
 
 export type Phase =
-  | 'menu' | 'map' | 'combat' | 'victory' | 'defeat'
-  | 'event' | 'shop' | 'levelup' | 'starter'; // ← ตัด 'reward' ออก
+  | 'start' | 'menu' | 'map' | 'combat' | 'victory' | 'defeat'
+  | 'event' | 'shop' | 'levelup' | 'starter'; // ← เพิ่ม 'start' สำหรับหน้าแรก
 
 export type Bucket =
   | 'max_hp' | 'max_energy' | 'max_hand'
@@ -230,6 +230,7 @@ export type GameState = {
 // ===== Commands =====
 export type Command =
   // Run / Flow
+  | { type: 'EnterMenu' }
   | { type: 'NewRun'; seed: string }
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }

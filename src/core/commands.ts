@@ -15,7 +15,7 @@ const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
 export function baseNewState(seed: string): GameState {
   return {
     seed,
-    phase: 'menu',
+    phase: 'start',
     turn: 0,
     player: {
       hp: START_HP, maxHp: START_HP, block: 0,

@@ -18,6 +18,7 @@ type Handler<T extends Command['type']> =
 // Pages-only: บังคับใช้ handler ฝั่ง pages เสมอ
 const H: { [K in Command['type']]?: Handler<K> } = {
   // Run lifecycle
+  EnterMenu: (s, cmd, r) => ({ state: { ...s, phase: 'menu' }, rng: r }),
   NewRun: run.newRun,
   ChooseStarterBlessing: run.chooseStarter,
 
