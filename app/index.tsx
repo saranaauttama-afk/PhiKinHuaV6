@@ -45,7 +45,7 @@ type Store = {
 
 const makeEmptyState = (): GameState => ({
   seed: '',
-  phase: 'menu',
+  phase: 'start',
   turn: 0,
   player: {
     hp: START_HP, maxHp: START_HP, block: 0,
@@ -111,7 +111,7 @@ export default function Home() {
   const [showSaveLoad, setShowSaveLoad] = useState(false);
   const [saveLoadError, setSaveLoadError] = useState<string>('');
   const [showDebugTools, setShowDebugTools] = useState(false);
-  const [showBlessingDialog, setShowBlessingDialog] = useState(true);
+  const [showBlessingDialog, setShowBlessingDialog] = useState(false);
   const [selectedBlessing, setSelectedBlessing] = useState<string | null>(null);
 
   let [fontsLoaded] = useFonts({
@@ -129,7 +129,11 @@ export default function Home() {
 
   // Show StartPage when phase is 'start'
   if (state.phase === 'start') {
-    return <StartPage onStartGame={() => dispatch({ type: 'EnterMenu' })} />;
+    return <StartPage onStartGame={() => {
+      dispatch({ type: 'EnterMenu' });
+      // แสดง BlessingDialog หลังจากเข้าหน้า index แล้ว
+      setTimeout(() => setShowBlessingDialog(true), 100);
+    }} />;
   }
 
   return (

@@ -211,7 +211,7 @@ export default function BlessingDialog({ visible, onClose, onReceiveBlessing, ch
                 textAlign: 'center',
               }}
             >
-              รับพรจ้ะ
+              เชิญรับพร ก่อนจ้ะ
             </Text>
           </ImageBackground>
         </Pressable>

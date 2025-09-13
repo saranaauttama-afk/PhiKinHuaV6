@@ -50,29 +50,36 @@ function StartPage({ onStartGame }: StartPageProps) {
         {/* Start Game Button */}
         <View style={{
           zIndex: 1,
-          width: '50%',
-          maxWidth: 300,
-          top:150
+          top: 150,
+          alignItems: 'center',
         }}>
           <Pressable
             onPress={onStartGame}
-            style={{ 
-              paddingHorizontal: 16, 
-              paddingVertical: 16, 
-              borderRadius: 16, 
-              backgroundColor: 'rgba(245, 158, 11, 0.15)', 
-              borderWidth: 1, 
-              // borderColor: 'rgba(30, 64, 175, 0.8)'
-            }}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.8 : 1,
+            })}
           >
-            <Text style={{
-              fontSize: 16,
-              color: 'rgba(255, 255, 255, 0.6)',
-              textAlign: 'center',
-              fontFamily: 'ChakraPetch_400Regular'
-            }}>
-              เข้าสู่เกมส์
-            </Text>
+            <ImageBackground
+              source={require('../../assets/images/btnBg.png')}
+              style={{
+                width: 200,
+                height: 120,
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity:0.8
+              }}
+              resizeMode="stretch"
+            >
+              <Text style={{
+                fontSize: 16,
+                color: 'white',
+                textAlign: 'center',
+                fontFamily: 'ChakraPetch_400Regular',
+                opacity:0.6
+              }}>
+                เข้าสู่เกมส์
+              </Text>
+            </ImageBackground>
           </Pressable>
         </View>
 
