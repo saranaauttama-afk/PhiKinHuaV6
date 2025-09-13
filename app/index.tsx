@@ -2,7 +2,7 @@
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View, ImageBackground } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View, ImageBackground, Image } from 'react-native';
 import { useFonts, Prompt_400Regular, Prompt_600SemiBold, Prompt_700Bold } from '@expo-google-fonts/prompt';
 import { ChakraPetch_400Regular, ChakraPetch_600SemiBold, ChakraPetch_700Bold } from '@expo-google-fonts/chakra-petch';
 import { create } from 'zustand';
@@ -21,6 +21,7 @@ import ShopView from './components/ShopView';
 import MapView from './components/MapView';
 import DeckView from './components/DeckView';
 import EventView from './components/EventView';
+import BlessingDialog from './components/BlessingDialog';
 
 // Commands that should trigger auto-save
 function shouldAutoSave(cmdType: Command['type']): boolean {
@@ -110,6 +111,8 @@ export default function Home() {
   const [showSaveLoad, setShowSaveLoad] = useState(false);
   const [saveLoadError, setSaveLoadError] = useState<string>('');
   const [showDebugTools, setShowDebugTools] = useState(false);
+  const [showBlessingDialog, setShowBlessingDialog] = useState(true);
+  const [selectedBlessing, setSelectedBlessing] = useState<string | null>(null);
 
   let [fontsLoaded] = useFonts({
     Prompt_400Regular,
@@ -149,6 +152,24 @@ export default function Home() {
           <MapView state={state} dispatch={dispatch} />
           <DeckView state={state} dispatch={dispatch} />
           <EventView state={state} dispatch={dispatch} />
+
+          {/* Blessing Icon - Above Player Status */}
+          {selectedBlessing && (
+            <Image
+              source={selectedBlessing === 'regen_1' 
+                ? require('../assets/imgBlessing/regen_1.png')
+                : require('../assets/imgBlessing/start_block_3.png')
+              }
+              style={{
+                position: 'absolute',
+                bottom: 140,
+                left: 20,
+                width: 32,
+                height: 32,
+              }}
+              resizeMode="contain"
+            />
+          )}
 
           {/* Player Status Block - Floating Card */}
           <View style={{
@@ -256,6 +277,16 @@ export default function Home() {
           
         </View>
       </ImageBackground>
+
+      {/* Blessing Dialog */}
+      <BlessingDialog 
+        visible={showBlessingDialog}
+        onClose={() => setShowBlessingDialog(false)}
+        onReceiveBlessing={(blessingId) => {
+          setSelectedBlessing(blessingId);
+          setShowBlessingDialog(false);
+        }}
+      />
     </View>
   );
 }
