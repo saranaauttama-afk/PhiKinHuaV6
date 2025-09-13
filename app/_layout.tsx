@@ -2,8 +2,12 @@ import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { Stack } from 'expo-router';
 import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function RootLayout() {
-  // ไม่ใส่ className หรือ style ใดๆ ที่นี่ เพื่อตัดสาเหตุ fragment style
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </GestureHandlerRootView>
+  );
 }

@@ -8,6 +8,7 @@ import { resetBlessingTurnFlags } from './blessingRuntime';
 import { enemyCardById } from './pack_enemy_cards';
 import type { EnemyCard } from './types';
 import { resetEquipmentTurnFlags, runEquipmentTurnHook } from './equipmentRuntime';
+import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
 
 // NOTE: We keep state updates pure by working on shallow copies of containers.
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -359,4 +360,54 @@ export function endEnemyTurn(state: GameState) {
   // Run standard enemy turn
   const { runEnemyTurn } = require('./engine/handlers/enemy');
   runEnemyTurn(state);
+}
+
+// ===== START COMBAT =====
+export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
+  // Find monster from Thai ghost pools
+  const allMonsters = [
+    ...THAI_GHOST_POOLS.T1,
+    ...THAI_GHOST_POOLS.T2,
+    ...THAI_GHOST_POOLS.T3,
+    ...THAI_GHOST_POOLS.T4,
+    ...THAI_GHOST_POOLS.T5,
+    ...THAI_GHOST_POOLS.Elite,
+    ...THAI_GHOST_POOLS.BossMid,
+    ...THAI_GHOST_POOLS.BossFinal,
+    ...THAI_GHOST_POOLS.SecretBoss
+  ];
+
+  const monsterData = allMonsters.find(m => m.id === monsterId);
+  if (!monsterData) {
+    console.error(`Monster not found: ${monsterId}`);
+    return;
+  }
+
+  // Initialize combat state
+  state.phase = 'combat';
+  state.enemy = {
+    id: monsterData.id,
+    name: monsterData.name,
+    hp: monsterData.hp,
+    maxHp: monsterData.hp,
+    dmg: 5, // Default damage
+    block: 0,
+    ai: { cycle: ['attack', 'defend'], index: 0 }, // Simple AI cycle
+    intentCardId: null,
+    maxEnergy: 3,
+    handSize: 0,
+    equipped: [],
+    statusEffects: []
+  };
+
+  // Initialize enemy deck and hand
+  state.enemyPiles = { draw: [], hand: [], discard: [] };
+  state.enemyEnergy = 0;
+
+  // Build player deck (only if RNG provided)
+  if (rng) {
+    buildAndShuffleDeck(state, rng);
+  }
+
+  console.log(`Combat started against ${monsterData.name} (HP: ${monsterData.hp})`);
 }

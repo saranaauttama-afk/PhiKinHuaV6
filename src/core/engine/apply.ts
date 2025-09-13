@@ -23,7 +23,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   ChooseStarterBlessing: run.chooseStarter,
 
   // Combat
-  // StartCombat: combat.start, // (ไม่ใช้ใน pages mode)
+  StartCombat: combat.start,
   PlayCard: combat.play,
   EndTurn: combat.endTurn,
 

@@ -2,7 +2,7 @@
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { pickEnemy } from '../../pack';
-import { buildAndShuffleDeck, drawUpTo, applyCardEffect, endEnemyTurn, isVictory, isDefeat, startPlayerTurn } from '../../commands';
+import { buildAndShuffleDeck, drawUpTo, applyCardEffect, endEnemyTurn, isVictory, isDefeat, startPlayerTurn, startCombat } from '../../commands';
 import { resetBlessingTurnFlags, runBlessingsTurnHook, getCardPlayedFns } from '../../blessingRuntime';
 import { START_ENERGY } from '../../balance/core';
 import { grantExpAndQueueLevelUp } from '../shared';
@@ -215,4 +215,11 @@ runEquipmentTurnHook(s, 'on_turn_end', 'player');
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
   return { state: s, rng: r };
+}
+
+export function start(s: GameState, cmd: Extract<Command, { type: 'StartCombat' }>, r: RNG) {
+  startCombat(s, cmd.monsterId, r);
+  // Start first player turn
+  const result = startPlayerTurn(s, r);
+  return result;
 }

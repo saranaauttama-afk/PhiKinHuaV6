@@ -130,13 +130,7 @@ export default function Home() {
     ChakraPetch_700Bold,
   });
 
-  // Redirect to battle for testing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push('/battle');
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+  // Auto redirect removed - user must click encounter to enter battle
 
   if (!fontsLoaded) {
     return null;

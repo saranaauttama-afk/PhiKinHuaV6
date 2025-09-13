@@ -235,7 +235,8 @@ export type Command =
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }
 
-  // Combat (no StartCombat)
+  // Combat
+  | { type: 'StartCombat'; monsterId: string }
   | { type: 'PlayCard'; index: number }
   | { type: 'EndTurn' }
 
