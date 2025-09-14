@@ -52,8 +52,17 @@ export type EnemyState = {
   dmg: number;
   block: number;
   // ↓ เพิ่มใหม่ (E1)
-  ai?: { cycle: string[]; index: number }; // อ้างถึง enemy card id
-  intentCardId?: string;                    // ใบที่จะเล่น "เทิร์นนี้"
+  ai?: {
+    cycle: string[];
+    index: number;
+    deck?: {
+      lists?: Array<{ id: string; weight: number; cards: string[] }>;
+      pool?: { allowOwners: string[]; include?: Array<{ id: string; w: number }>; minAttack?: number; minBlock?: number };
+      handSize?: number;
+      maxEnergy?: number;
+    };
+  }; // อ้างถึง enemy card id
+  intentCardId?: string | null;             // ใบที่จะเล่น "เทิร์นนี้"
   maxEnergy?: number;  // ค่าพลังงานสูงสุดของศัตรู (ต่อเทิร์น)
   handSize?: number;   // จำนวนการ์ดที่จั่วตอนเริ่มเทิร์นศัตรู
   equipped?: EquipmentData[];  // ศัตรูก็มี equipment ได้เหมือนกัน
@@ -238,6 +247,9 @@ export type Command =
   // Combat
   | { type: 'StartCombat'; monsterId: string }
   | { type: 'PlayCard'; index: number }
+  | { type: 'EnemyPlayCard'; cardIndex: number }
+  | { type: 'StartMonsterTurn' }
+  | { type: 'StartPlayerTurn' }
   | { type: 'EndTurn' }
 
   // Level Up

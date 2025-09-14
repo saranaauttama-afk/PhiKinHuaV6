@@ -25,6 +25,9 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   // Combat
   StartCombat: combat.start,
   PlayCard: combat.play,
+  EnemyPlayCard: combat.enemyPlayCard,
+  StartMonsterTurn: combat.startMonsterTurn,
+  StartPlayerTurn: combat.startPlayerTurnHandler,
   EndTurn: combat.endTurn,
 
   // Node completion (victory/levelup/shop/event) → pages handler

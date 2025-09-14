@@ -93,7 +93,6 @@ export function buildAndShuffleEnemyDeck(s: GameState, r: RNG) {
   return { state: s, rng: sh.rng };
 }
 
-// (เก็บเผื่ออนาคต: สร้างเด็คจาก config แบบ lists เท่านั้น ณ ตอนนี้)
 function buildDeckFromConfig(_enemyId: string, cfg: DeckConfig, r: RNG): { ids: string[]; rng: RNG; handSize?: number; maxEnergy?: number } {
   let rr = r;
   if ('lists' in cfg && cfg.lists?.length) {
@@ -104,6 +103,60 @@ function buildDeckFromConfig(_enemyId: string, cfg: DeckConfig, r: RNG): { ids: 
     const ids = pick.cards.slice(0, ENEMY_DECK_SIZE);
     return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
   }
+
+  // Handle pool config
+  if ('pool' in cfg && cfg.pool?.allowOwners) {
+    const { allowOwners, minAttack, minBlock } = cfg.pool;
+
+    console.log(`🔍 Building deck with pool config for ${_enemyId}:`);
+    console.log(`🔍 allowOwners: ${JSON.stringify(allowOwners)}`);
+    console.log(`🔍 minAttack: ${minAttack}, minBlock: ${minBlock}`);
+
+    // Get all available enemy cards
+    const allCards: string[] = [];
+    try {
+      const pack = require('../../pack_enemy_cards');
+      const enemyCards = pack.enemyCards || pack.default || [];
+
+      console.log(`🔍 Total enemy cards loaded: ${enemyCards.length}`);
+
+      for (const card of enemyCards) {
+        const ownerMatch = allowOwners.includes(card.owner || 'global');
+        const attackMatch = !minAttack || (card.dmg && card.dmg >= minAttack);
+        const blockMatch = !minBlock || (card.block && card.block >= minBlock);
+
+        console.log(`🔍 Card ${card.id}: owner=${card.owner}, ownerMatch=${ownerMatch}, dmg=${card.dmg}, attackMatch=${attackMatch}, block=${card.block}, blockMatch=${blockMatch}`);
+
+        // Filter by owner
+        if (!ownerMatch) continue;
+
+        // Filter by minimum stats if specified
+        if (minAttack && (!card.dmg || card.dmg < minAttack)) continue;
+        if (minBlock && (!card.block || card.block < minBlock)) continue;
+
+        allCards.push(card.id);
+        console.log(`✅ Added card: ${card.id}`);
+      }
+    } catch (error) {
+      console.error('Error loading enemy cards for pool:', error);
+    }
+
+    console.log(`🔍 Final card pool: ${JSON.stringify(allCards)}`);
+
+    if (allCards.length > 0) {
+      const ids: string[] = [];
+      for (let i = 0; i < ENEMY_DECK_SIZE; i++) {
+        const ro = int(rr, 0, allCards.length - 1);
+        rr = ro.rng;
+        ids.push(allCards[ro.value]);
+      }
+      console.log(`✅ Built deck with ${ids.length} cards: ${JSON.stringify(ids)}`);
+      return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
+    } else {
+      console.log(`⚠️ No cards found in pool, falling back to cycle`);
+    }
+  }
+
   // fallback: วน cycle เริ่มต้น (กันเด็คว่าง)
   const ids: string[] = defaultCycleForTier('normal').slice(0, ENEMY_DECK_SIZE);
   return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
@@ -141,7 +194,7 @@ function enemyDrawOne(s: GameState) {
   return true;
 }
 
-function enemyDrawUpToHand(s: GameState) {
+export function enemyDrawUpToHand(s: GameState) {
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] } | undefined;
   if (!piles) return;
   const want = Math.max(0, ((s as any).enemyHandSize ?? ENEMY_HAND_SIZE));
@@ -151,7 +204,7 @@ function enemyDrawUpToHand(s: GameState) {
   }
 }
 
-function enemyPlayCardId(s: GameState, idx: number): boolean {
+export function enemyPlayCardId(s: GameState, idx: number): boolean {
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] } | undefined;
   if (!s.enemy || !piles) {
     s.log.push(`DEBUG: enemyPlayCardId - No enemy or piles`);
@@ -234,8 +287,14 @@ export function runEnemyTurn(s: GameState) {
 
   // เริ่มเทิร์นศัตรู
   s.enemy.block = 0;
-  const baseEnemyEnergy = (s as any).enemyMaxEnergy ?? ENEMY_MAX_ENERGY_NORMAL;
-  (s as any).enemyEnergy = baseEnemyEnergy;
+  // Only set energy if not already set by EndTurn handler
+  if ((s as any).enemyEnergy === undefined || (s as any).enemyEnergy === 0) {
+    const baseEnemyEnergy = (s as any).enemyMaxEnergy ?? ENEMY_MAX_ENERGY_NORMAL;
+    (s as any).enemyEnergy = baseEnemyEnergy;
+    console.log(`🔋 runEnemyTurn: Setting default energy to ${baseEnemyEnergy}`);
+  } else {
+    console.log(`🔋 runEnemyTurn: Keeping existing energy ${(s as any).enemyEnergy}`);
+  }
 
   // จั่วถึงขนาดมือ
   enemyDrawUpToHand(s);

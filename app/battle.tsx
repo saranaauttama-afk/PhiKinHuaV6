@@ -21,10 +21,20 @@ export default function BattlePage() {
   const enemy = gameState.enemy;
   const [hoveredCardId, setHoveredCardId] = React.useState<string | null>(null);
   const [playedCardIds, setPlayedCardIds] = React.useState<string[]>([]);
+  const [monsterPlayingCard, setMonsterPlayingCard] = React.useState<{cardId: string, cardData: any} | null>(null);
+  const [monsterCardAnimation, setMonsterCardAnimation] = React.useState<{cardId: string, phase: 'flip' | 'enlarge' | 'execute'} | null>(null);
+  const [flippedCards, setFlippedCards] = React.useState<Set<string>>(new Set());
+  const [drawingCards, setDrawingCards] = React.useState(false);
+  const [drawnCards, setDrawnCards] = React.useState<string[]>([]);
 
   // Monster floating animation
   const monsterY = useSharedValue(0);
   const monsterX = useSharedValue(0);
+
+  // Monster card animation values
+  const cardFlipRotation = useSharedValue(0);
+  const cardScale = useSharedValue(1);
+  const cardTranslateY = useSharedValue(0);
 
   React.useEffect(() => {
     // Vertical floating animation
@@ -54,8 +64,54 @@ export default function BattlePage() {
     transform: [
       { translateX: monsterX.value },
       { translateY: monsterY.value },
-    ],
+    ] as any,
   }));
+
+  // Monster card animation style
+  const monsterCardAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { rotateY: `${cardFlipRotation.value}deg` },
+      { scale: cardScale.value },
+      { translateY: cardTranslateY.value },
+    ] as any,
+  }));
+
+  // Function to simulate monster card play animation
+  const playMonsterCardAnimation = React.useCallback(async (cardId: string, cardData: any) => {
+    console.log(`🎯 Starting animation for monster card: ${cardData?.name || cardData?.id}`);
+
+    // Phase 1: Flip card (face-down to face-up) - mark as flipped
+    setMonsterCardAnimation({ cardId, phase: 'flip' });
+    setFlippedCards(prev => new Set([...prev, cardId]));
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Phase 2: Enlarge and move center
+    setMonsterCardAnimation({ cardId, phase: 'enlarge' });
+    setMonsterPlayingCard({ cardId: cardData.id, cardData });
+
+    cardScale.value = withTiming(2.5, { duration: 600 });
+    cardTranslateY.value = withTiming(-100, { duration: 600 });
+
+    await new Promise(resolve => setTimeout(resolve, 700));
+
+    // Phase 3: Execute card effect
+    setMonsterCardAnimation({ cardId, phase: 'execute' });
+    console.log(`🎯 Executing effect for monster card: ${cardData?.name || cardData?.id}`);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Phase 4: Reset and remove
+    cardScale.value = withTiming(0, { duration: 300 });
+
+    setTimeout(() => {
+      setMonsterPlayingCard(null);
+      setMonsterCardAnimation(null);
+      // Keep the card flipped after animation
+    }, 300);
+  }, [cardScale, cardTranslateY]);
+
+  // Removed old startMonsterTurn - now handled directly in EndTurn
 
   const searchParams = useLocalSearchParams();
   const {
@@ -76,9 +132,108 @@ export default function BattlePage() {
   // Start combat when entering battle page
   React.useEffect(() => {
     if (monsterId && !enemy && gameState.phase !== 'combat') {
+      // Reset drawing states for new combat
+      setDrawingCards(false);
+      setDrawnCards([]);
+      setFlippedCards(new Set());
+      setMonsterCardAnimation(null);
+      setMonsterPlayingCard(null);
+
       dispatch({ type: 'StartCombat', monsterId: monsterId as string });
     }
   }, [monsterId, enemy, gameState.phase, dispatch]);
+
+  // Removed auto-trigger - monster turn will be triggered manually via StartMonsterTurn command
+
+  // Monitor monster sequential turn and play cards
+  const currentCardIndexRef = React.useRef(0);
+
+  // Draw cards animation first, then play cards
+  React.useEffect(() => {
+    const monsterSequentialTurn = (gameState as any).monsterSequentialTurn;
+
+    if (monsterSequentialTurn?.active && monsterSequentialTurn?.queue?.length > 0) {
+      console.log(`🎬 Starting monster turn with ${monsterSequentialTurn.queue.length} cards`);
+      console.log(`🎬 Queue: ${monsterSequentialTurn.queue.join(', ')}`);
+
+      // Reset states
+      currentCardIndexRef.current = 0;
+      setFlippedCards(new Set());
+      setDrawnCards([]);
+      setDrawingCards(true);
+
+      // Draw cards animation (like player)
+      const drawCardsWithAnimation = async () => {
+        console.log(`🎴 Drawing ${monsterSequentialTurn.queue.length} cards...`);
+
+        for (let i = 0; i < monsterSequentialTurn.queue.length; i++) {
+          const cardId = monsterSequentialTurn.queue[i];
+          console.log(`🎴 Drawing card ${i + 1}/${monsterSequentialTurn.queue.length}: ${cardId}`);
+
+          setDrawnCards(prev => [...prev, cardId]);
+          await new Promise(resolve => setTimeout(resolve, 600)); // 0.6s per card draw
+        }
+
+        console.log(`🎴 All cards drawn! Waiting before starting to play...`);
+        setDrawingCards(false);
+
+        // Wait a bit for player to see the drawn cards
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        console.log(`🎬 Starting to play cards sequentially`);
+        startPlayingCards();
+      };
+
+      const startPlayingCards = () => {
+        const playNextCard = () => {
+          const currentIndex = currentCardIndexRef.current;
+
+          if (currentIndex < monsterSequentialTurn.queue.length) {
+            const currentCardId = monsterSequentialTurn.queue[currentIndex];
+            console.log(`⏰ Playing card ${currentIndex}: ${currentCardId}`);
+
+            // Animate the card
+            const { enemyCardById } = require('../src/core/pack_enemy_cards');
+            const cardData = enemyCardById(currentCardId);
+            playMonsterCardAnimation(currentCardId, cardData);
+
+            // Execute the card after animation delay
+            setTimeout(() => {
+              dispatch({ type: 'EnemyPlayCard', cardIndex: currentIndex });
+            }, 1000);
+
+            // Move to next card
+            currentCardIndexRef.current++;
+          }
+        };
+
+        // Play first card immediately
+        playNextCard();
+
+        // Set up interval for remaining cards
+        const interval = setInterval(() => {
+          if (currentCardIndexRef.current < monsterSequentialTurn.queue.length) {
+            playNextCard();
+          } else {
+            clearInterval(interval);
+          }
+        }, 2500); // Slightly longer delay between cards
+
+        // Store interval in ref for cleanup
+        (currentCardIndexRef as any).interval = interval;
+      };
+
+      // Start the sequence
+      drawCardsWithAnimation();
+
+      // Cleanup function
+      return () => {
+        if ((currentCardIndexRef as any).interval) {
+          clearInterval((currentCardIndexRef as any).interval);
+        }
+      };
+    }
+  }, [(gameState as any).monsterSequentialTurn?.timer]);
 
   // Calculate deck size (total cards in all piles + master deck)
   const deckSize = gameState.masterDeck.length +
@@ -221,6 +376,244 @@ export default function BattlePage() {
             }}>
               {enemy ? `${enemy.hp}/${enemy.maxHp}` : (monsterHp ? `${monsterHp}/20` : `20/20`)}
             </Text>
+          </View>
+
+          {/* Monster Cards Area */}
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 10,
+            height: 60,
+          }}>
+            {/* Show monster's hand cards - use MonsterCardSystem if available */}
+            {(() => {
+              // Use enemyPiles system (works for all monsters)
+              if (gameState.enemyPiles?.hand) {
+                const enemyHand = gameState.enemyPiles.hand;
+                const { enemyCardById } = require('../src/core/pack_enemy_cards');
+
+                // Filter cards based on drawing state
+                const displayCards = (drawingCards || drawnCards.length > 0) ?
+                  enemyHand.filter(cardId => drawnCards.includes(cardId)) :
+                  // Don't show any cards initially until first draw animation starts
+                  gameState.phase === 'combat' && !(gameState as any).monsterSequentialTurn ? [] : enemyHand;
+
+                return displayCards.map((cardId: string, index: number) => {
+                  const isAnimating = monsterCardAnimation?.cardId === cardId;
+                  const card = enemyCardById(cardId);
+
+                  return (
+                    <Animated.View
+                      key={`monster-card-${cardId}-${index}`}
+                      style={[
+                        {
+                          width: 35,
+                          height: 50,
+                          marginHorizontal: 2,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 3,
+                          zIndex: isAnimating ? 999 : 1,
+                        },
+                        isAnimating && monsterCardAnimatedStyle
+                      ]}
+                    >
+                      {/* Card content - flip between back and front */}
+                      {(!flippedCards.has(cardId) && (!isAnimating || monsterCardAnimation?.phase === 'flip')) ? (
+                        // Card back with image
+                        <Image
+                          source={require('../assets/images/monsters/bgMonsterCardBackMini.png')}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: 4,
+                          }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        // Card front (when flipped)
+                        <View style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: 'rgba(40, 20, 80, 0.9)',
+                          borderRadius: 4,
+                          borderWidth: 1,
+                          borderColor: 'rgba(180, 150, 220, 0.6)',
+                        }}>
+                          <Text style={{
+                            color: 'white',
+                            fontSize: 8,
+                            fontFamily: 'ChakraPetch_400Regular',
+                            textAlign: 'center',
+                            marginBottom: 2,
+                          }}>
+                            {card?.name || cardId}
+                          </Text>
+                          {card?.dmg && (
+                            <Text style={{
+                              color: '#ff6b6b',
+                              fontSize: 10,
+                              fontFamily: 'ChakraPetch_700Bold',
+                            }}>
+                              ⚔{card.dmg}
+                            </Text>
+                          )}
+                          {card?.block && (
+                            <Text style={{
+                              color: '#4dabf7',
+                              fontSize: 10,
+                              fontFamily: 'ChakraPetch_700Bold',
+                            }}>
+                              🛡{card.block}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </Animated.View>
+                  );
+                });
+              } else {
+                // Fallback to old system
+                return gameState.enemyPiles?.hand?.map((cardId, index) => {
+                  const isAnimating = monsterCardAnimation?.cardId === cardId;
+                  const { enemyCardById } = require('../src/core/pack_enemy_cards');
+                  const card = enemyCardById(cardId);
+
+              return (
+                <Animated.View
+                  key={`enemy-card-${index}`}
+                  style={[
+                    {
+                      width: 35,
+                      height: 50,
+                      // backgroundColor: 'rgba(60, 30, 120, 0.8)',
+                      // borderRadius: 6,
+                      // borderWidth: 2,
+                      // borderColor: 'rgba(180, 150, 220, 0.6)',
+                      marginHorizontal: 2,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 3,
+                      zIndex: isAnimating ? 999 : 1,
+                    },
+                    isAnimating && monsterCardAnimatedStyle
+                  ]}
+                >
+                  {/* Card content - flip between back and front */}
+                  {(!isAnimating || monsterCardAnimation?.phase === 'flip') ? (
+                    // Card back with image
+                    <Image
+                      source={require('../assets/images/monsters/bgMonsterCardBackMini.png')}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: 4,
+                      }}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    // Card front (when flipped)
+                    <View style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: 'rgba(40, 20, 80, 0.9)',
+                      borderRadius: 4,
+                      padding: 2,
+                    }}>
+                      <Text
+                        numberOfLines={2}
+                        style={{
+                          fontSize: 8,
+                          color: 'white',
+                          fontFamily: 'ChakraPetch_600SemiBold',
+                          textAlign: 'center',
+                        }}>
+                        {card.name || card.id}
+                      </Text>
+                      {card.dmg && (
+                        <Text style={{
+                          fontSize: 10,
+                          color: '#ff6b6b',
+                          fontFamily: 'ChakraPetch_600SemiBold',
+                        }}>
+                          ⚔{card.dmg}
+                        </Text>
+                      )}
+                      {card.block && (
+                        <Text style={{
+                          fontSize: 10,
+                          color: '#4ecdc4',
+                          fontFamily: 'ChakraPetch_600SemiBold',
+                        }}>
+                          🛡{card.block}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                </Animated.View>
+              );
+                });
+              }
+            })()}
+
+            {/* Show placeholder when no cards displayed */}
+            {(() => {
+              const enemyHand = gameState.enemyPiles?.hand || [];
+              const displayCards = (drawingCards || drawnCards.length > 0) ?
+                enemyHand.filter(cardId => drawnCards.includes(cardId)) :
+                gameState.phase === 'combat' && !(gameState as any).monsterSequentialTurn ? [] : enemyHand;
+
+              return displayCards.length === 0 && (
+                <Text style={{
+                  color: 'rgba(255,255,255,0.3)',
+                  fontSize: 11,
+                  fontFamily: 'ChakraPetch_400Regular',
+                }}>
+                  {drawingCards ? 'Drawing cards...' :
+                   gameState.phase === 'combat' ? 'Waiting for monster turn...' : 'No cards in hand'}
+                </Text>
+              );
+            })()}
+          </View>
+
+          {/* Test Button for Monster Card Animation */}
+          <View style={{ marginTop: 10, alignItems: 'center' }}>
+            <Pressable
+              onPress={() => {
+                // Test animation with first card
+                if (gameState.enemyPiles?.hand && (gameState.enemyPiles?.hand?.length || 0) > 0) {
+                  const firstCardId = gameState.enemyPiles.hand[0];
+                  const { enemyCardById } = require('../src/core/pack_enemy_cards');
+                  const firstCard = enemyCardById(firstCardId);
+                  playMonsterCardAnimation(firstCardId, firstCard);
+                }
+              }}
+              style={{
+                backgroundColor: 'rgba(120, 60, 200, 0.8)',
+                paddingHorizontal: 15,
+                paddingVertical: 8,
+                borderRadius: 15,
+                borderWidth: 1,
+                borderColor: 'rgba(200, 150, 255, 0.5)',
+              }}
+            >
+              <Text style={{
+                color: 'white',
+                fontSize: 10,
+                fontFamily: 'ChakraPetch_600SemiBold',
+              }}>
+                Test Monster Play
+              </Text>
+            </Pressable>
           </View>
         </View>
 

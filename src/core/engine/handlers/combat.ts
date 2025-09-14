@@ -162,9 +162,50 @@ export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }
   processMinionsEndTurn(s);
 
   // ★ ปลายเทิร์นผู้เล่น → ยิงอุปกรณ์ก่อนสลับฝั่ง
-runEquipmentTurnHook(s, 'on_turn_end', 'player');
+  runEquipmentTurnHook(s, 'on_turn_end', 'player');
 
-  endEnemyTurn(s);
+  // Enhanced enemy turn with sequential card playing
+  const enemyHandlers = require('./enemy');
+  if (s.enemy && s.enemyPiles) {
+    console.log(`🎬 Starting enhanced enemy turn for ${s.enemy.id}`);
+
+    // Reset enemy energy
+    const maxEnergy = (s as any).enemyMaxEnergy || s.enemy.maxEnergy || 2;
+    s.enemyEnergy = maxEnergy;
+    console.log(`🔋 EndTurn: Setting enemy energy to ${maxEnergy}`);
+
+    // Enemy draws up to hand size only if hand is empty
+    if (s.enemyPiles.hand.length === 0) {
+      enemyHandlers.enemyDrawUpToHand(s);
+      console.log(`🎴 EndTurn: Enemy hand after draw:`, s.enemyPiles.hand);
+    } else {
+      console.log(`🎴 EndTurn: Enemy already has cards, skipping draw`);
+    }
+
+    // For specific monsters, use sequential turn instead of bulk AI
+    const useSequentialTurn = ['phi-krasue'].includes(s.enemy.id);
+
+    if (useSequentialTurn && s.enemyPiles.hand.length > 0) {
+      console.log(`🎬 Using sequential turn for ${s.enemy.id}`);
+      // Set monster turn state for sequential play
+      (s as any).monsterSequentialTurn = {
+        active: true,
+        queue: [...s.enemyPiles.hand], // Copy all cards to queue
+        currentIndex: 0,
+        timer: Date.now()
+      };
+
+      // Don't run bulk endEnemyTurn - let UI handle sequential play
+      return { state: s, rng: r };
+    } else {
+      console.log(`🤖 Using bulk AI turn for ${s.enemy.id}`);
+      // Run standard enemy turn (bulk play all cards)
+      endEnemyTurn(s);
+    }
+  } else {
+    // Fallback if no enemy/piles
+    endEnemyTurn(s);
+  }
   
   // Check for victory after enemy turn
   if (isVictory(s)) {
@@ -219,7 +260,80 @@ runEquipmentTurnHook(s, 'on_turn_end', 'player');
 
 export function start(s: GameState, cmd: Extract<Command, { type: 'StartCombat' }>, r: RNG) {
   startCombat(s, cmd.monsterId, r);
+
   // Start first player turn
-  const result = startPlayerTurn(s, r);
-  return result;
+  return startPlayerTurn(s, r);
+}
+
+export function enemyPlayCard(s: GameState, cmd: Extract<Command, { type: 'EnemyPlayCard' }>, r: RNG) {
+  console.log(`🎮 EnemyPlayCard called - cardIndex: ${cmd.cardIndex}`);
+  console.log(`🎮 Current enemyPiles.hand:`, s.enemyPiles?.hand);
+  console.log(`🎮 Enemy energy:`, (s as any).enemyEnergy);
+
+  // TEMP FIX: Force set energy for testing
+  if ((s as any).enemyEnergy === 0 || (s as any).enemyEnergy === undefined) {
+    console.log(`🔧 TEMP FIX: Setting enemy energy to 5 for testing`);
+    (s as any).enemyEnergy = 5;
+  }
+
+  if (s.phase !== 'combat' || !s.enemy || !s.enemyPiles) {
+    console.log(`🎮 Early exit - phase: ${s.phase}, enemy: ${!!s.enemy}, enemyPiles: ${!!s.enemyPiles}`);
+    return { state: s, rng: r };
+  }
+
+  const cardIndex = cmd.cardIndex;
+  const enemyHand = s.enemyPiles.hand;
+
+  if (cardIndex < 0 || cardIndex >= enemyHand.length) {
+    console.log(`Invalid enemy card index: ${cardIndex}, hand size: ${enemyHand.length}`);
+    return { state: s, rng: r };
+  }
+
+  const enemyHandlers = require('./enemy');
+  const success = enemyHandlers.enemyPlayCardId(s, cardIndex);
+
+  if (success) {
+    console.log(`Enemy successfully played card at index ${cardIndex}`);
+  } else {
+    console.log(`Enemy failed to play card at index ${cardIndex}`);
+  }
+
+  // Check if sequential turn is complete
+  const sequentialTurn = (s as any).monsterSequentialTurn;
+  if (sequentialTurn) {
+    const remainingCards = s.enemyPiles.hand.length;
+    console.log(`🎯 Sequential turn progress: ${sequentialTurn.queue.length - remainingCards}/${sequentialTurn.queue.length} cards played`);
+
+    if (remainingCards === 0) {
+      console.log(`🏮 Monster Sequential Turn complete`);
+      (s as any).monsterSequentialTurn = null;
+      ({ state: s, rng: r } = startPlayerTurn(s, r));
+    }
+  }
+
+  return { state: s, rng: r };
+}
+
+// MonsterPlayCard removed - using EnemyPlayCard with cardIndex instead
+
+export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { type: 'StartPlayerTurn' }>, r: RNG) {
+  if (s.phase !== 'combat') return { state: s, rng: r };
+
+  console.log(`🎯 StartPlayerTurn: Starting player turn`);
+  return startPlayerTurn(s, r);
+}
+
+export function startMonsterTurn(s: GameState, _cmd: Extract<Command, { type: 'StartMonsterTurn' }>, r: RNG) {
+  if (s.phase !== 'combat' || !s.enemy || !s.enemyPiles) return { state: s, rng: r };
+
+  console.log('🎮 StartMonsterTurn: Beginning sequential monster card execution');
+
+  // Set monster turn state
+  (s as any).monsterTurnActive = true;
+  (s as any).monsterCardQueue = [...s.enemyPiles.hand]; // Copy all cards to queue
+  (s as any).monsterTurnTimer = Date.now(); // Start timer
+
+  console.log(`🎮 Monster turn started with ${s.enemyPiles.hand.length} cards in queue`);
+
+  return { state: s, rng: r };
 }

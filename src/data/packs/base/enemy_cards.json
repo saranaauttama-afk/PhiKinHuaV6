@@ -277,5 +277,41 @@
     "energyCost": 1,
     "dmg": 8,
     "desc": "Spits poisonous venom at target"
+  },
+  {
+    "id": "krasue_claw",
+    "owner": "phi-krasue",
+    "name": "Krasue Claw",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "Sharp claw attack from the floating ghost"
+  },
+  {
+    "id": "krasue_guard",
+    "owner": "phi-krasue",
+    "name": "Krasue Guard",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "Protective stance using ethereal energy"
+  },
+  {
+    "id": "krasue_swipe",
+    "owner": "phi-krasue",
+    "name": "Krasue Swipe",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 9,
+    "desc": "Quick swipe attack with floating organs"
+  },
+  {
+    "id": "krasue_brace",
+    "owner": "phi-krasue",
+    "name": "Krasue Brace",
+    "type": "skill",
+    "energyCost": 2,
+    "block": 8,
+    "desc": "Strong defensive posture with ghostly energy"
   }
 ]

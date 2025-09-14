@@ -383,6 +383,22 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
     return;
   }
 
+  // Map monster to card deck owner
+  function getCardOwnerForMonster(monsterId: string): string[] {
+    // Map specific monsters to their card deck owners
+    const monsterDeckMap: Record<string, string[]> = {
+      'phi-krasue': ['global', 'phi-krasue'],
+      'phi-pop': ['global', 'phi_pop'],
+      'nang-tanee': ['global', 'spirit'],
+      'phi-nang-ram': ['global', 'spirit'],
+      'phi-pong-kang': ['global', 'spirit'],
+      // Add more monster-deck mappings as needed
+    };
+
+    // Return specific deck or fallback to global
+    return monsterDeckMap[monsterId] || ['global'];
+  }
+
   // Initialize combat state
   state.phase = 'combat';
   state.enemy = {
@@ -392,7 +408,32 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
     maxHp: monsterData.hp,
     dmg: 5, // Default damage
     block: 0,
-    ai: { cycle: ['attack', 'defend'], index: 0 }, // Simple AI cycle
+    ai: {
+      cycle: ['attack', 'defend'],
+      index: 0,
+      // Add deck configuration for monster-specific cards
+      deck: monsterId === 'phi-krasue'
+        ? {
+            // For phi-krasue: Use specific list to avoid duplicate IDs
+            lists: [{
+              id: 'phi-krasue-deck',
+              weight: 1,
+              cards: ['krasue_claw', 'krasue_guard', 'krasue_swipe'] // Only 3 unique cards
+            }],
+            handSize: 3,
+            maxEnergy: 3
+          }
+        : {
+            // For other monsters: Use pool system
+            pool: {
+              allowOwners: getCardOwnerForMonster(monsterId),
+              minAttack: 1,
+              minBlock: 1
+            },
+            handSize: 2,
+            maxEnergy: 2
+          }
+    },
     intentCardId: null,
     maxEnergy: 3,
     handSize: 0,
@@ -407,6 +448,11 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
   // Build player deck (only if RNG provided)
   if (rng) {
     buildAndShuffleDeck(state, rng);
+    // Build enemy deck but DON'T draw initial hand yet (let EndTurn handle it)
+    const enemyHandlers = require('./engine/handlers/enemy');
+    const result = enemyHandlers.buildAndShuffleEnemyDeck(state, rng);
+    rng = result.rng;
+    console.log(`🎯 Enemy deck built, hand will be drawn on first EndTurn`);
   }
 
   console.log(`Combat started against ${monsterData.name} (HP: ${monsterData.hp})`);
