@@ -27,6 +27,11 @@ const BLESSING_LIST: BlessingMeta[] = blessingsJson as any;
 // การ์ดทั้งหมด (ลอกเฉพาะฟิลด์ runtime)
 export const ALL_CARDS: CardData[] = CARD_LIST.map(({ starter, inRewards, inShop, ...c }) => c);
 
+// Function to get card by ID
+export function cardById(id: string): CardData | undefined {
+  return ALL_CARDS.find(card => card.id === id);
+}
+
 // เด็คเริ่มจากค่า "starter" ใน JSON (จำนวนซ้ำ)
 export const START_DECK: CardData[] = CARD_LIST.flatMap(c =>
   new Array(c.starter ?? 0).fill(0).map(() => {

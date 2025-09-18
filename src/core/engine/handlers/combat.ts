@@ -8,9 +8,31 @@ import { START_ENERGY } from '../../balance/core';
 import { grantExpAndQueueLevelUp } from '../shared';
 import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRuntime';
 import { getEquipmentById } from '../../pack';
+import { shouldUseUnifiedSystem } from '../../unified/simpleIntegration';
+import {
+  initializeUnifiedCombat,
+  unifiedEnemyTurn,
+  unifiedPlayCard
+} from '../../unified/simpleCombat';
+import {
+  shouldActivateUnifiedMode,
+  initializeUnifiedMode,
+  interceptPlayCard,
+  interceptEndTurn,
+  isUnifiedActive
+} from '../../unified/migrationLayer';
 
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
   if (s.phase !== 'combat' || s.combatVictoryLock) return { state: s, rng: r };
+
+  // Universal system handles all card playing now
+  const interceptResult = interceptPlayCard(s, cmd, r);
+  if (interceptResult.handled) {
+    return { state: interceptResult.state, rng: interceptResult.rng };
+  }
+
+  // Legacy system fallback (should not reach here in normal gameplay)
+  console.warn('[Combat] Falling back to legacy system - this should not happen');
   const idx = cmd.index;
   if (idx < 0 || idx >= s.piles.hand.length) return { state: s, rng: r };
   const played = s.piles.hand[idx];
@@ -148,8 +170,17 @@ runEquipmentCardPlayed(s, played, 'player');
   return { state: s, rng: r };
 }
 
-export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }>, r: RNG) {
+export function endTurn(s: GameState, cmd: Extract<Command, { type: 'EndTurn' }>, r: RNG) {
   if (s.phase !== 'combat') return { state: s, rng: r };
+
+  // Universal system handles all turn management now
+  const interceptResult = interceptEndTurn(s, cmd, r);
+  if (interceptResult.handled) {
+    return { state: interceptResult.state, rng: interceptResult.rng };
+  }
+
+  // Legacy system fallback (should not reach here in normal gameplay)
+  console.warn('[Combat] EndTurn falling back to legacy system - this should not happen');
 
   // Import status effects system
   const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
@@ -169,6 +200,12 @@ export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }
   if (s.enemy && s.enemyPiles) {
     console.log(`🎬 Starting enhanced enemy turn for ${s.enemy.id}`);
 
+    // Use unified system if available
+    if (shouldUseUnifiedSystem(s)) {
+      unifiedEnemyTurn(s, s.enemy.id, r);
+      return startPlayerTurn(s, r);
+    }
+
     // Reset enemy energy
     const maxEnergy = (s as any).enemyMaxEnergy || s.enemy.maxEnergy || 2;
     s.enemyEnergy = maxEnergy;
@@ -182,26 +219,10 @@ export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }
       console.log(`🎴 EndTurn: Enemy already has cards, skipping draw`);
     }
 
-    // For specific monsters, use sequential turn instead of bulk AI
-    const useSequentialTurn = ['phi-krasue'].includes(s.enemy.id);
-
-    if (useSequentialTurn && s.enemyPiles.hand.length > 0) {
-      console.log(`🎬 Using sequential turn for ${s.enemy.id}`);
-      // Set monster turn state for sequential play
-      (s as any).monsterSequentialTurn = {
-        active: true,
-        queue: [...s.enemyPiles.hand], // Copy all cards to queue
-        currentIndex: 0,
-        timer: Date.now()
-      };
-
-      // Don't run bulk endEnemyTurn - let UI handle sequential play
-      return { state: s, rng: r };
-    } else {
-      console.log(`🤖 Using bulk AI turn for ${s.enemy.id}`);
-      // Run standard enemy turn (bulk play all cards)
-      endEnemyTurn(s);
-    }
+    // Standard enemy AI for non-unified monsters
+    console.log(`🤖 Using bulk AI turn for ${s.enemy.id}`);
+    // Run standard enemy turn (bulk play all cards)
+    endEnemyTurn(s);
   } else {
     // Fallback if no enemy/piles
     endEnemyTurn(s);
@@ -261,6 +282,15 @@ export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }
 export function start(s: GameState, cmd: Extract<Command, { type: 'StartCombat' }>, r: RNG) {
   startCombat(s, cmd.monsterId, r);
 
+  // Initialize unified system (new migration layer)
+  if (shouldActivateUnifiedMode(s)) {
+    initializeUnifiedMode(s, r);
+  }
+  // Fallback to old unified system
+  else if (shouldUseUnifiedSystem(s)) {
+    initializeUnifiedCombat(s, r);
+  }
+
   // Start first player turn
   return startPlayerTurn(s, r);
 }
@@ -270,11 +300,17 @@ export function enemyPlayCard(s: GameState, cmd: Extract<Command, { type: 'Enemy
   console.log(`🎮 Current enemyPiles.hand:`, s.enemyPiles?.hand);
   console.log(`🎮 Enemy energy:`, (s as any).enemyEnergy);
 
-  // TEMP FIX: Force set energy for testing
-  if ((s as any).enemyEnergy === 0 || (s as any).enemyEnergy === undefined) {
-    console.log(`🔧 TEMP FIX: Setting enemy energy to 5 for testing`);
-    (s as any).enemyEnergy = 5;
+  // Use unified system if available
+  if (shouldUseUnifiedSystem(s) && s.enemy) {
+    const enemyId = s.enemy.id;
+    unifiedPlayCard(s, {
+      entityId: enemyId,
+      cardIndex: cmd.cardIndex,
+      targetId: 'player'
+    }, r);
+    return { state: s, rng: r };
   }
+
 
   if (s.phase !== 'combat' || !s.enemy || !s.enemyPiles) {
     console.log(`🎮 Early exit - phase: ${s.phase}, enemy: ${!!s.enemy}, enemyPiles: ${!!s.enemyPiles}`);
@@ -298,18 +334,6 @@ export function enemyPlayCard(s: GameState, cmd: Extract<Command, { type: 'Enemy
     console.log(`Enemy failed to play card at index ${cardIndex}`);
   }
 
-  // Check if sequential turn is complete
-  const sequentialTurn = (s as any).monsterSequentialTurn;
-  if (sequentialTurn) {
-    const remainingCards = s.enemyPiles.hand.length;
-    console.log(`🎯 Sequential turn progress: ${sequentialTurn.queue.length - remainingCards}/${sequentialTurn.queue.length} cards played`);
-
-    if (remainingCards === 0) {
-      console.log(`🏮 Monster Sequential Turn complete`);
-      (s as any).monsterSequentialTurn = null;
-      ({ state: s, rng: r } = startPlayerTurn(s, r));
-    }
-  }
 
   return { state: s, rng: r };
 }

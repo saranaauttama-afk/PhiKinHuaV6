@@ -10,6 +10,15 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useGame } from '../src/store/gameStore';
 import Card from './components/Card';
+import {
+  useUniversalPlayer,
+  useUniversalEnemy,
+  convertUniversalCardsForUI,
+  isUniversalSystemReady,
+  playUniversalCard,
+  endUniversalTurn,
+  getEntityDisplayStats
+} from '../src/core/unified/useUniversalState';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -24,8 +33,11 @@ export default function BattlePage() {
   const [monsterPlayingCard, setMonsterPlayingCard] = React.useState<{cardId: string, cardData: any} | null>(null);
   const [monsterCardAnimation, setMonsterCardAnimation] = React.useState<{cardId: string, phase: 'flip' | 'enlarge' | 'execute'} | null>(null);
   const [flippedCards, setFlippedCards] = React.useState<Set<string>>(new Set());
-  const [drawingCards, setDrawingCards] = React.useState(false);
-  const [drawnCards, setDrawnCards] = React.useState<string[]>([]);
+
+  // Universal system state
+  const universalPlayer = useUniversalPlayer();
+  const universalEnemy = useUniversalEnemy(gameState.enemy?.id);
+  const isUnified = isUniversalSystemReady();
 
   // Monster floating animation
   const monsterY = useSharedValue(0);
@@ -132,9 +144,7 @@ export default function BattlePage() {
   // Start combat when entering battle page
   React.useEffect(() => {
     if (monsterId && !enemy && gameState.phase !== 'combat') {
-      // Reset drawing states for new combat
-      setDrawingCards(false);
-      setDrawnCards([]);
+      // Reset states for new combat
       setFlippedCards(new Set());
       setMonsterCardAnimation(null);
       setMonsterPlayingCard(null);
@@ -145,95 +155,9 @@ export default function BattlePage() {
 
   // Removed auto-trigger - monster turn will be triggered manually via StartMonsterTurn command
 
-  // Monitor monster sequential turn and play cards
-  const currentCardIndexRef = React.useRef(0);
+  // Monster card animations
 
-  // Draw cards animation first, then play cards
-  React.useEffect(() => {
-    const monsterSequentialTurn = (gameState as any).monsterSequentialTurn;
-
-    if (monsterSequentialTurn?.active && monsterSequentialTurn?.queue?.length > 0) {
-      console.log(`🎬 Starting monster turn with ${monsterSequentialTurn.queue.length} cards`);
-      console.log(`🎬 Queue: ${monsterSequentialTurn.queue.join(', ')}`);
-
-      // Reset states
-      currentCardIndexRef.current = 0;
-      setFlippedCards(new Set());
-      setDrawnCards([]);
-      setDrawingCards(true);
-
-      // Draw cards animation (like player)
-      const drawCardsWithAnimation = async () => {
-        console.log(`🎴 Drawing ${monsterSequentialTurn.queue.length} cards...`);
-
-        for (let i = 0; i < monsterSequentialTurn.queue.length; i++) {
-          const cardId = monsterSequentialTurn.queue[i];
-          console.log(`🎴 Drawing card ${i + 1}/${monsterSequentialTurn.queue.length}: ${cardId}`);
-
-          setDrawnCards(prev => [...prev, cardId]);
-          await new Promise(resolve => setTimeout(resolve, 600)); // 0.6s per card draw
-        }
-
-        console.log(`🎴 All cards drawn! Waiting before starting to play...`);
-        setDrawingCards(false);
-
-        // Wait a bit for player to see the drawn cards
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        console.log(`🎬 Starting to play cards sequentially`);
-        startPlayingCards();
-      };
-
-      const startPlayingCards = () => {
-        const playNextCard = () => {
-          const currentIndex = currentCardIndexRef.current;
-
-          if (currentIndex < monsterSequentialTurn.queue.length) {
-            const currentCardId = monsterSequentialTurn.queue[currentIndex];
-            console.log(`⏰ Playing card ${currentIndex}: ${currentCardId}`);
-
-            // Animate the card
-            const { enemyCardById } = require('../src/core/pack_enemy_cards');
-            const cardData = enemyCardById(currentCardId);
-            playMonsterCardAnimation(currentCardId, cardData);
-
-            // Execute the card after animation delay
-            setTimeout(() => {
-              dispatch({ type: 'EnemyPlayCard', cardIndex: currentIndex });
-            }, 1000);
-
-            // Move to next card
-            currentCardIndexRef.current++;
-          }
-        };
-
-        // Play first card immediately
-        playNextCard();
-
-        // Set up interval for remaining cards
-        const interval = setInterval(() => {
-          if (currentCardIndexRef.current < monsterSequentialTurn.queue.length) {
-            playNextCard();
-          } else {
-            clearInterval(interval);
-          }
-        }, 2500); // Slightly longer delay between cards
-
-        // Store interval in ref for cleanup
-        (currentCardIndexRef as any).interval = interval;
-      };
-
-      // Start the sequence
-      drawCardsWithAnimation();
-
-      // Cleanup function
-      return () => {
-        if ((currentCardIndexRef as any).interval) {
-          clearInterval((currentCardIndexRef as any).interval);
-        }
-      };
-    }
-  }, [(gameState as any).monsterSequentialTurn?.timer]);
+  // Unified system handles monster turns automatically
 
   // Calculate deck size (total cards in all piles + master deck)
   const deckSize = gameState.masterDeck.length +
@@ -378,6 +302,35 @@ export default function BattlePage() {
             </Text>
           </View>
 
+          {/* Monster Energy Display (Universal System) */}
+          {isUnified && universalEnemy.energy && (
+            <View style={{
+              position: 'absolute',
+              top: 320,
+              right: 20,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: 'rgba(40, 20, 80, 0.8)',
+              padding: 8,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: 'rgba(180, 150, 220, 0.6)',
+            }}>
+              <Image
+                source={require('../assets/images/players/iEnergy.png')}
+                style={{ width: 20, height: 20, marginRight: 4, tintColor: '#ffd93d' }}
+                resizeMode="contain"
+              />
+              <Text style={{
+                color: '#ffd93d',
+                fontSize: 12,
+                fontFamily: 'ChakraPetch_600SemiBold',
+              }}>
+                {universalEnemy.energy.current}/{universalEnemy.energy.maximum}
+              </Text>
+            </View>
+          )}
+
           {/* Monster Cards Area */}
           <View style={{
             flexDirection: 'row',
@@ -386,18 +339,106 @@ export default function BattlePage() {
             marginTop: 10,
             height: 60,
           }}>
-            {/* Show monster's hand cards - use MonsterCardSystem if available */}
+            {/* Show monster's hand cards - use Unified System if available */}
             {(() => {
-              // Use enemyPiles system (works for all monsters)
-              if (gameState.enemyPiles?.hand) {
+              // Use universal system if available
+              if (isUnified && universalEnemy.hand.length > 0) {
+                const displayCards = convertUniversalCardsForUI(universalEnemy.hand);
+
+                return displayCards.map((card: any, index: number) => {
+                  const isAnimating = monsterCardAnimation?.cardId === card.id;
+
+                  return (
+                    <Animated.View
+                      key={`unified-card-${card.instanceId}`}
+                      style={[
+                        {
+                          width: 35,
+                          height: 50,
+                          marginHorizontal: 2,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 3,
+                          zIndex: isAnimating ? 999 : 1,
+                        },
+                        isAnimating && monsterCardAnimatedStyle
+                      ]}
+                    >
+                      {/* Card content - flip between back and front */}
+                      {(!flippedCards.has(card.id) && (!isAnimating || monsterCardAnimation?.phase === 'flip')) ? (
+                        // Card back with image
+                        <Image
+                          source={require('../assets/images/monsters/bgMonsterCardBackMini.png')}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: 4,
+                          }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        // Card front (when flipped)
+                        <View style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: 'rgba(40, 20, 80, 0.9)',
+                          borderRadius: 4,
+                          borderWidth: 1,
+                          borderColor: 'rgba(180, 150, 220, 0.6)',
+                          padding: 2,
+                        }}>
+                          <Text style={{
+                            color: 'white',
+                            fontSize: 7,
+                            fontFamily: 'ChakraPetch_400Regular',
+                            textAlign: 'center',
+                            marginBottom: 1,
+                          }}>
+                            {card.name}
+                          </Text>
+                          <Text style={{
+                            color: '#ffd93d',
+                            fontSize: 6,
+                            fontFamily: 'ChakraPetch_700Bold',
+                            marginBottom: 1,
+                          }}>
+                            ⚡{card.cost}
+                          </Text>
+                          {card.damage && (
+                            <Text style={{
+                              color: '#ff6b6b',
+                              fontSize: 8,
+                              fontFamily: 'ChakraPetch_700Bold',
+                            }}>
+                              ⚔{card.damage}
+                            </Text>
+                          )}
+                          {card.block && (
+                            <Text style={{
+                              color: '#4dabf7',
+                              fontSize: 8,
+                              fontFamily: 'ChakraPetch_700Bold',
+                            }}>
+                              🛡{card.block}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </Animated.View>
+                  );
+                });
+              }
+              // Fallback to enemyPiles system (for non-unified monsters)
+              else if (gameState.enemyPiles?.hand) {
                 const enemyHand = gameState.enemyPiles.hand;
                 const { enemyCardById } = require('../src/core/pack_enemy_cards');
 
-                // Filter cards based on drawing state
-                const displayCards = (drawingCards || drawnCards.length > 0) ?
-                  enemyHand.filter(cardId => drawnCards.includes(cardId)) :
-                  // Don't show any cards initially until first draw animation starts
-                  gameState.phase === 'combat' && !(gameState as any).monsterSequentialTurn ? [] : enemyHand;
+                // Show all cards in enemy hand
+                const displayCards = enemyHand;
 
                 return displayCards.map((cardId: string, index: number) => {
                   const isAnimating = monsterCardAnimation?.cardId === cardId;
@@ -568,9 +609,7 @@ export default function BattlePage() {
             {/* Show placeholder when no cards displayed */}
             {(() => {
               const enemyHand = gameState.enemyPiles?.hand || [];
-              const displayCards = (drawingCards || drawnCards.length > 0) ?
-                enemyHand.filter(cardId => drawnCards.includes(cardId)) :
-                gameState.phase === 'combat' && !(gameState as any).monsterSequentialTurn ? [] : enemyHand;
+              const displayCards = enemyHand;
 
               return displayCards.length === 0 && (
                 <Text style={{
@@ -578,8 +617,7 @@ export default function BattlePage() {
                   fontSize: 11,
                   fontFamily: 'ChakraPetch_400Regular',
                 }}>
-                  {drawingCards ? 'Drawing cards...' :
-                   gameState.phase === 'combat' ? 'Waiting for monster turn...' : 'No cards in hand'}
+                  No cards in hand
                 </Text>
               );
             })()}
@@ -627,8 +665,14 @@ export default function BattlePage() {
           alignItems: 'center',
           justifyContent: 'flex-end',
         }}>
-          {gameState.piles.hand.map((card, index) => {
-            const cardCount = gameState.piles.hand.length;
+          {(() => {
+            // Use universal system if available
+            const playerHand = isUnified && universalPlayer.hand.length > 0
+              ? convertUniversalCardsForUI(universalPlayer.hand)
+              : gameState.piles.hand;
+
+            return playerHand.map((card, index) => {
+            const cardCount = playerHand.length; // Use actual hand size
             const maxRotation = Math.min(25, cardCount * 2.5);
             const totalWidth = screenWidth - 40;
 
@@ -668,29 +712,55 @@ export default function BattlePage() {
                     // Show card details or preview
                   }}
                   onDragPlay={() => {
-                    console.log('Card played by drag:', card.name);
-                    // Mark card as played (will trigger fade out)
-                    setPlayedCardIds(prev => [...prev, card.id]);
+                    console.log('🎯 Card played by drag:', card.name, 'index:', index);
+                    console.log('🎯 BEFORE PLAY - Hand state:');
+                    console.log('🎯 Legacy hand:', gameState.piles.hand.map((c, i) => `${i}: ${c.name}(${c.id})`));
+                    console.log('🎯 Universal hand:', playerHand.map((c, i) => `${i}: ${c.name}(${c.instanceId})`));
+                    console.log('🎯 playedCardIds:', playedCardIds);
 
-                    // Play card through game engine
+                    // Mark card as played (will trigger fade out)
+                    // Use instanceId for universal system or card.id for legacy
+                    const cardIdentifier = isUnified && card.instanceId ? card.instanceId : card.id;
+                    setPlayedCardIds(prev => [...prev, cardIdentifier]);
+
+                    // Always use dispatch to go through migration layer
                     dispatch({ type: 'PlayCard', index });
 
-                    // After fade out animation, the card will be removed from hand by game engine
+                    // Log state after dispatch
                     setTimeout(() => {
-                      console.log('Card attack completed:', card.name);
-                      // Remove from playedCardIds since it's already removed from hand
-                      setPlayedCardIds(prev => prev.filter(id => id !== card.id));
-                    }, 800); // Match fade duration
+                      console.log('🎯 AFTER DISPATCH - Hand state:');
+                      console.log('🎯 Legacy hand:', gameState.piles.hand.map((c, i) => `${i}: ${c.name}(${c.id})`));
+                      console.log('🎯 Universal hand:', playerHand.map((c, i) => `${i}: ${c.name}(${c.instanceId})`));
+                      console.log('🎯 playedCardIds:', playedCardIds);
+                    }, 50);
+
+                    // For unified system, remove immediately since sync is instant
+                    // For legacy system, use setTimeout for animation
+                    if (isUnified) {
+                      // Immediate cleanup for universal system
+                      setTimeout(() => {
+                        const cardIdentifier = card.instanceId || card.id;
+                        setPlayedCardIds(prev => prev.filter(id => id !== cardIdentifier));
+                      }, 100); // Short delay for animation to start
+                    } else {
+                      // After fade out animation, the card will be removed from hand by game engine
+                      setTimeout(() => {
+                        console.log('Card attack completed:', card.name);
+                        // Remove from playedCardIds since it's already removed from hand
+                        setPlayedCardIds(prev => prev.filter(id => id !== card.id));
+                      }, 800); // Match fade duration
+                    }
                   }}
                   onHoverChange={(isHovered) => {
                     setHoveredCardId(isHovered ? card.id : null);
                   }}
-                  isPlayed={playedCardIds.includes(card.id)}
+                  isPlayed={playedCardIds.includes(isUnified && card.instanceId ? card.instanceId : card.id)}
                   animationDelay={index * 100} // Stagger by 100ms each
                 />
               </View>
             );
-          })}
+            });
+          })()}
         </View>
 
         {/* Player Badge - Bottom */}
@@ -746,7 +816,11 @@ export default function BattlePage() {
                     borderColor: 'rgba(68,23,0,0.8)',
                   }}>
                     <View style={{
-                      width: `${(player.hp / player.maxHp) * 100}%`,
+                      width: `${
+                        isUnified && universalPlayer.player
+                          ? (universalPlayer.player.hp / universalPlayer.player.maxHp) * 100
+                          : (player.hp / player.maxHp) * 100
+                      }%`,
                       height: '100%',
                       backgroundColor: 'rgba(144,4,4,0.5)',
                       borderRadius: 6,
@@ -767,7 +841,10 @@ export default function BattlePage() {
                     textShadowOffset: { width: 1, height: 1 },
                     textShadowRadius: 2,
                   }}>
-                    {player.hp}/{player.maxHp}
+                    {isUnified && universalPlayer.player
+                      ? `${universalPlayer.player.hp}/${universalPlayer.player.maxHp}`
+                      : `${player.hp}/${player.maxHp}`
+                    }
                   </Text>
                 </View>
               </View>
@@ -776,7 +853,11 @@ export default function BattlePage() {
               <Pressable
                 onPress={() => {
                   console.log('End Turn pressed');
-                  dispatch({ type: 'EndTurn' });
+                  if (isUnified) {
+                    endUniversalTurn();
+                  } else {
+                    dispatch({ type: 'EndTurn' });
+                  }
                 }}
                 style={{
                   width: 70,
@@ -823,7 +904,10 @@ export default function BattlePage() {
                   fontSize: 11,
                   fontFamily: 'ChakraPetch_600SemiBold',
                 }}>
-                  {player.energy}/{player.maxEnergy}
+                  {isUnified && universalPlayer.energy
+                    ? `${universalPlayer.energy.current}/${universalPlayer.energy.maximum}`
+                    : `${player.energy}/${player.maxEnergy}`
+                  }
                 </Text>
               </View>
 
@@ -853,7 +937,10 @@ export default function BattlePage() {
                   fontSize: 11,
                   fontFamily: 'ChakraPetch_600SemiBold',
                 }}>
-                  {player.block}
+                  {isUnified && universalPlayer.player
+                    ? universalPlayer.player.block
+                    : player.block
+                  }
                 </Text>
               </View>
 
