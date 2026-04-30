@@ -3,7 +3,9 @@
     "name": "PhiKinHua",
     "slug": "PhiKinHua",
     "scheme": "phikinhua",
+    "version": "1.0.0",
     "userInterfaceStyle": "automatic",
+    "orientation": "portrait",
     "plugins": [
       "expo-router",
       "expo-font"
@@ -11,10 +13,28 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "d6a92835-1924-4de9-bb5b-838ec2061dcd"
       }
     },
     "assets": [
       "./assets/fonts/"
-    ]
+    ],
+    "android": {
+      "package": "com.phikinhua.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a0a00"
+      }
+    },
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/scence/startPage.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#1a0a00"
+    },
+    "owner": "sarana"
   }
 }

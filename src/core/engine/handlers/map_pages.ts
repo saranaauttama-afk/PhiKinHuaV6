@@ -313,12 +313,12 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       console.log('🛒 Found existing shop:', existingShop ? 'YES' : 'NO', existingShop?.inventory.length);
       
       if (existingShop) {
-        console.log('🛒 Loading existing inventory:', existingShop.inventory.map(item => item.card?.name || item.card?.id));
+        console.log('🛒 Loading existing inventory:', existingShop.inventory.map(item => ('card' in item ? (item.card as any)?.name : undefined)));
       }
       
       if (existingShop) {
         // Use existing shop inventory
-        s.shopStock = existingShop.inventory.map(item => ({ card: item.card, price: item.price }));
+        s.shopStock = existingShop.inventory.map(item => ({ card: ('card' in item ? item.card : undefined) as any, price: item.price }));
         s.shopKind = 'card';
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Set current shop ID for saving
@@ -409,7 +409,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       
       if (existingShop) {
         // Use existing shop inventory for equipment
-        s.shopStock = existingShop.inventory.map(item => ({ equipment: item.equipment, price: item.price }));
+        s.shopStock = existingShop.inventory.map(item => ({ equipment: ('equipment' in item ? item.equipment : undefined) as any, price: item.price }));
         s.shopKind = 'equipment';
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current shop ID
@@ -495,7 +495,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       if (existingTreasure) {
         // Use existing treasure chest
         s.shopKind = 'treasure';
-        s.shopStock = existingTreasure.inventory.map(item => ({ card: item.card, price: item.price }));
+        s.shopStock = existingTreasure.inventory.map(item => ({ card: ('card' in item ? item.card : undefined) as any, price: item.price }));
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current treasure ID
         s.phase = 'shop';
@@ -513,13 +513,16 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       // Save treasure to registry for persistence
       if (!s.shopRegistry) s.shopRegistry = [];
       const treasureInventory = (s.shopStock || []).map(item => ({
-        card: item.card,
+        card: ('card' in item ? item.card : undefined) as any,
         price: item.price || 0
       }));
       s.shopRegistry.push({
         id: offer.shopId,
         kind: 'treasure',
-        inventory: treasureInventory
+        inventory: treasureInventory,
+        boughtItems: [],
+        timesEncountered: 1,
+        itemsBought: 0,
       });
       
       mp._activeOfferIndex = ix; mp._shopUsed = false;
@@ -535,7 +538,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       if (existingSingleTreasure) {
         // Use existing single treasure
         s.shopKind = 'treasure_single';
-        s.shopStock = existingSingleTreasure.inventory.map(item => ({ card: item.card, price: item.price }));
+        s.shopStock = existingSingleTreasure.inventory.map(item => ({ card: ('card' in item ? item.card : undefined) as any, price: item.price }));
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current treasure ID
         s.phase = 'shop';
@@ -553,13 +556,16 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       // Save single treasure to registry for persistence
       if (!s.shopRegistry) s.shopRegistry = [];
       const singleTreasureInventory = (s.shopStock || []).map(item => ({
-        card: item.card,
+        card: ('card' in item ? item.card : undefined) as any,
         price: item.price || 0
       }));
       s.shopRegistry.push({
         id: offer.shopId,
         kind: 'treasure_single',
-        inventory: singleTreasureInventory
+        inventory: singleTreasureInventory,
+        boughtItems: [],
+        timesEncountered: 1,
+        itemsBought: 0,
       });
       
       mp._activeOfferIndex = ix; mp._shopUsed = false;
@@ -668,10 +674,10 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
         if (existingShop) {
           // Update existing shop (always save existing shops, even if not used this visit)
           if (s.shopKind === 'card' || s.shopKind === 'equipment') {
-            console.log('🛒 Before update - Registry inventory:', existingShop.inventory.map(item => item.card?.name));
-            console.log('🛒 Before update - Current stock:', s.shopStock?.map(item => item.card?.name));
+            console.log('🛒 Before update - Registry inventory:', existingShop.inventory.map(item => ('card' in item ? (item.card as any)?.name : undefined)));
+            console.log('🛒 Before update - Current stock:', s.shopStock?.map(item => ('card' in item ? (item.card as any)?.name : undefined)));
             updateShopInRegistry(s, s.currentShopId, s.shopStock, boughtItems);
-            console.log('🛒 After update - Registry inventory:', existingShop.inventory.map(item => item.card?.name));
+            console.log('🛒 After update - Registry inventory:', existingShop.inventory.map(item => ('card' in item ? (item.card as any)?.name : undefined)));
           } else if (s.shopKind === 'treasure') {
             // Treasure chest: save current stock to registry (for persistence)
             updateShopInRegistry(s, s.currentShopId, s.shopStock, boughtItems);
@@ -914,8 +920,8 @@ function canProceedToNextMap(s: GameState): boolean {
   if (s.mapMode !== 'pages' || !s.pages?.current) return false;
   
   const mp = s.pages;
-  const offers = mp.current.offers;
-  const resolved = mp.current.resolved;
+  const offers = mp.current!.offers;
+  const resolved = mp.current!.resolved;
   
   let hasCombat = false;
   let combatCompleted = false;

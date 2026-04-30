@@ -17,6 +17,7 @@ export type CardType = 'attack' | 'skill' | 'equipment';
 
 export type CardData = {
   id: string;
+  instanceId?: string;  // unique per card instance in play — assigned on deck build
   name: string;
   type: CardType;
   cost: number;
@@ -26,10 +27,9 @@ export type CardData = {
   energyGain?: number;
   tags?: string[];
   rarity?: Rarity;
-  // Equipment card fields
-  equipmentId?: string;  // ID of equipment to install
-  slotCost?: number;     // Equipment slot cost
-  desc?: string;         // Equipment description
+  equipmentId?: string;
+  slotCost?: number;
+  desc?: string;
 };
 
 // Enemy
@@ -179,6 +179,7 @@ export type GameState = {
     discard: string[];
   };
   enemyEnergy?: number;
+  enemyLastPlayed?: string[];  // card IDs played last enemy turn, for UI animation
 
   piles: DeckPiles;
   masterDeck: CardData[];
@@ -249,8 +250,9 @@ export type Command =
   | { type: 'PlayCard'; index: number }
   | { type: 'EnemyPlayCard'; cardIndex: number }
   | { type: 'StartMonsterTurn' }
-  | { type: 'StartPlayerTurn' }
   | { type: 'EndTurn' }
+  | { type: 'StartPlayerTurn' }
+  | { type: 'DiscardCard'; index: number }
 
   // Level Up
   | { type: 'ChooseLevelUp'; index?: number }
@@ -324,6 +326,7 @@ export type Command =
   | { type: 'QA_TriggerEnemyBehavior' }
   | { type: 'QA_ForcePhase2' }
   // Minion Debug Commands
+  | { type: 'QA_SetEnvironment' }
   | { type: 'QA_SummonPlayerMinion'; minionId: string }
   | { type: 'QA_SummonEnemyMinion'; minionId: string }
   | { type: 'QA_ClearAllMinions' }

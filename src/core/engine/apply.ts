@@ -27,8 +27,16 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   PlayCard: combat.play,
   EnemyPlayCard: combat.enemyPlayCard,
   StartMonsterTurn: combat.startMonsterTurn,
-  StartPlayerTurn: combat.startPlayerTurnHandler,
   EndTurn: combat.endTurn,
+  StartPlayerTurn: combat.startPlayerTurnHandler,
+  DiscardCard: (s, cmd, r) => {
+    if (s.phase !== 'combat') return { state: s, rng: r };
+    const { index } = cmd;
+    if (index < 0 || index >= s.piles.hand.length) return { state: s, rng: r };
+    const [c] = s.piles.hand.splice(index, 1);
+    s.piles.discard.push(c);
+    return { state: s, rng: r };
+  },
 
   // Node completion (victory/levelup/shop/event) → pages handler
   CompleteNode: mappages.completeNode,

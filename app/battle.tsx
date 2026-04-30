@@ -1,169 +1,168 @@
 import React from 'react';
-import { View, Text, ImageBackground, Pressable, Dimensions, Image } from 'react-native';
+import { View, ImageBackground, Pressable, Image } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  withSequence
-} from 'react-native-reanimated';
 import { useGame } from '../src/store/gameStore';
-import Card from './components/Card';
-import {
-  useUniversalPlayer,
-  useUniversalEnemy,
-  convertUniversalCardsForUI,
-  isUniversalSystemReady,
-  playUniversalCard,
-  endUniversalTurn,
-  getEntityDisplayStats
-} from '../src/core/unified/useUniversalState';
+import { enemyCardById } from '../src/core/pack_enemy_cards';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
+import PlayerHand from './components/battle/PlayerHand';
+import PlayerHUD from './components/battle/PlayerHUD';
+import EnemyHandCard, { ENEMY_PLAY_TOTAL } from './components/battle/EnemyHandCard';
+import DamagePopup from './components/battle/DamagePopup';
+import DiscardOverlay from './components/battle/DiscardOverlay';
+import VictoryOverlay from './components/battle/VictoryOverlay';
+import DefeatOverlay from './components/battle/DefeatOverlay';
+
+type Phase = 'player' | 'discard' | 'enemy';
+
+const ENEMY_CARD_GAP    = 150;
+const PLAYER_UNLOCK_MIN = 1200;
+const ENEMY_SLIDE_IN    = 600;  // time for all face-down cards to slide in
+const ENEMY_SLIDE_PAUSE = 200;  // pause before playing starts
+
+type EnemyHandCardData = {
+  key: string;
+  card: { name: string; damage: number; block: number };
+  cardIndex: number;
+  totalCards: number;
+  delay: number;
+  playing: boolean;
+};
 
 export default function BattlePage() {
-  const router = useRouter();
-  const gameState = useGame((state) => state.state);
-  const dispatch = useGame((state) => state.dispatch);
+  const router    = useRouter();
+  const gameState = useGame((s) => s.state);
+  const dispatch  = useGame((s) => s.dispatch);
+  const { monsterId, monsterName } = useLocalSearchParams();
+
   const player = gameState.player;
-  const enemy = gameState.enemy;
-  const [hoveredCardId, setHoveredCardId] = React.useState<string | null>(null);
-  const [playedCardIds, setPlayedCardIds] = React.useState<string[]>([]);
-  const [monsterPlayingCard, setMonsterPlayingCard] = React.useState<{cardId: string, cardData: any} | null>(null);
-  const [monsterCardAnimation, setMonsterCardAnimation] = React.useState<{cardId: string, phase: 'flip' | 'enlarge' | 'execute'} | null>(null);
-  const [flippedCards, setFlippedCards] = React.useState<Set<string>>(new Set());
+  const enemy  = gameState.enemy;
 
-  // Universal system state
-  const universalPlayer = useUniversalPlayer();
-  const universalEnemy = useUniversalEnemy(gameState.enemy?.id);
-  const isUnified = isUniversalSystemReady();
+  const [phase, setPhase] = React.useState<Phase>('player');
 
-  // Monster floating animation
-  const monsterY = useSharedValue(0);
-  const monsterX = useSharedValue(0);
+  const [hoveredCardId,  setHoveredCardId]  = React.useState<string | null>(null);
+  const [playedCardIds,  setPlayedCardIds]  = React.useState<string[]>([]);
+  const [damagePopups,   setDamagePopups]   = React.useState<{ id: string; damage: number }[]>([]);
+  const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
 
-  // Monster card animation values
-  const cardFlipRotation = useSharedValue(0);
-  const cardScale = useSharedValue(1);
-  const cardTranslateY = useSharedValue(0);
+  const monsterRef  = React.useRef<MonsterAreaHandle>(null);
+  const timeoutRefs = React.useRef<ReturnType<typeof setTimeout>[]>([]);
+  const prevHpRef   = React.useRef<number>(player.hp);
+
+  const addTimeout = (fn: () => void, delay: number) => {
+    const id = setTimeout(fn, delay);
+    timeoutRefs.current.push(id);
+    return id;
+  };
 
   React.useEffect(() => {
-    // Vertical floating animation
-    monsterY.value = withRepeat(
-      withSequence(
-        withTiming(8, { duration: 2000 }),
-        withTiming(-8, { duration: 2000 })
-      ),
-      -1, // Infinite repeat
-      true // Reverse
-    );
-
-    // Horizontal floating animation (slightly offset timing)
-    setTimeout(() => {
-      monsterX.value = withRepeat(
-        withSequence(
-          withTiming(5, { duration: 2500 }),
-          withTiming(-5, { duration: 2500 })
-        ),
-        -1,
-        true
-      );
-    }, 500); // 0.5s delay for more natural movement
+    return () => { timeoutRefs.current.forEach(clearTimeout); };
   }, []);
 
-  const monsterAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: monsterX.value },
-      { translateY: monsterY.value },
-    ] as any,
-  }));
-
-  // Monster card animation style
-  const monsterCardAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { rotateY: `${cardFlipRotation.value}deg` },
-      { scale: cardScale.value },
-      { translateY: cardTranslateY.value },
-    ] as any,
-  }));
-
-  // Function to simulate monster card play animation
-  const playMonsterCardAnimation = React.useCallback(async (cardId: string, cardData: any) => {
-    console.log(`🎯 Starting animation for monster card: ${cardData?.name || cardData?.id}`);
-
-    // Phase 1: Flip card (face-down to face-up) - mark as flipped
-    setMonsterCardAnimation({ cardId, phase: 'flip' });
-    setFlippedCards(prev => new Set([...prev, cardId]));
-
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Phase 2: Enlarge and move center
-    setMonsterCardAnimation({ cardId, phase: 'enlarge' });
-    setMonsterPlayingCard({ cardId: cardData.id, cardData });
-
-    cardScale.value = withTiming(2.5, { duration: 600 });
-    cardTranslateY.value = withTiming(-100, { duration: 600 });
-
-    await new Promise(resolve => setTimeout(resolve, 700));
-
-    // Phase 3: Execute card effect
-    setMonsterCardAnimation({ cardId, phase: 'execute' });
-    console.log(`🎯 Executing effect for monster card: ${cardData?.name || cardData?.id}`);
-
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Phase 4: Reset and remove
-    cardScale.value = withTiming(0, { duration: 300 });
-
-    setTimeout(() => {
-      setMonsterPlayingCard(null);
-      setMonsterCardAnimation(null);
-      // Keep the card flipped after animation
-    }, 300);
-  }, [cardScale, cardTranslateY]);
-
-  // Removed old startMonsterTurn - now handled directly in EndTurn
-
-  const searchParams = useLocalSearchParams();
-  const {
-    monsterId,
-    monsterName,
-    monsterHp
-  } = searchParams;
-
-  // If no params provided, we shouldn't be here - go back to index
   React.useEffect(() => {
-    if (!monsterId) {
-      console.log('No monster ID provided, redirecting to index');
-      router.replace('/');
-      return;
-    }
-  }, [monsterId, router]);
+    if (!monsterId) router.replace('/');
+  }, [monsterId]);
 
-  // Start combat when entering battle page
   React.useEffect(() => {
     if (monsterId && !enemy && gameState.phase !== 'combat') {
-      // Reset states for new combat
-      setFlippedCards(new Set());
-      setMonsterCardAnimation(null);
-      setMonsterPlayingCard(null);
-
       dispatch({ type: 'StartCombat', monsterId: monsterId as string });
     }
-  }, [monsterId, enemy, gameState.phase, dispatch]);
+  }, [monsterId, enemy, gameState.phase]);
 
-  // Removed auto-trigger - monster turn will be triggered manually via StartMonsterTurn command
+  // Parse reward from engine log (format: "Victory! +X EXP, +Y gold")
+  const rewardLog = React.useMemo(() => {
+    const entry = [...gameState.log].reverse().find(l => /^Victory!\s+\+\d+ EXP/.test(l));
+    const m = entry?.match(/\+(\d+) EXP.*\+(\d+) gold/);
+    return { expGained: m ? parseInt(m[1]) : 0, goldGained: m ? parseInt(m[2]) : 0 };
+  }, [gameState.phase]);
 
-  // Monster card animations
+  React.useEffect(() => {
+    if (player.hp < prevHpRef.current) {
+      const dmg = prevHpRef.current - player.hp;
+      setDamagePopups(prev => [...prev, { id: `${Date.now()}`, damage: dmg }]);
+    }
+    prevHpRef.current = player.hp;
+  }, [player.hp]);
 
-  // Unified system handles monster turns automatically
-
-  // Calculate deck size (total cards in all piles + master deck)
-  const deckSize = gameState.masterDeck.length +
-    gameState.piles.draw.length +
-    gameState.piles.hand.length +
+  const playerHand = gameState.piles.hand;
+  const deckSize   = gameState.masterDeck.length + gameState.piles.draw.length +
     gameState.piles.discard.length;
+
+  const handlePlayCard = (card: any, index: number) => {
+    if (phase !== 'player') return;
+    const identifier = card.instanceId ?? card.id;
+    setPlayedCardIds(prev => [...prev, identifier]);
+    dispatch({ type: 'PlayCard', index });
+    addTimeout(() => monsterRef.current?.shake(), 250);
+    addTimeout(() => setPlayedCardIds(prev => prev.filter(id => id !== identifier)), 100);
+    const damage = card.dmg ?? card.damage ?? 0;
+    if (damage > 0) {
+      setDamagePopups(prev => [...prev, { id: `${Date.now()}-${index}`, damage }]);
+    }
+  };
+
+  const handleEndTurn = () => {
+    if (phase !== 'player') return;
+    if (playerHand.length > player.maxHandSize) {
+      setPhase('discard');
+      return;
+    }
+    startEnemyTurn();
+  };
+
+  const handleDiscardConfirm = (discardedIndices: number[]) => {
+    [...discardedIndices].sort((a, b) => b - a).forEach(idx => {
+      dispatch({ type: 'DiscardCard', index: idx });
+    });
+    startEnemyTurn();
+  };
+
+  const handleDiscardCancel = () => setPhase('player');
+
+  const startEnemyTurn = () => {
+    setPhase('enemy');
+    timeoutRefs.current.forEach(clearTimeout);
+    timeoutRefs.current = [];
+
+    dispatch({ type: 'EndTurn' });
+
+    const afterState = useGame.getState().state;
+    const playedIds: string[] = afterState.enemyLastPlayed ?? [];
+    const totalCards = playedIds.length;
+
+    const cards: EnemyHandCardData[] = playedIds.map((id, i) => {
+      const def = enemyCardById(id);
+      return {
+        key: `${Date.now()}-${i}`,
+        card: { name: def?.name ?? id, damage: def?.dmg ?? 0, block: def?.block ?? 0 },
+        cardIndex: i,
+        totalCards,
+        delay: i * 100,
+        playing: false,
+      };
+    });
+
+    setEnemyHandCards(cards);
+
+    // After slide-in, trigger each card to play sequentially
+    let t = ENEMY_SLIDE_IN + ENEMY_SLIDE_PAUSE;
+
+    cards.forEach((_, i) => {
+      addTimeout(() => {
+        setEnemyHandCards(prev =>
+          prev.map((c, idx) => idx === i ? { ...c, playing: true } : c)
+        );
+      }, t);
+      t += ENEMY_PLAY_TOTAL + ENEMY_CARD_GAP;
+    });
+
+    const unlockAt = Math.max(t + 200, PLAYER_UNLOCK_MIN);
+    addTimeout(() => {
+      setEnemyHandCards([]);
+      dispatch({ type: 'StartPlayerTurn' });
+      setPhase('player');
+    }, unlockAt);
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -172,796 +171,93 @@ export default function BattlePage() {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        {/* Close Button */}
-        <View style={{
-          position: 'absolute',
-          top: 30,
-          right: 10,
-          zIndex: 100,
-        }}>
+        <View style={{ position: 'absolute', top: 30, right: 10, zIndex: 100 }}>
           <Pressable onPress={() => router.back()}>
-            <ImageBackground
+            <Image
               source={require('../assets/images/btnDelete.png')}
-              style={{
-                width: 40,
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
+              style={{ width: 40, height: 40 }}
               resizeMode="stretch"
-            >
-            </ImageBackground>
+            />
           </Pressable>
         </View>
 
-        {/* Monster - Center */}
-        <View style={{
-          flex: 1,
-          // justifyContent: 'center',
-          top:65,
-          alignItems: 'center',
-        }}>
-          <Animated.View style={monsterAnimatedStyle}>
-            {(() => {
-              try {
-                // Load monster image based on monsterId
-                if (monsterId === 'phi-krasue') {
-                  return (
-                    <Image
-                      source={require('../assets/monsters/phi-krasue.png')}
-                      style={{
-                        width: 300,
-                        height: 300,
-                        marginBottom: 0,
-                      }}
-                      resizeMode="contain"
-                    />
-                  );
-                }
-              } catch (error) {
-                console.log(`Monster image not found: ${monsterId}`);
-              }
+        <MonsterArea
+          ref={monsterRef}
+          monsterId={monsterId}
+          monsterName={monsterName}
+          enemy={enemy ?? null}
+        />
 
-              // Fallback to emoji
-              return (
-                <Text style={{
-                  fontSize: 120,
-                  marginBottom: 20,
-                }}>
-                  👻
-                </Text>
-              );
-            })()}
-          </Animated.View>
+        {/* Enemy hand cards — absolute overlay, same card does slide-in + flip + rise */}
+        {enemyHandCards.map(c => (
+          <EnemyHandCard
+            key={c.key}
+            card={c.card}
+            cardIndex={c.cardIndex}
+            totalCards={c.totalCards}
+            delay={c.delay}
+            playing={c.playing}
+          />
+        ))}
 
-          <View style={{ position: 'relative', marginBottom: 15 }}>
-            <Image
-              source={require('../assets/images/badgeMonster.png')}
-              style={{
-                width: 300,
-                height: 80,
-              }}
-              resizeMode="contain"
+        <View
+          pointerEvents="none"
+          style={{ position: 'absolute', top: 280, left: 0, right: 0, alignItems: 'center', zIndex: 150 }}
+        >
+          {damagePopups.map(popup => (
+            <DamagePopup
+              key={popup.id}
+              damage={popup.damage}
+              onDone={() => setDamagePopups(prev => prev.filter(p => p.id !== popup.id))}
             />
-
-            <Text style={{
-              position: 'absolute',
-              top: 20,
-              left: 60,
-
-              color: 'rgba(255,255,255,0.4)',
-              fontSize: 12,
-              fontFamily: 'ChakraPetch_400Regular',
-              textAlign: 'center',
-              textAlignVertical: 'center',
-              // textShadowColor: 'rgba(0,0,0,0.8)',
-              // textShadowOffset: { width: 2, height: 2 },
-              // textShadowRadius: 4,
-            }}>
-              {enemy?.name || monsterName || 'Unknown Monster'}
-            </Text>
-
-            {/* HP Gauge */}
-            <View style={{
-              position: 'absolute',
-              // bottom: 15,
-              top:38,
-              left: 60,
-              width: 180,
-              height: 12,
-              backgroundColor: 'rgba(0,0,0,0.4)',
-              borderRadius: 6,
-              borderWidth: 1,
-              borderColor: 'rgba(68,23,0,0.8)',
-            }}>
-              <View style={{
-                width: `${enemy ? (enemy.hp / enemy.maxHp) * 100 : (monsterHp ? parseInt(monsterHp.toString()) / 20 * 100 : 100)}%`,
-                height: '100%',
-                backgroundColor: 'rgba(144,4,4,0.5)',
-                borderRadius: 5,
-              }} />
-            </View>
-
-            {/* HP Text */}
-            <Text style={{
-              position: 'absolute',
-              top: 35,
-              left: 50,
-              width: 200,
-              // height: 12,
-              color: 'rgba(255,255,255,0.5)',
-              fontSize: 10,
-              fontFamily: 'ChakraPetch_400Regular',
-              textAlign: 'center',
-              textAlignVertical: 'center',
-              // textShadowColor: 'rgba(0,0,0,0.8)',
-              // textShadowOffset: { width: 1, height: 1 },
-              // textShadowRadius: 2,
-            }}>
-              {enemy ? `${enemy.hp}/${enemy.maxHp}` : (monsterHp ? `${monsterHp}/20` : `20/20`)}
-            </Text>
-          </View>
-
-          {/* Monster Energy Display (Universal System) */}
-          {isUnified && universalEnemy.energy && (
-            <View style={{
-              position: 'absolute',
-              top: 320,
-              right: 20,
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: 'rgba(40, 20, 80, 0.8)',
-              padding: 8,
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: 'rgba(180, 150, 220, 0.6)',
-            }}>
-              <Image
-                source={require('../assets/images/players/iEnergy.png')}
-                style={{ width: 20, height: 20, marginRight: 4, tintColor: '#ffd93d' }}
-                resizeMode="contain"
-              />
-              <Text style={{
-                color: '#ffd93d',
-                fontSize: 12,
-                fontFamily: 'ChakraPetch_600SemiBold',
-              }}>
-                {universalEnemy.energy.current}/{universalEnemy.energy.maximum}
-              </Text>
-            </View>
-          )}
-
-          {/* Monster Cards Area */}
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 10,
-            height: 60,
-          }}>
-            {/* Show monster's hand cards - use Unified System if available */}
-            {(() => {
-              // Use universal system if available
-              if (isUnified && universalEnemy.hand.length > 0) {
-                const displayCards = convertUniversalCardsForUI(universalEnemy.hand);
-
-                return displayCards.map((card: any, index: number) => {
-                  const isAnimating = monsterCardAnimation?.cardId === card.id;
-
-                  return (
-                    <Animated.View
-                      key={`unified-card-${card.instanceId}`}
-                      style={[
-                        {
-                          width: 35,
-                          height: 50,
-                          marginHorizontal: 2,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          shadowColor: '#000',
-                          shadowOffset: { width: 0, height: 2 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 3,
-                          zIndex: isAnimating ? 999 : 1,
-                        },
-                        isAnimating && monsterCardAnimatedStyle
-                      ]}
-                    >
-                      {/* Card content - flip between back and front */}
-                      {(!flippedCards.has(card.id) && (!isAnimating || monsterCardAnimation?.phase === 'flip')) ? (
-                        // Card back with image
-                        <Image
-                          source={require('../assets/images/monsters/bgMonsterCardBackMini.png')}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            borderRadius: 4,
-                          }}
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        // Card front (when flipped)
-                        <View style={{
-                          flex: 1,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(40, 20, 80, 0.9)',
-                          borderRadius: 4,
-                          borderWidth: 1,
-                          borderColor: 'rgba(180, 150, 220, 0.6)',
-                          padding: 2,
-                        }}>
-                          <Text style={{
-                            color: 'white',
-                            fontSize: 7,
-                            fontFamily: 'ChakraPetch_400Regular',
-                            textAlign: 'center',
-                            marginBottom: 1,
-                          }}>
-                            {card.name}
-                          </Text>
-                          <Text style={{
-                            color: '#ffd93d',
-                            fontSize: 6,
-                            fontFamily: 'ChakraPetch_700Bold',
-                            marginBottom: 1,
-                          }}>
-                            ⚡{card.cost}
-                          </Text>
-                          {card.damage && (
-                            <Text style={{
-                              color: '#ff6b6b',
-                              fontSize: 8,
-                              fontFamily: 'ChakraPetch_700Bold',
-                            }}>
-                              ⚔{card.damage}
-                            </Text>
-                          )}
-                          {card.block && (
-                            <Text style={{
-                              color: '#4dabf7',
-                              fontSize: 8,
-                              fontFamily: 'ChakraPetch_700Bold',
-                            }}>
-                              🛡{card.block}
-                            </Text>
-                          )}
-                        </View>
-                      )}
-                    </Animated.View>
-                  );
-                });
-              }
-              // Fallback to enemyPiles system (for non-unified monsters)
-              else if (gameState.enemyPiles?.hand) {
-                const enemyHand = gameState.enemyPiles.hand;
-                const { enemyCardById } = require('../src/core/pack_enemy_cards');
-
-                // Show all cards in enemy hand
-                const displayCards = enemyHand;
-
-                return displayCards.map((cardId: string, index: number) => {
-                  const isAnimating = monsterCardAnimation?.cardId === cardId;
-                  const card = enemyCardById(cardId);
-
-                  return (
-                    <Animated.View
-                      key={`monster-card-${cardId}-${index}`}
-                      style={[
-                        {
-                          width: 35,
-                          height: 50,
-                          marginHorizontal: 2,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          shadowColor: '#000',
-                          shadowOffset: { width: 0, height: 2 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 3,
-                          zIndex: isAnimating ? 999 : 1,
-                        },
-                        isAnimating && monsterCardAnimatedStyle
-                      ]}
-                    >
-                      {/* Card content - flip between back and front */}
-                      {(!flippedCards.has(cardId) && (!isAnimating || monsterCardAnimation?.phase === 'flip')) ? (
-                        // Card back with image
-                        <Image
-                          source={require('../assets/images/monsters/bgMonsterCardBackMini.png')}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            borderRadius: 4,
-                          }}
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        // Card front (when flipped)
-                        <View style={{
-                          flex: 1,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(40, 20, 80, 0.9)',
-                          borderRadius: 4,
-                          borderWidth: 1,
-                          borderColor: 'rgba(180, 150, 220, 0.6)',
-                        }}>
-                          <Text style={{
-                            color: 'white',
-                            fontSize: 8,
-                            fontFamily: 'ChakraPetch_400Regular',
-                            textAlign: 'center',
-                            marginBottom: 2,
-                          }}>
-                            {card?.name || cardId}
-                          </Text>
-                          {card?.dmg && (
-                            <Text style={{
-                              color: '#ff6b6b',
-                              fontSize: 10,
-                              fontFamily: 'ChakraPetch_700Bold',
-                            }}>
-                              ⚔{card.dmg}
-                            </Text>
-                          )}
-                          {card?.block && (
-                            <Text style={{
-                              color: '#4dabf7',
-                              fontSize: 10,
-                              fontFamily: 'ChakraPetch_700Bold',
-                            }}>
-                              🛡{card.block}
-                            </Text>
-                          )}
-                        </View>
-                      )}
-                    </Animated.View>
-                  );
-                });
-              } else {
-                // Fallback to old system
-                return gameState.enemyPiles?.hand?.map((cardId, index) => {
-                  const isAnimating = monsterCardAnimation?.cardId === cardId;
-                  const { enemyCardById } = require('../src/core/pack_enemy_cards');
-                  const card = enemyCardById(cardId);
-
-              return (
-                <Animated.View
-                  key={`enemy-card-${index}`}
-                  style={[
-                    {
-                      width: 35,
-                      height: 50,
-                      // backgroundColor: 'rgba(60, 30, 120, 0.8)',
-                      // borderRadius: 6,
-                      // borderWidth: 2,
-                      // borderColor: 'rgba(180, 150, 220, 0.6)',
-                      marginHorizontal: 2,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 3,
-                      zIndex: isAnimating ? 999 : 1,
-                    },
-                    isAnimating && monsterCardAnimatedStyle
-                  ]}
-                >
-                  {/* Card content - flip between back and front */}
-                  {(!isAnimating || monsterCardAnimation?.phase === 'flip') ? (
-                    // Card back with image
-                    <Image
-                      source={require('../assets/images/monsters/bgMonsterCardBackMini.png')}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        borderRadius: 4,
-                      }}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    // Card front (when flipped)
-                    <View style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: 'rgba(40, 20, 80, 0.9)',
-                      borderRadius: 4,
-                      padding: 2,
-                    }}>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          fontSize: 8,
-                          color: 'white',
-                          fontFamily: 'ChakraPetch_600SemiBold',
-                          textAlign: 'center',
-                        }}>
-                        {card.name || card.id}
-                      </Text>
-                      {card.dmg && (
-                        <Text style={{
-                          fontSize: 10,
-                          color: '#ff6b6b',
-                          fontFamily: 'ChakraPetch_600SemiBold',
-                        }}>
-                          ⚔{card.dmg}
-                        </Text>
-                      )}
-                      {card.block && (
-                        <Text style={{
-                          fontSize: 10,
-                          color: '#4ecdc4',
-                          fontFamily: 'ChakraPetch_600SemiBold',
-                        }}>
-                          🛡{card.block}
-                        </Text>
-                      )}
-                    </View>
-                  )}
-                </Animated.View>
-              );
-                });
-              }
-            })()}
-
-            {/* Show placeholder when no cards displayed */}
-            {(() => {
-              const enemyHand = gameState.enemyPiles?.hand || [];
-              const displayCards = enemyHand;
-
-              return displayCards.length === 0 && (
-                <Text style={{
-                  color: 'rgba(255,255,255,0.3)',
-                  fontSize: 11,
-                  fontFamily: 'ChakraPetch_400Regular',
-                }}>
-                  No cards in hand
-                </Text>
-              );
-            })()}
-          </View>
-
-          {/* Test Button for Monster Card Animation */}
-          <View style={{ marginTop: 10, alignItems: 'center' }}>
-            <Pressable
-              onPress={() => {
-                // Test animation with first card
-                if (gameState.enemyPiles?.hand && (gameState.enemyPiles?.hand?.length || 0) > 0) {
-                  const firstCardId = gameState.enemyPiles.hand[0];
-                  const { enemyCardById } = require('../src/core/pack_enemy_cards');
-                  const firstCard = enemyCardById(firstCardId);
-                  playMonsterCardAnimation(firstCardId, firstCard);
-                }
-              }}
-              style={{
-                backgroundColor: 'rgba(120, 60, 200, 0.8)',
-                paddingHorizontal: 15,
-                paddingVertical: 8,
-                borderRadius: 15,
-                borderWidth: 1,
-                borderColor: 'rgba(200, 150, 255, 0.5)',
-              }}
-            >
-              <Text style={{
-                color: 'white',
-                fontSize: 10,
-                fontFamily: 'ChakraPetch_600SemiBold',
-              }}>
-                Test Monster Play
-              </Text>
-            </Pressable>
-          </View>
+          ))}
         </View>
 
-        {/* Hand Cards - Above Player Badge */}
-        <View style={{
-          position: 'absolute',
-          bottom: 120,
-          left: 0,
-          right: 0,
-          height: 160,
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-        }}>
-          {(() => {
-            // Use universal system if available
-            const playerHand = isUnified && universalPlayer.hand.length > 0
-              ? convertUniversalCardsForUI(universalPlayer.hand)
-              : gameState.piles.hand;
+        <PlayerHand
+          cards={playerHand}
+          playedCardIds={playedCardIds}
+          hoveredCardId={hoveredCardId}
+          energy={player.energy}
+          onPlayCard={handlePlayCard}
+          onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
+        />
 
-            return playerHand.map((card, index) => {
-            const cardCount = playerHand.length; // Use actual hand size
-            const maxRotation = Math.min(25, cardCount * 2.5);
-            const totalWidth = screenWidth - 40;
+        <PlayerHUD
+          hp={player.hp}
+          maxHp={player.maxHp}
+          energy={player.energy}
+          maxEnergy={player.maxEnergy}
+          block={player.block}
+          maxHandSize={player.maxHandSize}
+          deckSize={deckSize}
+          onEndTurn={handleEndTurn}
+          isEnemyTurn={phase === 'enemy'}
+        />
 
-            // Calculate spacing based on card count
-            let spacing;
-            if (cardCount <= 3) {
-              spacing = 100; // No overlap
-            } else if (cardCount <= 5) {
-              spacing = 70; // Some overlap
-            } else {
-              spacing = Math.max(50, totalWidth / (cardCount + 1)); // More overlap
-            }
+        {phase === 'discard' && (
+          <DiscardOverlay
+            cards={playerHand}
+            maxHandSize={player.maxHandSize}
+            onConfirm={handleDiscardConfirm}
+            onCancel={handleDiscardCancel}
+          />
+        )}
 
-            // Calculate position and rotation for each card
-            const centerIndex = (cardCount - 1) / 2;
-            const offsetFromCenter = index - centerIndex;
-            const rotation = (offsetFromCenter / centerIndex) * maxRotation;
-            const xOffset = offsetFromCenter * spacing;
+        {(gameState.phase === 'victory' || gameState.phase === 'levelup') && (
+          <VictoryOverlay
+            enemyName={enemy?.name ?? (Array.isArray(monsterName) ? monsterName[0] : monsterName) ?? 'ศัตรู'}
+            expGained={rewardLog.expGained}
+            goldGained={rewardLog.goldGained}
+            playerLevel={player.level}
+            playerExp={player.exp}
+            playerExpToNext={player.expToNext}
+            onContinue={() => router.replace('/')}
+          />
+        )}
 
-            return (
-              <View
-                key={card.id}
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: screenWidth / 2 + xOffset - 55, // Center and offset
-                  transform: [{ rotate: `${rotation}deg` }],
-                  zIndex: hoveredCardId === card.id ? 999 : index, // Hovered card goes to top
-                }}
-              >
-                <Card
-                  card={card}
-                  width={110}
-                  height={140}
-                  onPress={() => {
-                    console.log('Card tapped:', card.name);
-                    // Show card details or preview
-                  }}
-                  onDragPlay={() => {
-                    console.log('🎯 Card played by drag:', card.name, 'index:', index);
-                    console.log('🎯 BEFORE PLAY - Hand state:');
-                    console.log('🎯 Legacy hand:', gameState.piles.hand.map((c, i) => `${i}: ${c.name}(${c.id})`));
-                    console.log('🎯 Universal hand:', playerHand.map((c, i) => `${i}: ${c.name}(${c.instanceId})`));
-                    console.log('🎯 playedCardIds:', playedCardIds);
-
-                    // Mark card as played (will trigger fade out)
-                    // Use instanceId for universal system or card.id for legacy
-                    const cardIdentifier = isUnified && card.instanceId ? card.instanceId : card.id;
-                    setPlayedCardIds(prev => [...prev, cardIdentifier]);
-
-                    // Always use dispatch to go through migration layer
-                    dispatch({ type: 'PlayCard', index });
-
-                    // Log state after dispatch
-                    setTimeout(() => {
-                      console.log('🎯 AFTER DISPATCH - Hand state:');
-                      console.log('🎯 Legacy hand:', gameState.piles.hand.map((c, i) => `${i}: ${c.name}(${c.id})`));
-                      console.log('🎯 Universal hand:', playerHand.map((c, i) => `${i}: ${c.name}(${c.instanceId})`));
-                      console.log('🎯 playedCardIds:', playedCardIds);
-                    }, 50);
-
-                    // For unified system, remove immediately since sync is instant
-                    // For legacy system, use setTimeout for animation
-                    if (isUnified) {
-                      // Immediate cleanup for universal system
-                      setTimeout(() => {
-                        const cardIdentifier = card.instanceId || card.id;
-                        setPlayedCardIds(prev => prev.filter(id => id !== cardIdentifier));
-                      }, 100); // Short delay for animation to start
-                    } else {
-                      // After fade out animation, the card will be removed from hand by game engine
-                      setTimeout(() => {
-                        console.log('Card attack completed:', card.name);
-                        // Remove from playedCardIds since it's already removed from hand
-                        setPlayedCardIds(prev => prev.filter(id => id !== card.id));
-                      }, 800); // Match fade duration
-                    }
-                  }}
-                  onHoverChange={(isHovered) => {
-                    setHoveredCardId(isHovered ? card.id : null);
-                  }}
-                  isPlayed={playedCardIds.includes(isUnified && card.instanceId ? card.instanceId : card.id)}
-                  animationDelay={index * 100} // Stagger by 100ms each
-                />
-              </View>
-            );
-            });
-          })()}
-        </View>
-
-        {/* Player Badge - Bottom */}
-        <View style={{
-          position: 'absolute',
-          bottom: 10,
-          left: 0,
-          right: 0,
-          alignItems: 'center',
-        }}>
-          <View style={{ position: 'relative' }}>
-            <Image
-              source={require('../assets/images/players/badgePlayer.png')}
-              style={{
-                width: 350,
-                height: 100,
-              }}
-              resizeMode="contain"
-            />
-
-
-            {/* HP and End Turn Row */}
-            <View style={{
-              position: 'absolute',
-              top: 18,
-              left: 60,
-              right: 80,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-              {/* HP Section */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                {/* HP Icon */}
-                <Image
-                  source={require('../assets/images/players/iHp.png')}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    marginRight: 6,
-                  }}
-                  resizeMode="contain"
-                />
-
-                {/* Player HP Gauge with Text Overlay */}
-                <View style={{ position: 'relative' }}>
-                  <View style={{
-                    width: 100,
-                    height: 14,
-                    backgroundColor: 'rgba(0,0,0,0.4)',
-                    borderRadius: 7,
-                    borderWidth: 1,
-                    borderColor: 'rgba(68,23,0,0.8)',
-                  }}>
-                    <View style={{
-                      width: `${
-                        isUnified && universalPlayer.player
-                          ? (universalPlayer.player.hp / universalPlayer.player.maxHp) * 100
-                          : (player.hp / player.maxHp) * 100
-                      }%`,
-                      height: '100%',
-                      backgroundColor: 'rgba(144,4,4,0.5)',
-                      borderRadius: 6,
-                    }} />
-                  </View>
-
-                  {/* HP Text - Centered on Gauge */}
-                  <Text style={{
-                    position: 'absolute',
-                    top: -2,
-                    left: 0,
-                    right: 0,
-                    color: 'rgba(255,255,255,0.9)',
-                    fontSize: 10,
-                    fontFamily: 'ChakraPetch_600SemiBold',
-                    textAlign: 'center',
-                    textShadowColor: 'rgba(0,0,0,0.8)',
-                    textShadowOffset: { width: 1, height: 1 },
-                    textShadowRadius: 2,
-                  }}>
-                    {isUnified && universalPlayer.player
-                      ? `${universalPlayer.player.hp}/${universalPlayer.player.maxHp}`
-                      : `${player.hp}/${player.maxHp}`
-                    }
-                  </Text>
-                </View>
-              </View>
-
-              {/* End Turn Button */}
-              <Pressable
-                onPress={() => {
-                  console.log('End Turn pressed');
-                  if (isUnified) {
-                    endUniversalTurn();
-                  } else {
-                    dispatch({ type: 'EndTurn' });
-                  }
-                }}
-                style={{
-                  width: 70,
-                  height: 22,
-                  backgroundColor: 'rgba(200, 50, 50, 0.8)',
-                  borderRadius: 11,
-                  borderWidth: 2,
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={{
-                  color: 'white',
-                  fontSize: 9,
-                  fontFamily: 'ChakraPetch_600SemiBold',
-                  textShadowColor: 'rgba(0,0,0,0.8)',
-                  textShadowOffset: { width: 1, height: 1 },
-                  textShadowRadius: 2,
-                }}>
-                  จบเทิร์น
-                </Text>
-              </Pressable>
-            </View>
-
-            {/* Player Stats Row */}
-            <View style={{
-              position: 'absolute',
-              top: 40,
-              left: 80,
-              right: 80,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image
-                  source={require('../assets/images/players/iEnergy.png')}
-                  style={{ width: 24, height: 24, marginRight: 4 }}
-                  resizeMode="contain"
-                />
-                <Text style={{
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: 11,
-                  fontFamily: 'ChakraPetch_600SemiBold',
-                }}>
-                  {isUnified && universalPlayer.energy
-                    ? `${universalPlayer.energy.current}/${universalPlayer.energy.maximum}`
-                    : `${player.energy}/${player.maxEnergy}`
-                  }
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image
-                  source={require('../assets/images/players/iMaxHand.png')}
-                  style={{ width: 24, height: 24, marginRight: 4 }}
-                  resizeMode="contain"
-                />
-                <Text style={{
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: 11,
-                  fontFamily: 'ChakraPetch_600SemiBold',
-                }}>
-                  {player.maxHandSize}
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image
-                  source={require('../assets/images/players/iBlock.png')}
-                  style={{ width: 24, height: 24, marginRight: 4 }}
-                  resizeMode="contain"
-                />
-                <Text style={{
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: 11,
-                  fontFamily: 'ChakraPetch_600SemiBold',
-                }}>
-                  {isUnified && universalPlayer.player
-                    ? universalPlayer.player.block
-                    : player.block
-                  }
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image
-                  source={require('../assets/images/players/iDeck.png')}
-                  style={{ width: 24, height: 24, marginRight: 4 }}
-                  resizeMode="contain"
-                />
-                <Text style={{
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: 11,
-                  fontFamily: 'ChakraPetch_600SemiBold',
-                }}>
-                  {deckSize}
-                </Text>
-              </View>
-            </View>
-
-          </View>
-        </View>
+        {gameState.phase === 'defeat' && (
+          <DefeatOverlay onHome={() => router.replace('/')} />
+        )}
       </ImageBackground>
     </View>
   );

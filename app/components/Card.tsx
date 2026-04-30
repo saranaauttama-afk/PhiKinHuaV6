@@ -5,6 +5,9 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  withSequence,
+  withDelay,
+  cancelAnimation,
   runOnJS
 } from 'react-native-reanimated';
 import type { CardData } from '../../src/core/types';
@@ -42,9 +45,17 @@ export default function Card({
       onHoverChange(hovered);
     }
   };
-  const translateY = useSharedValue(200); // Start from below
-  const scale = useSharedValue(0.5); // Start small
-  const opacity = useSharedValue(0); // Start invisible
+  const translateY = useSharedValue(200);
+  const dragOffsetY = useSharedValue(0);
+  const shakeX = useSharedValue(0);
+  const scale = useSharedValue(0.5);
+  const opacity = useSharedValue(0);
+  const isPlayedShared = useSharedValue(false);
+  const isDisabledShared = useSharedValue(disabled);
+
+  React.useEffect(() => {
+    isDisabledShared.value = disabled;
+  }, [disabled]);
 
   // Entrance animation on mount
   React.useEffect(() => {
@@ -55,14 +66,21 @@ export default function Card({
     }, animationDelay);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [animationDelay]);
 
-  // Trigger fade out when card is played
   React.useEffect(() => {
     if (isPlayed) {
-      opacity.value = withTiming(0, { duration: 800 });
-      translateY.value = withTiming(-200, { duration: 800 }); // Move up as it fades
-      scale.value = withTiming(0.8, { duration: 800 }); // Shrink slightly
+      isPlayedShared.value = true;
+      cancelAnimation(translateY);
+      cancelAnimation(dragOffsetY);
+      cancelAnimation(scale);
+      // Flash: scale pop to 1.3 then shrink+fade
+      scale.value = withSequence(
+        withTiming(1.3, { duration: 100 }),
+        withTiming(0.8, { duration: 700 })
+      );
+      opacity.value = withDelay(100, withTiming(0, { duration: 700 }));
+      translateY.value = withDelay(100, withTiming(-200, { duration: 700 }));
     }
   }, [isPlayed]);
 
@@ -81,29 +99,39 @@ export default function Card({
   const panGesture = Gesture.Pan()
     .onBegin(() => {
       'worklet';
+      // Lift the card — dragOffsetY handles finger follow independently
       translateY.value = withTiming(-20, { duration: 150 });
       scale.value = withTiming(1.1, { duration: 150 });
       runOnJS(updateHoverState)(true);
     })
     .onUpdate((event) => {
       'worklet';
-      // Follow finger movement, but only allow upward movement
-      translateY.value = -20 + Math.min(0, event.translationY);
+      // Track finger separately — does NOT cancel the lift animation
+      dragOffsetY.value = Math.min(0, event.translationY);
     })
     .onEnd((event) => {
       'worklet';
-
-      // Check if dragged up enough to play card
       if (event.translationY < -50) {
-        runOnJS(handleDragPlay)();
+        if (isDisabledShared.value) {
+          shakeX.value = withSequence(
+            withTiming(15, { duration: 60 }),
+            withTiming(-15, { duration: 60 }),
+            withTiming(10, { duration: 60 }),
+            withTiming(-10, { duration: 60 }),
+            withTiming(0, { duration: 60 })
+          );
+        } else {
+          runOnJS(handleDragPlay)();
+        }
       }
-
       runOnJS(updateHoverState)(false);
     })
     .onFinalize(() => {
       'worklet';
-      // Always reset to original position when gesture is completely done
+      // Skip reset if card was already played (avoid racing with fade-out)
+      if (isPlayedShared.value) return;
       translateY.value = withTiming(0, { duration: 300 });
+      dragOffsetY.value = withTiming(0, { duration: 300 });
       scale.value = withTiming(1, { duration: 300 });
     });
 
@@ -116,7 +144,8 @@ export default function Card({
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateY: translateY.value },
+      { translateX: shakeX.value },
+      { translateY: translateY.value + dragOffsetY.value },
       { scale: scale.value },
     ],
     opacity: opacity.value,

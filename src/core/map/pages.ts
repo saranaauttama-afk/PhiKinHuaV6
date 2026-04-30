@@ -11,8 +11,8 @@ export type PageOffer =
   | { kind: 'shop_equipment'; shopId: string }
   | { kind: 'shop_remove'; shopId: string; phase: 1 | 2 }
   | { kind: 'shop_upgrade'; shopId: string; phase: 1 | 2 }
-  | { kind: 'well' }
-  | { kind: 'healing_shrine' }
+  | { kind: 'well'; shopId: string }
+  | { kind: 'healing_shrine'; shopId: string }
   | { kind: 'treasure'; shopId: string }
   | { kind: 'treasure_single'; shopId: string }
   | { kind: 'next_event' } // ไปหน้าถัดไปแบบเหตุการณ์พิเศษ
@@ -182,9 +182,9 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
         } else if (sh.kind === 'equipment') {
           cand.push({ offer: { kind: 'shop_equipment', shopId: sh.id }, w: WEIGHTS.shopEquipment * 2 });
         } else if (sh.kind === 'remove') {
-          cand.push({ offer: { kind: 'shop_remove', shopId: sh.id }, w: WEIGHTS.shopRemove1 * 2 });
+          cand.push({ offer: { kind: 'shop_remove', shopId: sh.id, phase: 1 as const }, w: WEIGHTS.shopRemove1 * 2 });
         } else if (sh.kind === 'upgrade') {
-          cand.push({ offer: { kind: 'shop_upgrade', shopId: sh.id }, w: WEIGHTS.shopUpgrade1 * 2 });
+          cand.push({ offer: { kind: 'shop_upgrade', shopId: sh.id, phase: 1 as const }, w: WEIGHTS.shopUpgrade1 * 2 });
         } else if (sh.kind === 'treasure') {
           cand.push({ offer: { kind: 'treasure', shopId: sh.id }, w: WEIGHTS.treasure * 2 });
         }
@@ -216,8 +216,8 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
     cand.push({ offer: { kind: 'shop_upgrade', shopId: 'upgrade_2', phase: 2 }, w: WEIGHTS.shopUpgrade2 });
   }
   
-  if (mp.pools.wells > 0)         cand.push({ offer: { kind: 'well' },                    w: WEIGHTS.well });
-  if (mp.pools.healingShrine > 0) cand.push({ offer: { kind: 'healing_shrine' },          w: WEIGHTS.healingShrine });
+  if (mp.pools.wells > 0)         cand.push({ offer: { kind: 'well', shopId: 'temp_well' },                       w: WEIGHTS.well });
+  if (mp.pools.healingShrine > 0) cand.push({ offer: { kind: 'healing_shrine', shopId: 'temp_healing_shrine' }, w: WEIGHTS.healingShrine });
   if (mp.pools.treasure > 0)      cand.push({ offer: { kind: 'treasure', shopId: 'temp_treasure' }, w: WEIGHTS.treasure });
   if (mp.pools.treasureSingle > 0) cand.push({ offer: { kind: 'treasure_single', shopId: 'temp_treasure_single' }, w: WEIGHTS.treasureSingle });
   if (allowNext)                  cand.push({ offer: { kind: 'next_event' },              w: WEIGHTS.nextEvent });
@@ -248,7 +248,7 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
 
   // กันหน้าโล่ง (เชิงปฏิบัติ ถ้า candidate ไม่พอ)
   while (offers.length < 3) {
-    if (mp.pools.wells > 0) offers.push({ kind: 'well' });
+    if (mp.pools.wells > 0) offers.push({ kind: 'well', shopId: 'temp_well' });
     else offers.push({ kind: 'shop_card', shopId: 'temp_card' });
   }
 
@@ -263,6 +263,10 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
         (offer as any).shopId = generateShopId('treasure', slotIndex);
       } else if (offer.shopId === 'temp_treasure_single') {
         (offer as any).shopId = generateShopId('treasure_single', slotIndex);
+      } else if (offer.shopId === 'temp_well') {
+        (offer as any).shopId = generateShopId('well', slotIndex);
+      } else if (offer.shopId === 'temp_healing_shrine') {
+        (offer as any).shopId = generateShopId('healing_shrine', slotIndex);
       }
       // Registry shops keep their existing IDs
     }

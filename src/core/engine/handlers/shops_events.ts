@@ -421,7 +421,7 @@ export function openTreasureChest(s: GameState, r: RNG): { state: GameState; rng
     const { rollShopStock } = require('../../shop');
     const out = rollShopStock(r, 2, 1.3); // 2 cards with slight power bias
     r = out.rng;
-    s.shopStock = out.items.map(item => ({ ...item, price: 0 })); // Set price to 0 (free)
+    s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
     s.shopKind = 'treasure';
     s.phase = 'shop';
   } catch {
@@ -442,7 +442,7 @@ export function openSingleTreasure(s: GameState, r: RNG): { state: GameState; rn
     const { rollShopStock } = require('../../shop');
     const out = rollShopStock(r, 1, 1.3); // 1 card with slight power bias
     r = out.rng;
-    s.shopStock = out.items.map(item => ({ ...item, price: 0 })); // Set price to 0 (free)
+    s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
     s.shopKind = 'treasure_single';
     s.phase = 'shop';
   } catch {
@@ -500,13 +500,13 @@ export function takeTreasureCard(s: GameState, cmd: Extract<Command, { type: 'Ta
   // Mark treasure as used and trigger map refresh
   if (s.pages && s.pages.current && s.pages._activeOfferIndex !== undefined) {
     const mp = s.pages;
-    const ix = mp._activeOfferIndex;
-    const offer = mp.current.offers[ix];
-    
+    const ix = mp._activeOfferIndex!;
+    const offer = mp.current!.offers[ix];
+
     // Consume treasure token and mark slot as resolved
     consumeToken(mp, offer);
-    mp.current.resolved[ix] = true;
-    
+    mp.current!.resolved[ix] = true;
+
     // Replace treasure slot with new encounter
     try {
       const out = replaceSingleOffer(mp, r, s, ix);
@@ -515,7 +515,7 @@ export function takeTreasureCard(s: GameState, cmd: Extract<Command, { type: 'Ta
     } catch (e) {
       s.log.push(`Auto-refresh treasure slot failed: ${e}`);
     }
-    
+
     // Clear active offer index
     mp._activeOfferIndex = undefined;
     mp._shopUsed = false;
@@ -568,13 +568,13 @@ export function takeSingleTreasureCard(s: GameState, cmd: Extract<Command, { typ
   // Mark treasure as used and trigger map refresh
   if (s.pages && s.pages.current && s.pages._activeOfferIndex !== undefined) {
     const mp = s.pages;
-    const ix = mp._activeOfferIndex;
-    const offer = mp.current.offers[ix];
-    
+    const ix = mp._activeOfferIndex!;
+    const offer = mp.current!.offers[ix];
+
     // Consume treasure token and mark slot as resolved
     consumeToken(mp, offer);
-    mp.current.resolved[ix] = true;
-    
+    mp.current!.resolved[ix] = true;
+
     // Replace treasure slot with new encounter
     try {
       const out = replaceSingleOffer(mp, r, s, ix);
@@ -607,7 +607,7 @@ export function randomizeSingleTreasure(s: GameState, _cmd: Extract<Command, { t
     const { rollShopStock } = require('../../shop');
     const out = rollShopStock(r, 1, 1.3); // 1 card with slight power bias
     r = out.rng;
-    s.shopStock = out.items.map(item => ({ ...item, price: 0 })); // Set price to 0 (free)
+    s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
   } catch {
     // Fallback if rollShopStock fails
     const fb = fallbackShopStock(r, 1);
@@ -623,7 +623,7 @@ export function randomizeSingleTreasure(s: GameState, _cmd: Extract<Command, { t
     const existingShop = s.shopRegistry.find(shop => shop.id === s.currentShopId);
     if (existingShop) {
       existingShop.inventory = (s.shopStock || []).map(item => ({
-        card: item.card,
+        card: ('card' in item ? item.card : undefined) as any,
         price: item.price || 0
       }));
     }

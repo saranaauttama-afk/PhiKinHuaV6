@@ -1,4 +1,4 @@
-// src/core/engine/handlers/combat.ts
+// src/core/engine/handlers/combat.ts — Legacy only (unified system removed)
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { pickEnemy } from '../../pack';
@@ -8,106 +8,42 @@ import { START_ENERGY } from '../../balance/core';
 import { grantExpAndQueueLevelUp } from '../shared';
 import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRuntime';
 import { getEquipmentById } from '../../pack';
-import { shouldUseUnifiedSystem } from '../../unified/simpleIntegration';
-import {
-  initializeUnifiedCombat,
-  unifiedEnemyTurn,
-  unifiedPlayCard
-} from '../../unified/simpleCombat';
-import {
-  shouldActivateUnifiedMode,
-  initializeUnifiedMode,
-  interceptPlayCard,
-  interceptEndTurn,
-  isUnifiedActive
-} from '../../unified/migrationLayer';
 
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
   if (s.phase !== 'combat' || s.combatVictoryLock) return { state: s, rng: r };
 
-  // Universal system handles all card playing now
-  const interceptResult = interceptPlayCard(s, cmd, r);
-  if (interceptResult.handled) {
-    return { state: interceptResult.state, rng: interceptResult.rng };
-  }
-
-  // Legacy system fallback (should not reach here in normal gameplay)
-  console.warn('[Combat] Falling back to legacy system - this should not happen');
   const idx = cmd.index;
   if (idx < 0 || idx >= s.piles.hand.length) return { state: s, rng: r };
   const played = s.piles.hand[idx];
 
-  // Handle equipment cards - install temporarily
+  // Equipment cards
   if (played.type === 'equipment' && played.equipmentId) {
-    s.log.push(`DEBUG: Attempting to play equipment card: ${played.name} (ID: ${played.id})`);
-    s.log.push(`DEBUG: Equipment ID to install: ${played.equipmentId}`);
-    
     const equipmentData = getEquipmentById(played.equipmentId);
     let equipmentInstalled = false;
-    
-    if (!equipmentData) {
-      s.log.push(`DEBUG: Equipment data not found for ID: ${played.equipmentId}`);
-    } else {
-      s.log.push(`DEBUG: Equipment data found: ${equipmentData.name} (ID: ${equipmentData.id})`);
-      
-      // Check if already equipped (either permanently or temporarily)
+
+    if (equipmentData) {
       const alreadyEquipped = (s.equipped || []).some(eq => eq.id === equipmentData.id);
-      s.log.push(`DEBUG: Already equipped? ${alreadyEquipped}`);
-      s.log.push(`DEBUG: Current equipped: [${(s.equipped || []).map(eq => `${eq.name}(${eq.id})`).join(', ')}]`);
-      
       if (!alreadyEquipped) {
-        // Calculate slot usage - during combat, we have additional temporary slots
         const currentSlotUsage = (s.equipped || []).reduce((sum, eq) => sum + (eq.slotCost || 1), 0);
-        const baseSlots = s.equipmentSlotsMax || 1;
-        const tempSlots = s.equipmentTempSlots || 5; // Default 5 temp slots during combat
-        const maxSlots = baseSlots + tempSlots;
+        const maxSlots = (s.equipmentSlotsMax || 1) + (s.equipmentTempSlots || 5);
         const cardSlotCost = played.slotCost || equipmentData.slotCost || 1;
-        
-        s.log.push(`DEBUG: Slot check - Current: ${currentSlotUsage}, Base: ${baseSlots}, Temp: ${tempSlots}, Total: ${maxSlots}, Need: ${cardSlotCost}`);
-        
         if (currentSlotUsage + cardSlotCost <= maxSlots) {
-          // Install temporarily
           s.equipped = s.equipped || [];
-          s.equipped.push({
-            id: equipmentData.id,
-            name: equipmentData.name,
-            rarity: equipmentData.rarity,
-            slotCost: equipmentData.slotCost,
-            desc: equipmentData.desc,
-            tags: equipmentData.tags,
-            temporary: true // Mark as temporary
-          } as any);
-          
+          s.equipped.push({ ...equipmentData, temporary: true } as any);
           equipmentInstalled = true;
-          s.log.push(`Temporarily equipped: ${equipmentData.name || equipmentData.id}`);
-          s.log.push(`DEBUG: Equipment count now ${s.equipped.length}, temp count: ${s.equipped.filter(eq => eq.temporary).length}`);
-        } else {
-          s.log.push(`DEBUG: Not enough equipment slots for ${equipmentData.name || equipmentData.id}`);
-          s.log.push(`Not enough equipment slots for ${equipmentData.name || equipmentData.id}`);
+          s.log.push(`Equipped: ${equipmentData.name}`);
         }
-      } else {
-        s.log.push(`DEBUG: ${equipmentData.name || equipmentData.id} is already equipped`);
-        s.log.push(`${equipmentData.name || equipmentData.id} is already equipped`);
       }
     }
-    
-    // Equipment cards are removed from hand
+
     const [c] = s.piles.hand.splice(idx, 1);
-    
-    // If equipment was installed, remove the card completely (don't put in discard)
-    // If equipment couldn't be installed, put in discard as normal
-    if (!equipmentInstalled) {
-      s.piles.discard.push(c);
-    }
-    
-    s.log.push(`Played ${played.name}${equipmentInstalled ? ' (consumed)' : ' (failed)'}`);
-    s.log.push(`DEBUG: Card ${equipmentInstalled ? 'REMOVED from game' : 'went to discard'}`);
+    if (!equipmentInstalled) s.piles.discard.push(c);
+    s.log.push(`Played ${played.name}${equipmentInstalled ? ' (equipped)' : ' (failed)'}`);
     return { state: s, rng: r };
   }
 
-  // energy paywall (basic=0, special>=1) - only for non-equipment cards
-  const base = typeof (played as any).cost === 'number' ? (played as any).cost : 0;
-  const cost = Math.max(0, Math.floor(base));
+  // Energy check
+  const cost = Math.max(0, Math.floor(typeof (played as any).cost === 'number' ? (played as any).cost : 0));
   if (cost > 0) {
     const cur = s.player.energy ?? 0;
     if (cur < cost) {
@@ -117,13 +53,9 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     s.player.energy = cur - cost;
   }
 
-  // effect
-  console.log(`🔥 About to call applyCardEffect for card: ${played.name} (${played.id})`);
   applyCardEffect(s, idx);
-  console.log(`🔥 Finished applyCardEffect for card: ${played.name}`);
-// ★ แจ้งอุปกรณ์ว่า “ผู้เล่นเล่นการ์ด”
-runEquipmentCardPlayed(s, played, 'player');
-  // blessings on_card_played
+  runEquipmentCardPlayed(s, played, 'player');
+
   try {
     for (const b of (s.blessings ?? [])) {
       const fns = getCardPlayedFns(b, played);
@@ -134,7 +66,6 @@ runEquipmentCardPlayed(s, played, 'player');
     s.log.push(`Blessing error: ${e?.message ?? String(e)}`);
   }
 
-  // move to discard or exhaust
   const [c] = s.piles.hand.splice(idx, 1);
   if ((played as any).exhaust) {
     s.piles.exhaust.push(c);
@@ -144,7 +75,6 @@ runEquipmentCardPlayed(s, played, 'player');
     s.log.push(`Played ${played.name}`);
   }
 
-  // on-play draw
   if ((played as any).draw && (played as any).draw > 0) {
     const target = s.piles.hand.length + (played as any).draw;
     ({ state: s, rng: r } = drawUpTo(s, r, target));
@@ -153,12 +83,8 @@ runEquipmentCardPlayed(s, played, 'player');
   if (isVictory(s)) {
     r = grantExpAndQueueLevelUp(s, r);
     s.combatVictoryLock = true;
-    
-    // Clear minions on victory
     const { clearAllMinions } = require('../../minionRuntime');
     clearAllMinions(s);
-    
-    // Check if level up is pending - go to levelup phase first
     if (s.levelUp && !s.levelUp.consumed) {
       s.phase = 'levelup';
       s.log.push('Level Up!');
@@ -173,71 +99,32 @@ runEquipmentCardPlayed(s, played, 'player');
 export function endTurn(s: GameState, cmd: Extract<Command, { type: 'EndTurn' }>, r: RNG) {
   if (s.phase !== 'combat') return { state: s, rng: r };
 
-  // Universal system handles all turn management now
-  const interceptResult = interceptEndTurn(s, cmd, r);
-  if (interceptResult.handled) {
-    return { state: interceptResult.state, rng: interceptResult.rng };
-  }
-
-  // Legacy system fallback (should not reach here in normal gameplay)
-  console.warn('[Combat] EndTurn falling back to legacy system - this should not happen');
-
-  // Import status effects system
   const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
-
-  // Process status effects at end of player turn
-  processStatusEffectsOnTurnEnd('player', s);
-
-  // Process minions at end of turn (duration countdown, etc.)
   const { processMinionsEndTurn } = require('../../minionRuntime');
-  processMinionsEndTurn(s);
 
-  // ★ ปลายเทิร์นผู้เล่น → ยิงอุปกรณ์ก่อนสลับฝั่ง
+  processStatusEffectsOnTurnEnd('player', s);
+  processMinionsEndTurn(s);
   runEquipmentTurnHook(s, 'on_turn_end', 'player');
 
-  // Enhanced enemy turn with sequential card playing
   const enemyHandlers = require('./enemy');
   if (s.enemy && s.enemyPiles) {
-    console.log(`🎬 Starting enhanced enemy turn for ${s.enemy.id}`);
+    s.enemyEnergy = s.enemy.maxEnergy || 2;
 
-    // Use unified system if available
-    if (shouldUseUnifiedSystem(s)) {
-      unifiedEnemyTurn(s, s.enemy.id, r);
-      return startPlayerTurn(s, r);
-    }
-
-    // Reset enemy energy
-    const maxEnergy = (s as any).enemyMaxEnergy || s.enemy.maxEnergy || 2;
-    s.enemyEnergy = maxEnergy;
-    console.log(`🔋 EndTurn: Setting enemy energy to ${maxEnergy}`);
-
-    // Enemy draws up to hand size only if hand is empty
     if (s.enemyPiles.hand.length === 0) {
       enemyHandlers.enemyDrawUpToHand(s);
-      console.log(`🎴 EndTurn: Enemy hand after draw:`, s.enemyPiles.hand);
-    } else {
-      console.log(`🎴 EndTurn: Enemy already has cards, skipping draw`);
     }
+    s.enemyLastPlayed = [...s.enemyPiles.hand];
 
-    // Standard enemy AI for non-unified monsters
-    console.log(`🤖 Using bulk AI turn for ${s.enemy.id}`);
-    // Run standard enemy turn (bulk play all cards)
     endEnemyTurn(s);
   } else {
-    // Fallback if no enemy/piles
     endEnemyTurn(s);
   }
-  
-  // Check for victory after enemy turn
+
   if (isVictory(s)) {
     r = grantExpAndQueueLevelUp(s, r);
     s.combatVictoryLock = true;
-    
-    // Clear minions on victory
     const { clearAllMinions } = require('../../minionRuntime');
     clearAllMinions(s);
-    
-    // Check if level up is pending - go to levelup phase first
     if (s.levelUp && !s.levelUp.consumed) {
       s.phase = 'levelup';
       s.log.push('Level Up!');
@@ -247,32 +134,27 @@ export function endTurn(s: GameState, cmd: Extract<Command, { type: 'EndTurn' }>
     }
     return { state: s, rng: r };
   }
-  
+
   if (isDefeat(s)) {
     s.phase = 'defeat';
     s.log.push('Defeat..');
-    
-    // Clear minions on defeat
     const { clearAllMinions } = require('../../minionRuntime');
     clearAllMinions(s);
-    
-    // Clear temporary equipment slots
     s.equipmentTempSlots = 0;
-    
-    // Remove temporary equipment on defeat
     if (s.equipped) {
-      const permanentEquipment = s.equipped.filter(eq => !eq.temporary);
-      const removedCount = s.equipped.length - permanentEquipment.length;
-      s.equipped = permanentEquipment;
-      if (removedCount > 0) {
-        s.log.push(`Removed ${removedCount} temporary equipment`);
-      }
+      s.equipped = s.equipped.filter(eq => !eq.temporary);
     }
-    
     return { state: s, rng: r };
   }
+
   runBlessingsTurnHook(s, 'on_turn_end');
   s.turn = 1;
+
+  return { state: s, rng: r };
+}
+
+export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { type: 'StartPlayerTurn' }>, r: RNG) {
+  if (s.phase !== 'combat') return { state: s, rng: r };
   ({ state: s, rng: r } = startPlayerTurn(s, r));
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
@@ -282,82 +164,16 @@ export function endTurn(s: GameState, cmd: Extract<Command, { type: 'EndTurn' }>
 export function start(s: GameState, cmd: Extract<Command, { type: 'StartCombat' }>, r: RNG) {
   startCombat(s, cmd.monsterId, r);
 
-  // Initialize unified system (new migration layer)
-  if (shouldActivateUnifiedMode(s)) {
-    initializeUnifiedMode(s, r);
-  }
-  // Fallback to old unified system
-  else if (shouldUseUnifiedSystem(s)) {
-    initializeUnifiedCombat(s, r);
-  }
-
-  // Start first player turn
-  return startPlayerTurn(s, r);
-}
-
-export function enemyPlayCard(s: GameState, cmd: Extract<Command, { type: 'EnemyPlayCard' }>, r: RNG) {
-  console.log(`🎮 EnemyPlayCard called - cardIndex: ${cmd.cardIndex}`);
-  console.log(`🎮 Current enemyPiles.hand:`, s.enemyPiles?.hand);
-  console.log(`🎮 Enemy energy:`, (s as any).enemyEnergy);
-
-  // Use unified system if available
-  if (shouldUseUnifiedSystem(s) && s.enemy) {
-    const enemyId = s.enemy.id;
-    unifiedPlayCard(s, {
-      entityId: enemyId,
-      cardIndex: cmd.cardIndex,
-      targetId: 'player'
-    }, r);
-    return { state: s, rng: r };
-  }
-
-
-  if (s.phase !== 'combat' || !s.enemy || !s.enemyPiles) {
-    console.log(`🎮 Early exit - phase: ${s.phase}, enemy: ${!!s.enemy}, enemyPiles: ${!!s.enemyPiles}`);
-    return { state: s, rng: r };
-  }
-
-  const cardIndex = cmd.cardIndex;
-  const enemyHand = s.enemyPiles.hand;
-
-  if (cardIndex < 0 || cardIndex >= enemyHand.length) {
-    console.log(`Invalid enemy card index: ${cardIndex}, hand size: ${enemyHand.length}`);
-    return { state: s, rng: r };
-  }
-
-  const enemyHandlers = require('./enemy');
-  const success = enemyHandlers.enemyPlayCardId(s, cardIndex);
-
-  if (success) {
-    console.log(`Enemy successfully played card at index ${cardIndex}`);
-  } else {
-    console.log(`Enemy failed to play card at index ${cardIndex}`);
-  }
-
+  ({ state: s, rng: r } = startPlayerTurn(s, r));
 
   return { state: s, rng: r };
 }
 
-// MonsterPlayCard removed - using EnemyPlayCard with cardIndex instead
-
-export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { type: 'StartPlayerTurn' }>, r: RNG) {
-  if (s.phase !== 'combat') return { state: s, rng: r };
-
-  console.log(`🎯 StartPlayerTurn: Starting player turn`);
-  return startPlayerTurn(s, r);
+// Kept for apply.ts compatibility — legacy endTurn handles all enemy card playing
+export function enemyPlayCard(s: GameState, _cmd: Extract<Command, { type: 'EnemyPlayCard' }>, r: RNG) {
+  return { state: s, rng: r };
 }
 
 export function startMonsterTurn(s: GameState, _cmd: Extract<Command, { type: 'StartMonsterTurn' }>, r: RNG) {
-  if (s.phase !== 'combat' || !s.enemy || !s.enemyPiles) return { state: s, rng: r };
-
-  console.log('🎮 StartMonsterTurn: Beginning sequential monster card execution');
-
-  // Set monster turn state
-  (s as any).monsterTurnActive = true;
-  (s as any).monsterCardQueue = [...s.enemyPiles.hand]; // Copy all cards to queue
-  (s as any).monsterTurnTimer = Date.now(); // Start timer
-
-  console.log(`🎮 Monster turn started with ${s.enemyPiles.hand.length} cards in queue`);
-
   return { state: s, rng: r };
 }

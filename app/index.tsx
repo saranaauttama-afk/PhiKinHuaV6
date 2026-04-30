@@ -49,7 +49,7 @@ type Store = {
 
 const makeEmptyState = (): GameState => ({
   seed: '',
-  phase: 'menu',
+  phase: 'start',
   turn: 0,
   player: {
     hp: START_HP, maxHp: START_HP, block: 0,

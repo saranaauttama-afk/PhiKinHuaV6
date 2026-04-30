@@ -8,8 +8,9 @@ import { resetBlessingTurnFlags } from './blessingRuntime';
 import { enemyCardById } from './pack_enemy_cards';
 import type { EnemyCard } from './types';
 import { resetEquipmentTurnFlags, runEquipmentTurnHook } from './equipmentRuntime';
-import { isUnifiedActive } from './unified/migrationLayer';
 import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
+
+let _instanceCounter = 0;
 
 // NOTE: We keep state updates pure by working on shallow copies of containers.
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -97,10 +98,13 @@ export function drawUpTo(s: GameState, rng: RNG, targetHandSize = HAND_SIZE): { 
 export function buildAndShuffleDeck(_state: GameState, _rng: RNG): { state: GameState; rng: RNG } {
   let state = _state;
   let rng = _rng;
-  // ✅ ใช้ masterDeck เป็นแหล่งสร้างกอง ถ้าว่างค่อย fallback ไป START_DECK
   const source = state.masterDeck?.length ? state.masterDeck : START_DECK;
   const out = shuffle(rng, source);
-  state.piles = { draw: out.array.slice(), hand: [], discard: [], exhaust: [] };
+  _instanceCounter = 0;
+  state.piles = {
+    draw: out.array.map(c => ({ ...c, instanceId: `${c.id}__${++_instanceCounter}` })),
+    hand: [], discard: [], exhaust: [],
+  };
   rng = out.rng;
   return { state, rng };
 }
@@ -125,13 +129,8 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   // Process status effects at start of turn
   processStatusEffectsOnTurnStart('player', state);
 
-  // จั่วให้ครบมือ (disabled when using Universal System)
-  if (!isUnifiedActive()) {
-    const out = drawUpTo(state, rng, state.player.maxHandSize ?? HAND_SIZE);
-    state = out.state; rng = out.rng;
-  } else {
-    console.log('[Commands] Skipping drawUpTo - Universal System handles card drawing');
-  }
+  const out = drawUpTo(state, rng, state.player.maxHandSize ?? HAND_SIZE);
+  state = out.state; rng = out.rng;
 
   // ★ ยิง on_turn_start (ฝั่งผู้เล่น)
   runEquipmentTurnHook(state, 'on_turn_start', 'player');
