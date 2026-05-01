@@ -82,7 +82,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const maxHp        = enemy?.maxHp ?? 20;
 
   return (
-    <View style={{ flex: 1, paddingTop: 65, alignItems: 'center' }}>
+    <View style={{ flex: 1, paddingTop: 100, alignItems: 'center' }}>
       <Animated.View style={floatStyle}>
         {monsterImage ? (
           <Image source={monsterImage} style={{ width: 300, height: 300 }} resizeMode="contain" />
@@ -91,7 +91,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         )}
       </Animated.View>
 
-      <View style={{ marginBottom: 15 }}>
+      <View style={{ marginBottom: -8 }}>
         <Image
           source={require('../../../assets/images/badgeMonster.png')}
           style={{ width: 300, height: 80 }}

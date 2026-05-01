@@ -129,7 +129,9 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   // Process status effects at start of turn
   processStatusEffectsOnTurnStart('player', state);
 
-  const out = drawUpTo(state, rng, state.player.maxHandSize ?? HAND_SIZE);
+  // จั่วเพิ่ม maxHandSize ใบ (ไม่ใช่จั่วถึง maxHandSize) — card ค้างมือได้สะสม
+  const drawTarget = state.piles.hand.length + (state.player.maxHandSize ?? HAND_SIZE);
+  const out = drawUpTo(state, rng, drawTarget);
   state = out.state; rng = out.rng;
 
   // ★ ยิง on_turn_start (ฝั่งผู้เล่น)

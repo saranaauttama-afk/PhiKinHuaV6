@@ -251,6 +251,8 @@ export type Command =
   | { type: 'EnemyPlayCard'; cardIndex: number }
   | { type: 'StartMonsterTurn' }
   | { type: 'EndTurn' }
+  | { type: 'PrepareEnemyTurn' }
+  | { type: 'ResolveEnemyCard'; cardId: string }
   | { type: 'StartPlayerTurn' }
   | { type: 'DiscardCard'; index: number }
 

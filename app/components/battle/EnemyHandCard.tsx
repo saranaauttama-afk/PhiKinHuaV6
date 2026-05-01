@@ -11,11 +11,11 @@ import Animated, {
 
 const CARD_W      = 110;
 const CARD_H      = 150;
-const IDLE_SCALE  = 0.36;   // 150 * 0.36 = 54px tall — matches face-down card height
-const SLOT_W      = 44;     // 38px card + 3px margin each side
+const IDLE_SCALE  = 0.28;   // เล็กลง — นั่งอยู่เหนือ badge enemy
+const SLOT_W      = 40;
 
-// Fixed layout: paddingTop(65) + sprite(300) + badge(80) + marginBottom(15) + halfHand(30)
-const HAND_CENTER_Y = 490;
+// paddingTop(100) + sprite(300) − 20 (เหนือ badge เล็กน้อย)
+const HAND_CENTER_Y = 380;
 
 const PHASE_ENTER = 450;
 const PHASE_FLIP  = 300;
@@ -23,7 +23,8 @@ const PHASE_RISE  = 350;
 const PHASE_HOLD  = 500;
 const PHASE_EXIT  = 200;
 
-export const ENEMY_PLAY_TOTAL = PHASE_FLIP + PHASE_RISE + PHASE_HOLD + PHASE_EXIT; // 1350ms
+export const ENEMY_PLAY_TOTAL      = PHASE_FLIP + PHASE_RISE + PHASE_HOLD + PHASE_EXIT; // 1350ms
+export const ENEMY_MAX_SCALE_OFFSET = PHASE_FLIP + PHASE_RISE; // 650ms — จังหวะที่ card ใหญ่สุด
 
 const easeOut  = Easing.out(Easing.cubic);
 const easeBack = Easing.out(Easing.back(1.4));

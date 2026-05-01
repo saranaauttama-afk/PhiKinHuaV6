@@ -257,7 +257,7 @@ s.log.push(`Enemy discards unknown card ${id}.`);
   return true;
 }
 
-function enemyDiscardHand(s: GameState) {
+export function enemyDiscardHand(s: GameState) {
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] } | undefined;
   if (!piles) return;
   if (piles.hand.length > 0) {

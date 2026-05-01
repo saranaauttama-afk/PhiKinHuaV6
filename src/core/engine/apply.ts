@@ -28,6 +28,8 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EnemyPlayCard: combat.enemyPlayCard,
   StartMonsterTurn: combat.startMonsterTurn,
   EndTurn: combat.endTurn,
+  PrepareEnemyTurn: combat.prepareEnemyTurn,
+  ResolveEnemyCard: combat.resolveEnemyCard,
   StartPlayerTurn: combat.startPlayerTurnHandler,
   DiscardCard: (s, cmd, r) => {
     if (s.phase !== 'combat') return { state: s, rng: r };

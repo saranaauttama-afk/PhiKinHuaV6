@@ -177,3 +177,71 @@ export function enemyPlayCard(s: GameState, _cmd: Extract<Command, { type: 'Enem
 export function startMonsterTurn(s: GameState, _cmd: Extract<Command, { type: 'StartMonsterTurn' }>, r: RNG) {
   return { state: s, rng: r };
 }
+
+// ── ขั้นที่ 1: เตรียมเทิร์น enemy (ดึงการ์ด, บันทึก enemyLastPlayed) ยังไม่ apply effect
+export function prepareEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'PrepareEnemyTurn' }>, r: RNG) {
+  if (s.phase !== 'combat') return { state: s, rng: r };
+
+  const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
+  const { processMinionsEndTurn }         = require('../../minionRuntime');
+  const { processEnemyTurnBehaviors }     = require('../../enemyBehaviorRuntime');
+  const { onTurnEndForCombos }            = require('../../cardComboSystem');
+  const { onPlayerTurnEnd }              = require('../../adaptiveAI');
+  const { enemyDrawUpToHand, enemyDiscardHand } = require('./enemy');
+
+  // จบเทิร์น player
+  processStatusEffectsOnTurnEnd('player', s);
+  processMinionsEndTurn(s);
+  runEquipmentTurnHook(s, 'on_turn_end', 'player');
+  runBlessingsTurnHook(s, 'on_turn_end');
+  resetBlessingTurnFlags(s);
+  onTurnEndForCombos(s);
+  onPlayerTurnEnd(s, { energyUsed: 0, blockGained: s.player.block });
+  s.turn = 1;
+
+  // เตรียมเทิร์น enemy
+  if (s.enemy && (s as any).enemyPiles) {
+    (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
+    s.enemy.block = 0;
+
+    if ((s as any).enemyPiles.hand.length === 0) {
+      enemyDrawUpToHand(s);
+    }
+    // บันทึกรายการที่จะเล่น แล้วเคลียร์มือทันที (animation ใช้ enemyLastPlayed)
+    s.enemyLastPlayed = [...(s as any).enemyPiles.hand];
+    enemyDiscardHand(s);
+  }
+
+  return { state: s, rng: r };
+}
+
+// ── ขั้นที่ 2: apply effect ของ 1 ใบ (เรียกตอน card ถึง max scale)
+export function resolveEnemyCard(s: GameState, cmd: Extract<Command, { type: 'ResolveEnemyCard' }>, r: RNG) {
+  if (!s.enemy) return { state: s, rng: r };
+
+  const { enemyCardById } = require('../../pack_enemy_cards');
+  const def = enemyCardById(cmd.cardId);
+  if (!def) return { state: s, rng: r };
+
+  if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
+    const atk      = def.dmg!;
+    const blockAfter = Math.max(0, s.player.block - atk);
+    const hpLoss   = Math.max(0, atk - s.player.block);
+    s.player.block = blockAfter;
+    s.player.hp    = Math.max(0, s.player.hp - hpLoss);
+    s.log.push(`Enemy resolves ${def.name ?? def.id}: -${hpLoss} HP`);
+  } else if ((def.block ?? 0) > 0) {
+    s.enemy.block = (s.enemy.block ?? 0) + (def.block ?? 0);
+    s.log.push(`Enemy resolves ${def.name ?? def.id}: +${def.block} block`);
+  } else {
+    s.log.push(`Enemy resolves ${def.name ?? def.id}`);
+  }
+
+  if (isDefeat(s)) {
+    s.phase = 'defeat';
+    const { clearAllMinions } = require('../../minionRuntime');
+    clearAllMinions(s);
+  }
+
+  return { state: s, rng: r };
+}
