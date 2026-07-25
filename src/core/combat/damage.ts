@@ -18,9 +18,45 @@ export type Side = 'player' | 'enemy';
 
 export type DamageSource =
   | { kind: 'card'; cardId: string }
+  | { kind: 'combo'; comboId: string }
   | { kind: 'status'; effectId: string }
-  | { kind: 'minion'; minionId: string }
+  | { kind: 'minion'; minionId: string; ignoresBlock?: boolean }
   | { kind: 'event' };
+
+/**
+ * กฎของดาเมจแต่ละชนิด — ที่มาของดาเมจเป็นตัวกำหนดกฎเอง ไม่ต้องส่ง flag เพิ่ม
+ *
+ * - card / combo: ดาเมจต่อสู้เต็มรูปแบบ ผ่านทุกอย่าง
+ *   (combo เกิดจากการเล่นการ์ดของผู้เล่น = พลังของผู้เล่น จึงคิดเหมือนการ์ด)
+ *
+ * - status (poison ฯลฯ): ทะลุ block และไม่โดน modifier ใดๆ
+ *   block คือการปัดป้องหมัดที่กำลังมา แต่พิษอยู่ในตัวแล้ว — เป็นธรรมเนียมของแนวนี้
+ *   และ DoT ที่ stack ได้ต้องคาดเดาได้ ไม่ใช่คูณซ้อนกับ buff จนบานปลาย
+ *
+ * - minion: โดน block ตามปกติ (เว้นแต่ ability ระบุ ignoresBlock)
+ *   ผู้รับที่ติด vulnerable กินเพิ่ม แต่ *ไม่* สืบทอด strength ของผู้เรียก
+ *   เพราะ minion เป็นคนละตัวกับผู้เรียก มีพลังของตัวเอง
+ *
+ * - event: ดาเมจเชิงเนื้อเรื่อง ไม่ใช่การต่อสู้ → ทะลุทุกอย่าง
+ */
+type DamageRules = {
+  useBlock: boolean;
+  attackerMods: boolean;
+  defenderMods: boolean;
+};
+
+function rulesFor(source: DamageSource): DamageRules {
+  switch (source.kind) {
+    case 'card':
+    case 'combo':
+      return { useBlock: true, attackerMods: true, defenderMods: true };
+    case 'minion':
+      return { useBlock: !source.ignoresBlock, attackerMods: false, defenderMods: true };
+    case 'status':
+    case 'event':
+      return { useBlock: false, attackerMods: false, defenderMods: false };
+  }
+}
 
 export type DamageResult = {
   /** ตัวเลขดิบก่อนปรับ (เช่น ค่า dmg บนการ์ด) */
@@ -65,30 +101,35 @@ export function dealDamage(
     return { raw, modified: 0, blocked: 0, hpLoss: 0, died: false };
   }
 
+  const rules = rulesFor(args.source);
+  let dmg = raw;
+
   // 1) ฝั่งผู้ตี — ฟังก์ชันนี้อ่าน status ของ "ผู้ตี" จาก flag ตัวที่สอง
   //    (ก่อนหน้านี้ถูกเรียกด้วย true เสมอ ทำให้ฝั่งศัตรูไม่เคยถูกคำนวณ)
-  let dmg = modifyDamageForStatusEffects(state, raw, from === 'player');
+  if (rules.attackerMods) {
+    dmg = modifyDamageForStatusEffects(state, dmg, from === 'player');
 
-  // 2) adaptive AI — เดิมใช้กับดาเมจผู้เล่นเท่านั้นในรูปแบบ inverse
-  //    คงไว้ตามเดิมเพื่อไม่ให้ balance ฝั่งศัตรูขยับเกินจากที่ตั้งใจแก้
-  if (from === 'player') {
-    const { getAdaptiveDamageMultiplier } = require('../adaptiveAI');
-    const mult = getAdaptiveDamageMultiplier();
-    if (Number.isFinite(mult) && mult > 0) {
-      dmg = dmg * (1 / mult);
+    // 2) adaptive AI — เดิมใช้กับดาเมจผู้เล่นเท่านั้นในรูปแบบ inverse
+    //    คงไว้ตามเดิมเพื่อไม่ให้ balance ฝั่งศัตรูขยับเกินจากที่ตั้งใจแก้
+    if (from === 'player') {
+      const { getAdaptiveDamageMultiplier } = require('../adaptiveAI');
+      const mult = getAdaptiveDamageMultiplier();
+      if (Number.isFinite(mult) && mult > 0) {
+        dmg = dmg * (1 / mult);
+      }
     }
   }
 
   // 3) ฝั่งผู้รับ — vulnerable เคยประกาศไว้ใน registry แต่ไม่เคยถูกต่อสาย
-  if (hasStatusEffect(to, state, 'vulnerable' as any)) {
+  if (rules.defenderMods && hasStatusEffect(to, state, 'vulnerable' as any)) {
     dmg = dmg * VULNERABLE_MULTIPLIER;
   }
 
   const modified = Math.max(0, Math.round(dmg));
 
-  // 4) block ดูดซับ
+  // 4) block ดูดซับ (ดาเมจบางชนิดทะลุ block — ดู rulesFor)
   const blockBefore = targetState.block ?? 0;
-  const blocked = Math.min(blockBefore, modified);
+  const blocked = rules.useBlock ? Math.min(blockBefore, modified) : 0;
   const hpLoss = modified - blocked;
 
   targetState.block = blockBefore - blocked;

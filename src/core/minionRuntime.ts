@@ -173,13 +173,10 @@ function processMinionAbility(
   
   switch (ability.type) {
     case 'attack':
-      const damage = ability.value;
-      if (ability.ignores_block) {
-        actualTarget.hp = Math.max(0, actualTarget.hp - damage);
-        state.log.push(`👻 ${minion.name} phases through defenses for ${damage} damage!`);
-      } else {
-        dealMinionDamage(state, minion, actualTarget, actualTargetType, damage);
-      }
+      dealMinionDamage(
+        state, minion, actualTarget, actualTargetType,
+        ability.value, !!ability.ignores_block
+      );
       break;
       
     case 'heal':
@@ -273,27 +270,27 @@ function dealMinionDamage(
   minion: MinionData,
   target: any,
   targetType: 'player' | 'enemy',
-  damage: number
+  damage: number,
+  ignoresBlock = false
 ): void {
-  
-  // (Environment system removed - using base damage)
-  
-  // Apply block system for both player and enemy targets
-  const blockBefore = target.block || 0;
-  if (blockBefore > 0) {
-    const blockedDamage = Math.min(damage, blockBefore);
-    target.block = blockBefore - blockedDamage;
-    damage -= blockedDamage;
-    
-    if (blockedDamage > 0) {
-      state.log.push(`🛡️ ${targetType} blocks ${blockedDamage} damage from ${minion.name} (${target.block} block remaining)`);
-    }
+  // minion เป็นคนละตัวกับผู้เรียก → ไม่สืบทอด strength ของผู้เรียก
+  // แต่ผู้รับที่ติด vulnerable ยังกินเพิ่มตามปกติ (ดู rulesFor ใน combat/damage.ts)
+  const { dealDamage } = require('./combat/damage');
+  const result = dealDamage(state, {
+    from: targetType === 'player' ? 'enemy' : 'player',
+    to: targetType,
+    raw: damage,
+    source: { kind: 'minion', minionId: minion.id, ignoresBlock },
+  });
+
+  if (result.blocked > 0) {
+    state.log.push(
+      `🛡️ ${targetType} blocks ${result.blocked} damage from ${minion.name} (${target.block} block remaining)`
+    );
   }
-  
-  // Apply remaining damage
-  if (damage > 0) {
-    target.hp = Math.max(0, target.hp - damage);
-    state.log.push(`⚔️ ${minion.name} deals ${damage} damage to ${targetType}!`);
+  if (result.hpLoss > 0) {
+    const suffix = ignoresBlock ? ' (ignores block)' : '';
+    state.log.push(`⚔️ ${minion.name} deals ${result.hpLoss} damage to ${targetType}!${suffix}`);
   }
 }
 
@@ -445,12 +442,10 @@ function processMinionsAbilities(state: GameState, minion: MinionData, owner: 'p
             const damage = ability.value;
             
             if (targetEntity) {
-              if (ability.ignores_block) {
-                targetEntity.hp = Math.max(0, targetEntity.hp - damage);
-                state.log.push(`${owner === 'player' ? '✨' : '👿'} ${minion.name} ${ability.description} for ${damage} damage (ignores block)!`);
-              } else {
-                dealMinionDamage(state, minion, targetEntity, targetType, damage);
-              }
+              dealMinionDamage(
+                state, minion, targetEntity, targetType,
+                damage, !!ability.ignores_block
+              );
             }
           }
           break;

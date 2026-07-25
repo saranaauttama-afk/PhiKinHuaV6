@@ -279,8 +279,15 @@ function executeComboEffects(state: GameState, combo: CardCombo): void {
     switch (effect.type) {
       case 'damage':
         if (state.enemy && effect.target === 'enemy') {
-          state.enemy.hp = Math.max(0, state.enemy.hp - effect.value);
-          state.log.push(`💥 ${effect.description}: ${effect.value} damage!`);
+          // combo เกิดจากการเล่นการ์ดของผู้เล่น → คิดเป็นดาเมจต่อสู้เต็มรูปแบบ
+          const { dealDamage } = require('./combat/damage');
+          const result = dealDamage(state, {
+            from: 'player',
+            to: 'enemy',
+            raw: effect.value,
+            source: { kind: 'combo', comboId: combo.id },
+          });
+          state.log.push(`💥 ${effect.description}: ${result.modified} damage!`);
         }
         break;
         

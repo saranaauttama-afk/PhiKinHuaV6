@@ -277,21 +277,51 @@ Phase 1 ให้ค่ามากที่สุดต่อเวลาที
 `damageMultiplier` เป็น 1.0/1.2/0.9) น่าจะเหลือจาก "unified system" ที่ถูกถอดไป
 แทนที่ด้วยการ validate `raw` ครั้งเดียวที่ปากทาง `dealDamage` แล้ว throw ให้เห็นชัดแทนกลืนเงียบ
 
-**damage path ที่ยัง *ไม่* ได้ต่อ — ต้องตัดสินใจเชิง design ก่อน:**
+**damage path ที่เหลือ — ตัดสินใจแล้วและต่อสายครบ:**
 
-| ที่ | ลักษณะ | คำถามที่ต้องตอบ |
-|---|---|---|
-| `combat/status-effects/runtime.ts:305` | poison / DoT tick | DoT ควรทะลุ block ไหม? (ถ้าต่อเข้า `dealDamage` จะโดน block ดูด ซึ่งเปลี่ยนกฎ) |
-| `minionRuntime.ts:178,295,449` | ดาเมจจาก minion | minion ควรได้ strength ของเจ้าของไหม? เป้าหมายควรได้ vulnerable ไหม? |
-| `cardComboSystem.ts:282` | ดาเมจตรงจาก combo | เป็นดาเมจ "จริง" ที่ควรผ่านระบบ หรือเป็น true damage โดยตั้งใจ? |
-| `engine/handlers/shops_events.ts:213` | HP loss จาก event | น่าจะถูกแล้วที่ทะลุ block (ดาเมจเชิงเนื้อเรื่อง ไม่ใช่การต่อสู้) — ไม่ต้องแก้ |
+ทำให้ `source.kind` เป็นตัวกำหนดกฎเอง (`rulesFor` ใน `combat/damage.ts`) จะได้ไม่ต้องส่ง flag เพิ่ม
 
-3 อันแรกกระทบ balance ทั้งคู่ไม่ว่าจะเลือกทางไหน จึงไม่ตัดสินใจแทน
+| kind | block | modifier ฝั่งผู้ตี | modifier ฝั่งผู้รับ | เหตุผล |
+|---|---|---|---|---|
+| `card` / `combo` | ✓ | ✓ | ✓ | combo เกิดจากการเล่นการ์ดของผู้เล่น = พลังของผู้เล่น จึงคิดเหมือนการ์ด |
+| `status` (poison) | ✗ | ✗ | ✗ | block คือการปัดป้องหมัดที่กำลังมา แต่พิษอยู่ในตัวแล้ว — เป็นธรรมเนียมของแนวนี้ และ DoT ที่ stack ได้ต้องคาดเดาได้ |
+| `minion` | ✓ (เว้นแต่ ability ระบุ `ignoresBlock`) | ✗ | ✓ | minion เป็นคนละตัวกับผู้เรียก มีพลังของตัวเอง จึงไม่สืบทอด strength |
+| `event` | ✗ | ✗ | ✗ | ดาเมจเชิงเนื้อเรื่อง ไม่ใช่การต่อสู้ (จุดนี้ถูกอยู่แล้ว ไม่ได้แก้) |
 
-**เรื่องที่ยังค้าง:** `adaptiveAI` เก็บ `currentAdaptation` เป็น module-level state อยู่นอก
-`GameState` → ไม่ถูก save, ไม่ผูกกับ seed, ค้างข้ามรันใน session เดียวกัน
-ขัดกับที่เกมตั้งใจให้ deterministic ตาม seed
-Phase 1 คงพฤติกรรมเดิมไว้ทุกอย่าง (ใช้กับดาเมจผู้เล่นเท่านั้น แบบ inverse) ยังไม่แก้
+---
+
+## 5.2 พบระหว่างทาง: determinism ของทั้งเกมพัง (ยังไม่แก้)
+
+`gameSpec.txt` ระบุว่ารันต้อง deterministic ตาม seed และ `rng.ts` เขียนหัวไฟล์ไว้เองว่า
+*"Pure functional RNG (mulberry32) — no Math.random"*
+
+แต่ **`Math.random()` ถูกใช้อยู่ 22 จุดใน `src/core`** รวมถึงจุดที่สำคัญที่สุด:
+
+| ไฟล์ | ผลกระทบ |
+|---|---|
+| `monsters/thai-ghosts.ts` (9 จุด) | **เลือก tier และตัวมอนสเตอร์** → seed เดียวกันได้มอนคนละตัว |
+| `combat/minions/index.ts` (3 จุด) | เลือก minion |
+| `minionRuntime.ts` (2 จุด) | เลือกเป้าหมาย + `mockRng = { seed: Math.random() }` |
+| `level.ts:201` | สุ่มตัวเลือกตอนเลเวลอัป |
+| `adaptiveAI.ts:271` | `aggressionLevel = 40 + Math.random() * 40` |
+| `shopRegistry.ts`, `combat/minions/thai-minions.ts` | สร้าง id ด้วย `Date.now()` + `Math.random()` |
+
+**แปลว่าตอนนี้ seed เดียวกันไม่ได้ให้รันเดียวกัน** และ save/reload อาจได้ผลต่างจากเดิม
+ซึ่งขัดกับ invariant ที่เกมประกาศไว้เอง
+
+เรื่องนี้ใหญ่กว่าและครอบคลุมกว่าประเด็น `adaptiveAI` ที่เคยตั้งไว้ใน §6
+จึงยุบรวมเป็นเฟสเดียวกัน:
+
+### Phase 5 (ใหม่) — คืน determinism ให้ทั้งเกม
+- ร้อย `RNG` ผ่านจุดที่สุ่มทั้ง 22 จุด แทน `Math.random()`
+- ย้าย state ของ `adaptiveAI` (`currentAdaptation`, `playerPatterns`) เข้า `GameState`
+  → ถูก save, ผูกกับ seed, ไม่ค้างข้ามรัน
+- เปลี่ยน id ที่ใช้ `Date.now()` เป็น counter ที่ deterministic
+- เพิ่มเทสต์: seed เดียวกัน → รันเหมือนกันทุกครั้ง
+
+**ทำไมไม่แก้ตอน Phase 1:** การรื้อ `adaptiveAI` 451 บรรทัดเพื่อแก้ determinism ที่จุดเดียว
+ในขณะที่อีก 21 จุดยังพังอยู่ ไม่ได้ทำให้เกม deterministic ขึ้นจริง
+ควรทำทีเดียวพร้อมกันเป็นเฟสของตัวเอง
 
 ## 6. เรื่องที่ยังไม่ชัด ต้องตัดสินใจตอนลงมือ
 

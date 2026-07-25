@@ -301,9 +301,15 @@ function processSpecificStatusEffect(
 
     case 'poison':
       if (timing === 'turn_end') {
-        const damage = stacks;
-        targetState.hp = Math.max(0, targetState.hp - damage);
-        state.log.push(`☠️ ${target === 'player' ? 'ผู้เล่น' : 'ศัตรู'} ได้รับความเสียหายจากพิษ ${damage} หน่วย`);
+        // พิษทะลุ block และไม่โดน modifier — ดูเหตุผลใน combat/damage.ts (rulesFor)
+        const { dealDamage } = require('../damage');
+        const result = dealDamage(state, {
+          from: target === 'player' ? 'enemy' : 'player',
+          to: target,
+          raw: stacks,
+          source: { kind: 'status', effectId: 'poison' },
+        });
+        state.log.push(`☠️ ${target === 'player' ? 'ผู้เล่น' : 'ศัตรู'} ได้รับความเสียหายจากพิษ ${result.hpLoss} หน่วย`);
       }
       break;
 

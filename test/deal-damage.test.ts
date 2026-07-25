@@ -97,6 +97,89 @@ describe('dealDamage — status effect ทั้งสองฝั่ง', () =>
   });
 });
 
+describe('กฎของดาเมจแต่ละชนิด (source.kind เป็นตัวกำหนด)', () => {
+  it('status (พิษ) ทะลุ block', () => {
+    const { state } = makeCombatState({ enemyHp: 30, enemyBlock: 10 });
+    const r = dealDamage(state, {
+      from: 'player', to: 'enemy', raw: 4,
+      source: { kind: 'status', effectId: 'poison' },
+    });
+    expect(r.blocked).toBe(0);
+    expect(r.hpLoss).toBe(4);
+    expect(state.enemy!.block).toBe(10); // block ไม่ถูกแตะ
+    expect(state.enemy!.hp).toBe(26);
+  });
+
+  it('status ไม่โดน modifier ใดๆ — พิษเท่าเดิมแม้ผู้รับติด vulnerable', () => {
+    const { state } = makeCombatState({ enemyHp: 30, enemyBlock: 0 });
+    applyStatusEffect('enemy', state, 'vulnerable' as any, 3, 1);
+    applyStatusEffect('player', state, 'strength' as any, 3, 5);
+    const r = dealDamage(state, {
+      from: 'player', to: 'enemy', raw: 4,
+      source: { kind: 'status', effectId: 'poison' },
+    });
+    expect(r.modified).toBe(4);
+  });
+
+  it('minion โดน block ตามปกติ', () => {
+    const { state } = makeCombatState({ enemyHp: 30, enemyBlock: 5 });
+    const r = dealDamage(state, {
+      from: 'player', to: 'enemy', raw: 8,
+      source: { kind: 'minion', minionId: 'm1' },
+    });
+    expect(r.blocked).toBe(5);
+    expect(r.hpLoss).toBe(3);
+  });
+
+  it('minion ที่ ignoresBlock ทะลุ block', () => {
+    const { state } = makeCombatState({ enemyHp: 30, enemyBlock: 5 });
+    const r = dealDamage(state, {
+      from: 'player', to: 'enemy', raw: 8,
+      source: { kind: 'minion', minionId: 'm1', ignoresBlock: true },
+    });
+    expect(r.blocked).toBe(0);
+    expect(r.hpLoss).toBe(8);
+    expect(state.enemy!.block).toBe(5);
+  });
+
+  it('minion ไม่สืบทอด strength ของผู้เรียก แต่ vulnerable ของผู้รับยังมีผล', () => {
+    const { state } = makeCombatState({ enemyHp: 40, enemyBlock: 0 });
+    applyStatusEffect('player', state, 'strength' as any, 3, 5);
+    applyStatusEffect('enemy', state, 'vulnerable' as any, 3, 1);
+    const r = dealDamage(state, {
+      from: 'player', to: 'enemy', raw: 8,
+      source: { kind: 'minion', minionId: 'm1' },
+    });
+    // ไม่บวก strength 5 แต่คูณ vulnerable 1.5 → 12 (ไม่ใช่ 19.5)
+    expect(r.modified).toBe(12);
+  });
+
+  it('combo คิดเต็มระบบเหมือนการ์ด', () => {
+    const { state } = makeCombatState({ enemyHp: 40, enemyBlock: 3 });
+    applyStatusEffect('player', state, 'strength' as any, 3, 2);
+    const r = dealDamage(state, {
+      from: 'player', to: 'enemy', raw: 8,
+      source: { kind: 'combo', comboId: 'c1' },
+    });
+    expect(r.modified).toBe(10); // 8 + 2
+    expect(r.blocked).toBe(3);
+    expect(r.hpLoss).toBe(7);
+  });
+
+  it('event ทะลุทุกอย่าง (ดาเมจเชิงเนื้อเรื่อง)', () => {
+    const { state } = makeCombatState({ playerHp: 50, playerBlock: 20 });
+    applyStatusEffect('player', state, 'vulnerable' as any, 3, 1);
+    const r = dealDamage(state, {
+      from: 'enemy', to: 'player', raw: 6,
+      source: { kind: 'event' },
+    });
+    expect(r.modified).toBe(6);
+    expect(r.blocked).toBe(0);
+    expect(state.player.block).toBe(20);
+    expect(state.player.hp).toBe(44);
+  });
+});
+
 describe('gainBlock', () => {
   it('บวก block สะสมให้ฝั่งที่ระบุ', () => {
     const { state } = makeCombatState({ playerBlock: 2 });
