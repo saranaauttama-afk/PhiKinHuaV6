@@ -18,6 +18,7 @@ import { resetBlessingTurnFlags, runBlessingsTurnHook } from '../../blessingRunt
 import { START_ENERGY } from '../../balance/core';
 import { buildAndShuffleEnemyDeck } from './enemy';
 import { runEquipmentOnEquip } from '../../equipmentRuntime';
+import { deckForMonster } from '../../monsters/monster-decks';
 import { getEquipmentById } from '../../pack';
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
@@ -210,6 +211,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       }
       
       // สร้าง EnemyState จาก Thai monster data
+      // เด็คมาจาก monster-decks.ts — เดิม hardcode ['claw','guard'] ให้ทุกตัว
+      // ทำให้ผี 31 ตนเล่นเหมือนกันหมด ต่างกันแค่ HP
+      const deck = deckForMonster(thaiMonster);
       s.enemy = {
         id: thaiMonster.id,
         name: thaiMonster.name,
@@ -217,8 +221,10 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         maxHp: thaiMonster.hp,
         dmg: Math.floor(thaiMonster.hp / 5),
         block: 0,
-        ai: { cycle: ['claw', 'guard'], index: 0 },
-        intentCardId: 'claw'
+        ai: { cycle: ['claw', 'guard'], index: 0, deck },
+        maxEnergy: deck.maxEnergy,
+        handSize: deck.handSize,
+        intentCardId: null,
       };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
       
@@ -275,7 +281,8 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         return { state: s, rng };
       }
       
-      // สร้าง EnemyState จาก Thai boss data
+      // สร้าง EnemyState จาก Thai boss data — เด็คตามตัวเช่นเดียวกับผีทั่วไป
+      const bossDeck = deckForMonster(thaiBoss);
       s.enemy = {
         id: thaiBoss.id,
         name: thaiBoss.name,
@@ -283,8 +290,10 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         maxHp: thaiBoss.hp,
         dmg: Math.floor(thaiBoss.hp / 4), // บอสแรงกว่า
         block: 0,
-        ai: { cycle: ['claw', 'guard', 'spell'], index: 0 },
-        intentCardId: 'claw'
+        ai: { cycle: ['claw', 'guard', 'spell'], index: 0, deck: bossDeck },
+        maxEnergy: bossDeck.maxEnergy,
+        handSize: bossDeck.handSize,
+        intentCardId: null,
       };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
       

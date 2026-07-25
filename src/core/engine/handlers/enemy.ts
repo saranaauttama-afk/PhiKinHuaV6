@@ -2,7 +2,7 @@
 import type { GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { int } from '../../rng';
-import { enemyCardById } from '../../pack_enemy_cards';
+import { enemyCardById, poolForOwner } from '../../pack_enemy_cards';
 import {
   ENEMY_DECK_SIZE, ENEMY_HAND_SIZE,
   ENEMY_MAX_ENERGY_NORMAL, ENEMY_MAX_ENERGY_ELITE, ENEMY_MAX_ENERGY_BOSS
@@ -109,40 +109,13 @@ function buildDeckFromConfig(_enemyId: string, cfg: DeckConfig, r: RNG): { ids: 
   if ('pool' in cfg && cfg.pool?.allowOwners) {
     const { allowOwners, minAttack, minBlock } = cfg.pool;
 
-    console.log(`🔍 Building deck with pool config for ${_enemyId}:`);
-    console.log(`🔍 allowOwners: ${JSON.stringify(allowOwners)}`);
-    console.log(`🔍 minAttack: ${minAttack}, minBlock: ${minBlock}`);
-
-    // Get all available enemy cards
-    const allCards: string[] = [];
-    try {
-      const pack = require('../../pack_enemy_cards');
-      const enemyCards = pack.enemyCards || pack.default || [];
-
-      console.log(`🔍 Total enemy cards loaded: ${enemyCards.length}`);
-
-      for (const card of enemyCards) {
-        const ownerMatch = allowOwners.includes(card.owner || 'global');
-        const attackMatch = !minAttack || (card.dmg && card.dmg >= minAttack);
-        const blockMatch = !minBlock || (card.block && card.block >= minBlock);
-
-        console.log(`🔍 Card ${card.id}: owner=${card.owner}, ownerMatch=${ownerMatch}, dmg=${card.dmg}, attackMatch=${attackMatch}, block=${card.block}, blockMatch=${blockMatch}`);
-
-        // Filter by owner
-        if (!ownerMatch) continue;
-
-        // Filter by minimum stats if specified
-        if (minAttack && (!card.dmg || card.dmg < minAttack)) continue;
-        if (minBlock && (!card.block || card.block < minBlock)) continue;
-
-        allCards.push(card.id);
-        console.log(`✅ Added card: ${card.id}`);
-      }
-    } catch (error) {
-      console.error('Error loading enemy cards for pool:', error);
-    }
-
-    console.log(`🔍 Final card pool: ${JSON.stringify(allCards)}`);
+    // เดิมอ่านการ์ดจาก `pack.enemyCards || pack.default` ซึ่งไม่มีอยู่จริง
+    // (โมดูลนี้ export เป็นฟังก์ชัน) → รายการว่างเสมอ แล้วตกไป fallback claw/guard
+    // เงียบๆ ทำให้ deck config ไม่เคยถูกใช้เลย ทั้งที่ poolForOwner มีไว้เพื่อการนี้
+    const allCards = poolForOwner(allowOwners)
+      .filter(card => !minAttack || (card.dmg ?? 0) >= minAttack)
+      .filter(card => !minBlock || (card.block ?? 0) >= minBlock)
+      .map(card => card.id);
 
     if (allCards.length > 0) {
       const ids: string[] = [];
@@ -151,10 +124,7 @@ function buildDeckFromConfig(_enemyId: string, cfg: DeckConfig, r: RNG): { ids: 
         rr = ro.rng;
         ids.push(allCards[ro.value]);
       }
-      console.log(`✅ Built deck with ${ids.length} cards: ${JSON.stringify(ids)}`);
       return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
-    } else {
-      console.log(`⚠️ No cards found in pool, falling back to cycle`);
     }
   }
 
