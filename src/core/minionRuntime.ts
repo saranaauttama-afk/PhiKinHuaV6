@@ -4,6 +4,7 @@ import type { GameState } from './types';
 import type { MinionData } from './types_extended';
 import { THAI_MINIONS } from './combat/minions/thai-minions';
 import { applyStatusEffect } from './statusEffectsRuntime';
+import { makeDeterministicId, nextStateRng, pickFrom } from './rngState';
 
 // ===== Global Minion State =====
 
@@ -43,7 +44,8 @@ export function summonMinion(
     // Create unique minion instance
     const minion: MinionData = {
       ...minionTemplate,
-      id: `${minionId}_${Date.now()}_${i}`, // Unique ID for this instance
+      // id ต้องไม่ซ้ำและซ้ำได้ตาม seed — Date.now() ทำให้รันเดิมได้ id คนละชุด
+      id: makeDeterministicId(state, minionId),
       owner,
       statusEffects: []
     };
@@ -203,9 +205,10 @@ function processMinionAbility(
         const targetHand = Math.min(currentHand + ability.value, state.player.maxHandSize || 7);
         
         if (targetHand > currentHand && state.piles) {
-          // สร้าง mock RNG object สำหรับการใช้งาน
-          const mockRng = { seed: Math.random() };
-          const result = drawUpTo(state, mockRng, targetHand);
+          // เดิมเป็น `{ seed: Math.random() }` ซึ่งผิดรูปแบบของ RNG จริง (`{ s: number }`)
+          // ทำให้ rng.s เป็น undefined — การจั่วเลยไม่ได้สุ่มจริงและไม่ผูกกับ seed
+          // TS จับไม่ได้เพราะ drawUpTo ถูกดึงผ่าน require() ซึ่งเป็น any
+          const result = drawUpTo(state, nextStateRng(state), targetHand);
           Object.assign(state, result.state);
           state.log.push(`🎴 ${minion.name} grants card draw (+${targetHand - currentHand} cards)`);
         } else {
@@ -340,7 +343,7 @@ export function damageMinionsByOwner(
   if (!minions.length) return;
   
   // Reduce duration of random minion instead of HP
-  const targetMinion = minions[Math.floor(Math.random() * minions.length)];
+  const targetMinion = pickFrom(state, minions)!;
   const durationLoss = Math.min(damage, targetMinion.duration);
   targetMinion.duration = Math.max(0, targetMinion.duration - durationLoss);
   

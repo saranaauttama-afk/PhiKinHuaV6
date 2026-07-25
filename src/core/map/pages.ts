@@ -105,8 +105,9 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
       ghostTier = 'SecretBoss';
     }
     
-    const boss = getRandomMonsterFromTier(ghostTier);
-    offers.push({ kind: 'boss', bossType, enemyId: boss.id });
+    const picked = getRandomMonsterFromTier(ghostTier, r);
+    r = picked.rng;
+    offers.push({ kind: 'boss', bossType, enemyId: picked.monster.id });
   }
 
   // Track used monsters to avoid duplicates in same page
@@ -121,7 +122,9 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
     if (tier === 'elite') {
       ghostTier = 'Elite';
     } else {
-      ghostTier = getTierForFight(fightIndex);
+      const tierRoll = getTierForFight(fightIndex, rngRef.rng);
+      rngRef.rng = tierRoll.rng;
+      ghostTier = tierRoll.tier;
       // If getTierForFight returns Elite or Boss, fallback to appropriate normal tier
       if (ghostTier === 'Elite' || ghostTier.includes('Boss') || ghostTier === 'SecretBoss') {
         ghostTier = fightIndex <= 2 ? 'T1' : fightIndex <= 4 ? 'T2' : fightIndex <= 6 ? 'T3' : fightIndex <= 9 ? 'T4' : 'T5';

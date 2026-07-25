@@ -56,9 +56,17 @@ export interface AIAdaptation {
   statusCleansing: boolean;
 }
 
-// ===== Global AI State =====
+// ===== AI State (เก็บใน GameState ไม่ใช่ระดับโมดูล) =====
+//
+// เดิม playerPatterns/currentAdaptation เป็น const ระดับโมดูล ทำให้:
+//   - ไม่ถูก save (โหลดเกมกลับมาแล้ว AI ลืมทุกอย่าง)
+//   - ไม่ผูกกับ seed (รันเดิมได้ผลต่างกัน)
+//   - ค้างข้ามรันใน session เดียวกัน
+// ตอนนี้ย้ายเข้า state.ai แล้ว โดยยังเข้าถึงผ่าน accessor เพื่อไม่ต้องแก้ทุกจุดที่ใช้
 
-const playerPatterns: PlayerPattern = {
+export type AIState = { patterns: PlayerPattern; adaptation: AIAdaptation };
+
+const makePlayerPatterns = (): PlayerPattern => ({
   cardTypePreference: { attack: 0, skill: 0, equipment: 0 },
   costDistribution: { 0: 0, 1: 0, 2: 0, 3: 0 },
   playStyle: 'balanced',
@@ -74,9 +82,9 @@ const playerPatterns: PlayerPattern = {
   vulnerableToRush: false,
   overReliantOnBlock: false,
   lowHealthPanic: false
-};
+});
 
-const currentAdaptation: AIAdaptation = {
+const makeAdaptation = (): AIAdaptation => ({
   priorityBehaviors: [],
   prioritySpells: [],
   statusFocus: [],
@@ -91,7 +99,19 @@ const currentAdaptation: AIAdaptation = {
   antiComboDisruption: false,
   blockCounters: false,
   statusCleansing: false
-};
+});
+
+export function createAIState(): AIState {
+  return { patterns: makePlayerPatterns(), adaptation: makeAdaptation() };
+}
+
+function aiState(state: GameState): AIState {
+  if (!state.ai) state.ai = createAIState();
+  return state.ai;
+}
+
+const patternsOf   = (state: GameState) => aiState(state).patterns;
+const adaptationOf = (state: GameState) => aiState(state).adaptation;
 
 // ===== Player Pattern Learning =====
 
@@ -104,7 +124,7 @@ export function learnFromPlayerAction(
   
   switch (actionType) {
     case 'card_played':
-      learnCardUsagePattern(actionData.card, turnPhase);
+      learnCardUsagePattern(state, actionData.card, turnPhase);
       break;
       
     case 'turn_end':
@@ -112,7 +132,7 @@ export function learnFromPlayerAction(
       break;
       
     case 'status_applied':
-      learnStatusPattern(actionData.statusId, actionData.target);
+      learnStatusPattern(state, actionData.statusId, actionData.target);
       break;
       
     case 'damage_taken':
@@ -121,7 +141,7 @@ export function learnFromPlayerAction(
   }
   
   // Update play style based on patterns
-  updatePlayStyleClassification();
+  updatePlayStyleClassification(state);
   
   // Adapt AI based on learned patterns
   adaptAIStrategy(state);
@@ -134,25 +154,25 @@ function getTurnPhase(state: GameState): 'early' | 'mid' | 'late' {
   return 'late';
 }
 
-function learnCardUsagePattern(card: any, phase: 'early' | 'mid' | 'late'): void {
+function learnCardUsagePattern(state: GameState, card: any, phase: 'early' | 'mid' | 'late'): void {
   // Track card type preferences
   const cardType = card.type as string;
-  playerPatterns.cardTypePreference[cardType] = (playerPatterns.cardTypePreference[cardType] || 0) + 1;
+  patternsOf(state).cardTypePreference[cardType] = (patternsOf(state).cardTypePreference[cardType] || 0) + 1;
   
   // Track cost distribution
   const cost = Math.min(card.cost || 0, 3);
-  playerPatterns.costDistribution[cost] = (playerPatterns.costDistribution[cost] || 0) + 1;
+  patternsOf(state).costDistribution[cost] = (patternsOf(state).costDistribution[cost] || 0) + 1;
   
   // Learn phase-specific strategies
   if (phase === 'early' && card.type === 'attack' && card.cost <= 1) {
     // Player prefers early aggression
-    if (playerPatterns.earlyGameStrategy !== 'rush') {
-      playerPatterns.earlyGameStrategy = 'rush';
+    if (patternsOf(state).earlyGameStrategy !== 'rush') {
+      patternsOf(state).earlyGameStrategy = 'rush';
     }
   }
   
   if (card.draw && card.draw > 0) {
-    playerPatterns.cardDrawPreference += 1;
+    patternsOf(state).cardDrawPreference += 1;
   }
 }
 
@@ -162,56 +182,56 @@ function learnTurnPattern(state: GameState, turnData: any): void {
   const maxEnergy = state.player.maxEnergy || 3;
   const efficiency = energyUsed / maxEnergy;
   
-  playerPatterns.energyEfficiency = (playerPatterns.energyEfficiency + efficiency) / 2;
+  patternsOf(state).energyEfficiency = (patternsOf(state).energyEfficiency + efficiency) / 2;
   
   // Learn defensive patterns
   const blockGained = turnData.blockGained || 0;
   if (blockGained > 0) {
-    playerPatterns.blockingFrequency += 0.1;
+    patternsOf(state).blockingFrequency += 0.1;
   }
   
   // Detect panic patterns
   if (state.player.hp < state.player.maxHp * 0.25 && blockGained > 6) {
-    playerPatterns.lowHealthPanic = true;
+    patternsOf(state).lowHealthPanic = true;
   }
 }
 
-function learnStatusPattern(statusId: string, target: 'player' | 'enemy'): void {
+function learnStatusPattern(state: GameState, statusId: string, target: 'player' | 'enemy'): void {
   if (target === 'enemy') {
-    playerPatterns.statusUsage[statusId] = (playerPatterns.statusUsage[statusId] || 0) + 1;
+    patternsOf(state).statusUsage[statusId] = (patternsOf(state).statusUsage[statusId] || 0) + 1;
   } else {
-    playerPatterns.statusCountering[statusId] = (playerPatterns.statusCountering[statusId] || 0) + 1;
+    patternsOf(state).statusCountering[statusId] = (patternsOf(state).statusCountering[statusId] || 0) + 1;
   }
 }
 
 function learnDefensivePattern(state: GameState, damage: number, blocked: number): void {
   const blockRatio = blocked / (damage + blocked);
-  playerPatterns.blockingFrequency = (playerPatterns.blockingFrequency + blockRatio) / 2;
+  patternsOf(state).blockingFrequency = (patternsOf(state).blockingFrequency + blockRatio) / 2;
   
   // Detect over-reliance on block
   if (blockRatio > 0.7 && damage < 3) {
-    playerPatterns.overReliantOnBlock = true;
+    patternsOf(state).overReliantOnBlock = true;
   }
 }
 
-function updatePlayStyleClassification(): void {
-  const attackPreference = (playerPatterns.cardTypePreference as any).attack || 0;
-  const skillPreference = (playerPatterns.cardTypePreference as any).skill || 0;
-  const totalCards = attackPreference + skillPreference + ((playerPatterns.cardTypePreference as any).equipment || 0);
+function updatePlayStyleClassification(state: GameState): void {
+  const attackPreference = (patternsOf(state).cardTypePreference as any).attack || 0;
+  const skillPreference = (patternsOf(state).cardTypePreference as any).skill || 0;
+  const totalCards = attackPreference + skillPreference + ((patternsOf(state).cardTypePreference as any).equipment || 0);
   
   if (totalCards === 0) return;
   
   const attackRatio = attackPreference / totalCards;
-  const blockFreq = playerPatterns.blockingFrequency;
+  const blockFreq = patternsOf(state).blockingFrequency;
   
   if (attackRatio > 0.6 && blockFreq < 0.3) {
-    playerPatterns.playStyle = 'aggressive';
+    patternsOf(state).playStyle = 'aggressive';
   } else if (attackRatio < 0.4 && blockFreq > 0.6) {
-    playerPatterns.playStyle = 'defensive';
-  } else if (playerPatterns.cardDrawPreference > 5) {
-    playerPatterns.playStyle = 'combo';
+    patternsOf(state).playStyle = 'defensive';
+  } else if (patternsOf(state).cardDrawPreference > 5) {
+    patternsOf(state).playStyle = 'combo';
   } else {
-    playerPatterns.playStyle = 'balanced';
+    patternsOf(state).playStyle = 'balanced';
   }
 }
 
@@ -219,13 +239,13 @@ function updatePlayStyleClassification(): void {
 
 function adaptAIStrategy(state: GameState): void {
   // Reset adaptation
-  resetAdaptation();
+  resetAdaptation(state);
   
   // Counter player's play style
-  counterPlayStyle();
+  counterPlayStyle(state);
   
   // Counter specific patterns
-  counterPlayerWeaknesses();
+  counterPlayerWeaknesses(state);
   
   // Adjust difficulty based on player performance
   adjustDifficulty(state);
@@ -244,77 +264,77 @@ function adaptAIStrategy(state: GameState): void {
  * กลับเป็น 1.0 → ผู้เล่น HP ตกต่ำกว่า 30% ครั้งเดียว ดาเมจก็แรงขึ้นตลอดรัน
  * (และข้ามรันด้วย เพราะตัวแปรอยู่ระดับโมดูล)
  */
-function resetAdaptation(): void {
-  currentAdaptation.priorityBehaviors = [];
-  currentAdaptation.prioritySpells = [];
-  currentAdaptation.statusFocus = [];
-  currentAdaptation.aggressionLevel = 50;
-  currentAdaptation.spellCastingPreference = 50;
-  currentAdaptation.minionUsage = 30;
-  currentAdaptation.damageMultiplier = 1.0;
-  currentAdaptation.healthMultiplier = 1.0;
-  currentAdaptation.energyBonus = 0;
-  currentAdaptation.spellChargeReduction = 0;
-  currentAdaptation.antiRushTactics = false;
-  currentAdaptation.antiComboDisruption = false;
-  currentAdaptation.blockCounters = false;
-  currentAdaptation.statusCleansing = false;
+function resetAdaptation(state: GameState): void {
+  adaptationOf(state).priorityBehaviors = [];
+  adaptationOf(state).prioritySpells = [];
+  adaptationOf(state).statusFocus = [];
+  adaptationOf(state).aggressionLevel = 50;
+  adaptationOf(state).spellCastingPreference = 50;
+  adaptationOf(state).minionUsage = 30;
+  adaptationOf(state).damageMultiplier = 1.0;
+  adaptationOf(state).healthMultiplier = 1.0;
+  adaptationOf(state).energyBonus = 0;
+  adaptationOf(state).spellChargeReduction = 0;
+  adaptationOf(state).antiRushTactics = false;
+  adaptationOf(state).antiComboDisruption = false;
+  adaptationOf(state).blockCounters = false;
+  adaptationOf(state).statusCleansing = false;
 }
 
-function counterPlayStyle(): void {
-  switch (playerPatterns.playStyle) {
+function counterPlayStyle(state: GameState): void {
+  switch (patternsOf(state).playStyle) {
     case 'aggressive':
       // Counter aggression with defense and punishment
-      currentAdaptation.aggressionLevel = 30;
-      currentAdaptation.statusFocus.push('weakness', 'vulnerable');
-      currentAdaptation.priorityBehaviors.push('defensive_stance', 'counter_attack');
+      adaptationOf(state).aggressionLevel = 30;
+      adaptationOf(state).statusFocus.push('weakness', 'vulnerable');
+      adaptationOf(state).priorityBehaviors.push('defensive_stance', 'counter_attack');
       break;
       
     case 'defensive':
       // Counter defense with pressure and inevitability
-      currentAdaptation.aggressionLevel = 80;
-      currentAdaptation.minionUsage = 60;
-      currentAdaptation.statusFocus.push('poison', 'curse');
-      currentAdaptation.prioritySpells.push('long_term_damage');
+      adaptationOf(state).aggressionLevel = 80;
+      adaptationOf(state).minionUsage = 60;
+      adaptationOf(state).statusFocus.push('poison', 'curse');
+      adaptationOf(state).prioritySpells.push('long_term_damage');
       break;
       
     case 'combo':
       // Disrupt combos with forced actions and card destruction
-      currentAdaptation.antiComboDisruption = true;
-      currentAdaptation.statusFocus.push('corruption', 'entangle');
-      currentAdaptation.priorityBehaviors.push('disrupt_hand', 'force_discard');
+      adaptationOf(state).antiComboDisruption = true;
+      adaptationOf(state).statusFocus.push('corruption', 'entangle');
+      adaptationOf(state).priorityBehaviors.push('disrupt_hand', 'force_discard');
       break;
       
     case 'balanced':
       // Vary tactics to keep player guessing
-      currentAdaptation.aggressionLevel = 40 + Math.random() * 40;
-      currentAdaptation.spellCastingPreference = 60;
+      adaptationOf(state).aggressionLevel = 40 + Math.random() * 40;
+      adaptationOf(state).spellCastingPreference = 60;
       break;
   }
 }
 
-function counterPlayerWeaknesses(): void {
+function counterPlayerWeaknesses(state: GameState): void {
   // Counter over-reliance on block
-  if (playerPatterns.overReliantOnBlock) {
-    currentAdaptation.blockCounters = true;
-    currentAdaptation.statusFocus.push('vulnerable');
-    currentAdaptation.priorityBehaviors.push('unblockable_attack', 'block_destruction');
+  if (patternsOf(state).overReliantOnBlock) {
+    adaptationOf(state).blockCounters = true;
+    adaptationOf(state).statusFocus.push('vulnerable');
+    adaptationOf(state).priorityBehaviors.push('unblockable_attack', 'block_destruction');
   }
   
   // Exploit low health panic
-  if (playerPatterns.lowHealthPanic) {
-    currentAdaptation.priorityBehaviors.push('pressure_when_low', 'false_security');
+  if (patternsOf(state).lowHealthPanic) {
+    adaptationOf(state).priorityBehaviors.push('pressure_when_low', 'false_security');
   }
   
   // Counter rush vulnerability
-  if (playerPatterns.vulnerableToRush) {
-    currentAdaptation.aggressionLevel = 90;
-    currentAdaptation.priorityBehaviors.push('early_aggression', 'overwhelming_start');
+  if (patternsOf(state).vulnerableToRush) {
+    adaptationOf(state).aggressionLevel = 90;
+    adaptationOf(state).priorityBehaviors.push('early_aggression', 'overwhelming_start');
   }
   
   // Apply status counters
-  for (const statusType of playerPatterns.weakToStatusTypes) {
-    currentAdaptation.statusFocus.push(statusType);
+  for (const statusType of patternsOf(state).weakToStatusTypes) {
+    adaptationOf(state).statusFocus.push(statusType);
   }
 }
 
@@ -327,14 +347,14 @@ function adjustDifficulty(state: GameState): void {
   // Dynamic difficulty scaling
   if (playerHpRatio > 0.8 && turnNumber > 5) {
     // Player is doing well, increase difficulty
-    currentAdaptation.damageMultiplier = 1.2;
-    currentAdaptation.healthMultiplier = 1.1;
-    currentAdaptation.energyBonus = 1;
-    currentAdaptation.spellChargeReduction = 1;
+    adaptationOf(state).damageMultiplier = 1.2;
+    adaptationOf(state).healthMultiplier = 1.1;
+    adaptationOf(state).energyBonus = 1;
+    adaptationOf(state).spellChargeReduction = 1;
   } else if (playerHpRatio < 0.3 && enemyHpRatio > 0.7) {
     // Player is struggling, decrease difficulty slightly
-    currentAdaptation.damageMultiplier = 0.9;
-    currentAdaptation.healthMultiplier = 0.95;
+    adaptationOf(state).damageMultiplier = 0.9;
+    adaptationOf(state).healthMultiplier = 0.95;
   }
 }
 
@@ -342,69 +362,69 @@ function applyAdaptationsToEnemy(state: GameState): void {
   if (!state.enemy) return;
   
   // Apply damage and health modifiers
-  if (currentAdaptation.damageMultiplier !== 1.0) {
+  if (adaptationOf(state).damageMultiplier !== 1.0) {
     // This would be applied to enemy attacks
-    state.log.push(`🤖 AI adapts: damage ${currentAdaptation.damageMultiplier > 1 ? 'increased' : 'decreased'}`);
+    state.log.push(`🤖 AI adapts: damage ${adaptationOf(state).damageMultiplier > 1 ? 'increased' : 'decreased'}`);
   }
   
-  if (currentAdaptation.energyBonus > 0) {
+  if (adaptationOf(state).energyBonus > 0) {
     const currentEnergy = (state as any).enemyEnergy || 0;
-    (state as any).enemyEnergy = currentEnergy + currentAdaptation.energyBonus;
-    state.log.push(`🤖 AI adapts: gains ${currentAdaptation.energyBonus} extra energy`);
+    (state as any).enemyEnergy = currentEnergy + adaptationOf(state).energyBonus;
+    state.log.push(`🤖 AI adapts: gains ${adaptationOf(state).energyBonus} extra energy`);
   }
   
   // Log adaptation summary
-  state.log.push(`🧠 AI analyzing... play style: ${playerPatterns.playStyle}, aggression: ${currentAdaptation.aggressionLevel}`);
+  state.log.push(`🧠 AI analyzing... play style: ${patternsOf(state).playStyle}, aggression: ${adaptationOf(state).aggressionLevel}`);
 }
 
 // ===== Advanced Behavior Modifications =====
 
-export function getAdaptiveBehaviorPriority(behaviorId: string): number {
+export function getAdaptiveBehaviorPriority(state: GameState, behaviorId: string): number {
   const basePriority = 5; // Default priority
   
-  if (currentAdaptation.priorityBehaviors.includes(behaviorId)) {
+  if (adaptationOf(state).priorityBehaviors.includes(behaviorId)) {
     return basePriority + 3; // Higher priority
   }
   
   // Contextual priority adjustments
   switch (behaviorId) {
     case 'aggressive_rush':
-      return currentAdaptation.aggressionLevel > 70 ? basePriority + 2 : basePriority - 1;
+      return adaptationOf(state).aggressionLevel > 70 ? basePriority + 2 : basePriority - 1;
       
     case 'defensive_stance':
-      return currentAdaptation.aggressionLevel < 40 ? basePriority + 2 : basePriority - 1;
+      return adaptationOf(state).aggressionLevel < 40 ? basePriority + 2 : basePriority - 1;
       
     case 'spell_focus':
-      return currentAdaptation.spellCastingPreference > 60 ? basePriority + 1 : basePriority;
+      return adaptationOf(state).spellCastingPreference > 60 ? basePriority + 1 : basePriority;
       
     case 'summon_minions':
-      return currentAdaptation.minionUsage > 50 ? basePriority + 1 : basePriority;
+      return adaptationOf(state).minionUsage > 50 ? basePriority + 1 : basePriority;
       
     default:
       return basePriority;
   }
 }
 
-export function getAdaptiveSpellPriority(spellId: string): number {
+export function getAdaptiveSpellPriority(state: GameState, spellId: string): number {
   const basePriority = 5;
   
-  if (currentAdaptation.prioritySpells.includes(spellId)) {
+  if (adaptationOf(state).prioritySpells.includes(spellId)) {
     return basePriority + 3;
   }
   
   return basePriority;
 }
 
-export function shouldApplyAdaptiveStatusFocus(statusId: StatusEffectType): boolean {
-  return currentAdaptation.statusFocus.includes(statusId);
+export function shouldApplyAdaptiveStatusFocus(state: GameState, statusId: StatusEffectType): boolean {
+  return adaptationOf(state).statusFocus.includes(statusId);
 }
 
-export function getAdaptiveDamageMultiplier(): number {
-  return currentAdaptation.damageMultiplier;
+export function getAdaptiveDamageMultiplier(state: GameState): number {
+  return adaptationOf(state).damageMultiplier;
 }
 
-export function getAdaptiveSpellChargeReduction(): number {
-  return currentAdaptation.spellChargeReduction;
+export function getAdaptiveSpellChargeReduction(state: GameState): number {
+  return adaptationOf(state).spellChargeReduction;
 }
 
 // ===== Combat Integration Hooks =====
@@ -427,42 +447,24 @@ export function onDamageTaken(state: GameState, damage: number, blocked: number)
 
 // ===== Utility Functions =====
 
-export function getPlayerPattern(): PlayerPattern {
-  return { ...playerPatterns };
+export function getPlayerPattern(state: GameState): PlayerPattern {
+  return { ...patternsOf(state) };
 }
 
-export function getCurrentAdaptation(): AIAdaptation {
-  return { ...currentAdaptation };
+export function getCurrentAdaptation(state: GameState): AIAdaptation {
+  return { ...adaptationOf(state) };
 }
 
-export function resetAILearning(): void {
-  // Reset patterns
-  Object.keys(playerPatterns.cardTypePreference).forEach(key => {
-    (playerPatterns.cardTypePreference as any)[key] = 0;
-  });
-  Object.keys(playerPatterns.costDistribution).forEach(key => {
-    (playerPatterns.costDistribution as any)[key] = 0;
-  });
-  
-  playerPatterns.playStyle = 'balanced';
-  playerPatterns.blockingFrequency = 0;
-  playerPatterns.energyEfficiency = 0;
-  playerPatterns.cardDrawPreference = 0;
-  playerPatterns.statusUsage = {};
-  playerPatterns.statusCountering = {};
-  playerPatterns.weakToStatusTypes = [];
-  playerPatterns.vulnerableToRush = false;
-  playerPatterns.overReliantOnBlock = false;
-  playerPatterns.lowHealthPanic = false;
-  
-  // Reset adaptations
-  resetAdaptation();
+/** ล้างสิ่งที่ AI เรียนรู้ทั้งหมด — สร้าง AIState ใหม่ทับไปเลย
+ *  (เดิมรีเซ็ตทีละฟิลด์แล้วตกหล่นตัวคูณความยาก ทำให้ค่าค้างข้ามรัน) */
+export function resetAILearning(state: GameState): void {
+  state.ai = createAIState();
 }
 
 export function debugAdaptiveAI(state: GameState): void {
   console.log('=== ADAPTIVE AI DEBUG ===');
-  console.log('Player Pattern:', playerPatterns);
-  console.log('Current Adaptation:', currentAdaptation);
+  console.log('Player Pattern:', patternsOf(state));
+  console.log('Current Adaptation:', adaptationOf(state));
   console.log('Turn:', state.turn);
   if (state.enemy) {
     console.log('Enemy HP:', `${state.enemy.hp}/${state.enemy.maxHp}`);

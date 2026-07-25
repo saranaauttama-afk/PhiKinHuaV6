@@ -1,5 +1,7 @@
 // src/core/monsters/thai-ghosts.ts - ระบบผีไทยแบบใหม่ตาม Game Spec
 
+import { int, next, type RNG } from '../rng';
+
 export interface ThaiGhostData {
   id: string;
   name: string;
@@ -257,9 +259,19 @@ export function getMonsterById(monsterId: string): ThaiGhostData | undefined {
   return undefined;
 }
 
-export function getRandomMonsterFromTier(tier: keyof typeof THAI_GHOST_POOLS): ThaiGhostData {
+/**
+ * สุ่มผีจาก tier ที่กำหนด
+ *
+ * ใช้ seeded RNG ตามที่ rng.ts ประกาศไว้เอง ("no Math.random") — seed เดียวกัน
+ * ต้องได้ผีตัวเดิมทุกครั้ง ไม่งั้น save/reload จะได้รันคนละแบบ
+ */
+export function getRandomMonsterFromTier(
+  tier: keyof typeof THAI_GHOST_POOLS,
+  rng: RNG
+): { monster: ThaiGhostData; rng: RNG } {
   const monsters = THAI_GHOST_POOLS[tier];
-  return monsters[Math.floor(Math.random() * monsters.length)];
+  const roll = int(rng, 0, monsters.length - 1);
+  return { monster: monsters[roll.value], rng: roll.rng };
 }
 
 export function getAllMonsterIds(): string[] {
@@ -271,47 +283,59 @@ export function getAllMonsterIds(): string[] {
 }
 
 // Fight progression mapping (ตาม Game Spec)
-export function getTierForFight(fightIndex: number): keyof typeof THAI_GHOST_POOLS {
+export function getTierForFight(
+  fightIndex: number,
+  rng: RNG
+): { tier: keyof typeof THAI_GHOST_POOLS; rng: RNG } {
+  // ทอยครั้งเดียวแล้วส่ง rng ตัวใหม่ต่อ — ทุกการทอยต้องเดินสถานะ rng ไปข้างหน้า
+  let r = rng;
+  const roll = (): number => {
+    const out = next(r);
+    r = out.rng;
+    return out.value;
+  };
+  const done = (tier: keyof typeof THAI_GHOST_POOLS) => ({ tier, rng: r });
+
   // Fight 1-2: T1-T2
   if (fightIndex <= 2) {
-    return Math.random() < 0.6 ? 'T1' : 'T2';
+    return done(roll() < 0.6 ? 'T1' : 'T2');
   }
   // Fight 3-4: T1-T3 + Elite 5%
   else if (fightIndex <= 4) {
-    if (Math.random() < 0.05) return 'Elite';
-    return Math.random() < 0.3 ? 'T1' : Math.random() < 0.6 ? 'T2' : 'T3';
+    if (roll() < 0.05) return done('Elite');
+    return done(roll() < 0.3 ? 'T1' : roll() < 0.6 ? 'T2' : 'T3');
   }
   // Fight 5-6: T2-T3 + Elite 10%
   else if (fightIndex <= 6) {
-    if (Math.random() < 0.1) return 'Elite';
-    return Math.random() < 0.5 ? 'T2' : 'T3';
+    if (roll() < 0.1) return done('Elite');
+    return done(roll() < 0.5 ? 'T2' : 'T3');
   }
   // Fight 7: Mid Boss
   else if (fightIndex === 7) {
-    return 'BossMid';
+    return done('BossMid');
   }
   // Fight 8-9: T3-T4 + Elite 15%
   else if (fightIndex <= 9) {
-    if (Math.random() < 0.15) return 'Elite';
-    return Math.random() < 0.5 ? 'T3' : 'T4';
+    if (roll() < 0.15) return done('Elite');
+    return done(roll() < 0.5 ? 'T3' : 'T4');
   }
   // Fight 10-12: T4-T5 + Elite 20-25%
   else if (fightIndex <= 12) {
-    if (Math.random() < 0.25) return 'Elite';
-    return Math.random() < 0.5 ? 'T4' : 'T5';
+    if (roll() < 0.25) return done('Elite');
+    return done(roll() < 0.5 ? 'T4' : 'T5');
   }
   // Fight 13-14: T5 + Elite 25-30%
   else if (fightIndex <= 14) {
-    if (Math.random() < 0.3) return 'Elite';
-    return 'T5';
+    if (roll() < 0.3) return done('Elite');
+    return done('T5');
   }
   // Fight 15: Final Boss
   else if (fightIndex === 15) {
-    return 'BossFinal';
+    return done('BossFinal');
   }
   // Fight 16+: Secret Boss
   else {
-    return 'SecretBoss';
+    return done('SecretBoss');
   }
 }
 

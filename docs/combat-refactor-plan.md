@@ -352,16 +352,29 @@ Phase 1 ให้ค่ามากที่สุดต่อเวลาที
 เรื่องนี้ใหญ่กว่าและครอบคลุมกว่าประเด็น `adaptiveAI` ที่เคยตั้งไว้ใน §6
 จึงยุบรวมเป็นเฟสเดียวกัน:
 
-### Phase 5 (ใหม่) — คืน determinism ให้ทั้งเกม
-- ร้อย `RNG` ผ่านจุดที่สุ่มทั้ง 22 จุด แทน `Math.random()`
-- ย้าย state ของ `adaptiveAI` (`currentAdaptation`, `playerPatterns`) เข้า `GameState`
-  → ถูก save, ผูกกับ seed, ไม่ค้างข้ามรัน
-- เปลี่ยน id ที่ใช้ `Date.now()` เป็น counter ที่ deterministic
-- เพิ่มเทสต์: seed เดียวกัน → รันเหมือนกันทุกครั้ง
+### Phase 5 — คืน determinism ให้ทั้งเกม ✅
+- `getTierForFight` / `getRandomMonsterFromTier` รับ `RNG` แล้วคืน rng ตัวใหม่ต่อ
+  (แบบเดียวกับ `next`/`int` ใน `rng.ts`) — ผู้เรียกใน `map/pages.ts` ร้อยต่อให้
+- `level.ts` ใช้ rng ที่ร้อยเข้ามาอยู่แล้วแทน `Math.random`
+- `rngState.ts` (ใหม่) — `nextStateRng` / `pickFrom` / `makeDeterministicId`
+  สำหรับจุดที่อยู่ลึกจนร้อย RNG ผ่าน signature ไม่ได้ (minion) โดย derive จาก
+  `seed` + ตัวนับที่เก็บใน state เอง จึงยังซ้ำได้ 100%
+- id ของร้าน/minion เปลี่ยนจาก `Date.now() + Math.random()` เป็น counter
+- ลบ `createRandomPlayerMinion` / `createRandomEnemyMinion` / `createMinionByAbility`
+  (ไม่มีใครเรียก และทั้งสามใช้ `Math.random`)
+- ย้าย `playerPatterns` / `currentAdaptation` เข้า `GameState.ai`
 
-**ทำไมไม่แก้ตอน Phase 1:** การรื้อ `adaptiveAI` 451 บรรทัดเพื่อแก้ determinism ที่จุดเดียว
-ในขณะที่อีก 21 จุดยังพังอยู่ ไม่ได้ทำให้เกม deterministic ขึ้นจริง
-ควรทำทีเดียวพร้อมกันเป็นเฟสของตัวเอง
+**บั๊กที่เจอระหว่างทาง:** `minionRuntime.ts` สร้าง RNG ปลอมเป็น `{ seed: Math.random() }`
+ทั้งที่ `RNG` จริงคือ `{ s: number }` → `rng.s` เป็น `undefined` การจั่วการ์ดจาก minion
+จึงไม่ได้สุ่มจริงเลย TypeScript จับไม่ได้เพราะ `drawUpTo` ถูกดึงผ่าน `require()` ซึ่งเป็น `any`
+
+เทสต์ `determinism.test.ts` (12 เทสต์) เป็นตาข่ายกันหลุดกลับไปใช้ `Math.random` อีก
+
+### หน้าเลเวลอัป ✅
+`state.levelUp` ถูกเตรียมไว้ครบตั้งแต่แรก (คู่ตัวเลือก + การ์ด/พรที่สุ่มมา)
+แต่ `phase === 'levelup'` ถูก `VictoryOverlay` กลืน ผู้เล่นจึงไม่เคยได้เลือก
+เพิ่ม `LevelUpOverlay` ที่แสดงก่อนหน้าชนะ รองรับตัวเลือกที่ต้องเลือกของย่อยอีกชั้น
+(การ์ด/พร) และปุ่มข้าม — `levelup.test.ts` (7 เทสต์) ครอบลูปนี้
 
 ## 6. เรื่องที่ยังไม่ชัด ต้องตัดสินใจตอนลงมือ
 

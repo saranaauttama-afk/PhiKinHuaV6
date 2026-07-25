@@ -208,6 +208,20 @@ export type GameState = {
   /** รางวัลจากชัยชนะครั้งล่าสุด — UI อ่านจากที่นี่ ไม่ใช่จากข้อความใน log */
   lastReward?: { exp: number; gold: number };
 
+  /**
+   * ตัวนับสำหรับ derive RNG ในจุดที่ร้อย RNG ผ่าน signature ไม่ได้ (ดู rngState.ts)
+   * เก็บใน state เพื่อให้ผลลัพธ์ยังซ้ำได้ตาม seed
+   */
+  rngCursor?: number;
+  /** ตัวนับสำหรับสร้าง id ที่ไม่ซ้ำแบบ deterministic (แทน Date.now + Math.random) */
+  idCursor?: number;
+
+  /**
+   * สถานะการเรียนรู้ของ AI — เดิมเก็บเป็นตัวแปรระดับโมดูลใน adaptiveAI.ts
+   * ทำให้ไม่ถูก save ไม่ผูกกับ seed และค้างข้ามรัน
+   */
+  ai?: import('./adaptiveAI').AIState;
+
   player: PlayerState;
   enemy?: EnemyState;
   

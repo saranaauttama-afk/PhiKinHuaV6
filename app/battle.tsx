@@ -13,6 +13,7 @@ import StatGainPopup from './components/battle/StatGainPopup';
 import DiscardOverlay from './components/battle/DiscardOverlay';
 import VictoryOverlay from './components/battle/VictoryOverlay';
 import DefeatOverlay from './components/battle/DefeatOverlay';
+import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 
@@ -334,7 +335,20 @@ export default function BattlePage() {
           />
         )}
 
-        {(gameState.phase === 'victory' || gameState.phase === 'levelup') && (
+        {/* เลเวลอัปต้องมาก่อนหน้าชนะ — เดิม VictoryOverlay กลืน phase นี้ไป
+            ทำให้ผู้เล่นไม่เคยได้เลือกรางวัลเลย */}
+        {gameState.phase === 'levelup' && gameState.levelUp?.choice && (
+          <LevelUpOverlay
+            state={gameState}
+            playerLevel={player.level}
+            onChoose={(option, index) =>
+              dispatch({ type: 'ChooseLevelUpOption', option, index })
+            }
+            onSkip={() => dispatch({ type: 'SkipLevelUp' })}
+          />
+        )}
+
+        {gameState.phase === 'victory' && (
           <VictoryOverlay
             enemyName={enemy?.name ?? (Array.isArray(monsterName) ? monsterName[0] : monsterName) ?? 'ศัตรู'}
             expGained={reward.exp}

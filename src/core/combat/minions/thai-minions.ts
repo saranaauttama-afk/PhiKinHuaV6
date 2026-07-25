@@ -1,6 +1,8 @@
 // src/core/combat/minions/thai-minions.ts — สหายและลูกน้องในระบบไทย
 
 import type { MinionData } from '../../types_extended';
+import type { GameState } from '../../types';
+import { makeDeterministicId } from '../../rngState';
 
 /**
  * คลังข้อมูลสหายและลูกน้องทั้งหมดในเกม
@@ -328,14 +330,19 @@ export function getDurableMinions(): MinionData[] {
 }
 
 // สร้าง Minion instance ใหม่สำหรับใช้ในเกม
-export function createMinionInstance(minionId: string, owner: 'player' | 'enemy'): MinionData | null {
+// `state` ใช้สร้าง id ที่ไม่ซ้ำแบบ deterministic — เดิมใช้ Date.now() + Math.random()
+// ซึ่งทำให้ id เปลี่ยนทุกครั้งแม้จะเป็น seed เดิม
+export function createMinionInstance(
+  state: GameState,
+  minionId: string,
+  owner: 'player' | 'enemy'
+): MinionData | null {
   const template = getMinionById(minionId);
   if (!template) return null;
-  
-  // สร้าง instance ใหม่ด้วย ID ที่ไม่ซ้ำ
+
   return {
     ...template,
-    id: `${minionId}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+    id: makeDeterministicId(state, minionId),
     owner, // ใช้ owner ที่ส่งมา (อาจแตกต่างจาก template)
     // abilities และ duration จะคัดลอกจาก template
   };

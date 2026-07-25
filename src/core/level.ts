@@ -1,6 +1,6 @@
 // Level/XP — weights & rolling for level-up rewards (buckets)
 import type { RNG } from './rng';
-import { int, shuffle } from './rng';
+import { int, next, shuffle } from './rng';
 import type { GameState, CardData, BlessingDef } from './types';
 import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
 
@@ -198,7 +198,11 @@ export function rollThreeCards(rng: RNG, playerLevel = 1) {
   const cards: CardData[] = [];
   
   for (let i = 0; i < 3; i++) {
-    const roll = Math.random() * 100;
+    // ใช้ rng ที่ร้อยเข้ามาอยู่แล้ว ไม่ใช่ Math.random —
+    // การ์ดรางวัลตอนเลเวลอัปต้องซ้ำได้เมื่อใช้ seed เดิม
+    const rarityRoll = next(r);
+    r = rarityRoll.rng;
+    const roll = rarityRoll.value * 100;
     let selectedPool: CardData[] = BY_RARITY.Common;
     
     if (roll < legendaryWeight && BY_RARITY.Legendary.length > 0) {

@@ -39,46 +39,9 @@ export { THAI_MINIONS as MINIONS_REGISTRY } from './thai-minions';
 import { THAI_MINIONS, createMinionInstance } from './thai-minions';
 import type { MinionData } from '../../types_extended';
 
-// สร้าง Minion แบบสุ่มสำหรับผู้เล่น
-export function createRandomPlayerMinion(): MinionData | null {
-  const playerMinionIds = Object.keys(THAI_MINIONS).filter(id => 
-    THAI_MINIONS[id].owner === 'player'
-  );
-  
-  if (playerMinionIds.length === 0) return null;
-  
-  const randomId = playerMinionIds[Math.floor(Math.random() * playerMinionIds.length)];
-  return createMinionInstance(randomId, 'player');
-}
-
-// สร้าง Minion แบบสุ่มสำหรับศัตรู
-export function createRandomEnemyMinion(): MinionData | null {
-  const enemyMinionIds = Object.keys(THAI_MINIONS).filter(id => 
-    THAI_MINIONS[id].owner === 'enemy'
-  );
-  
-  if (enemyMinionIds.length === 0) return null;
-  
-  const randomId = enemyMinionIds[Math.floor(Math.random() * enemyMinionIds.length)];
-  return createMinionInstance(randomId, 'enemy');
-}
-
-// สร้าง Minion ตามประเภทความสามารถที่ต้องการ
-export function createMinionByAbility(
-  abilityType: 'attack' | 'heal' | 'energy' | 'status' | 'block',
-  owner: 'player' | 'enemy'
-): MinionData | null {
-  // หา minions ที่มีความสามารถตามที่ต้องการและ owner ที่ถูกต้อง
-  const suitableMinions = Object.entries(THAI_MINIONS).filter(([_, minion]) => 
-    minion.abilities.some(ability => ability.type === abilityType) &&
-    minion.owner === owner
-  );
-  
-  if (suitableMinions.length === 0) return null;
-  
-  const randomMinion = suitableMinions[Math.floor(Math.random() * suitableMinions.length)];
-  return createMinionInstance(randomMinion[0], owner);
-}
+// createRandomPlayerMinion / createRandomEnemyMinion / createMinionByAbility
+// ถูกลบออกแล้ว — ไม่มีใครเรียกเลย และทั้งสามใช้ Math.random ซึ่งขัดกับ
+// ข้อกำหนดเรื่อง seed determinism ถ้าต้องใช้อีก ให้เขียนใหม่โดยรับ RNG เข้ามา
 
 // ตรวจสอบว่า Minion มีความสามารถเฉพาะหรือไม่
 export function minionHasAbility(

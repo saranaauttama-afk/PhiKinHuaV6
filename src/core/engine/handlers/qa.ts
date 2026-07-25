@@ -295,7 +295,7 @@ export function qaDebugAdaptiveAI(state: GameState, cmd: Command & { type: 'QA_D
 
 export function qaResetAILearning(state: GameState, cmd: Command & { type: 'QA_ResetAILearning' }, rng: RNG) {
   const { resetAILearning } = require('../../adaptiveAI');
-  resetAILearning();
+  resetAILearning(state);
   state.log.push('🔄 AI learning patterns reset');
   return { state, rng };
 }

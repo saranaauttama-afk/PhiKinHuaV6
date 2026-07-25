@@ -1,16 +1,20 @@
 // src/core/shopRegistry.ts — Shop Registry System for Persistent Shops
 
 import type { GameState, ShopKind, ShopItem, PersistentShop } from './types';
+import { makeDeterministicId } from './rngState';
 
 /**
  * สร้าง Persistent Shop ใหม่
  */
 export function createPersistentShop(
+  state: GameState,
   kind: ShopKind,
   inventory: ShopItem[]
 ): PersistentShop {
   return {
-    id: `shop_${kind}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+    // id ต้องซ้ำได้ตาม seed — เดิมใช้ Date.now() + Math.random()
+    // ทำให้ save/reload ได้ id คนละชุดและรันเดิมไม่เหมือนเดิม
+    id: makeDeterministicId(state, `shop_${kind}`),
     kind,
     inventory: [...inventory], // copy
     boughtItems: [],
@@ -33,7 +37,7 @@ export function addShopToRegistry(
     state.shopRegistry = [];
   }
 
-  const shop = createPersistentShop(kind, inventory);
+  const shop = createPersistentShop(state, kind, inventory);
   if (shopId) {
     shop.id = shopId; // Use provided static ID
   }

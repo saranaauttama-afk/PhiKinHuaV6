@@ -119,7 +119,7 @@ export function dealDamage(
     //    คงไว้ตามเดิมเพื่อไม่ให้ balance ฝั่งศัตรูขยับเกินจากที่ตั้งใจแก้
     if (from === 'player') {
       const { getAdaptiveDamageMultiplier } = require('../adaptiveAI');
-      const mult = getAdaptiveDamageMultiplier();
+      const mult = getAdaptiveDamageMultiplier(state);
       if (Number.isFinite(mult) && mult > 0) {
         dmg = dmg * (1 / mult);
       }
