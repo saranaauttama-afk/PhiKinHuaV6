@@ -1,0 +1,63 @@
+# Redesign Context — PhiKinHuaV6 → "Night of the Full Moon" style
+
+Living doc for the redesign conversation between the dev (saranaauttama-afk) and Claude. Update this as decisions get made — treat it as the source of truth for "what we agreed on," separate from `CLAUDE.md` (which is pure technical orientation).
+
+Started: 2026-07-25
+
+---
+
+## 1. Where the project actually is right now
+
+- Full mechanical loop already implemented: seeded-RNG map generation (15 fixed fights across 2 parts + optional secret boss), card combat, status effects, equipment, "blessing" (relic) system, shop with persistence/respawn, save slots. See `gameRule/gameSpec.txt` for the full original spec — it already explicitly names Night of the Full Moon as the reference, so this isn't a new direction, it's finishing a direction that was set from the start but never executed visually.
+- Theme: Thai folklore ghosts (ผีกระสือ, ปอบ, กุมารทอง, แม่นาค, พญานาค, ...) as the monster roster, 31 monsters across tiers T1–T5 + Elite + 2 Boss tiers + Secret Boss.
+- Visually: functional gray-box. UI chrome (frames, HUD icons, buttons) exists; almost no character/monster illustration exists yet (one monster image total). A few background scenes exist (`abandonedHut`, `swamp`, `battleScence1`, `startPage`).
+- Latest engineering work (branch `animationComplete`/`updateBattle`) focused on battle feedback/timing, not visuals.
+
+**Read `CLAUDE.md` for the technical map of the codebase** (file locations, state pattern, known issues). This doc is for design/direction, not code structure.
+
+## 2. What "Night of the Full Moon" style means (reference points to align on)
+
+Night of the Full Moon (月圆之夜) is known for a specific combination — worth being explicit about *which parts* we're borrowing, since "redesign in that style" could mean any subset of these:
+
+1. **Hand-painted, storybook illustration** — soft painterly brushwork, not flat vector/anime-cel art. Characters and monsters read as illustrations out of a dark fairytale book, not game sprites.
+2. **Framing as a physical book/artifact** — UI chrome styled like parchment, leather, wax seals, torn paper edges, candlelight vignettes — the interface itself is part of the fiction (you're paging through a cursed storybook), not a neutral HUD overlay.
+3. **Restrained "living illustration" animation** — mostly-static painted scenes with small looping motion (candle flicker, mist drift, cloth sway, breathing) rather than full sprite animation. Combat impact is sold through screen effects/lighting/card motion more than character animation frames.
+4. **Muted, moody, warm-vs-cold palette** — desaturated backgrounds with a few warm light sources (candle, lantern, moon) pulling focus; horror through atmosphere and silhouette rather than gore or bright FX.
+5. **Narrative-first event/encounter cards** — encounters read like short illustrated story beats with a few choices, not just "here's a monster, fight it." Text and art share equal weight.
+6. **Typography** — a refined serif/display font for narrative/flavor text vs. a cleaner face for numbers/UI, both evoking old-world print rather than a modern game HUD font.
+
+Question to resolve with the dev: **which of these 6 are actually the goal**, vs. which parts of the *current* Thai-ghost identity should stay distinct rather than just copying NotFM's look wholesale (e.g., Thai temple/jungle/rural-horror visual vocabulary instead of NotFM's European fairytale one, even if the *technique* — painterly, book-framed, muted-palette — is shared).
+
+## 3. Redesign scope — open question
+
+Not yet decided how big this redesign is. Rough tiers, cheapest to most expensive:
+
+- **A. Visual direction only**: art style guide + UI chrome restyle (frames, fonts, colors, card layout) applied to existing screens/flow, existing mechanics untouched.
+- **B. A + UI/UX flow changes**: e.g., encounter/event presentation becomes more narrative-card-like, map presentation changes, combat screen layout rework — still same mechanical rules underneath.
+- **C. B + content**: new/rewritten event text, monster flavor, blessing flavor to match tone; possibly new art asset pipeline (commissioned/AI-assisted illustration, sourcing plan).
+- **D. B/C + mechanical changes**: if "Night of the Full Moon" is meant as a mechanical reference too (its choice-driven story encounters were as important to that game as its art), might mean encounter design changes, not just skin.
+
+## 4. Decision log
+
+| Date | Decision | Rationale |
+|---|---|---|
+| 2026-07-25 | Redesign targets **all 6** NotFM style elements (§2): painterly storybook illustration, book/parchment UI framing, restrained living-illustration animation, muted-palette-with-warm-light, narrative-first event cards, old-print typography. | Dev wants the full aesthetic system, not a partial skin — confirmed explicitly over "art style only" or "UI framing only" options. This is Scope tier **B** (§3) at minimum: visual direction + UI/UX flow together, since book-framing and narrative-first event cards both require flow/layout changes, not just re-skinned assets. |
+| 2026-07-25 | Keep the **Thai ghost / rural Thai identity clearly dominant** — technique borrowed from NotFM (painterly, book-framed, muted+warm), but subject matter, palette cues, and motifs stay Thai (rice fields, jungle, temples, cloth offerings, incense, banana groves), not a re-skin toward NotFM's European fairytale imagery. | Explicit choice over "blend" or "lean euro-fairytale" options. This is the identity anchor for every subsequent art/UI decision — when in doubt, pull toward Thai folk-horror reference (Thai ghost films, rural temple art, traditional Thai painting/mural style) over NotFM's own screenshots. |
+| 2026-07-25 | Art pipeline: **AI-generated, then refined/composited** (not commissioned illustration, not placeholder-forever). | Fastest path to actually filling the asset gap (currently ~1 monster illustration total across 31 monsters + UI chrome). Implies we'll need a prompt/style-reference system to keep 31 monsters + UI frames + backgrounds visually consistent — that consistency system is itself a design task, see Working Notes. |
+| 2026-07-25 | Scope is **B+C together** (§3): visual/UI redesign *and* content rewrite (event text, card/blessing flavor text, encounter framing) happen in the same pass, not visual-first-then-content-later. Mechanical rule changes (tier D — encounter design logic itself) stay out of scope unless raised separately. | Dev chose "ทำควบคู่กันเลย" over doing art/UI first and content later — text tone and visual tone need to land together for the storybook framing to actually read as one voice, not a reskin bolted onto old copy. |
+| 2026-07-25 | Redesign work happens on a **new branch cut from `animationComplete`** (not `main`). | `animationComplete`/`updateBattle` is the latest engineering work (battle feedback/timing); branching from it keeps the redesign on top of current mechanics instead of reintroducing the gap vs. `main`. Branch name: `redesign-notfm-style`. |
+
+## 5. Open questions to resolve with the dev
+
+- [x] Which of the 6 NotFM style elements (§2) are the actual target? → all 6
+- [x] Keep the Thai-ghost visual/cultural vocabulary distinct, or lean closer to NotFM's own European-fairytale look-and-feel? → stay clearly Thai
+- [x] Art pipeline → AI-generated + refine/composite
+- [x] Redesign scope → **B+C together**: visual/UI + content (event/card/blessing text) in the same pass. Mechanical encounter-design changes (tier D) stay out unless raised separately.
+- [x] Branch → new branch `redesign-notfm-style` cut from `animationComplete`
+- [ ] Platform/perf constraints: Expo/React Native — heavy painterly full-screen art + reanimated effects need to stay performant on mid-range Android (presumably the primary target for a Thai mobile audience). Worth confirming target devices before locking asset resolution/format/animation budget.
+- [ ] Any existing reference boards / mockups / specific Thai-horror references the dev already has in mind (specific films, temple mural styles, illustrators) beyond "like Night of the Full Moon but Thai"?
+- [ ] AI art pipeline specifics: which tool(s), how style consistency gets locked across 31 monsters + UI frames + backgrounds (style reference image? fixed prompt template? LoRA/character sheet approach?), and who does the refine/composite pass.
+
+## 6. Working notes
+
+*(running scratch space for ideas raised mid-conversation before they're firm enough for the decision log)*
