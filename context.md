@@ -61,3 +61,46 @@ Not yet decided how big this redesign is. Rough tiers, cheapest to most expensiv
 ## 6. Working notes
 
 *(running scratch space for ideas raised mid-conversation before they're firm enough for the decision log)*
+
+## 7. NotFM mechanical gap (opened 2026-07-25)
+
+Raised by the dev before starting the art pass: *"ระบบเกมส์เราเหมือน notfm ยัง หรือคุณทำตามแค่สเปกเดิม"*
+
+Honest answer at the time: the engine had been built to the **existing `gameSpec.txt`**, which is
+Slay-the-Spire-shaped, not NotFM-shaped. Five gaps were identified; the dev chose to close 1–4.
+
+| # | Gap | Status |
+|---|---|---|
+| 1 | Enemy intent — declare next turn's action, so combat is planning not guessing | ✅ done |
+| 2 | Character classes — per-class deck/stats/passives, the core of NotFM's replay value | ✅ done |
+| 3 | Journey map — a visible path you walk, replacing the 3-slot rotating tray | ✅ done |
+| 4 | Card fusion | pending |
+| 5 | Narrative event encounters (story choices, not just shops) | not in scope yet |
+
+### Decision: journey map replaces Dynamic Refresh (2026-07-25)
+
+The old map was three slots that **re-rolled themselves the moment you cleared one**
+(`Dynamic Refresh`, documented in `GAME_RULES_DEVELOPER.md`). Consequences:
+
+- the player never saw what was ahead, and had no sense of distance travelled
+- `pages.pageIndex` stayed `0` for an entire run, because pages never actually turned —
+  which is what silently broke boss selection and monster tier progression before
+- a "Proceed" button existed purely to escape a tray that would otherwise refill forever
+
+Replaced with `src/core/map/journey.ts`: a layered DAG built **once at run start** and
+visible end to end. Boss rows are one node wide (unavoidable), fight rows two, rest rows
+two or three. A rest row always precedes a boss.
+
+**The deliberately conservative part:** `ChooseOffer` / `CompleteNode` and every shop/event
+handler were left untouched. `src/core/map/journeySync.ts` writes the reachable nodes into
+`pages.current.offers`, so the change is *where the choices come from*, not how they resolve.
+
+Notable consequences, all covered by tests:
+- the secret boss row is **appended when unlocked**, not built up-front — otherwise the
+  player would see it waiting on the map before earning it
+- monster picking is now **predecessor-aware**: no path through the graph can put the same
+  ghost in two consecutive fights (the previous per-page dedupe couldn't see across paths)
+- fight rows are fixed at width 2 because T2/T4/T5 pools hold only 3 ghosts each — a 3-wide
+  fight row can drain a pool and force a repeat on the row after it
+- the Elite pool (HP 85–110) is now sliced by fight index; elites could previously appear
+  from fight 3 at full strength, which the starter deck cannot beat

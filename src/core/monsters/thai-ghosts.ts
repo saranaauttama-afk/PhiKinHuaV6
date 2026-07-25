@@ -297,6 +297,20 @@ export function eliteChanceForFight(fightIndex: number): number {
   return 0.30;
 }
 
+/**
+ * Elite ที่เหมาะกับช่วงไฟต์นั้น
+ *
+ * pool ของ Elite ไล่ตั้งแต่ HP 85 ถึง 110 แต่โอกาสเจอ Elite เปิดตั้งแต่ไฟต์ที่ 3
+ * ถ้าไม่แบ่งช่วง ผู้เล่นมีสิทธิ์เจอ Elite 110 HP ตั้งแต่ยังใช้เด็คตั้งต้น
+ * ซึ่งเป็นกำแพงที่เจาะไม่ได้ ไม่ใช่ความท้าทาย
+ */
+export function eliteSubPoolForFight(fightIndex: number): ThaiGhostData[] {
+  const byHp = [...THAI_GHOST_POOLS.Elite].sort((a, b) => a.hp - b.hp);
+  if (fightIndex <= 6) return byHp.slice(0, 2);
+  if (fightIndex <= 9) return byHp.slice(0, 4);
+  return byHp;
+}
+
 // Fight progression mapping (ตาม Game Spec)
 export function getTierForFight(
   fightIndex: number,

@@ -4,7 +4,8 @@ import type { RNG } from '../../rng';
 import { baseNewState } from '../../commands';
 import { rollTwoBlessings } from '../../level';
 import { START_ENERGY } from '../../balance/core';
-import { initPageMap, rollPageOffers } from '../../map/pages';
+import { initPageMap } from '../../map/pages';
+import { startJourney } from '../../map/journeySync';
 import { getClass, buildStarterDeck } from '../../classes';
 import { getEquipmentById } from '../../pack';
 
@@ -202,11 +203,9 @@ export function chooseStarter(
     s.pages = init.map;
   }
 
-  // ✅ Roll ข้อเสนอหน้าแรกทันที (3 ช่อง) แล้วไป phase 'map' เพื่อแสดง Pages UI
-  const ro = rollPageOffers(s.pages, r, s); r = ro.rng;
-  s.pages.current = { offers: ro.offers, resolved: ro.offers.map(() => false) };
-  s.pages._activeOfferIndex = undefined;
-  s.pages._shopUsed = false;
+  // ✅ วางเส้นทางทั้งรันไว้ล่วงหน้า แล้วเปิดตัวเลือกของชั้นแรก
+  // (เดิม roll ถาด 3 ช่องที่สุ่มตัวเองใหม่เรื่อยๆ ผู้เล่นจึงไม่เคยเห็นทางข้างหน้า)
+  r = startJourney(s, r);
 
   s.phase = 'map'; // UI ของคุณใช้ phase 'map' เพื่อโชว์ pages อยู่แล้ว
   s.enemy = undefined;

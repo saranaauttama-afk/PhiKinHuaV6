@@ -283,6 +283,13 @@ export type GameState = {
   mapMode?: MapMode;
   pages?: MapStatePages;
 
+  /**
+   * เส้นทางของรัน — กราฟแบบชั้นที่มองเห็นล่วงหน้าได้ทั้งเส้น
+   * `pages.current.offers` ถูกสร้างจากโหนดที่เดินไปได้ตอนนี้ เพื่อให้ handler
+   * ของคอมแบต/ร้าน/event ที่มีอยู่ทำงานต่อได้โดยไม่ต้องแก้
+   */
+  journey?: import('./map/journey').JourneyMap;
+
   // Shop / Events
   shopKind?: ShopKind;
   shopStock?: ShopItem[];

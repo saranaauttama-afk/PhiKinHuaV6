@@ -9,18 +9,17 @@ import type { SaveSlotInfo } from '../src/core/storage';
 import type { PageOffer } from '../src/core/map/pages';
 import { useGame } from '../src/store/gameStore';
 import { describeOffer, isShopLike } from './components/offerDisplay';
-import { PAGE_MIN_BEFORE_SPLIT } from '../src/core/balance/weights';
 
 // Components
 import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
-import MapView from './components/MapView';
 import DeckView from './components/DeckView';
 import EventView from './components/EventView';
 import EncounterCard from './components/EncounterCard';
 import BtnEncounter from './components/BtnEncounter';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
+import JourneyTrail from './components/JourneyTrail';
 import { useRouter } from 'expo-router';
 
 
@@ -47,13 +46,8 @@ export default function Home() {
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
 
-  // จบ encounter แล้วช่องนั้นจะถูกสุ่มใหม่ทันที (Dynamic Refresh) `resolved` จึงกลับเป็น false
-  // ตัวนับที่บอกความคืบหน้าจริงของหน้านี้คือ `_resolvesOnPage`
-  const resolvesOnPage = state.pages?._resolvesOnPage ?? 0;
-  const canProceed = resolvesOnPage >= PAGE_MIN_BEFORE_SPLIT;
-
-  // หน้าบอสมีช่องเดียวและเลี่ยงไม่ได้ (ไฟต์ 7 / 15 / ศึกลับ)
-  const isBossPage = offers.some(o => o.kind === 'boss');
+  // ตัวเลือกบนแผนที่คือ "โหนดที่เดินไปได้จากตรงที่ยืนอยู่" ไม่ใช่ถาดที่สุ่มใหม่ได้
+  // เลือกทางไหนก็เดินไปทางนั้น ไม่มีปุ่มข้าม ไม่มีการวนเก็บให้ครบก่อนไปต่อ
 
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
@@ -70,7 +64,7 @@ export default function Home() {
     }
   };
 
-  /** ลบช่องออกจากแผนที่ — ร้าน/สมบัติใช้คำสั่งของร้านเพื่อให้ช่อง refresh */
+  /** ข้ามโหนดนี้ไป — เดินผ่านร้านโดยไม่แวะ แล้วไปต่อชั้นถัดไป */
   const dismissOffer = (offer: PageOffer, index: number) => {
     if (isShopLike(offer)) dispatch({ type: 'DeleteShopFromMap', index });
     else dispatch({ type: 'DismissOffer', index });
@@ -154,9 +148,12 @@ export default function Home() {
         resizeMode="cover"
       >
         <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', paddingTop: 50 }}>
-          
-          {/* Encounter Cards Row — มาจาก engine จริง ไม่ใช่ค่าที่ hardcode ไว้ */}
-          <View style={{ flexDirection: 'row', marginTop: 120 }}>
+
+          {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
+          <JourneyTrail state={state} />
+
+          {/* ทางแยกตรงหน้า — มาจากโหนดที่เดินไปได้จริงบนเส้นทาง */}
+          <View style={{ flexDirection: 'row', marginTop: 70 }}>
             {offers.map((offer, i) => {
               const d = describeOffer(offer, i);
               const resolved = page?.resolved[i] ?? false;
@@ -186,32 +183,14 @@ export default function Home() {
             })}
           </View>
 
-          {/* เดินทางต่อ — ซ่อนบนหน้าบอส เพราะบอสถูกล็อกที่ไฟต์นั้น เลี่ยงไม่ได้ */}
-          {offers.length > 0 && !isBossPage && (
-            <View style={{ alignItems: 'center', marginTop: 12 }}>
-              <Pressable
-                onPress={() => dispatch({ type: 'Proceed' })}
-                disabled={!canProceed}
-                style={{
-                  paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12,
-                  opacity: canProceed ? 1 : 0.4,
-                  backgroundColor: 'rgba(0,0,0,0.5)',
-                  borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
-                }}
-              >
-                <Text style={{ color: 'white', fontFamily: 'Prompt_600SemiBold' }}>
-                  {canProceed
-                    ? 'เดินทางต่อ ▸'
-                    : `ผจญภัยต่ออีก ${PAGE_MIN_BEFORE_SPLIT - resolvesOnPage} ครั้ง`}
-                </Text>
-              </Pressable>
-            </View>
-          )}
+          {/* ไม่มีปุ่ม "เดินทางต่อ" อีกแล้ว — เลือกทางแยกคือการเดินทางต่อในตัวเอง */}
 
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
+          {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool
+              กับ "Page X/Y" ซึ่งไม่มีความหมายอีกแล้วบนแผนที่แบบเส้นทาง
+              และยังมีรายการทางเลือกซ้ำกับการ์ด encounter ด้านบนอีกชุด */}
           <ShopView state={state} dispatch={dispatch} />
-          <MapView state={state} dispatch={dispatch} />
           <DeckView state={state} dispatch={dispatch} />
           <EventView state={state} dispatch={dispatch} />
 

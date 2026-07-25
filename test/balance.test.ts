@@ -43,9 +43,9 @@ function playRun(seed: string): { fights: FightLog[]; levelAtFinalBoss: number }
 
     const i = offers.findIndex((o: any) => o.kind === 'monster' || o.kind === 'boss');
     if (i < 0) {
-      const ne = offers.findIndex((o: any) => o.kind === 'next_event');
-      if (ne >= 0) { go({ type: 'ChooseOffer', index: ne }); continue; }
-      go({ type: 'Proceed' });
+      // ชั้นพักบนเส้นทาง — แวะแล้วเดินต่อ
+      go({ type: 'ChooseOffer', index: 0 });
+      go({ type: 'CompleteNode' });
       continue;
     }
 
@@ -129,14 +129,30 @@ describe('เลเวลตอนเข้าบอสสุดท้าย', (
 
 describe('ความยากไต่ระดับ', () => {
   it('ผีช่วงท้ายเลือดหนากว่าช่วงต้นอย่างชัดเจน', () => {
+    // วัดรวมทุก seed ด้วย เพราะไฟต์ 3-4 มีโอกาสเจอ Elite 5% ตามสเปค
+    // รันเดียวที่ทอยติด Elite ตั้งแต่ต้นจะดันค่าเฉลี่ยช่วงต้นขึ้นทั้งก้อน
+    // — เป็นความผันผวนที่ตั้งใจให้มี ไม่ใช่ความยากที่ไม่ไต่ระดับ
+    const earlyHp: number[] = [];
+    const lateHp: number[] = [];
+    const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
+
     for (const seed of SEEDS) {
       const { fights } = playRun(seed);
       const early = fights.filter(f => f.index <= 4 && f.index !== MID_BOSS_FIGHT);
       const late  = fights.filter(f => f.index >= 10 && f.index < FINAL_BOSS_FIGHT);
 
-      const avg = (xs: FightLog[]) => xs.reduce((a, b) => a + b.hp, 0) / Math.max(1, xs.length);
-      expect(avg(late), `seed ${seed}`).toBeGreaterThan(avg(early) * 1.8);
+      expect(early.length, `seed ${seed}`).toBeGreaterThan(0);
+      expect(late.length, `seed ${seed}`).toBeGreaterThan(0);
+
+      // แต่ละรันต้องไต่ขึ้นชัดเจนอยู่ดี แค่เผื่อความผันผวนจาก Elite ช่วงต้น
+      expect(avg(late.map(f => f.hp)), `seed ${seed}`)
+        .toBeGreaterThan(avg(early.map(f => f.hp)) * 1.5);
+
+      earlyHp.push(...early.map(f => f.hp));
+      lateHp.push(...late.map(f => f.hp));
     }
+
+    expect(avg(lateHp)).toBeGreaterThan(avg(earlyHp) * 2);
   });
 
   it('ไม่เจอผี T1 ในช่วงท้ายเกม', () => {

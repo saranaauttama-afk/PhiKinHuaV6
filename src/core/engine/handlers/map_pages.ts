@@ -22,6 +22,9 @@ import { deckForMonster } from '../../monsters/monster-decks';
 import { planEnemyIntent } from '../../combat/intent';
 import { applyClassCombatStart } from '../../classes';
 import { getEquipmentById } from '../../pack';
+import {
+  usesJourney, enterNode, advanceJourney, unlockSecretBossRows,
+} from '../../map/journeySync';
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
 export function replaceSingleOffer(mp: MapStatePages, rng: RNG, s: GameState, slotIndex: number) {
@@ -185,6 +188,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
   const offers: PageOffer[] = mp.current.offers as PageOffer[];
   const offer: PageOffer | undefined = offers[ix];
   if (!offer || mp.current.resolved[ix]) return { state: s, rng };
+
+  // แผนที่แบบเดินทาง: เลือกช่องไหน = เดินไปยืนที่โหนดนั้น เดินแล้วเดินกลับไม่ได้
+  if (usesJourney(s)) enterNode(s, ix);
 
   switch (offer.kind) {
     case 'monster': {
@@ -625,6 +631,9 @@ export function dismiss(s: GameState, cmd: Extract<Command, { type: 'DismissOffe
   const { rng, mp } = got;
   if (!mp.current) return { state: s, rng };
 
+  // บนเส้นทางไม่มีการ "ปัดทิ้ง" — ต้องเลือกทางใดทางหนึ่งเสมอ
+  if (usesJourney(s)) return { state: s, rng };
+
   const ix = cmd.index;
   const offer: PageOffer | undefined = (mp.current.offers as PageOffer[])[ix];
   if (!offer || mp.current.resolved[ix]) return { state: s, rng };
@@ -638,6 +647,14 @@ export function dismiss(s: GameState, cmd: Extract<Command, { type: 'DismissOffe
 export function proceed(s: GameState, _cmd: Extract<Command, { type: 'Proceed' }>, r: RNG) {
   const got = ensurePages(s, r);
   let { rng, mp } = got;
+
+  // บนเส้นทางไม่มีปุ่ม "ไปหน้าถัดไป" — ชั้นถัดไปเปิดเองเมื่อจบโหนดปัจจุบัน
+  if (usesJourney(s)) {
+    s.phase = 'map';
+    (s as any).nodePhase = 'map_ready';
+    advanceJourney(s);
+    return { state: s, rng };
+  }
 
   if (mp.pageIndex + 1 >= mp.totalPages) {
     s.log.push('Proceed: already at last page');
@@ -654,6 +671,7 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
 
   if (!mp.current) return { state: s, rng };
   const ix = mp._activeOfferIndex;
+  const onJourney = usesJourney(s);
 
   if (ix != null && (mp.current.offers as PageOffer[])[ix]) {
     const offer: PageOffer = (mp.current.offers as PageOffer[])[ix] as PageOffer;
@@ -682,6 +700,9 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
           if (hpRatio >= SECRET_BOSS_HP_RATIO) {
             s.secretBossUnlocked = true;
             s.log.push('เลือดยังเหลือเฟือ… มีบางอย่างรออยู่ข้างหน้า');
+            // เส้นทางถูกวางไว้ล่วงหน้าถึงบอสสุดท้ายเท่านั้น — ต่อชั้นศึกลับตอนนี้
+            // เพื่อไม่ให้ผู้เล่นเห็นมันรออยู่บนแผนที่ตั้งแต่ยังไม่ปลดล็อค
+            if (onJourney) rng = unlockSecretBossRows(s, rng);
             return proceed(s, { type: 'Proceed' } as any, rng);
           }
         }
@@ -787,8 +808,9 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
         return false; // Unknown shop kind - don't refresh
       })();
       
-      if (stockExhausted) {
-        console.log(`🛒 Shop stock exhausted (${s.shopKind}) - will refresh slot`);
+      // บนเส้นทาง หนึ่งโหนดคือหนึ่งครั้งที่แวะ — ออกจากร้านแล้วเดินต่อเสมอ
+      // (ถาดเดิมปล่อยให้ร้านค้างไว้จนของหมด เพราะช่องถูกสุ่มใหม่ได้เรื่อยๆ)
+      if (onJourney || stockExhausted) {
         mp.current.resolved[ix] = true;
         consumeToken(mp, offer);
       }
@@ -802,6 +824,7 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
     else if (s.phase === 'event') {
       // well: ต้องใช้หรือกดปิดให้ถูก flag ถึง resolve; event ชนิดอื่น resolve ได้ตรง ๆ
       const ok =
+        onJourney ||
         (s.event?.type === 'well' && ((s.event.used ?? false) || (s.event.dismissed ?? false))) ||
         (s.event?.type && s.event.type !== 'well');
 
@@ -815,6 +838,16 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
 
     // === Page flow enhancement ===
     // เมื่อจบ encounter ที่ไม่ใช่ boss/next_event → รีเฟรชช่องทันที (เฉพาะที่ resolved จริงๆ)
+    // บนเส้นทางไม่มีการรีเฟรช — จบโหนดแล้วเปิดชั้นถัดไปแทน
+    if (onJourney) {
+      if (ix != null && mp.current?.resolved[ix]) {
+        mp._activeOfferIndex = undefined;
+        mp._shopUsed = false;
+        advanceJourney(s);
+      }
+      return { state: s, rng };
+    }
+
     if (ix != null && mp.current && (mp.current.offers as PageOffer[])[ix] && mp.current.resolved[ix]) {
       const offer: PageOffer = (mp.current.offers as PageOffer[])[ix] as PageOffer;
       if (offer.kind !== 'boss' && offer.kind !== 'next_event') {
@@ -843,6 +876,7 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
     mp._shopUsed = false;
   }
 // เคลียร์ครบ 3 ช่อง → ไปหน้าถัดไป auto
+  if (onJourney) return { state: s, rng };
   if (s.pages?.current?.resolved.every(Boolean)) {
     return proceed(s, { type: 'Proceed' } as any, rng);
   }
@@ -893,6 +927,15 @@ export function deleteShopFromMap(s: GameState, cmd: Extract<Command, { type: 'D
   mp.current.resolved[ix] = true;
   consumeToken(mp, offer);
   s.log.push('🗑️ Shop deleted from map');
+
+  // บนเส้นทางไม่มีการรีเฟรชช่อง — ลบร้านคือเลือกที่จะข้ามโหนดนั้นแล้วเดินต่อ
+  if (usesJourney(s)) {
+    enterNode(s, ix);
+    mp._activeOfferIndex = undefined;
+    mp._shopUsed = false;
+    advanceJourney(s);
+    return { state: s, rng };
+  }
 
   // Refresh slot with new encounter (same as monster completion)
   const refreshResult = replaceSingleOffer(mp, rng, s, ix);
@@ -953,6 +996,12 @@ export function deleteShop(s: GameState, _cmd: Extract<Command, { type: 'DeleteS
   // reset flags
   mp._activeOfferIndex = undefined;
   mp._shopUsed = false;
+
+  // บนเส้นทาง: ลบร้านแล้วเดินต่อ ไม่มีช่องให้รีเฟรช
+  if (usesJourney(s)) {
+    advanceJourney(s);
+    return { state: s, rng };
+  }
 
   // ตาม game rule: ลบร้านแล้ว → Refresh slot ทันที (เหมือนตอนสู้มอนสเตอร์จบ)
   const refreshResult = replaceSingleOffer(mp, rng, s, ix);

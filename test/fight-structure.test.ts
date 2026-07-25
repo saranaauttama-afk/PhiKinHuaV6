@@ -8,6 +8,7 @@ import {
 } from '../src/core/map/pages';
 import { SECRET_BOSS_HP_RATIO } from '../src/core/balance/weights';
 import { THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
+import { buildJourney } from '../src/core/map/journey';
 
 /**
  * โครงสร้างรันตาม gameSpec.txt — 15 ไฟต์, บอสกลางที่ไฟต์ 7, บอสสุดท้ายที่ 15
@@ -16,9 +17,19 @@ import { THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
  * ซึ่งค้างที่ 0 → ได้ 'final' เสมอ BossMid กับ SecretBoss จึงเข้าไม่ถึงเลย
  */
 
+type FightRecord = {
+  index: number;
+  kind: string;
+  bossType?: string;
+  enemyId: string;
+  /** สถานะทันทีหลังปิดโหนดของไฟต์นี้ — ใช้ตรวจว่าเดินทางต่อได้จริง */
+  phaseAfter: string;
+  offersAfter: number;
+};
+
 type RunResult = {
   state: GameState;
-  fights: Array<{ index: number; kind: string; bossType?: string; enemyId: string }>;
+  fights: FightRecord[];
 };
 
 /** เล่นรันจนจบ โดยชนะทุกไฟต์ทันที และคุมเลือดตอนจบบอสสุดท้ายได้ */
@@ -30,7 +41,7 @@ function playFullRun(seed: string, opts: { hpRatioAtFinal?: number } = {}): RunR
   go({ type: 'NewRun', seed });
   go({ type: 'ChooseStarterBlessing', index: 0 });
 
-  const fights: RunResult['fights'] = [];
+  const fights: FightRecord[] = [];
   let guard = 0;
 
   while (guard++ < 500 && s.phase !== 'run_complete') {
@@ -39,9 +50,9 @@ function playFullRun(seed: string, opts: { hpRatioAtFinal?: number } = {}): RunR
 
     const i = offers.findIndex((o: any) => o.kind === 'monster' || o.kind === 'boss');
     if (i < 0) {
-      const ne = offers.findIndex((o: any) => o.kind === 'next_event');
-      if (ne >= 0) { go({ type: 'ChooseOffer', index: ne }); continue; }
-      go({ type: 'Proceed' });
+      // ชั้นพักบนเส้นทาง — ต้องแวะโหนดใดโหนดหนึ่งแล้วปิด ถึงจะเปิดชั้นถัดไป
+      go({ type: 'ChooseOffer', index: 0 });
+      go({ type: 'CompleteNode' });
       continue;
     }
 
@@ -49,12 +60,7 @@ function playFullRun(seed: string, opts: { hpRatioAtFinal?: number } = {}): RunR
     go({ type: 'ChooseOffer', index: i });
     if (s.phase !== 'combat') break;
 
-    fights.push({
-      index: (s.fightCount ?? 0) + 1,
-      kind: offer.kind,
-      bossType: offer.bossType,
-      enemyId: offer.enemyId,
-    });
+    const index = (s.fightCount ?? 0) + 1;
 
     // คุมเลือดถ้าเป็นบอสสุดท้าย เพื่อทดสอบเงื่อนไขศึกลับ
     if (offer.bossType === 'final' && opts.hpRatioAtFinal != null) {
@@ -71,6 +77,15 @@ function playFullRun(seed: string, opts: { hpRatioAtFinal?: number } = {}): RunR
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
     go({ type: 'CompleteNode' });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+
+    fights.push({
+      index,
+      kind: offer.kind,
+      bossType: offer.bossType,
+      enemyId: offer.enemyId,
+      phaseAfter: s.phase,
+      offersAfter: (s.pages?.current?.offers ?? []).length,
+    });
   }
 
   return { state: s, fights };
@@ -132,21 +147,17 @@ describe('บอสมาจาก pool ที่ถูกต้อง', () => {
     expect(idsOf('BossFinal')).toContain(fin.enemyId);
   });
 
-  it('หน้าบอสมีช่องเดียว — เลี่ยงไม่ได้', () => {
-    let s: any = { seed: 'boss-page', phase: 'start', turn: 0 };
-    let r = makeRng('boss-page');
-    const go = (c: any) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
-    go({ type: 'NewRun', seed: 'boss-page' });
-    go({ type: 'ChooseStarterBlessing', index: 0 });
-
-    // ดัน fightCount ให้ไฟต์ถัดไปเป็นบอสกลาง แล้วเปิดหน้าใหม่
-    s.fightCount = MID_BOSS_FIGHT - 1;
-    s.pages.current = undefined;
-    go({ type: 'OpenPage' });
-
-    const offers: PageOffer[] = s.pages.current.offers;
-    expect(offers).toHaveLength(1);
-    expect(offers[0].kind).toBe('boss');
+  it('ชั้นบอสบนเส้นทางมีทางเดียว — เลี่ยงไม่ได้', () => {
+    for (const seed of ['boss-page', 'bp-2', 'bp-3']) {
+      const { journey } = buildJourney(makeRng(seed));
+      const bossRows = journey.rows.filter(row =>
+        row.some(id => journey.nodes[id].offer.kind === 'boss')
+      );
+      expect(bossRows.length, `seed ${seed}`).toBeGreaterThan(0);
+      for (const row of bossRows) {
+        expect(row, `seed ${seed}`).toHaveLength(1);
+      }
+    }
   });
 });
 
@@ -182,28 +193,21 @@ describe('ศึกลับกับพระยามัจจุราช', (
 });
 
 describe('ชนะบอสกลางแล้วเดินทางต่อ ไม่ใช่จบรัน', () => {
-  it('หลังบอสกลาง phase กลับไปเล่นต่อได้', () => {
-    let s: any = { seed: 'mid-cont', phase: 'start', turn: 0 };
-    let r = makeRng('mid-cont');
-    const go = (c: any) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
-    go({ type: 'NewRun', seed: 'mid-cont' });
-    go({ type: 'ChooseStarterBlessing', index: 0 });
+  it('หลังบอสกลาง ยังมีทางให้เดินต่อ', () => {
+    const { fights } = playFullRun('mid-cont', { hpRatioAtFinal: 0.2 });
+    const mid = fights.find(f => f.bossType === 'mid')!;
 
-    s.fightCount = MID_BOSS_FIGHT - 1;
-    s.pages.current = undefined;
-    go({ type: 'OpenPage' });
-    go({ type: 'ChooseOffer', index: 0 });
-    expect(s.phase).toBe('combat');
+    expect(mid).toBeDefined();
+    expect(mid.phaseAfter).not.toBe('run_complete');
+    expect(mid.phaseAfter).not.toBe('victory');
+    expect(mid.offersAfter).toBeGreaterThan(0);
+  });
 
-    s.piles.hand = [
-      { id: 'kill', name: 'kill', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' },
-    ];
-    go({ type: 'PlayCard', index: 0 });
-    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
-    go({ type: 'CompleteNode' });
-    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+  it('บอสสุดท้ายเป็นปลายทางจริง — ไม่มีทางเดินต่อ', () => {
+    const { fights, state } = playFullRun('mid-cont', { hpRatioAtFinal: 0.2 });
+    const fin = fights.find(f => f.bossType === 'final')!;
 
-    expect(s.phase).not.toBe('run_complete');
-    expect(s.pages.current.offers.length).toBeGreaterThan(0);
+    expect(fin.phaseAfter).toBe('run_complete');
+    expect(state.phase).toBe('run_complete');
   });
 });
