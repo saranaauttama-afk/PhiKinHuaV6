@@ -61,6 +61,8 @@ export default function BattlePage() {
     if (!monsterId) router.replace('/');
   }, [monsterId]);
 
+  // ปกติ ChooseOffer บนหน้าแผนที่เซ็ตอัพคอมแบตมาให้ครบแล้ว (ศัตรู เด็ค มือแรก)
+  // เหลือไว้เป็นทางสำรองกรณีเปิดหน้านี้ตรงๆ เช่นตอน dev
   React.useEffect(() => {
     if (monsterId && !enemy && gameState.phase !== 'combat') {
       dispatch({ type: 'StartCombat', monsterId: monsterId as string });
@@ -340,7 +342,12 @@ export default function BattlePage() {
             playerLevel={player.level}
             playerExp={player.exp}
             playerExpToNext={player.expToNext}
-            onContinue={() => router.replace('/')}
+            onContinue={() => {
+              // ปิด node บนแผนที่ก่อนกลับ — engine จะ mark resolved,
+              // หัก token ของ pool แล้วพากลับสู่ phase 'map' ให้เอง
+              dispatch({ type: 'CompleteNode' });
+              router.replace('/');
+            }}
           />
         )}
 

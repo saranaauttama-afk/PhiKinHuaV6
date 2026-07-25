@@ -267,14 +267,22 @@ event, level-up choice, ระบบ 15 ไฟต์ทั้งหมด
 
 engine เสร็จกว่า UI มาก — สิ่งที่ขาดคือหน้าแผนที่จริงที่ต่อกับ `pages` state
 
-### Phase 6 (ใหม่) — ต่อหน้าแผนที่เข้ากับ engine
+### Phase 6 — ต่อหน้าแผนที่เข้ากับ engine ✅
 - แทนปุ่ม hardcode ด้วย offer จริงจาก `s.pages.current.offers`
-- ต่อ `ChooseOffer` / `CompleteNode` / `Proceed` เข้ากับ UI
-- ส่งผลการต่อสู้กลับเข้าลูป (ตอนนี้ battle.tsx `router.replace('/')` เฉยๆ)
-- ทำให้ shop / event / level-up เข้าถึงได้จริง
+- ต่อ `ChooseOffer` / `CompleteNode` / `Proceed` / `DeleteShopFromMap` เข้ากับ UI
+- `StartPage` → `NewRun` → หน้าเลือกพรตั้งต้นจาก `state.starter.choices` → หน้าแผนที่
+- ชนะแล้ว `CompleteNode` ก่อนกลับหน้าแผนที่ (engine mark resolved + หัก token เอง)
+- `app/components/offerDisplay.ts` แปลง `PageOffer` เป็นข้อมูลที่ `BtnEncounter` ใช้
+- ลบ `BlessingDialog` / `EncounterDialog` แบบ mock ที่ถูกแทนที่แล้ว
 
-งานนี้ควรทำ**ก่อน**เริ่มรีดีไซน์ภาพ เพราะรีดีไซน์หน้าแผนที่ให้สวย
-ในขณะที่มันยังไม่ได้ต่อกับระบบจริง = ต้องรื้อทำใหม่อีกรอบ
+**เรื่องที่เข้าใจผิดตอนแรก:** เคยคิดว่าหลังเคลียร์ encounter ช่องนั้นจะค้างเป็น
+`resolved = true` แต่ engine ทำ **Dynamic Refresh** — สุ่ม encounter ใหม่ลงช่องนั้นทันที
+`resolved` จึงกลับเป็น `false` (ตรงตาม `GAME_RULES_DEVELOPER.md`)
+ตัวนับความคืบหน้าจริงของหน้าคือ `_resolvesOnPage` เทียบกับ `PAGE_MIN_BEFORE_SPLIT = 3`
+UI จึงต้องใช้ตัวนี้ ไม่ใช่ `resolved`
+
+**ยังไม่ได้ทำ:** ระบบ level-up choice ยังไม่มีหน้า UI (`state.levelUp` ถูกตั้งค่าแล้ว
+แต่ไม่มีที่ให้ผู้เล่นเลือก) — ตอนนี้ `phase === 'levelup'` ถูก VictoryOverlay กลืนไป
 
 **รวม ~4-5 วัน** แล้วค่อยเริ่ม CombatView ใหม่สไตล์ NotFM บนฐานที่นิ่งแล้ว
 
