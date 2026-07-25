@@ -13,7 +13,7 @@ import {
 
 import { pickEnemy } from '../../pack';
 import { buildAndShuffleDeck, drawUpTo, startPlayerTurn } from '../../commands';
-import { PAGE_FORCE_SPLIT_AT, PAGE_MIN_BEFORE_SPLIT } from '../../balance/weights';
+import { PAGE_FORCE_SPLIT_AT, PAGE_MIN_BEFORE_SPLIT, SECRET_BOSS_HP_RATIO } from '../../balance/weights';
 import { resetBlessingTurnFlags, runBlessingsTurnHook } from '../../blessingRuntime';
 import { START_ENERGY } from '../../balance/core';
 import { buildAndShuffleEnemyDeck } from './enemy';
@@ -101,6 +101,20 @@ function ensurePages(s: GameState, r: RNG): { rng: RNG; mp: MapStatePages } {
   }
   
   return { rng: r, mp: s.pages };
+}
+
+/**
+ * ล้างสเตตที่เหลือจากคอมแบตก่อนกลับสู่หน้าแผนที่
+ * ใช้ร่วมกันทั้งคอมแบตปกติและบอส — เดิมทางบอสไม่ได้ล้าง ทำให้ศัตรูที่ตายแล้ว
+ * ติดไปกับ state ต่อ
+ */
+function clearCombatState(s: GameState) {
+  s.enemy = undefined;
+  (s as any).enemyPiles = undefined;
+  (s as any).playerPiles = undefined;
+  (s as any).enemyIntentCardId = null;
+  s.player.block = 0;
+  s.player.energy = s.player.maxEnergy ?? START_ENERGY;
 }
 
 function formatOffer(o: PageOffer): string {
@@ -631,28 +645,49 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
       consumeToken(mp, offer);
 
       if (offer.kind === 'boss') {
-        s.log.push('Boss defeated! Act cleared.');
-        // Clear temporary equipment slots
         s.equipmentTempSlots = 0;
-        // Remove temporary equipment after boss combat too
         removeTemporaryEquipment(s);
-        // คง phase='victory' ให้ UI แสดงจบแอค
+        mp._activeOfferIndex = undefined;
+        mp._shopUsed = false;
+        clearCombatState(s);
+
+        // บอสกลาง — จบภาคแรก แล้วเดินทางต่อ ไม่ใช่จบรัน
+        if (offer.bossType === 'mid') {
+          s.log.push('ชนะบอสกลาง เดินทางต่อสู่ภาคสอง');
+          return proceed(s, { type: 'Proceed' } as any, rng);
+        }
+
+        // บอสสุดท้าย — ถ้าเลือดเหลือมากพอ ปลดล็อคศึกลับต่อท้าย
+        if (offer.bossType === 'final') {
+          const hpRatio = s.player.hp / Math.max(1, s.player.maxHp);
+          if (hpRatio >= SECRET_BOSS_HP_RATIO) {
+            s.secretBossUnlocked = true;
+            s.log.push('เลือดยังเหลือเฟือ… มีบางอย่างรออยู่ข้างหน้า');
+            return proceed(s, { type: 'Proceed' } as any, rng);
+          }
+        }
+
+        // จบรัน (บอสสุดท้ายโดยไม่ปลดล็อคศึกลับ หรือชนะศึกลับแล้ว)
+        s.phase = 'run_complete';
+        s.runSummary = {
+          won: true,
+          fights: s.fightCount ?? 0,
+          level: s.player.level,
+          gold: s.player.gold ?? 0,
+          beatSecretBoss: offer.bossType === 'secret',
+        };
+        s.log.push('จบการเดินทาง');
         return { state: s, rng };
       }
 
       // คอมแบตธรรมดา → กลับหน้า map
       s.phase = 'map';
       (s as any).nodePhase = 'map_ready';
-      s.enemy = undefined;
-      (s as any).enemyPiles = undefined;
-      (s as any).playerPiles = undefined;
-      (s as any).enemyIntentCardId = null;
-      s.player.block = 0;
-      s.player.energy = s.player.maxEnergy ?? START_ENERGY;
-      
+      clearCombatState(s);
+
       // Clear temporary equipment slots
       s.equipmentTempSlots = 0;
-      
+
       // Remove temporary equipment after combat
       removeTemporaryEquipment(s);
     }

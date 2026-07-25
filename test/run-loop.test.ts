@@ -124,7 +124,7 @@ describe('เลือก encounter ที่เป็นศัตรู', () =>
     expect(s.pages!.current!.offers).toHaveLength(3);
   });
 
-  it('บอสไม่ถูก refresh — ยังคง phase victory ไว้ให้ UI แสดงจบแอค', () => {
+  it('บอสไม่ถูก refresh เหมือน encounter ปกติ', () => {
     // ใช้ offer เป็นบอสโดยตรงเพื่อทดสอบเส้นทางนี้
     let s = run(newRun('boss-test'), [{ type: 'ChooseStarterBlessing', index: 0 }]);
     s.pages!.current!.offers[0] = {
@@ -138,8 +138,11 @@ describe('เลือก encounter ที่เป็นศัตรู', () =>
     s.phase = 'victory';
     s = run(s, [{ type: 'CompleteNode' }]);
 
-    expect(s.phase).toBe('victory');
-    expect(s.pages!.current!.resolved[0]).toBe(true);
+    // บอสกลางพาเดินทางต่อ (ไม่ค้างที่ victory และไม่จบรัน)
+    // รายละเอียดลำดับบอสอยู่ใน fight-structure.test.ts
+    expect(s.phase).not.toBe('victory');
+    expect(s.phase).not.toBe('run_complete');
+    expect(s.enemy).toBeUndefined();
   });
 });
 

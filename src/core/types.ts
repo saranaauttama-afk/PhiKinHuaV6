@@ -91,7 +91,8 @@ export type EquipmentData = {
 
 export type Phase =
   | 'start' | 'menu' | 'map' | 'combat' | 'victory' | 'defeat'
-  | 'event' | 'shop' | 'levelup' | 'starter'; // ← เพิ่ม 'start' สำหรับหน้าแรก
+  | 'event' | 'shop' | 'levelup' | 'starter'
+  | 'run_complete'; // จบรันแล้ว (ชนะบอสสุดท้าย) — แสดงจอสรุป
 
 export type Bucket =
   | 'max_hp' | 'max_energy' | 'max_hand'
@@ -227,6 +228,17 @@ export type GameState = {
   
   // Fight tracking for boss encounters
   fightCount?: number; // Total fights completed (for boss timing)
+
+  /** ปลดล็อคศึกลับกับพระยามัจจุราชแล้วหรือยัง (ดู SECRET_BOSS_HP_RATIO) */
+  secretBossUnlocked?: boolean;
+  /** สรุปผลตอนจบรัน — UI อ่านจากที่นี่ */
+  runSummary?: {
+    won: boolean;
+    fights: number;
+    level: number;
+    gold: number;
+    beatSecretBoss: boolean;
+  };
   enemyPiles?: {
     draw: string[];
     hand: string[];

@@ -6,9 +6,22 @@ export const PAGES_TOTAL = 16;
 export const SHOP_STOCK_SIZE = 3;
 export const SHOP_POWER_BIAS = 1.15;
 
+/**
+ * เงื่อนไขปลดล็อคศึกลับกับพระยามัจจุราช (ไฟต์ที่ 16)
+ *
+ * ชนะบอสสุดท้ายโดยเลือดยังเหลือไม่น้อยกว่าสัดส่วนนี้ = มีแรงเหลือพอจะท้ามัจจุราช
+ * เลือกเงื่อนไขนี้เพราะตรวจได้จาก state ตรงๆ ผู้เล่นรู้ตัวได้ระหว่างเล่น
+ * และให้รางวัลกับการเล่นที่ประหยัดเลือด แทนที่จะเป็นเงื่อนไขลับที่เดาไม่ได้
+ */
+export const SECRET_BOSS_HP_RATIO = 0.5;
+
+// รันหนึ่งมี 15 ไฟต์ โดยไฟต์ 7 กับ 15 เป็นบอส → เหลือไฟต์ปกติ 13 ไฟต์
+// (1-6 = 6 ไฟต์, 8-14 = 7 ไฟต์) pool ของมอนจึงต้องรวมกันได้ 13 พอดี
+export const NORMAL_FIGHTS_TOTAL = 13;
+
 export const POOL_DEFAULT = {
   normal: 9,
-  elite: 3,
+  elite: 4,
   shopCard: 4,
   shopEquipment: 2,
   shopRemove1: 1, // Phase 1: early game

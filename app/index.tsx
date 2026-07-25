@@ -19,6 +19,7 @@ import DeckView from './components/DeckView';
 import EventView from './components/EventView';
 import EncounterCard from './components/EncounterCard';
 import BtnEncounter from './components/BtnEncounter';
+import RunCompleteScreen from './components/RunCompleteScreen';
 import { useRouter } from 'expo-router';
 
 
@@ -49,6 +50,9 @@ export default function Home() {
   const resolvesOnPage = state.pages?._resolvesOnPage ?? 0;
   const canProceed = resolvesOnPage >= PAGE_MIN_BEFORE_SPLIT;
 
+  // หน้าบอสมีช่องเดียวและเลี่ยงไม่ได้ (ไฟต์ 7 / 15 / ศึกลับ)
+  const isBossPage = offers.some(o => o.kind === 'boss');
+
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
     dispatch({ type: 'ChooseOffer', index });
@@ -77,6 +81,11 @@ export default function Home() {
   // Show StartPage when phase is 'start'
   if (state.phase === 'start') {
     return <StartPage onStartGame={() => newRun(seed)} />;
+  }
+
+  // จบรันแล้ว — แสดงจอสรุปแทนการเด้งกลับแผนที่ที่ไม่มีอะไรเหลือ
+  if (state.phase === 'run_complete') {
+    return <RunCompleteScreen state={state} onNewRun={() => newRun(`${Date.now()}`)} />;
   }
 
   // เลือกพรตั้งต้นก่อนเข้าหน้าแรก
@@ -165,8 +174,8 @@ export default function Home() {
             })}
           </View>
 
-          {/* เดินทางต่อ — เปิดเมื่อเคลียร์ศัตรูในหน้านี้แล้ว */}
-          {offers.length > 0 && (
+          {/* เดินทางต่อ — ซ่อนบนหน้าบอส เพราะบอสถูกล็อกที่ไฟต์นั้น เลี่ยงไม่ได้ */}
+          {offers.length > 0 && !isBossPage && (
             <View style={{ alignItems: 'center', marginTop: 12 }}>
               <Pressable
                 onPress={() => dispatch({ type: 'Proceed' })}

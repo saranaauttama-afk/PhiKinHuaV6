@@ -78,6 +78,29 @@ export function consumeToken(mp: MapStatePages, offer: PageOffer) {
 }
 
 // Generate shop offers with static IDs and sequential logic
+// ── โครงสร้างรันตาม gameSpec.txt ────────────────────────────────────────────
+// 15 ไฟต์ต่อรัน: ไฟต์ 1-6 ปกติ, 7 = Mid Boss, 8-14 ปกติ, 15 = Final Boss
+// ไฟต์ 16 = Secret Boss (ต่อท้าย เฉพาะเมื่อปลดล็อคได้)
+export const MID_BOSS_FIGHT    = 7;
+export const FINAL_BOSS_FIGHT  = 15;
+export const SECRET_BOSS_FIGHT = 16;
+
+/** ไฟต์ถัดไปที่ผู้เล่นกำลังจะเจอ (1-based) */
+export function nextFightIndex(s: GameState): number {
+  return (s.fightCount ?? 0) + 1;
+}
+
+/** ไฟต์นี้เป็นบอสไหม — คืน null ถ้าเป็นไฟต์ปกติ */
+export function bossTypeForFight(
+  fightIndex: number,
+  s: GameState
+): 'mid' | 'final' | 'secret' | null {
+  if (fightIndex === MID_BOSS_FIGHT) return 'mid';
+  if (fightIndex === FINAL_BOSS_FIGHT) return 'final';
+  if (fightIndex === SECRET_BOSS_FIGHT && s.secretBossUnlocked) return 'secret';
+  return null;
+}
+
 export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offers: PageOffer[]; rng: RNG } {
   const offers: PageOffer[] = [];
   const cand: Array<{ offer: PageOffer; w: number }> = [];
@@ -87,27 +110,23 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
   const allowElite = (mp.pools.normal <= 0) && (mp.pools.elite > 0);
   const allowNext  = (mp.pools.nextEvent > 0) && (pLeft > monsLeft + 1);
 
-  // inject boss เมื่อไม่มีมอนเหลือ
-  if (monsLeft <= 0) {
-    // Determine boss type based on progress (simplified logic)
-    const fightIndex = Math.max(1, Math.min(15, mp.pageIndex + 1));
-    let bossType: 'mid' | 'final' | 'secret' = 'final';
-    let ghostTier: keyof typeof THAI_GHOST_POOLS = 'BossFinal';
-    
-    if (fightIndex === 7) {
-      bossType = 'mid';
-      ghostTier = 'BossMid';
-    } else if (fightIndex === 15) {
-      bossType = 'final';
-      ghostTier = 'BossFinal';
-    } else if (fightIndex > 15) {
-      bossType = 'secret';
-      ghostTier = 'SecretBoss';
-    }
-    
-    const picked = getRandomMonsterFromTier(ghostTier, r);
+  // ── บอสถูกล็อกที่ลำดับไฟต์ ไม่ใช่ตอน pool หมด ──────────────────────────
+  //
+  // เดิมบอสโผล่เมื่อมอนหมด pool (ไฟต์ที่ 13) และเลือกประเภทจาก `pageIndex + 1`
+  // ซึ่งค้างที่ 0 ตลอดรัน (เพราะช่องถูก refresh แทนที่จะเปลี่ยนหน้า)
+  // → ไม่เคยเท่ากับ 7 หรือ 15 เลย บอสจึงเป็น 'final' เสมอ และ BossMid/SecretBoss
+  //   เข้าไม่ถึงตลอดกาล ทั้งที่ gameSpec ระบุว่า fight 7 = Mid, fight 15 = Final
+  //
+  // ตอนนี้ใช้ `fightCount` (จำนวนไฟต์ที่ชนะแล้ว) เป็นตัวตัดสิน
+  const bossType = bossTypeForFight(nextFightIndex(s), s);
+  if (bossType) {
+    const tier: keyof typeof THAI_GHOST_POOLS =
+      bossType === 'mid' ? 'BossMid' : bossType === 'final' ? 'BossFinal' : 'SecretBoss';
+
+    const picked = getRandomMonsterFromTier(tier, r);
     r = picked.rng;
-    offers.push({ kind: 'boss', bossType, enemyId: picked.monster.id });
+    // หน้าบอสมีช่องเดียว — เลี่ยงไม่ได้ ตามที่สเปคเขียนว่าบอส "ถูกล็อก" ที่ไฟต์นั้น
+    return { offers: [{ kind: 'boss', bossType, enemyId: picked.monster.id }], rng: r };
   }
 
   // Track used monsters to avoid duplicates in same page
