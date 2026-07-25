@@ -1,9 +1,9 @@
 // src/core/engine/shared.ts
 import type { GameState, CardData } from '../types';
 import type { RNG } from '../rng';
-import { nextExpForLevel, EXP_KILL_NORMAL, EXP_KILL_ELITE, EXP_KILL_BOSS } from '../balance/progression';
+import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
 import { rollLevelUpChoice, rollTwoBlessings, rollThreeCards, type LevelBucket } from '../level';
-import { goldRewardForVictory } from '../balance/economy';
+import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
 
 export function getCurrentNodeId(map?: any): string | undefined {
   if (!map) return undefined;
@@ -27,31 +27,27 @@ export function upgradeCard(c: CardData): CardData {
   return up;
 }
 
+/** tier ของผีที่เพิ่งถูกฆ่า — อ่านจาก enemy ที่ยังอยู่ใน state ตอนชนะ */
+function defeatedMonsterTier(s: GameState): ThaiGhostData['tier'] | undefined {
+  const id = s.enemy?.id;
+  if (!id) return undefined;
+  return getMonsterById(id)?.tier;
+}
+
 export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
-  let gained = EXP_KILL_NORMAL;
-  let tier: 'normal' | 'elite' | 'boss' = 'normal';
-  
   // Increment fight count for boss timing
   s.fightCount = (s.fightCount || 0) + 1;
-  
-  // Determine enemy tier for rewards
-  if (s.pages?.current && s.pages._activeOfferIndex != null) {
-    // Pages mode - get tier from active offer
-    const offer = s.pages.current.offers[s.pages._activeOfferIndex];
-    if (offer?.kind === 'monster') {
-      if (offer.tier === 'elite') { gained = EXP_KILL_ELITE; tier = 'elite'; }
-    } else if (offer?.kind === 'boss') {
-      gained = EXP_KILL_BOSS; tier = 'boss';
-    }
-  }
-  
-  // Grant EXP
+
+  // รางวัลคิดจาก tier ของผีที่เพิ่งฆ่าจริงๆ (T1…T5/Elite/Boss)
+  // เดิมใช้ก้อนเดียวสำหรับทุกตัวที่ไม่ใช่ elite/boss ผีกระสือกับผีพราย
+  // จึงให้รางวัลเท่ากันทั้งที่ HP ต่างกัน 4 เท่า
+  const tier = defeatedMonsterTier(s);
+  const gained = expForMonster(tier);
+  const gold = goldForMonster(tier);
+
   s.player.exp += gained;
-  
-  // Grant Gold
-  const goldResult = goldRewardForVictory(tier, s.player.level, r);
-  if (goldResult.rng) r = goldResult.rng;
-  s.player.gold = (s.player.gold || 0) + goldResult.amount;
+  s.player.gold = (s.player.gold || 0) + gold;
+  const goldResult = { amount: gold };
 
   // เก็บรางวัลไว้เป็นข้อมูล ไม่ใช่ให้ UI ไปแกะจากข้อความ log
   // (log เป็นข้อความสำหรับคนอ่าน — พอ rewrite ข้อความเกม regex จะพังทันที)

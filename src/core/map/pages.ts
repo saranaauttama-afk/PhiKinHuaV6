@@ -1,9 +1,9 @@
 // src/core/map/pages.ts
 import type { RNG } from '../rng';
-import { int } from '../rng';
+import { int, next } from '../rng';
 import { PAGES_TOTAL, POOL_DEFAULT, WEIGHTS } from '../balance/weights';
 import type { GameState } from '../types';
-import { getTierForFight, getRandomMonsterFromTier, THAI_GHOST_POOLS } from '../monsters/thai-ghosts';
+import { getTierForFight, getRandomMonsterFromTier, eliteChanceForFight, THAI_GHOST_POOLS } from '../monsters/thai-ghosts';
 
 export type PageOffer =
   | { kind: 'monster', tier: 'normal' | 'elite', enemyId: string }
@@ -31,6 +31,12 @@ export type MapStatePages = {
   };
   // Track deleted shops for sequential logic
   deletedShops: string[];
+  /**
+   * ผีที่เพิ่งถูกเสนอไปไม่กี่ตัวหลังสุด — ใช้เลี่ยงเจอตัวเดิมซ้ำติดกัน
+   * ของเดิมกันซ้ำเฉพาะภายในหน้าเดียว แต่ช่องถูก refresh ทีละช่องตลอดเวลา
+   * จึงไม่มีความจำข้ามการ refresh และเจอผีตัวเดิมซ้ำได้บ่อย
+   */
+  recentMonsterIds?: string[];
   current?: { offers: PageOffer[]; resolved: boolean[] };
   _closeAfterCombat?: boolean;
   _advanceAfterLevelup?: boolean;
@@ -81,6 +87,9 @@ export function consumeToken(mp: MapStatePages, offer: PageOffer) {
 // ── โครงสร้างรันตาม gameSpec.txt ────────────────────────────────────────────
 // 15 ไฟต์ต่อรัน: ไฟต์ 1-6 ปกติ, 7 = Mid Boss, 8-14 ปกติ, 15 = Final Boss
 // ไฟต์ 16 = Secret Boss (ต่อท้าย เฉพาะเมื่อปลดล็อคได้)
+/** จำผีที่เพิ่งเสนอไปกี่ตัว เพื่อไม่ให้เจอตัวเดิมซ้ำติดๆ กัน */
+const RECENT_MONSTER_MEMORY = 6;
+
 export const MID_BOSS_FIGHT    = 7;
 export const FINAL_BOSS_FIGHT  = 15;
 export const SECRET_BOSS_FIGHT = 16;
@@ -107,7 +116,16 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
 
   const monsLeft = monstersLeft(mp);
   const pLeft    = pagesLeft(mp);
-  const allowElite = (mp.pools.normal <= 0) && (mp.pools.elite > 0);
+
+  // Elite โผล่ตามโอกาสของช่วงไฟต์ (ตาราง Fight Progression ในสเปค)
+  // เดิมเปิดต่อเมื่อ pool ของมอนธรรมดาหมด → Elite ทั้งหมดกระจุกท้ายรันเสมอ
+  // ยังคงเงื่อนไข "normal หมดแล้วใช้ elite แทน" ไว้เพื่อให้ครบ 13 ไฟต์
+  const eliteRoll = next(r);
+  r = eliteRoll.rng;
+  const allowElite =
+    mp.pools.elite > 0 &&
+    (mp.pools.normal <= 0 || eliteRoll.value < eliteChanceForFight(nextFightIndex(s)));
+
   const allowNext  = (mp.pools.nextEvent > 0) && (pLeft > monsLeft + 1);
 
   // ── บอสถูกล็อกที่ลำดับไฟต์ ไม่ใช่ตอน pool หมด ──────────────────────────
@@ -134,8 +152,10 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
   
   // Helper function to create monster offer with specific enemy (avoiding duplicates)
   const createMonsterOffer = (tier: 'normal' | 'elite', rngRef: { rng: RNG }): PageOffer => {
-    // Calculate fight index based on current progress (simplified - would be more complex in real system)
-    const fightIndex = Math.max(1, Math.min(15, mp.pageIndex + 1));
+    // ใช้ลำดับไฟต์จริง ไม่ใช่ pageIndex — pageIndex ค้างที่ 0 ตลอดรันเพราะช่องถูก
+    // refresh แทนที่จะเปลี่ยนหน้า ทำให้เดิมเรียก getTierForFight(1) เสมอ
+    // ผู้เล่นจึงเจอผี T1-T2 ไปจนจบเกม tier progression ในสเปคไม่เคยถูกใช้
+    const fightIndex = Math.max(1, Math.min(FINAL_BOSS_FIGHT, nextFightIndex(s)));
     
     let ghostTier: keyof typeof THAI_GHOST_POOLS;
     if (tier === 'elite') {
@@ -150,20 +170,41 @@ export function rollPageOffers(mp: MapStatePages, r: RNG, s: GameState): { offer
       }
     }
     
-    // Get available monsters (excluding already used ones)
-    const availableMonsters = THAI_GHOST_POOLS[ghostTier].filter(m => !usedMonsterIds.has(m.id));
-    
-    // If no available monsters, reset and use all
-    const monstersToChoose = availableMonsters.length > 0 ? availableMonsters : THAI_GHOST_POOLS[ghostTier];
-    
+    // เลี่ยงตัวที่อยู่ในหน้านี้แล้ว และตัวที่เพิ่งเจอไปไม่กี่ไฟต์ก่อน
+    const recent = mp.recentMonsterIds ?? [];
+    const pool = THAI_GHOST_POOLS[ghostTier];
+
+    const justBefore = recent[recent.length - 1];
+
+    // ตัวที่วางอยู่บนกระดานตอนนี้ก็นับเป็นซ้ำ — ไม่งั้นผู้เล่นสู้ช่องหนึ่งเสร็จ
+    // แล้วไปเจอผีตัวเดิมที่นั่งรออยู่อีกช่องทันที
+    const onBoard = new Set(
+      (mp.current?.offers ?? [])
+        .filter((o): o is Extract<PageOffer, { kind: 'monster' }> => o.kind === 'monster')
+        .map(o => o.enemyId)
+    );
+
+    const taken = (id: string) => usedMonsterIds.has(id) || onBoard.has(id);
+
+    const fresh     = pool.filter(m => !taken(m.id) && !recent.includes(m.id));
+    const notOnPage = pool.filter(m => !taken(m.id) && m.id !== justBefore);
+    const notLast   = pool.filter(m => m.id !== justBefore);
+
+    // ผ่อนเงื่อนไขทีละขั้น (pool ของ T1/T2 มีแค่ 3 ตัว เลี่ยงครบทุกข้อไม่ได้เสมอ)
+    // แต่ขั้นสุดท้ายยังกันไม่ให้ซ้ำกับตัวที่เพิ่งเจอทันที
+    const monstersToChoose = fresh.length > 0 ? fresh
+      : notOnPage.length > 0 ? notOnPage
+      : notLast.length > 0 ? notLast
+      : pool;
+
     // Use deterministic RNG to pick monster
     const roll = int(rngRef.rng, 0, monstersToChoose.length - 1);
     rngRef.rng = roll.rng;
     const monster = monstersToChoose[roll.value];
-    
-    // Mark this monster as used
+
     usedMonsterIds.add(monster.id);
-    
+    mp.recentMonsterIds = [...recent, monster.id].slice(-RECENT_MONSTER_MEMORY);
+
     return { kind: 'monster', tier, enemyId: monster.id };
   };
 

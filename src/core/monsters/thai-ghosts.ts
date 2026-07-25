@@ -282,6 +282,21 @@ export function getAllMonsterIds(): string[] {
   return ids;
 }
 
+/**
+ * โอกาสเจอ Elite ตามช่วงไฟต์ (ตาราง Fight Progression ใน gameSpec.txt)
+ *
+ * เดิม Elite ถูกปล่อยออกมาต่อเมื่อ pool ของมอนธรรมดาหมดแล้วเท่านั้น
+ * ทำให้ Elite ทั้งหมดกระจุกอยู่ท้ายรัน (ไฟต์ 11-14 รวด) แทนที่จะโผล่ประปราย
+ */
+export function eliteChanceForFight(fightIndex: number): number {
+  if (fightIndex <= 2) return 0;
+  if (fightIndex <= 4) return 0.05;
+  if (fightIndex <= 6) return 0.10;
+  if (fightIndex <= 9) return 0.15;
+  if (fightIndex <= 12) return 0.25;
+  return 0.30;
+}
+
 // Fight progression mapping (ตาม Game Spec)
 export function getTierForFight(
   fightIndex: number,
