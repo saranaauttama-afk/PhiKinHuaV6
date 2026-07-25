@@ -52,6 +52,11 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   const goldResult = goldRewardForVictory(tier, s.player.level, r);
   if (goldResult.rng) r = goldResult.rng;
   s.player.gold = (s.player.gold || 0) + goldResult.amount;
+
+  // เก็บรางวัลไว้เป็นข้อมูล ไม่ใช่ให้ UI ไปแกะจากข้อความ log
+  // (log เป็นข้อความสำหรับคนอ่าน — พอ rewrite ข้อความเกม regex จะพังทันที)
+  s.lastReward = { exp: gained, gold: goldResult.amount };
+
   s.log.push(`Victory! +${gained} EXP, +${goldResult.amount} gold`);
 
   while (s.player.exp >= s.player.expToNext) {

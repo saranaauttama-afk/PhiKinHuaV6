@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
   cancelAnimation,
 } from 'react-native-reanimated';
+import { useBattleLayout } from './battleLayout';
 
 const MONSTER_IMAGES: Record<string, any> = {
   'phi-krasue': require('../../../assets/monsters/phi-krasue.png'),
@@ -32,8 +33,11 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   monsterName,
   enemy,
 }, ref) {
-  const id   = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
-  const name = Array.isArray(monsterName) ? monsterName[0] : monsterName;
+  const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
+  const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
+  // ขนาด/ตำแหน่งของภาพผีมาจากไฟล์เดียวกับที่การ์ดศัตรูใช้อ้างอิง
+  // เปลี่ยนขนาดที่นี่แล้วการ์ดจะขยับตามเอง (ดู battleLayout.ts)
+  const layout = useBattleLayout();
 
   const monsterY      = useSharedValue(0);
   const monsterX      = useSharedValue(0);
@@ -82,12 +86,16 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const maxHp        = enemy?.maxHp ?? 20;
 
   return (
-    <View style={{ flex: 1, paddingTop: 100, alignItems: 'center' }}>
+    <View style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
       <Animated.View style={floatStyle}>
         {monsterImage ? (
-          <Image source={monsterImage} style={{ width: 300, height: 300 }} resizeMode="contain" />
+          <Image
+            source={monsterImage}
+            style={{ width: layout.monsterSize, height: layout.monsterSize }}
+            resizeMode="contain"
+          />
         ) : (
-          <Text style={{ fontSize: 120 }}>👻</Text>
+          <Text style={{ fontSize: layout.monsterSize * 0.4 }}>👻</Text>
         )}
       </Animated.View>
 

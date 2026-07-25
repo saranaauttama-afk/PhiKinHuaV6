@@ -241,7 +241,7 @@ function useCombatTimeline(events: CombatEvent[], opts?: { speed?: number })
 | 0 | test harness | ครึ่งวัน | แก้ของอันตรายได้อย่างมั่นใจ |
 | 1 | รวม damage path | 1 วัน | **แก้บั๊กกฎเกม** — status effect ทำงานครบทั้งสองฝั่ง |
 | 2 | event stream | 1 วัน | กฎเกมหลุดจากอนิเมชั่น |
-| 3 | view เล่น event | 1-2 วัน | อนิเมชั่นนิ่ง + skip/speed |
+| 3 | view เล่น event | 1-2 วัน | อนิเมชั่นนิ่ง + skip/speed ✅ |
 | 4 | เก็บกวาด | ครึ่งวัน | ฐานสะอาดพร้อมรีดีไซน์ |
 
 **รวม ~4-5 วัน** แล้วค่อยเริ่ม CombatView ใหม่สไตล์ NotFM บนฐานที่นิ่งแล้ว

@@ -205,6 +205,9 @@ export type GameState = {
    */
   pendingEvents?: CombatEvent[];
 
+  /** รางวัลจากชัยชนะครั้งล่าสุด — UI อ่านจากที่นี่ ไม่ใช่จากข้อความใน log */
+  lastReward?: { exp: number; gold: number };
+
   player: PlayerState;
   enemy?: EnemyState;
   

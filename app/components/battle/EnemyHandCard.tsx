@@ -1,21 +1,18 @@
 import React from 'react';
-import { View, Image, Text, useWindowDimensions } from 'react-native';
+import { View, Image, Text } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withDelay,
   withSequence,
   Easing,
 } from 'react-native-reanimated';
+import { useBattleLayout } from './battleLayout';
 
 const CARD_W      = 110;
 const CARD_H      = 150;
 const IDLE_SCALE  = 0.28;   // เล็กลง — นั่งอยู่เหนือ badge enemy
 const SLOT_W      = 40;
-
-// paddingTop(100) + sprite(300) − 20 (เหนือ badge เล็กน้อย)
-const HAND_CENTER_Y = 380;
 
 const PHASE_ENTER = 450;
 const PHASE_FLIP  = 300;
@@ -36,23 +33,27 @@ interface Props {
   totalCards: number;
   delay: number;    // slide-in delay (staggered)
   playing: boolean; // when true → flip + rise + exit
+  /** ยิงตอนการ์ดโจมตีขึ้นเต็มขนาด — ให้หน้าแม่วาดจอแฟลช */
+  onAttackPeak?: () => void;
 }
 
-export default function EnemyHandCard({ card, cardIndex, totalCards, delay, playing }: Props) {
-  const { width: W, height: H } = useWindowDimensions();
+export default function EnemyHandCard({
+  card, cardIndex, totalCards, delay, playing, onAttackPeak,
+}: Props) {
+  const layout = useBattleLayout();
 
-  const slotCenterX = W / 2 - (totalCards * SLOT_W) / 2 + cardIndex * SLOT_W + SLOT_W / 2;
+  const slotCenterX =
+    layout.screenW / 2 - (totalCards * SLOT_W) / 2 + cardIndex * SLOT_W + SLOT_W / 2;
   const idlePosX    = slotCenterX - CARD_W / 2;
-  const idlePosY    = HAND_CENTER_Y - CARD_H / 2;  // 415
-  const centerX     = W / 2 - CARD_W / 2;
-  const centerY     = H / 2 - CARD_H / 2 - 40;
+  const idlePosY    = layout.enemyHandCenterY - CARD_H / 2;
+  const centerX     = layout.centerX - CARD_W / 2;
+  const centerY     = layout.centerY - CARD_H / 2;
 
-  const posX         = useSharedValue(idlePosX);
-  const posY         = useSharedValue(idlePosY - 80); // start above slot
-  const scale        = useSharedValue(IDLE_SCALE);
-  const opacity      = useSharedValue(0);
-  const flip         = useSharedValue(0);
-  const flashOpacity = useSharedValue(0);
+  const posX    = useSharedValue(idlePosX);
+  const posY    = useSharedValue(idlePosY - 80); // start above slot
+  const scale   = useSharedValue(IDLE_SCALE);
+  const opacity = useSharedValue(0);
+  const flip    = useSharedValue(0);
 
   // Phase 1: slide in to slot (face-down)
   React.useEffect(() => {
@@ -91,14 +92,11 @@ export default function EnemyHandCard({ card, cardIndex, totalCards, delay, play
       withTiming(0, { duration: PHASE_EXIT, easing: easeIn }),
     );
 
+    // จอแฟลชตอนการ์ดโจมตีขึ้นเต็มขนาด — วาดที่ root ของหน้า (ดู ScreenFlash)
+    // ไม่ใช่ในการ์ดใบนี้ เพราะ container ของการ์ดถูก scale/translate อยู่
     if (card.damage > 0) {
-      flashOpacity.value = withDelay(
-        PHASE_FLIP + PHASE_RISE,
-        withSequence(
-          withTiming(0.35, { duration: 120, easing: easeOut }),
-          withTiming(0,    { duration: 280, easing: easeOut }),
-        )
-      );
+      const t = setTimeout(() => onAttackPeak?.(), PHASE_FLIP + PHASE_RISE);
+      return () => clearTimeout(t);
     }
   }, [playing]);
 
@@ -123,17 +121,6 @@ export default function EnemyHandCard({ card, cardIndex, totalCards, delay, play
     position: 'absolute', width: '100%', height: '100%',
     opacity: flip.value >= 0.5 ? 1 : 0,
     transform: [{ perspective: 900 }, { rotateY: `${(flip.value - 1) * 90}deg` }],
-  }));
-
-  const screenFlashStyle = useAnimatedStyle(() => ({
-    position: 'absolute',
-    top: -posY.value / scale.value,
-    left: -posX.value / scale.value,
-    width: W / scale.value,
-    height: H / scale.value,
-    backgroundColor: 'rgba(200,30,30,0.4)',
-    opacity: flashOpacity.value,
-    pointerEvents: 'none' as any,
   }));
 
   const isAttack = card.damage > 0;
@@ -186,8 +173,6 @@ export default function EnemyHandCard({ card, cardIndex, totalCards, delay, play
         </View>
       </Animated.View>
 
-      {/* Screen flash (when card is at full scale) */}
-      {playing && isAttack && <Animated.View style={screenFlashStyle} />}
     </Animated.View>
   );
 }

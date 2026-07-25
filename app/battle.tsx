@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ImageBackground, Pressable, Image } from 'react-native';
+import { View, ImageBackground, Pressable, Image, Text } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
 import type { CombatEvent } from '../src/core/types';
@@ -14,6 +14,7 @@ import DiscardOverlay from './components/battle/DiscardOverlay';
 import VictoryOverlay from './components/battle/VictoryOverlay';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
+import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 
 type Phase = 'player' | 'discard' | 'enemy';
 
@@ -49,6 +50,7 @@ export default function BattlePage() {
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
 
   const monsterRef = React.useRef<MonsterAreaHandle>(null);
+  const flashRef   = React.useRef<ScreenFlashHandle>(null);
   const timeline   = useCombatTimeline();
 
   // timer ของเอฟเฟกต์เล็กๆ ฝั่งผู้เล่น (เฟดการ์ด, สั่นมอนสเตอร์) — ล้างตอน unmount
@@ -65,13 +67,7 @@ export default function BattlePage() {
     }
   }, [monsterId, enemy, gameState.phase]);
 
-  // Parse reward from engine log (format: "Victory! +X EXP, +Y gold")
-  // TODO(Phase 3): อ่านจาก state ตรงๆ — regex นี้จะพังทันทีที่ rewrite ข้อความเกม
-  const rewardLog = React.useMemo(() => {
-    const entry = [...gameState.log].reverse().find(l => /^Victory!\s+\+\d+ EXP/.test(l));
-    const m = entry?.match(/\+(\d+) EXP.*\+(\d+) gold/);
-    return { expGained: m ? parseInt(m[1]) : 0, goldGained: m ? parseInt(m[2]) : 0 };
-  }, [gameState.phase]);
+  const reward = gameState.lastReward ?? { exp: 0, gold: 0 };
 
   const playerHand = gameState.piles.hand;
   const deckSize   = gameState.masterDeck.length + gameState.piles.draw.length +
@@ -224,6 +220,28 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
+        {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
+            ก่อนอนิเมชั่นเริ่มเล่น สิ่งเดียวที่ถูกข้ามคือภาพ */}
+        {timeline.isPlaying && (
+          <Pressable
+            onPress={timeline.skip}
+            style={{
+              position: 'absolute', top: 34, left: 14, zIndex: 600,
+              paddingHorizontal: 14, paddingVertical: 6,
+              borderRadius: 14,
+              backgroundColor: 'rgba(0,0,0,0.45)',
+              borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+            }}
+          >
+            <Text style={{
+              color: 'rgba(255,255,255,0.85)', fontSize: 12,
+              fontFamily: 'ChakraPetch_600SemiBold',
+            }}>
+              ข้าม ▸▸
+            </Text>
+          </Pressable>
+        )}
+
         <MonsterArea
           ref={monsterRef}
           monsterId={monsterId}
@@ -231,10 +249,13 @@ export default function BattlePage() {
           enemy={enemy ?? null}
         />
 
+        <ScreenFlash ref={flashRef} />
+
         {/* Enemy hand cards — absolute overlay, same card does slide-in + flip + rise */}
         {enemyHandCards.map(c => (
           <EnemyHandCard
             key={c.key}
+            onAttackPeak={() => flashRef.current?.flash()}
             card={c.card}
             cardIndex={c.cardIndex}
             totalCards={c.totalCards}
@@ -314,8 +335,8 @@ export default function BattlePage() {
         {(gameState.phase === 'victory' || gameState.phase === 'levelup') && (
           <VictoryOverlay
             enemyName={enemy?.name ?? (Array.isArray(monsterName) ? monsterName[0] : monsterName) ?? 'ศัตรู'}
-            expGained={rewardLog.expGained}
-            goldGained={rewardLog.goldGained}
+            expGained={reward.exp}
+            goldGained={reward.gold}
             playerLevel={player.level}
             playerExp={player.exp}
             playerExpToNext={player.expToNext}
