@@ -80,6 +80,42 @@ export type DamageResult = {
 const VULNERABLE_MULTIPLIER = 1.5;
 
 /**
+ * คำนวณดาเมจหลังปรับ **โดยไม่แตะ state** — ใช้ทั้งตอนลงดาเมจจริง
+ * และตอนคำนวณตัวเลข intent ที่จะโชว์ให้ผู้เล่นเห็นล่วงหน้า
+ *
+ * ตัวเลขบน intent ต้องมาจากสูตรเดียวกับดาเมจจริง ไม่งั้นผู้เล่นวางแผนจากเลขที่โกหก
+ */
+export function computeModifiedDamage(
+  state: GameState,
+  args: { from: Side; to: Side; raw: number; source: DamageSource }
+): number {
+  const { from, to, raw } = args;
+  const rules = rulesFor(args.source);
+  let dmg = raw;
+
+  // 1) ฝั่งผู้ตี — ฟังก์ชันนี้อ่าน status ของ "ผู้ตี" จาก flag ตัวที่สอง
+  if (rules.attackerMods) {
+    dmg = modifyDamageForStatusEffects(state, dmg, from === 'player');
+
+    // 2) adaptive AI — ใช้กับดาเมจผู้เล่นเท่านั้นในรูปแบบ inverse
+    if (from === 'player') {
+      const { getAdaptiveDamageMultiplier } = require('../adaptiveAI');
+      const mult = getAdaptiveDamageMultiplier(state);
+      if (Number.isFinite(mult) && mult > 0) {
+        dmg = dmg * (1 / mult);
+      }
+    }
+  }
+
+  // 3) ฝั่งผู้รับ — vulnerable
+  if (rules.defenderMods && hasStatusEffect(to, state, 'vulnerable' as any)) {
+    dmg = dmg * VULNERABLE_MULTIPLIER;
+  }
+
+  return Math.max(0, Math.round(dmg));
+}
+
+/**
  * คำนวณดาเมจสุดท้ายและลงผลกับ state
  *
  * ลำดับการคำนวณ:
@@ -108,30 +144,7 @@ export function dealDamage(
   const sourceKind = args.source.kind;
 
   const rules = rulesFor(args.source);
-  let dmg = raw;
-
-  // 1) ฝั่งผู้ตี — ฟังก์ชันนี้อ่าน status ของ "ผู้ตี" จาก flag ตัวที่สอง
-  //    (ก่อนหน้านี้ถูกเรียกด้วย true เสมอ ทำให้ฝั่งศัตรูไม่เคยถูกคำนวณ)
-  if (rules.attackerMods) {
-    dmg = modifyDamageForStatusEffects(state, dmg, from === 'player');
-
-    // 2) adaptive AI — เดิมใช้กับดาเมจผู้เล่นเท่านั้นในรูปแบบ inverse
-    //    คงไว้ตามเดิมเพื่อไม่ให้ balance ฝั่งศัตรูขยับเกินจากที่ตั้งใจแก้
-    if (from === 'player') {
-      const { getAdaptiveDamageMultiplier } = require('../adaptiveAI');
-      const mult = getAdaptiveDamageMultiplier(state);
-      if (Number.isFinite(mult) && mult > 0) {
-        dmg = dmg * (1 / mult);
-      }
-    }
-  }
-
-  // 3) ฝั่งผู้รับ — vulnerable เคยประกาศไว้ใน registry แต่ไม่เคยถูกต่อสาย
-  if (rules.defenderMods && hasStatusEffect(to, state, 'vulnerable' as any)) {
-    dmg = dmg * VULNERABLE_MULTIPLIER;
-  }
-
-  const modified = Math.max(0, Math.round(dmg));
+  const modified = computeModifiedDamage(state, { from, to, raw, source: args.source });
 
   // 4) block ดูดซับ (ดาเมจบางชนิดทะลุ block — ดู rulesFor)
   const blockBefore = targetState.block ?? 0;

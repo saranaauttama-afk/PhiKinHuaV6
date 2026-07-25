@@ -9,6 +9,8 @@ import Animated, {
   cancelAnimation,
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
+import EnemyIntentBadge from './EnemyIntentBadge';
+import type { EnemyIntent } from '../../../src/core/types';
 
 const MONSTER_IMAGES: Record<string, any> = {
   'phi-krasue': require('../../../assets/monsters/phi-krasue.png'),
@@ -22,6 +24,11 @@ type Props = {
     block?: number; maxEnergy?: number; handSize?: number;
     statusEffects?: { id: string; stacks?: number }[];
   } | null;
+  /** ศัตรูจะทำอะไรเทิร์นหน้า */
+  intent?: EnemyIntent;
+  playerBlock?: number;
+  /** ซ่อน intent ระหว่างที่ศัตรูกำลังเล่นอยู่ */
+  hideIntent?: boolean;
 };
 
 export type MonsterAreaHandle = {
@@ -32,6 +39,9 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   monsterId,
   monsterName,
   enemy,
+  intent,
+  playerBlock = 0,
+  hideIntent = false,
 }, ref) {
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
@@ -131,6 +141,13 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
           {hp}/{maxHp}
         </Text>
       </View>
+
+      {/* ศัตรูจะทำอะไรเทิร์นหน้า — ซ่อนระหว่างเทิร์นศัตรูเพราะกำลังทำอยู่แล้ว */}
+      {enemy && !hideIntent && (
+        <View style={{ marginTop: 10, marginBottom: 2 }}>
+          <EnemyIntentBadge intent={intent} playerBlock={playerBlock} />
+        </View>
+      )}
 
       {enemy && (
         <View style={{

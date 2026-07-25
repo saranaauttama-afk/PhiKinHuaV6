@@ -4,6 +4,7 @@ import type { RNG } from '../../rng';
 import { pickEnemy } from '../../pack';
 import { buildAndShuffleDeck, drawUpTo, applyCardEffect, endEnemyTurn, isVictory, isDefeat, startPlayerTurn, startCombat } from '../../commands';
 import { resetBlessingTurnFlags, runBlessingsTurnHook, getCardPlayedFns } from '../../blessingRuntime';
+import { planEnemyIntent } from '../../combat/intent';
 import { START_ENERGY } from '../../balance/core';
 import { grantExpAndQueueLevelUp } from '../shared';
 import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRuntime';
@@ -216,11 +217,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
     s.enemy.block = 0;
 
-    if ((s as any).enemyPiles.hand.length === 0) {
-      enemyDrawUpToHand(s);
-    }
+    // เล่นตามที่ประกาศไว้เป๊ะ — ถ้าเล่นไม่ตรงกับที่โชว์ ผู้เล่นจะวางแผนไม่ได้
+    if (!s.enemyIntent) planEnemyIntent(s);
+    const toPlay: string[] = [...(s.enemyIntent?.cardIds ?? [])];
 
-    const toPlay: string[] = [...(s as any).enemyPiles.hand];
     s.enemyLastPlayed = toPlay;
     enemyDiscardHand(s);
 
@@ -265,6 +265,9 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   }
 
   emit(s, { t: 'TurnEnded', who: 'enemy' });
+
+  // ประกาศแผนของเทิร์นถัดไปทันที เพื่อให้ผู้เล่นเห็นตลอดเทิร์นตัวเอง
+  if (s.phase === 'combat') planEnemyIntent(s);
 
   return { state: s, rng: r };
 }

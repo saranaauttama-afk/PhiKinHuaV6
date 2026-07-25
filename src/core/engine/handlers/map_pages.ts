@@ -19,6 +19,7 @@ import { START_ENERGY } from '../../balance/core';
 import { buildAndShuffleEnemyDeck } from './enemy';
 import { runEquipmentOnEquip } from '../../equipmentRuntime';
 import { deckForMonster } from '../../monsters/monster-decks';
+import { planEnemyIntent } from '../../combat/intent';
 import { getEquipmentById } from '../../pack';
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
@@ -227,6 +228,8 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         intentCardId: null,
       };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
+      // ประกาศแผนของศัตรูตั้งแต่เทิร์นแรก ผู้เล่นจะได้วางแผนตั้งแต่ไพ่ใบแรก
+      planEnemyIntent(s);
       
       // Initialize enemy behaviors and minions
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
@@ -296,6 +299,8 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         intentCardId: null,
       };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
+      // ประกาศแผนของศัตรูตั้งแต่เทิร์นแรก ผู้เล่นจะได้วางแผนตั้งแต่ไพ่ใบแรก
+      planEnemyIntent(s);
       
       // Initialize boss behaviors and minions
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
