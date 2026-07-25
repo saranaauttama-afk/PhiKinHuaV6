@@ -2,24 +2,24 @@ import React from 'react';
 import { View, ImageBackground, Pressable, Image } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
-import { enemyCardById } from '../src/core/pack_enemy_cards';
+import type { CombatEvent } from '../src/core/types';
 
 import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
 import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
-import EnemyHandCard, { ENEMY_PLAY_TOTAL, ENEMY_MAX_SCALE_OFFSET } from './components/battle/EnemyHandCard';
+import EnemyHandCard from './components/battle/EnemyHandCard';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
 import DiscardOverlay from './components/battle/DiscardOverlay';
 import VictoryOverlay from './components/battle/VictoryOverlay';
 import DefeatOverlay from './components/battle/DefeatOverlay';
+import { useCombatTimeline } from './components/battle/useCombatTimeline';
 
 type Phase = 'player' | 'discard' | 'enemy';
 
-const ENEMY_CARD_GAP    = 150;
-const PLAYER_UNLOCK_MIN = 1200;
-const ENEMY_SLIDE_IN    = 600;  // time for all face-down cards to slide in
-const ENEMY_SLIDE_PAUSE = 200;  // pause before playing starts
+/** key ที่ไม่ซ้ำสำหรับ popup ของแต่ละ event */
+let _popupSeq = 0;
+const eventKey = (_ev: CombatEvent) => `${++_popupSeq}`;
 
 type EnemyHandCardData = {
   key: string;
@@ -48,19 +48,12 @@ export default function BattlePage() {
   const [statGainPopups, setStatGainPopups] = React.useState<{ id: string; statType: 'block' | 'energy'; side: 'player' | 'enemy'; amount: number }[]>([]);
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
 
-  const monsterRef  = React.useRef<MonsterAreaHandle>(null);
-  const timeoutRefs = React.useRef<ReturnType<typeof setTimeout>[]>([]);
-  const prevHpRef   = React.useRef<number>(player.hp);
+  const monsterRef = React.useRef<MonsterAreaHandle>(null);
+  const timeline   = useCombatTimeline();
 
-  const addTimeout = (fn: () => void, delay: number) => {
-    const id = setTimeout(fn, delay);
-    timeoutRefs.current.push(id);
-    return id;
-  };
-
-  React.useEffect(() => {
-    return () => { timeoutRefs.current.forEach(clearTimeout); };
-  }, []);
+  // timer ของเอฟเฟกต์เล็กๆ ฝั่งผู้เล่น (เฟดการ์ด, สั่นมอนสเตอร์) — ล้างตอน unmount
+  const cardFadeTimers = React.useRef<ReturnType<typeof setTimeout>[]>([]);
+  React.useEffect(() => () => { cardFadeTimers.current.forEach(clearTimeout); }, []);
 
   React.useEffect(() => {
     if (!monsterId) router.replace('/');
@@ -73,19 +66,12 @@ export default function BattlePage() {
   }, [monsterId, enemy, gameState.phase]);
 
   // Parse reward from engine log (format: "Victory! +X EXP, +Y gold")
+  // TODO(Phase 3): อ่านจาก state ตรงๆ — regex นี้จะพังทันทีที่ rewrite ข้อความเกม
   const rewardLog = React.useMemo(() => {
     const entry = [...gameState.log].reverse().find(l => /^Victory!\s+\+\d+ EXP/.test(l));
     const m = entry?.match(/\+(\d+) EXP.*\+(\d+) gold/);
     return { expGained: m ? parseInt(m[1]) : 0, goldGained: m ? parseInt(m[2]) : 0 };
   }, [gameState.phase]);
-
-  React.useEffect(() => {
-    if (player.hp < prevHpRef.current) {
-      const dmg = prevHpRef.current - player.hp;
-      setDamagePopups(prev => [...prev, { id: `${Date.now()}`, damage: dmg }]);
-    }
-    prevHpRef.current = player.hp;
-  }, [player.hp]);
 
   const playerHand = gameState.piles.hand;
   const deckSize   = gameState.masterDeck.length + gameState.piles.draw.length +
@@ -96,25 +82,39 @@ export default function BattlePage() {
     const identifier = card.instanceId ?? card.id;
     setPlayedCardIds(prev => [...prev, identifier]);
 
-    const prevBlock  = player.block;
     const prevEnergy = player.energy;
 
     dispatch({ type: 'PlayCard', index });
-    addTimeout(() => setPlayedCardIds(prev => prev.filter(id => id !== identifier)), 100);
 
-    const next = useGame.getState().state.player;
-    const now  = Date.now();
+    const t = setTimeout(
+      () => setPlayedCardIds(prev => prev.filter(id => id !== identifier)),
+      100
+    );
+    cardFadeTimers.current.push(t);
 
-    const damage = card.dmg ?? card.damage ?? 0;
-    if (damage > 0) {
-      setEnemyDamagePopups(prev => [...prev, { id: `${now}-${index}`, damage }]);
-      addTimeout(() => monsterRef.current?.shake(), 250);
+    // เทิร์นผู้เล่นให้ฟีดแบ็กทันที ไม่ต้องหน่วงเป็นคิวเหมือนเทิร์นศัตรู
+    const after = useGame.getState().state;
+    for (const ev of after.pendingEvents ?? []) {
+      if (ev.t === 'Damage' && ev.target === 'enemy' && ev.hpLoss > 0) {
+        // ตัวเลขที่โชว์คือ HP ที่หายจริง — เดิมโชว์ค่าบนการ์ดซึ่งไม่หัก block/buff
+        setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss }]);
+        const shakeTimer = setTimeout(() => monsterRef.current?.shake(), 250);
+        cardFadeTimers.current.push(shakeTimer);
+      } else if (ev.t === 'BlockGained' && ev.target === 'player') {
+        setStatGainPopups(prev => [...prev, {
+          id: `block-${eventKey(ev)}`,
+          statType: 'block', side: 'player', amount: ev.amount,
+        }]);
+      }
     }
-    if (next.block > prevBlock) {
-      setStatGainPopups(prev => [...prev, { id: `block-${now}`, statType: 'block', side: 'player', amount: next.block - prevBlock }]);
-    }
-    if (next.energy > prevEnergy) {
-      setStatGainPopups(prev => [...prev, { id: `energy-${now}`, statType: 'energy', side: 'player', amount: next.energy - prevEnergy }]);
+
+    // energy ยังไม่มี event ของตัวเอง — เทียบค่าก่อน/หลังไปก่อน
+    const nextEnergy = after.player.energy;
+    if (nextEnergy > prevEnergy) {
+      setStatGainPopups(prev => [...prev, {
+        id: `energy-${Date.now()}`,
+        statType: 'energy', side: 'player', amount: nextEnergy - prevEnergy,
+      }]);
     }
   };
 
@@ -136,69 +136,76 @@ export default function BattlePage() {
 
   const handleDiscardCancel = () => setPhase('player');
 
+  /**
+   * เทิร์นศัตรู: engine คำนวณจนจบในทีเดียว แล้วเราเอา event ที่ได้มาเล่นเป็นอนิเมชั่น
+   *
+   * เดิมที่นี่ตั้ง setTimeout ยิง dispatch ทีละใบตามจังหวะอนิเมชั่น ทำให้กฎเกม
+   * ผูกกับเวลาของภาพ ตอนนี้ state ถูกต้องตั้งแต่บรรทัด dispatch แล้ว
+   * ที่เหลือเป็นเรื่องภาพล้วนๆ
+   */
   const startEnemyTurn = () => {
     setPhase('enemy');
-    timeoutRefs.current.forEach(clearTimeout);
-    timeoutRefs.current = [];
 
-    // Phase 1: ดึงการ์ด enemy + player turn-end effects — ยังไม่ apply damage
-    dispatch({ type: 'PrepareEnemyTurn' });
+    dispatch({ type: 'ResolveEnemyTurn' });
 
-    const afterState = useGame.getState().state;
-    const playedIds: string[] = afterState.enemyLastPlayed ?? [];
-    const totalCards = playedIds.length;
+    const after = useGame.getState().state;
+    const events = after.pendingEvents ?? [];
 
-    const cards: EnemyHandCardData[] = playedIds.map((id, i) => {
-      const def = enemyCardById(id);
-      return {
-        key: `${Date.now()}-${i}`,
-        card: { name: def?.name ?? id, damage: def?.dmg ?? 0, block: def?.block ?? 0 },
+    // เตรียมการ์ดคว่ำทั้งมือให้เห็นก่อน แล้วค่อยเปิดทีละใบตาม event
+    const revealOrder = events.filter(e => e.t === 'EnemyCardRevealed');
+    setEnemyHandCards(
+      revealOrder.map((e, i) => ({
+        key: `${i}-${e.cardId}`,
+        card: { name: e.name, damage: e.dmg, block: e.block },
         cardIndex: i,
-        totalCards,
+        totalCards: revealOrder.length,
         delay: i * 100,
         playing: false,
-      };
-    });
+      }))
+    );
 
-    setEnemyHandCards(cards);
-
-    let t = ENEMY_SLIDE_IN + ENEMY_SLIDE_PAUSE;
-
-    playedIds.forEach((cardId, i) => {
-      // trigger play animation (flip + rise)
-      addTimeout(() => {
-        setEnemyHandCards(prev =>
-          prev.map((c, idx) => idx === i ? { ...c, playing: true } : c)
-        );
-      }, t);
-
-      // Phase 2: apply effect ตอน card ถึง max scale + show stat popups
-      addTimeout(() => {
-        const prevEnemyBlock = useGame.getState().state.enemy?.block ?? 0;
-        dispatch({ type: 'ResolveEnemyCard', cardId });
-        const nextEnemy = useGame.getState().state.enemy;
-        if (nextEnemy && nextEnemy.block > prevEnemyBlock) {
-          setStatGainPopups(prev => [...prev, {
-            id: `enemy-block-${Date.now()}-${i}`,
-            statType: 'block',
-            side: 'enemy',
-            amount: nextEnemy.block - prevEnemyBlock,
-          }]);
-        }
-      }, t + ENEMY_MAX_SCALE_OFFSET);
-
-      t += ENEMY_PLAY_TOTAL + ENEMY_CARD_GAP;
-    });
-
-    const unlockAt = Math.max(t + 200, PLAYER_UNLOCK_MIN);
-    addTimeout(() => {
+    timeline.play(events, () => {
       setEnemyHandCards([]);
       if (useGame.getState().state.phase === 'combat') {
         dispatch({ type: 'StartPlayerTurn' });
         setPhase('player');
       }
-    }, unlockAt);
+    });
   };
+
+  // แปลง event ที่ timeline กำลังเล่นอยู่ ให้เป็นภาพบนจอ
+  const currentEvent = timeline.current;
+  React.useEffect(() => {
+    if (!currentEvent) return;
+
+    switch (currentEvent.t) {
+      case 'EnemyCardRevealed': {
+        // ใบที่เท่าไหร่ ดูจากจำนวน reveal ที่เล่นไปแล้ว
+        const idx = timeline.played.filter(e => e.t === 'EnemyCardRevealed').length - 1;
+        setEnemyHandCards(prev => prev.map((c, i) => (i === idx ? { ...c, playing: true } : c)));
+        break;
+      }
+
+      case 'Damage': {
+        // ตัวเลขที่โชว์คือ HP ที่หายจริง ไม่ใช่ค่าบนการ์ด
+        if (currentEvent.hpLoss <= 0) break;
+        const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss };
+        if (currentEvent.target === 'player') setDamagePopups(prev => [...prev, popup]);
+        else setEnemyDamagePopups(prev => [...prev, popup]);
+        break;
+      }
+
+      case 'BlockGained': {
+        setStatGainPopups(prev => [...prev, {
+          id: `block-${eventKey(currentEvent)}`,
+          statType: 'block',
+          side: currentEvent.target,
+          amount: currentEvent.amount,
+        }]);
+        break;
+      }
+    }
+  }, [currentEvent]);
 
   return (
     <View style={{ flex: 1 }}>

@@ -163,10 +163,47 @@ export interface EquipmentRuntimeState {
   turnStamp: number; // increases every turn (player + enemy turns)
   onceGate: Record<string, number>; // equipment.id -> lastTurnStampUsed
 }
+// ── Combat events ────────────────────────────────────────────────────────────
+// engine คำนวณจนจบแล้วคายเหตุการณ์ออกมาเป็นลิสต์ — view เอาไปเล่นเป็นอนิเมชั่น
+// ตามจังหวะของตัวเอง ไม่มี setTimeout ตัวไหนได้แตะ game state อีก
+//
+// ค่าที่อยู่ใน event คือค่าที่เกิดขึ้นจริง (เช่น hpLoss หลังหัก block แล้ว)
+// UI ต้องแสดงจากตรงนี้ ไม่ใช่จากตัวเลขบนการ์ด
+
+export type CombatEventTarget = 'player' | 'enemy';
+
+export type CombatEvent =
+  /** ศัตรูเปิดการ์ดใบหนึ่ง — view ใช้จังหวะนี้พลิกการ์ด */
+  | { t: 'EnemyCardRevealed'; cardId: string; name: string; dmg: number; block: number }
+  | {
+      t: 'Damage';
+      target: CombatEventTarget;
+      /** ตัวเลขดิบก่อนปรับ (ค่าบนการ์ด) */
+      raw: number;
+      /** หลังปรับด้วย status effect แล้ว */
+      modified: number;
+      blocked: number;
+      hpLoss: number;
+      died: boolean;
+      sourceKind: 'card' | 'combo' | 'status' | 'minion' | 'event';
+    }
+  | { t: 'BlockGained'; target: CombatEventTarget; amount: number }
+  | { t: 'Healed'; target: CombatEventTarget; amount: number }
+  | { t: 'StatusApplied'; target: CombatEventTarget; effectId: string; stacks: number }
+  | { t: 'Died'; who: CombatEventTarget }
+  | { t: 'TurnEnded'; who: CombatEventTarget };
+
 export type GameState = {
   seed: string;
   phase: Phase;
   turn: number;
+
+  /**
+   * เหตุการณ์ที่เกิดจากคำสั่งล่าสุด — view อ่านแล้วเคลียร์ทิ้ง
+   * ไม่ใช่ส่วนหนึ่งของ "สถานะเกม" จริงๆ จึงไม่ต้อง save
+   * (ตอน loadGame จะถูกตั้งเป็น [] เสมอ)
+   */
+  pendingEvents?: CombatEvent[];
 
   player: PlayerState;
   enemy?: EnemyState;
@@ -251,8 +288,8 @@ export type Command =
   | { type: 'EnemyPlayCard'; cardIndex: number }
   | { type: 'StartMonsterTurn' }
   | { type: 'EndTurn' }
-  | { type: 'PrepareEnemyTurn' }
-  | { type: 'ResolveEnemyCard'; cardId: string }
+  /** ทำเทิร์นศัตรูจบในทีเดียว แล้วคายผลออกมาทาง state.pendingEvents */
+  | { type: 'ResolveEnemyTurn' }
   | { type: 'StartPlayerTurn' }
   | { type: 'DiscardCard'; index: number }
 

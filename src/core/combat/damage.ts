@@ -8,11 +8,16 @@
 // ไฟล์นี้รวมทุกอย่างไว้ที่เดียว และ **คืนผลลัพธ์ที่ละเอียดพอให้ UI เอาไปแสดงได้ตรงจริง**
 // (ตัวเลขที่เด้งบนจอต้องมาจาก DamageResult ไม่ใช่จากค่าบนการ์ด)
 
-import type { GameState } from '../types';
+import type { CombatEvent, GameState } from '../types';
 import {
   modifyDamageForStatusEffects,
   hasStatusEffect,
 } from './status-effects';
+
+/** ปล่อย event ให้ view เอาไปเล่นเป็นอนิเมชั่น (ดู CombatEvent ใน types.ts) */
+export function emit(state: GameState, ev: CombatEvent) {
+  (state.pendingEvents ??= []).push(ev);
+}
 
 export type Side = 'player' | 'enemy';
 
@@ -100,6 +105,7 @@ export function dealDamage(
   if (!targetState) {
     return { raw, modified: 0, blocked: 0, hpLoss: 0, died: false };
   }
+  const sourceKind = args.source.kind;
 
   const rules = rulesFor(args.source);
   let dmg = raw;
@@ -139,6 +145,14 @@ export function dealDamage(
   targetState.hp = Math.max(0, hpBefore - hpLoss);
   const died = hpBefore > 0 && targetState.hp <= 0;
 
+  emit(state, {
+    t: 'Damage',
+    target: to,
+    raw, modified, blocked, hpLoss, died,
+    sourceKind,
+  });
+  if (died) emit(state, { t: 'Died', who: to });
+
   return { raw, modified, blocked, hpLoss, died };
 }
 
@@ -147,5 +161,17 @@ export function gainBlock(state: GameState, side: Side, amount: number): number 
   const targetState = side === 'player' ? state.player : state.enemy;
   if (!targetState || amount <= 0) return 0;
   targetState.block = (targetState.block ?? 0) + amount;
+  emit(state, { t: 'BlockGained', target: side, amount });
   return amount;
+}
+
+/** ฟื้น HP — คืนจำนวนที่ฟื้นได้จริง (ไม่เกิน maxHp) */
+export function heal(state: GameState, side: Side, amount: number): number {
+  const targetState = side === 'player' ? state.player : state.enemy;
+  if (!targetState || amount <= 0) return 0;
+  const before = targetState.hp;
+  targetState.hp = Math.min(targetState.maxHp, before + amount);
+  const healed = targetState.hp - before;
+  if (healed > 0) emit(state, { t: 'Healed', target: side, amount: healed });
+  return healed;
 }

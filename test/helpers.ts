@@ -1,5 +1,6 @@
 import type { CardData, GameState } from '../src/core/types';
 import { baseNewState, startCombat } from '../src/core/commands';
+import { applyCommand } from '../src/core/reducer';
 import { makeRng, type RNG } from '../src/core/rng';
 import { resetAILearning } from '../src/core/adaptiveAI';
 
@@ -50,6 +51,15 @@ export function makeCombatState(opts: {
   };
 
   return { state, rng };
+}
+
+/**
+ * ให้ศัตรูเล่นการ์ดตามที่ระบุ แล้วคืน state หลังจบเทิร์นศัตรู
+ * ใส่มือให้ตรงๆ เพื่อไม่ต้องพึ่ง RNG ในการจั่ว
+ */
+export function runEnemyCards(state: GameState, cardIds: string[]): GameState {
+  (state as any).enemyPiles = { draw: [], hand: [...cardIds], discard: [] };
+  return applyCommand(state, { type: 'ResolveEnemyTurn' }, makeRng('test')).state;
 }
 
 export function attackCard(dmg: number, over: Partial<CardData> = {}): CardData {

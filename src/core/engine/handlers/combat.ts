@@ -8,7 +8,7 @@ import { START_ENERGY } from '../../balance/core';
 import { grantExpAndQueueLevelUp } from '../shared';
 import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRuntime';
 import { getEquipmentById } from '../../pack';
-import { dealDamage, gainBlock } from '../../combat/damage';
+import { dealDamage, gainBlock, emit } from '../../combat/damage';
 
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
   if (s.phase !== 'combat' || s.combatVictoryLock) return { state: s, rng: r };
@@ -179,8 +179,17 @@ export function startMonsterTurn(s: GameState, _cmd: Extract<Command, { type: 'S
   return { state: s, rng: r };
 }
 
-// ── ขั้นที่ 1: เตรียมเทิร์น enemy (ดึงการ์ด, บันทึก enemyLastPlayed) ยังไม่ apply effect
-export function prepareEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'PrepareEnemyTurn' }>, r: RNG) {
+/**
+ * ทำเทิร์นศัตรูทั้งเทิร์นจบในทีเดียว แล้วคายผลออกมาทาง s.pendingEvents
+ *
+ * เดิมงานนี้ถูกแยกเป็น PrepareEnemyTurn + ResolveEnemyCard ทีละใบ โดยให้ view
+ * ตั้ง setTimeout ยิง dispatch ตามจังหวะอนิเมชั่น ทำให้กฎเกมผูกกับเวลาของอนิเมชั่น
+ * (จูนอนิเมชั่นแล้วดาเมจเลื่อนตาม, JS thread ดีเลย์แล้วภาพกับ state หลุดกัน)
+ *
+ * ตอนนี้ state ถูกคำนวณจนจบทันที ส่วน view เอา event ไปเล่นตามจังหวะของตัวเอง
+ * จะเร่ง จะข้าม หรือออกจากจอกลางคัน ก็ไม่กระทบความถูกต้องของ state
+ */
+export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'ResolveEnemyTurn' }>, r: RNG) {
   if (s.phase !== 'combat') return { state: s, rng: r };
 
   const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
@@ -200,7 +209,9 @@ export function prepareEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'P
   onPlayerTurnEnd(s, { energyUsed: 0, blockGained: s.player.block });
   s.turn = 1;
 
-  // เตรียมเทิร์น enemy
+  emit(s, { t: 'TurnEnded', who: 'player' });
+
+  // ── เทิร์นศัตรู
   if (s.enemy && (s as any).enemyPiles) {
     (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
     s.enemy.block = 0;
@@ -208,44 +219,52 @@ export function prepareEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'P
     if ((s as any).enemyPiles.hand.length === 0) {
       enemyDrawUpToHand(s);
     }
-    // บันทึกรายการที่จะเล่น แล้วเคลียร์มือทันที (animation ใช้ enemyLastPlayed)
-    s.enemyLastPlayed = [...(s as any).enemyPiles.hand];
+
+    const toPlay: string[] = [...(s as any).enemyPiles.hand];
+    s.enemyLastPlayed = toPlay;
     enemyDiscardHand(s);
+
+    const { enemyCardById } = require('../../pack_enemy_cards');
+
+    for (const cardId of toPlay) {
+      // ผู้เล่นตายกลางคัน → หยุดทันที ใบที่เหลือไม่ถูกเล่น
+      if (s.phase !== 'combat') break;
+
+      const def = enemyCardById(cardId);
+      if (!def) continue;
+
+      emit(s, {
+        t: 'EnemyCardRevealed',
+        cardId,
+        name: def.name ?? def.id,
+        dmg: def.dmg ?? 0,
+        block: def.block ?? 0,
+      });
+
+      if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
+        const result = dealDamage(s, {
+          from: 'enemy',
+          to: 'player',
+          raw: def.dmg!,
+          source: { kind: 'card', cardId: def.id },
+        });
+        s.log.push(`Enemy plays ${def.name ?? def.id}: -${result.hpLoss} HP`);
+      } else if ((def.block ?? 0) > 0) {
+        gainBlock(s, 'enemy', def.block ?? 0);
+        s.log.push(`Enemy plays ${def.name ?? def.id}: +${def.block} block`);
+      } else {
+        s.log.push(`Enemy plays ${def.name ?? def.id}`);
+      }
+
+      if (isDefeat(s)) {
+        s.phase = 'defeat';
+        const { clearAllMinions } = require('../../minionRuntime');
+        clearAllMinions(s);
+      }
+    }
   }
 
-  return { state: s, rng: r };
-}
-
-// ── ขั้นที่ 2: apply effect ของ 1 ใบ (เรียกตอน card ถึง max scale)
-export function resolveEnemyCard(s: GameState, cmd: Extract<Command, { type: 'ResolveEnemyCard' }>, r: RNG) {
-  if (!s.enemy) return { state: s, rng: r };
-  // ผู้เล่นตายไปแล้ว (หรือคอมแบตจบแล้ว) → ไม่ resolve ใบที่เหลือต่อ
-  if (s.phase !== 'combat') return { state: s, rng: r };
-
-  const { enemyCardById } = require('../../pack_enemy_cards');
-  const def = enemyCardById(cmd.cardId);
-  if (!def) return { state: s, rng: r };
-
-  if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-    const result = dealDamage(s, {
-      from: 'enemy',
-      to: 'player',
-      raw: def.dmg!,
-      source: { kind: 'card', cardId: def.id },
-    });
-    s.log.push(`Enemy resolves ${def.name ?? def.id}: -${result.hpLoss} HP`);
-  } else if ((def.block ?? 0) > 0) {
-    gainBlock(s, 'enemy', def.block ?? 0);
-    s.log.push(`Enemy resolves ${def.name ?? def.id}: +${def.block} block`);
-  } else {
-    s.log.push(`Enemy resolves ${def.name ?? def.id}`);
-  }
-
-  if (isDefeat(s)) {
-    s.phase = 'defeat';
-    const { clearAllMinions } = require('../../minionRuntime');
-    clearAllMinions(s);
-  }
+  emit(s, { t: 'TurnEnded', who: 'enemy' });
 
   return { state: s, rng: r };
 }

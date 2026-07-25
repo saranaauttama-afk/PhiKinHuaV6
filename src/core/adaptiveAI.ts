@@ -234,12 +234,31 @@ function adaptAIStrategy(state: GameState): void {
   applyAdaptationsToEnemy(state);
 }
 
+/**
+ * รีเซ็ตค่า adaptation ทั้งหมดกลับเป็นค่าเริ่มต้น
+ *
+ * ถูกเรียกทุกครั้งที่ต้นทาง adaptAIStrategy() เพื่อให้คำนวณใหม่จากสถานะปัจจุบัน
+ *
+ * เดิมรีเซ็ตแค่ 5 จาก 14 ฟิลด์ ทำให้ตัวคูณความยาก (damageMultiplier ฯลฯ)
+ * ที่ adjustDifficulty ตั้งไว้ค้างถาวร เพราะ adjustDifficulty เองก็ไม่มี else
+ * กลับเป็น 1.0 → ผู้เล่น HP ตกต่ำกว่า 30% ครั้งเดียว ดาเมจก็แรงขึ้นตลอดรัน
+ * (และข้ามรันด้วย เพราะตัวแปรอยู่ระดับโมดูล)
+ */
 function resetAdaptation(): void {
   currentAdaptation.priorityBehaviors = [];
   currentAdaptation.prioritySpells = [];
   currentAdaptation.statusFocus = [];
   currentAdaptation.aggressionLevel = 50;
   currentAdaptation.spellCastingPreference = 50;
+  currentAdaptation.minionUsage = 30;
+  currentAdaptation.damageMultiplier = 1.0;
+  currentAdaptation.healthMultiplier = 1.0;
+  currentAdaptation.energyBonus = 0;
+  currentAdaptation.spellChargeReduction = 0;
+  currentAdaptation.antiRushTactics = false;
+  currentAdaptation.antiComboDisruption = false;
+  currentAdaptation.blockCounters = false;
+  currentAdaptation.statusCleansing = false;
 }
 
 function counterPlayStyle(): void {

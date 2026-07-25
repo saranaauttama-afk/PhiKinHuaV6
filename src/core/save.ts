@@ -103,6 +103,8 @@ export function fromSaveV1(data: SaveV1): GameState {
       maxHandSize: data.player.maxHandSize ?? HAND_SIZE,
     },
     enemy: undefined,
+    // event เป็นของชั่วคราวสำหรับ view ไม่ใช่สถานะเกม — เริ่มว่างเสมอ
+    pendingEvents: [],
     piles: { draw: [], hand: [], discard: [], exhaust: [] },
     log: ['Loaded SaveV1.'],
     blessings,

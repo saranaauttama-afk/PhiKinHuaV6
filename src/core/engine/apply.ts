@@ -28,8 +28,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EnemyPlayCard: combat.enemyPlayCard,
   StartMonsterTurn: combat.startMonsterTurn,
   EndTurn: combat.endTurn,
-  PrepareEnemyTurn: combat.prepareEnemyTurn,
-  ResolveEnemyCard: combat.resolveEnemyCard,
+  ResolveEnemyTurn: combat.resolveEnemyTurn,
   StartPlayerTurn: combat.startPlayerTurnHandler,
   DiscardCard: (s, cmd, r) => {
     if (s.phase !== 'combat') return { state: s, rng: r };
@@ -130,6 +129,9 @@ export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
   const s = cloneForReducer(state);
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
+  // event เป็นผลของ "คำสั่งนี้" เท่านั้น — เคลียร์ของคำสั่งก่อนหน้าทิ้งทุกครั้ง
+  // view ที่ยังเล่นคิวเก่าค้างอยู่จะถือ array เดิมไว้เอง ไม่ถูกกระทบ
+  s.pendingEvents = [];
 
   const h = H[cmd.type] as Handler<typeof cmd.type> | undefined;
   if (h) return h(s, cmd as any, rng);
