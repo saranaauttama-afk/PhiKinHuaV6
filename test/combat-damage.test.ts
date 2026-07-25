@@ -103,34 +103,41 @@ describe('status effect กับดาเมจ', () => {
     expect(state.enemy!.hp).toBe(24);
   });
 
-  it('[บั๊ก] strength ของศัตรู *ไม่* เพิ่มดาเมจที่ศัตรูตี — resolveEnemyCard ข้าม status effect', () => {
+  it('strength ของศัตรูเพิ่มดาเมจที่ศัตรูตี', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
     applyStatusEffect('enemy', state, 'strength' as any, 3, 5);
     resolveEnemyCard(state, { type: 'ResolveEnemyCard', cardId: 'claw' } as any, {} as any);
-    // ถูกต้องควรเป็น 6 + 5 = 11 → hp 39
-    // ปัจจุบันได้ 6 เฉยๆ เพราะไม่เคยเรียก modifyDamageForStatusEffects ฝั่งศัตรู
-    expect(state.player.hp).toBe(44);
+    // 6 + 5 stacks = 11
+    expect(state.player.hp).toBe(39);
   });
 
-  it('[บั๊ก] weakness ของศัตรู *ไม่* ลดดาเมจที่ศัตรูตี', () => {
+  it('weakness ของศัตรูลดดาเมจที่ศัตรูตี 25%', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
     applyStatusEffect('enemy', state, 'weakness' as any, 3, 1);
     resolveEnemyCard(state, { type: 'ResolveEnemyCard', cardId: 'claw' } as any, {} as any);
-    // ถูกต้องควรเป็น floor(6 * 0.75) = 4 → hp 46
-    expect(state.player.hp).toBe(44);
+    // floor(6 * 0.75) = 4
+    expect(state.player.hp).toBe(46);
   });
 
-  it('[บั๊ก] vulnerable ไม่มีผลต่อดาเมจเลยทั้งสองฝั่ง (ประกาศไว้แต่ไม่ได้ต่อสาย)', () => {
+  it('vulnerable ทำให้ผู้รับกินดาเมจเพิ่ม 50% (ฝั่งศัตรูเป็นผู้รับ)', () => {
     const { state } = makeCombatState({ hand: [attackCard(8)], enemyHp: 30 });
     applyStatusEffect('enemy', state, 'vulnerable' as any, 3, 1);
     applyCardEffect(state, 0);
-    // ปกติ vulnerable ควรทำให้เป้าหมายรับดาเมจเพิ่ม แต่ตอนนี้ได้ 8 เท่าเดิม
-    expect(state.enemy!.hp).toBe(22);
+    // 8 * 1.5 = 12
+    expect(state.enemy!.hp).toBe(18);
+  });
+
+  it('vulnerable ทำงานฝั่งผู้เล่นเป็นผู้รับด้วย', () => {
+    const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
+    applyStatusEffect('player', state, 'vulnerable' as any, 3, 1);
+    resolveEnemyCard(state, { type: 'ResolveEnemyCard', cardId: 'claw' } as any, {} as any);
+    // 6 * 1.5 = 9
+    expect(state.player.hp).toBe(41);
   });
 });
 
-describe('[บั๊ก] resolveEnemyCard ไม่หยุดเมื่อผู้เล่นตายแล้ว', () => {
-  it('ยังคำนวณดาเมจต่อได้แม้ phase เป็น defeat แล้ว', () => {
+describe('resolveEnemyCard หยุดเมื่อคอมแบตจบแล้ว', () => {
+  it('ใบที่เหลือไม่ resolve ต่อหลังผู้เล่นตาย', () => {
     const { state } = makeCombatState({ playerHp: 5, playerBlock: 0 });
     const cmd = { type: 'ResolveEnemyCard', cardId: 'claw' } as any;
 
@@ -138,10 +145,10 @@ describe('[บั๊ก] resolveEnemyCard ไม่หยุดเมื่อ�
     expect(state.phase).toBe('defeat');
     expect(state.player.hp).toBe(0);
 
-    // ใบถัดไปที่ battle.tsx ตั้ง setTimeout ไว้ล่วงหน้ายังยิงเข้ามาได้
-    // ฟังก์ชันเช็คแค่ !s.enemy ไม่ได้เช็ค phase → resolve ต่อโดยไม่บ่น
+    // battle.tsx ตั้ง setTimeout ของใบที่เหลือไว้ล่วงหน้าแล้ว จึงยังยิงเข้ามาได้
+    // ตอนนี้ handler เช็ค phase → ไม่ทำอะไรต่อ
     const before = state.log.length;
     resolveEnemyCard(state, cmd, {} as any);
-    expect(state.log.length).toBeGreaterThan(before);
+    expect(state.log.length).toBe(before);
   });
 });

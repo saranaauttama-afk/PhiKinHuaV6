@@ -8,6 +8,7 @@ import { START_ENERGY } from '../../balance/core';
 import { grantExpAndQueueLevelUp } from '../shared';
 import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRuntime';
 import { getEquipmentById } from '../../pack';
+import { dealDamage, gainBlock } from '../../combat/damage';
 
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
   if (s.phase !== 'combat' || s.combatVictoryLock) return { state: s, rng: r };
@@ -218,20 +219,23 @@ export function prepareEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'P
 // ── ขั้นที่ 2: apply effect ของ 1 ใบ (เรียกตอน card ถึง max scale)
 export function resolveEnemyCard(s: GameState, cmd: Extract<Command, { type: 'ResolveEnemyCard' }>, r: RNG) {
   if (!s.enemy) return { state: s, rng: r };
+  // ผู้เล่นตายไปแล้ว (หรือคอมแบตจบแล้ว) → ไม่ resolve ใบที่เหลือต่อ
+  if (s.phase !== 'combat') return { state: s, rng: r };
 
   const { enemyCardById } = require('../../pack_enemy_cards');
   const def = enemyCardById(cmd.cardId);
   if (!def) return { state: s, rng: r };
 
   if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-    const atk      = def.dmg!;
-    const blockAfter = Math.max(0, s.player.block - atk);
-    const hpLoss   = Math.max(0, atk - s.player.block);
-    s.player.block = blockAfter;
-    s.player.hp    = Math.max(0, s.player.hp - hpLoss);
-    s.log.push(`Enemy resolves ${def.name ?? def.id}: -${hpLoss} HP`);
+    const result = dealDamage(s, {
+      from: 'enemy',
+      to: 'player',
+      raw: def.dmg!,
+      source: { kind: 'card', cardId: def.id },
+    });
+    s.log.push(`Enemy resolves ${def.name ?? def.id}: -${result.hpLoss} HP`);
   } else if ((def.block ?? 0) > 0) {
-    s.enemy.block = (s.enemy.block ?? 0) + (def.block ?? 0);
+    gainBlock(s, 'enemy', def.block ?? 0);
     s.log.push(`Enemy resolves ${def.name ?? def.id}: +${def.block} block`);
   } else {
     s.log.push(`Enemy resolves ${def.name ?? def.id}`);

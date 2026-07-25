@@ -262,6 +262,37 @@ Phase 1 ให้ค่ามากที่สุดต่อเวลาที
 - save/autosave + seeded RNG
 - ระบบ blessing / equipment / minion (ยังไม่แตะ แต่ Phase 1 อาจทำให้ต้องต่อสายเพิ่มถ้ามันมี damage path ของตัวเอง — ต้องเช็คตอนลงมือ)
 
+---
+
+## 5.1 ผลจริงหลังทำ Phase 0-1 เสร็จ (2026-07-25)
+
+**ทำแล้ว:**
+- Phase 0: vitest + Vite plugin แปลง `require()` ตอน transform (ไม่แตะซอร์ส) + characterization test
+- Phase 1: `src/core/combat/damage.ts` (`dealDamage` / `gainBlock`) ต่อสายครบ 3 path ของการ์ด
+- ลบ `playEnemyCard` ที่ตายแล้ว + NaN guard 3 ชั้น + `console.log` ใน hot path
+- รวม 31 เทสต์ผ่าน, `tsc --noEmit` สะอาด
+
+**NaN guard — สรุปว่าเป็นซาก:** ไล่ต้นตอแล้วยืนยันว่า trigger ไม่ได้ในโค้ดปัจจุบัน
+(`getStatusEffectStacks` คืน `|| 0` เสมอ, `applyComboCardModifiers` ไม่แตะ `dmg`,
+`damageMultiplier` เป็น 1.0/1.2/0.9) น่าจะเหลือจาก "unified system" ที่ถูกถอดไป
+แทนที่ด้วยการ validate `raw` ครั้งเดียวที่ปากทาง `dealDamage` แล้ว throw ให้เห็นชัดแทนกลืนเงียบ
+
+**damage path ที่ยัง *ไม่* ได้ต่อ — ต้องตัดสินใจเชิง design ก่อน:**
+
+| ที่ | ลักษณะ | คำถามที่ต้องตอบ |
+|---|---|---|
+| `combat/status-effects/runtime.ts:305` | poison / DoT tick | DoT ควรทะลุ block ไหม? (ถ้าต่อเข้า `dealDamage` จะโดน block ดูด ซึ่งเปลี่ยนกฎ) |
+| `minionRuntime.ts:178,295,449` | ดาเมจจาก minion | minion ควรได้ strength ของเจ้าของไหม? เป้าหมายควรได้ vulnerable ไหม? |
+| `cardComboSystem.ts:282` | ดาเมจตรงจาก combo | เป็นดาเมจ "จริง" ที่ควรผ่านระบบ หรือเป็น true damage โดยตั้งใจ? |
+| `engine/handlers/shops_events.ts:213` | HP loss จาก event | น่าจะถูกแล้วที่ทะลุ block (ดาเมจเชิงเนื้อเรื่อง ไม่ใช่การต่อสู้) — ไม่ต้องแก้ |
+
+3 อันแรกกระทบ balance ทั้งคู่ไม่ว่าจะเลือกทางไหน จึงไม่ตัดสินใจแทน
+
+**เรื่องที่ยังค้าง:** `adaptiveAI` เก็บ `currentAdaptation` เป็น module-level state อยู่นอก
+`GameState` → ไม่ถูก save, ไม่ผูกกับ seed, ค้างข้ามรันใน session เดียวกัน
+ขัดกับที่เกมตั้งใจให้ deterministic ตาม seed
+Phase 1 คงพฤติกรรมเดิมไว้ทุกอย่าง (ใช้กับดาเมจผู้เล่นเท่านั้น แบบ inverse) ยังไม่แก้
+
 ## 6. เรื่องที่ยังไม่ชัด ต้องตัดสินใจตอนลงมือ
 
 - `getAdaptiveDamageMultiplier()` ใน `commands.ts:188-202` ใช้แบบ `1/adaptiveMult` (inverse) กับดาเมจผู้เล่น ไม่มีเอกสารว่าตั้งใจให้ทำอะไร → ต้องถามเจ้าของโค้ดว่าจะเก็บไว้หรือถอด ก่อนย้ายเข้า `dealDamage`

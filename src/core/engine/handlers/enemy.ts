@@ -8,6 +8,7 @@ import {
   ENEMY_MAX_ENERGY_NORMAL, ENEMY_MAX_ENERGY_ELITE, ENEMY_MAX_ENERGY_BOSS
 } from '../../balance/core';
 import { runEquipmentTurnHook, runEquipmentCardPlayed, resetEquipmentTurnFlags } from '../../equipmentRuntime';
+import { dealDamage, gainBlock } from '../../combat/damage';
 // PATCH: import equipment hooks for enemy start/end & on_card_played
 
 type DeckConfig =
@@ -237,14 +238,15 @@ s.log.push(`Enemy discards unknown card ${id}.`);
 
   // เล่นเอฟเฟ็กต์
   if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-    const atk = Math.max(0, def.dmg!);
-    const blockAfter = Math.max(0, s.player.block - atk);
-    const hpLoss = Math.max(0, atk - s.player.block);
-    s.player.block = blockAfter;
-    s.player.hp = Math.max(0, s.player.hp - hpLoss);
-    s.log.push(`Enemy plays ${def.name ?? def.id}: Attack ${atk} (${hpLoss} dmg).`);
+    const result = dealDamage(s, {
+      from: 'enemy',
+      to: 'player',
+      raw: Math.max(0, def.dmg!),
+      source: { kind: 'card', cardId: def.id },
+    });
+    s.log.push(`Enemy plays ${def.name ?? def.id}: Attack ${result.modified} (${result.hpLoss} dmg).`);
   } else if (def.type === 'skill' && (def.block ?? 0) > 0) {
-    s.enemy.block = (s.enemy.block ?? 0) + (def.block ?? 0);
+    gainBlock(s, 'enemy', def.block ?? 0);
     s.log.push(`Enemy plays ${def.name ?? def.id}: Block +${def.block}.`);
   } else {
     s.log.push(`Enemy plays ${def.name ?? def.id}.`);

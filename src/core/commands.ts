@@ -5,10 +5,9 @@ import type { CardData, GameState } from './types';
 import { HAND_SIZE, START_ENERGY, START_DECK, START_GOLD, START_HP, nextExpForLevel } from './balance';
 import { shuffle, type RNG } from './rng';
 import { resetBlessingTurnFlags } from './blessingRuntime';
-import { enemyCardById } from './pack_enemy_cards';
-import type { EnemyCard } from './types';
 import { resetEquipmentTurnFlags, runEquipmentTurnHook } from './equipmentRuntime';
 import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
+import { dealDamage, gainBlock } from './combat/damage';
 
 let _instanceCounter = 0;
 
@@ -150,78 +149,49 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   const card = state.piles.hand[idxInHand];
   if (!card) return;
   
-  console.log(`🔥 Playing card: ${card.id} (${card.name})`);
-  console.log('🔥 Card object:', JSON.stringify(card, null, 2));
   state.log.push(`🎴 Playing ${card.name} (${card.id})`);
-  
+
   // Import all advanced systems
-  const { modifyCardCostForStatusEffects, modifyDamageForStatusEffects, canPlayAttackCards } = require('./statusEffectsRuntime');
-  const { onPlayerCardPlayed, getAdaptiveDamageMultiplier } = require('./adaptiveAI');
+  const { canPlayAttackCards } = require('./statusEffectsRuntime');
+  const { onPlayerCardPlayed } = require('./adaptiveAI');
   const { applyComboCardModifiers, onCardPlayedForCombos } = require('./cardComboSystem');
-  
+
   // Check if attack cards can be played (entangle check)
   if (card.type === 'attack' && !canPlayAttackCards(state)) {
     state.log.push(`Cannot play attack cards while entangled`);
     return;
   }
-  
+
   // ★ Apply combo system modifiers first
   const modifiedCard = applyComboCardModifiers(state, card);
-  console.log('🔥 Modified card object:', JSON.stringify(modifiedCard, null, 2));
-  
-  // Note: Energy is already paid by combat handler
-  console.log(`🔥 Energy already paid by combat handler`);
 
-  // Effect - Damage with status effect modifications
+  // หมายเหตุ: energy ถูกหักไปแล้วโดย combat handler
+
+  // Effect - Damage (ผ่าน dealDamage ที่เดียว — ดู src/core/combat/damage.ts)
   if (modifiedCard.dmg && state.enemy) {
-    console.log(`🔥 Original card damage: ${modifiedCard.dmg}`);
-    let modifiedDamage = modifyDamageForStatusEffects(state, modifiedCard.dmg, true); // true = player attack
-    console.log(`🔥 After status effects: ${modifiedDamage}`);
-    
-    // Safety check for NaN
-    if (isNaN(modifiedDamage)) {
-      console.error('🔥 ERROR: modifiedDamage is NaN, using original damage');
-      modifiedDamage = modifiedCard.dmg;
-    }
-    
-    // Apply adaptive AI damage multiplier with safety check
-    const adaptiveMult = getAdaptiveDamageMultiplier();
-    let finalDamage;
-    
-    if (isNaN(adaptiveMult) || adaptiveMult === 0) {
-      console.error('🔥 ERROR: adaptiveMult is invalid:', adaptiveMult);
-      finalDamage = Math.round(modifiedDamage);
+    const result = dealDamage(state, {
+      from: 'player',
+      to: 'enemy',
+      raw: modifiedCard.dmg,
+      source: { kind: 'card', cardId: card.id },
+    });
+
+    if (result.blocked > 0) {
+      state.log.push(
+        `💥 ${result.modified} damage vs ${result.blocked} block → ${result.hpLoss} HP lost, ${state.enemy.block} block remaining`
+      );
     } else {
-      finalDamage = Math.round(modifiedDamage * (1 / adaptiveMult)); // Inverse for player damage
-      
-      // Final safety check
-      if (isNaN(finalDamage)) {
-        console.error('🔥 ERROR: finalDamage is NaN, using modifiedDamage directly');
-        finalDamage = Math.round(modifiedDamage);
-      }
+      state.log.push(`💥 ${result.modified} damage dealt → ${result.hpLoss} HP lost`);
     }
-    
-    // Apply damage through block system
-    const blockBefore = state.enemy.block || 0;
-    const blockAfter = Math.max(0, blockBefore - finalDamage);
-    const hpLoss = Math.max(0, finalDamage - blockBefore);
-    state.enemy.block = blockAfter;
-    state.enemy.hp = Math.max(0, state.enemy.hp - hpLoss);
-    
-    if (blockBefore > 0) {
-      state.log.push(`💥 ${finalDamage} damage vs ${blockBefore} block → ${hpLoss} HP lost, ${blockAfter} block remaining`);
-    } else {
-      state.log.push(`💥 ${finalDamage} damage dealt → ${hpLoss} HP lost`);
-    }
-    
-    if (finalDamage !== card.dmg) {
-      state.log.push(`Damage modified: ${card.dmg} → ${finalDamage}`);
+
+    if (result.modified !== result.raw) {
+      state.log.push(`Damage modified: ${result.raw} → ${result.modified}`);
     }
   }
-  
+
   // Block effect
   if (modifiedCard.block) {
-    state.player.block += modifiedCard.block;
+    gainBlock(state, 'player', modifiedCard.block);
   }
   
   // ✅ รองรับการ์ดที่ให้พลังงาน (เช่น Focus: energyGain = 1)
@@ -230,45 +200,36 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
     state.log.push(`Gained +${modifiedCard.energyGain} energy`);
   }
   
-  console.log(`🔥 About to check summonMinion property...`);
-  
   try {
     // ✅ รองรับการเรียก minion
-    console.log(`🔥 Checking summonMinion property:`, modifiedCard.summonMinion);
     if (modifiedCard.summonMinion) {
-      console.log(`🔥 Card ${card.id} has summonMinion:`, modifiedCard.summonMinion);
       const { summonMinion } = require('./minionRuntime');
-      
+
       // ตรวจสอบ minionTarget สำหรับ status effects
       const minionTarget = (modifiedCard as any).minionTarget;
       let owner = 'player'; // Default owner
-      
+
       if (minionTarget === 'enemy') {
         // สำหรับ status effects ที่กระทบศัตรู - minion จะมี owner เป็น 'enemy'
         owner = 'enemy';
       }
-      
+
       summonMinion(state, modifiedCard.summonMinion, owner as 'player' | 'enemy', 1);
-    } else {
-      console.log(`🔥 Card ${card.id} does NOT have summonMinion property`);
     }
-    
+
     // ✅ Special minion effects for specific cards
     if (card.id === 'hell_gate') {
-      console.log('🔥 Hell gate special effect triggered');
       const { summonMinion } = require('./minionRuntime');
       summonMinion(state, 'demon_minion', 'player', 2);
     }
   } catch (error) {
-    console.log(`🔥 ERROR in minion summoning:`, error);
     state.log.push(`Error in minion summoning: ${error}`);
   }
-  
+
   // ✅ Status Effect cards (direct application)
   if ((modifiedCard as any).statusEffect) {
     const statusConfig = (modifiedCard as any).statusEffect;
-    console.log(`🔥 Card ${card.id} applying status:`, statusConfig);
-    
+
     try {
       const { applyStatusEffect } = require('./statusEffectsRuntime');
       const targetType = statusConfig.target; // 'enemy' or 'player'
@@ -283,7 +244,6 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
       
       state.log.push(`✨ ${card.name} applies ${statusConfig.effect} (${statusConfig.value} stacks) to ${targetType}`);
     } catch (error) {
-      console.log(`🔥 ERROR applying status effect:`, error);
       state.log.push(`Error applying status effect: ${error}`);
     }
   }
@@ -303,34 +263,6 @@ export function isVictory(state: GameState): boolean {
 
 export function isDefeat(state: GameState): boolean {
   return state.player.hp <= 0;
-}
-
-function playEnemyCard(s: GameState) {
-  if (!s.enemy || !s.enemy.intentCardId) return;
-  const card: EnemyCard | undefined = enemyCardById(s.enemy.intentCardId);
-  if (!card) { s.log.push(`Enemy tries unknown card: ${s.enemy.intentCardId}`); return; }
-
-  if (card.type === 'attack' && (card.dmg ?? 0) > 0) {
-    const atk = Math.max(0, card.dmg!);
-    const blockAfter = Math.max(0, s.player.block - atk);
-    const hpLoss = Math.max(0, atk - s.player.block);
-    s.player.block = blockAfter;
-    s.player.hp = Math.max(0, s.player.hp - hpLoss);
-    s.log.push(`Enemy plays ${card.name ?? card.id}: Attack ${atk} (${hpLoss} dmg).`);
-  } else if (card.type === 'skill' && (card.block ?? 0) > 0) {
-    s.enemy.block = (s.enemy.block ?? 0) + (card.block ?? 0);
-    s.log.push(`Enemy plays ${card.name ?? card.id}: Block +${card.block}.`);
-  } else {
-    s.log.push(`Enemy plays ${card.name ?? card.id}.`);
-  }
-}
-
-// helper เดิน pointer ไปไพ่ถัดไป
-function stepNextEnemyCard(s: GameState) {
-  const ai = s.enemy?.ai;
-  if (!s.enemy || !ai || ai.cycle.length === 0) return;
-  ai.index = (ai.index + 1) % ai.cycle.length;
-  s.enemy.intentCardId = ai.cycle[ai.index];
 }
 
 export function endPlayerTurn(state: GameState) {
@@ -458,8 +390,7 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
     const enemyHandlers = require('./engine/handlers/enemy');
     const result = enemyHandlers.buildAndShuffleEnemyDeck(state, rng);
     rng = result.rng;
-    console.log(`🎯 Enemy deck built, hand will be drawn on first EndTurn`);
   }
 
-  console.log(`Combat started against ${monsterData.name} (HP: ${monsterData.hp})`);
+  state.log.push(`เริ่มต่อสู้กับ ${monsterData.name} (HP: ${monsterData.hp})`);
 }
