@@ -20,6 +20,7 @@ import EventView from './components/EventView';
 import EncounterCard from './components/EncounterCard';
 import BtnEncounter from './components/BtnEncounter';
 import RunCompleteScreen from './components/RunCompleteScreen';
+import ClassSelectScreen from './components/ClassSelectScreen';
 import { useRouter } from 'expo-router';
 
 
@@ -32,6 +33,7 @@ export default function Home() {
   const [saveLoadError, setSaveLoadError] = useState<string>('');
   const [showDebugTools, setShowDebugTools] = useState(false);
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const [pickingClass, setPickingClass] = useState(false);
 
   let [fontsLoaded] = useFonts({
     Prompt_400Regular,
@@ -80,12 +82,22 @@ export default function Home() {
 
   // Show StartPage when phase is 'start'
   if (state.phase === 'start') {
-    return <StartPage onStartGame={() => newRun(seed)} />;
+    return <StartPage onStartGame={() => setPickingClass(true)} />;
+  }
+
+  // เลือกผู้เดินทางก่อนเริ่มรัน — คลาสกำหนดเด็คและวิธีเล่นทั้งรัน
+  if (pickingClass) {
+    return (
+      <ClassSelectScreen
+        onPick={(classId) => { setPickingClass(false); newRun(seed, classId); }}
+        onBack={() => setPickingClass(false)}
+      />
+    );
   }
 
   // จบรันแล้ว — แสดงจอสรุปแทนการเด้งกลับแผนที่ที่ไม่มีอะไรเหลือ
   if (state.phase === 'run_complete') {
-    return <RunCompleteScreen state={state} onNewRun={() => newRun(`${Date.now()}`)} />;
+    return <RunCompleteScreen state={state} onNewRun={() => setPickingClass(true)} />;
   }
 
   // เลือกพรตั้งต้นก่อนเข้าหน้าแรก

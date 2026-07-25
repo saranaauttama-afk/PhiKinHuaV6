@@ -1,6 +1,7 @@
 // app/store/gameStore.ts - Shared game store
 import { create } from 'zustand';
 import type { Command, GameState } from '../../src/core/types';
+import type { ClassId } from '../core/classes';
 import { applyCommand } from '../../src/core/reducer';
 import { saveGame, loadGame, getSaveSlots, autoSave, type SaveSlotInfo } from '../../src/core/storage';
 import { HAND_SIZE, START_ENERGY, START_HP } from '../../src/core/balance/core';
@@ -21,7 +22,7 @@ type Store = {
   state: GameState;
   rng: RNG;
   dispatch: (cmd: Command) => void;
-  newRun: (seed: string) => void;
+  newRun: (seed: string, classId?: ClassId) => void;
   saveToSlot: (slot: number) => Promise<void>;
   loadFromSlot: (slot: number) => Promise<void>;
   getSaveSlots: () => Promise<SaveSlotInfo[]>;
@@ -132,12 +133,13 @@ export const useGame = create<Store>((set, get) => ({
     }
   },
 
-  newRun: (seed: string) => {
-    const newState = makeEmptyState();
-    newState.seed = seed;
-    newState.phase = 'menu';
+  newRun: (seed: string, classId?: ClassId) => {
+    // ต้องผ่านคำสั่ง NewRun จริง ไม่ใช่สร้าง state เปล่าเอง
+    // เดิมตั้ง phase เป็น 'menu' ตรงๆ ทำให้ข้ามการเซ็ตอัพรันทั้งหมด
+    // (เด็คตั้งต้น, pages, พรตั้งต้น) หน้าเลือกพรจึงไม่มีทางขึ้น
     const newRng = makeRng(seed);
-    set({ state: newState, rng: newRng });
+    const result = applyCommand(makeEmptyState(), { type: 'NewRun', seed, classId }, newRng);
+    set({ state: result.state, rng: result.rng });
   },
 
   saveToSlot: async (slot: number) => {

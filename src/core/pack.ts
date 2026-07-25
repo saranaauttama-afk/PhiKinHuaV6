@@ -8,6 +8,7 @@ export const ACTIVE_PACK = 'base' as const;
 
 // --- JSON imports (ต้องเปิด resolveJsonModule ใน tsconfig)
 import cardsJson from '../data/packs/base/cards.json';
+import classCardsJson from '../data/packs/base/class_cards.json';
 // import enemiesJson from '../data/packs/base/enemies.json'; // เปลี่ยนใช้ระบบไทยใหม่
 import blessingsJson from '../data/packs/base/blessings.json';
 import EQUIP_LIST from '../data/packs/base/equipment.json';
@@ -20,7 +21,9 @@ type CardJson = CardData & { starter?: number; inRewards?: boolean; inShop?: boo
 type EnemyJson = EnemyState & { tier: 'normal' | 'elite' | 'boss' };
 type BlessingMeta = { id: string; name: string; rarity: Rarity; desc?: string; oncePerTurn?: boolean };
 
-const CARD_LIST: CardJson[] = cardsJson as any;
+// การ์ดของคลาสอื่นอยู่คนละไฟล์ แต่รวมเป็นคลังเดียวกัน
+// (การ์ดใน cards.json ทั้งหมดติดแท็ก shaman อยู่แล้ว)
+const CARD_LIST: CardJson[] = [...(cardsJson as any), ...(classCardsJson as any)];
 // const ENEMY_LIST: EnemyJson[] = enemiesJson as any; // ใช้ระบบไทยแทน
 const BLESSING_LIST: BlessingMeta[] = blessingsJson as any;
 

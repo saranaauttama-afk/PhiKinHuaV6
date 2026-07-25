@@ -171,7 +171,11 @@ function generateChoiceContext(s: GameState, optionA: LevelBucket, optionB: Leve
   }
 }
 
-export function rollThreeCards(rng: RNG, playerLevel = 1) {
+/**
+ * สุ่มการ์ดรางวัล 3 ใบ — กรองเฉพาะการ์ดของคลาสที่เล่นอยู่
+ * ถ้าไม่กรอง นักรบจะได้การ์ดหมอผีเป็นรางวัล ซึ่งทำให้ตัวตนของคลาสจางหมด
+ */
+export function rollThreeCards(rng: RNG, playerLevel = 1, classTag?: string) {
   let r = rng;
   
   // ปรับน้ำหนักตาม level
@@ -203,14 +207,23 @@ export function rollThreeCards(rng: RNG, playerLevel = 1) {
     const rarityRoll = next(r);
     r = rarityRoll.rng;
     const roll = rarityRoll.value * 100;
-    let selectedPool: CardData[] = BY_RARITY.Common;
+    const forClass = (list: CardData[]) =>
+      classTag ? list.filter(c => (c.tags ?? []).includes(classTag)) : list;
+    const POOL = {
+      Common:    forClass(BY_RARITY.Common),
+      Uncommon:  forClass(BY_RARITY.Uncommon),
+      Rare:      forClass(BY_RARITY.Rare),
+      Legendary: forClass(BY_RARITY.Legendary),
+    };
+
+    let selectedPool: CardData[] = POOL.Common;
     
-    if (roll < legendaryWeight && BY_RARITY.Legendary.length > 0) {
-      selectedPool = BY_RARITY.Legendary;
-    } else if (roll < legendaryWeight + rareWeight && BY_RARITY.Rare.length > 0) {
-      selectedPool = BY_RARITY.Rare;
-    } else if (roll < legendaryWeight + rareWeight + uncommonWeight && BY_RARITY.Uncommon.length > 0) {
-      selectedPool = BY_RARITY.Uncommon;
+    if (roll < legendaryWeight && POOL.Legendary.length > 0) {
+      selectedPool = POOL.Legendary;
+    } else if (roll < legendaryWeight + rareWeight && POOL.Rare.length > 0) {
+      selectedPool = POOL.Rare;
+    } else if (roll < legendaryWeight + rareWeight + uncommonWeight && POOL.Uncommon.length > 0) {
+      selectedPool = POOL.Uncommon;
     }
     
     if (selectedPool.length > 0) {

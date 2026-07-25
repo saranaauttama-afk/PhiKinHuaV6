@@ -5,6 +5,7 @@ import { baseNewState } from '../../commands';
 import { rollTwoBlessings } from '../../level';
 import { START_ENERGY } from '../../balance/core';
 import { initPageMap, rollPageOffers } from '../../map/pages';
+import { getClass, buildStarterDeck } from '../../classes';
 import { getEquipmentById } from '../../pack';
 
 // Auto-equip equipment cards from starting deck and remove equipped cards from deck
@@ -138,8 +139,26 @@ export function newRun(
   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };
   s.turnFlags.equipmentOnce = {};
 
-  const { START_DECK } = require('../../balance/core');
-  s.masterDeck = JSON.parse(JSON.stringify(START_DECK));
+  // ── คลาสกำหนดค่าสถานะตั้งต้นและเด็ค
+  // เดิมทุกรันใช้ START_DECK ชุดเดียวกันหมด เล่นรอบสองจึงเหมือนรอบแรก
+  const cls = getClass(cmd.classId);
+  s.classId = cls.id;
+  s.player.maxHp       = cls.startHp;
+  s.player.hp          = cls.startHp;
+  s.player.maxEnergy   = cls.startEnergy;
+  s.player.energy      = cls.startEnergy;
+  s.player.maxHandSize = cls.startHandSize;
+
+  const { ALL_CARDS } = require('../../pack');
+  const deck = buildStarterDeck(cls, ALL_CARDS);
+  if (deck.length > 0) {
+    s.masterDeck = deck;
+  } else {
+    // การ์ดของคลาสหาย — ใช้เด็คกลางไว้ก่อนดีกว่าเริ่มรันด้วยเด็คว่าง
+    const { START_DECK } = require('../../balance/core');
+    s.masterDeck = JSON.parse(JSON.stringify(START_DECK));
+    s.log.push(`ไม่พบการ์ดของคลาส ${cls.name} ใช้เด็คกลางแทน`);
+  }
 
   // ✅ Equipment defaults
   s.equipmentSlotsMax = 1;

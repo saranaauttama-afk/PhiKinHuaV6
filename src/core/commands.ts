@@ -7,7 +7,7 @@ import { shuffle, type RNG } from './rng';
 import { resetBlessingTurnFlags } from './blessingRuntime';
 import { resetEquipmentTurnFlags, runEquipmentTurnHook } from './equipmentRuntime';
 import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
-import { dealDamage, gainBlock } from './combat/damage';
+import { dealDamage, gainBlock, heal } from './combat/damage';
 
 let _instanceCounter = 0;
 
@@ -192,6 +192,12 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   // Block effect
   if (modifiedCard.block) {
     gainBlock(state, 'player', modifiedCard.block);
+  }
+
+  // ฟื้นพลังชีวิต — เดิมไม่มีการรองรับเลย การ์ดสายฟื้นฟูจึงไม่ทำอะไร
+  if (modifiedCard.heal && modifiedCard.heal > 0) {
+    const healed = heal(state, 'player', modifiedCard.heal);
+    if (healed > 0) state.log.push(`ฟื้นพลังชีวิต ${healed}`);
   }
   
   // ✅ รองรับการ์ดที่ให้พลังงาน (เช่น Focus: energyGain = 1)

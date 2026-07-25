@@ -4,7 +4,11 @@ import type { RNG } from './rng';
 import { int, shuffle } from './rng';
 
 // โหลดพูลการ์ดจากแพ็ค base (ให้ Metro bundle ได้)
-const cardsBase: CardData[] = require('../data/packs/base/cards.json');
+// ต้องรวมการ์ดของคลาสอื่นด้วย ไม่งั้นร้านจะมีแต่การ์ดหมอผีสำหรับทุกคลาส
+const cardsBase: CardData[] = [
+  ...require('../data/packs/base/cards.json'),
+  ...require('../data/packs/base/class_cards.json'),
+];
 
 // จัดกลุ่มตาม Rarity จาก cards.json (อนุญาตเฉพาะใบที่ขายได้)
 function buildPools() {
@@ -47,7 +51,9 @@ function priceForCard(c: CardData, act = 1): number {
 export function rollShopStock(
   rng: RNG,
   count = 6,
-  act = 1
+  act = 1,
+  /** แท็กคลาสของผู้เล่น — ร้านจะขายเฉพาะการ์ดของคลาสนั้น */
+  classTag?: string
 ): { rng: RNG; items: ShopItem[] } {
   let r = rng;
   const out: ShopItem[] = [];
@@ -58,7 +64,27 @@ export function rollShopStock(
   const total = weights.Common + weights.Uncommon + weights.Rare + weights.Legendary;
 
   // พูลตาม rarity (อัปเดตครั้งเดียวตอนเรียก)
-  const BY_RARITY = buildPools();
+  const ALL_POOLS = buildPools();
+
+  // ร้านขายเฉพาะการ์ดของคลาสที่เล่นอยู่ ไม่งั้นตัวตนของคลาสจะจางหมด
+  //
+  // กรองเข้มทุก rarity — rarity ไหนไม่มีการ์ดของคลาสนี้ก็ปล่อยว่างไว้
+  // แล้วให้ pickFromRarity ไล่ไปหยิบจาก rarity อื่นเอง (รองรับพูลว่างอยู่แล้ว)
+  // ถอยไปใช้พูลรวมเฉพาะกรณีที่คลาสนั้นไม่มีการ์ดเลยสักใบ
+  const byClass = (list: CardData[]) =>
+    list.filter(c => (c.tags ?? []).includes(classTag!));
+
+  const filteredPools: typeof ALL_POOLS = classTag
+    ? {
+        Common:    byClass(ALL_POOLS.Common),
+        Uncommon:  byClass(ALL_POOLS.Uncommon),
+        Rare:      byClass(ALL_POOLS.Rare),
+        Legendary: byClass(ALL_POOLS.Legendary),
+      }
+    : ALL_POOLS;
+
+  const hasAnyClassCard = Object.values(filteredPools).some(list => list.length > 0);
+  const BY_RARITY = hasAnyClassCard ? filteredPools : ALL_POOLS;
 
   // helper: หยิบการ์ดใบหนึ่งจากพูลตาม rarity ถ้ายังเหลือ
   const pickFromRarity = (rar: Rarity): CardData | undefined => {

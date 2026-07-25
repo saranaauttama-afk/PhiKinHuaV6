@@ -4,6 +4,7 @@ import type { RNG } from '../rng';
 import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
 import { rollLevelUpChoice, rollTwoBlessings, rollThreeCards, type LevelBucket } from '../level';
 import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
+import { applyClassVictoryPassive, getClass } from '../classes';
 
 export function getCurrentNodeId(map?: any): string | undefined {
   if (!map) return undefined;
@@ -47,6 +48,9 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
 
   s.player.exp += gained;
   s.player.gold = (s.player.gold || 0) + gold;
+
+  // พรติดตัวของคลาสที่ทำงานตอนชนะไฟต์ (แม่ชีฟื้นเลือดข้ามไฟต์)
+  applyClassVictoryPassive(s);
   const goldResult = { amount: gold };
 
   // เก็บรางวัลไว้เป็นข้อมูล ไม่ใช่ให้ UI ไปแกะจากข้อความ log
@@ -67,7 +71,7 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
       
       // Check if either option needs additional choices (cards/blessings)
       if (choice.optionA === 'cards' || choice.optionB === 'cards') {
-        const rr = rollThreeCards(r, s.player.level); r = rr.rng; cardChoices = rr.list;
+        const rr = rollThreeCards(r, s.player.level, getClass(s.classId).cardTag); r = rr.rng; cardChoices = rr.list;
       }
       if (choice.optionA === 'blessing' || choice.optionB === 'blessing') {
         const bb = rollTwoBlessings(r); r = bb.rng; blessingChoices = bb.list;

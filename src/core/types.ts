@@ -25,6 +25,8 @@ export type CardData = {
   block?: number;
   draw?: number;
   energyGain?: number;
+  /** ฟื้นพลังชีวิตให้ผู้เล่น */
+  heal?: number;
   tags?: string[];
   rarity?: Rarity;
   equipmentId?: string;
@@ -216,6 +218,9 @@ export type GameState = {
   phase: Phase;
   turn: number;
 
+  /** คลาสที่ผู้เล่นเลือกไว้ตอนเริ่มรัน — กำหนดเด็ค ค่าสถานะ และพรติดตัว */
+  classId?: import('./classes').ClassId;
+
   /** ศัตรูจะทำอะไรเทิร์นหน้า — UI แสดงระหว่างเทิร์นผู้เล่น */
   enemyIntent?: EnemyIntent;
 
@@ -327,7 +332,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string }
+  | { type: 'NewRun'; seed: string; classId?: import('./classes').ClassId }
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }
 

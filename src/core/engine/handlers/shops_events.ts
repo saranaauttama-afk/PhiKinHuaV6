@@ -2,6 +2,7 @@
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { rollShopStock } from '../../shop';
+import { getClass } from '../../classes';
 import { applyRemoveCard, rollGamble, rollTreasure } from '../../events';
 import { START_ENERGY } from '../../balance/core';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
@@ -45,7 +46,7 @@ export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopRer
   s.player.gold -= SHOP_REROLL_COST;
   try {
     const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS);
+    const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS, getClass(s.classId).cardTag);
     r = out.rng;
     s.shopStock = out.items;
   } catch {
@@ -61,7 +62,7 @@ export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopRer
 export function qaOpenShopHere(s: GameState, _cmd: Extract<Command, { type: 'QA_OpenShopHere' }>, r: RNG) {
   try {
     const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS);
+    const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS, getClass(s.classId).cardTag);
     r = out.rng;
     s.shopStock = out.items;
   } catch {
@@ -233,7 +234,7 @@ export function eventTreasureOpen(s: GameState, _cmd: Extract<Command, { type: '
 export function openShopCard(s: GameState, r: RNG): { state: GameState; rng: RNG } {
   try {
     const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 3, SHOP_POWER_BIAS); // Limit to 3 cards
+    const out = rollShopStock(r, 3, SHOP_POWER_BIAS, getClass(s.classId).cardTag); // Limit to 3 cards
     r = out.rng;
     s.shopStock = out.items;
   } catch {
@@ -419,7 +420,7 @@ export function openTreasureChest(s: GameState, r: RNG): { state: GameState; rng
   // Generate 2 random cards for treasure chest
   try {
     const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 2, 1.3); // 2 cards with slight power bias
+    const out = rollShopStock(r, 2, 1.3, getClass(s.classId).cardTag); // 2 cards with slight power bias
     r = out.rng;
     s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
     s.shopKind = 'treasure';
@@ -440,7 +441,7 @@ export function openSingleTreasure(s: GameState, r: RNG): { state: GameState; rn
   // Generate 1 random card for single treasure
   try {
     const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 1, 1.3); // 1 card with slight power bias
+    const out = rollShopStock(r, 1, 1.3, getClass(s.classId).cardTag); // 1 card with slight power bias
     r = out.rng;
     s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
     s.shopKind = 'treasure_single';
@@ -605,7 +606,7 @@ export function randomizeSingleTreasure(s: GameState, _cmd: Extract<Command, { t
   // Generate new card
   try {
     const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 1, 1.3); // 1 card with slight power bias
+    const out = rollShopStock(r, 1, 1.3, getClass(s.classId).cardTag); // 1 card with slight power bias
     r = out.rng;
     s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
   } catch {
