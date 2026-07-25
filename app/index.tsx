@@ -5,18 +5,11 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View, ImageBackground, Image } from 'react-native';
 import { useFonts, Prompt_400Regular, Prompt_600SemiBold, Prompt_700Bold } from '@expo-google-fonts/prompt';
 import { ChakraPetch_400Regular, ChakraPetch_600SemiBold, ChakraPetch_700Bold } from '@expo-google-fonts/chakra-petch';
-import { create } from 'zustand';
-import type { Command, GameState } from '../src/core/types';
-import { applyCommand } from '../src/core/reducer';
-import { saveGame, loadGame, getSaveSlots, autoSave, type SaveSlotInfo } from '../src/core/storage';
-import { HAND_SIZE, START_ENERGY, START_HP } from '../src/core/balance/core';
-import { nextExpForLevel } from '../src/core/balance/progression';
-import { makeRng, seedFromString, type RNG } from '../src/core/rng';
-import { START_GOLD } from '../src/core/balance';
+import type { SaveSlotInfo } from '../src/core/storage';
+import { useGame } from '../src/store/gameStore';
 
 // Components
 import StartPage from './components/StartPage';
-import CombatView from './components/CombatView';
 import ShopView from './components/ShopView';
 import MapView from './components/MapView';
 import DeckView from './components/DeckView';
@@ -27,86 +20,6 @@ import EncounterCard from './components/EncounterCard';
 import BtnEncounter from './components/BtnEncounter';
 import { useRouter } from 'expo-router';
 
-// Commands that should trigger auto-save
-function shouldAutoSave(cmdType: Command['type']): boolean {
-  const autoSaveCommands: Command['type'][] = [
-    'CompleteNode', 'ChooseLevelUp', 'TakeShop', 'EventChooseBlessing',
-    'ChooseOffer', 'Proceed', 'ShopRemoveBuy', 'ShopUpgradeBuy'
-  ];
-  return autoSaveCommands.includes(cmdType);
-}
-
-type Store = {
-  state: GameState;
-  rng: RNG;
-  dispatch: (cmd: Command) => void;
-  newRun: (seed: string) => void;
-  saveToSlot: (slot: number) => Promise<void>;
-  loadFromSlot: (slot: number) => Promise<void>;
-  getSaveSlots: () => Promise<SaveSlotInfo[]>;
-  autoSaveEnabled: boolean;
-};
-
-const makeEmptyState = (): GameState => ({
-  seed: '',
-  phase: 'start',
-  turn: 0,
-  player: {
-    hp: START_HP, maxHp: START_HP, block: 0,
-    energy: START_ENERGY, gold: START_GOLD,
-    level: 1, exp: 0, expToNext: nextExpForLevel(1),
-    maxEnergy: START_ENERGY, maxHandSize: HAND_SIZE,
-  },
-  enemy: undefined,
-  fightCount: 0,
-  piles: { draw: [], hand: [], discard: [], exhaust: [] },
-  log: [],
-  blessings: [],
-  turnFlags: { blessingOnce: {} },
-  runCounters: { removed: 0 },
-  masterDeck: [],
-  deckOpen: false,
-  shopRegistry: [],
-});
-
-const useGame = create<Store>((set, get) => ({
-  state: makeEmptyState(),
-  rng: makeRng('demo-001'),
-  autoSaveEnabled: true,
-
-  dispatch: (cmd: Command) => {
-    const { state, rng } = get();
-    const result = applyCommand(state, cmd, rng);
-    set({ state: result.state, rng: result.rng });
-
-    if (get().autoSaveEnabled && shouldAutoSave(cmd.type)) {
-      setTimeout(() => autoSave(result.state), 100);
-    }
-  },
-
-  newRun: (seed: string) => {
-    const newState = makeEmptyState();
-    newState.seed = seed;
-    newState.phase = 'menu';
-    const newRng = makeRng(seed);
-    set({ state: newState, rng: newRng });
-  },
-
-  saveToSlot: async (slot: number) => {
-    const { state } = get();
-    await saveGame(state, slot);
-  },
-
-  loadFromSlot: async (slot: number) => {
-    const loadedState = await loadGame(slot);
-    if (loadedState) {
-      const newRng = makeRng(loadedState.seed || 'fallback');
-      set({ state: loadedState, rng: newRng });
-    }
-  },
-
-  getSaveSlots: () => getSaveSlots(),
-}));
 
 export default function Home() {
   const { state, dispatch, newRun, saveToSlot, loadFromSlot, getSaveSlots } = useGame();
@@ -226,8 +139,7 @@ export default function Home() {
           </View>
 
 
-          {/* Game Components */}
-          <CombatView state={state} dispatch={dispatch} />
+          {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
           <ShopView state={state} dispatch={dispatch} />
           <MapView state={state} dispatch={dispatch} />
           <DeckView state={state} dispatch={dispatch} />

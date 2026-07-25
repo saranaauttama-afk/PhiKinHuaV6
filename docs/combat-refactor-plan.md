@@ -242,7 +242,39 @@ function useCombatTimeline(events: CombatEvent[], opts?: { speed?: number })
 | 1 | รวม damage path | 1 วัน | **แก้บั๊กกฎเกม** — status effect ทำงานครบทั้งสองฝั่ง |
 | 2 | event stream | 1 วัน | กฎเกมหลุดจากอนิเมชั่น |
 | 3 | view เล่น event | 1-2 วัน | อนิเมชั่นนิ่ง + skip/speed ✅ |
-| 4 | เก็บกวาด | ครึ่งวัน | ฐานสะอาดพร้อมรีดีไซน์ |
+| 4 | เก็บกวาด | ครึ่งวัน | ฐานสะอาดพร้อมรีดีไซน์ ✅ |
+
+---
+
+## 5.3 พบตอน Phase 4: หน้าแผนที่ยังไม่ได้ต่อกับ engine เลย
+
+ตอนไปยุบ store ที่ซ้ำกัน พบว่า `app/index.tsx` กับ `app/battle.tsx`
+**ใช้ zustand store คนละตัว** — index.tsx สร้าง `useGame` ของตัวเองไว้ในไฟล์
+ส่วน battle.tsx import จาก `src/store/gameStore.ts`
+
+ผลคือ index.tsx อ่าน `player.hp / gold / exp` จาก store ที่**ไม่เคยเห็นผลการต่อสู้เลย**
+(แก้แล้วใน Phase 4 — เหลือ store เดียว)
+
+แต่ปัญหาที่ใหญ่กว่าคือ **หน้าแผนที่ยังเป็น mock**:
+- ทางเข้าเกมคือปุ่ม hardcode 3 ปุ่ม (`phi-krasue`, ร้านค้า, สมบัติ) ที่ `index.tsx:163-210`
+  → `router.push('/battle', { monsterId: 'phi-krasue' })` แบบตายตัว
+- `MapView` / `ShopView` / `EventView` / `DeckView` ถูก render ไว้จริง แต่ **คืน null หมด**
+  เพราะ index.tsx dispatch แค่ `EnterMenu` คำสั่งเดียว ไม่เคยเข้าสู่ phase ที่ component พวกนั้นต้องการ
+
+**แปลว่าระบบใน engine ที่ทำเสร็จแล้วเหล่านี้ยังไม่มีทางเข้าจาก UI:**
+map/page generation, force split, boss ที่ fight 7/15, shop + registry + respawn,
+event, level-up choice, ระบบ 15 ไฟต์ทั้งหมด
+
+engine เสร็จกว่า UI มาก — สิ่งที่ขาดคือหน้าแผนที่จริงที่ต่อกับ `pages` state
+
+### Phase 6 (ใหม่) — ต่อหน้าแผนที่เข้ากับ engine
+- แทนปุ่ม hardcode ด้วย offer จริงจาก `s.pages.current.offers`
+- ต่อ `ChooseOffer` / `CompleteNode` / `Proceed` เข้ากับ UI
+- ส่งผลการต่อสู้กลับเข้าลูป (ตอนนี้ battle.tsx `router.replace('/')` เฉยๆ)
+- ทำให้ shop / event / level-up เข้าถึงได้จริง
+
+งานนี้ควรทำ**ก่อน**เริ่มรีดีไซน์ภาพ เพราะรีดีไซน์หน้าแผนที่ให้สวย
+ในขณะที่มันยังไม่ได้ต่อกับระบบจริง = ต้องรื้อทำใหม่อีกรอบ
 
 **รวม ~4-5 วัน** แล้วค่อยเริ่ม CombatView ใหม่สไตล์ NotFM บนฐานที่นิ่งแล้ว
 
