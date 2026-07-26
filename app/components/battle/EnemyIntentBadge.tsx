@@ -42,7 +42,7 @@ export default function EnemyIntentBadge({ intent, playerBlock }: Props) {
       </Text>
 
       {intent.damage > 0 && (
-        <Text style={{ color: '#ff6b6b', fontSize: 16, fontFamily: 'ChakraPetch_700Bold' }}>
+        <Text style={{ color: '#ff6b6b', fontSize: 16, fontFamily: 'Prompt_700Bold' }}>
           ⚔ {intent.damage}
           {playerBlock > 0 && (
             <Text style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12 }}>
@@ -53,7 +53,7 @@ export default function EnemyIntentBadge({ intent, playerBlock }: Props) {
       )}
 
       {intent.block > 0 && (
-        <Text style={{ color: '#7ab8ff', fontSize: 16, fontFamily: 'ChakraPetch_700Bold' }}>
+        <Text style={{ color: '#7ab8ff', fontSize: 16, fontFamily: 'Prompt_700Bold' }}>
           🛡 {intent.block}
         </Text>
       )}

@@ -12,6 +12,7 @@
 import React from 'react';
 import { Image, ImageStyle, StyleProp, Text, View, ViewStyle } from 'react-native';
 import { artSlot } from '../../src/art/catalog';
+import { font, palette, radius, surface } from '../theme';
 
 /**
  * รูปที่มีอยู่จริงในโปรเจกต์ตอนนี้
@@ -73,13 +74,36 @@ export default function Art({
   const h = height ?? w / ratio;
 
   if (src) {
-    return (
+    const img = (
       <Image
         source={src}
         style={[{ width: w, height: h }, imageStyle as any]}
         resizeMode={resizeMode}
       />
     );
+
+    // ไฟล์ที่ยังเป็นพื้นทึบจะกลายเป็นสี่เหลี่ยมสีลอยอยู่กลางฉาก
+    // ครอบกรอบให้อ่านเป็น "ภาพในกรอบ" ไปก่อน — กลบไว้ ไม่ใช่แก้
+    // ได้ไฟล์พื้นโปร่งมาเมื่อไหร่ ให้ลบ `opaqueSource` ออกจาก catalog
+    if (spec?.opaqueSource) {
+      return (
+        <View
+          style={[
+            {
+              borderRadius: radius.md,
+              borderWidth: 1,
+              borderColor: palette.line,
+              overflow: 'hidden',
+            },
+            style,
+          ]}
+        >
+          {img}
+        </View>
+      );
+    }
+
+    return img;
   }
 
   const tiny = compact || w < 90 || h < 90;
@@ -90,11 +114,11 @@ export default function Art({
         {
           width: w,
           height: h,
-          borderRadius: 10,
+          borderRadius: radius.sm,
           borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.28)',
+          borderColor: palette.line,
           borderStyle: 'dashed',
-          backgroundColor: 'rgba(255,255,255,0.06)',
+          backgroundColor: surface.panelDim,
           alignItems: 'center',
           justifyContent: 'center',
           paddingHorizontal: 6,
@@ -108,10 +132,10 @@ export default function Art({
       <Text
         numberOfLines={2}
         style={{
-          color: 'rgba(255,255,255,0.9)',
+          color: palette.text,
           fontSize: tiny ? 10 : 13,
           textAlign: 'center',
-          fontFamily: 'Prompt_600SemiBold',
+          fontFamily: font.heading,
         }}
       >
         {spec?.label ?? slot}
@@ -122,22 +146,23 @@ export default function Art({
           <Text
             numberOfLines={3}
             style={{
-              color: 'rgba(255,255,255,0.55)',
+              color: palette.textDim,
               fontSize: 10,
               textAlign: 'center',
               lineHeight: 14,
+              fontFamily: font.ui,
             }}
           >
             {spec?.brief ?? 'ยังไม่มีข้อมูลช่องรูปนี้ใน catalog'}
           </Text>
 
-          <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 9, textAlign: 'center' }}>
+          <Text style={{ color: palette.textFaint, fontSize: 9, textAlign: 'center', fontFamily: font.ui }}>
             {spec ? `assets/${spec.file} · ${spec.size[0]}×${spec.size[1]}` : slot}
           </Text>
         </>
       )}
 
-      <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9 }}>รอรูป</Text>
+      <Text style={{ color: palette.textFaint, fontSize: 9, fontFamily: font.ui }}>รอรูป</Text>
     </View>
   );
 }

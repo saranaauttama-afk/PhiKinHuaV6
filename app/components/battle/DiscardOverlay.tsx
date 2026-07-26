@@ -47,7 +47,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
       <Text style={{
         color: 'rgba(255,220,180,0.95)',
         fontSize: 17,
-        fontFamily: 'ChakraPetch_700Bold',
+        fontFamily: 'Prompt_700Bold',
         marginBottom: 6,
       }}>
         เลือกการ์ดที่จะทิ้ง
@@ -55,7 +55,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
       <Text style={{
         color: 'rgba(255,200,100,0.7)',
         fontSize: 11,
-        fontFamily: 'ChakraPetch_400Regular',
+        fontFamily: 'Prompt_400Regular',
         marginBottom: 28,
       }}>
         เลือก {mustDiscard} ใบ  ({selectedIndices.length}/{mustDiscard})
@@ -101,7 +101,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                     borderRadius: 10, width: 20, height: 20,
                     alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <Text style={{ color: '#ffd93d', fontSize: 10, fontFamily: 'ChakraPetch_700Bold' }}>
+                    <Text style={{ color: '#ffd93d', fontSize: 10, fontFamily: 'Prompt_700Bold' }}>
                       {card.cost}
                     </Text>
                   </View>
@@ -115,14 +115,14 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                     borderRadius: 10, width: 20, height: 20,
                     alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <Text style={{ color: 'white', fontSize: 10, fontFamily: 'ChakraPetch_700Bold' }}>✕</Text>
+                    <Text style={{ color: 'white', fontSize: 10, fontFamily: 'Prompt_700Bold' }}>✕</Text>
                   </View>
                 )}
 
                 <Text style={{
                   color: isSelected ? 'rgba(255,160,160,0.95)' : 'rgba(255,255,255,0.9)',
                   fontSize: 10,
-                  fontFamily: 'ChakraPetch_600SemiBold',
+                  fontFamily: 'Prompt_600SemiBold',
                   textAlign: 'center',
                   marginBottom: 8,
                   marginTop: 16,
@@ -131,12 +131,12 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                 </Text>
 
                 {damage > 0 && (
-                  <Text style={{ color: '#ff6b6b', fontSize: 22, fontFamily: 'ChakraPetch_700Bold' }}>
+                  <Text style={{ color: '#ff6b6b', fontSize: 22, fontFamily: 'Prompt_700Bold' }}>
                     ⚔ {damage}
                   </Text>
                 )}
                 {block > 0 && (
-                  <Text style={{ color: '#4dabf7', fontSize: 22, fontFamily: 'ChakraPetch_700Bold' }}>
+                  <Text style={{ color: '#4dabf7', fontSize: 22, fontFamily: 'Prompt_700Bold' }}>
                     🛡 {block}
                   </Text>
                 )}
@@ -160,7 +160,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
           }}>
             <Text style={{
               color: 'rgba(255,255,255,0.6)',
-              fontFamily: 'ChakraPetch_600SemiBold',
+              fontFamily: 'Prompt_600SemiBold',
               fontSize: 13,
             }}>
               ยกเลิก
@@ -181,7 +181,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
           }}>
             <Text style={{
               color: canConfirm ? 'rgba(255,220,220,0.95)' : 'rgba(255,255,255,0.2)',
-              fontFamily: 'ChakraPetch_700Bold',
+              fontFamily: 'Prompt_700Bold',
               fontSize: 13,
             }}>
               ยืนยัน ({selectedIndices.length}/{mustDiscard})

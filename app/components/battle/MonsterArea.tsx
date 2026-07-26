@@ -107,7 +107,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <Text style={{
           position: 'absolute', top: 20, left: 60,
           color: 'rgba(255,255,255,0.4)', fontSize: 12,
-          fontFamily: 'ChakraPetch_400Regular',
+          fontFamily: 'Prompt_400Regular',
         }}>
           {displayName}
         </Text>
@@ -125,7 +125,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <Text style={{
           position: 'absolute', top: 35, left: 50, width: 200,
           color: 'rgba(255,255,255,0.5)', fontSize: 10,
-          fontFamily: 'ChakraPetch_400Regular', textAlign: 'center',
+          fontFamily: 'Prompt_400Regular', textAlign: 'center',
         }}>
           {hp}/{maxHp}
         </Text>
@@ -173,7 +173,7 @@ function EnemyStatItem({ icon, value }: { icon: ImageSourcePropType; value: stri
       <Image source={icon} style={{ width: 18, height: 18 }} resizeMode="contain" />
       <Text style={{
         color: 'rgba(255,255,255,0.85)', fontSize: 11,
-        fontFamily: 'ChakraPetch_600SemiBold',
+        fontFamily: 'Prompt_600SemiBold',
       }}>
         {value}
       </Text>

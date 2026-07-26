@@ -3,8 +3,7 @@ import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import React, { useMemo, useState, useEffect } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View, ImageBackground, Image } from 'react-native';
-import { useFonts, Prompt_400Regular, Prompt_600SemiBold, Prompt_700Bold } from '@expo-google-fonts/prompt';
-import { ChakraPetch_400Regular, ChakraPetch_600SemiBold, ChakraPetch_700Bold } from '@expo-google-fonts/chakra-petch';
+import { useAppFonts } from './useAppFonts';
 import type { SaveSlotInfo } from '../src/core/storage';
 import type { PageOffer } from '../src/core/map/pages';
 import { useGame } from '../src/store/gameStore';
@@ -20,6 +19,9 @@ import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
 import JourneyTrail from './components/JourneyTrail';
 import StoryEventView from './components/StoryEventView';
+import PlayerStatusBar from './components/PlayerStatusBar';
+import Panel, { GameButton, Scrim } from './components/Panel';
+import { palette, font, size, space } from './theme';
 import { useRouter } from 'expo-router';
 
 
@@ -34,14 +36,7 @@ export default function Home() {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [pickingClass, setPickingClass] = useState(false);
 
-  let [fontsLoaded] = useFonts({
-    Prompt_400Regular,
-    Prompt_600SemiBold,
-    Prompt_700Bold,
-    ChakraPetch_400Regular,
-    ChakraPetch_600SemiBold,
-    ChakraPetch_700Bold,
-  });
+  const [fontsLoaded] = useAppFonts();
 
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
@@ -103,38 +98,45 @@ export default function Home() {
           style={{ flex: 1 }}
           resizeMode="cover"
         >
-          <View style={{
-            flex: 1, backgroundColor: 'rgba(0,0,0,0.7)',
-            justifyContent: 'center', paddingHorizontal: 28, gap: 16,
-          }}>
+          <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
             <Text style={{
-              color: 'white', fontSize: 22, textAlign: 'center',
-              fontFamily: 'Prompt_700Bold', marginBottom: 8,
+              color: palette.moon, fontSize: size.display, textAlign: 'center',
+              fontFamily: font.display,
             }}>
               เลือกพรติดตัว
             </Text>
+            <Text style={{
+              color: palette.textFaint, fontSize: size.ui, textAlign: 'center',
+              fontFamily: font.ui, marginTop: space.xs, marginBottom: space.xl,
+            }}>
+              สิ่งที่ติดตัวไปตลอดการเดินทาง เลือกได้อย่างเดียว
+            </Text>
 
-            {state.starter.choices.map((b, i) => (
-              <Pressable
-                key={b.id ?? i}
-                onPress={() => dispatch({ type: 'ChooseStarterBlessing', index: i })}
-                style={{
-                  padding: 16, borderRadius: 14,
-                  backgroundColor: 'rgba(0,0,0,0.55)',
-                  borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
-                }}
-              >
-                <Text style={{ color: 'white', fontSize: 17, fontFamily: 'Prompt_600SemiBold' }}>
-                  {b.name ?? b.id}
-                </Text>
-                {!!b.desc && (
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, marginTop: 4 }}>
-                    {b.desc}
-                  </Text>
-                )}
-              </Pressable>
-            ))}
-          </View>
+            <View style={{ gap: space.md }}>
+              {state.starter.choices.map((b, i) => (
+                <Pressable
+                  key={b.id ?? i}
+                  onPress={() => dispatch({ type: 'ChooseStarterBlessing', index: i })}
+                >
+                  <Panel emphasis>
+                    <Text style={{
+                      color: palette.moon, fontSize: size.heading, fontFamily: font.heading,
+                    }}>
+                      {b.name ?? b.id}
+                    </Text>
+                    {!!b.desc && (
+                      <Text style={{
+                        color: palette.textDim, fontSize: size.bodyLg,
+                        fontFamily: font.body, marginTop: space.xs, lineHeight: 24,
+                      }}>
+                        {b.desc}
+                      </Text>
+                    )}
+                  </Panel>
+                </Pressable>
+              ))}
+            </View>
+          </Scrim>
         </ImageBackground>
       </View>
     );
@@ -147,19 +149,37 @@ export default function Home() {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', paddingTop: 50 }}>
+        <Scrim style={{ paddingTop: 46 }}>
 
           {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
           <JourneyTrail state={state} />
 
-          {/* ทางแยกตรงหน้า — มาจากโหนดที่เดินไปได้จริงบนเส้นทาง */}
-          <View style={{ flexDirection: 'row', marginTop: 70 }}>
+          {/* ทางแยกตรงหน้า — มาจากโหนดที่เดินไปได้จริงบนเส้นทาง
+              การ์ดมีความกว้างตามสัดส่วนของกรอบ จึงจัดกลางแล้วเว้นช่องไฟ
+              แทนที่จะยืด flex เต็มความกว้างจนกรอบบิดผิดสัดส่วน */}
+          <View style={{
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: space.sm,
+            paddingHorizontal: space.sm,
+            paddingBottom: 140,
+          }}>
             {offers.map((offer, i) => {
               const d = describeOffer(offer, i);
               const resolved = page?.resolved[i] ?? false;
+              const picked = selectedCard === i;
 
               return (
-                <View key={`${d.id}-${i}`} style={{ flex: 1, opacity: resolved ? 0.4 : 1 }}>
+                <View
+                  key={`${d.id}-${i}`}
+                  style={{
+                    opacity: resolved ? 0.35 : 1,
+                    // การ์ดที่เลือกอยู่ยกขึ้นเล็กน้อย ให้รู้ว่ากำลังตัดสินใจใบไหน
+                    transform: [{ translateY: picked ? -8 : 0 }],
+                  }}
+                >
                   <BtnEncounter
                     encounter={{
                       id: d.id,
@@ -168,8 +188,9 @@ export default function Home() {
                       description: d.description,
                       artSlot: d.artSlot,
                     }}
-                    onPress={() => !resolved && setSelectedCard(i)}
-                    showButtons={selectedCard === i && !resolved}
+                    height={offers.length >= 3 ? 232 : 264}
+                    onPress={() => !resolved && setSelectedCard(picked ? null : i)}
+                    showButtons={picked && !resolved}
                     onEnter={() => {
                       setSelectedCard(null);
                       enterOffer(offer, i);
@@ -197,110 +218,9 @@ export default function Home() {
           <EventView state={state} dispatch={dispatch} />
 
 
-          {/* Player Status Block - Floating Card */}
-          <ImageBackground
-            source={require('../assets/images/bgUserPanel.png')}
-            style={{
-              position: 'absolute',
-              bottom: 30,
-              left: 15,
-              right: 15,
-              padding: 12,
-              height:180
-            }}
-            resizeMode="stretch"
-          >
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              top:60,
-              width:280,
-              left:25
-            }}>
-              {/* HP */}
-              <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={{ 
-                  color: '#ef4444', 
-                  fontSize: 11, 
-                  fontFamily: 'ChakraPetch_600SemiBold'
-                }}>HP</Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 13,
-                  fontFamily: 'ChakraPetch_400Regular'
-                }}>
-                  {state.player.hp}/{state.player.maxHp}
-                </Text>
-              </View>
+          <PlayerStatusBar state={state} />
 
-              {/* Energy */}
-              <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={{ 
-                  color: '#3b82f6', 
-                  fontSize: 11, 
-                  fontFamily: 'ChakraPetch_600SemiBold'
-                }}>Energy</Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 13,
-                  fontFamily: 'ChakraPetch_400Regular'
-                }}>
-                  {state.player.energy}/{state.player.maxEnergy}
-                </Text>
-              </View>
-
-              {/* Gold */}
-              <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={{ 
-                  color: '#f59e0b', 
-                  fontSize: 11, 
-                  fontFamily: 'ChakraPetch_600SemiBold'
-                }}>Gold</Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 13,
-                  fontFamily: 'ChakraPetch_400Regular'
-                }}>
-                  {state.player.gold}
-                </Text>
-              </View>
-
-              {/* Hand Size */}
-              <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={{ 
-                  color: '#8b5cf6', 
-                  fontSize: 11, 
-                  fontFamily: 'ChakraPetch_600SemiBold'
-                }}>Hand</Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 13,
-                  fontFamily: 'ChakraPetch_400Regular'
-                }}>
-                  {state.piles.hand.length}/{state.player.maxHandSize}
-                </Text>
-              </View>
-
-              {/* Experience */}
-              <View style={{ alignItems: 'center', flex: 1 }}>
-                <Text style={{ 
-                  color: '#10b981', 
-                  fontSize: 11, 
-                  fontFamily: 'ChakraPetch_600SemiBold'
-                }}>EXP</Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 13,
-                  fontFamily: 'ChakraPetch_400Regular'
-                }}>
-                  {state.player.exp}/{state.player.expToNext}
-                </Text>
-              </View>
-            </View>
-          </ImageBackground>
-          
-        </View>
+        </Scrim>
       </ImageBackground>
 
       {/* BlessingDialog/EncounterDialog แบบ mock ถูกแทนด้วยหน้าเลือกพรจริง

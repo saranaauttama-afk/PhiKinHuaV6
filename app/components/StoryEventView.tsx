@@ -10,6 +10,8 @@ import { ImageBackground, Pressable, ScrollView, Text, View } from 'react-native
 import type { Command, GameState } from '../../src/core/types';
 import { getStoryEvent, choiceLocked } from '../../src/core/events/story';
 import Art from './Art';
+import Panel, { GameButton, Scrim } from './Panel';
+import { font, palette, radius, size, space, surface, tint } from '../theme';
 
 type Props = {
   state: GameState;
@@ -32,11 +34,11 @@ export default function StoryEventView({ state, dispatch }: Props) {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.78)', padding: 22, paddingTop: 60 }}>
+        <Scrim heavy style={{ padding: space.xl, paddingTop: 56 }}>
           <ScrollView contentContainerStyle={{ paddingBottom: 28 }}>
 
             <Text style={{
-              color: '#ffd88a', fontSize: 22, fontFamily: 'Prompt_700Bold',
+              color: palette.moon, fontSize: size.display, fontFamily: font.display,
               textAlign: 'center',
             }}>
               {ev.title}
@@ -48,8 +50,8 @@ export default function StoryEventView({ state, dispatch }: Props) {
 
             {/* เนื้อเรื่อง — ให้ที่เยอะและเว้นบรรทัดกว้าง เพราะคนต้องอ่านจริง */}
             <Text style={{
-              color: 'rgba(255,255,255,0.92)', fontSize: 16, lineHeight: 28,
-              fontFamily: 'Prompt_400Regular',
+              color: palette.text, fontSize: size.bodyLg, lineHeight: 30,
+              fontFamily: font.body,
             }}>
               {ev.text}
             </Text>
@@ -65,21 +67,21 @@ export default function StoryEventView({ state, dispatch }: Props) {
                       disabled={!!locked}
                       style={{
                         padding: 14, borderRadius: 14,
-                        backgroundColor: locked ? 'rgba(0,0,0,0.35)' : 'rgba(40,28,18,0.85)',
+                        backgroundColor: locked ? surface.panelDim : surface.panelRaise,
                         borderWidth: 1,
-                        borderColor: locked ? 'rgba(255,255,255,0.12)' : 'rgba(255,216,138,0.45)',
+                        borderColor: locked ? palette.line : palette.lineStrong,
                         opacity: locked ? 0.55 : 1,
                       }}
                     >
                       <Text style={{
-                        color: locked ? 'rgba(255,255,255,0.5)' : 'white',
-                        fontSize: 15, fontFamily: 'Prompt_600SemiBold',
+                        color: locked ? palette.textFaint : palette.text,
+                        fontSize: size.heading, fontFamily: font.heading,
                       }}>
                         {c.label}
                       </Text>
                       {/* บอกเหตุผลที่กดไม่ได้เสมอ — ทางที่เทาโดยไม่บอกอะไรคือทางที่กวนใจเปล่าๆ */}
                       {!!locked && (
-                        <Text style={{ color: '#fca5a5', fontSize: 12, marginTop: 4 }}>
+                        <Text style={{ color: palette.blood, fontSize: size.label, marginTop: 4, fontFamily: font.ui }}>
                           {locked}
                         </Text>
                       )}
@@ -93,34 +95,27 @@ export default function StoryEventView({ state, dispatch }: Props) {
               <View style={{ marginTop: 20 }}>
                 <View style={{
                   padding: 16, borderRadius: 14,
-                  backgroundColor: 'rgba(255,216,138,0.1)',
-                  borderWidth: 1, borderColor: 'rgba(255,216,138,0.35)',
+                  backgroundColor: tint.moonFaint,
+                  borderWidth: 1, borderColor: palette.lineStrong,
                 }}>
                   <Text style={{
-                    color: 'rgba(255,255,255,0.9)', fontSize: 15, lineHeight: 26,
-                    fontFamily: 'Prompt_400Regular',
+                    color: palette.text, fontSize: size.bodyLg, lineHeight: 28,
+                    fontFamily: font.body,
                   }}>
                     {story.result}
                   </Text>
                 </View>
 
-                <Pressable
+                <GameButton
+                  label="เดินทางต่อ ▸"
+                  tone="primary"
                   onPress={() => dispatch({ type: 'CompleteNode' })}
-                  style={{
-                    marginTop: 18, alignSelf: 'center',
-                    paddingHorizontal: 28, paddingVertical: 12, borderRadius: 14,
-                    backgroundColor: 'rgba(255,216,138,0.25)',
-                    borderWidth: 1, borderColor: 'rgba(255,216,138,0.6)',
-                  }}
-                >
-                  <Text style={{ color: '#ffd88a', fontSize: 15, fontFamily: 'Prompt_600SemiBold' }}>
-                    เดินทางต่อ ▸
-                  </Text>
-                </Pressable>
+                  style={{ marginTop: space.lg, alignSelf: 'center' }}
+                />
               </View>
             )}
           </ScrollView>
-        </View>
+        </Scrim>
       </ImageBackground>
     </View>
   );

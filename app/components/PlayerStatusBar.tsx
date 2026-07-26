@@ -1,0 +1,87 @@
+// app/components/PlayerStatusBar.tsx — แถบสถานะผู้เล่นบนหน้าแผนที่
+//
+// สองเรื่องที่แก้จากของเดิม:
+//
+// 1. **สี** — เดิมแจกสีคนละสีให้ทุกค่า (HP แดง, Energy ฟ้า, Gold ส้ม, Hand ม่วง,
+//    EXP เขียว) ซึ่งเป็นสีจากพาเลตต์เว็บที่ไม่มีอยู่ในงานอาร์ตเลยสักสี
+//    ตอนนี้เหลือสีเน้นสองสีตามระบบ: แดงเลือดหมูสำหรับ HP อย่างเดียว
+//    ที่เหลือเป็นทองแสงจันทร์ แยกกันด้วยป้ายชื่อ ไม่ใช่ด้วยสี
+//
+// 2. **ตำแหน่ง** — เดิมวางเนื้อหาด้วย `top: 60, left: 25, width: 280` ตายตัว
+//    ซึ่งอิงกับความกว้างจอเครื่องเดียว จอแคบกว่านั้นข้อความจะล้นออกนอกกรอบ
+//    ตอนนี้วางตามสัดส่วนของกรอบ
+
+import React from 'react';
+import { ImageBackground, Text, View } from 'react-native';
+import type { GameState } from '../../src/core/types';
+import { palette, font, size } from '../theme';
+
+const PANEL_H = 170;
+
+/** พื้นที่ใช้งานจริงข้างในกรอบ วัดเป็นสัดส่วนจากไฟล์ bgUserPanel.png */
+const INNER = { top: 0.34, height: 0.44, left: 0.09, right: 0.09 };
+
+function Stat({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
+  return (
+    <View style={{ alignItems: 'center', flex: 1 }}>
+      <Text
+        style={{
+          color: danger ? palette.blood : palette.moonDim,
+          fontSize: size.tiny,
+          fontFamily: font.uiMed,
+          letterSpacing: 0.5,
+        }}
+      >
+        {label}
+      </Text>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        style={{
+          color: danger ? palette.blood : palette.text,
+          fontSize: size.ui,
+          fontFamily: font.ui,
+          marginTop: 1,
+        }}
+      >
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+export default function PlayerStatusBar({ state }: { state: GameState }) {
+  const p = state.player;
+
+  return (
+    <ImageBackground
+      source={require('../../assets/images/bgUserPanel.png')}
+      style={{
+        position: 'absolute',
+        bottom: 24,
+        left: 12,
+        right: 12,
+        height: PANEL_H,
+      }}
+      resizeMode="stretch"
+    >
+      <View
+        style={{
+          position: 'absolute',
+          top: PANEL_H * INNER.top,
+          height: PANEL_H * INNER.height,
+          left: `${INNER.left * 100}%`,
+          right: `${INNER.right * 100}%`,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}
+      >
+        <Stat label="เลือด"   value={`${p.hp}/${p.maxHp}`} danger />
+        <Stat label="พลังงาน" value={`${p.energy}/${p.maxEnergy}`} />
+        <Stat label="ทอง"     value={`${p.gold ?? 0}`} />
+        <Stat label="มือ"     value={`${state.piles.hand.length}/${p.maxHandSize}`} />
+        <Stat label="ค่าประสบการณ์" value={`${p.exp}/${p.expToNext}`} />
+      </View>
+    </ImageBackground>
+  );
+}

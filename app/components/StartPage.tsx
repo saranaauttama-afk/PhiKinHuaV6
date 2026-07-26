@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, ImageBackground, Dimensions } from 'react-native';
-import { useFonts, Prompt_400Regular, Prompt_600SemiBold, Prompt_700Bold } from '@expo-google-fonts/prompt';
-import { ChakraPetch_400Regular, ChakraPetch_600SemiBold, ChakraPetch_700Bold } from '@expo-google-fonts/chakra-petch';
+import { useAppFonts } from '../useAppFonts';
 import type { GameState } from '../../src/core/types';
 
 const { width, height } = Dimensions.get('window');
@@ -11,14 +10,7 @@ interface StartPageProps {
 }
 
 function StartPage({ onStartGame }: StartPageProps) {
-  let [fontsLoaded] = useFonts({
-    Prompt_400Regular,
-    Prompt_600SemiBold,
-    Prompt_700Bold,
-    ChakraPetch_400Regular,
-    ChakraPetch_600SemiBold,
-    ChakraPetch_700Bold,
-  });
+  const [fontsLoaded] = useAppFonts();
 
   if (!fontsLoaded) {
     return null; // or loading spinner
@@ -74,7 +66,7 @@ function StartPage({ onStartGame }: StartPageProps) {
                 fontSize: 16,
                 color: 'white',
                 textAlign: 'center',
-                fontFamily: 'ChakraPetch_400Regular',
+                fontFamily: 'Prompt_400Regular',
                 opacity:0.6
               }}>
                 เข้าสู่เกมส์
@@ -93,7 +85,7 @@ function StartPage({ onStartGame }: StartPageProps) {
           <Text style={{
             fontSize: 14,
             color: 'rgba(255, 255, 255, 0.2)',
-              fontFamily: 'ChakraPetch_400Regular',
+              fontFamily: 'Prompt_400Regular',
             textShadowColor: 'rgba(0, 0, 0, 0.8)',
             textShadowOffset: { width: 1, height: 1 },
             textShadowRadius: 2

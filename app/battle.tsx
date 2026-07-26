@@ -16,6 +16,7 @@ import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
+import { useAppFonts } from './useAppFonts';
 
 type Phase = 'player' | 'discard' | 'enemy';
 
@@ -37,6 +38,9 @@ export default function BattlePage() {
   const gameState = useGame((s) => s.state);
   const dispatch  = useGame((s) => s.dispatch);
   const { monsterId, monsterName } = useLocalSearchParams();
+  // หน้านี้ใช้ฟอนต์เหมือนหน้าอื่นแต่เดิมไม่เคยโหลดเอง — รอดมาเพราะปกติผู้เล่น
+  // เดินผ่านหน้าแผนที่ก่อนเสมอ แต่ expo-router เปิดตรงเข้าหน้านี้ได้
+  const [fontsLoaded] = useAppFonts();
 
   const player = gameState.player;
   const enemy  = gameState.enemy;
@@ -206,6 +210,9 @@ export default function BattlePage() {
     }
   }, [currentEvent]);
 
+  // hook ทั้งหมดต้องถูกเรียกก่อนถึงจะ return ได้ ไม่งั้นลำดับ hook เพี้ยน
+  if (!fontsLoaded) return null;
+
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
@@ -238,7 +245,7 @@ export default function BattlePage() {
           >
             <Text style={{
               color: 'rgba(255,255,255,0.85)', fontSize: 12,
-              fontFamily: 'ChakraPetch_600SemiBold',
+              fontFamily: 'Prompt_600SemiBold',
             }}>
               ข้าม ▸▸
             </Text>

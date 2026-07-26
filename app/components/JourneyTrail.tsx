@@ -9,6 +9,7 @@
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import type { GameState } from '../../src/core/types';
+import { font, palette, size, space, surface, tint } from '../theme';
 
 const TILE_W = 34;
 const TILE_GAP = 6;
@@ -51,8 +52,8 @@ export default function JourneyTrail({ state }: { state: GameState }) {
   return (
     <View style={{ paddingHorizontal: 12 }}>
       <Text style={{
-        color: 'rgba(255,255,255,0.75)', fontSize: 12,
-        fontFamily: 'Prompt_600SemiBold', marginBottom: 6,
+        color: palette.moonDim, fontSize: size.label,
+        fontFamily: font.uiMed, marginBottom: space.xs, letterSpacing: 0.5,
       }}>
         เส้นทาง · ศึกที่ {Math.min(fightsDone + 1, fightRows)}/{fightRows}
       </Text>
@@ -68,20 +69,20 @@ export default function JourneyTrail({ state }: { state: GameState }) {
           const past    = i < choosingRow;
           const current = i === choosingRow;
 
-          const accent =
-            kind === 'boss' ? '#f87171'
-            : kind === 'fight' ? '#fbbf24'
-            : '#4ade80';
+          // สีเน้นมีสองสีเท่านั้น: บอสเป็นแดงเลือดหมู ที่เหลือเป็นทองแสงจันทร์
+          // ชั้นพักจางกว่าชั้นสู้ เพื่อให้สายตาอ่านจังหวะหนัก-เบาของเส้นทางได้
+          const accent = kind === 'boss' ? palette.blood : palette.moon;
+          const dim    = kind === 'rest';
 
           return (
             <View key={i} style={{ alignItems: 'center', width: TILE_W }}>
               <View style={{
                 width: TILE_W, height: TILE_W, borderRadius: TILE_W / 2,
                 alignItems: 'center', justifyContent: 'center',
-                backgroundColor: current ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.45)',
+                backgroundColor: current ? tint.moonSoft : surface.panelWell,
                 borderWidth: current ? 2 : 1,
-                borderColor: current ? accent : 'rgba(255,255,255,0.2)',
-                opacity: past ? 0.35 : 1,
+                borderColor: current ? accent : palette.line,
+                opacity: past ? 0.3 : dim ? 0.66 : 1,
               }}>
                 <Text style={{ fontSize: kind === 'boss' ? 17 : 15, color: accent }}>
                   {past ? '✓' : ICON[kind]}
@@ -89,8 +90,8 @@ export default function JourneyTrail({ state }: { state: GameState }) {
               </View>
 
               <Text style={{
-                color: 'rgba(255,255,255,0.55)', fontSize: 9, marginTop: 2,
-                fontFamily: 'ChakraPetch_400Regular',
+                color: palette.textFaint, fontSize: 9, marginTop: 2,
+                fontFamily: font.ui,
               }}>
                 {fightIndex ?? ''}
               </Text>

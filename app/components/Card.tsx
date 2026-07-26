@@ -194,7 +194,7 @@ export default function Card({
           <Text style={{
             color: 'white',
             fontSize: 10,
-            fontFamily: 'ChakraPetch_600SemiBold',
+            fontFamily: 'Prompt_600SemiBold',
             textShadowColor: 'rgba(0,0,0,0.8)',
             textShadowOffset: { width: 1, height: 1 },
             textShadowRadius: 2,
@@ -222,7 +222,7 @@ export default function Card({
           <Text style={{
             color: 'white',
             fontSize: 11,
-            fontFamily: 'ChakraPetch_600SemiBold',
+            fontFamily: 'Prompt_600SemiBold',
             textAlign: 'center',
             textShadowColor: 'rgba(0,0,0,0.8)',
             textShadowOffset: { width: 1, height: 1 },
@@ -235,7 +235,7 @@ export default function Card({
           <Text style={{
             color: 'rgba(255,255,255,0.8)',
             fontSize: 8,
-            fontFamily: 'ChakraPetch_400Regular',
+            fontFamily: 'Prompt_400Regular',
             textAlign: 'center',
             marginTop: 2,
             paddingHorizontal: 6,

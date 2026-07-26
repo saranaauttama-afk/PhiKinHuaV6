@@ -30,7 +30,7 @@ export default function DamagePopup({ damage, onDone }: Props) {
     <Animated.Text style={[{
       color: '#ff3333',
       fontSize: 44,
-      fontFamily: 'ChakraPetch_700Bold',
+      fontFamily: 'Prompt_700Bold',
       textShadowColor: 'rgba(0,0,0,0.9)',
       textShadowOffset: { width: 2, height: 2 },
       textShadowRadius: 4,

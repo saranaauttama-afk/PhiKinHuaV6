@@ -55,7 +55,7 @@ export default function VictoryOverlay({
         {/* Title */}
         <Text style={{
           color: '#ffd700', fontSize: 42,
-          fontFamily: 'ChakraPetch_700Bold',
+          fontFamily: 'Prompt_700Bold',
           textShadowColor: 'rgba(255,200,0,0.6)',
           textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12,
           marginBottom: 4,
@@ -64,7 +64,7 @@ export default function VictoryOverlay({
         </Text>
         <Text style={{
           color: 'rgba(255,255,255,0.5)', fontSize: 13,
-          fontFamily: 'ChakraPetch_400Regular', marginBottom: 28,
+          fontFamily: 'Prompt_400Regular', marginBottom: 28,
         }}>
           {enemyName} ถูกปราบแล้ว
         </Text>
@@ -72,10 +72,10 @@ export default function VictoryOverlay({
         {/* EXP row */}
         <View style={{ width: '100%', marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-            <Text style={{ color: 'rgba(200,255,200,0.7)', fontSize: 12, fontFamily: 'ChakraPetch_400Regular' }}>
+            <Text style={{ color: 'rgba(200,255,200,0.7)', fontSize: 12, fontFamily: 'Prompt_400Regular' }}>
               Lv.{playerLevel}  EXP
             </Text>
-            <Text style={{ color: '#7fffb0', fontSize: 13, fontFamily: 'ChakraPetch_700Bold' }}>
+            <Text style={{ color: '#7fffb0', fontSize: 13, fontFamily: 'Prompt_700Bold' }}>
               +{expGained}
             </Text>
           </View>
@@ -92,7 +92,7 @@ export default function VictoryOverlay({
           </View>
           <Text style={{
             color: 'rgba(255,255,255,0.35)', fontSize: 10,
-            fontFamily: 'ChakraPetch_400Regular',
+            fontFamily: 'Prompt_400Regular',
             textAlign: 'right', marginTop: 3,
           }}>
             {playerExp} / {playerExpToNext}
@@ -104,7 +104,7 @@ export default function VictoryOverlay({
           <Text style={{ fontSize: 28 }}>💰</Text>
           <Text style={{
             color: '#ffd700', fontSize: 28,
-            fontFamily: 'ChakraPetch_700Bold',
+            fontFamily: 'Prompt_700Bold',
             textShadowColor: 'rgba(255,200,0,0.5)',
             textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8,
           }}>
@@ -124,7 +124,7 @@ export default function VictoryOverlay({
         >
           <Text style={{
             color: 'white', fontSize: 15,
-            fontFamily: 'ChakraPetch_600SemiBold',
+            fontFamily: 'Prompt_600SemiBold',
             textShadowColor: 'rgba(0,0,0,0.5)',
             textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2,
           }}>

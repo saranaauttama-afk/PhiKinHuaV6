@@ -80,7 +80,7 @@ export default function Battle({ visible, onClose, monster }: BattleProps) {
             <Text style={{
               color: 'white',
               fontSize: 24,
-              fontFamily: 'ChakraPetch_600SemiBold',
+              fontFamily: 'Prompt_600SemiBold',
               textAlign: 'center',
               marginBottom: 20,
             }}>
@@ -90,7 +90,7 @@ export default function Battle({ visible, onClose, monster }: BattleProps) {
             <Text style={{
               color: 'white',
               fontSize: 16,
-              fontFamily: 'ChakraPetch_400Regular',
+              fontFamily: 'Prompt_400Regular',
               textAlign: 'center',
               opacity: 0.8,
             }}>

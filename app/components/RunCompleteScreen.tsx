@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, ImageBackground } from 'react-native';
 import type { GameState } from '../../src/core/types';
+import Panel, { GameButton, Scrim } from './Panel';
+import { palette, font, size, space } from '../theme';
 
 /**
  * จอสรุปตอนจบรัน
@@ -25,32 +27,25 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <View style={{
-          flex: 1, backgroundColor: 'rgba(0,0,0,0.78)',
-          justifyContent: 'center', paddingHorizontal: 30,
-        }}>
+        <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
           <Text style={{
-            color: s.beatSecretBoss ? '#ffd88a' : 'white',
-            fontSize: 28, textAlign: 'center',
-            fontFamily: 'Prompt_700Bold',
+            color: s.beatSecretBoss ? palette.moon : palette.text,
+            fontSize: size.display, textAlign: 'center',
+            fontFamily: font.display,
           }}>
             {s.beatSecretBoss ? 'ท้ามัจจุราชสำเร็จ' : 'จบการเดินทาง'}
           </Text>
 
           <Text style={{
-            color: 'rgba(255,255,255,0.7)', fontSize: 15,
-            textAlign: 'center', marginTop: 8, marginBottom: 28,
+            color: palette.textDim, fontSize: size.bodyLg, fontFamily: font.body,
+            textAlign: 'center', marginTop: space.sm, marginBottom: space.xl,
           }}>
             {s.beatSecretBoss
               ? 'แม้แต่เจ้าแห่งความตายก็ยังต้องถอย'
               : 'คุณผ่านค่ำคืนนี้มาได้'}
           </Text>
 
-          <View style={{
-            gap: 12, padding: 20, borderRadius: 16,
-            backgroundColor: 'rgba(20,14,10,0.75)',
-            borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
-          }}>
+          <Panel emphasis={!!s.beatSecretBoss} style={{ gap: space.md }}>
             <Row label="ไฟต์ทั้งหมด" value={`${s.fights}`} />
             <Row label="เลเวลสุดท้าย" value={`${s.level}`} />
             <Row label="ทรัพย์ที่เหลือ" value={`${s.gold}`} />
@@ -58,22 +53,15 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
               label="ศึกลับ"
               value={s.beatSecretBoss ? 'ชนะแล้ว' : 'ยังไม่ปลดล็อค'}
             />
-          </View>
+          </Panel>
 
-          <Pressable
+          <GameButton
+            label="ออกเดินทางอีกครั้ง"
+            tone="primary"
             onPress={onNewRun}
-            style={{
-              marginTop: 30, alignSelf: 'center',
-              paddingHorizontal: 30, paddingVertical: 12, borderRadius: 14,
-              backgroundColor: 'rgba(0,0,0,0.6)',
-              borderWidth: 1, borderColor: 'rgba(255,216,138,0.5)',
-            }}
-          >
-            <Text style={{ color: '#ffd88a', fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
-              ออกเดินทางอีกครั้ง
-            </Text>
-          </Pressable>
-        </View>
+            style={{ marginTop: space.xxl, alignSelf: 'center' }}
+          />
+        </Scrim>
       </ImageBackground>
     </View>
   );
@@ -82,8 +70,8 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-      <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15 }}>{label}</Text>
-      <Text style={{ color: 'white', fontSize: 15, fontFamily: 'Prompt_600SemiBold' }}>
+      <Text style={{ color: palette.textDim, fontSize: size.ui, fontFamily: font.ui }}>{label}</Text>
+      <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.uiMed }}>
         {value}
       </Text>
     </View>

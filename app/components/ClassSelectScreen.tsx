@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView, ImageBackground } from 'react-native';
 import { ALL_CLASS_IDS, CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
 import Art from './Art';
+import { GameButton } from './Panel';
+import { font, palette, size, space, surface } from '../theme';
 
 /**
  * หน้าเลือกคลาสก่อนเริ่มรัน
@@ -26,7 +28,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', paddingTop: 56, paddingHorizontal: 20 }}>
+        <View style={{ flex: 1, backgroundColor: palette.scrim, paddingTop: 56, paddingHorizontal: 20 }}>
           <Text style={{
             color: 'white', fontSize: 24, textAlign: 'center',
             fontFamily: 'Prompt_700Bold',
@@ -34,7 +36,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
             เลือกผู้เดินทาง
           </Text>
           <Text style={{
-            color: 'rgba(255,255,255,0.6)', fontSize: 14,
+            color: palette.textDim, fontSize: 14,
             textAlign: 'center', marginTop: 4, marginBottom: 18,
           }}>
             แต่ละคนถือสำรับและวิชาคนละอย่าง
@@ -50,9 +52,9 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
                   onPress={() => setSelected(id)}
                   style={{
                     padding: 16, borderRadius: 16,
-                    backgroundColor: isOn ? 'rgba(40,28,18,0.92)' : 'rgba(0,0,0,0.5)',
+                    backgroundColor: isOn ? surface.panelRaise : surface.panelSunk,
                     borderWidth: isOn ? 2 : 1,
-                    borderColor: isOn ? 'rgba(255,216,138,0.75)' : 'rgba(255,255,255,0.18)',
+                    borderColor: isOn ? palette.lineStrong : palette.line,
                   }}
                 >
                   <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -61,15 +63,18 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
 
                     <View style={{ flex: 1 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-                        <Text style={{ color: '#ffd88a', fontSize: 19, fontFamily: 'Prompt_700Bold' }}>
+                        <Text style={{ color: palette.moon, fontSize: 19, fontFamily: 'Prompt_700Bold' }}>
                           {c.name}
                         </Text>
-                        <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>
+                        <Text style={{ color: palette.textFaint, fontSize: 13 }}>
                           {c.title}
                         </Text>
                       </View>
 
-                      <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 6 }}>
+                      <Text style={{
+                        color: palette.textDim, fontSize: size.bodyLg,
+                        fontFamily: font.body, lineHeight: 25, marginTop: 6,
+                      }}>
                         {c.desc}
                       </Text>
 
@@ -84,12 +89,12 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
                   {isOn && (
                     <View style={{
                       marginTop: 12, paddingTop: 10,
-                      borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.12)',
+                      borderTopWidth: 1, borderTopColor: palette.line,
                     }}>
-                      <Text style={{ color: '#ffd88a', fontSize: 14, fontFamily: 'Prompt_600SemiBold' }}>
+                      <Text style={{ color: palette.moon, fontSize: 14, fontFamily: 'Prompt_600SemiBold' }}>
                         {c.passiveName}
                       </Text>
-                      <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 2 }}>
+                      <Text style={{ color: palette.textDim, fontSize: 13, marginTop: 2 }}>
                         {c.passiveDesc}
                       </Text>
                     </View>
@@ -107,18 +112,18 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
                 alignSelf: 'center',
                 paddingHorizontal: 34, paddingVertical: 12, borderRadius: 14,
                 opacity: selected ? 1 : 0.4,
-                backgroundColor: 'rgba(0,0,0,0.6)',
-                borderWidth: 1, borderColor: 'rgba(255,216,138,0.5)',
+                backgroundColor: surface.panelSunk,
+                borderWidth: 1, borderColor: palette.lineStrong,
               }}
             >
-              <Text style={{ color: '#ffd88a', fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
+              <Text style={{ color: palette.moon, fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
                 {selected ? 'ออกเดินทาง' : 'เลือกผู้เดินทางก่อน'}
               </Text>
             </Pressable>
 
             {onBack && (
               <Pressable onPress={onBack} style={{ alignSelf: 'center' }}>
-                <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>◂ ย้อนกลับ</Text>
+                <Text style={{ color: palette.textFaint, fontSize: 13 }}>◂ ย้อนกลับ</Text>
               </Pressable>
             )}
           </View>
@@ -131,8 +136,8 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-      <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>{label}</Text>
-      <Text style={{ color: 'white', fontSize: 15, fontFamily: 'ChakraPetch_700Bold' }}>{value}</Text>
+      <Text style={{ color: palette.textFaint, fontSize: 12 }}>{label}</Text>
+      <Text style={{ color: 'white', fontSize: 15, fontFamily: 'Prompt_700Bold' }}>{value}</Text>
     </View>
   );
 }

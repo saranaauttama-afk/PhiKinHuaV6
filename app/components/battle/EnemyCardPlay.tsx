@@ -155,17 +155,17 @@ export default function EnemyCardPlay({ card, fromX }: Props) {
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10, gap: 8 }}>
               <Text style={{
                 color: 'rgba(255,230,230,0.95)', fontSize: 11,
-                fontFamily: 'ChakraPetch_600SemiBold', textAlign: 'center',
+                fontFamily: 'Prompt_600SemiBold', textAlign: 'center',
               }}>
                 {card.name}
               </Text>
               {card.damage > 0 && (
-                <Text style={{ color: '#ff4444', fontSize: 36, fontFamily: 'ChakraPetch_700Bold' }}>
+                <Text style={{ color: '#ff4444', fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
                   ⚔ {card.damage}
                 </Text>
               )}
               {card.block > 0 && (
-                <Text style={{ color: '#4dabf7', fontSize: 36, fontFamily: 'ChakraPetch_700Bold' }}>
+                <Text style={{ color: '#4dabf7', fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
                   🛡 {card.block}
                 </Text>
               )}

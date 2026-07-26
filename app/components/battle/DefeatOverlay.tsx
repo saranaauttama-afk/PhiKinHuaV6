@@ -45,7 +45,7 @@ export default function DefeatOverlay({ onHome }: Props) {
         {/* Title */}
         <Text style={{
           color: '#cc2222', fontSize: 48,
-          fontFamily: 'ChakraPetch_700Bold',
+          fontFamily: 'Prompt_700Bold',
           textShadowColor: 'rgba(200,0,0,0.7)',
           textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16,
           marginBottom: 12,
@@ -55,7 +55,7 @@ export default function DefeatOverlay({ onHome }: Props) {
 
         <Text style={{
           color: 'rgba(255,255,255,0.4)', fontSize: 14,
-          fontFamily: 'ChakraPetch_400Regular',
+          fontFamily: 'Prompt_400Regular',
           textAlign: 'center', marginBottom: 52,
           lineHeight: 22,
         }}>
@@ -73,7 +73,7 @@ export default function DefeatOverlay({ onHome }: Props) {
         >
           <Text style={{
             color: 'white', fontSize: 15,
-            fontFamily: 'ChakraPetch_600SemiBold',
+            fontFamily: 'Prompt_600SemiBold',
           }}>
             กลับหน้าหลัก
           </Text>
