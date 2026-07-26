@@ -15,7 +15,6 @@ import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
 import EventView from './components/EventView';
-import EncounterCard from './components/EncounterCard';
 import BtnEncounter from './components/BtnEncounter';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
@@ -166,6 +165,7 @@ export default function Home() {
                       type: d.type,
                       name: d.name,
                       description: d.description,
+                      artSlot: d.artSlot,
                     }}
                     onPress={() => !resolved && setSelectedCard(i)}
                     showButtons={selectedCard === i && !resolved}

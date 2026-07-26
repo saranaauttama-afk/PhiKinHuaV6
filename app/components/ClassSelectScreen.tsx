@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, ImageBackground } from 'react-native';
 import { ALL_CLASS_IDS, CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
+import Art from './Art';
 
 /**
  * หน้าเลือกคลาสก่อนเริ่มรัน
@@ -54,23 +55,30 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
                     borderColor: isOn ? 'rgba(255,216,138,0.75)' : 'rgba(255,255,255,0.18)',
                   }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-                    <Text style={{ color: '#ffd88a', fontSize: 19, fontFamily: 'Prompt_700Bold' }}>
-                      {c.name}
-                    </Text>
-                    <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>
-                      {c.title}
-                    </Text>
-                  </View>
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    {/* ยังไม่มีภาพตัวละคร — <Art> วาง placeholder พร้อมโจทย์ภาพไว้ให้ */}
+                    <Art slot={`class/${id}`} width={72} compact />
 
-                  <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 6 }}>
-                    {c.desc}
-                  </Text>
+                    <View style={{ flex: 1 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
+                        <Text style={{ color: '#ffd88a', fontSize: 19, fontFamily: 'Prompt_700Bold' }}>
+                          {c.name}
+                        </Text>
+                        <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>
+                          {c.title}
+                        </Text>
+                      </View>
 
-                  <View style={{ flexDirection: 'row', gap: 16, marginTop: 10 }}>
-                    <Stat label="พลังชีวิต" value={`${c.startHp}`} />
-                    <Stat label="พลังงาน" value={`${c.startEnergy}`} />
-                    <Stat label="ขนาดมือ" value={`${c.startHandSize}`} />
+                      <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 6 }}>
+                        {c.desc}
+                      </Text>
+
+                      <View style={{ flexDirection: 'row', gap: 16, marginTop: 10 }}>
+                        <Stat label="พลังชีวิต" value={`${c.startHp}`} />
+                        <Stat label="พลังงาน" value={`${c.startEnergy}`} />
+                        <Stat label="ขนาดมือ" value={`${c.startHandSize}`} />
+                      </View>
+                    </View>
                   </View>
 
                   {isOn && (

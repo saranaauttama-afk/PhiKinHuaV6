@@ -104,3 +104,29 @@ Notable consequences, all covered by tests:
   fight row can drain a pool and force a repeat on the row after it
 - the Elite pool (HP 85–110) is now sliced by fight index; elites could previously appear
   from fight 3 at full strength, which the starter deck cannot beat
+
+## 8. ระบบ placeholder ของอาร์ต (2026-07-26)
+
+**การตัดสินใจ:** ทำ UI ต่อได้เลยโดยไม่ต้องรอรูปครบ ช่องไหนยังไม่มีรูปให้วาดกรอบ
+placeholder ที่บอก **ชื่อ · ขนาด · ชื่อไฟล์ที่ต้องวาง · ภาพควรเป็นอะไร** แทน
+
+โครงสร้างแยกสองชั้นโดยตั้งใจ:
+
+| ไฟล์ | หน้าที่ | แก้เมื่อไหร่ |
+|---|---|---|
+| `src/art/catalog.ts` | เกม **ต้องการ** รูปอะไรบ้าง (ข้อมูลล้วน ไม่มี `require`) | generate จากข้อมูลเกม — เพิ่มผี/คลาส/พรใหม่แล้วช่องรูปโผล่เอง |
+| `app/components/Art.tsx` | รูปที่ **มีอยู่จริง** ผูกกับ slot ไหน | วางไฟล์แล้วเพิ่มหนึ่งบรรทัด |
+| `docs/art-checklist.md` | ลิสต์ของที่ยังขาด | `npm run art:checklist` |
+
+ที่ต้องแยกเพราะ React Native / Metro บังคับว่า `require()` เป็น path คงที่ตอน build
+สแกนโฟลเดอร์อัตโนมัติไม่ได้ — ความเสี่ยงคือ *วางไฟล์แล้วลืมต่อสาย* แล้วเกมยังโชว์
+placeholder อยู่ทั้งที่รูปมาแล้ว `test/art.test.ts` ดักเคสนั้นไว้ (ยืนยันแล้วว่าเทสต์
+แดงจริงเมื่อเจอเคสนี้ ไม่ใช่เทสต์ที่ผ่านตลอด)
+
+**สถานะตอนตั้งระบบ: มีรูป 7 จาก 61 ช่อง** — ผี 1/23, บอส 0/5, คลาส 0/4, พร 2/12,
+ฉาก 4/6, ภาพบนการ์ดโหนด 2/8, ไอคอนเส้นทาง 0/3
+
+ลบไฟล์ตายที่เจอระหว่างทาง: `BlessingDialog.tsx` `EncounterDialog.tsx` `EncounterCard.tsx`
+ทั้งสามเป็น mock ที่ไม่มีใครเรียกแล้ว และเป็นสามในสี่จุดที่ `require` รูปผีกระสือซ้ำกัน
+`BlessingDialog` ยังอ้าง id พรที่ไม่มีจริงใน `blessings.json` (`regen_1`, `start_block_3`)
+ซึ่งเป็นที่มาของชื่อไฟล์รูปพรสองไฟล์ที่มีอยู่ — ตอนนี้แม็ปตามความหมายภาพแล้ว

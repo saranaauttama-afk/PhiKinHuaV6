@@ -18,10 +18,17 @@ export type OfferDisplay = {
   isCombat: boolean;
   /** ลบออกจากแผนที่ได้ไหม (มอนสเตอร์กับบอสลบไม่ได้) */
   canDismiss: boolean;
+  /** ช่องรูปใน `src/art/catalog.ts` — ยังไม่มีรูปก็แสดง placeholder ให้เอง */
+  artSlot: string;
 };
 
 export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
-  const base = { id: `${offer.kind}-${index}`, isCombat: false, canDismiss: true };
+  const base = {
+    id: `${offer.kind}-${index}`,
+    isCombat: false,
+    canDismiss: true,
+    artSlot: `encounter/${offer.kind}`,
+  };
 
   switch (offer.kind) {
     case 'monster': {
@@ -34,6 +41,7 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
         description: m?.description ?? 'ศัตรูที่รออยู่ข้างหน้า',
         isCombat: true,
         canDismiss: false,
+        artSlot: `monster/${offer.enemyId}`,
       };
     }
 
@@ -47,6 +55,7 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
         description: b?.description ?? 'ศึกใหญ่ที่หลีกเลี่ยงไม่ได้',
         isCombat: true,
         canDismiss: false,
+        artSlot: `monster/${offer.enemyId}`,
       };
     }
 

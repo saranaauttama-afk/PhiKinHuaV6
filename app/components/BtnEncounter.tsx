@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, Pressable, ImageBackground } from 'react-native';
+import { View, Text, Pressable, ImageBackground } from 'react-native';
+import Art from './Art';
 
 interface BtnEncounterProps {
   encounter: {
@@ -7,6 +8,8 @@ interface BtnEncounterProps {
     type: string;
     name: string;
     description: string;
+    /** ช่องรูปใน src/art/catalog.ts */
+    artSlot: string;
   };
   onPress?: () => void;
   onEnter?: () => void;
@@ -15,20 +18,6 @@ interface BtnEncounterProps {
 }
 
 export default function BtnEncounter({ encounter, onPress, onEnter, onClose, showButtons = false }: BtnEncounterProps) {
-  const getEncounterIcon = (type: string) => {
-    switch (type) {
-      case 'monster': return '👹';
-      case 'boss': return '👑';
-      case 'shop_card': return '🛒';
-      case 'shop_equipment': return '⚔️';
-      case 'healing_shrine': return '🏥';
-      case 'treasure': return '📦';
-      case 'treasure_single': return '💎';
-      case 'next_event': return '📄';
-      default: return '❓';
-    }
-  };
-
   return (
     <Pressable onPress={onPress} style={{ width: '100%' }}>
       <ImageBackground
@@ -57,44 +46,9 @@ export default function BtnEncounter({ encounter, onPress, onEnter, onClose, sho
           {encounter.name}
         </Text>
 
-        {/* Image */}
+        {/* Image — ช่องไหนยังไม่มีรูป <Art> จะวาด placeholder ที่บอกว่าต้องการรูปอะไร */}
         <View style={{ marginTop: 20, alignItems: 'center' }}>
-          {(() => {
-            try {
-              // Try to load image based on encounter type and id
-              let imageSource = null;
-
-              if (encounter.id === 'phi-krasue') {
-                imageSource = require('../../assets/monsters/phi-krasue.png');
-              } else if (encounter.type === 'shop_card') {
-                imageSource = require('../../assets/encounters/enShopCardMini.png');
-              } else if (encounter.type === 'treasure') {
-                imageSource = require('../../assets/encounters/enTreasureOpenMini.png');
-              }
-
-              if (imageSource) {
-                return (
-                  <Image
-                    source={imageSource}
-                    style={{
-                      width: 100,
-                      height: 100,
-                    }}
-                    resizeMode="contain"
-                  />
-                );
-              }
-            } catch (error) {
-              console.log(`Image not found for: ${encounter.id}`);
-            }
-
-            // Fallback to emoji
-            return (
-              <Text style={{ fontSize: 80 }}>
-                {getEncounterIcon(encounter.type)}
-              </Text>
-            );
-          })()}
+          <Art slot={encounter.artSlot} width={100} height={100} />
         </View>
 
         {/* Description */}

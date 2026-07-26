@@ -9,12 +9,9 @@ import Animated, {
   cancelAnimation,
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
+import Art from '../Art';
 import EnemyIntentBadge from './EnemyIntentBadge';
 import type { EnemyIntent } from '../../../src/core/types';
-
-const MONSTER_IMAGES: Record<string, any> = {
-  'phi-krasue': require('../../../assets/monsters/phi-krasue.png'),
-};
 
 type Props = {
   monsterId: string | string[];
@@ -90,7 +87,6 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
     },
   }));
 
-  const monsterImage = MONSTER_IMAGES[id];
   const displayName  = enemy?.name ?? name ?? 'Unknown';
   const hp           = enemy?.hp    ?? 20;
   const maxHp        = enemy?.maxHp ?? 20;
@@ -98,15 +94,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   return (
     <View style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
       <Animated.View style={floatStyle}>
-        {monsterImage ? (
-          <Image
-            source={monsterImage}
-            style={{ width: layout.monsterSize, height: layout.monsterSize }}
-            resizeMode="contain"
-          />
-        ) : (
-          <Text style={{ fontSize: layout.monsterSize * 0.4 }}>👻</Text>
-        )}
+        {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}
+        <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
       </Animated.View>
 
       <View style={{ marginBottom: -8 }}>

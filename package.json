@@ -8,7 +8,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "art:checklist": "vite-node scripts/art-checklist.ts"
   },
   "dependencies": {
     "@expo-google-fonts/chakra-petch": "^0.4.0",
