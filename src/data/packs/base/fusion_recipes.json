@@ -1,0 +1,74 @@
+[
+  {
+    "pair": ["bamboo_dart", "bamboo_dart"],
+    "id": "fused_bamboo_volley",
+    "name": "ห่าไผ่",
+    "desc": "ปาไผ่เผาพร้อมกันทั้งกำ โจมตี 10 โดยไม่ต้องเสียพลังงาน"
+  },
+  {
+    "pair": ["cooling_cloth", "cooling_cloth"],
+    "id": "fused_double_cloth",
+    "name": "ผ้าเย็นสองชั้น",
+    "desc": "พันผ้าเย็นซ้อนสองชั้น ป้องกัน 10 โดยไม่ต้องเสียพลังงาน"
+  },
+  {
+    "pair": ["bamboo_dart", "cooling_cloth"],
+    "id": "fused_dart_and_cloth",
+    "name": "ปาไผ่คลุมผ้า",
+    "desc": "ขว้างไผ่แล้วชักผ้าเย็นคลุมตัวทันที โจมตี 5 และป้องกัน 5"
+  },
+  {
+    "pair": ["bamboo_dart", "meditation"],
+    "id": "fused_calm_dart",
+    "name": "ปาไผ่ใจนิ่ง",
+    "desc": "ขว้างไผ่ด้วยจิตสงบ โจมตี 5 จั่วการ์ด 1 ใบ และได้พลังงานคืน 1"
+  },
+  {
+    "pair": ["cooling_cloth", "meditation"],
+    "id": "fused_calm_cloth",
+    "name": "ผ้าเย็นใจนิ่ง",
+    "desc": "คลุมผ้าเย็นแล้วนั่งสงบ ป้องกัน 5 จั่วการ์ด 1 ใบ และได้พลังงานคืน 1"
+  },
+  {
+    "pair": ["spirit_whisper", "ghost_dodge"],
+    "id": "fused_whisper_dodge",
+    "name": "กระซิบหลบเงา",
+    "desc": "ผีกระซิบบอกทางหลบ โจมตี 3 ป้องกัน 2 และจั่วการ์ด 2 ใบ"
+  },
+  {
+    "pair": ["cursed_needle", "holy_powder"],
+    "id": "fused_needle_powder",
+    "name": "เข็มคลุกผง",
+    "desc": "จุ่มเข็มในผงเจ้าพ่อก่อนปัก โจมตี 7 และป้องกัน 4"
+  },
+  {
+    "pair": ["bell_sound", "holy_powder"],
+    "id": "fused_bell_powder",
+    "name": "ระฆังโปรยผง",
+    "desc": "สั่นระฆังพร้อมโปรยผงเจ้าพ่อ ป้องกัน 10 ในการร่ายครั้งเดียว"
+  },
+  {
+    "pair": ["soul_drain", "holy_powder"],
+    "id": "fused_drain_powder",
+    "name": "ดูดวิญญาณคลุกผง",
+    "desc": "ดูดวิญญาณพร้อมตั้งเกราะผง โจมตี 5 และป้องกัน 4"
+  },
+  {
+    "pair": ["curse_chant", "cooling_cloth"],
+    "id": "fused_chant_cloth",
+    "name": "สาปใต้ผ้าเย็น",
+    "desc": "ร่ายคาถาสาปจากใต้ผ้าเย็น โจมตี 4 และป้องกัน 5"
+  },
+  {
+    "pair": ["spirit_whisper", "bamboo_dart"],
+    "id": "fused_whisper_dart",
+    "name": "ไผ่กระซิบ",
+    "desc": "ผีบอกจุดอ่อนก่อนขว้าง โจมตี 8 และจั่วการ์ด 1 ใบ โดยไม่เสียพลังงาน"
+  },
+  {
+    "pair": ["meditation", "ghost_dodge"],
+    "id": "fused_calm_dodge",
+    "name": "สมาธิเงาผี",
+    "desc": "นั่งสงบให้ผีบังตัว ป้องกัน 2 จั่วการ์ด 2 ใบ และได้พลังงานคืน 1"
+  }
+]

@@ -129,7 +129,7 @@ export type EventState =
 export type ShopItem = 
   | { card: CardData; price: number }
   | { equipment: any; price: number };
-export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single';
+export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single' | 'fusion';
 
 export type ShopState = 'unused' | 'visited' | 'completed';
 
@@ -297,6 +297,9 @@ export type GameState = {
   currentShopId?: string; // Track current shop ID for persistence
   event?: EventState;
 
+  /** แท่นผสานการ์ด — ผสานได้ครั้งเดียวต่อแท่น การเลือกจึงมีน้ำหนัก */
+  fusionAltar?: { timesUsed: number };
+
   // flags & counters
   turnFlags: {
     blessingOnce: Record<string, boolean>;
@@ -371,6 +374,9 @@ export type Command =
   // Shop (remove/upgrade)
   | { type: 'ShopRemoveBuy'; index: number }
   | { type: 'ShopUpgradeBuy'; index: number }
+
+  // ผสานการ์ด — index อ้างตำแหน่งใน masterDeck
+  | { type: 'FuseCards'; indexA: number; indexB: number }
 
   // Events
   | { type: 'DoBonfireHeal' }

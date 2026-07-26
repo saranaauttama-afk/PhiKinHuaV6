@@ -11,6 +11,7 @@ import * as se from './handlers/shops_events';
 import * as qa from './handlers/qa';
 import * as ui from './handlers/ui';
 import * as equipment from './handlers/equipment';
+import * as fusion from './handlers/fusion';
 
 type Handler<T extends Command['type']> =
   (s: GameState, cmd: Extract<Command, { type: T }>, r: RNG) => { state: GameState; rng: RNG };
@@ -67,6 +68,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EventTreasureOpen: se.eventTreasureOpen,
   ShopRemoveBuy: se.shopRemoveBuy,
   ShopUpgradeBuy: se.shopUpgradeBuy,
+  FuseCards: fusion.fuseCardsCmd,
   DoWellUse: se.doWellUse,
   DoWellDismiss: se.doWellDismiss,
   UseWell: se.useWell,

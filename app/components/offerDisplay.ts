@@ -1,4 +1,4 @@
-import type { PageOffer } from '../../src/core/map/pages';
+import { isRestOfferKind, type PageOffer } from '../../src/core/map/pages';
 import { getMonsterById } from '../../src/core/monsters/thai-ghosts';
 
 /**
@@ -83,18 +83,20 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
     case 'treasure_single':
       return { ...base, type: 'treasure_single', name: 'สมบัติชิ้นเดียว', description: 'ได้การ์ดฟรีหนึ่งใบ' };
 
+    case 'fusion_altar':
+      return { ...base, type: 'fusion_altar', name: 'แท่นผสาน', description: 'รวมการ์ดสองใบเป็นใบเดียว สำรับบางลง แต่แน่นขึ้น' };
+
     case 'next_event':
       return { ...base, type: 'next_event', name: 'ทางไปต่อ', description: 'เดินทางต่อไปยังพื้นที่ถัดไป', canDismiss: false };
   }
 }
 
-/** offer ที่ต้องลบด้วยคำสั่งของร้าน (เพื่อให้ช่องถูก refresh) */
+/**
+ * offer ที่ข้ามได้ (โหนดพัก) — ใช้คำสั่งของร้านเพื่อให้ engine เดินต่อให้
+ *
+ * เงื่อนไขอยู่ที่ `isRestOfferKind` ใน core ที่เดียว ไม่เขียนซ้ำที่นี่
+ * เดิมสองฝั่งเขียนคนละแบบจน `treasure_single` กดข้ามแล้วเงียบ
+ */
 export function isShopLike(offer: PageOffer): boolean {
-  return (
-    offer.kind.startsWith('shop_') ||
-    offer.kind === 'well' ||
-    offer.kind === 'healing_shrine' ||
-    offer.kind === 'treasure' ||
-    offer.kind === 'treasure_single'
-  );
+  return isRestOfferKind(offer.kind);
 }

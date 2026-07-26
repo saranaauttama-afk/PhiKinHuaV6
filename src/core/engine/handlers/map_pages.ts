@@ -7,6 +7,7 @@ import {
   initPageMap,
   rollPageOffers,
   consumeToken,
+  isRestOfferKind,
   type MapStatePages,
   type PageOffer,
 } from '../../map/pages';
@@ -613,6 +614,20 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       return { state: s, rng };
     }
 
+    case 'fusion_altar': {
+      // แท่นผสานไม่มีของขาย ไม่ต้องสุ่มสต็อก — แค่เปิดหน้าให้เลือกการ์ดสองใบ
+      s.shopKind = 'fusion';
+      s.shopStock = undefined;
+      s.shopBoughtItems = [];
+      s.currentShopId = offer.shopId;
+      // นับใหม่ทุกแท่น — แท่นละหนึ่งครั้ง
+      s.fusionAltar = { timesUsed: 0 };
+      s.phase = 'shop';
+      mp._activeOfferIndex = ix; mp._shopUsed = false;
+      s.log.push(`ChooseOffer → แท่นผสาน (${offer.shopId})`);
+      return { state: s, rng };
+    }
+
     case 'next_event': {
       // ใช้ token แล้วข้ามหน้าเลย
       consumeToken(mp, offer);
@@ -897,8 +912,8 @@ export function deleteShopFromMap(s: GameState, cmd: Extract<Command, { type: 'D
 
   const offer = mp.current.offers[ix] as PageOffer;
 
-  // Only allow deleting shops, healing shrines, wells, and treasures from map
-  if (!offer.kind.startsWith('shop_') && offer.kind !== 'healing_shrine' && offer.kind !== 'well' && offer.kind !== 'treasure') {
+  // ข้ามได้เฉพาะโหนดพัก — โหนดสู้กับบอสข้ามไม่ได้
+  if (!isRestOfferKind(offer.kind)) {
     return { state: s, rng };
   }
 

@@ -15,6 +15,7 @@ export type PageOffer =
   | { kind: 'healing_shrine'; shopId: string }
   | { kind: 'treasure'; shopId: string }
   | { kind: 'treasure_single'; shopId: string }
+  | { kind: 'fusion_altar'; shopId: string }
   | { kind: 'next_event' } // ไปหน้าถัดไปแบบเหตุการณ์พิเศษ
   | { kind: 'boss', bossType: 'mid' | 'final' | 'secret', enemyId: string };
 
@@ -55,6 +56,24 @@ export function initPageMap(r: RNG) {
   return { map, rng: r };
 }
 
+/**
+ * โหนดชนิดพัก — เดินผ่านได้โดยไม่ต้องสู้ และข้ามไปเลยก็ได้
+ *
+ * เดิมเงื่อนไขนี้ถูกเขียนซ้ำคนละแบบใน `isShopLike` (UI) กับ `deleteShopFromMap`
+ * (engine) จน `treasure_single` เป็น "ข้ามได้" ฝั่ง UI แต่ engine ปฏิเสธ
+ * ปุ่มข้ามจึงกดแล้วเงียบ
+ */
+export function isRestOfferKind(kind: PageOffer['kind']): boolean {
+  return (
+    kind.startsWith('shop_') ||
+    kind === 'well' ||
+    kind === 'healing_shrine' ||
+    kind === 'treasure' ||
+    kind === 'treasure_single' ||
+    kind === 'fusion_altar'
+  );
+}
+
 export function pagesLeft(mp: MapStatePages) { return Math.max(0, mp.totalPages - mp.pageIndex); }
 export function monstersLeft(mp: MapStatePages) { return Math.max(0, mp.pools.normal + mp.pools.elite); }
 
@@ -79,6 +98,8 @@ export function consumeToken(mp: MapStatePages, offer: PageOffer) {
     case 'treasure':        if (mp.pools.treasure      > 0) mp.pools.treasure--;       break;
     case 'treasure_single': if (mp.pools.treasureSingle > 0) mp.pools.treasureSingle--; break;
     case 'next_event':      if (mp.pools.nextEvent     > 0) mp.pools.nextEvent--;      break;
+    // แท่นผสานมีเฉพาะบนแผนที่แบบเส้นทาง ซึ่งไม่ใช้ระบบ pool
+    case 'fusion_altar':    break;
     case 'boss':            break;
   }
 }

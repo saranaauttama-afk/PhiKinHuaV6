@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { GameState, Command } from '../../src/core/types';
 import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
+import FusionAltarView from './FusionAltarView';
 
 interface ShopViewProps {
   state: GameState;
@@ -410,7 +411,8 @@ function ShopView({ state, dispatch }: ShopViewProps) {
       {shopKind === 'well' && renderWellShop()}
       {shopKind === 'treasure' && renderTreasureShop()}
       {shopKind === 'treasure_single' && renderSingleTreasureShop()}
-      
+      {shopKind === 'fusion' && <FusionAltarView state={state} dispatch={dispatch} />}
+
       {/* Shop Control Buttons */}
       <View style={{ marginTop: 16, flexDirection: 'row', justifyContent: 'center', gap: 12 }}>
         <Pressable

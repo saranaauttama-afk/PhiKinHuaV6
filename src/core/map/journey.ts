@@ -113,7 +113,8 @@ export function planSecretRows(): RowPlan[] {
 }
 
 const REST_KINDS: PageOffer['kind'][] = [
-  'shop_card', 'shop_equipment', 'healing_shrine', 'well', 'treasure', 'treasure_single',
+  'shop_card', 'shop_equipment', 'healing_shrine', 'well',
+  'treasure', 'treasure_single', 'fusion_altar',
 ];
 
 function makeRestOffer(kind: PageOffer['kind'], id: string): PageOffer {
@@ -124,6 +125,7 @@ function makeRestOffer(kind: PageOffer['kind'], id: string): PageOffer {
     case 'well':            return { kind, shopId: `${id}_well` };
     case 'treasure':        return { kind, shopId: `${id}_treasure` };
     case 'treasure_single': return { kind, shopId: `${id}_treasure1` };
+    case 'fusion_altar':    return { kind, shopId: `${id}_fusion` };
     default:                return { kind: 'shop_card', shopId: `${id}_shop_card` };
   }
 }
