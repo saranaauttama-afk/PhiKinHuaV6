@@ -17,6 +17,7 @@ import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 import { useAppFonts } from './useAppFonts';
+import { palette, surface, tint } from './theme';
 
 type Phase = 'player' | 'discard' | 'enemy';
 
@@ -239,12 +240,12 @@ export default function BattlePage() {
               position: 'absolute', top: 34, left: 14, zIndex: 600,
               paddingHorizontal: 14, paddingVertical: 6,
               borderRadius: 14,
-              backgroundColor: 'rgba(0,0,0,0.45)',
-              borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+              backgroundColor: surface.glassDim,
+              borderWidth: 1, borderColor: palette.line,
             }}
           >
             <Text style={{
-              color: 'rgba(255,255,255,0.85)', fontSize: 12,
+              color: palette.text, fontSize: 12,
               fontFamily: 'Prompt_600SemiBold',
             }}>
               ข้าม ▸▸

@@ -8,6 +8,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
+import { palette, surface, tint } from '../../theme';
 
 const CARD_W      = 110;
 const CARD_H      = 150;
@@ -124,7 +125,7 @@ export default function EnemyHandCard({
   }));
 
   const isAttack = card.damage > 0;
-  const bgColor  = isAttack ? 'rgba(255,80,80,0.12)' : 'rgba(60,140,255,0.12)';
+  const bgColor  = isAttack ? tint.bloodSoft : tint.moonFaint;
 
   return (
     <Animated.View style={containerStyle}>
@@ -151,23 +152,23 @@ export default function EnemyHandCard({
           />
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10, gap: 8 }}>
             <Text style={{
-              color: 'rgba(255,230,230,0.95)', fontSize: 11,
+              color: palette.text, fontSize: 11,
               fontFamily: 'Prompt_600SemiBold', textAlign: 'center',
             }}>
               {card.name}
             </Text>
             {card.damage > 0 && (
-              <Text style={{ color: '#ff4444', fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
+              <Text style={{ color: palette.bloodLit, fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
                 ⚔ {card.damage}
               </Text>
             )}
             {card.block > 0 && (
-              <Text style={{ color: '#4dabf7', fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
+              <Text style={{ color: palette.moon, fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
                 🛡 {card.block}
               </Text>
             )}
             {card.damage === 0 && card.block === 0 && (
-              <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 22 }}>✦</Text>
+              <Text style={{ color: palette.textDim, fontSize: 22 }}>✦</Text>
             )}
           </View>
         </View>

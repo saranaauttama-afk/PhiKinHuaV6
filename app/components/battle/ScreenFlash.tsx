@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
+import { palette, surface, tint } from '../../theme';
 
 /**
  * จอแฟลชสีแดงตอนโดนโจมตี — วางเป็น sibling ที่ root ของหน้าต่อสู้
@@ -22,7 +23,7 @@ import Animated, {
 export type ScreenFlashHandle = { flash: () => void };
 
 const ScreenFlash = React.forwardRef<ScreenFlashHandle, { color?: string }>(
-  function ScreenFlash({ color = 'rgba(200,30,30,0.4)' }, ref) {
+  function ScreenFlash({ color = tint.bloodSoft }, ref) {
     const opacity = useSharedValue(0);
 
     React.useImperativeHandle(ref, () => ({

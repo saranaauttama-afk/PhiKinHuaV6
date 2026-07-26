@@ -18,27 +18,7 @@ const ROOT = path.resolve(__dirname, '..');
 const APP = path.join(ROOT, 'app');
 
 /** ไฟล์ที่ยังไม่ได้ย้ายเข้าระบบ — ลดลิสต์นี้ลงเรื่อยๆ อย่าเพิ่มเข้าไป */
-const NOT_YET_MIGRATED = new Set<string>([
-  'components/Card.tsx',
-  'components/Temp.tsx',
-  'components/DeckView.tsx',
-  'components/EventView.tsx',
-  'components/StartPage.tsx',
-  'components/battle/DiscardOverlay.tsx',
-  'components/battle/VictoryOverlay.tsx',
-  'components/battle/DefeatOverlay.tsx',
-  'components/battle/LevelUpOverlay.tsx',
-  'components/battle/PlayerHand.tsx',
-  'components/battle/PlayerHUD.tsx',
-  'components/battle/EnemyHandCard.tsx',
-  'components/battle/EnemyCardPlay.tsx',
-  'components/battle/EnemyIntentBadge.tsx',
-  'components/battle/DamagePopup.tsx',
-  'components/battle/StatGainPopup.tsx',
-  'components/battle/ScreenFlash.tsx',
-  'components/battle/MonsterArea.tsx',
-  'battle.tsx',
-]);
+const NOT_YET_MIGRATED = new Set<string>([]);
 
 /** สีที่อนุญาตให้เขียนตรงๆ ได้ — โปร่งใส ขาวดำล้วนที่ใช้เป็นม่าน/เงา */
 const ALLOWED_LITERALS = /^(transparent|#fff|#ffffff|#000|#000000)$/i;
@@ -85,6 +65,28 @@ describe('ระบบสี', () => {
   it('ไม่มีไฟล์ในลิสต์ยกเว้นที่หายไปแล้ว — ลิสต์ต้องไม่ค้างชื่อไฟล์ที่ถูกลบ', () => {
     const stale = [...NOT_YET_MIGRATED].filter(f => !fs.existsSync(path.join(APP, f)));
     expect(stale, 'ลบชื่อออกจาก NOT_YET_MIGRATED ด้วย').toEqual([]);
+  });
+
+  /**
+   * ดักผลข้างเคียงของการไล่เปลี่ยนสีทีเดียวทั้งโปรเจกต์
+   *
+   * ถ้าสองสีเดิมที่ต่างกัน (เช่น ฟ้ากับเขียว) ถูกแม็ปไปเป็น token เดียวกัน
+   * `a ? X : X` จะเหลืออยู่แบบเงียบๆ — โค้ดยังทำงาน เทสต์สียังผ่าน
+   * แต่ของสองอย่างที่เคยแยกออกจากกันได้ด้วยตา กลายเป็นสีเดียวกันไปแล้ว
+   * (เจอจริงสามจุด: ป้ายการ์ด/พลังงาน, ชนิดการ์ดในสำรับ, ปุ่มตอนกด)
+   */
+  it('ไม่มีทางเลือกสีที่สองทางให้ผลเหมือนกัน', () => {
+    const collapsed: string[] = [];
+    const re = /\?\s*(palette|surface|tint)\.(\w+)\s*:\s*(palette|surface|tint)\.(\w+)/g;
+
+    for (const f of files) {
+      const src = fs.readFileSync(path.join(APP, f), 'utf8');
+      for (const m of src.matchAll(re)) {
+        if (m[1] === m[3] && m[2] === m[4]) collapsed.push(`${f}: ${m[0]}`);
+      }
+    }
+
+    expect(collapsed, 'สองทางให้สีเดียวกัน แปลว่าของสองอย่างแยกด้วยตาไม่ออกแล้ว').toEqual([]);
   });
 
   it('ไม่มีใครใช้ ChakraPetch อีกแล้ว — ตัวอักษรแนวเทคโนขัดกับงานอาร์ต', () => {

@@ -46,49 +46,15 @@ export function replaceSingleOffer(mp: MapStatePages, rng: RNG, s: GameState, sl
 
 
 
-type ShopOpenFn = (s: GameState, r: RNG) => { state: GameState; rng: RNG };
-
-// Remove temporary equipment after combat
+// ถอดเครื่องรางชั่วคราวออกหลังจบคอมแบต
 function removeTemporaryEquipment(s: GameState) {
   if (!s.equipped) return;
-  
-  const permanentEquipment = s.equipped.filter(eq => !eq.temporary);
-  const removedCount = s.equipped.length - permanentEquipment.length;
-  
-  s.equipped = permanentEquipment;
-  
-  if (removedCount > 0) {
-    s.log.push(`Removed ${removedCount} temporary equipment`);
-  }
-}
 
-function resolveShops(): {
-  openShopCard?: ShopOpenFn;
-  openShopRemove?: ShopOpenFn;
-  openShopUpgrade?: ShopOpenFn;
-  openWell?: ShopOpenFn;
-} {
-  const mod = require('./shops_events') || {};
-  return {
-    // พยายามรองรับหลายชื่อที่ทีมอาจใช้
-    openShopCard: mod.openShopCard ?? mod.openCardShop ?? mod.openShopCards ?? mod.openShop,
-    openShopRemove: mod.openShopRemove ?? mod.openRemoveShop ?? mod.openShopRemoveFn,
-    openShopUpgrade: mod.openShopUpgrade ?? mod.openUpgradeShop ?? mod.openShopUpgradeFn,
-    openWell: mod.openWell ?? mod.openEventWell ?? mod.openWellEvent,
-  };
-}
+  const permanent = s.equipped.filter(eq => !eq.temporary);
+  const removed = s.equipped.length - permanent.length;
+  s.equipped = permanent;
 
-function callOrLog(
-  fn: ShopOpenFn | undefined,
-  name: string,
-  s: GameState,
-  r: RNG
-): { state: GameState; rng: RNG } {
-  if (!fn) {
-    s.log.push(`Shop/Event resolver: "${name}" undefined (check exports in shops_events.ts)`);
-    return { state: s, rng: r };
-  }
-  return fn(s, r);
+  if (removed > 0) s.log.push(`ถอดเครื่องรางชั่วคราว ${removed} ชิ้น`);
 }
 
 // -------------------------------------------------

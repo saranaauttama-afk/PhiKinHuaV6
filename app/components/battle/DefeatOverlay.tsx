@@ -4,6 +4,7 @@ import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withDelay, withSequence, Easing,
 } from 'react-native-reanimated';
+import { palette, surface, tint } from '../../theme';
 
 type Props = {
   onHome: () => void;
@@ -37,16 +38,16 @@ export default function DefeatOverlay({ onHome }: Props) {
   return (
     <Animated.View style={[{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.85)',
+      backgroundColor: palette.scrimHeavy,
       justifyContent: 'center', alignItems: 'center', zIndex: 500,
     }, bgStyle]}>
       <Animated.View style={[{ alignItems: 'center' }, cardStyle]}>
 
         {/* Title */}
         <Text style={{
-          color: '#cc2222', fontSize: 48,
+          color: palette.blood, fontSize: 48,
           fontFamily: 'Prompt_700Bold',
-          textShadowColor: 'rgba(200,0,0,0.7)',
+          textShadowColor: palette.bloodDeep,
           textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16,
           marginBottom: 12,
         }}>
@@ -54,7 +55,7 @@ export default function DefeatOverlay({ onHome }: Props) {
         </Text>
 
         <Text style={{
-          color: 'rgba(255,255,255,0.4)', fontSize: 14,
+          color: palette.textFaint, fontSize: 14,
           fontFamily: 'Prompt_400Regular',
           textAlign: 'center', marginBottom: 52,
           lineHeight: 22,
@@ -65,14 +66,15 @@ export default function DefeatOverlay({ onHome }: Props) {
         <Pressable
           onPress={onHome}
           style={({ pressed }) => ({
-            backgroundColor: pressed ? 'rgba(100,0,0,0.9)' : 'rgba(130,0,0,0.8)',
+            // ต้องต่างกันจริงตอนกด ไม่งั้นปุ่มไม่มีฟีดแบ็กว่าโดนแตะแล้ว
+            backgroundColor: pressed ? tint.bloodSoft : palette.bloodDeep,
             paddingHorizontal: 44, paddingVertical: 13,
             borderRadius: 22, borderWidth: 1.5,
-            borderColor: 'rgba(200,50,50,0.55)',
+            borderColor: tint.bloodLine,
           })}
         >
           <Text style={{
-            color: 'white', fontSize: 15,
+            color: palette.text, fontSize: 15,
             fontFamily: 'Prompt_600SemiBold',
           }}>
             กลับหน้าหลัก

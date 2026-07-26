@@ -1,6 +1,14 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { GameState, Command } from '../../src/core/types';
+import { palette, surface, tint } from '../theme';
+
+/** ชื่อชนิดการ์ดเป็นภาษาไทย — เดิมเอาค่า type ดิบมาต่อกับคำว่า "Cards" */
+const TYPE_LABEL: Record<string, string> = {
+  attack: 'การ์ดโจมตี',
+  skill: 'การ์ดวิชา',
+  equipment: 'เครื่องราง',
+};
 
 interface DeckViewProps {
   state: GameState;
@@ -23,47 +31,47 @@ function DeckView({ state, dispatch }: DeckViewProps) {
   const equipmentCards = (state.masterDeck ?? []).filter(c => c.type === 'equipment');
 
   return (
-    <View style={{ marginTop: 16, padding: 16, borderRadius: 16, backgroundColor: 'rgba(39, 39, 42, 0.7)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+    <View style={{ marginTop: 16, padding: 16, borderRadius: 16, backgroundColor: surface.panel, borderWidth: 1, borderColor: palette.line }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>📚 Your Deck ({state.masterDeck?.length} cards)</Text>
+        <Text style={{ color: palette.text, fontSize: 20, fontWeight: 'bold' }}>📚 สำรับของเรา ({state.masterDeck?.length} ใบ)</Text>
         <Pressable
           onPress={() => dispatch({ type: 'CloseDeck' })}
           style={{
             paddingHorizontal: 12,
             paddingVertical: 8,
             borderRadius: 8,
-            backgroundColor: 'rgba(220, 38, 38, 0.5)',
+            backgroundColor: palette.blood,
             borderWidth: 1,
-            borderColor: 'rgba(248, 113, 113, 0.5)'
+            borderColor: tint.bloodLine
           }}
         >
-          <Text style={{ color: '#fecaca' }}>✕ Close</Text>
+          <Text style={{ color: palette.blood }}>✕ ปิด</Text>
         </Pressable>
       </View>
 
       {!cardList.length ? (
-        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', textAlign: 'center', paddingVertical: 32 }}>Deck is empty.</Text>
+        <Text style={{ color: palette.textDim, textAlign: 'center', paddingVertical: 32 }}>สำรับว่างเปล่า</Text>
       ) : (
         <>
           {/* Equipment Management Section */}
           {(equipmentCards.length > 0 || (state.equipped && state.equipped.length > 0)) && (
-            <View style={{ marginBottom: 24, padding: 16, borderRadius: 8, backgroundColor: 'rgba(63, 63, 70, 0.5)', borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.3)' }}>
-              <Text style={{ color: '#fbbf24', fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
-                ⚔️ Equipment ({(state.equipped ?? []).length}/{state.equipmentSlotsMax ?? 1})
+            <View style={{ marginBottom: 24, padding: 16, borderRadius: 8, backgroundColor: surface.panelRaise, borderWidth: 1, borderColor: surface.panelWell }}>
+              <Text style={{ color: palette.moonDim, fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
+                ⚔️ เครื่องราง ({(state.equipped ?? []).length}/{state.equipmentSlotsMax ?? 1})
               </Text>
               
               {/* Currently Equipped */}
               {(state.equipped ?? []).length > 0 && (
                 <View style={{ marginBottom: 16 }}>
-                  <Text style={{ color: '#fcd34d', fontWeight: '600', marginBottom: 8 }}>🛡️ Currently Equipped:</Text>
+                  <Text style={{ color: palette.moonDim, fontWeight: '600', marginBottom: 8 }}>🛡️ ที่สวมอยู่</Text>
                   {(state.equipped ?? []).map((eq, i) => (
-                    <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, padding: 12, borderRadius: 8, backgroundColor: 'rgba(20, 83, 45, 0.3)', borderWidth: 1, borderColor: 'rgba(34, 197, 94, 0.3)' }}>
+                    <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, padding: 12, borderRadius: 8, backgroundColor: surface.panelWell, borderWidth: 1, borderColor: tint.moonSoft }}>
                       <View style={{ flex: 1 }}>
-                        <Text style={{ color: '#86efac', fontWeight: '600' }}>{eq.name || eq.id}</Text>
-                        <Text style={{ color: 'rgba(134, 239, 172, 0.7)', fontSize: 14 }}>{eq.desc}</Text>
+                        <Text style={{ color: palette.moonDim, fontWeight: '600' }}>{eq.name || eq.id}</Text>
+                        <Text style={{ color: palette.moonDim, fontSize: 14 }}>{eq.desc}</Text>
                         <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
-                          <Text style={{ color: '#4ade80', fontSize: 12 }}>⭐ {eq.rarity}</Text>
-                          {eq.temporary && <Text style={{ color: '#fdba74', fontSize: 12 }}>🕐 TEMPORARY</Text>}
+                          <Text style={{ color: palette.moon, fontSize: 12 }}>⭐ {eq.rarity}</Text>
+                          {eq.temporary && <Text style={{ color: palette.moonDim, fontSize: 12 }}>🕐 TEMPORARY</Text>}
                         </View>
                       </View>
                       {!eq.temporary && (
@@ -73,12 +81,12 @@ function DeckView({ state, dispatch }: DeckViewProps) {
                             paddingHorizontal: 12,
                             paddingVertical: 8,
                             borderRadius: 8,
-                            backgroundColor: 'rgba(220, 38, 38, 0.5)',
+                            backgroundColor: palette.blood,
                             borderWidth: 1,
-                            borderColor: 'rgba(248, 113, 113, 0.5)'
+                            borderColor: tint.bloodLine
                           }}
                         >
-                          <Text style={{ color: '#fecaca', fontWeight: '600' }}>Unequip</Text>
+                          <Text style={{ color: palette.blood, fontWeight: '600' }}>ถอด</Text>
                         </Pressable>
                       )}
                     </View>
@@ -89,7 +97,7 @@ function DeckView({ state, dispatch }: DeckViewProps) {
               {/* Equipment Cards in Deck */}
               {equipmentCards.length > 0 && (
                 <View>
-                  <Text className="text-amber-300 font-semibold mb-2">📦 Available Equipment Cards:</Text>
+                  <Text className="text-amber-300 font-semibold mb-2">📦 เครื่องรางที่ยังไม่ได้สวม</Text>
                   {equipmentCards.map((card, i) => {
                     const isEquipped = (state.equipped ?? []).some(eq => eq.id === card.equipmentId);
                     const currentSlotUsage = (state.equipped ?? []).reduce((sum, eq) => sum + (eq.slotCost || 1), 0);
@@ -121,11 +129,11 @@ function DeckView({ state, dispatch }: DeckViewProps) {
                               onPress={() => dispatch({ type: 'EquipFromDeck', cardId: card.id })}
                               className="px-3 py-2 rounded-lg bg-blue-600/50 border border-blue-400/50 active:opacity-70"
                             >
-                              <Text className="text-blue-200 font-semibold">Equip</Text>
+                              <Text className="text-blue-200 font-semibold">สวม</Text>
                             </Pressable>
                           )}
                           {!canEquip && !isEquipped && (
-                            <Text className="text-red-400 text-sm font-semibold px-2">No Slots</Text>
+                            <Text className="text-red-400 text-sm font-semibold px-2">ช่องเต็ม</Text>
                           )}
                         </View>
                       </View>
@@ -138,7 +146,7 @@ function DeckView({ state, dispatch }: DeckViewProps) {
           
           {/* Regular Card List */}
           <View>
-            <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>🃏 Cards by Type</Text>
+            <Text style={{ color: palette.text, fontSize: 18, fontWeight: '600', marginBottom: 12 }}>🃏 แยกตามชนิด</Text>
             
             {/* Group by card type */}
             {['attack', 'skill', 'equipment'].map(type => {
@@ -146,31 +154,35 @@ function DeckView({ state, dispatch }: DeckViewProps) {
               if (typeCards.length === 0) return null;
               
               const typeIcon = type === 'attack' ? '⚔️' : type === 'skill' ? '🧠' : '⚙️';
-              const typeColorStyle = type === 'attack' ? '#fca5a5' : type === 'skill' ? '#93c5fd' : '#fcd34d';
+              // สามชนิดต้องแยกออกจากกันได้ — โจมตีเป็นแดง ที่เหลือแยกด้วยความสว่าง
+              const typeColorStyle =
+                type === 'attack' ? palette.blood
+                : type === 'skill' ? palette.moon
+                : palette.moonDim;
               
               return (
                 <View key={type} style={{ marginBottom: 16 }}>
                   <Text style={{ color: typeColorStyle, fontWeight: '600', marginBottom: 8 }}>
-                    {typeIcon} {type.charAt(0).toUpperCase() + type.slice(1)} Cards ({typeCards.length})
+                    {typeIcon} {TYPE_LABEL[type] ?? type} ({typeCards.length} ใบ)
                   </Text>
                   <View style={{ marginLeft: 12 }}>
                     {typeCards.map((item, idx) => (
-                      <View key={`${item.name}-${idx}`} style={{ marginBottom: 8, padding: 8, borderRadius: 8, backgroundColor: 'rgba(63, 63, 70, 0.3)' }}>
+                      <View key={`${item.name}-${idx}`} style={{ marginBottom: 8, padding: 8, borderRadius: 8, backgroundColor: surface.panelWell }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                           <View>
-                            <Text style={{ color: 'white', fontWeight: '600' }}>{item.name} × {item.count}</Text>
+                            <Text style={{ color: palette.text, fontWeight: '600' }}>{item.name} × {item.count}</Text>
                             <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
-                              <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14 }}>Cost: {item.card.cost ?? 0}</Text>
-                              {item.card.dmg && <Text style={{ color: '#fca5a5', fontSize: 14 }}>DMG {item.card.dmg}</Text>}
-                              {item.card.block && <Text style={{ color: '#7dd3fc', fontSize: 14 }}>Block {item.card.block}</Text>}
-                              {item.card.energyGain && <Text style={{ color: '#fcd34d', fontSize: 14 }}>Energy +{item.card.energyGain}</Text>}
-                              {item.card.draw && <Text style={{ color: '#86efac', fontSize: 14 }}>Draw {item.card.draw}</Text>}
+                              <Text style={{ color: palette.textDim, fontSize: 14 }}>Cost: {item.card.cost ?? 0}</Text>
+                              {item.card.dmg && <Text style={{ color: palette.blood, fontSize: 14 }}>DMG {item.card.dmg}</Text>}
+                              {item.card.block && <Text style={{ color: palette.moonDim, fontSize: 14 }}>Block {item.card.block}</Text>}
+                              {item.card.energyGain && <Text style={{ color: palette.moonDim, fontSize: 14 }}>Energy +{item.card.energyGain}</Text>}
+                              {item.card.draw && <Text style={{ color: palette.moonDim, fontSize: 14 }}>Draw {item.card.draw}</Text>}
                             </View>
                             {item.card.desc && (
-                              <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: 12, marginTop: 4 }}>{item.card.desc}</Text>
+                              <Text style={{ color: palette.textFaint, fontSize: 12, marginTop: 4 }}>{item.card.desc}</Text>
                             )}
                           </View>
-                          <Text style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: 14 }}>⭐ {item.card.rarity}</Text>
+                          <Text style={{ color: palette.textFaint, fontSize: 14 }}>⭐ {item.card.rarity}</Text>
                         </View>
                       </View>
                     ))}

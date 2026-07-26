@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { GameState } from '../../../src/core/types';
+import { palette, surface, tint } from '../../theme';
 
 /**
  * หน้าเลือกรางวัลตอนเลเวลอัป
@@ -76,18 +77,18 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
   return (
     <View style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.82)',
+      backgroundColor: palette.scrimHeavy,
       justifyContent: 'center', paddingHorizontal: 22,
       zIndex: 1000,
     }}>
       <Text style={{
-        color: '#ffd88a', fontSize: 24, textAlign: 'center',
+        color: palette.moon, fontSize: 24, textAlign: 'center',
         fontFamily: 'Prompt_700Bold', marginBottom: 4,
       }}>
         เลเวล {playerLevel}
       </Text>
       <Text style={{
-        color: 'rgba(255,255,255,0.65)', fontSize: 14,
+        color: palette.textDim, fontSize: 14,
         textAlign: 'center', marginBottom: 18,
       }}>
         {pending ? 'เลือกหนึ่งอย่าง' : choice.contextDescription || 'เลือกทางเดินของคุณ'}
@@ -103,15 +104,15 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                 onPress={() => press(opt)}
                 style={{
                   padding: 18, borderRadius: 16,
-                  backgroundColor: 'rgba(20,14,10,0.85)',
-                  borderWidth: 1, borderColor: 'rgba(255,216,138,0.45)',
+                  backgroundColor: surface.panel,
+                  borderWidth: 1, borderColor: palette.lineStrong,
                 }}
               >
-                <Text style={{ color: '#ffd88a', fontSize: 18, fontFamily: 'Prompt_600SemiBold' }}>
+                <Text style={{ color: palette.moon, fontSize: 18, fontFamily: 'Prompt_600SemiBold' }}>
                   {l.title}
                 </Text>
                 {!!l.detail && (
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, marginTop: 4 }}>
+                  <Text style={{ color: palette.textDim, fontSize: 14, marginTop: 4 }}>
                     {l.detail}
                   </Text>
                 )}
@@ -128,15 +129,15 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                 onPress={() => onChoose(pending, i)}
                 style={{
                   padding: 16, borderRadius: 14,
-                  backgroundColor: 'rgba(20,14,10,0.85)',
-                  borderWidth: 1, borderColor: 'rgba(255,216,138,0.35)',
+                  backgroundColor: surface.panel,
+                  borderWidth: 1, borderColor: palette.line,
                 }}
               >
-                <Text style={{ color: 'white', fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
+                <Text style={{ color: palette.text, fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
                   {sc.title}
                 </Text>
                 {!!sc.detail && (
-                  <Text style={{ color: 'rgba(255,255,255,0.65)', fontSize: 13, marginTop: 4 }}>
+                  <Text style={{ color: palette.textDim, fontSize: 13, marginTop: 4 }}>
                     {sc.detail}
                   </Text>
                 )}
@@ -145,13 +146,13 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
           </ScrollView>
 
           <Pressable onPress={() => setPending(null)} style={{ marginTop: 14, alignSelf: 'center' }}>
-            <Text style={{ color: 'rgba(255,255,255,0.55)', fontSize: 14 }}>◂ ย้อนกลับ</Text>
+            <Text style={{ color: palette.textDim, fontSize: 14 }}>◂ ย้อนกลับ</Text>
           </Pressable>
         </View>
       )}
 
       <Pressable onPress={onSkip} style={{ marginTop: 22, alignSelf: 'center' }}>
-        <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>ข้ามไปก่อน</Text>
+        <Text style={{ color: palette.textFaint, fontSize: 13 }}>ข้ามไปก่อน</Text>
       </Pressable>
     </View>
   );

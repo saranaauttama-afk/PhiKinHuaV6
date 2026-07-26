@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
+import { palette, surface, tint } from '../../theme';
 
 interface CardItem {
   instanceId?: string;
@@ -38,14 +39,14 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
   return (
     <View style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.88)',
+      backgroundColor: palette.scrimFull,
       zIndex: 500,
       justifyContent: 'center',
       alignItems: 'center',
     }}>
       {/* Header */}
       <Text style={{
-        color: 'rgba(255,220,180,0.95)',
+        color: palette.moon,
         fontSize: 17,
         fontFamily: 'Prompt_700Bold',
         marginBottom: 6,
@@ -53,7 +54,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
         เลือกการ์ดที่จะทิ้ง
       </Text>
       <Text style={{
-        color: 'rgba(255,200,100,0.7)',
+        color: palette.moonDim,
         fontSize: 11,
         fontFamily: 'Prompt_400Regular',
         marginBottom: 28,
@@ -85,8 +86,8 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                 height: CARD_H,
                 borderRadius: 10,
                 borderWidth: isSelected ? 2.5 : 1,
-                borderColor: isSelected ? '#ff6b6b' : 'rgba(255,255,255,0.2)',
-                backgroundColor: isSelected ? 'rgba(90,15,15,0.95)' : 'rgba(25,12,45,0.92)',
+                borderColor: isSelected ? palette.bloodLit : palette.line,
+                backgroundColor: isSelected ? palette.bloodDeep : surface.panel,
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: 8,
@@ -97,11 +98,11 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                 {card.cost !== undefined && (
                   <View style={{
                     position: 'absolute', top: 6, left: 6,
-                    backgroundColor: 'rgba(60,100,200,0.8)',
+                    backgroundColor: palette.paperDeep,
                     borderRadius: 10, width: 20, height: 20,
                     alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <Text style={{ color: '#ffd93d', fontSize: 10, fontFamily: 'Prompt_700Bold' }}>
+                    <Text style={{ color: palette.moon, fontSize: 10, fontFamily: 'Prompt_700Bold' }}>
                       {card.cost}
                     </Text>
                   </View>
@@ -111,16 +112,16 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                 {isSelected && (
                   <View style={{
                     position: 'absolute', top: 6, right: 6,
-                    backgroundColor: '#cc2222',
+                    backgroundColor: palette.blood,
                     borderRadius: 10, width: 20, height: 20,
                     alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <Text style={{ color: 'white', fontSize: 10, fontFamily: 'Prompt_700Bold' }}>✕</Text>
+                    <Text style={{ color: palette.text, fontSize: 10, fontFamily: 'Prompt_700Bold' }}>✕</Text>
                   </View>
                 )}
 
                 <Text style={{
-                  color: isSelected ? 'rgba(255,160,160,0.95)' : 'rgba(255,255,255,0.9)',
+                  color: isSelected ? palette.bloodLit : palette.text,
                   fontSize: 10,
                   fontFamily: 'Prompt_600SemiBold',
                   textAlign: 'center',
@@ -131,17 +132,17 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                 </Text>
 
                 {damage > 0 && (
-                  <Text style={{ color: '#ff6b6b', fontSize: 22, fontFamily: 'Prompt_700Bold' }}>
+                  <Text style={{ color: palette.bloodLit, fontSize: 22, fontFamily: 'Prompt_700Bold' }}>
                     ⚔ {damage}
                   </Text>
                 )}
                 {block > 0 && (
-                  <Text style={{ color: '#4dabf7', fontSize: 22, fontFamily: 'Prompt_700Bold' }}>
+                  <Text style={{ color: palette.moon, fontSize: 22, fontFamily: 'Prompt_700Bold' }}>
                     🛡 {block}
                   </Text>
                 )}
                 {damage === 0 && block === 0 && (
-                  <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18 }}>✦</Text>
+                  <Text style={{ color: palette.textFaint, fontSize: 18 }}>✦</Text>
                 )}
               </View>
             </Pressable>
@@ -156,10 +157,10 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
             paddingHorizontal: 32, paddingVertical: 12,
             borderRadius: 10,
             borderWidth: 1,
-            borderColor: 'rgba(255,255,255,0.3)',
+            borderColor: palette.line,
           }}>
             <Text style={{
-              color: 'rgba(255,255,255,0.6)',
+              color: palette.textDim,
               fontFamily: 'Prompt_600SemiBold',
               fontSize: 13,
             }}>
@@ -175,12 +176,12 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
           <View style={{
             paddingHorizontal: 32, paddingVertical: 12,
             borderRadius: 10,
-            backgroundColor: canConfirm ? 'rgba(180,40,40,0.9)' : 'rgba(60,20,20,0.5)',
+            backgroundColor: canConfirm ? palette.bloodDeep : surface.panelWell,
             borderWidth: 1,
-            borderColor: canConfirm ? 'rgba(255,100,100,0.5)' : 'transparent',
+            borderColor: canConfirm ? tint.bloodLine : 'transparent',
           }}>
             <Text style={{
-              color: canConfirm ? 'rgba(255,220,220,0.95)' : 'rgba(255,255,255,0.2)',
+              color: canConfirm ? palette.text : palette.line,
               fontFamily: 'Prompt_700Bold',
               fontSize: 13,
             }}>

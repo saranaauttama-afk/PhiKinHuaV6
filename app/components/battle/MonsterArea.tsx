@@ -12,6 +12,7 @@ import { useBattleLayout } from './battleLayout';
 import Art from '../Art';
 import EnemyIntentBadge from './EnemyIntentBadge';
 import type { EnemyIntent } from '../../../src/core/types';
+import { palette, surface, tint } from '../../theme';
 
 type Props = {
   monsterId: string | string[];
@@ -106,7 +107,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         />
         <Text style={{
           position: 'absolute', top: 20, left: 60,
-          color: 'rgba(255,255,255,0.4)', fontSize: 12,
+          color: palette.textFaint, fontSize: 12,
           fontFamily: 'Prompt_400Regular',
         }}>
           {displayName}
@@ -114,17 +115,17 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <View style={{
           position: 'absolute', top: 38, left: 60,
           width: 180, height: 12,
-          backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: 6,
-          borderWidth: 1, borderColor: 'rgba(68,23,0,0.8)',
+          backgroundColor: surface.glassDim, borderRadius: 6,
+          borderWidth: 1, borderColor: palette.line,
         }}>
           <View style={{
             width: `${(hp / maxHp) * 100}%`,
-            height: '100%', backgroundColor: 'rgba(144,4,4,0.5)', borderRadius: 5,
+            height: '100%', backgroundColor: palette.bloodDeep, borderRadius: 5,
           }} />
         </View>
         <Text style={{
           position: 'absolute', top: 35, left: 50, width: 200,
-          color: 'rgba(255,255,255,0.5)', fontSize: 10,
+          color: palette.textFaint, fontSize: 10,
           fontFamily: 'Prompt_400Regular', textAlign: 'center',
         }}>
           {hp}/{maxHp}
@@ -141,9 +142,9 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       {enemy && (
         <View style={{
           flexDirection: 'row', gap: 14, alignItems: 'center',
-          backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: 12,
+          backgroundColor: surface.glassDim, borderRadius: 12,
           paddingHorizontal: 14, paddingVertical: 6,
-          borderWidth: 1, borderColor: 'rgba(68,23,0,0.6)',
+          borderWidth: 1, borderColor: palette.line,
         }}>
           <EnemyStatItem
             icon={require('../../../assets/images/players/iBlock.png')}
@@ -172,7 +173,7 @@ function EnemyStatItem({ icon, value }: { icon: ImageSourcePropType; value: stri
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
       <Image source={icon} style={{ width: 18, height: 18 }} resizeMode="contain" />
       <Text style={{
-        color: 'rgba(255,255,255,0.85)', fontSize: 11,
+        color: palette.text, fontSize: 11,
         fontFamily: 'Prompt_600SemiBold',
       }}>
         {value}

@@ -4,6 +4,7 @@ import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withDelay, withSequence, Easing,
 } from 'react-native-reanimated';
+import { palette, surface, tint } from '../../theme';
 
 type Props = {
   enemyName: string;
@@ -47,23 +48,23 @@ export default function VictoryOverlay({
   return (
     <Animated.View style={[{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.78)',
+      backgroundColor: palette.scrimHeavy,
       justifyContent: 'center', alignItems: 'center', zIndex: 500,
     }, bgStyle]}>
       <Animated.View style={[{ width: 300, alignItems: 'center' }, cardStyle]}>
 
         {/* Title */}
         <Text style={{
-          color: '#ffd700', fontSize: 42,
+          color: palette.moon, fontSize: 42,
           fontFamily: 'Prompt_700Bold',
-          textShadowColor: 'rgba(255,200,0,0.6)',
+          textShadowColor: palette.lineStrong,
           textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12,
           marginBottom: 4,
         }}>
           ชนะ!
         </Text>
         <Text style={{
-          color: 'rgba(255,255,255,0.5)', fontSize: 13,
+          color: palette.textFaint, fontSize: 13,
           fontFamily: 'Prompt_400Regular', marginBottom: 28,
         }}>
           {enemyName} ถูกปราบแล้ว
@@ -72,26 +73,26 @@ export default function VictoryOverlay({
         {/* EXP row */}
         <View style={{ width: '100%', marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-            <Text style={{ color: 'rgba(200,255,200,0.7)', fontSize: 12, fontFamily: 'Prompt_400Regular' }}>
+            <Text style={{ color: palette.moonDim, fontSize: 12, fontFamily: 'Prompt_400Regular' }}>
               Lv.{playerLevel}  EXP
             </Text>
-            <Text style={{ color: '#7fffb0', fontSize: 13, fontFamily: 'Prompt_700Bold' }}>
+            <Text style={{ color: palette.moon, fontSize: 13, fontFamily: 'Prompt_700Bold' }}>
               +{expGained}
             </Text>
           </View>
           <View style={{
             width: '100%', height: 12,
-            backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 6,
-            borderWidth: 1, borderColor: 'rgba(80,200,100,0.35)',
+            backgroundColor: surface.glass, borderRadius: 6,
+            borderWidth: 1, borderColor: tint.moonSoft,
             overflow: 'hidden',
           }}>
             <Animated.View style={[{
               height: '100%',
-              backgroundColor: 'rgba(60,210,100,0.75)', borderRadius: 5,
+              backgroundColor: palette.lineStrong, borderRadius: 5,
             }, barStyle]} />
           </View>
           <Text style={{
-            color: 'rgba(255,255,255,0.35)', fontSize: 10,
+            color: palette.textFaint, fontSize: 10,
             fontFamily: 'Prompt_400Regular',
             textAlign: 'right', marginTop: 3,
           }}>
@@ -103,9 +104,9 @@ export default function VictoryOverlay({
         <Animated.View style={[{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 36 }, goldStyle]}>
           <Text style={{ fontSize: 28 }}>💰</Text>
           <Text style={{
-            color: '#ffd700', fontSize: 28,
+            color: palette.moon, fontSize: 28,
             fontFamily: 'Prompt_700Bold',
-            textShadowColor: 'rgba(255,200,0,0.5)',
+            textShadowColor: palette.line,
             textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8,
           }}>
             +{goldGained}
@@ -116,16 +117,16 @@ export default function VictoryOverlay({
         <Pressable
           onPress={onContinue}
           style={({ pressed }) => ({
-            backgroundColor: pressed ? 'rgba(180,120,20,0.9)' : 'rgba(200,140,30,0.85)',
+            backgroundColor: pressed ? palette.paperDeep : palette.paper,
             paddingHorizontal: 48, paddingVertical: 13,
             borderRadius: 22, borderWidth: 1.5,
-            borderColor: 'rgba(255,215,0,0.55)',
+            borderColor: palette.lineStrong,
           })}
         >
           <Text style={{
-            color: 'white', fontSize: 15,
+            color: palette.text, fontSize: 15,
             fontFamily: 'Prompt_600SemiBold',
-            textShadowColor: 'rgba(0,0,0,0.5)',
+            textShadowColor: surface.glass,
             textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2,
           }}>
             ดำเนินต่อ

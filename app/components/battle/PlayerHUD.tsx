@@ -6,6 +6,7 @@ import Animated, {
   withTiming,
   withSequence,
 } from 'react-native-reanimated';
+import { palette, surface, tint } from '../../theme';
 
 type Props = {
   hp: number;
@@ -66,7 +67,7 @@ export default function PlayerHUD({
         {/* Red flash overlay */}
         <Animated.View style={[{
           position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(255,0,0,0.6)', borderRadius: 8,
+          backgroundColor: tint.bloodLine, borderRadius: 8,
           pointerEvents: 'none',
         }, flashStyle]} />
 
@@ -85,19 +86,19 @@ export default function PlayerHUD({
             <View style={{ position: 'relative' }}>
               <View style={{
                 width: 100, height: 14,
-                backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: 7,
-                borderWidth: 1, borderColor: 'rgba(68,23,0,0.8)',
+                backgroundColor: surface.glassDim, borderRadius: 7,
+                borderWidth: 1, borderColor: palette.line,
               }}>
                 <View style={{
                   width: `${(hp / maxHp) * 100}%`,
-                  height: '100%', backgroundColor: 'rgba(144,4,4,0.5)', borderRadius: 6,
+                  height: '100%', backgroundColor: palette.bloodDeep, borderRadius: 6,
                 }} />
               </View>
               <Text style={{
                 position: 'absolute', top: -2, left: 0, right: 0,
-                color: 'rgba(255,255,255,0.9)', fontSize: 10,
+                color: palette.text, fontSize: 10,
                 fontFamily: 'Prompt_600SemiBold', textAlign: 'center',
-                textShadowColor: 'rgba(0,0,0,0.8)',
+                textShadowColor: palette.shadow,
                 textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2,
               }}>
                 {hp}/{maxHp}
@@ -111,16 +112,16 @@ export default function PlayerHUD({
             disabled={isEnemyTurn}
             style={{
               width: 70, height: 22,
-              backgroundColor: 'rgba(200,50,50,0.8)', borderRadius: 11,
-              borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)',
+              backgroundColor: palette.blood, borderRadius: 11,
+              borderWidth: 2, borderColor: palette.line,
               justifyContent: 'center', alignItems: 'center',
               opacity: isEnemyTurn ? 0.5 : 1,
             }}
           >
             <Text style={{
-              color: 'white', fontSize: 9,
+              color: palette.text, fontSize: 9,
               fontFamily: 'Prompt_600SemiBold',
-              textShadowColor: 'rgba(0,0,0,0.8)',
+              textShadowColor: palette.shadow,
               textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2,
             }}>
               จบเทิร์น
@@ -148,7 +149,7 @@ function StatItem({ icon, value }: { icon: any; value: string }) {
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <Image source={icon} style={{ width: 24, height: 24, marginRight: 4 }} resizeMode="contain" />
       <Text style={{
-        color: 'rgba(255,255,255,0.9)', fontSize: 11,
+        color: palette.text, fontSize: 11,
         fontFamily: 'Prompt_600SemiBold',
       }}>
         {value}

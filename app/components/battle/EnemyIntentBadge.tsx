@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import type { EnemyIntent } from '../../../src/core/types';
+import { palette, surface, tint } from '../../theme';
 
 /**
  * ป้ายบอกว่าศัตรูจะทำอะไรเทิร์นหน้า
@@ -30,22 +31,22 @@ export default function EnemyIntentBadge({ intent, playerBlock }: Props) {
     <View style={{
       flexDirection: 'row', alignItems: 'center', gap: 10,
       paddingHorizontal: 14, paddingVertical: 7, borderRadius: 14,
-      backgroundColor: 'rgba(0,0,0,0.55)',
+      backgroundColor: surface.glass,
       borderWidth: 1,
-      borderColor: intent.damage > 0 ? 'rgba(255,90,90,0.55)' : 'rgba(120,180,255,0.5)',
+      borderColor: intent.damage > 0 ? tint.bloodLine : palette.lineStrong,
     }}>
       <Text style={{
-        color: 'rgba(255,255,255,0.8)', fontSize: 12,
+        color: palette.text, fontSize: 12,
         fontFamily: 'Prompt_600SemiBold',
       }}>
         {label}
       </Text>
 
       {intent.damage > 0 && (
-        <Text style={{ color: '#ff6b6b', fontSize: 16, fontFamily: 'Prompt_700Bold' }}>
+        <Text style={{ color: palette.bloodLit, fontSize: 16, fontFamily: 'Prompt_700Bold' }}>
           ⚔ {intent.damage}
           {playerBlock > 0 && (
-            <Text style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12 }}>
+            <Text style={{ color: palette.textDim, fontSize: 12 }}>
               {'  '}→ เลือด {willHurt}
             </Text>
           )}
@@ -53,7 +54,7 @@ export default function EnemyIntentBadge({ intent, playerBlock }: Props) {
       )}
 
       {intent.block > 0 && (
-        <Text style={{ color: '#7ab8ff', fontSize: 16, fontFamily: 'Prompt_700Bold' }}>
+        <Text style={{ color: palette.moon, fontSize: 16, fontFamily: 'Prompt_700Bold' }}>
           🛡 {intent.block}
         </Text>
       )}

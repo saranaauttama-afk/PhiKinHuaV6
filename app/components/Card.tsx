@@ -11,6 +11,7 @@ import Animated, {
   runOnJS
 } from 'react-native-reanimated';
 import type { CardData } from '../../src/core/types';
+import { palette, surface, tint } from '../theme';
 
 interface CardProps {
   card: CardData;
@@ -192,10 +193,10 @@ export default function Card({
             resizeMode="contain"
           />
           <Text style={{
-            color: 'white',
+            color: palette.text,
             fontSize: 10,
             fontFamily: 'Prompt_600SemiBold',
-            textShadowColor: 'rgba(0,0,0,0.8)',
+            textShadowColor: palette.shadow,
             textShadowOffset: { width: 1, height: 1 },
             textShadowRadius: 2,
           }}>
@@ -220,11 +221,11 @@ export default function Card({
 
           {/* Card Name */}
           <Text style={{
-            color: 'white',
+            color: palette.text,
             fontSize: 11,
             fontFamily: 'Prompt_600SemiBold',
             textAlign: 'center',
-            textShadowColor: 'rgba(0,0,0,0.8)',
+            textShadowColor: palette.shadow,
             textShadowOffset: { width: 1, height: 1 },
             textShadowRadius: 2,
           }}>
@@ -233,13 +234,13 @@ export default function Card({
 
           {/* Card Description */}
           <Text style={{
-            color: 'rgba(255,255,255,0.8)',
+            color: palette.text,
             fontSize: 8,
             fontFamily: 'Prompt_400Regular',
             textAlign: 'center',
             marginTop: 2,
             paddingHorizontal: 6,
-            textShadowColor: 'rgba(0,0,0,0.8)',
+            textShadowColor: palette.shadow,
             textShadowOffset: { width: 1, height: 1 },
             textShadowRadius: 2,
           }}>

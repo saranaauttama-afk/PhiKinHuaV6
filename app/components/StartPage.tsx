@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, ImageBackground, Dimensions } from 'react-native';
 import { useAppFonts } from '../useAppFonts';
 import type { GameState } from '../../src/core/types';
+import { palette, surface, tint } from '../theme';
 
 const { width, height } = Dimensions.get('window');
 
@@ -36,7 +37,7 @@ function StartPage({ onStartGame }: StartPageProps) {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)'
+          backgroundColor: surface.glassDim
         }} />
       
         {/* Start Game Button */}
@@ -64,7 +65,7 @@ function StartPage({ onStartGame }: StartPageProps) {
             >
               <Text style={{
                 fontSize: 16,
-                color: 'white',
+                color: palette.text,
                 textAlign: 'center',
                 fontFamily: 'Prompt_400Regular',
                 opacity:0.6
@@ -84,9 +85,9 @@ function StartPage({ onStartGame }: StartPageProps) {
         }}>
           <Text style={{
             fontSize: 14,
-            color: 'rgba(255, 255, 255, 0.2)',
+            color: palette.line,
               fontFamily: 'Prompt_400Regular',
-            textShadowColor: 'rgba(0, 0, 0, 0.8)',
+            textShadowColor: palette.scrimHeavy,
             textShadowOffset: { width: 1, height: 1 },
             textShadowRadius: 2
           }}>

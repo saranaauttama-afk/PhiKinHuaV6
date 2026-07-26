@@ -21,8 +21,8 @@ import JourneyTrail from './components/JourneyTrail';
 import StoryEventView from './components/StoryEventView';
 import PlayerStatusBar from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
-import { palette, font, size, space } from './theme';
 import { useRouter } from 'expo-router';
+import { palette, font, size, space } from './theme';
 
 
 export default function Home() {

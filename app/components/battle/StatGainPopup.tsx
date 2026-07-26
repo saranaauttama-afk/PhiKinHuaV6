@@ -3,6 +3,7 @@ import { useWindowDimensions } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, Easing,
 } from 'react-native-reanimated';
+import { palette, surface, tint } from '../../theme';
 
 type StatType = 'block' | 'energy';
 type Side     = 'player' | 'enemy';
@@ -47,7 +48,10 @@ export default function StatGainPopup({ amount, statType, side, onDone }: Props)
     opacity: opacity.value,
   }));
 
-  const color = statType === 'block' ? '#60cfff' : '#7fffb0';
+  // พาเลตต์มีสีเน้นสองสี และทั้งการ์ดกับพลังงานไม่ใช่ "อันตราย" จึงเป็นทองทั้งคู่
+  // แยกกันด้วยความสว่างกับไอคอนแทน: พลังงานคือของที่ได้มาแล้วใช้ต่อ จึงสว่างกว่า
+  // ส่วนการ์ดป้องกันเป็นของตั้งรับ จึงหม่นกว่าหนึ่งขั้น
+  const color = statType === 'block' ? palette.moonDim : palette.moon;
   const icon  = statType === 'block' ? '🛡' : '⚡';
 
   // ── Player side: bottom-anchored, near stat icon ──────────────
@@ -60,7 +64,7 @@ export default function StatGainPopup({ amount, statType, side, onDone }: Props)
         left: centerX - 28,
         color, fontSize: 22,
         fontFamily: 'Prompt_700Bold',
-        textShadowColor: 'rgba(0,0,0,0.85)',
+        textShadowColor: palette.scrimHeavy,
         textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3,
         pointerEvents: 'none',
         zIndex: 999,
@@ -78,7 +82,7 @@ export default function StatGainPopup({ amount, statType, side, onDone }: Props)
       left: W / 2 - 28,
       color, fontSize: 22,
       fontFamily: 'Prompt_700Bold',
-      textShadowColor: 'rgba(0,0,0,0.85)',
+      textShadowColor: palette.scrimHeavy,
       textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3,
       pointerEvents: 'none',
       zIndex: 999,

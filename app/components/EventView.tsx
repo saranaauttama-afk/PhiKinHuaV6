@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { GameState, Command } from '../../src/core/types';
 import { getBucketDisplayInfo } from '../../src/core/level';
+import { palette, surface, tint } from '../theme';
 
 interface EventViewProps {
   state: GameState;
@@ -19,9 +20,9 @@ function EventView({ state, dispatch }: EventViewProps) {
   const renderWell = () => {
     const event = state.event as any;
     return (
-      <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: 'rgba(30, 58, 138, 0.3)', borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.3)' }}>
-        <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>🏞️ Mystical Well</Text>
-        <Text style={{ color: '#bfdbfe', marginBottom: 16 }}>A magical well glows with healing energy.</Text>
+      <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: surface.panelWell, borderWidth: 1, borderColor: palette.line }}>
+        <Text style={{ color: palette.text, fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>🏞️ Mystical Well</Text>
+        <Text style={{ color: palette.moonDim, marginBottom: 16 }}>A magical well glows with healing energy.</Text>
         
         {!event.used && !event.dismissed ? (
           <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -31,12 +32,12 @@ function EventView({ state, dispatch }: EventViewProps) {
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 borderRadius: 12,
-                backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                backgroundColor: tint.moonPick,
                 borderWidth: 1,
-                borderColor: 'rgba(74, 222, 128, 0.5)'
+                borderColor: palette.lineStrong
               }}
             >
-              <Text style={{ color: '#bbf7d0', fontWeight: '600' }}>💧 Drink (+10 HP)</Text>
+              <Text style={{ color: palette.moonDim, fontWeight: '600' }}>💧 Drink (+10 HP)</Text>
             </Pressable>
             <Pressable
               onPress={() => dispatch({ type: 'DoWellDismiss' })}
@@ -44,17 +45,17 @@ function EventView({ state, dispatch }: EventViewProps) {
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 borderRadius: 12,
-                backgroundColor: 'rgba(75, 85, 99, 0.5)',
+                backgroundColor: surface.panelWell,
                 borderWidth: 1,
-                borderColor: 'rgba(156, 163, 175, 0.5)'
+                borderColor: palette.line
               }}
             >
-              <Text style={{ color: '#d1d5db', fontWeight: '600' }}>🚶 Leave</Text>
+              <Text style={{ color: palette.textDim, fontWeight: '600' }}>🚶 Leave</Text>
             </Pressable>
           </View>
         ) : (
           <View style={{ alignItems: 'center' }}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.6)', marginBottom: 12 }}>
+            <Text style={{ color: palette.textDim, marginBottom: 12 }}>
               {event.used ? '✅ You feel refreshed from the magical waters.' : '👋 You decided to leave the well untouched.'}
             </Text>
             <Pressable
@@ -63,12 +64,12 @@ function EventView({ state, dispatch }: EventViewProps) {
                 paddingHorizontal: 24,
                 paddingVertical: 12,
                 borderRadius: 12,
-                backgroundColor: 'rgba(37, 99, 235, 0.5)',
+                backgroundColor: palette.lineStrong,
                 borderWidth: 1,
-                borderColor: 'rgba(96, 165, 250, 0.5)'
+                borderColor: palette.lineStrong
               }}
             >
-              <Text style={{ color: '#bfdbfe', fontWeight: '600' }}>Continue Journey</Text>
+              <Text style={{ color: palette.moonDim, fontWeight: '600' }}>Continue Journey</Text>
             </Pressable>
           </View>
         )}
@@ -143,23 +144,23 @@ function EventView({ state, dispatch }: EventViewProps) {
               padding: 16,
               marginHorizontal: 4,
               borderRadius: 12,
-              backgroundColor: needsSubChoice ? 'rgba(234, 179, 8, 0.1)' : 'rgba(234, 179, 8, 0.2)',
+              backgroundColor: needsSubChoice ? tint.moonFaint : tint.moonSoft,
               borderWidth: 2,
-              borderColor: needsSubChoice ? 'rgba(234, 179, 8, 0.2)' : 'rgba(234, 179, 8, 0.4)',
+              borderColor: needsSubChoice ? tint.moonSoft : palette.line,
               opacity: needsSubChoice ? 0.6 : 1,
             }}
           >
             <Text style={{ fontSize: 32, textAlign: 'center', marginBottom: 8 }}>{info.icon}</Text>
-            <Text style={{ color: 'white', fontWeight: 'bold', textAlign: 'center', marginBottom: 4 }}>{info.name}</Text>
-            <Text style={{ color: '#fde68a', textAlign: 'center', fontSize: 12 }}>{info.description}</Text>
+            <Text style={{ color: palette.text, fontWeight: 'bold', textAlign: 'center', marginBottom: 4 }}>{info.name}</Text>
+            <Text style={{ color: palette.moonDim, textAlign: 'center', fontSize: 12 }}>{info.description}</Text>
           </Pressable>
         );
       };
 
       return (
-        <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: 'rgba(146, 64, 14, 0.3)', borderWidth: 1, borderColor: 'rgba(234, 179, 8, 0.3)' }}>
-          <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>⬆️ Level Up!</Text>
-          <Text style={{ color: '#fde68a', marginBottom: 16, textAlign: 'center' }}>
+        <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: surface.panelWell, borderWidth: 1, borderColor: palette.line }}>
+          <Text style={{ color: palette.text, fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>⬆️ Level Up!</Text>
+          <Text style={{ color: palette.moonDim, marginBottom: 16, textAlign: 'center' }}>
             {contextDescription || 'Choose your path forward:'}
           </Text>
           
@@ -171,16 +172,16 @@ function EventView({ state, dispatch }: EventViewProps) {
           {/* Sub-choice rendering for cards/blessings */}
           {(optionA === 'cards' || optionB === 'cards') && lu.cardChoices && (
             <View style={{ marginTop: 16 }}>
-              <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Choose cards to add:</Text>
+              <Text style={{ color: palette.text, fontWeight: 'bold', marginBottom: 8 }}>Choose cards to add:</Text>
               <View style={{ gap: 8 }}>
                 {lu.cardChoices.map((card, i) => (
                   <Pressable
                     key={i}
                     onPress={() => dispatch({ type: 'ChooseLevelUpOption', option: optionA === 'cards' ? 'A' : 'B', index: i })}
-                    style={{ padding: 12, borderRadius: 8, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.4)' }}
+                    style={{ padding: 12, borderRadius: 8, backgroundColor: tint.moonSoft, borderWidth: 1, borderColor: palette.line }}
                   >
-                    <Text style={{ color: '#bfdbfe', fontWeight: 'bold' }}>{card.name}</Text>
-                    <Text style={{ color: '#93c5fd', fontSize: 12 }}>Cost: {card.cost ?? 0}</Text>
+                    <Text style={{ color: palette.moonDim, fontWeight: 'bold' }}>{card.name}</Text>
+                    <Text style={{ color: palette.moonDim, fontSize: 12 }}>Cost: {card.cost ?? 0}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -189,16 +190,16 @@ function EventView({ state, dispatch }: EventViewProps) {
 
           {(optionA === 'blessing' || optionB === 'blessing') && lu.blessingChoices && (
             <View style={{ marginTop: 16 }}>
-              <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Choose a blessing:</Text>
+              <Text style={{ color: palette.text, fontWeight: 'bold', marginBottom: 8 }}>Choose a blessing:</Text>
               <View style={{ gap: 8 }}>
                 {lu.blessingChoices.map((blessing, i) => (
                   <Pressable
                     key={i}
                     onPress={() => dispatch({ type: 'ChooseLevelUpOption', option: optionA === 'blessing' ? 'A' : 'B', index: i })}
-                    style={{ padding: 12, borderRadius: 8, backgroundColor: 'rgba(147, 51, 234, 0.2)', borderWidth: 1, borderColor: 'rgba(147, 51, 234, 0.4)' }}
+                    style={{ padding: 12, borderRadius: 8, backgroundColor: tint.moonSoft, borderWidth: 1, borderColor: palette.line }}
                   >
-                    <Text style={{ color: '#ddd6fe', fontWeight: 'bold' }}>{blessing.name}</Text>
-                    <Text style={{ color: '#c4b5fd', fontSize: 12 }}>{blessing.desc}</Text>
+                    <Text style={{ color: palette.moonDim, fontWeight: 'bold' }}>{blessing.name}</Text>
+                    <Text style={{ color: palette.moonDim, fontSize: 12 }}>{blessing.desc}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -208,7 +209,7 @@ function EventView({ state, dispatch }: EventViewProps) {
           {/* Remove/Upgrade card selection */}
           {(optionA === 'remove' || optionB === 'remove' || optionA === 'upgrade' || optionB === 'upgrade') && !lu.choice?.selectedOption && (
             <View style={{ marginTop: 16 }}>
-              <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>
+              <Text style={{ color: palette.text, fontWeight: 'bold', marginBottom: 8 }}>
                 Choose a card to {optionA === 'remove' || optionB === 'remove' ? 'remove' : 'upgrade'}:
               </Text>
               <View style={{ gap: 8 }}>
@@ -222,13 +223,13 @@ function EventView({ state, dispatch }: EventViewProps) {
                     style={{ 
                       padding: 12, 
                       borderRadius: 8, 
-                      backgroundColor: 'rgba(239, 68, 68, 0.2)', 
+                      backgroundColor: tint.bloodSoft, 
                       borderWidth: 1, 
-                      borderColor: 'rgba(239, 68, 68, 0.4)' 
+                      borderColor: tint.bloodLine 
                     }}
                   >
-                    <Text style={{ color: '#fecaca', fontWeight: 'bold' }}>{card.name}</Text>
-                    <Text style={{ color: '#fca5a5', fontSize: 12 }}>
+                    <Text style={{ color: palette.blood, fontWeight: 'bold' }}>{card.name}</Text>
+                    <Text style={{ color: palette.blood, fontSize: 12 }}>
                       Cost: {card.cost ?? 0}
                       {card.dmg && ` | DMG: ${card.dmg}`}
                       {card.block && ` | Block: ${card.block}`}
@@ -245,13 +246,13 @@ function EventView({ state, dispatch }: EventViewProps) {
                   paddingHorizontal: 16,
                   paddingVertical: 8,
                   borderRadius: 8,
-                  backgroundColor: 'rgba(107, 114, 128, 0.3)',
+                  backgroundColor: surface.panelWell,
                   borderWidth: 1,
-                  borderColor: 'rgba(156, 163, 175, 0.4)',
+                  borderColor: palette.line,
                   alignSelf: 'center'
                 }}
               >
-                <Text style={{ color: '#d1d5db', fontWeight: '600' }}>← Back to rewards</Text>
+                <Text style={{ color: palette.textDim, fontWeight: '600' }}>← Back to rewards</Text>
               </Pressable>
             </View>
           )}
@@ -262,31 +263,31 @@ function EventView({ state, dispatch }: EventViewProps) {
     // Legacy support for old bucket system
     if (lu.bucket) {
       const Btn = ({ label, onPress }: { label: string; onPress: () => void }) => (
-        <Pressable onPress={onPress} style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, backgroundColor: 'rgba(234, 179, 8, 0.5)', borderWidth: 1, borderColor: 'rgba(250, 204, 21, 0.5)' }}>
-          <Text style={{ color: '#fde68a', fontWeight: 'bold' }}>{label}</Text>
+        <Pressable onPress={onPress} style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, backgroundColor: palette.lineStrong, borderWidth: 1, borderColor: palette.lineStrong }}>
+          <Text style={{ color: palette.moonDim, fontWeight: 'bold' }}>{label}</Text>
         </Pressable>
       );
 
       return (
-        <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: 'rgba(146, 64, 14, 0.3)', borderWidth: 1, borderColor: 'rgba(234, 179, 8, 0.3)' }}>
-          <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>⬆️ Level Up!</Text>
-          <Text style={{ color: '#fde68a', marginBottom: 16 }}>Choose your reward:</Text>
+        <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: surface.panelWell, borderWidth: 1, borderColor: palette.line }}>
+          <Text style={{ color: palette.text, fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>⬆️ Level Up!</Text>
+          <Text style={{ color: palette.moonDim, marginBottom: 16 }}>Choose your reward:</Text>
           
           {(() => {
             switch (lu.bucket) {
               case 'blessing':
                 return (
                   <View>
-                    <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Choose a blessing:</Text>
+                    <Text style={{ color: palette.text, fontWeight: 'bold', marginBottom: 8 }}>Choose a blessing:</Text>
                     <View style={{ gap: 8 }}>
                       {(lu.blessingChoices ?? []).map((blessing, i) => (
                         <Pressable
                           key={i}
                           onPress={() => dispatch({ type: 'ChooseLevelUp', index: i })}
-                          style={{ padding: 12, borderRadius: 8, backgroundColor: 'rgba(147, 51, 234, 0.2)', borderWidth: 1, borderColor: 'rgba(147, 51, 234, 0.4)' }}
+                          style={{ padding: 12, borderRadius: 8, backgroundColor: tint.moonSoft, borderWidth: 1, borderColor: palette.line }}
                         >
-                          <Text style={{ color: '#ddd6fe', fontWeight: 'bold' }}>{blessing.name}</Text>
-                          <Text style={{ color: '#c4b5fd', fontSize: 12 }}>{blessing.desc}</Text>
+                          <Text style={{ color: palette.moonDim, fontWeight: 'bold' }}>{blessing.name}</Text>
+                          <Text style={{ color: palette.moonDim, fontSize: 12 }}>{blessing.desc}</Text>
                         </Pressable>
                       ))}
                     </View>
@@ -295,16 +296,16 @@ function EventView({ state, dispatch }: EventViewProps) {
               case 'cards':
                 return (
                   <View>
-                    <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Choose cards to add:</Text>
+                    <Text style={{ color: palette.text, fontWeight: 'bold', marginBottom: 8 }}>Choose cards to add:</Text>
                     <View style={{ gap: 8 }}>
                       {(lu.cardChoices ?? []).map((card, i) => (
                         <Pressable
                           key={i}
                           onPress={() => dispatch({ type: 'ChooseLevelUp', index: i })}
-                          style={{ padding: 12, borderRadius: 8, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.4)' }}
+                          style={{ padding: 12, borderRadius: 8, backgroundColor: tint.moonSoft, borderWidth: 1, borderColor: palette.line }}
                         >
-                          <Text style={{ color: '#bfdbfe', fontWeight: 'bold' }}>{card.name}</Text>
-                          <Text style={{ color: '#93c5fd', fontSize: 12 }}>Cost: {card.cost ?? 0}</Text>
+                          <Text style={{ color: palette.moonDim, fontWeight: 'bold' }}>{card.name}</Text>
+                          <Text style={{ color: palette.moonDim, fontSize: 12 }}>Cost: {card.cost ?? 0}</Text>
                         </Pressable>
                       ))}
                     </View>
@@ -362,9 +363,9 @@ function EventView({ state, dispatch }: EventViewProps) {
   };
 
   const renderVictory = () => (
-    <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: 'rgba(20, 83, 45, 0.3)', borderWidth: 1, borderColor: 'rgba(34, 197, 94, 0.3)' }}>
-      <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>🎉 Victory!</Text>
-      <Text style={{ color: '#bbf7d0', marginBottom: 16 }}>You have defeated your enemy!</Text>
+    <View style={{ marginTop: 16, borderRadius: 16, padding: 16, backgroundColor: surface.panelWell, borderWidth: 1, borderColor: tint.moonSoft }}>
+      <Text style={{ color: palette.text, fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>🎉 Victory!</Text>
+      <Text style={{ color: palette.moonDim, marginBottom: 16 }}>You have defeated your enemy!</Text>
       
       <Pressable
         onPress={() => dispatch({ type: 'CompleteNode' })}
@@ -372,12 +373,12 @@ function EventView({ state, dispatch }: EventViewProps) {
           paddingHorizontal: 24,
           paddingVertical: 12,
           borderRadius: 12,
-          backgroundColor: 'rgba(34, 197, 94, 0.5)',
+          backgroundColor: tint.moonPick,
           borderWidth: 1,
-          borderColor: 'rgba(74, 222, 128, 0.5)'
+          borderColor: palette.lineStrong
         }}
       >
-        <Text style={{ color: '#bbf7d0', fontWeight: '600' }}>Continue</Text>
+        <Text style={{ color: palette.moonDim, fontWeight: '600' }}>Continue</Text>
       </Pressable>
     </View>
   );
