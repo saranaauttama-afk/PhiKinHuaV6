@@ -26,6 +26,7 @@ const GROUP_TITLE: Record<ArtSlot['group'], string> = {
   monster: 'ผี',
   boss: 'บอส',
   blessing: 'พรติดตัว',
+  event: 'ภาพประกอบเหตุการณ์',
   encounter: 'ภาพบนการ์ดโหนด',
   node: 'ไอคอนบนแถบเส้นทาง',
 };
@@ -66,7 +67,9 @@ function main() {
     '',
   ];
 
-  const groups = ['scene', 'class', 'monster', 'boss', 'blessing', 'encounter', 'node'] as const;
+  const groups = [
+    'scene', 'class', 'monster', 'boss', 'blessing', 'event', 'encounter', 'node',
+  ] as const;
 
   for (const g of groups) {
     const list = rows.filter(r => r.group === g);

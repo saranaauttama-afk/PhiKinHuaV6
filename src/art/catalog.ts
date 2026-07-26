@@ -10,6 +10,7 @@
 
 import { THAI_GHOST_POOLS } from '../core/monsters/thai-ghosts';
 import { CHARACTER_CLASSES, ALL_CLASS_IDS } from '../core/classes';
+import { STORY_EVENTS } from '../core/events/story';
 
 const blessings: Array<{ id: string; name: string; desc?: string }> =
   require('../data/packs/base/blessings.json');
@@ -26,7 +27,7 @@ export type ArtSlot = {
   /** ภาพนี้ควรเป็นอะไร — ใช้ทั้งบน placeholder และเป็นโจทย์ตอนไปหา/สร้างรูป */
   brief: string;
   /** จัดกลุ่มในลิสต์ */
-  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter';
+  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter' | 'event';
 };
 
 /**
@@ -115,12 +116,30 @@ function blessingSlots(): ArtSlot[] {
   }));
 }
 
+/**
+ * ภาพประกอบของเหตุการณ์เล่าเรื่อง
+ *
+ * ใช้ข้อความเปิดเรื่องเป็นโจทย์ภาพตรงๆ — คนหารูปจะได้ไม่ต้องเปิดไฟล์ข้อมูลอีกที
+ * และภาพกับข้อความจะได้ไม่หลุดจากกันเวลาแก้เนื้อเรื่อง
+ */
+function storyEventSlots(): ArtSlot[] {
+  return STORY_EVENTS.map(e => ({
+    id: `event/${e.id}`,
+    label: e.title,
+    file: `events/${e.id}.png`,
+    size: [768, 512] as [number, number],
+    brief: `${e.text.slice(0, 90)}… — ภาพฉากแนวนอน ไม่ต้องมีตัวเอกในภาพ`,
+    group: 'event' as const,
+  }));
+}
+
 /** ช่องรูปทั้งหมดที่เกมต้องการ เรียงตามกลุ่ม */
 export const ART_CATALOG: ArtSlot[] = [
   ...SCENES,
   ...classSlots(),
   ...monsterSlots(),
   ...blessingSlots(),
+  ...storyEventSlots(),
   ...ENCOUNTERS,
   ...NODES,
 ];

@@ -1,5 +1,6 @@
 import { isRestOfferKind, type PageOffer } from '../../src/core/map/pages';
 import { getMonsterById } from '../../src/core/monsters/thai-ghosts';
+import { getStoryEvent } from '../../src/core/events/story';
 
 /**
  * แปลง PageOffer จาก engine เป็นข้อมูลที่ BtnEncounter ใช้แสดงผล
@@ -85,6 +86,17 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
 
     case 'fusion_altar':
       return { ...base, type: 'fusion_altar', name: 'แท่นผสาน', description: 'รวมการ์ดสองใบเป็นใบเดียว สำรับบางลง แต่แน่นขึ้น' };
+
+    case 'story_event': {
+      // ชื่อจริงของเหตุการณ์บอกไปเลย แต่ไม่บอกว่าเลือกอะไรได้บ้าง
+      const ev = getStoryEvent(offer.eventId);
+      return {
+        ...base,
+        type: 'story_event',
+        name: ev?.title ?? 'เหตุการณ์',
+        description: 'มีบางอย่างเกิดขึ้นระหว่างทาง',
+      };
+    }
 
     case 'next_event':
       return { ...base, type: 'next_event', name: 'ทางไปต่อ', description: 'เดินทางต่อไปยังพื้นที่ถัดไป', canDismiss: false };

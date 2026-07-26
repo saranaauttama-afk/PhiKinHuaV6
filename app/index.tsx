@@ -19,6 +19,7 @@ import BtnEncounter from './components/BtnEncounter';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
 import JourneyTrail from './components/JourneyTrail';
+import StoryEventView from './components/StoryEventView';
 import { useRouter } from 'expo-router';
 
 
@@ -191,6 +192,7 @@ export default function Home() {
               กับ "Page X/Y" ซึ่งไม่มีความหมายอีกแล้วบนแผนที่แบบเส้นทาง
               และยังมีรายการทางเลือกซ้ำกับการ์ด encounter ด้านบนอีกชุด */}
           <ShopView state={state} dispatch={dispatch} />
+          <StoryEventView state={state} dispatch={dispatch} />
           <DeckView state={state} dispatch={dispatch} />
           <EventView state={state} dispatch={dispatch} />
 

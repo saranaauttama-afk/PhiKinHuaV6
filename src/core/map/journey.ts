@@ -21,6 +21,7 @@ import {
   getTierForFight, getRandomMonsterFromTier, eliteChanceForFight,
   eliteSubPoolForFight, THAI_GHOST_POOLS,
 } from '../monsters/thai-ghosts';
+import { STORY_EVENTS } from '../events/story';
 
 export type JourneyNode = {
   id: string;
@@ -112,12 +113,35 @@ export function planSecretRows(): RowPlan[] {
   ];
 }
 
-const REST_KINDS: PageOffer['kind'][] = [
-  'shop_card', 'shop_equipment', 'healing_shrine', 'well',
-  'treasure', 'treasure_single', 'fusion_altar',
+/**
+ * ชนิดของโหนดพัก พร้อมน้ำหนัก
+ *
+ * เหตุการณ์เล่าเรื่องได้น้ำหนักสูงสุด เพราะเป็นสิ่งที่ทำให้ชั้นพักรู้สึกเป็น
+ * "เรื่องที่เกิดขึ้นระหว่างทาง" ไม่ใช่แค่แถวปุ่มฟังก์ชันให้กดก่อนไปสู้ต่อ
+ */
+const REST_WEIGHTS: Array<[PageOffer['kind'], number]> = [
+  ['story_event', 8],
+  ['shop_card', 3],
+  ['healing_shrine', 3],
+  ['fusion_altar', 3],
+  ['treasure', 2],
+  ['shop_equipment', 2],
+  ['well', 2],
+  ['treasure_single', 2],
 ];
 
-function makeRestOffer(kind: PageOffer['kind'], id: string): PageOffer {
+function pickRestKind(r: RNG): { kind: PageOffer['kind']; rng: RNG } {
+  const total = REST_WEIGHTS.reduce((a, [, w]) => a + w, 0);
+  const roll = int(r, 1, total);
+  let acc = 0;
+  for (const [kind, w] of REST_WEIGHTS) {
+    acc += w;
+    if (roll.value <= acc) return { kind, rng: roll.rng };
+  }
+  return { kind: REST_WEIGHTS[0][0], rng: roll.rng };
+}
+
+function makeRestOffer(kind: PageOffer['kind'], id: string, eventId = ''): PageOffer {
   switch (kind) {
     case 'shop_card':       return { kind, shopId: `${id}_shop_card` };
     case 'shop_equipment':  return { kind, shopId: `${id}_shop_equip` };
@@ -126,6 +150,7 @@ function makeRestOffer(kind: PageOffer['kind'], id: string): PageOffer {
     case 'treasure':        return { kind, shopId: `${id}_treasure` };
     case 'treasure_single': return { kind, shopId: `${id}_treasure1` };
     case 'fusion_altar':    return { kind, shopId: `${id}_fusion` };
+    case 'story_event':     return { kind, shopId: `${id}_event`, eventId };
     default:                return { kind: 'shop_card', shopId: `${id}_shop_card` };
   }
 }
@@ -277,6 +302,11 @@ function growJourney(j: JourneyMap, plan: RowPlan[], r: RNG): RNG {
     .map(id => (j.nodes[id].offer as any).enemyId as string | undefined)
     .filter((x): x is string => !!x);
 
+  const usedEvents = j.rows
+    .flat()
+    .map(id => (j.nodes[id].offer as any).eventId as string | undefined)
+    .filter((x): x is string => !!x);
+
   added.forEach((ids, i) => {
     const rowPlan = plan[i];
     const rowIdx = startIdx + i;
@@ -311,8 +341,19 @@ function growJourney(j: JourneyMap, plan: RowPlan[], r: RNG): RNG {
         memo[id] = [eid];
 
       } else {
-        const kRoll = int(r, 0, REST_KINDS.length - 1); r = kRoll.rng;
-        j.nodes[id].offer = makeRestOffer(REST_KINDS[kRoll.value], id);
+        const kRoll = pickRestKind(r); r = kRoll.rng;
+
+        let eventId = '';
+        if (kRoll.kind === 'story_event') {
+          // เหตุการณ์ไม่ซ้ำภายในรันเดียว — เจอเรื่องเดิมสองรอบแล้วมนตร์ขลังหายหมด
+          const fresh = STORY_EVENTS.filter(e => !usedEvents.includes(e.id));
+          const pool = fresh.length > 0 ? fresh : STORY_EVENTS;
+          const pick = int(r, 0, pool.length - 1); r = pick.rng;
+          eventId = pool[pick.value].id;
+          usedEvents.push(eventId);
+        }
+
+        j.nodes[id].offer = makeRestOffer(kRoll.kind, id, eventId);
         memo[id] = banned;
       }
     });

@@ -614,6 +614,18 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       return { state: s, rng };
     }
 
+    case 'story_event': {
+      // เหตุการณ์ไม่ใช่ร้าน — ไม่มีของขาย ไม่มี shopKind มีแต่เรื่องกับทางเลือก
+      s.story = { eventId: offer.eventId };
+      s.shopKind = undefined;
+      s.shopStock = undefined;
+      s.currentShopId = offer.shopId;
+      s.phase = 'event';
+      mp._activeOfferIndex = ix; mp._shopUsed = false;
+      s.log.push(`ChooseOffer → เหตุการณ์ (${offer.eventId})`);
+      return { state: s, rng };
+    }
+
     case 'fusion_altar': {
       // แท่นผสานไม่มีของขาย ไม่ต้องสุ่มสต็อก — แค่เปิดหน้าให้เลือกการ์ดสองใบ
       s.shopKind = 'fusion';
@@ -837,6 +849,12 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
       s.phase = 'map';
     }
     else if (s.phase === 'event') {
+      // เหตุการณ์เล่าเรื่องต้องเลือกทางก่อน ถึงจะเดินต่อได้
+      // ไม่งั้นกดออกเลยก็ข้ามผลของเหตุการณ์ไปได้ทั้งดุ้น
+      if (s.story && s.story.result == null) {
+        return { state: s, rng };
+      }
+
       // well: ต้องใช้หรือกดปิดให้ถูก flag ถึง resolve; event ชนิดอื่น resolve ได้ตรง ๆ
       const ok =
         onJourney ||
@@ -848,6 +866,7 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
         consumeToken(mp, offer);
       }
       s.event = undefined;
+      s.story = undefined;
       s.phase = 'map';
     }
 

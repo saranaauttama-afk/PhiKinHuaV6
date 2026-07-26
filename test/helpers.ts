@@ -1,4 +1,5 @@
-import type { CardData, GameState } from '../src/core/types';
+import type { CardData, Command, GameState } from '../src/core/types';
+import { getStoryEvent, choiceLocked } from '../src/core/events/story';
 import { baseNewState, startCombat } from '../src/core/commands';
 import { applyCommand } from '../src/core/reducer';
 import { makeRng, type RNG } from '../src/core/rng';
@@ -50,6 +51,22 @@ export function makeCombatState(opts: {
 export function runEnemyCards(state: GameState, cardIds: string[]): GameState {
   (state as any).enemyPiles = { draw: [], hand: [...cardIds], discard: [] };
   return applyCommand(state, { type: 'ResolveEnemyTurn' }, makeRng('test')).state;
+}
+
+/**
+ * ถ้ากำลังอยู่ในเหตุการณ์เล่าเรื่อง ให้เลือกทางแรกที่เลือกได้
+ *
+ * เหตุการณ์ต้องเลือกทางก่อนถึงจะปิดโหนดได้ (ไม่งั้นข้ามผลของเหตุการณ์ไปได้ทั้งดุ้น)
+ * ตัวขับรันเต็มรันจึงต้องรู้จักตอบเหตุการณ์ด้วย ไม่ใช่แค่กด CompleteNode
+ */
+export function resolveStoryIfAny(s: GameState, go: (c: Command) => void): void {
+  if (s.phase !== 'event' || !s.story) return;
+
+  const ev = getStoryEvent(s.story.eventId);
+  if (!ev) return;
+
+  const index = ev.choices.findIndex(c => choiceLocked(s, c) == null);
+  go({ type: 'ChooseEventOption', index: index >= 0 ? index : 0 });
 }
 
 export function attackCard(dmg: number, over: Partial<CardData> = {}): CardData {

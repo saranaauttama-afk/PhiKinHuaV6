@@ -300,6 +300,13 @@ export type GameState = {
   /** แท่นผสานการ์ด — ผสานได้ครั้งเดียวต่อแท่น การเลือกจึงมีน้ำหนัก */
   fusionAltar?: { timesUsed: number };
 
+  /** เหตุการณ์เล่าเรื่องที่กำลังอยู่ — `result` มีค่าแปลว่าเลือกไปแล้ว */
+  story?: {
+    eventId: string;
+    chosenIndex?: number;
+    result?: string;
+  };
+
   // flags & counters
   turnFlags: {
     blessingOnce: Record<string, boolean>;
@@ -377,6 +384,9 @@ export type Command =
 
   // ผสานการ์ด — index อ้างตำแหน่งใน masterDeck
   | { type: 'FuseCards'; indexA: number; indexB: number }
+
+  // เหตุการณ์เล่าเรื่อง
+  | { type: 'ChooseEventOption'; index: number }
 
   // Events
   | { type: 'DoBonfireHeal' }
