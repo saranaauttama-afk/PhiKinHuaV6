@@ -10,8 +10,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
 import Art from '../Art';
-import EnemyIntentBadge from './EnemyIntentBadge';
-import type { EnemyIntent } from '../../../src/core/types';
 import { palette, surface, tint } from '../../theme';
 
 type Props = {
@@ -22,11 +20,6 @@ type Props = {
     block?: number; maxEnergy?: number; handSize?: number;
     statusEffects?: { id: string; stacks?: number }[];
   } | null;
-  /** ศัตรูจะทำอะไรเทิร์นหน้า */
-  intent?: EnemyIntent;
-  playerBlock?: number;
-  /** ซ่อน intent ระหว่างที่ศัตรูกำลังเล่นอยู่ */
-  hideIntent?: boolean;
 };
 
 export type MonsterAreaHandle = {
@@ -37,9 +30,6 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   monsterId,
   monsterName,
   enemy,
-  intent,
-  playerBlock = 0,
-  hideIntent = false,
 }, ref) {
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
@@ -132,12 +122,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         </Text>
       </View>
 
-      {/* ศัตรูจะทำอะไรเทิร์นหน้า — ซ่อนระหว่างเทิร์นศัตรูเพราะกำลังทำอยู่แล้ว */}
-      {enemy && !hideIntent && (
-        <View style={{ marginTop: 10, marginBottom: 2 }}>
-          <EnemyIntentBadge intent={intent} playerBlock={playerBlock} />
-        </View>
-      )}
+      {/* ไม่มีป้ายบอกท่าล่วงหน้าแล้ว — ศัตรูตัดสินใจตอนถึงตาของตัวเอง
+          ผู้เล่นรู้ว่าโดนอะไรตอนที่โดนจริง */}
 
       {enemy && (
         <View style={{

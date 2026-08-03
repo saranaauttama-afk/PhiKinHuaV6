@@ -217,8 +217,12 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
     s.enemy.block = 0;
 
-    // เล่นตามที่ประกาศไว้เป๊ะ — ถ้าเล่นไม่ตรงกับที่โชว์ ผู้เล่นจะวางแผนไม่ได้
-    if (!s.enemyIntent) planEnemyIntent(s);
+    // ศัตรูตัดสินใจ ณ ตอนที่ถึงตาจริง ไม่ใช่ตั้งแต่ท้ายเทิร์นก่อน
+    //
+    // เดิมต้องเลือกไว้ล่วงหน้าเพราะต้องเอาไปโชว์บนป้าย intent พอเลิกโชว์แล้ว
+    // การเลื่อนมาตัดสินใจตรงนี้ดีกว่าในเชิงกฎเกม — ศัตรูเห็นกระดานจริงตอนนั้น
+    // ทั้งการ์ดที่ผู้เล่นเพิ่งตั้งและเลือดที่เพิ่งเสีย ไม่ใช่ภาพเมื่อเทิร์นที่แล้ว
+    planEnemyIntent(s);
     const toPlay: string[] = [...(s.enemyIntent?.cardIds ?? [])];
 
     s.enemyLastPlayed = toPlay;
@@ -266,8 +270,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
 
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 
-  // ประกาศแผนของเทิร์นถัดไปทันที เพื่อให้ผู้เล่นเห็นตลอดเทิร์นตัวเอง
-  if (s.phase === 'combat') planEnemyIntent(s);
+  // ไม่ประกาศแผนล่วงหน้าอีกแล้ว — ล้างทิ้งเพื่อไม่ให้ค้างเป็นข้อมูลเก่า
+  s.enemyIntent = undefined;
 
   return { state: s, rng: r };
 }

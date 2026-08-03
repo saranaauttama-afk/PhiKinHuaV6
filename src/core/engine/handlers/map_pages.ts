@@ -20,7 +20,6 @@ import { START_ENERGY } from '../../balance/core';
 import { buildAndShuffleEnemyDeck } from './enemy';
 import { runEquipmentOnEquip } from '../../equipmentRuntime';
 import { deckForMonster } from '../../monsters/monster-decks';
-import { planEnemyIntent } from '../../combat/intent';
 import { applyClassCombatStart } from '../../classes';
 import { getEquipmentById } from '../../pack';
 import {
@@ -202,8 +201,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         intentCardId: null,
       };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
-      // ประกาศแผนของศัตรูตั้งแต่เทิร์นแรก ผู้เล่นจะได้วางแผนตั้งแต่ไพ่ใบแรก
-      planEnemyIntent(s);
+      // ไม่ประกาศท่าล่วงหน้าแล้ว — ศัตรูเลือกไพ่ตอนถึงตาของตัวเอง
       // พรติดตัวของคลาสที่ทำงานตอนเริ่มไฟต์
       applyClassCombatStart(s);
       
@@ -275,8 +273,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         intentCardId: null,
       };
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
-      // ประกาศแผนของศัตรูตั้งแต่เทิร์นแรก ผู้เล่นจะได้วางแผนตั้งแต่ไพ่ใบแรก
-      planEnemyIntent(s);
+      // ไม่ประกาศท่าล่วงหน้าแล้ว — ศัตรูเลือกไพ่ตอนถึงตาของตัวเอง
       // พรติดตัวของคลาสที่ทำงานตอนเริ่มไฟต์
       applyClassCombatStart(s);
       

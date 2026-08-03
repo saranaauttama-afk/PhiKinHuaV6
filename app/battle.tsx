@@ -258,9 +258,6 @@ export default function BattlePage() {
           monsterId={monsterId}
           monsterName={monsterName}
           enemy={enemy ?? null}
-          intent={gameState.enemyIntent}
-          playerBlock={player.block}
-          hideIntent={phase === 'enemy'}
         />
 
         <ScreenFlash ref={flashRef} />
