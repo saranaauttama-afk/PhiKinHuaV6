@@ -124,6 +124,15 @@ const REST_WEIGHTS: Array<[PageOffer['kind'], number]> = [
   ['shop_card', 3],
   ['healing_shrine', 3],
   ['fusion_altar', 3],
+  // ปลุกเสก/สละการ์ด — สองอย่างนี้มีระบบครบมาตั้งแต่ต้น (handler, ราคาที่แพงขึ้น
+  // ตามจำนวนครั้ง, หน้าร้าน, ช่องรูป) แต่ตอนย้ายจากถาดหมุนมาเป็นแผนที่เดินทาง
+  // มันตกจากตารางนี้ไป กลายเป็นโค้ดที่เดินไปไม่ถึงมาตลอด
+  //
+  // วัดแล้วสำรับโตจาก ~11 ใบเป็น ~13-17 ใบต่อรัน ซึ่งไม่ได้บวม สองร้านนี้จึงไม่ได้
+  // มีไว้แก้สำรับล้น แต่มีไว้ให้เลือกได้ว่าสำรับจะคมขึ้นทางไหน
+  // สละได้น้ำหนักน้อยกว่า เพราะถอนใบเสียออกให้ผลแรงกว่าปลุกเสกใบดีขึ้นหนึ่งขั้น
+  ['shop_upgrade', 3],
+  ['shop_remove', 2],
   ['treasure', 2],
   ['shop_equipment', 2],
   ['well', 2],
@@ -141,10 +150,18 @@ function pickRestKind(r: RNG): { kind: PageOffer['kind']; rng: RNG } {
   return { kind: REST_WEIGHTS[0][0], rng: roll.rng };
 }
 
-function makeRestOffer(kind: PageOffer['kind'], id: string, eventId = ''): PageOffer {
+/**
+ * @param act ภาคที่ 1 (ก่อนบอสกลาง) หรือ 2 — ร้านปลุกเสก/สละต้องรู้
+ *            เพราะโครงสร้าง offer ของสองชนิดนี้มีฟิลด์ `phase` ติดมาแต่เดิม
+ */
+function makeRestOffer(
+  kind: PageOffer['kind'], id: string, eventId = '', act: 1 | 2 = 1
+): PageOffer {
   switch (kind) {
     case 'shop_card':       return { kind, shopId: `${id}_shop_card` };
     case 'shop_equipment':  return { kind, shopId: `${id}_shop_equip` };
+    case 'shop_remove':     return { kind, shopId: `${id}_remove`,  phase: act };
+    case 'shop_upgrade':    return { kind, shopId: `${id}_upgrade`, phase: act };
     case 'healing_shrine':  return { kind, shopId: `${id}_shrine` };
     case 'well':            return { kind, shopId: `${id}_well` };
     case 'treasure':        return { kind, shopId: `${id}_treasure` };
@@ -342,10 +359,16 @@ function growJourney(j: JourneyMap, plan: RowPlan[], r: RNG): RNG {
     .map(id => (j.nodes[id].offer as any).eventId as string | undefined)
     .filter((x): x is string => !!x);
 
+  /** ผ่านบอสกลางมาแล้วหรือยัง ณ ชั้นที่กำลังเติม — ร้านปลุกเสก/สละใช้แยกภาค */
+  const fightsBefore = (upto: number) =>
+    j.plans.filter(p => p.kind !== 'rest').length
+    + plan.slice(0, upto).filter(p => p.kind !== 'rest').length;
+
   added.forEach((ids, i) => {
     const rowPlan = plan[i];
     const rowIdx = startIdx + i;
     const inRow: string[] = [];
+    const act: 1 | 2 = fightsBefore(i) >= MID_BOSS_FIGHT ? 2 : 1;
 
     ids.forEach((id, col) => {
       // โหนดยังไม่มี offer — ใส่ placeholder ไว้ก่อนเพื่อให้ precedingEnemiesOf อ่านได้
@@ -388,7 +411,7 @@ function growJourney(j: JourneyMap, plan: RowPlan[], r: RNG): RNG {
           usedEvents.push(eventId);
         }
 
-        j.nodes[id].offer = makeRestOffer(kRoll.kind, id, eventId);
+        j.nodes[id].offer = makeRestOffer(kRoll.kind, id, eventId, act);
         memo[id] = banned;
       }
     });

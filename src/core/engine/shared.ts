@@ -21,10 +21,45 @@ export function cloneForReducer(prev: GameState): GameState {
   return s;
 }
 
+/** ใบนี้ปลุกเสกได้อีกไหม */
+export function canUpgrade(c: CardData): boolean {
+  return !c.upgraded;
+}
+
+/** จำนวนที่บวกให้ใบที่มีตัวเลข */
+export const UPGRADE_BONUS = 4;
+
+/**
+ * ปลุกเสกการ์ดหนึ่งใบ — **ครั้งเดียวต่อใบ**
+ *
+ * ของเดิมบวก +3 dmg / +3 block ให้ทุกใบเหมือนกันหมด แล้วเติม " +" ท้ายชื่อ
+ * โดยไม่จำกัดจำนวนครั้ง อัพใบเดิมสามรอบได้ชื่อ "ฟันดาบ + + +" และตัวเลขวิ่งหนี
+ * ทั้งสำรับ — ทางที่ดีที่สุดคือทุ่มทองใส่ใบเดียวแล้วถือยาว
+ *
+ * สูตรตอนนี้แยกตามสิ่งที่ใบนั้นทำจริง:
+ *   - มีตัวเลขโจมตี/กัน → บวกตัวเลขนั้น
+ *   - ไม่มีตัวเลขเลย (ใบผลพิเศษ) → ลดค่าร่ายลงหนึ่ง ได้ใช้เร็วขึ้นหนึ่งเทิร์น
+ *     ค่าร่ายศูนย์อยู่แล้วก็ให้จั่วเพิ่มหนึ่งใบแทน
+ *
+ * **ใบที่ใช้แล้วหายยังหายเหมือนเดิม** — ตอนแรกตั้งใจให้การปลุกเสกปลดข้อจำกัดนี้
+ * แต่ใบ exhaust ทั้งหกใบในเกมไม่มีตัวเลขให้บวกเลย มันเป็นผลพิเศษล้วนๆ และสองใบ
+ * ในนั้นคือ "ฟื้นเต็มหลอด + กันสถานะ 3 เทิร์น" กับ "ฟื้น 8 และ **Max HP +2 ถาวร**"
+ * ปลดข้อจำกัดให้ = ร่ายซ้ำได้ไม่จำกัด = เลือดสูงสุดไม่มีเพดานและตายไม่เป็น
+ */
 export function upgradeCard(c: CardData): CardData {
-  const up = { ...c, name: (c.name ?? c.id) + ' +' };
-  if (typeof up.dmg === 'number') up.dmg += 3;
-  if (typeof up.block === 'number') up.block += 3;
+  if (!canUpgrade(c)) return c;
+
+  const up: CardData = { ...c, name: (c.name ?? c.id) + ' +', upgraded: true };
+
+  const hasNumbers = typeof up.dmg === 'number' || typeof up.block === 'number';
+  if (hasNumbers) {
+    if (typeof up.dmg === 'number') up.dmg += UPGRADE_BONUS;
+    if (typeof up.block === 'number') up.block += UPGRADE_BONUS;
+    return up;
+  }
+
+  if ((up.cost ?? 0) > 0) up.cost = up.cost - 1;
+  else up.draw = (up.draw ?? 0) + 1;
   return up;
 }
 

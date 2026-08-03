@@ -1,7 +1,7 @@
 // src/core/engine/handlers/level.ts
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
-import { upgradeCard } from '../shared';
+import { upgradeCard, canUpgrade } from '../shared';
 
 export function chooseLevelUp(s: GameState, cmd: Extract<Command, { type: 'ChooseLevelUp' }>, r: RNG) {
   if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed) return { state: s, rng: r };
@@ -70,7 +70,10 @@ function applyBucketChoice(s: GameState, bucket: string, idx: number) {
       break;
     }
     case 'upgrade': {
-      const i = idx;
+      // ปลุกเสกได้ครั้งเดียวต่อใบ — ถ้าใบที่ชี้มาปลุกไปแล้ว ให้ไปใบแรกที่ยังปลุกได้
+      // รางวัลเลเวลอัปที่กดแล้วไม่มีอะไรเกิดขึ้นคือรางวัลที่หายไปเฉยๆ
+      const target = s.masterDeck[idx];
+      const i = target && canUpgrade(target) ? idx : s.masterDeck.findIndex(canUpgrade);
       if (i >= 0 && i < s.masterDeck.length) {
         s.masterDeck[i] = upgradeCard(s.masterDeck[i]);
       }

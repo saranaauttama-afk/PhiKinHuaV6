@@ -247,6 +247,29 @@ export default function Card({
             {card.desc}
           </Text>
         </View>
+
+        {/* ใบที่เล่นแล้วหายไปจากไฟต์เลย — ต้องเห็นก่อนกด ไม่ใช่รู้ตอนมันหายไปแล้ว
+            คำอธิบายบางใบเขียน "(ใช้ได้ครั้งเดียว)" ไว้ แต่ตัวหนังสือ 8px
+            ท้ายย่อหน้าไม่ใช่สิ่งที่คนอ่านทันตอนกำลังคิดว่าจะเล่นใบไหน */}
+        {card.exhaust && (
+          <View style={{
+            position: 'absolute', bottom: 4, alignSelf: 'center',
+            paddingHorizontal: 6, paddingVertical: 1,
+            borderRadius: 999,
+            backgroundColor: tint.bloodSoft,
+            borderWidth: 1, borderColor: tint.bloodLine,
+          }}>
+            <Text style={{
+              color: palette.bloodLit, fontSize: 7,
+              fontFamily: 'Prompt_600SemiBold',
+              textShadowColor: palette.shadow,
+              textShadowOffset: { width: 1, height: 1 },
+              textShadowRadius: 2,
+            }}>
+              ใช้แล้วหาย
+            </Text>
+          </View>
+        )}
       </ImageBackground>
       </Animated.View>
     </GestureDetector>

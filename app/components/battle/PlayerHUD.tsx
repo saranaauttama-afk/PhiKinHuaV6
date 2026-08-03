@@ -15,15 +15,18 @@ type Props = {
   maxEnergy: number;
   block: number;
   maxHandSize: number;
-  deckSize: number;
+  /** เหลือในกองจั่วกี่ใบ — ไม่ใช่ขนาดสำรับทั้งหมด (ดูหมายเหตุที่ battle.tsx) */
+  drawCount: number;
   onEndTurn: () => void;
+  /** แตะเลขกองจั่วเพื่อเปิดหน้ากองการ์ด */
+  onOpenPiles?: () => void;
   isEnemyTurn?: boolean;
   hudFlashKey?: number;
 };
 
 export default function PlayerHUD({
-  hp, maxHp, energy, maxEnergy, block, maxHandSize, deckSize, onEndTurn,
-  isEnemyTurn, hudFlashKey,
+  hp, maxHp, energy, maxEnergy, block, maxHandSize, drawCount, onEndTurn,
+  onOpenPiles, isEnemyTurn, hudFlashKey,
 }: Props) {
   const flashOpacity = useSharedValue(0);
   const hudShakeX = useSharedValue(0);
@@ -137,23 +140,43 @@ export default function PlayerHUD({
           <StatItem icon={require('../../../assets/images/players/iEnergy.png')} value={`${energy}/${maxEnergy}`} />
           <StatItem icon={require('../../../assets/images/players/iMaxHand.png')} value={`${maxHandSize}`} />
           <StatItem icon={require('../../../assets/images/players/iBlock.png')} value={`${block}`} />
-          <StatItem icon={require('../../../assets/images/players/iDeck.png')} value={`${deckSize}`} />
+          <StatItem
+            icon={require('../../../assets/images/players/iDeck.png')}
+            value={`${drawCount}`}
+            onPress={onOpenPiles}
+          />
         </View>
       </View>
     </Animated.View>
   );
 }
 
-function StatItem({ icon, value }: { icon: any; value: string }) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+function StatItem({ icon, value, onPress }: { icon: any; value: string; onPress?: () => void }) {
+  const inner = (
+    <>
       <Image source={icon} style={{ width: 24, height: 24, marginRight: 4 }} resizeMode="contain" />
       <Text style={{
         color: palette.text, fontSize: 11,
         fontFamily: 'Prompt_600SemiBold',
+        // ค่าที่กดได้ต้องดูต่างจากค่าที่ดูอย่างเดียว ไม่งั้นไม่มีใครลองกด
+        textDecorationLine: onPress ? 'underline' : 'none',
       }}>
         {value}
       </Text>
-    </View>
+    </>
+  );
+
+  if (!onPress) {
+    return <View style={{ flexDirection: 'row', alignItems: 'center' }}>{inner}</View>;
+  }
+
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={10}
+      style={{ flexDirection: 'row', alignItems: 'center' }}
+    >
+      {inner}
+    </Pressable>
   );
 }

@@ -1,7 +1,20 @@
+// app/components/DeckView.tsx — สำรับทั้งหมดของผู้เล่น
+//
+// **หน้านี้เขียนเสร็จมานานแล้วแต่เปิดไม่ได้** — คำสั่ง `OpenDeck` ต่อสายเข้า
+// reducer เรียบร้อย แต่ไม่มีปุ่มไหนในเกมสั่งมันเลย เป็นหน้าจอที่ไม่มีประตู
+// ตอนนี้เข้าได้จากแถบสถานะบนแผนที่ และจากหน้าต่อสู้
+//
+// ของเดิมยังมีปัญหาอีกสองอย่าง: วางเป็นบล็อกไหลอยู่กลางหน้าแผนที่ (ไม่ใช่จอทับ
+// จึงล้นออกนอกจอ) และปุ่มปิดเป็นตัวหนังสือสีเลือดบนพื้นสีเลือด — มองไม่เห็น
+// ส่วนของเครื่องรางก็ยังเป็น className ของ NativeWind ปนกับ StyleSheet อยู่
+
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import type { GameState, Command } from '../../src/core/types';
-import { palette, surface, tint } from '../theme';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import type { Command, GameState } from '../../src/core/types';
+import { groupCards } from '../../src/core/cards/group';
+import CardRow from './CardRow';
+import { GameButton } from './Panel';
+import { font, palette, radius, size, space, surface, tint } from '../theme';
 
 /** ชื่อชนิดการ์ดเป็นภาษาไทย — เดิมเอาค่า type ดิบมาต่อกับคำว่า "Cards" */
 const TYPE_LABEL: Record<string, string> = {
@@ -9,192 +22,191 @@ const TYPE_LABEL: Record<string, string> = {
   skill: 'การ์ดวิชา',
   equipment: 'เครื่องราง',
 };
+const TYPE_ORDER = ['attack', 'skill', 'equipment'] as const;
 
-interface DeckViewProps {
+type Props = {
   state: GameState;
   dispatch: (cmd: Command) => void;
-}
+};
 
-function DeckView({ state, dispatch }: DeckViewProps) {
+export default function DeckView({ state, dispatch }: Props) {
   if (!state.deckOpen) return null;
 
-  // Group cards by ID for counting
-  const counts = new Map<string, { name: string; count: number; card: any }>();
-  for (const c of state.masterDeck ?? []) {
-    const name = c.name ?? c.id;
-    const rec = counts.get(c.id) ?? { name, count: 0, card: c };
-    rec.count += 1;
-    counts.set(c.id, rec);
-  }
-  
-  const cardList = Array.from(counts.values()).sort((a, b) => a.name.localeCompare(b.name));
-  const equipmentCards = (state.masterDeck ?? []).filter(c => c.type === 'equipment');
+  const deck = state.masterDeck ?? [];
+
+  const rows = groupCards(deck);
+
+  const equipped = state.equipped ?? [];
+  const slotsMax = state.equipmentSlotsMax ?? 1;
+  const slotsUsed = equipped.reduce((sum, eq) => sum + (eq.slotCost || 1), 0);
+  const equipmentCards = deck.filter(c => c.type === 'equipment');
 
   return (
-    <View style={{ marginTop: 16, padding: 16, borderRadius: 16, backgroundColor: surface.panel, borderWidth: 1, borderColor: palette.line }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={{ color: palette.text, fontSize: 20, fontWeight: 'bold' }}>📚 สำรับของเรา ({state.masterDeck?.length} ใบ)</Text>
-        <Pressable
-          onPress={() => dispatch({ type: 'CloseDeck' })}
-          style={{
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            borderRadius: 8,
-            backgroundColor: palette.blood,
-            borderWidth: 1,
-            borderColor: tint.bloodLine
-          }}
-        >
-          <Text style={{ color: palette.blood }}>✕ ปิด</Text>
-        </Pressable>
+    <View style={{
+      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+      backgroundColor: palette.scrimFull,
+      zIndex: 2000,
+    }}>
+      <View style={{
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+        paddingHorizontal: space.xl, paddingTop: 56, paddingBottom: space.md,
+      }}>
+        <View>
+          <Text style={{ color: palette.moon, fontSize: size.title, fontFamily: font.display }}>
+            สำรับของเรา
+          </Text>
+          <Text style={{ color: palette.textDim, fontSize: size.ui, fontFamily: font.ui }}>
+            ทั้งหมด {deck.length} ใบ
+          </Text>
+        </View>
+        <GameButton label="ปิด" onPress={() => dispatch({ type: 'CloseDeck' })} />
       </View>
 
-      {!cardList.length ? (
-        <Text style={{ color: palette.textDim, textAlign: 'center', paddingVertical: 32 }}>สำรับว่างเปล่า</Text>
-      ) : (
-        <>
-          {/* Equipment Management Section */}
-          {(equipmentCards.length > 0 || (state.equipped && state.equipped.length > 0)) && (
-            <View style={{ marginBottom: 24, padding: 16, borderRadius: 8, backgroundColor: surface.panelRaise, borderWidth: 1, borderColor: surface.panelWell }}>
-              <Text style={{ color: palette.moonDim, fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
-                ⚔️ เครื่องราง ({(state.equipped ?? []).length}/{state.equipmentSlotsMax ?? 1})
-              </Text>
-              
-              {/* Currently Equipped */}
-              {(state.equipped ?? []).length > 0 && (
-                <View style={{ marginBottom: 16 }}>
-                  <Text style={{ color: palette.moonDim, fontWeight: '600', marginBottom: 8 }}>🛡️ ที่สวมอยู่</Text>
-                  {(state.equipped ?? []).map((eq, i) => (
-                    <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, padding: 12, borderRadius: 8, backgroundColor: surface.panelWell, borderWidth: 1, borderColor: tint.moonSoft }}>
-                      <View style={{ flex: 1 }}>
-                        <Text style={{ color: palette.moonDim, fontWeight: '600' }}>{eq.name || eq.id}</Text>
-                        <Text style={{ color: palette.moonDim, fontSize: 14 }}>{eq.desc}</Text>
-                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
-                          <Text style={{ color: palette.moon, fontSize: 12 }}>⭐ {eq.rarity}</Text>
-                          {eq.temporary && <Text style={{ color: palette.moonDim, fontSize: 12 }}>🕐 TEMPORARY</Text>}
-                        </View>
-                      </View>
-                      {!eq.temporary && (
-                        <Pressable
-                          onPress={() => dispatch({ type: 'UnequipToDeck', equipmentId: eq.id })}
-                          style={{
-                            paddingHorizontal: 12,
-                            paddingVertical: 8,
-                            borderRadius: 8,
-                            backgroundColor: palette.blood,
-                            borderWidth: 1,
-                            borderColor: tint.bloodLine
-                          }}
-                        >
-                          <Text style={{ color: palette.blood, fontWeight: '600' }}>ถอด</Text>
-                        </Pressable>
-                      )}
-                    </View>
-                  ))}
-                </View>
-              )}
-              
-              {/* Equipment Cards in Deck */}
-              {equipmentCards.length > 0 && (
-                <View>
-                  <Text className="text-amber-300 font-semibold mb-2">📦 เครื่องรางที่ยังไม่ได้สวม</Text>
-                  {equipmentCards.map((card, i) => {
-                    const isEquipped = (state.equipped ?? []).some(eq => eq.id === card.equipmentId);
-                    const currentSlotUsage = (state.equipped ?? []).reduce((sum, eq) => sum + (eq.slotCost || 1), 0);
-                    const maxSlots = state.equipmentSlotsMax || 1;
-                    const canEquip = !isEquipped && currentSlotUsage < maxSlots;
-                    
-                    return (
-                      <View key={card.id + i} className={`flex-row justify-between items-center mb-2 p-3 rounded-lg border ${
-                        isEquipped ? 'bg-gray-600/30 border-gray-500/30' : 'bg-blue-900/30 border-blue-500/30'
-                      }`}>
-                        <View className="flex-1">
-                          <Text className={`font-semibold ${isEquipped ? 'text-gray-400' : 'text-blue-300'}`}>
-                            {card.name || card.id}
-                          </Text>
-                          <Text className={`text-sm ${isEquipped ? 'text-gray-400' : 'text-blue-300/70'}`}>
-                            {card.desc}
-                          </Text>
-                          <View className="flex-row gap-2 mt-1">
-                            <Text className={`text-xs ${isEquipped ? 'text-gray-400' : 'text-blue-400'}`}>
-                              ⭐ {card.rarity}
-                            </Text>
-                            {isEquipped && <Text className="text-gray-400 text-xs">✓ EQUIPPED</Text>}
-                          </View>
-                        </View>
-                        
-                        <View className="ml-3">
-                          {canEquip && (
-                            <Pressable
-                              onPress={() => dispatch({ type: 'EquipFromDeck', cardId: card.id })}
-                              className="px-3 py-2 rounded-lg bg-blue-600/50 border border-blue-400/50 active:opacity-70"
-                            >
-                              <Text className="text-blue-200 font-semibold">สวม</Text>
-                            </Pressable>
-                          )}
-                          {!canEquip && !isEquipped && (
-                            <Text className="text-red-400 text-sm font-semibold px-2">ช่องเต็ม</Text>
-                          )}
-                        </View>
-                      </View>
-                    );
-                  })}
-                </View>
-              )}
-            </View>
-          )}
-          
-          {/* Regular Card List */}
-          <View>
-            <Text style={{ color: palette.text, fontSize: 18, fontWeight: '600', marginBottom: 12 }}>🃏 แยกตามชนิด</Text>
-            
-            {/* Group by card type */}
-            {['attack', 'skill', 'equipment'].map(type => {
-              const typeCards = cardList.filter(item => item.card.type === type);
-              if (typeCards.length === 0) return null;
-              
-              const typeIcon = type === 'attack' ? '⚔️' : type === 'skill' ? '🧠' : '⚙️';
-              // สามชนิดต้องแยกออกจากกันได้ — โจมตีเป็นแดง ที่เหลือแยกด้วยความสว่าง
-              const typeColorStyle =
-                type === 'attack' ? palette.blood
-                : type === 'skill' ? palette.moon
-                : palette.moonDim;
-              
-              return (
-                <View key={type} style={{ marginBottom: 16 }}>
-                  <Text style={{ color: typeColorStyle, fontWeight: '600', marginBottom: 8 }}>
-                    {typeIcon} {TYPE_LABEL[type] ?? type} ({typeCards.length} ใบ)
-                  </Text>
-                  <View style={{ marginLeft: 12 }}>
-                    {typeCards.map((item, idx) => (
-                      <View key={`${item.name}-${idx}`} style={{ marginBottom: 8, padding: 8, borderRadius: 8, backgroundColor: surface.panelWell }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <View>
-                            <Text style={{ color: palette.text, fontWeight: '600' }}>{item.name} × {item.count}</Text>
-                            <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
-                              <Text style={{ color: palette.textDim, fontSize: 14 }}>Cost: {item.card.cost ?? 0}</Text>
-                              {item.card.dmg && <Text style={{ color: palette.blood, fontSize: 14 }}>DMG {item.card.dmg}</Text>}
-                              {item.card.block && <Text style={{ color: palette.moonDim, fontSize: 14 }}>Block {item.card.block}</Text>}
-                              {item.card.energyGain && <Text style={{ color: palette.moonDim, fontSize: 14 }}>Energy +{item.card.energyGain}</Text>}
-                              {item.card.draw && <Text style={{ color: palette.moonDim, fontSize: 14 }}>Draw {item.card.draw}</Text>}
-                            </View>
-                            {item.card.desc && (
-                              <Text style={{ color: palette.textFaint, fontSize: 12, marginTop: 4 }}>{item.card.desc}</Text>
-                            )}
-                          </View>
-                          <Text style={{ color: palette.textFaint, fontSize: 14 }}>⭐ {item.card.rarity}</Text>
-                        </View>
-                      </View>
-                    ))}
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: space.xl, paddingBottom: space.xxl, gap: space.lg,
+        }}
+      >
+        {deck.length === 0 && (
+          <Text style={{
+            color: palette.textDim, fontSize: size.bodyLg, fontFamily: font.body,
+            textAlign: 'center', paddingVertical: space.xxl,
+          }}>
+            สำรับว่างเปล่า
+          </Text>
+        )}
+
+        {(equipped.length > 0 || equipmentCards.length > 0) && (
+          <Section title={`เครื่องราง (${slotsUsed}/${slotsMax} ช่อง)`}>
+            {equipped.map((eq, i) => (
+              <View
+                key={eq.id ?? i}
+                style={{
+                  flexDirection: 'row', alignItems: 'center', gap: space.md,
+                  padding: space.md, borderRadius: radius.md,
+                  backgroundColor: surface.panelRaise,
+                  borderWidth: 1, borderColor: palette.lineStrong,
+                }}
+              >
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+                    <Text style={{ color: palette.moon, fontSize: size.ui, fontFamily: font.uiMed }}>
+                      {eq.name || eq.id}
+                    </Text>
+                    {eq.temporary && (
+                      <Text style={{ color: palette.textFaint, fontSize: size.tiny, fontFamily: font.ui }}>
+                        ชั่วคราว (หมดเมื่อจบไฟต์)
+                      </Text>
+                    )}
                   </View>
+                  {!!eq.desc && (
+                    <Text style={{
+                      color: palette.textFaint, fontSize: size.body,
+                      fontFamily: font.body, marginTop: 2, lineHeight: 22,
+                    }}>
+                      {eq.desc}
+                    </Text>
+                  )}
+                </View>
+
+                {/* ของชั่วคราวถอดไม่ได้ — มันจะหายเองตอนจบไฟต์ */}
+                {!eq.temporary && (
+                  <SmallButton
+                    label="ถอด"
+                    onPress={() => dispatch({ type: 'UnequipToDeck', equipmentId: eq.id })}
+                  />
+                )}
+              </View>
+            ))}
+
+            {equipmentCards.map((card, i) => {
+              const isEquipped = equipped.some(eq => eq.id === card.equipmentId);
+              if (isEquipped) return null;
+              const canEquip = slotsUsed < slotsMax;
+
+              return (
+                <View
+                  key={`${card.id}-${i}`}
+                  style={{
+                    flexDirection: 'row', alignItems: 'center', gap: space.md,
+                    padding: space.md, borderRadius: radius.md,
+                    backgroundColor: surface.panelSunk,
+                    borderWidth: 1, borderColor: surface.panelWell,
+                  }}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.uiMed }}>
+                      {card.name || card.id}
+                    </Text>
+                    {!!card.desc && (
+                      <Text style={{
+                        color: palette.textFaint, fontSize: size.body,
+                        fontFamily: font.body, marginTop: 2, lineHeight: 22,
+                      }}>
+                        {card.desc}
+                      </Text>
+                    )}
+                  </View>
+
+                  {canEquip ? (
+                    <SmallButton
+                      label="สวม"
+                      onPress={() => dispatch({ type: 'EquipFromDeck', cardId: card.id })}
+                    />
+                  ) : (
+                    <Text style={{ color: palette.textFaint, fontSize: size.label, fontFamily: font.ui }}>
+                      ช่องเต็ม
+                    </Text>
+                  )}
                 </View>
               );
             })}
-          </View>
-        </>
-      )}
+          </Section>
+        )}
+
+        {TYPE_ORDER.map(type => {
+          const list = rows.filter(r => r.card.type === type);
+          if (list.length === 0) return null;
+          const total = list.reduce((n, r) => n + r.count, 0);
+
+          return (
+            <Section key={type} title={`${TYPE_LABEL[type] ?? type} (${total} ใบ)`}>
+              {list.map(r => (
+                <CardRow key={r.card.id} card={r.card} count={r.count} />
+              ))}
+            </Section>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
 
-export default DeckView;
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <View style={{ gap: space.sm }}>
+      <Text style={{ color: palette.moonDim, fontSize: size.heading, fontFamily: font.heading }}>
+        {title}
+      </Text>
+      <View style={{ gap: space.sm }}>{children}</View>
+    </View>
+  );
+}
+
+function SmallButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => ({
+        paddingHorizontal: space.lg, paddingVertical: space.sm,
+        borderRadius: radius.md,
+        backgroundColor: pressed ? tint.moonPick : tint.moonSoft,
+        borderWidth: 1, borderColor: palette.lineStrong,
+      })}
+    >
+      <Text style={{ color: palette.moon, fontSize: size.label, fontFamily: font.uiMed }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}

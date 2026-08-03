@@ -27,6 +27,15 @@ export type CardData = {
   energyGain?: number;
   /** ฟื้นพลังชีวิตให้ผู้เล่น */
   heal?: number;
+  /**
+   * เล่นแล้วออกจากไฟต์ไปเลย (เข้ากองเผา ไม่กลับมาในกองจั่วอีก)
+   *
+   * มีในไฟล์ข้อมูลและ `combat.ts` อ่านใช้มาตลอด แต่ไม่เคยอยู่ในไทป์
+   * ทุกที่ที่ใช้จึงต้อง cast เป็น any — และ UI ก็เลยไม่เคยแสดงมันเลย
+   */
+  exhaust?: boolean;
+  /** ปลุกเสกไปแล้ว — ใบหนึ่งปลุกเสกได้ครั้งเดียว (ดู `upgradeCard`) */
+  upgraded?: boolean;
   tags?: string[];
   rarity?: Rarity;
   equipmentId?: string;

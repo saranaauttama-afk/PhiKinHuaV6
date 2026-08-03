@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import type { GameState } from '../../../src/core/types';
-import { palette, surface, tint } from '../../theme';
+import type { CardData, GameState } from '../../../src/core/types';
+import CardRow from '../CardRow';
+import { palette, surface, tint, font, size, space } from '../../theme';
 
 /**
  * หน้าเลือกรางวัลตอนเลเวลอัป
@@ -47,13 +48,26 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
 
   const bucketOf = (opt: 'A' | 'B') => (opt === 'A' ? choice.optionA : choice.optionB);
 
-  const subChoices = (opt: 'A' | 'B') => {
+  const deck = state.masterDeck ?? [];
+  /** ในสำรับตอนนี้มีการ์ด id นี้อยู่กี่ใบ */
+  const ownedCount = (id: string) => deck.filter(c => c.id === id).length;
+
+  type SubChoice = {
+    key: string;
+    title: string;
+    detail: string;
+    /** ตัวเลือกที่เป็นการ์ดจริง — แสดงเต็มใบแทนที่จะเป็นแค่ชื่อ */
+    card?: CardData;
+  };
+
+  const subChoices = (opt: 'A' | 'B'): SubChoice[] => {
     const bucket = bucketOf(opt);
     if (bucket === 'cards') {
       return (state.levelUp?.cardChoices ?? []).map((c, i) => ({
         key: c.instanceId ?? `${c.id}-${i}`,
         title: c.name,
         detail: c.desc ?? '',
+        card: c,
       }));
     }
     if (bucket === 'blessing') {
@@ -122,24 +136,53 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         </View>
       ) : (
         <View>
+          {/* เลือกการ์ดโดยไม่รู้ว่าสำรับมีกี่ใบคือการเลือกแบบไม่มีข้อมูล
+              สำรับใหญ่ขึ้นหนึ่งใบ = โอกาสจั่วเจอใบที่ต้องการลดลงทุกใบ */}
+          {bucketOf(pending) === 'cards' && (
+            <Text style={{
+              color: palette.textFaint, fontSize: size.label,
+              fontFamily: font.ui, textAlign: 'center', marginBottom: space.md,
+            }}>
+              สำรับตอนนี้ {deck.length} ใบ · หยิบแล้วจะเป็น {deck.length + 1} ใบ
+            </Text>
+          )}
+
           <ScrollView style={{ maxHeight: 340 }} contentContainerStyle={{ gap: 12 }}>
             {subChoices(pending).map((sc, i) => (
               <Pressable
                 key={sc.key}
                 onPress={() => onChoose(pending, i)}
                 style={{
-                  padding: 16, borderRadius: 14,
-                  backgroundColor: surface.panel,
-                  borderWidth: 1, borderColor: palette.line,
+                  padding: sc.card ? 0 : 16, borderRadius: 14,
+                  backgroundColor: sc.card ? 'transparent' : surface.panel,
+                  borderWidth: sc.card ? 0 : 1, borderColor: palette.line,
                 }}
               >
-                <Text style={{ color: palette.text, fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
-                  {sc.title}
-                </Text>
-                {!!sc.detail && (
-                  <Text style={{ color: palette.textDim, fontSize: 13, marginTop: 4 }}>
-                    {sc.detail}
-                  </Text>
+                {sc.card ? (
+                  <View>
+                    <CardRow card={sc.card} />
+                    {/* ซ้ำใบเดิมไม่ได้แปลว่าแย่ — บางทีเราตั้งใจถือใบเดิมหลายใบ
+                        แต่ต้องรู้ตัวว่ากำลังทำอยู่ */}
+                    {ownedCount(sc.card.id) > 0 && (
+                      <Text style={{
+                        color: palette.moonDim, fontSize: size.tiny,
+                        fontFamily: font.ui, marginTop: 2, marginLeft: space.md,
+                      }}>
+                        มีอยู่แล้ว {ownedCount(sc.card.id)} ใบ
+                      </Text>
+                    )}
+                  </View>
+                ) : (
+                  <>
+                    <Text style={{ color: palette.text, fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
+                      {sc.title}
+                    </Text>
+                    {!!sc.detail && (
+                      <Text style={{ color: palette.textDim, fontSize: 13, marginTop: 4 }}>
+                        {sc.detail}
+                      </Text>
+                    )}
+                  </>
                 )}
               </Pressable>
             ))}

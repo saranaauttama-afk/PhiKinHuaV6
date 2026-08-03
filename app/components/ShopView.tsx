@@ -43,13 +43,15 @@ function cardLine(c?: CardData): string {
 }
 
 function ItemChip({
-  title, line, note, onPress, wide = false,
+  title, line, note, onPress, wide = false, disabled = false,
 }: {
-  title: string; line?: string; note?: string; onPress: () => void; wide?: boolean;
+  title: string; line?: string; note?: string; onPress: () => void;
+  wide?: boolean; disabled?: boolean;
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={disabled ? undefined : onPress}
+      disabled={disabled}
       style={{
         paddingHorizontal: space.md, paddingVertical: space.sm,
         borderRadius: radius.md,
@@ -57,6 +59,7 @@ function ItemChip({
         borderWidth: 1, borderColor: palette.line,
         minWidth: wide ? '46%' : 110,
         flexGrow: wide ? 1 : 0,
+        opacity: disabled ? 0.4 : 1,
       }}
     >
       <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.heading }}>
@@ -198,7 +201,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         <Lead>โต๊ะพิธีตั้งอยู่กลางลาน ธูปยังไหม้ค้าง เจ้าพิธีรอเราอยู่แล้ว</Lead>
         <Money state={state} />
         <Text style={{ color: palette.moonDim, fontSize: size.label, marginBottom: space.md, fontFamily: font.ui }}>
-          ค่าพิธี {cost} ทอง · ปลุกเสกไปแล้ว {count} ใบ
+          ค่าพิธี {cost} ทอง · ปลุกเสกไปแล้ว {count} ใบ · ใบหนึ่งปลุกเสกได้ครั้งเดียว
         </Text>
         <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
           {deck.map((card, i) => (
@@ -206,6 +209,10 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
               key={i}
               title={card.name || card.id}
               line={cardLine(card)}
+              // ใบที่ปลุกไปแล้วยังโชว์อยู่แต่กดไม่ได้ — ซ่อนทิ้งจะทำให้ลำดับ index
+              // ที่ส่งเข้า dispatch เพี้ยนจากสำรับจริง
+              note={card.upgraded ? 'ปลุกเสกแล้ว' : undefined}
+              disabled={!!card.upgraded}
               onPress={() => dispatch({ type: 'ShopUpgradeBuy', index: i })}
             />
           ))}

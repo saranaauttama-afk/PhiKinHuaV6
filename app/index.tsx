@@ -264,17 +264,23 @@ export default function Home() {
               และยังมีรายการทางเลือกซ้ำกับการ์ด encounter ด้านบนอีกชุด */}
           <ShopView state={state} dispatch={dispatch} />
           <StoryEventView state={state} dispatch={dispatch} />
-          <DeckView state={state} dispatch={dispatch} />
           <EventView state={state} dispatch={dispatch} />
 
 
-          <PlayerStatusBar state={state} />
+          <PlayerStatusBar
+            state={state}
+            onOpenDeck={() => dispatch({ type: 'OpenDeck' })}
+          />
 
         </Scrim>
       </ImageBackground>
 
       {/* BlessingDialog/EncounterDialog แบบ mock ถูกแทนด้วยหน้าเลือกพรจริง
           และการ์ด encounter ที่มาจาก state.pages แล้ว */}
+
+      {/* สำรับเป็นจอทับเต็มจอ วางนอก Scrim เพื่อให้อยู่เหนือทุกอย่าง
+          เดิมวางเป็นบล็อกไหลอยู่ในคอลัมน์กลางแผนที่ จึงล้นออกนอกจอ */}
+      <DeckView state={state} dispatch={dispatch} />
 
     </View>
   );

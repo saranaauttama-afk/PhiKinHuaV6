@@ -14,6 +14,7 @@ import DiscardOverlay from './components/battle/DiscardOverlay';
 import VictoryOverlay from './components/battle/VictoryOverlay';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
+import PileView, { type PileId } from './components/battle/PileView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 import { useAppFonts } from './useAppFonts';
@@ -78,8 +79,20 @@ export default function BattlePage() {
   const reward = gameState.lastReward ?? { exp: 0, gold: 0 };
 
   const playerHand = gameState.piles.hand;
-  const deckSize   = gameState.masterDeck.length + gameState.piles.draw.length +
-    gameState.piles.discard.length;
+
+  /**
+   * เลขข้างไอคอนสำรับ = **เหลือในกองจั่วกี่ใบ**
+   *
+   * เดิมคิดเป็น `masterDeck + draw + discard` ซึ่งนับซ้ำ — `masterDeck` คือสำรับ
+   * ถาวรของรัน ส่วน `draw` คือสำเนาที่สับไว้สำหรับไฟต์นี้ (ดู `buildAndShuffleDeck`)
+   * สำรับ 12 ใบตอนเริ่มไฟต์จึงขึ้นเลข 24 มาตลอด
+   *
+   * ตัวเลขที่ใช้ตัดสินใจตอนสู้คือ "เหลือให้จั่วอีกกี่ใบ" ไม่ใช่ขนาดสำรับทั้งหมด
+   */
+  const drawCount = gameState.piles.draw.length;
+
+  /** กองที่กำลังเปิดดู — บนหน้าจอเท่านั้น ไม่ใช่สเตตของเกม */
+  const [openPile, setOpenPile] = React.useState<PileId | null>(null);
 
   const handlePlayCard = (card: any, index: number) => {
     if (phase !== 'player') return;
@@ -329,9 +342,19 @@ export default function BattlePage() {
           maxEnergy={player.maxEnergy}
           block={player.block}
           maxHandSize={player.maxHandSize}
-          deckSize={deckSize}
+          drawCount={drawCount}
           onEndTurn={handleEndTurn}
+          onOpenPiles={() => setOpenPile('draw')}
           isEnemyTurn={phase === 'enemy'}
+        />
+
+        {/* กองจั่ว/กองทิ้ง/กองเผา — ดูได้ทุกจังหวะ ไม่ต้องหยุดเทิร์น */}
+        <PileView
+          piles={gameState.piles}
+          deck={gameState.masterDeck}
+          open={openPile}
+          onChangePile={setOpenPile}
+          onClose={() => setOpenPile(null)}
         />
 
         {phase === 'discard' && (

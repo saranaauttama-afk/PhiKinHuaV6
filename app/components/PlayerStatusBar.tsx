@@ -12,18 +12,20 @@
 //    ตอนนี้วางตามสัดส่วนของกรอบ
 
 import React from 'react';
-import { ImageBackground, Text, View } from 'react-native';
+import { ImageBackground, Pressable, Text, View } from 'react-native';
 import type { GameState } from '../../src/core/types';
-import { palette, font, size } from '../theme';
+import { palette, font, size, radius, tint } from '../theme';
 
 const PANEL_H = 170;
 
 /** พื้นที่ใช้งานจริงข้างในกรอบ วัดเป็นสัดส่วนจากไฟล์ bgUserPanel.png */
 const INNER = { top: 0.34, height: 0.44, left: 0.09, right: 0.09 };
 
-function Stat({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
-  return (
-    <View style={{ alignItems: 'center', flex: 1 }}>
+function Stat({
+  label, value, danger = false, onPress,
+}: { label: string; value: string; danger?: boolean; onPress?: () => void }) {
+  const body = (pressed: boolean) => (
+    <>
       <Text
         style={{
           color: danger ? palette.blood : palette.moonDim,
@@ -42,15 +44,37 @@ function Stat({ label, value, danger = false }: { label: string; value: string; 
           fontSize: size.ui,
           fontFamily: font.ui,
           marginTop: 1,
+          // ค่าที่กดได้ขีดเส้นใต้ไว้ ไม่งั้นมันดูเหมือนตัวเลขเฉยๆ ไม่มีใครลองกด
+          textDecorationLine: onPress ? 'underline' : 'none',
         }}
       >
         {value}
       </Text>
-    </View>
+    </>
+  );
+
+  if (!onPress) {
+    return <View style={{ alignItems: 'center', flex: 1 }}>{body(false)}</View>;
+  }
+
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => ({
+        alignItems: 'center', flex: 1,
+        borderRadius: radius.sm,
+        backgroundColor: pressed ? tint.moonSoft : 'transparent',
+      })}
+    >
+      {({ pressed }) => body(pressed)}
+    </Pressable>
   );
 }
 
-export default function PlayerStatusBar({ state }: { state: GameState }) {
+export default function PlayerStatusBar({
+  state, onOpenDeck,
+}: { state: GameState; onOpenDeck?: () => void }) {
   const p = state.player;
 
   return (
@@ -79,7 +103,9 @@ export default function PlayerStatusBar({ state }: { state: GameState }) {
         <Stat label="เลือด"   value={`${p.hp}/${p.maxHp}`} danger />
         <Stat label="พลังงาน" value={`${p.energy}/${p.maxEnergy}`} />
         <Stat label="ทอง"     value={`${p.gold ?? 0}`} />
-        <Stat label="มือ"     value={`${state.piles.hand.length}/${p.maxHandSize}`} />
+        {/* เดิมช่องนี้คือ "มือ" ซึ่งบนแผนที่เป็น 0 เสมอ (สเตตคอมแบตถูกล้างแล้ว)
+            เปลี่ยนเป็นจำนวนการ์ดในสำรับ และทำให้กดเข้าไปดูทั้งสำรับได้ */}
+        <Stat label="สำรับ"   value={`${(state.masterDeck ?? []).length}`} onPress={onOpenDeck} />
         <Stat label="ค่าประสบการณ์" value={`${p.exp}/${p.expToNext}`} />
       </View>
     </ImageBackground>

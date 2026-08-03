@@ -8,7 +8,7 @@ import { START_ENERGY } from '../../balance/core';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
 import { SHOP_STOCK_SIZE, SHOP_POWER_BIAS } from '../../balance/weights';
-import { upgradeCard } from '../shared';
+import { upgradeCard, canUpgrade } from '../shared';
 import { replaceSingleOffer } from './map_pages';
 import { consumeToken } from '../../map/pages';
 import { loseRun } from './runEnd';
@@ -162,6 +162,14 @@ export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'Shop
   }
   const i = cmd.index;
   if (i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
+
+  // ใบที่ปลุกเสกไปแล้วปลุกซ้ำไม่ได้ — กันไว้ที่นี่ด้วย ไม่ใช่แค่ซ่อนปุ่มใน UI
+  // ไม่งั้นเสียทองฟรีโดยไม่มีอะไรเปลี่ยน
+  if (!canUpgrade(s.masterDeck[i])) {
+    s.log.push('การ์ดใบนี้ปลุกเสกไปแล้ว');
+    return { state: s, rng: r };
+  }
+
   s.player.gold -= price;
   s.masterDeck[i] = upgradeCard(s.masterDeck[i]);
   s.runCounters = s.runCounters || ({} as any);
