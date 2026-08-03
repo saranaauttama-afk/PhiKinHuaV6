@@ -332,7 +332,7 @@ export default function BattlePage() {
 
         {/* ผีที่เรียกมา — วางเหนือมือ ใต้ฉากกลาง ซ้ายของเรา ขวาของศัตรู */}
         <View style={{ position: 'absolute', bottom: 210, left: 0, right: 0, zIndex: 200 }}>
-          <MinionRow player={gameState.playerMinions} enemy={gameState.enemyMinions} />
+          <MinionRow minions={gameState.minions} />
         </View>
 
         {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้ */}

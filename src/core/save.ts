@@ -24,7 +24,7 @@ export const SAVE_VERSION = 2;
  * โหลดกลับมาผู้เล่นจะยืนอยู่บนแผนที่เสมอ ไม่ใช่กลางไฟต์
  */
 const DROP_ON_SAVE = [
-  'enemy', 'enemyIntent', 'enemyPiles', 'playerPiles', 'enemyIntentCardId',
+  'enemy', 'enemyIntent', 'enemyPiles', 'playerPiles', 'enemyIntentCardId', 'minions',
   'piles', 'pendingEvents', 'turnFlags', 'levelUp', 'starter',
   'shopKind', 'shopStock', 'shopBoughtItems', 'currentShopId',
   'event', 'deckOpen', 'combatVictoryLock', 'equipmentTempSlots',
@@ -74,6 +74,7 @@ export function fromSave(data: SaveV2): GameState {
     turn: 0,
     enemy: undefined,
     enemyIntent: undefined,
+    minions: [],
     pendingEvents: [],
     piles: { draw: [], hand: [], discard: [], exhaust: [] },
     turnFlags: { blessingOnce: {}, equipmentOnce: {} },

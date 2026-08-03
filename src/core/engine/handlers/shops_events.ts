@@ -8,7 +8,7 @@ import { START_ENERGY } from '../../balance/core';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
 import { SHOP_STOCK_SIZE, SHOP_POWER_BIAS } from '../../balance/weights';
-import { upgradeCard, canUpgrade } from '../shared';
+import { upgradeCard, canUpgrade, grantBlessing } from '../shared';
 import { replaceSingleOffer } from './map_pages';
 import { consumeToken } from '../../map/pages';
 import { loseRun } from './runEnd';
@@ -194,8 +194,7 @@ export function eventChooseBlessing(s: GameState, cmd: Extract<Command, { type: 
   const idx = cmd.index;
   const pick = s.event.options[idx];
   if (!pick) return { state: s, rng: r };
-  if (!s.blessings.find(b => b.id === pick.id)) {
-    s.blessings.push(pick);
+  if (grantBlessing(s, pick)) {
     s.event.chosenId = pick.id;
     s.log.push(`Shrine: took ${pick.name}`);
   } else {
@@ -308,22 +307,6 @@ export function openShopEquipment(s: GameState, r: RNG): { state: GameState; rng
   s.phase = 'shop';
   s.log.push(`Shop(equipment): ${items.length} items`);
   return { state: s, rng: rr };
-}
-
-export function openWell(s: GameState, r: RNG): { state: GameState; rng: RNG } {
-  // event แบบ well (ใช้/ปฏิเสธได้ 1 ครั้ง)
-  s.event = { type: 'well', used: false, dismissed: false } as any;
-  s.phase = 'event';
-  s.log.push('Event: well open');
-  return { state: s, rng: r };
-}
-
-export function openHealingShrine(s: GameState, r: RNG): { state: GameState; rng: RNG } {
-  // event แบบ healing shrine (ฟื้นฟู HP)
-  s.event = { type: 'healing_shrine', used: false, dismissed: false } as any;
-  s.phase = 'event';
-  s.log.push('Event: healing shrine open');
-  return { state: s, rng: r };
 }
 
 export function doHealingShrineUse(s: GameState, _cmd: Extract<Command, { type: 'DoHealingShrineUse' }>, r: RNG) {

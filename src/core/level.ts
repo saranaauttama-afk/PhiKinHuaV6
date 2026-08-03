@@ -236,9 +236,26 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classTag?: string) {
   return { rng: r, list: cards };
 }
 
-export function rollTwoBlessings(rng: RNG) {
+/**
+ * สุ่มพรให้เลือกสองอย่าง — **ไม่เสนอพรที่ถืออยู่แล้ว**
+ *
+ * เดิมสุ่มจากคลังทั้ง 12 อย่างโดยไม่สนว่าถืออะไรอยู่ ผลคือรันหนึ่งได้พรซ้ำเป็น
+ * เรื่องปกติ (วัดจริง 5 รัน เกือบทุกรันมีอย่างน้อยหนึ่งคู่) และ **พรซ้ำผลซ้อนกัน**
+ * เพราะ blessingRuntime วนทำงานทีละรายการในลิสต์ — "ผีป้องกัน" สองใบได้ Block 4
+ * ต่อการ์ดโจมตี ซึ่งไม่มีใครออกแบบไว้ มันแค่หลุดมา
+ *
+ * ที่แก้ตรงนี้เพราะรางวัลที่ได้มาแล้วไม่มีผลคือรางวัลที่หายไปเฉยๆ —
+ * กันตอนแจกดีกว่ากันตอนใช้
+ *
+ * @param owned id ของพรที่ถืออยู่แล้ว
+ */
+export function rollTwoBlessings(rng: RNG, owned: string[] = []) {
   let r = rng;
-  const pool: BlessingDef[] = [...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon, ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary];
+  const pool: BlessingDef[] = [
+    ...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon,
+    ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary,
+  ].filter(b => !owned.includes(b.id));
+
   const sh = shuffle(r, pool); r = sh.rng;
   return { rng: r, list: sh.array.slice(0, Math.min(2, sh.array.length)).map(b => ({ ...b })) };
 }

@@ -6,20 +6,29 @@ import { THAI_MINIONS } from './combat/minions/thai-minions';
 import { applyStatusEffect } from './statusEffectsRuntime';
 import { makeDeterministicId, nextStateRng, pickFrom } from './rngState';
 
-// ===== Global Minion State =====
+// ===== ผีที่ถูกเรียกมาในไฟต์นี้ =====
+//
+// **เคยเป็นอาร์เรย์ระดับโมดูล** — บั๊กชนิดเดียวกับที่ adaptiveAI เคยเป็นก่อน
+// Phase 5: ไม่ได้อยู่ใน `GameState` จึงไม่ถูกเซฟ ไม่ถูกโคลนตอน `applyCommand`
+// และ **ค้างข้ามรัน** (มันถูกล้างตอนเริ่มไฟต์เท่านั้น ระหว่างนั้นเป็นของกลาง
+// ที่ทุก state ใช้ร่วมกัน) ตอนนี้อยู่ใน `state.minions` ตัวเดียว
+//
+// ฟังก์ชันอ่านค่าทุกตัวรับ `state` แล้ว — ไม่มีทางลัดที่อ่านของกลางได้อีก
 
-const activeMinions: MinionData[] = [];
-
-export function getActiveMinions(): MinionData[] {
-  return [...activeMinions];
+function pool(state: GameState): MinionData[] {
+  return (state.minions ??= []);
 }
 
-export function getPlayerMinions(): MinionData[] {
-  return activeMinions.filter(m => m.owner === 'player');
+export function getActiveMinions(state: GameState): MinionData[] {
+  return [...pool(state)];
 }
 
-export function getEnemyMinions(): MinionData[] {
-  return activeMinions.filter(m => m.owner === 'enemy');
+export function getPlayerMinions(state: GameState): MinionData[] {
+  return pool(state).filter(m => m.owner === 'player');
+}
+
+export function getEnemyMinions(state: GameState): MinionData[] {
+  return pool(state).filter(m => m.owner === 'enemy');
 }
 
 // ===== Minion Summoning =====
@@ -50,7 +59,7 @@ export function summonMinion(
       statusEffects: []
     };
 
-    activeMinions.push(minion);
+    pool(state).push(minion);
     
     const ownerName = owner === 'player' ? 'Player' : state.enemy?.name || 'Enemy';
     const abilitySummary = minion.abilities.map(a => a.description).join(', ');
@@ -58,7 +67,7 @@ export function summonMinion(
   }
 
   // Check summoning limits
-  const ownerMinions = activeMinions.filter(m => m.owner === owner);
+  const ownerMinions = pool(state).filter(m => m.owner === owner);
   const maxMinions = owner === 'player' ? 3 : (state.enemy ? getEnemyMaxMinions(state) : 2); // Reduced limits
   
   if (ownerMinions.length > maxMinions) {
@@ -73,7 +82,6 @@ export function summonMinion(
   }
   
   // ★ Sync minions to state for UI
-  syncMinionsToState(state);
 }
 
 function getEnemyMaxMinions(state: GameState): number {
@@ -86,39 +94,35 @@ function getEnemyMaxMinions(state: GameState): number {
 // ===== Minion Management =====
 
 export function removeMinion(state: GameState, minionId: string): boolean {
-  const index = activeMinions.findIndex(m => m.id === minionId);
+  const index = pool(state).findIndex(m => m.id === minionId);
   if (index >= 0) {
-    const removed = activeMinions.splice(index, 1)[0];
+    const removed = pool(state).splice(index, 1)[0];
     state.log.push(`💀 ${removed.name} is removed from battle`);
-    syncMinionsToState(state);
     return true;
   }
   return false;
 }
 
 export function clearAllMinions(state: GameState, owner?: 'player' | 'enemy'): void {
-  const toRemove = owner ? 
-    activeMinions.filter(m => m.owner === owner) : 
-    [...activeMinions];
-    
+  const toRemove = owner
+    ? pool(state).filter(m => m.owner === owner)
+    : [...pool(state)];
+
   if (toRemove.length > 0) {
     // Clear without individual logging to avoid spam
-    if (owner) {
-      activeMinions.splice(0, activeMinions.length, ...activeMinions.filter(m => m.owner !== owner));
-    } else {
-      activeMinions.length = 0;
-    }
+    state.minions = owner
+      ? pool(state).filter(m => m.owner !== owner)
+      : [];
     
     const ownerText = owner ? `${owner} ` : '';
     state.log.push(`🧹 All ${ownerText}minions cleared from battle`);
-    syncMinionsToState(state);
   }
 }
 
 // ===== Minion Combat Actions =====
 
 export function processMinionTurn(state: GameState, owner: 'player' | 'enemy'): void {
-  const minions = activeMinions.filter(m => m.owner === owner);
+  const minions = pool(state).filter(m => m.owner === owner);
   if (!minions.length) return;
 
   const targetOwner = owner === 'player' ? 'enemy' : 'player';
@@ -296,7 +300,7 @@ function dealMinionDamage(
 export function processMinionsEndTurn(state: GameState): void {
   const remainingMinions: MinionData[] = [];
   
-  for (const minion of activeMinions) {
+  for (const minion of pool(state)) {
     // Process status effects on minions
     if (minion.statusEffects?.length) {
       // Simplified status processing for minions
@@ -319,10 +323,7 @@ export function processMinionsEndTurn(state: GameState): void {
     remainingMinions.push(minion);
   }
   
-  // Update active minions
-  activeMinions.length = 0;
-  activeMinions.push(...remainingMinions);
-  syncMinionsToState(state);
+  state.minions = remainingMinions;
 }
 
 // ===== Minion Damage Taking =====
@@ -333,7 +334,7 @@ export function damageMinionsByOwner(
   owner: 'player' | 'enemy',
   damage: number
 ): void {
-  const minions = activeMinions.filter(m => m.owner === owner);
+  const minions = pool(state).filter(m => m.owner === owner);
   if (!minions.length) return;
   
   // Reduce duration of random minion instead of HP
@@ -350,48 +351,37 @@ export function damageMinionsByOwner(
 
 // ===== Integration Helpers =====
 
-export function syncMinionsToState(state: GameState): void {
-  // ก๊อปอาร์เรย์ระดับโมดูลลง state ให้ UI อ่านได้ (ดูหมายเหตุที่ `playerMinions`)
-  state.playerMinions = getPlayerMinions();
-  state.enemyMinions = getEnemyMinions();
-}
-
 export function initializeCombatMinions(state: GameState): void {
-  // Clear all minions at start of combat
-  activeMinions.length = 0;
-  syncMinionsToState(state);
+  // เริ่มไฟต์ใหม่ = ไม่มีผีตกค้างจากไฟต์ก่อน
+  state.minions = [];
   state.log.push('🧹 Combat area cleared of minions');
 }
 
 export function processPlayerTurnMinions(state: GameState): void {
   // Debug logs commented out for production
   // console.log(`🔥 processPlayerTurnMinions called`);
-  const playerMinions = getPlayerMinions();
+  const playerMinions = getPlayerMinions(state);
   // console.log(`🔥 Player minions count: ${playerMinions.length}`);
   // playerMinions.forEach((minion, i) => {
   //   console.log(`🔥 Minion ${i}: ${minion.name} (${minion.id}), Owner: ${minion.owner}`);
   // });
   
   processMinionTurn(state, 'player');
-  syncMinionsToState(state);
 }
 
 export function processEnemyTurnMinions(state: GameState): void {
   processMinionTurn(state, 'enemy');
-  syncMinionsToState(state);
 }
 
 // ===== Utility Functions =====
 
-export function getMinionCount(owner?: 'player' | 'enemy'): number {
-  if (owner) {
-    return activeMinions.filter(m => m.owner === owner).length;
-  }
-  return activeMinions.length;
+export function getMinionCount(state: GameState, owner?: 'player' | 'enemy'): number {
+  if (owner) return pool(state).filter(m => m.owner === owner).length;
+  return pool(state).length;
 }
 
-export function getMinionById(minionId: string): MinionData | undefined {
-  return activeMinions.find(m => m.id === minionId);
+export function getMinionById(state: GameState, minionId: string): MinionData | undefined {
+  return pool(state).find(m => m.id === minionId);
 }
 
 export function getAllMinionTypes(): Record<string, MinionData> {
@@ -401,13 +391,13 @@ export function getAllMinionTypes(): Record<string, MinionData> {
 export function debugMinions(state: GameState): void {
   // Debug function - uncomment when needed
   // console.log('=== MINIONS DEBUG ===');
-  // console.log('Active Minions:', activeMinions.length);
-  // console.log('Player Minions:', getPlayerMinions().map(m => `${m.name}(${m.duration} turns)`));
-  // console.log('Enemy Minions:', getEnemyMinions().map(m => `${m.name}(${m.duration} turns)`));
+  // console.log('Active Minions:', pool(state).length);
+  // console.log('Player Minions:', getPlayerMinions(state).map(m => `${m.name}(${m.duration} turns)`));
+  // console.log('Enemy Minions:', getEnemyMinions(state).map(m => `${m.name}(${m.duration} turns)`));
 }
 
 export function processEnemyMinions(state: GameState): void {
-  const enemyMinions = getEnemyMinions();
+  const enemyMinions = getEnemyMinions(state);
   if (!enemyMinions?.length) return;
   
   // Process enemy minion abilities (both attack and support)
@@ -417,7 +407,7 @@ export function processEnemyMinions(state: GameState): void {
 }
 
 export function processPlayerMinions(state: GameState): void {
-  const playerMinions = getPlayerMinions();
+  const playerMinions = getPlayerMinions(state);
   if (!playerMinions?.length) return;
   
   // Process player minion abilities (both attack and support)

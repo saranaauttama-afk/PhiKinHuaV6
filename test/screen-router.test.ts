@@ -115,6 +115,42 @@ describe('หน้าแผนที่พร้อมแสดงจริง�
   });
 });
 
+describe('ถึงหน้าแผนที่แล้ว phase ต้องเป็นแผนที่จริง', () => {
+  /**
+   * `EventView` เคยเรนเดอร์หน้าเลเวลอัป/ชนะ/เลือกพรอีกชุดหนึ่ง (ภาษาอังกฤษ)
+   * ทับซ้อนกับ `LevelUpOverlay`/`VictoryOverlay`/หน้าเลือกพรของ index.tsx
+   * มันไม่เคยขึ้นเพราะ phase พวกนั้นถูกจัดการจบที่หน้าต่อสู้ก่อนเสมอ — ลบทิ้งแล้ว
+   *
+   * ข้อนี้คือเหตุผลที่ลบได้: ถ้าวันหนึ่งมี phase อื่นหลุดมาถึงหน้าแผนที่จริง
+   * จะได้รู้ตัวตรงนี้ ไม่ใช่ไปเจอจอที่ไม่มีอะไรเรนเดอร์
+   */
+  it('ทุกครั้งที่ screenForState ตอบ map ระหว่างเดินรัน phase เป็น map เสมอ', () => {
+    let s: any = run([
+      { type: 'NewRun', seed: 'phase-inv', classId: 'shaman' },
+      { type: 'SkipChapter' },
+      { type: 'ChooseStarterBlessing', index: 0 },
+    ]);
+    let r = makeRng('phase-inv');
+    const go = (c: Command) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
+
+    for (let i = 0; i < 12; i++) {
+      while (s.chapter) go({ type: 'SkipChapter' });
+      if (screenForState(s, NO_CLASS_PICK) !== 'map') break;
+
+      expect(s.phase, `รอบที่ ${i} หลุดมาถึงหน้าแผนที่ด้วย phase ${s.phase}`).toBe('map');
+
+      const offers = s.pages?.current?.offers ?? [];
+      if (!offers.length) break;
+      const restIx = offers.findIndex((o: any) => o.kind !== 'monster' && o.kind !== 'boss');
+      if (restIx < 0) break;
+
+      go({ type: 'ChooseOffer', index: restIx });
+      if (s.phase === 'event' && s.story) go({ type: 'ChooseEventOption', index: 0 });
+      go({ type: 'CompleteNode' });
+    }
+  });
+});
+
 describe('state ตั้งต้นของ store ตรงกับของ engine', () => {
   it('ใช้ baseNewState ตัวเดียวกัน ไม่ได้เขียนขึ้นมาเอง', () => {
     // เดิม store ประกอบ state เองรวมถึงก๊อปข้อมูลการ์ดมาแปะไว้ ซึ่งเก่ากว่า

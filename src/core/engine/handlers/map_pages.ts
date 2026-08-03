@@ -210,11 +210,8 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       
       // Initialize enemy behaviors and minions
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
-      const { syncMinionsToState } = require('../../minionRuntime');
-      
       initializeEnemyBehaviors(s);
-      // Don't clear minions on combat start - let them persist from previous summons
-      syncMinionsToState(s);
+      // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
       
       // ตั้ง intent แสดงล่วงหน้า (ไพ่บนสุดของ draw)
       (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
@@ -282,11 +279,8 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       
       // Initialize boss behaviors and minions
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
-      const { syncMinionsToState } = require('../../minionRuntime');
-      
       initializeEnemyBehaviors(s);
-      // Don't clear minions on combat start - let them persist from previous summons
-      syncMinionsToState(s);
+      // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
       
       (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
 

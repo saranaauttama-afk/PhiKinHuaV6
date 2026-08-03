@@ -1,7 +1,7 @@
 // src/core/engine/handlers/level.ts
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
-import { upgradeCard, canUpgrade } from '../shared';
+import { upgradeCard, canUpgrade, grantBlessing } from '../shared';
 
 export function chooseLevelUp(s: GameState, cmd: Extract<Command, { type: 'ChooseLevelUp' }>, r: RNG) {
   if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed) return { state: s, rng: r };
@@ -57,7 +57,7 @@ function applyBucketChoice(s: GameState, bucket: string, idx: number) {
     }
     case 'blessing': {
       const bsel = s.levelUp?.blessingChoices?.[idx]; if (!bsel) break;
-      s.blessings.push(bsel);
+      grantBlessing(s, bsel);
       break;
     }
     case 'remove': {

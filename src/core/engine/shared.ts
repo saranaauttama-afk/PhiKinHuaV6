@@ -1,5 +1,5 @@
 // src/core/engine/shared.ts
-import type { GameState, CardData } from '../types';
+import type { GameState, CardData, BlessingDef } from '../types';
 import type { RNG } from '../rng';
 import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
 import { rollLevelUpChoice, rollTwoBlessings, rollThreeCards, type LevelBucket } from '../level';
@@ -19,6 +19,20 @@ export function cloneForReducer(prev: GameState): GameState {
     s.event.options = prev.event.options;
   }
   return s;
+}
+
+/**
+ * เพิ่มพรเข้าตัวผู้เล่น — เงียบๆ ถ้ามีอยู่แล้ว
+ *
+ * ตาข่ายชั้นสุดท้าย: `rollTwoBlessings` กันไม่ให้เสนอพรที่ถืออยู่แล้ว
+ * แต่พรถูกแจกจากสามที่ (เลเวลอัป ศาล เหตุการณ์) จุดนี้เลยกันไว้อีกชั้น
+ * ให้ "ถือพรเดิมสองใบ" เป็นไปไม่ได้ ไม่ว่าจะมาทางไหน
+ */
+export function grantBlessing(s: GameState, b: BlessingDef): boolean {
+  s.blessings = s.blessings ?? [];
+  if (s.blessings.some(x => x.id === b.id)) return false;
+  s.blessings.push(b);
+  return true;
 }
 
 /** ใบนี้ปลุกเสกได้อีกไหม */
@@ -109,7 +123,8 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
         const rr = rollThreeCards(r, s.player.level, getClass(s.classId).cardTag); r = rr.rng; cardChoices = rr.list;
       }
       if (choice.optionA === 'blessing' || choice.optionB === 'blessing') {
-        const bb = rollTwoBlessings(r); r = bb.rng; blessingChoices = bb.list;
+        const owned = (s.blessings ?? []).map(b => b.id);
+        const bb = rollTwoBlessings(r, owned); r = bb.rng; blessingChoices = bb.list;
       }
       
       s.levelUp = { choice, cardChoices, blessingChoices, consumed: false };

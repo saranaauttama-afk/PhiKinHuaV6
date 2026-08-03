@@ -13,7 +13,6 @@ import { describeOffer, isShopLike } from './components/offerDisplay';
 import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
-import EventView from './components/EventView';
 import BtnEncounter from './components/BtnEncounter';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
@@ -266,7 +265,6 @@ export default function Home() {
               และยังมีรายการทางเลือกซ้ำกับการ์ด encounter ด้านบนอีกชุด */}
           <ShopView state={state} dispatch={dispatch} />
           <StoryEventView state={state} dispatch={dispatch} />
-          <EventView state={state} dispatch={dispatch} />
 
 
           <PlayerStatusBar

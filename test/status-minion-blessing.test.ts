@@ -8,6 +8,13 @@ import { THAI_MINIONS } from '../src/core/combat/minions/thai-minions';
 import { STATUS_EFFECTS_REGISTRY } from '../src/core/combat/status-effects/registry';
 import { sortForDisplay, isDebuff } from '../src/core/combat/statusDisplay';
 import { minionTemplateId, visibleMinions, minionSummary } from '../src/core/combat/minions/display';
+import { summonMinion } from '../src/core/minionRuntime';
+import { rollTwoBlessings } from '../src/core/level';
+import { grantBlessing } from '../src/core/engine/shared';
+import { BLESSINGS_BY_RARITY } from '../src/core/pack';
+import type { Command, GameState } from '../src/core/types';
+import type { PageOffer } from '../src/core/map/pages';
+import { resolveStoryIfAny } from './helpers';
 import { groupBlessings } from '../src/core/blessing/group';
 import { applyStatusEffect } from '../src/core/statusEffectsRuntime';
 import { makeCombatState } from './helpers';
@@ -15,6 +22,48 @@ import cardsJson from '../src/data/packs/base/cards.json';
 import classCardsJson from '../src/data/packs/base/class_cards.json';
 
 const ALL_CARDS = [...cardsJson, ...classCardsJson] as any[];
+const ALL_BLESSINGS = Object.values(BLESSINGS_BY_RARITY).flat();
+
+/** เดินรันจนจบ โดยเลือกพรทุกครั้งที่มีให้เลือก */
+function playToEnd(seed: string): GameState {
+  let s: any = { seed, phase: 'start', turn: 0 };
+  let r = makeRng(seed);
+  const go = (c: Command) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
+  const skipChapters = () => { while (s.chapter) go({ type: 'SkipChapter' }); };
+
+  go({ type: 'NewRun', seed, classId: 'shaman' });
+  skipChapters();
+  go({ type: 'ChooseStarterBlessing', index: 0 });
+  skipChapters();
+
+  let guard = 0;
+  while (guard++ < 300 && s.phase !== 'run_complete' && s.phase !== 'defeat') {
+    const offers: PageOffer[] = s.pages?.current?.offers ?? [];
+    if (!offers.length) break;
+    const i = offers.findIndex(o => o.kind === 'monster' || o.kind === 'boss');
+    if (i < 0) {
+      go({ type: 'ChooseOffer', index: 0 });
+      resolveStoryIfAny(s, go);
+      go({ type: 'CompleteNode' });
+      skipChapters();
+      continue;
+    }
+    go({ type: 'ChooseOffer', index: i });
+    if (s.phase !== 'combat') break;
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'levelup') {
+      const lu = s.levelUp?.choice;
+      if (lu?.optionA === 'blessing') go({ type: 'ChooseLevelUpOption', option: 'A', index: 0 });
+      else if (lu?.optionB === 'blessing') go({ type: 'ChooseLevelUpOption', option: 'B', index: 0 });
+      else go({ type: 'SkipLevelUp' });
+    }
+    go({ type: 'CompleteNode' });
+    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    skipChapters();
+  }
+  return s;
+}
 
 /**
  * สามอย่างที่ผู้เล่นมองไม่เห็นมาตลอด: ผีที่เรียกมา สถานะที่ติดตัว และพรติดตัว
@@ -134,12 +183,29 @@ describe('ผีที่เรียกมา', () => {
     });
 
     const out = applyCommand(state, { type: 'PlayCard', index: 0 }, rng).state;
-    const mine = visibleMinions(out.playerMinions);
+    const mine = visibleMinions(out.minions).filter(m => m.owner === 'player');
 
     expect(mine.length, 'เสกแล้วไม่มีผีโผล่มาเลย').toBeGreaterThan(0);
     expect(mine[0].name).toBe('กุมารทอง');
     expect(mine[0].duration).toBeGreaterThan(0);
     expect(minionSummary(mine[0]).length).toBeGreaterThan(0);
+  });
+
+  /**
+   * ผีเคยอยู่ในอาร์เรย์ระดับโมดูล — **state ทุกก้อนใช้ของกลางร่วมกัน**
+   * เสกใส่ state หนึ่ง แล้ว state อีกก้อนที่ไม่เกี่ยวข้องกันเลยก็เห็นผีตัวนั้นด้วย
+   *
+   * ข้อนี้จงใจไม่เดินผ่านการเริ่มไฟต์ เพราะการเริ่มไฟต์ล้างอาร์เรย์ทิ้ง —
+   * เทสต์ที่เดินผ่านมันจะผ่านทั้งที่ของยังพัง (เขียนพลาดแบบนั้นมาแล้วรอบหนึ่ง)
+   */
+  it('ผีอยู่ใน state ของตัวเอง ไม่ใช่ของกลางที่ทุก state ใช้ร่วมกัน', () => {
+    const a = makeCombatState({ hand: [] }).state;
+    const b = makeCombatState({ hand: [] }).state;
+
+    summonMinion(a, 'kuman_spirit', 'player', 1);
+
+    expect(a.minions ?? []).toHaveLength(1);
+    expect(b.minions ?? [], 'ผีข้ามไปโผล่ใน state อื่น').toHaveLength(0);
   });
 
   it('ตัดชื่อแม่แบบออกจาก id ที่ต่อท้ายให้ไม่ซ้ำได้', () => {
@@ -195,5 +261,49 @@ describe('รวมพรซ้ำ', () => {
 
   it('ไม่มีพรก็ไม่พัง', () => {
     expect(groupBlessings([])).toEqual([]);
+  });
+});
+
+describe('พรซ้ำ', () => {
+  /**
+   * เดิมสุ่มพรจากคลังทั้ง 12 อย่างโดยไม่สนว่าถืออะไรอยู่ ผลคือได้พรเดิมซ้ำบ่อย
+   * และ **ผลซ้อนกัน** เพราะ blessingRuntime วนทำงานทีละรายการในลิสต์
+   * ("ผีป้องกัน" สองใบ = Block 4 ต่อการ์ดโจมตี) ไม่มีใครออกแบบไว้ มันแค่หลุดมา
+   *
+   * แก้ที่ตอนแจก ไม่ใช่ตอนใช้ — รางวัลที่ได้มาแล้วไม่มีผลคือรางวัลที่หายไปเฉยๆ
+   */
+  it('ไม่เสนอพรที่ถืออยู่แล้ว', () => {
+    const all = rollTwoBlessings(makeRng('bl')).list;
+    expect(all.length).toBe(2);
+
+    const owned = [all[0].id];
+    for (const seed of ['a', 'b', 'c', 'd', 'e']) {
+      const out = rollTwoBlessings(makeRng(seed), owned).list;
+      expect(out.map(b => b.id), `seed ${seed}`).not.toContain(owned[0]);
+    }
+  });
+
+  it('ถือครบทุกพรแล้ว = ไม่มีอะไรให้เสนอ ไม่ใช่เสนอของซ้ำ', () => {
+    const everything = rollTwoBlessings(makeRng('x')).list;
+    const all = ALL_BLESSINGS.map(b => b.id);
+    expect(rollTwoBlessings(makeRng('y'), all).list).toEqual([]);
+    expect(everything.length).toBeGreaterThan(0);
+  });
+
+  it('แจกพรเดิมซ้ำไม่ได้ ไม่ว่ามาจากทางไหน', () => {
+    const s: any = { blessings: [], log: [] };
+    const b = { id: 'ghost_protection', name: 'ผีป้องกัน' } as BlessingDef;
+
+    expect(grantBlessing(s, b)).toBe(true);
+    expect(grantBlessing(s, b), 'แจกซ้ำได้ = ผลซ้อนกัน').toBe(false);
+    expect(s.blessings).toHaveLength(1);
+  });
+
+  it('เดินรันเต็มแล้วไม่มีพรซ้ำสักอย่าง', () => {
+    for (const seed of ['b1', 'b2', 'b3', 'b4', 'b5']) {
+      const s = playToEnd(seed);
+      const ids = s.blessings.map(b => b.id);
+      expect(new Set(ids).size, `seed ${seed}: ${ids.join(', ')}`).toBe(ids.length);
+    }
   });
 });

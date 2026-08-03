@@ -16,13 +16,14 @@ import Art from '../Art';
 import { font, palette, radius, size, space, surface, tint } from '../../theme';
 
 type Props = {
-  player?: MinionData[];
-  enemy?: MinionData[];
+  /** ผีทั้งไฟต์ ทั้งสองฝั่ง — แยกด้วย `owner` ตรงนี้ */
+  minions?: MinionData[];
 };
 
-export default function MinionRow({ player, enemy }: Props) {
-  const mine = visibleMinions(player);
-  const theirs = visibleMinions(enemy);
+export default function MinionRow({ minions }: Props) {
+  const all = visibleMinions(minions);
+  const mine = all.filter(m => m.owner === 'player');
+  const theirs = all.filter(m => m.owner === 'enemy');
   const [open, setOpen] = React.useState<string | null>(null);
 
   if (mine.length === 0 && theirs.length === 0) return null;

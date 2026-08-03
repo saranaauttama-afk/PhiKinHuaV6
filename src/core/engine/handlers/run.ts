@@ -7,6 +7,7 @@ import { START_ENERGY } from '../../balance/core';
 import { initPageMap } from '../../map/pages';
 import { startJourney } from '../../map/journeySync';
 import { getClass, buildStarterDeck } from '../../classes';
+import { grantBlessing } from '../shared';
 import { fireChapter } from '../../story/chapters';
 import { getEquipmentById } from '../../pack';
 
@@ -125,7 +126,7 @@ function autoEquipStartingCards(s: GameState) {
 
 //   // Starter blessing (เลือกก่อนเข้าเพจแรก)
 //   s.levelUp = null;
-//   const bb = rollTwoBlessings(r); r = bb.rng;
+//   const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id)); r = bb.rng;
 //   s.starter = { choices: bb.list, consumed: false };
 //   s.phase = 'starter';
 //   return { state: s, rng: r };
@@ -177,7 +178,7 @@ export function newRun(
 
   // Starter blessing
   s.levelUp = null;
-  const bb = rollTwoBlessings(r); r = bb.rng;
+  const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id)); r = bb.rng;
   s.starter = { choices: bb.list, consumed: false };
   s.phase = 'starter';
 
@@ -197,8 +198,7 @@ export function chooseStarter(
     return { state: s, rng: r };
   }
   const b = s.starter.choices[cmd.index];
-  if (b) {
-    s.blessings.push(b);
+  if (b && grantBlessing(s, b)) {
     s.log.push(`Starter blessing: ${b.name ?? b.id}`);
   }
   s.starter = null;

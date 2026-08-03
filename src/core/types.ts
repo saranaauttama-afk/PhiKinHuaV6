@@ -279,17 +279,15 @@ export type GameState = {
     discard: string[];
   };
   /**
-   * ผีที่ถูกเรียกมาช่วยในไฟต์นี้ — **สำเนาสำหรับแสดงผลเท่านั้น**
+   * ผีที่ถูกเรียกมาช่วยในไฟต์นี้ ทั้งสองฝั่ง (แยกด้วย `owner`)
    *
-   * ตัวจริงอยู่ในอาร์เรย์ระดับโมดูลใน `minionRuntime.ts` แล้วถูกก๊อปลงมาที่นี่
-   * ผ่าน `syncMinionsToState` ซึ่งเป็นบั๊กชนิดเดียวกับที่ adaptiveAI เคยเป็น
-   * (ไม่ถูกเซฟ ไม่ผูกกับ seed ค้างข้ามรัน) — ยังไม่ได้ย้ายในรอบนี้
+   * เคยเป็นอาร์เรย์ระดับโมดูลใน `minionRuntime.ts` — ไม่ถูกเซฟ ไม่ถูกโคลนตอน
+   * `applyCommand` และเป็นของกลางที่ทุก state ใช้ร่วมกัน (บั๊กชนิดเดียวกับที่
+   * adaptiveAI เคยเป็นก่อน Phase 5)
    *
-   * ที่ประกาศไทป์ไว้ก็เพื่อให้ UI อ่านได้โดยไม่ต้อง cast เป็น any
-   * ซึ่งเป็นเหตุผลหนึ่งที่ไม่เคยมีใครเอามาแสดงเลย
+   * เป็นสเตตของคอมแบต จึงไม่ถูกเก็บลงเซฟ เหมือน `piles`
    */
-  playerMinions?: import('./types_extended').MinionData[];
-  enemyMinions?: import('./types_extended').MinionData[];
+  minions?: import('./types_extended').MinionData[];
 
   enemyEnergy?: number;
   enemyLastPlayed?: string[];  // card IDs played last enemy turn, for UI animation

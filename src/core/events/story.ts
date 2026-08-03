@@ -142,11 +142,15 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
 
     case 'blessing': {
       const { rollTwoBlessings } = require('../level');
-      const out = rollTwoBlessings(r);
+      const { grantBlessing } = require('../engine/shared');
+      const out = rollTwoBlessings(r, (s.blessings ?? []).map(x => x.id));
       const b = out.list[0];
-      if (b) {
-        s.blessings = [...(s.blessings ?? []), b];
+      if (b && grantBlessing(s, b)) {
         s.log.push(`ได้พร ${b.name ?? b.id}`);
+      } else {
+        // คลังพรหมดแล้ว — ให้ทองแทน ดีกว่าเหตุการณ์ที่กดแล้วไม่มีอะไรเกิดขึ้น
+        s.player.gold = (s.player.gold ?? 0) + 40;
+        s.log.push('ไม่มีพรใหม่เหลือแล้ว — ได้ทรัพย์ 40 แทน');
       }
       return out.rng;
     }
