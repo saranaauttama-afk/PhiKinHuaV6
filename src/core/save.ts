@@ -1,126 +1,121 @@
-// src/core/save.ts
-// Pure save/load (forward-only). ไม่ทำ IO ใดๆ — ใช้ใน UI ชั้นนอกค่อยเขียนลง storage.
-// แนวคิด: เก็บแต่ข้อมูลที่ "จำเป็น" และ rehydrate จาก data packs ตอนโหลด
+// src/core/save.ts — เซฟ/โหลดแบบไม่ทำ IO (ชั้นนอกค่อยเขียนลง storage)
+//
+// **เขียนใหม่ทั้งไฟล์ — ของเดิมทำข้อมูลหายเงียบๆ**
+//
+// SaveV1 เลือกเก็บทีละฟิลด์ (whitelist) ซึ่งเขียนไว้ตั้งแต่ก่อนมีระบบเส้นทาง คลาส
+// ผสานการ์ด และเหตุการณ์เล่าเรื่อง ผลคือทุกอย่างที่เพิ่มมาทีหลัง **ไม่ถูกเก็บเลย**:
+// `journey`, `classId`, `fightCount`, `secretBossUnlocked`, `shopRegistry`,
+// `defeatedEnemyIds` — โหลดกลับมาแล้วรันพัง
+//
+// ที่ร้ายที่สุดคือสำรับ: เก็บเป็น id แล้ว rehydrate จาก `cards.json` อย่างเดียว
+// การ์ดคลาส (อยู่ใน `class_cards.json`) กับการ์ดที่ผสานแล้ว (`fused_*` ซึ่งไม่มีใน
+// ไฟล์ข้อมูลใดๆ เพราะสร้างตอนเล่น) จะ **หายไปจากสำรับโดยไม่มีข้อความอะไรบอก**
+//
+// V2 กลับด้าน: เก็บ `GameState` ทั้งก้อน แล้ว **ตัดเฉพาะสิ่งที่ตั้งใจไม่เก็บ**
+// (สเตตของคอมแบต) ทุกอย่างเป็นข้อมูล primitive อยู่แล้ว การ์ดก็เก็บทั้งใบไม่ใช่ id
+// เพิ่มฟิลด์ใหม่ใน GameState ทีหลังแล้วเซฟจะตามไปเอง ไม่พังซ้ำรอยเดิม
 
-import type {
-  GameState, PlayerState, RunCounters, BlessingDef, CardData
-} from './types';
-import { HAND_SIZE, START_ENERGY, START_HP } from './balance/core';
-import { nextExpForLevel } from './balance/progression';
+import type { GameState } from './types';
 
-// โหลด data packs ตรง ๆ (ปลอดภัยเพราะเป็น JSON ล้วน)
-const cardsBase: CardData[] = require('../data/packs/base/cards.json');
-const blessBase: BlessingDef[] = require('../data/packs/base/blessings.json');
+export const SAVE_VERSION = 2;
 
-export const SAVE_VERSION = 1;
+/**
+ * ฟิลด์ที่ตั้งใจไม่เก็บ — เป็นของชั่วคราวระหว่างคอมแบตหรือของ view
+ * โหลดกลับมาผู้เล่นจะยืนอยู่บนแผนที่เสมอ ไม่ใช่กลางไฟต์
+ */
+const DROP_ON_SAVE = [
+  'enemy', 'enemyIntent', 'enemyPiles', 'playerPiles', 'enemyIntentCardId',
+  'piles', 'pendingEvents', 'turnFlags', 'levelUp', 'starter',
+  'shopKind', 'shopStock', 'shopBoughtItems', 'currentShopId',
+  'event', 'deckOpen', 'combatVictoryLock', 'equipmentTempSlots',
+] as const;
 
-export type SaveV1 = {
-  version: 1;
-  seed: string;
-  mapMode: 'pages';                 // เราใช้ pages-first แล้ว
-  pages: NonNullable<GameState['pages']>; // เก็บ state ของ pages ทั้งก้อน (มันเป็นข้อมูล primitive)
-  player: PlayerState;
-  masterDeckIds: string[];          // อ้างอิงการ์ดด้วย id เพื่อ rehydrate
-  blessingIds: string[];            // อ้างอิงพรด้วย id เพื่อ rehydrate
-  runCounters?: RunCounters;
-  gold: number;                     // สะดวกอ่านเร็ว
-  // หมายเหตุ: ไม่เก็บ combat/piles/enemy เพื่อความเรียบง่าย (โหลดแล้วกลับเข้าแผนที่/เพจ)
+export type SaveV2 = {
+  version: 2;
+  /** สถานะทั้งก้อนที่ตัดสเตตคอมแบตออกแล้ว */
+  state: Partial<GameState> & { seed: string };
 };
 
-// === helpers rehydrate ===
-function byId<T extends { id: string }>(arr: T[]): Map<string, T> {
-  const m = new Map<string, T>();
-  for (const x of arr) m.set(x.id, x);
-  return m;
-}
-const cardsById = byId(cardsBase);
-const blessById = byId(blessBase);
+/** ข้อมูลย่อสำหรับโชว์บนปุ่ม "เดินทางต่อ" โดยไม่ต้องโหลดทั้งเซฟ */
+export type SaveSummary = {
+  classId?: string;
+  fight: number;
+  totalFights: number;
+  hp: number;
+  maxHp: number;
+  gold: number;
+  level: number;
+};
 
-function rehydrateCards(ids: string[]): CardData[] {
-  const out: CardData[] = [];
-  for (const id of ids) {
-    const def = cardsById.get(id);
-    if (def) out.push({ ...def });
-  }
-  return out;
-}
-function rehydrateBlessings(ids: string[]): BlessingDef[] {
-  const out: BlessingDef[] = [];
-  for (const id of ids) {
-    const def = blessById.get(id);
-    if (def) out.push({ ...def });
-  }
-  return out;
+export function toSave(s: GameState): SaveV2 {
+  const copy: any = JSON.parse(JSON.stringify(s));
+  for (const k of DROP_ON_SAVE) delete copy[k];
+
+  // ยืนอยู่บนแผนที่เสมอตอนโหลด — ถ้าเซฟตอนอยู่ในร้าน/เหตุการณ์
+  // ก็ให้กลับมาที่แผนที่ ไม่ใช่กลับเข้าไปกลางหน้าที่ไม่มีข้อมูลรองรับแล้ว
+  copy.phase = 'map';
+
+  return { version: SAVE_VERSION, state: copy };
 }
 
-// === public API ===
-export function toSaveV1(s: GameState): SaveV1 {
-  const masterDeckIds = (s.masterDeck ?? []).map(c => c.id);
-  const blessingIds = (s.blessings ?? []).map(b => b.id);
-
-  // ป้องกัน: ถ้ายังไม่มี pages.current ก็ให้ UI เรียก OpenPage ก่อนเซฟ (แต่เรายังเก็บ pages ไว้ครบ)
-  if (s.mapMode !== 'pages' || !s.pages) {
-    throw new Error('SaveV1: pages mode required.');
+export function fromSave(data: SaveV2): GameState {
+  if (data.version !== SAVE_VERSION) {
+    throw new Error(`เซฟเวอร์ชัน ${data.version} ใช้กับเกมเวอร์ชันนี้ไม่ได้`);
   }
 
+  const s = data.state as GameState;
+
+  // เติมสเตตที่ตัดออกตอนเซฟกลับมาเป็นค่าเริ่มต้น
   return {
-    version: SAVE_VERSION,
-    seed: s.seed ?? '',
-    mapMode: 'pages',
-    pages: JSON.parse(JSON.stringify(s.pages)),
-    player: { ...s.player },
-    masterDeckIds,
-    blessingIds,
-    runCounters: s.runCounters ? { ...s.runCounters } : undefined,
-    gold: s.player.gold ?? 0,
-  };
-}
-
-export function fromSaveV1(data: SaveV1): GameState {
-  if (data.version !== 1) {
-    throw new Error(`Unsupported save version: ${data.version}`);
-  }
-
-  // rehydrate
-  const masterDeck = rehydrateCards(data.masterDeckIds);
-  const blessings = rehydrateBlessings(data.blessingIds);
-
-  // สร้าง GameState ใหม่แบบสะอาด (กลับเข้าสู่หน้าแผนที่/เพจ)
-  const s: GameState = {
-    seed: data.seed,
+    ...s,
     phase: 'map',
     turn: 0,
-    player: {
-      hp: data.player.hp ?? START_HP,
-      maxHp: data.player.maxHp ?? START_HP,
-      block: 0,
-      energy: data.player.maxEnergy ?? START_ENERGY,
-      gold: data.gold ?? data.player.gold ?? 0,
-      level: data.player.level ?? 1,
-      exp: data.player.exp ?? 0,
-      expToNext: data.player.expToNext ?? nextExpForLevel(data.player.level ?? 1),
-      maxEnergy: data.player.maxEnergy ?? START_ENERGY,
-      maxHandSize: data.player.maxHandSize ?? HAND_SIZE,
-    },
     enemy: undefined,
-    // event เป็นของชั่วคราวสำหรับ view ไม่ใช่สถานะเกม — เริ่มว่างเสมอ
+    enemyIntent: undefined,
     pendingEvents: [],
     piles: { draw: [], hand: [], discard: [], exhaust: [] },
-    log: ['Loaded SaveV1.'],
-    blessings,
     turnFlags: { blessingOnce: {}, equipmentOnce: {} },
-    runCounters: data.runCounters ? { ...data.runCounters } : { removed: 0 },
-    combatVictoryLock: false,
-    masterDeck,
-    deckOpen: false,
     levelUp: null,
     starter: null,
-    mapMode: 'pages',
-    pages: JSON.parse(JSON.stringify(data.pages)),
     shopKind: undefined,
     shopStock: undefined,
+    shopBoughtItems: undefined,
+    currentShopId: undefined,
     event: undefined,
+    story: undefined,
+    deckOpen: false,
+    combatVictoryLock: false,
+    player: { ...s.player, block: 0, energy: s.player.maxEnergy },
+    log: [...(s.log ?? []), 'โหลดการเดินทางที่ค้างไว้'],
   };
+}
 
-  return s;
+/**
+ * เซฟนี้ยังเล่นต่อได้ไหม
+ *
+ * เช็คตรงนี้แทนที่จะให้ผู้เล่นกดแล้วไปเจอจอเปล่า — เซฟจากก่อนมีระบบเส้นทาง
+ * จะไม่มี `journey` และเล่นต่อไม่ได้
+ */
+export function isPlayableSave(data: unknown): data is SaveV2 {
+  if (!data || typeof data !== 'object') return false;
+  const d = data as any;
+  if (d.version !== SAVE_VERSION) return false;
+  if (!d.state || typeof d.state !== 'object') return false;
+  if (!d.state.journey || !d.state.journey.rows?.length) return false;
+  if (d.state.phase === 'run_complete') return false;   // รันนี้จบไปแล้ว
+  return true;
+}
+
+export function summarize(data: SaveV2): SaveSummary {
+  const s = data.state;
+  const plans = s.journey?.plans ?? [];
+  return {
+    classId: s.classId,
+    fight: Math.min((s.fightCount ?? 0) + 1, plans.filter(p => p.kind !== 'rest').length || 15),
+    totalFights: plans.filter(p => p.kind !== 'rest').length || 15,
+    hp: s.player?.hp ?? 0,
+    maxHp: s.player?.maxHp ?? 0,
+    gold: s.player?.gold ?? 0,
+    level: s.player?.level ?? 1,
+  };
 }

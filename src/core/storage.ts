@@ -3,7 +3,10 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { GameState } from './types';
-import { toSaveV1, fromSaveV1, type SaveV1 } from './save';
+import {
+  toSave, fromSave, isPlayableSave, summarize,
+  type SaveV2, type SaveSummary,
+} from './save';
 
 // Storage keys
 const SAVE_SLOT_PREFIX = 'phikinhua_save_';
@@ -26,7 +29,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
 
 export async function saveGame(state: GameState, slot: number = 0): Promise<void> {
   try {
-    const saveData = toSaveV1(state);
+    const saveData = toSave(state);
     const key = slot === -1 ? AUTO_SAVE_KEY : `${SAVE_SLOT_PREFIX}${slot}`;
     
     // Add metadata
@@ -58,8 +61,8 @@ export async function loadGame(slot: number = 0): Promise<GameState> {
       throw new Error(`No save found in slot ${slot === -1 ? 'auto' : slot}`);
     }
 
-    const saveData = JSON.parse(saved) as SaveV1 & { savedAt?: string; slot?: string | number };
-    return fromSaveV1(saveData);
+    const saveData = JSON.parse(saved) as SaveV2 & { savedAt?: string; slot?: string | number };
+    return fromSave(saveData);
   } catch (error) {
     console.error('Failed to load game:', error);
     throw new Error(`Failed to load game: ${error}`);
@@ -81,6 +84,8 @@ export async function deleteSave(slot: number): Promise<void> {
 export type SaveSlotInfo = {
   slot: number;
   exists: boolean;
+  /** เซฟเวอร์ชันเก่าหรือเสียหาย — มีอยู่แต่เล่นต่อไม่ได้ */
+  playable?: boolean;
   savedAt?: string;
   playerLevel?: number;
   gold?: number;
@@ -96,15 +101,18 @@ export async function getSaveSlots(maxSlots: number = 3): Promise<SaveSlotInfo[]
     try {
       const saved = await AsyncStorage.getItem(key);
       if (saved) {
-        const data = JSON.parse(saved) as SaveV1 & { savedAt?: string };
+        const data = JSON.parse(saved) as SaveV2 & { savedAt?: string };
+        const ok = isPlayableSave(data);
+        const sum = ok ? summarize(data) : undefined;
         slots.push({
           slot: i,
           exists: true,
+          playable: ok,
           savedAt: data.savedAt,
-          playerLevel: data.player?.level,
-          gold: data.gold,
-          currentPage: (data.pages?.pageIndex ?? 0) + 1,
-          totalPages: data.pages?.totalPages,
+          playerLevel: sum?.level,
+          gold: sum?.gold,
+          currentPage: sum?.fight,
+          totalPages: sum?.totalFights,
         });
       } else {
         slots.push({ slot: i, exists: false });
@@ -118,13 +126,30 @@ export async function getSaveSlots(maxSlots: number = 3): Promise<SaveSlotInfo[]
   return slots;
 }
 
-export async function hasAutoSave(): Promise<boolean> {
+/**
+ * มีการเดินทางที่ค้างไว้และเล่นต่อได้จริงไหม
+ *
+ * เดิมตอบแค่ว่ามีไฟล์อยู่ไหม — เซฟเวอร์ชันเก่าที่ไม่มีเส้นทางก็ตอบ true
+ * แล้วผู้เล่นจะกดเล่นต่อไปเจอจอเปล่า
+ */
+export async function loadAutoSaveSummary(): Promise<SaveSummary | null> {
   try {
     const saved = await AsyncStorage.getItem(AUTO_SAVE_KEY);
-    return saved !== null;
+    if (!saved) return null;
+    const data = JSON.parse(saved);
+    if (!isPlayableSave(data)) return null;
+    return summarize(data);
   } catch {
-    return false;
+    return null;
   }
+}
+
+export async function hasAutoSave(): Promise<boolean> {
+  return (await loadAutoSaveSummary()) !== null;
+}
+
+export async function clearAutoSave(): Promise<void> {
+  try { await AsyncStorage.removeItem(AUTO_SAVE_KEY); } catch {}
 }
 
 // === Settings ===

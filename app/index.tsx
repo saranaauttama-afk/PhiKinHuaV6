@@ -27,7 +27,7 @@ import { palette, font, size, space } from './theme';
 
 
 export default function Home() {
-  const { state, dispatch, newRun, saveToSlot, loadFromSlot, getSaveSlots } = useGame();
+  const { state, dispatch, newRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
   const router = useRouter();
   const [seed, setSeed] = useState('demo-001');
   const [saveSlots, setSaveSlots] = useState<SaveSlotInfo[]>([]);
@@ -75,7 +75,12 @@ export default function Home() {
   const screen = screenForState(state, { pickingClass });
 
   if (screen === 'start') {
-    return <StartPage onStartGame={() => setPickingClass(true)} />;
+    return (
+      <StartPage
+        onStartGame={() => setPickingClass(true)}
+        onContinue={() => { void continueRun(); }}
+      />
+    );
   }
 
   // เลือกผู้เดินทางก่อนเริ่มรัน — คลาสกำหนดเด็คและวิธีเล่นทั้งรัน

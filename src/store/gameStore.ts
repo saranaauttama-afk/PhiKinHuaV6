@@ -10,11 +10,22 @@ import { nextExpForLevel } from '../../src/core/balance/progression';
 import { makeRng, seedFromString, type RNG } from '../../src/core/rng';
 import { START_GOLD } from '../../src/core/balance';
 
-// Commands that should trigger auto-save
+/**
+ * คำสั่งที่ควรเซฟหลังทำ — จุดที่ "ความคืบหน้าเปลี่ยนจริง"
+ *
+ * เดิมขาดคำสั่งที่เพิ่มมาทีหลังทั้งหมด (เลือกเหตุการณ์ ผสานการ์ด เลือกของเลเวลอัป)
+ * ปิดแอปหลังทำสิ่งเหล่านั้นแล้วกลับมา ผลจะหายไป
+ */
 function shouldAutoSave(cmdType: Command['type']): boolean {
   const autoSaveCommands: Command['type'][] = [
-    'CompleteNode', 'ChooseLevelUp', 'TakeShop', 'EventChooseBlessing',
-    'ChooseOffer', 'Proceed', 'ShopRemoveBuy', 'ShopUpgradeBuy'
+    'CompleteNode', 'ChooseOffer', 'Proceed',
+    'ChooseStarterBlessing',
+    'ChooseLevelUp', 'ChooseLevelUpOption', 'SkipLevelUp',
+    'TakeShop', 'TakeShopEquipment', 'ShopRemoveBuy', 'ShopUpgradeBuy',
+    'TakeTreasureCard', 'TakeSingleTreasureCard',
+    'UseWell', 'UseHealingShrine',
+    'EventChooseBlessing',
+    'ChooseEventOption', 'FuseCards',
   ];
   return autoSaveCommands.includes(cmdType);
 }
@@ -26,6 +37,7 @@ type Store = {
   newRun: (seed: string, classId?: ClassId) => void;
   saveToSlot: (slot: number) => Promise<void>;
   loadFromSlot: (slot: number) => Promise<void>;
+  continueRun: () => Promise<boolean>;
   getSaveSlots: () => Promise<SaveSlotInfo[]>;
   autoSaveEnabled: boolean;
 };
@@ -76,6 +88,18 @@ export const useGame = create<Store>((set, get) => ({
     if (loaded) {
       const newRng = makeRng(loaded.seed || 'demo-fallback');
       set({ state: loaded, rng: newRng });
+    }
+  },
+
+  /** เล่นต่อจากเซฟอัตโนมัติ — คืน false ถ้าไม่มีหรือเล่นต่อไม่ได้ */
+  continueRun: async () => {
+    try {
+      const loaded = await loadGame(-1);
+      if (!loaded?.journey) return false;
+      set({ state: loaded, rng: makeRng(loaded.seed || 'demo-fallback') });
+      return true;
+    } catch {
+      return false;
     }
   },
 
