@@ -309,6 +309,18 @@ export type GameState = {
    */
   defeatedEnemyIds?: string[];
 
+  /**
+   * บทคั่นที่กำลังอ่านอยู่ — มีค่าแปลว่าเกมหยุดรอให้อ่านจบก่อน
+   * `paragraph` คือย่อหน้าที่เปิดถึงแล้ว (แตะเพื่อเปิดย่อหน้าถัดไป)
+   */
+  chapter?: { id: string; paragraph: number };
+
+  /**
+   * บทที่ขึ้นไปแล้วในรันนี้ — กันไม่ให้บทเดิมขึ้นซ้ำเมื่อจุดยิงถูกเรียกซ้ำ
+   * (คนละเรื่องกับ "เคยอ่านข้ามรัน" ซึ่งเก็บใน settings ไม่ใช่ในเซฟของรัน)
+   */
+  chaptersSeen?: string[];
+
   /** เหตุการณ์เล่าเรื่องที่กำลังอยู่ — `result` มีค่าแปลว่าเลือกไปแล้ว */
   story?: {
     eventId: string;
@@ -396,6 +408,10 @@ export type Command =
 
   // เหตุการณ์เล่าเรื่อง
   | { type: 'ChooseEventOption'; index: number }
+
+  // บทคั่นเล่าเรื่อง — แตะเปิดย่อหน้าถัดไป หรือข้ามทั้งบท
+  | { type: 'AdvanceChapter' }
+  | { type: 'SkipChapter' }
 
   // Events
   | { type: 'DoBonfireHeal' }

@@ -10,6 +10,7 @@ import { grantExpAndQueueLevelUp } from '../shared';
 import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRuntime';
 import { getEquipmentById } from '../../pack';
 import { dealDamage, gainBlock, emit } from '../../combat/damage';
+import { loseRun } from './runEnd';
 
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
   if (s.phase !== 'combat' || s.combatVictoryLock) return { state: s, rng: r };
@@ -138,7 +139,7 @@ export function endTurn(s: GameState, cmd: Extract<Command, { type: 'EndTurn' }>
   }
 
   if (isDefeat(s)) {
-    s.phase = 'defeat';
+    loseRun(s);
     s.log.push('Defeat..');
     const { clearAllMinions } = require('../../minionRuntime');
     clearAllMinions(s);
@@ -261,7 +262,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       }
 
       if (isDefeat(s)) {
-        s.phase = 'defeat';
+        loseRun(s);
         const { clearAllMinions } = require('../../minionRuntime');
         clearAllMinions(s);
       }

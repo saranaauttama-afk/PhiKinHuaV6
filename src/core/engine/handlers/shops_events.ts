@@ -11,6 +11,7 @@ import { SHOP_STOCK_SIZE, SHOP_POWER_BIAS } from '../../balance/weights';
 import { upgradeCard } from '../shared';
 import { replaceSingleOffer } from './map_pages';
 import { consumeToken } from '../../map/pages';
+import { loseRun } from './runEnd';
 // ===== Fallback stock (ใช้เมื่อ rollShopStock พัง/ยังไม่พร้อม) =====
 import { int } from '../../rng';
 const cardsBase = require('../../../data/packs/base/cards.json'); // top-level ให้ Metro bundle
@@ -213,7 +214,7 @@ export function eventGambleRoll(s: GameState, _cmd: Extract<Command, { type: 'Ev
     } else {
       s.player.hp = Math.max(0, s.player.hp - (g.resolved.hpLoss ?? 0));
       s.log.push(`Gamble: LOSE -${g.resolved.hpLoss} HP`);
-      if (s.player.hp === 0) { s.phase = 'defeat'; }
+      if (s.player.hp === 0) { loseRun(s); }
     }
   }
   return { state: s, rng: r };

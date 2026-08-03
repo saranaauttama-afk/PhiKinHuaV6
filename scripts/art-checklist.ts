@@ -27,6 +27,7 @@ const GROUP_TITLE: Record<ArtSlot['group'], string> = {
   boss: 'บอส',
   blessing: 'พรติดตัว',
   event: 'ภาพประกอบเหตุการณ์',
+  chapter: 'ภาพประกอบบทคั่น',
   encounter: 'ภาพบนการ์ดโหนด',
   node: 'ไอคอนบนแถบเส้นทาง',
 };
@@ -67,9 +68,10 @@ function main() {
     '',
   ];
 
-  const groups = [
-    'scene', 'class', 'monster', 'boss', 'blessing', 'event', 'encounter', 'node',
-  ] as const;
+  // ลำดับหัวข้อมาจาก GROUP_TITLE ซึ่งเป็น Record ครบทุกกลุ่ม (TS บังคับ)
+  // เดิมเป็นลิสต์แยกอีกชุด — เพิ่มกลุ่มใหม่แล้วมันหายจากลิสต์เงียบๆ
+  // ทั้งที่ยอดรวมด้านบนนับให้ (บทคั่น 10 ช่องหายไปแบบนั้นมาแล้ว)
+  const groups = Object.keys(GROUP_TITLE) as ArtSlot['group'][];
 
   for (const g of groups) {
     const list = rows.filter(r => r.group === g);

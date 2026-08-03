@@ -25,6 +25,9 @@ import { getEquipmentById } from '../../pack';
 import {
   usesJourney, enterNode, advanceJourney, unlockSecretBossRows,
 } from '../../map/journeySync';
+import { fireChapter } from '../../story/chapters';
+import { winRun } from './runEnd';
+
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
 export function replaceSingleOffer(mp: MapStatePages, rng: RNG, s: GameState, slotIndex: number) {
@@ -686,6 +689,9 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
         // บอสกลาง — จบภาคแรก แล้วเดินทางต่อ ไม่ใช่จบรัน
         if (offer.bossType === 'mid') {
           s.log.push('ชนะบอสกลาง เดินทางต่อสู่ภาคสอง');
+          // เดิมบอกแค่ผ่าน log ซึ่งไม่มีจอไหนแสดง — ผ่านบอสกลางแล้วก็แค่เจอ
+          // แผนที่หน้าใหม่ ไม่รู้เลยว่าเพิ่งจบครึ่งแรกของเรื่องไป
+          fireChapter(s, { kind: 'mid_boss' });
           return proceed(s, { type: 'Proceed' } as any, rng);
         }
 
@@ -695,6 +701,8 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
           if (hpRatio >= SECRET_BOSS_HP_RATIO) {
             s.secretBossUnlocked = true;
             s.log.push('เลือดยังเหลือเฟือ… มีบางอย่างรออยู่ข้างหน้า');
+            // จุดพลิกที่สำคัญที่สุดของรัน แต่เดิมสื่อสารผ่าน log บรรทัดเดียว
+            fireChapter(s, { kind: 'secret' });
             // เส้นทางถูกวางไว้ล่วงหน้าถึงบอสสุดท้ายเท่านั้น — ต่อชั้นศึกลับตอนนี้
             // เพื่อไม่ให้ผู้เล่นเห็นมันรออยู่บนแผนที่ตั้งแต่ยังไม่ปลดล็อค
             if (onJourney) rng = unlockSecretBossRows(s, rng);
@@ -703,14 +711,7 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
         }
 
         // จบรัน (บอสสุดท้ายโดยไม่ปลดล็อคศึกลับ หรือชนะศึกลับแล้ว)
-        s.phase = 'run_complete';
-        s.runSummary = {
-          won: true,
-          fights: s.fightCount ?? 0,
-          level: s.player.level,
-          gold: s.player.gold ?? 0,
-          beatSecretBoss: offer.bossType === 'secret',
-        };
+        winRun(s, offer.bossType === 'secret');
         s.log.push('จบการเดินทาง');
         return { state: s, rng };
       }

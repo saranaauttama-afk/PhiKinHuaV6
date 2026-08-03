@@ -14,6 +14,7 @@ import type { JourneyNode } from './journey';
 import { initPageMap } from './pages';
 import { THAI_GHOST_POOLS, getMonsterById } from '../monsters/thai-ghosts';
 import { pickFrom } from '../rngState';
+import { fireChapter } from '../story/chapters';
 
 /** รันนี้ใช้แผนที่แบบเดินทางอยู่หรือเปล่า */
 export function usesJourney(s: GameState): boolean {
@@ -140,6 +141,20 @@ export function enterNode(s: GameState, ix: number): JourneyNode | undefined {
 /** จบโหนดปัจจุบันแล้ว — เปิดตัวเลือกของชั้นถัดไป */
 export function advanceJourney(s: GameState): void {
   syncOffersFromJourney(s);
+  chapterAtFinalBossGate(s);
+}
+
+/**
+ * บทก่อนบอสสุดท้าย — ยิงตอน "เห็นโหนดบอสรออยู่ตรงหน้า" ไม่ใช่ตอนกดเข้า
+ *
+ * กดเข้าโหนดบอสแล้ว UI ผลักไปหน้าต่อสู้ทันที บทที่เปิดตอนนั้นจึงไม่มีที่ขึ้น
+ * เกาะไว้กับ `advanceJourney` เพราะเป็นจุดเดียวที่แปลว่า "เดินถึงชั้นใหม่แล้ว"
+ * ทุกทางที่เดินต่อผ่านตรงนี้หมด ตัวกันขึ้นซ้ำอยู่ใน `fireChapter` แล้ว
+ */
+function chapterAtFinalBossGate(s: GameState): void {
+  const offers = s.pages?.current?.offers ?? [];
+  const atGate = offers.some((o: any) => o.kind === 'boss' && o.bossType === 'final');
+  if (atGate) fireChapter(s, { kind: 'final_boss' });
 }
 
 /** เดินถึงปลายทางแล้วหรือยัง */

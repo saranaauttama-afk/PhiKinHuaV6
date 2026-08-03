@@ -19,6 +19,7 @@ import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
 import JourneyTrail from './components/JourneyTrail';
 import StoryEventView from './components/StoryEventView';
+import ChapterView from './components/ChapterView';
 import PlayerStatusBar from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
 import { useRouter } from 'expo-router';
@@ -91,6 +92,11 @@ export default function Home() {
         onBack={() => setPickingClass(false)}
       />
     );
+  }
+
+  // บทคั่น — หยุดทุกอย่างไว้ก่อนจนกว่าจะอ่านจบหรือกดข้าม
+  if (screen === 'chapter') {
+    return <ChapterView state={state} dispatch={dispatch} />;
   }
 
   // จบรันแล้ว — แสดงจอสรุปแทนการเด้งกลับแผนที่ที่ไม่มีอะไรเหลือ

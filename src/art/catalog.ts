@@ -11,6 +11,7 @@
 import { THAI_GHOST_POOLS } from '../core/monsters/thai-ghosts';
 import { CHARACTER_CLASSES, ALL_CLASS_IDS } from '../core/classes';
 import { STORY_EVENTS } from '../core/events/story';
+import { STORY_CHAPTERS } from '../core/story/chapters';
 
 const blessings: Array<{ id: string; name: string; desc?: string }> =
   require('../data/packs/base/blessings.json');
@@ -27,7 +28,7 @@ export type ArtSlot = {
   /** ภาพนี้ควรเป็นอะไร — ใช้ทั้งบน placeholder และเป็นโจทย์ตอนไปหา/สร้างรูป */
   brief: string;
   /** จัดกลุ่มในลิสต์ */
-  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter' | 'event';
+  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter' | 'event' | 'chapter';
   /**
    * ไฟล์ที่มีอยู่ยังเป็นพื้นทึบ ทั้งที่ช่องนี้ต้องการพื้นโปร่ง
    *
@@ -143,6 +144,22 @@ function storyEventSlots(): ArtSlot[] {
   }));
 }
 
+/**
+ * ภาพประกอบบทคั่น — ภาพเดียวเต็มความกว้าง อยู่เหนือข้อความ
+ *
+ * ใช้ย่อหน้าแรกเป็นโจทย์ เพราะมันคือสิ่งที่ผู้เล่นเห็นพร้อมภาพพอดี
+ */
+function chapterSlots(): ArtSlot[] {
+  return STORY_CHAPTERS.map(c => ({
+    id: `chapter/${c.id}`,
+    label: `บท: ${c.title}${c.classId ? ` (${c.classId})` : ''}`,
+    file: `chapters/${c.id}.png`,
+    size: [1024, 576] as [number, number],
+    brief: `${c.text[0]?.slice(0, 90) ?? c.title}… — ภาพฉากแนวนอน บรรยากาศนำก่อนข้อความ`,
+    group: 'chapter' as const,
+  }));
+}
+
 /** ช่องรูปทั้งหมดที่เกมต้องการ เรียงตามกลุ่ม */
 export const ART_CATALOG: ArtSlot[] = [
   ...SCENES,
@@ -150,6 +167,7 @@ export const ART_CATALOG: ArtSlot[] = [
   ...monsterSlots(),
   ...blessingSlots(),
   ...storyEventSlots(),
+  ...chapterSlots(),
   ...ENCOUNTERS,
   ...NODES,
 ];

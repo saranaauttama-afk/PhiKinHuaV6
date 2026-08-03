@@ -7,6 +7,7 @@ import { START_ENERGY } from '../../balance/core';
 import { initPageMap } from '../../map/pages';
 import { startJourney } from '../../map/journeySync';
 import { getClass, buildStarterDeck } from '../../classes';
+import { fireChapter } from '../../story/chapters';
 import { getEquipmentById } from '../../pack';
 
 // Auto-equip equipment cards from starting deck and remove equipped cards from deck
@@ -179,6 +180,11 @@ export function newRun(
   const bb = rollTwoBlessings(r); r = bb.rng;
   s.starter = { choices: bb.list, consumed: false };
   s.phase = 'starter';
+
+  // บทเปิดเรื่องของคลาส — ขึ้นก่อนหน้าเลือกพร เพื่อให้รู้ว่ากำลังเล่นเป็นใคร
+  // และออกเดินทางเพราะอะไร ก่อนจะถูกถามว่าจะเอาพรอะไรติดตัว
+  fireChapter(s, { kind: 'prologue', classId: cls.id });
+
   return { state: s, rng: r };
 }
 

@@ -20,6 +20,15 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
   const s = state.runSummary;
   if (!s) return null;
 
+  // จอเดียวใช้ทั้งชนะและแพ้ — เดิมทางแพ้ไม่เคยมาถึงจอสรุปเลย
+  // (`phase='defeat'` ตกไปหน้าแผนที่ของรันที่ผู้เล่นเพิ่งตาย)
+  const headline = !s.won
+    ? 'ไปไม่ถึงเช้า'
+    : s.beatSecretBoss ? 'ท้ามัจจุราชสำเร็จ' : 'จบการเดินทาง';
+  const subline = !s.won
+    ? 'คืนนี้จบลงกลางทาง — แต่พระจันทร์เต็มดวงยังมีอีกทุกเดือน'
+    : s.beatSecretBoss ? 'แม้แต่เจ้าแห่งความตายก็ยังต้องถอย' : 'คุณผ่านค่ำคืนนี้มาได้';
+
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
@@ -29,24 +38,22 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
       >
         <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
           <Text style={{
-            color: s.beatSecretBoss ? palette.moon : palette.text,
+            color: !s.won ? palette.blood : s.beatSecretBoss ? palette.moon : palette.text,
             fontSize: size.display, textAlign: 'center',
             fontFamily: font.display,
           }}>
-            {s.beatSecretBoss ? 'ท้ามัจจุราชสำเร็จ' : 'จบการเดินทาง'}
+            {headline}
           </Text>
 
           <Text style={{
             color: palette.textDim, fontSize: size.bodyLg, fontFamily: font.body,
             textAlign: 'center', marginTop: space.sm, marginBottom: space.xl,
           }}>
-            {s.beatSecretBoss
-              ? 'แม้แต่เจ้าแห่งความตายก็ยังต้องถอย'
-              : 'คุณผ่านค่ำคืนนี้มาได้'}
+            {subline}
           </Text>
 
           <Panel emphasis={!!s.beatSecretBoss} style={{ gap: space.md }}>
-            <Row label="ไฟต์ทั้งหมด" value={`${s.fights}`} />
+            <Row label={s.won ? 'ไฟต์ทั้งหมด' : 'ไปได้ถึงไฟต์ที่'} value={`${s.fights}`} />
             <Row label="เลเวลสุดท้าย" value={`${s.level}`} />
             <Row label="ทรัพย์ที่เหลือ" value={`${s.gold}`} />
             <Row

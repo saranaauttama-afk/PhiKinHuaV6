@@ -52,14 +52,21 @@ describe('ลำดับหน้าตลอดการเริ่มรั�
     expect(screenForState(baseNewState(''), { pickingClass: true })).toBe('class-select');
   });
 
-  it('เลือกคลาสแล้ว → หน้าเลือกพรตั้งต้น', () => {
+  it('เลือกคลาสแล้ว → บทเปิดเรื่องก่อน แล้วค่อยหน้าเลือกพรตั้งต้น', () => {
     const s = run([{ type: 'NewRun', seed: 'router', classId: 'shaman' }]);
-    expect(screenForState(s, NO_CLASS_PICK)).toBe('starter-blessing');
+    expect(screenForState(s, NO_CLASS_PICK)).toBe('chapter');
+
+    const after = run([
+      { type: 'NewRun', seed: 'router', classId: 'shaman' },
+      { type: 'SkipChapter' },
+    ]);
+    expect(screenForState(after, NO_CLASS_PICK)).toBe('starter-blessing');
   });
 
   it('เลือกพรแล้ว → หน้าแผนที่ และแผนที่พร้อมใช้จริง', () => {
     const s = run([
       { type: 'NewRun', seed: 'router', classId: 'shaman' },
+      { type: 'SkipChapter' },
       { type: 'ChooseStarterBlessing', index: 0 },
     ]);
     expect(screenForState(s, NO_CLASS_PICK)).toBe('map');

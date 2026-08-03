@@ -14,6 +14,7 @@ import type { GameState } from '../src/core/types';
 export type Screen =
   | 'start'
   | 'class-select'
+  | 'chapter'
   | 'run-complete'
   | 'starter-blessing'
   | 'map';
@@ -30,7 +31,15 @@ export function screenForState(
 
   if (OUT_OF_RUN.includes(state.phase)) return 'start';
 
+  // บทคั่นมาก่อนทุกหน้าในรัน — มันคือช่วงที่เกมหยุดเล่าเรื่อง
+  // ทั้งบทเปิดเรื่อง (มาก่อนหน้าเลือกพร) และบทปิดเรื่อง (มาก่อนจอสรุป)
+  if (state.chapter) return 'chapter';
+
   if (state.phase === 'run_complete') return 'run-complete';
+
+  // แพ้แล้วก็จบรันเหมือนกัน — เดิมตกไปหน้าแผนที่ของรันที่ผู้เล่นเพิ่งตาย
+  // แล้วเดินต่อได้เหมือนไม่มีอะไรเกิดขึ้น
+  if (state.phase === 'defeat' && state.runSummary) return 'run-complete';
 
   if (state.phase === 'starter' && state.starter && !state.starter.consumed) {
     return 'starter-blessing';

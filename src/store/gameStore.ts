@@ -4,7 +4,9 @@ import type { Command, GameState } from '../../src/core/types';
 import type { ClassId } from '../core/classes';
 import { applyCommand } from '../../src/core/reducer';
 import { baseNewState } from '../../src/core/commands';
-import { saveGame, loadGame, getSaveSlots, autoSave, type SaveSlotInfo } from '../../src/core/storage';
+import {
+  saveGame, loadGame, getSaveSlots, autoSave, clearAutoSave, type SaveSlotInfo,
+} from '../../src/core/storage';
 import { HAND_SIZE, START_ENERGY, START_HP } from '../../src/core/balance/core';
 import { nextExpForLevel } from '../../src/core/balance/progression';
 import { makeRng, seedFromString, type RNG } from '../../src/core/rng';
@@ -64,7 +66,17 @@ export const useGame = create<Store>((set, get) => ({
     const result = applyCommand(state, cmd, rng);
     set({ state: result.state, rng: result.rng });
 
-    if (get().autoSaveEnabled && shouldAutoSave(cmd.type)) {
+    if (!get().autoSaveEnabled) return;
+
+    // รันจบแล้ว (ชนะหรือแพ้) — ลบเซฟค้างทิ้ง
+    // ไม่งั้นปุ่ม "เดินทางต่อ" จะพากลับเข้ารันเดิม: ตายแล้วย้อนไปยืนก่อนไฟต์ที่ตาย
+    // ซึ่งแปลว่าแพ้ได้ไม่จำกัดครั้ง การตายจึงไม่มีความหมายอะไรเลย
+    if (result.state.runSummary) {
+      setTimeout(() => { void clearAutoSave(); }, 0);
+      return;
+    }
+
+    if (shouldAutoSave(cmd.type)) {
       setTimeout(() => autoSave(result.state), 100);
     }
   },

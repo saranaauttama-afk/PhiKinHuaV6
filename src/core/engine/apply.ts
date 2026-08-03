@@ -13,6 +13,7 @@ import * as ui from './handlers/ui';
 import * as equipment from './handlers/equipment';
 import * as fusion from './handlers/fusion';
 import * as story from './handlers/story';
+import * as chapter from './handlers/chapter';
 
 type Handler<T extends Command['type']> =
   (s: GameState, cmd: Extract<Command, { type: T }>, r: RNG) => { state: GameState; rng: RNG };
@@ -71,6 +72,8 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   ShopUpgradeBuy: se.shopUpgradeBuy,
   FuseCards: fusion.fuseCardsCmd,
   ChooseEventOption: story.chooseEventOption,
+  AdvanceChapter: chapter.advanceChapter,
+  SkipChapter: chapter.skipChapter,
   DoWellUse: se.doWellUse,
   DoWellDismiss: se.doWellDismiss,
   UseWell: se.useWell,

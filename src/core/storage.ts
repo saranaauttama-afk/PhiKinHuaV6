@@ -18,11 +18,19 @@ export type GameSettings = {
   autoSaveEnabled: boolean;
   maxSaveSlots: number;
   lastPlayedSlot?: number;
+  /**
+   * บทคั่นที่เคยอ่านจบแล้ว — จำข้ามรัน
+   *
+   * อยู่ใน settings ไม่ใช่ในเซฟของรัน เพราะเป็นเรื่องของคนเล่น ไม่ใช่ของรัน
+   * รอบที่สิบไม่ควรถูกบังคับให้แตะผ่านบทเปิดเรื่องเดิมทีละย่อหน้าอีก
+   */
+  seenChapters?: string[];
 };
 
 export const DEFAULT_SETTINGS: GameSettings = {
   autoSaveEnabled: true,
   maxSaveSlots: 3,
+  seenChapters: [],
 };
 
 // === Save/Load Functions ===
@@ -172,6 +180,19 @@ export async function loadSettings(): Promise<GameSettings> {
     console.error('Failed to load settings:', error);
   }
   return DEFAULT_SETTINGS;
+}
+
+/** บทที่เคยอ่านจบแล้วข้ามรัน — ใช้ตัดสินว่าจะเปิดทีละย่อหน้าหรือกางทั้งบทเลย */
+export async function loadSeenChapters(): Promise<string[]> {
+  const settings = await loadSettings();
+  return settings.seenChapters ?? [];
+}
+
+export async function markChapterSeen(id: string): Promise<void> {
+  const settings = await loadSettings();
+  const seen = settings.seenChapters ?? [];
+  if (seen.includes(id)) return;
+  await saveSettings({ ...settings, seenChapters: [...seen, id] });
 }
 
 // === Auto Save ===

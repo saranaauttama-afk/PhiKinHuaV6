@@ -28,6 +28,8 @@ const DROP_ON_SAVE = [
   'piles', 'pendingEvents', 'turnFlags', 'levelUp', 'starter',
   'shopKind', 'shopStock', 'shopBoughtItems', 'currentShopId',
   'event', 'deckOpen', 'combatVictoryLock', 'equipmentTempSlots',
+  // บทที่ค้างอ่านอยู่เป็นของหน้าจอ ไม่ใช่ความคืบหน้า — `chaptersSeen` ต่างหากที่เก็บ
+  'chapter',
 ] as const;
 
 export type SaveV2 = {
@@ -83,6 +85,7 @@ export function fromSave(data: SaveV2): GameState {
     currentShopId: undefined,
     event: undefined,
     story: undefined,
+    chapter: undefined,
     deckOpen: false,
     combatVictoryLock: false,
     player: { ...s.player, block: 0, energy: s.player.maxEnergy },
@@ -103,6 +106,10 @@ export function isPlayableSave(data: unknown): data is SaveV2 {
   if (!d.state || typeof d.state !== 'object') return false;
   if (!d.state.journey || !d.state.journey.rows?.length) return false;
   if (d.state.phase === 'run_complete') return false;   // รันนี้จบไปแล้ว
+  // `toSave` บังคับ phase เป็น 'map' เสมอ เช็ค phase อย่างเดียวจึงไม่พอ:
+  // เซฟที่เขียนตอนจบรัน (ชนะหรือแพ้) จะดูเหมือนเซฟกลางทาง แล้วปุ่ม "เดินทางต่อ"
+  // จะพาผู้เล่นกลับเข้ารันที่จบไปแล้ว — ตายแล้วเดินต่อได้ไม่รู้จบ
+  if (d.state.runSummary) return false;
   return true;
 }
 
