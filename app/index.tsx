@@ -22,6 +22,7 @@ import StoryEventView from './components/StoryEventView';
 import PlayerStatusBar from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
 import { useRouter } from 'expo-router';
+import { screenForState, mapIsReady } from './screenRouter';
 import { palette, font, size, space } from './theme';
 
 
@@ -69,13 +70,16 @@ export default function Home() {
     return null;
   }
 
-  // Show StartPage when phase is 'start'
-  if (state.phase === 'start') {
+  // หน้าไหนควรขึ้น ตัดสินที่ `screenForState` ซึ่งเป็นฟังก์ชันบริสุทธิ์และมีเทสต์คุม
+  // เดิมเป็น if-chain อยู่ตรงนี้ แล้วพลาดจนเปิดแอปมาค้างที่แผนที่เปล่า
+  const screen = screenForState(state, { pickingClass });
+
+  if (screen === 'start') {
     return <StartPage onStartGame={() => setPickingClass(true)} />;
   }
 
   // เลือกผู้เดินทางก่อนเริ่มรัน — คลาสกำหนดเด็คและวิธีเล่นทั้งรัน
-  if (pickingClass) {
+  if (screen === 'class-select') {
     return (
       <ClassSelectScreen
         onPick={(classId) => { setPickingClass(false); newRun(seed, classId); }}
@@ -85,12 +89,12 @@ export default function Home() {
   }
 
   // จบรันแล้ว — แสดงจอสรุปแทนการเด้งกลับแผนที่ที่ไม่มีอะไรเหลือ
-  if (state.phase === 'run_complete') {
+  if (screen === 'run-complete') {
     return <RunCompleteScreen state={state} onNewRun={() => setPickingClass(true)} />;
   }
 
   // เลือกพรตั้งต้นก่อนเข้าหน้าแรก
-  if (state.phase === 'starter' && state.starter && !state.starter.consumed) {
+  if (screen === 'starter-blessing') {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground
@@ -113,7 +117,7 @@ export default function Home() {
             </Text>
 
             <View style={{ gap: space.md }}>
-              {state.starter.choices.map((b, i) => (
+              {(state.starter?.choices ?? []).map((b, i) => (
                 <Pressable
                   key={b.id ?? i}
                   onPress={() => dispatch({ type: 'ChooseStarterBlessing', index: i })}
@@ -136,6 +140,41 @@ export default function Home() {
                 </Pressable>
               ))}
             </View>
+          </Scrim>
+        </ImageBackground>
+      </View>
+    );
+  }
+
+  // มาถึงหน้าแผนที่โดยไม่มีเส้นทาง = หลุดมาผิดทาง (เช่นเซฟเก่าก่อนมีระบบเส้นทาง)
+  // เดิมกรณีนี้จะได้จอเปล่าที่กดอะไรไม่ได้เลย ต้องมีทางออกให้เสมอ
+  if (!mapIsReady(state)) {
+    return (
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={require('../assets/scence/swamp.png')}
+          style={{ flex: 1 }}
+          resizeMode="cover"
+        >
+          <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
+            <Text style={{
+              color: palette.moon, fontSize: size.title, fontFamily: font.display,
+              textAlign: 'center',
+            }}>
+              ไม่พบเส้นทางของรันนี้
+            </Text>
+            <Text style={{
+              color: palette.textDim, fontSize: size.bodyLg, fontFamily: font.body,
+              textAlign: 'center', marginTop: space.sm, lineHeight: 26,
+            }}>
+              อาจเป็นเซฟที่บันทึกไว้ก่อนระบบแผนที่จะเปลี่ยน เริ่มการเดินทางใหม่ได้เลย
+            </Text>
+            <GameButton
+              label="ออกเดินทางใหม่"
+              tone="primary"
+              onPress={() => setPickingClass(true)}
+              style={{ marginTop: space.xl, alignSelf: 'center' }}
+            />
           </Scrim>
         </ImageBackground>
       </View>
