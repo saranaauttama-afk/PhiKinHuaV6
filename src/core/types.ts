@@ -278,6 +278,19 @@ export type GameState = {
     hand: string[];
     discard: string[];
   };
+  /**
+   * ผีที่ถูกเรียกมาช่วยในไฟต์นี้ — **สำเนาสำหรับแสดงผลเท่านั้น**
+   *
+   * ตัวจริงอยู่ในอาร์เรย์ระดับโมดูลใน `minionRuntime.ts` แล้วถูกก๊อปลงมาที่นี่
+   * ผ่าน `syncMinionsToState` ซึ่งเป็นบั๊กชนิดเดียวกับที่ adaptiveAI เคยเป็น
+   * (ไม่ถูกเซฟ ไม่ผูกกับ seed ค้างข้ามรัน) — ยังไม่ได้ย้ายในรอบนี้
+   *
+   * ที่ประกาศไทป์ไว้ก็เพื่อให้ UI อ่านได้โดยไม่ต้อง cast เป็น any
+   * ซึ่งเป็นเหตุผลหนึ่งที่ไม่เคยมีใครเอามาแสดงเลย
+   */
+  playerMinions?: import('./types_extended').MinionData[];
+  enemyMinions?: import('./types_extended').MinionData[];
+
   enemyEnergy?: number;
   enemyLastPlayed?: string[];  // card IDs played last enemy turn, for UI animation
 

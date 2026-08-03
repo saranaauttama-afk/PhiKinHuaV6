@@ -8,7 +8,12 @@
     "rarity": "Common",
     "starter": 4,
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "burn"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "burn"
+    ],
     "desc": "ปาไผ่เผาใส่ศัตรู สร้างความเสียหาย 5 และเผาไหม้ 2 ดาเมจต่อเทิร์น เป็นเวลา 2 เทิร์น"
   },
   {
@@ -19,19 +24,29 @@
     "block": 4,
     "rarity": "Common",
     "inShop": true,
-    "tags": ["block", "thai", "shaman", "curse"],
+    "tags": [
+      "block",
+      "thai",
+      "shaman",
+      "curse"
+    ],
     "desc": "โรยผงเจ้าพ่อป้องกัน Block 4 หากศัตรูโจมตี ศัตรูจะได้รับคำสาป"
   },
   {
     "id": "cooling_cloth",
     "name": "ผ้าเย็น",
-    "type": "skill", 
+    "type": "skill",
     "cost": 0,
     "block": 5,
     "rarity": "Common",
     "starter": 4,
     "inShop": true,
-    "tags": ["block", "thai", "shaman", "cleanse"],
+    "tags": [
+      "block",
+      "thai",
+      "shaman",
+      "cleanse"
+    ],
     "desc": "ใช้ผ้าเย็นปิดหน้า Block 5 และล้างสถานะลบทั้งหมด"
   },
   {
@@ -40,9 +55,14 @@
     "type": "skill",
     "cost": 1,
     "block": 6,
-    "rarity": "Common", 
+    "rarity": "Common",
     "inShop": true,
-    "tags": ["block", "thai", "shaman", "weaken"],
+    "tags": [
+      "block",
+      "thai",
+      "shaman",
+      "weaken"
+    ],
     "desc": "ส่งเสียงระฆังผีป่าย Block 6 และทำให้ศัตรู Weak 1 เทิร์น"
   },
   {
@@ -53,7 +73,12 @@
     "dmg": 7,
     "rarity": "Common",
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "conditional"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "conditional"
+    ],
     "desc": "เสกเข็มปักผี 7 ดาเมจ หากศัตรูมีสถานะลบ +4 ดาเมจ"
   },
   {
@@ -66,7 +91,12 @@
     "rarity": "Common",
     "starter": 1,
     "inShop": true,
-    "tags": ["thai", "shaman", "draw", "energy"],
+    "tags": [
+      "thai",
+      "shaman",
+      "draw",
+      "energy"
+    ],
     "desc": "นั่งสมาธิสงบจิต จั่วการ์ด 1 ใบ และได้ Energy +1"
   },
   {
@@ -77,8 +107,12 @@
     "rarity": "Common",
     "inShop": true,
     "summonMinion": "ghost_ally",
-    "tags": ["thai", "shaman", "minion"],
-    "desc": "เรียกผีเก่ามาช่วย สร้าง Ghost Ally (3 HP, โจมตี 4, หายไปหลัง 3 เทิร์น)"
+    "tags": [
+      "thai",
+      "shaman",
+      "minion"
+    ],
+    "desc": "เรียกผีเก่ามาช่วยรบ โจมตีศัตรู 4 ทุกต้นเทิร์นโดยทะลุการป้องกัน นาน 3 เทิร์น"
   },
   {
     "id": "soul_drain",
@@ -88,7 +122,12 @@
     "dmg": 5,
     "rarity": "Uncommon",
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "heal"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "heal"
+    ],
     "desc": "ดูดวิญญาณศัตรู 5 ดาเมจ และฟื้นฟู HP เท่ากับดาเมจที่ทำ"
   },
   {
@@ -99,7 +138,12 @@
     "draw": 2,
     "rarity": "Uncommon",
     "inShop": true,
-    "tags": ["thai", "shaman", "energy", "draw"],
+    "tags": [
+      "thai",
+      "shaman",
+      "energy",
+      "draw"
+    ],
     "desc": "ทรงผีเข้าร่าง เทิร์นนี้การ์ดฟรี (0 Energy) ทั้งหมดใช้ได้ไม่จำกัด และจั่วการ์ด 2 ใบ"
   },
   {
@@ -110,19 +154,29 @@
     "dmg": 20,
     "rarity": "Rare",
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "minion"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "minion"
+    ],
     "desc": "เปิดประตูนรกปล่อยปีศาจ 20 ดาเมจ และสร้าง 2 Demon Minions (HP 4, โจมตี 3 แต่ละตัว)"
   },
   {
     "id": "spirit_whisper",
     "name": "กระซิบผี",
-    "type": "attack", 
+    "type": "attack",
     "cost": 0,
     "dmg": 3,
     "draw": 1,
     "rarity": "Common",
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "draw"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "draw"
+    ],
     "desc": "ผีกระซิบข้อมูลให้ 3 ดาเมจ และจั่วการ์ด 1 ใบ"
   },
   {
@@ -134,7 +188,12 @@
     "draw": 1,
     "rarity": "Common",
     "inShop": true,
-    "tags": ["block", "thai", "shaman", "draw"],
+    "tags": [
+      "block",
+      "thai",
+      "shaman",
+      "draw"
+    ],
     "desc": "ให้ผีช่วยหลบ Block 2 และจั่วการ์ด 1 ใบ"
   },
   {
@@ -142,9 +201,13 @@
     "name": "ยาสมุนไพร",
     "type": "skill",
     "cost": 0,
-    "rarity": "Common", 
+    "rarity": "Common",
     "inShop": true,
-    "tags": ["thai", "shaman", "heal"],
+    "tags": [
+      "thai",
+      "shaman",
+      "heal"
+    ],
     "desc": "ดื่มยาสมุนไพรโบราณ ฟื้นฟู 4 HP และล้างสถานะลบ 1 อย่าง"
   },
   {
@@ -155,19 +218,29 @@
     "dmg": 4,
     "rarity": "Common",
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "curse"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "curse"
+    ],
     "desc": "เสกคาถาสาปส่ง 4 ดาเมจ ศัตรูได้รับ Cursed (รับดาเมจเพิ่ม +1 จากทุกแหล่ง) 3 เทิร์น"
   },
   {
     "id": "sacred_ritual",
-    "name": "พิธีบวงสรวง", 
+    "name": "พิธีบวงสรวง",
     "type": "skill",
     "cost": 1,
     "rarity": "Uncommon",
     "inShop": true,
-    "tags": ["thai", "shaman", "draw", "exhaust"],
+    "tags": [
+      "thai",
+      "shaman",
+      "draw",
+      "exhaust"
+    ],
     "exhaust": true,
-    "desc": "ทำพิธีบวงสรวงผี เลือกการ์ด 3 ใบจากกอง Discard กลับมือ (ใช้ได้ครั้งเดียว)"
+    "desc": "ทำพิธีบวงสรวงผี เลือกการ์ด 3 ใบจากกอง Discard กลับมือ (ใช้แล้วหายไปจากไฟต์นี้)"
   },
   {
     "id": "royal_medicine",
@@ -176,9 +249,14 @@
     "cost": 2,
     "rarity": "Uncommon",
     "inShop": true,
-    "tags": ["thai", "shaman", "heal", "exhaust"],
+    "tags": [
+      "thai",
+      "shaman",
+      "heal",
+      "exhaust"
+    ],
     "exhaust": true,
-    "desc": "ดื่มยาชาววังลับ ฟื้นฟู HP 8 และ Max HP +2 ถาวร (ใช้ได้ครั้งเดียว)"
+    "desc": "ดื่มยาชาววังลับ ฟื้นฟู HP 8 และ Max HP +2 ถาวร (ใช้แล้วหายไปจากไฟต์นี้)"
   },
   {
     "id": "create_kuman",
@@ -188,21 +266,31 @@
     "rarity": "Uncommon",
     "inShop": true,
     "starter": 1,
-    "tags": ["thai", "shaman", "minion", "exhaust"],
+    "tags": [
+      "thai",
+      "shaman",
+      "minion",
+      "exhaust"
+    ],
     "exhaust": true,
     "summonMinion": "kuman_spirit",
-    "desc": "สร้างกุมารเด็กน้อย สร้าง Kuman (8 HP, โจมตี 2, รักษา 2 HP/เทิร์น) (ใช้ได้ครั้งเดียว)"
+    "desc": "เรียกกุมารทองมาอยู่ข้างกาย ฟื้นพลังชีวิตให้เรา 2 ทุกต้นเทิร์น นาน 6 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)"
   },
   {
     "id": "summon_poison_spirit",
-    "name": "เรียกผีพิษ", 
+    "name": "เรียกผีพิษ",
     "type": "skill",
     "cost": 2,
     "rarity": "Uncommon",
     "inShop": true,
     "summonMinion": "poison_spirit",
-    "tags": ["thai", "shaman", "minion", "status"],
-    "desc": "เรียกผีพิษมาช่วย สร้าง Poison Spirit (4 turns, ทำให้ศัตรู poison 2 stacks)"
+    "tags": [
+      "thai",
+      "shaman",
+      "minion",
+      "status"
+    ],
+    "desc": "เรียกผีพิษมาวนอยู่รอบศัตรู ใส่พิษ 1 ชั้นทุกต้นเทิร์น นาน 4 เทิร์น"
   },
   {
     "id": "direct_poison_spell",
@@ -213,10 +301,20 @@
     "starter": 1,
     "inShop": true,
     "exhaust": true,
-    "summonMinion": "poison_status",
-    "minionTarget": "enemy",
-    "tags": ["thai", "shaman", "status", "poison", "exhaust"],
-    "desc": "เสกคาถาพิษโดยตรง ให้ศัตรู Poison 3 damage/turn นาน 4 turns (ใช้ได้ครั้งเดียว)"
+    "tags": [
+      "thai",
+      "shaman",
+      "status",
+      "poison",
+      "exhaust"
+    ],
+    "desc": "เสกคาถาพิษใส่ศัตรูโดยตรง ติดพิษ 3 ต่อเทิร์น นาน 4 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "poison",
+      "duration": 4,
+      "value": 3
+    }
   },
   {
     "id": "salt_circle",
@@ -226,7 +324,12 @@
     "block": 10,
     "rarity": "Uncommon",
     "inShop": true,
-    "tags": ["block", "thai", "shaman", "sanctuary"],
+    "tags": [
+      "block",
+      "thai",
+      "shaman",
+      "sanctuary"
+    ],
     "desc": "วางวงเกลือล้อมรอบ Block 10 และได้ Sanctuary (ลดดาเมจครั้งถัดไป 50%)"
   },
   {
@@ -237,7 +340,12 @@
     "dmg": 12,
     "rarity": "Rare",
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "revenge"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "revenge"
+    ],
     "desc": "เรียกผีตายโหงมาแก้แค้น 12 ดาเมจ หาก HP ตัวเอง < 50% ดาเมจ x2"
   },
   {
@@ -247,9 +355,15 @@
     "cost": 3,
     "rarity": "Legendary",
     "inShop": true,
-    "tags": ["attack", "thai", "shaman", "instant", "exhaust"],
+    "tags": [
+      "attack",
+      "thai",
+      "shaman",
+      "instant",
+      "exhaust"
+    ],
     "exhaust": true,
-    "desc": "เสกอาถรรพ์ดำสุดท้าย ศัตรูทุกตัว HP เหลือ 1 (ใช้ได้ครั้งเดียวต่อไฟต์)"
+    "desc": "เสกอาถรรพ์ดำสุดท้าย ศัตรูทุกตัว HP เหลือ 1 (ใช้แล้วหายไปจากไฟต์นี้)"
   },
   {
     "id": "divine_protection",
@@ -258,9 +372,15 @@
     "cost": 3,
     "rarity": "Legendary",
     "inShop": true,
-    "tags": ["thai", "shaman", "heal", "immunity", "exhaust"],
+    "tags": [
+      "thai",
+      "shaman",
+      "heal",
+      "immunity",
+      "exhaust"
+    ],
     "exhaust": true,
-    "desc": "เรียกเทพารักษ์มาช่วย ฟื้นฟู HP เต็ม และ Immunity ทุกสถานะ 3 เทิร์น (ใช้ได้ครั้งเดียว)"
+    "desc": "เรียกเทพารักษ์มาช่วย ฟื้นฟู HP เต็ม และ Immunity ทุกสถานะ 3 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)"
   },
   {
     "id": "ancestral_spirits",
@@ -269,7 +389,11 @@
     "cost": 1,
     "rarity": "Legendary",
     "inShop": true,
-    "tags": ["thai", "shaman", "copy"],
+    "tags": [
+      "thai",
+      "shaman",
+      "copy"
+    ],
     "desc": "เรียกวิญญาณพ่อแม่มาช่วย Copy การ์ดที่เล่นครั้งสุดท้าย (เล่นได้ฟรี)"
   },
   {
@@ -283,7 +407,12 @@
     "equipmentId": "cooling_cloth_equipment",
     "slotCost": 1,
     "desc": "Equipment Card: ติดตั้งผ้าเย็นถาวร ฟื้นฟู 2 HP ต้นเทิร์น",
-    "tags": ["equipment", "thai", "shaman", "heal"]
+    "tags": [
+      "equipment",
+      "thai",
+      "shaman",
+      "heal"
+    ]
   },
   {
     "id": "equipment_luang_pu_amulet",
@@ -296,7 +425,12 @@
     "equipmentId": "luang_pu_amulet",
     "slotCost": 1,
     "desc": "Equipment Card: ติดตั้งเครื่องรางหลวงปู่ ลดดาเมจที่รับ 1 แต้ม",
-    "tags": ["equipment", "thai", "shaman", "defense"]
+    "tags": [
+      "equipment",
+      "thai",
+      "shaman",
+      "defense"
+    ]
   },
   {
     "id": "equipment_prayer_beads",
@@ -308,7 +442,12 @@
     "equipmentId": "prayer_beads",
     "slotCost": 1,
     "desc": "Equipment Card: ติดตั้งลูกประคำ เมื่อเล่นการ์ดโจมตี +1 ดาเมจ",
-    "tags": ["equipment", "thai", "shaman", "attack"]
+    "tags": [
+      "equipment",
+      "thai",
+      "shaman",
+      "attack"
+    ]
   },
   {
     "id": "equipment_nang_tani_skull",
@@ -320,7 +459,12 @@
     "equipmentId": "nang_tani_skull",
     "slotCost": 1,
     "desc": "Equipment Card: ติดตั้งกะโหลกนางตานี เมื่อศัตรูตาย จั่วการ์ด 1 ใบ",
-    "tags": ["equipment", "thai", "shaman", "draw"]
+    "tags": [
+      "equipment",
+      "thai",
+      "shaman",
+      "draw"
+    ]
   },
   {
     "id": "equipment_shaman_staff",
@@ -332,6 +476,11 @@
     "equipmentId": "shaman_staff",
     "slotCost": 1,
     "desc": "Equipment Card: ติดตั้งไม้เท้าหมอผี การ์ดแรกแต่ละเทิร์น ใช้ Energy -1",
-    "tags": ["equipment", "thai", "shaman", "energy"]
+    "tags": [
+      "equipment",
+      "thai",
+      "shaman",
+      "energy"
+    ]
   }
 ]

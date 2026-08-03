@@ -90,13 +90,29 @@ describe('เลขกองจั่วในหน้าต่อสู้', (
 });
 
 describe('การ์ดใช้แล้วหาย', () => {
-  it('ไฟล์ข้อมูลมีใบแบบนี้จริง และบอกไว้ในคำอธิบาย', () => {
+  /**
+   * ข้อความเดิมเขียนว่า "(ใช้ได้ครั้งเดียว)" ซึ่งอ่านได้ว่าครั้งเดียวตลอดรัน
+   * แต่กองเผาถูกสร้างใหม่ทุกไฟต์จาก `masterDeck` — ใบนั้นกลับมาในไฟต์ถัดไป
+   */
+  it('ไฟล์ข้อมูลมีใบแบบนี้จริง และบอกขอบเขตให้ตรง (หายจากไฟต์นี้ ไม่ใช่หายตลอดรัน)', () => {
     const exhausters = CARDS.filter(c => c.exhaust);
     expect(exhausters.length, 'ไม่มีใบ exhaust เลย = ข้อนี้ไม่มีความหมาย')
       .toBeGreaterThan(0);
     for (const c of exhausters) {
-      expect(c.desc ?? '', `${c.id} ไม่ได้บอกว่าใช้ได้ครั้งเดียว`).toContain('ครั้งเดียว');
+      expect(c.desc ?? '', `${c.id} ไม่ได้บอกว่าใช้แล้วหาย`).toContain('หายไปจากไฟต์นี้');
     }
+  });
+
+  it('ใบที่เผาแล้วกลับมาในไฟต์ถัดไป — ข้อความจึงต้องไม่บอกว่าหายตลอดรัน', () => {
+    const s = baseNewState('fresh-fight');
+    s.masterDeck = [
+      { id: 'one_shot', name: 'ใบครั้งเดียว', type: 'skill', cost: 0, exhaust: true },
+      attackCard(5, { id: 'plain', name: 'ธรรมดา' }),
+    ];
+    // ไฟต์ใหม่สร้างกองจั่วจาก masterDeck ใหม่ทั้งกอง กองเผาของไฟต์ก่อนไม่เกี่ยว
+    buildAndShuffleDeck(s, makeRng('fresh-fight'));
+    expect(s.piles.draw.map(c => c.id)).toContain('one_shot');
+    expect(s.piles.exhaust).toEqual([]);
   });
 
   it('เล่นแล้วเข้ากองเผา ไม่ใช่กองทิ้ง', () => {

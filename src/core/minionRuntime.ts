@@ -252,19 +252,13 @@ function processMinionAbility(
       state.log.push(`🚫 ${minion.name} blocks ${blockedTypes} this turn`);
       break;
       
-    case 'cleanse':
-      // Remove status effect minions from the target
-      const beforeCount = activeMinions.length;
-      const targetOwner = actualTargetType;
-      activeMinions.splice(0, activeMinions.length, 
-        ...activeMinions.filter(m => !(m.isStatusEffect && m.owner === targetOwner))
-      );
-      const cleansed = beforeCount - activeMinions.length;
-      if (cleansed > 0) {
-        state.log.push(`✨ ${minion.name} cleanses ${cleansed} status effects from ${targetOwner}`);
-        syncMinionsToState(state);
-      }
+    case 'cleanse': {
+      // เดิมล้าง "minion ที่เป็นสถานะปลอม" — ระบบสถานะชุดที่สองที่ซ้อนอยู่กับ
+      // `statusEffects` ตัวจริง สถานะปลอมถูกลบทิ้งแล้ว จึงล้างของจริงแทน
+      const { clearAllStatusEffects } = require('./statusEffectsRuntime');
+      clearAllStatusEffects(actualTargetType, state, 'debuff');
       break;
+    }
   }
 }
 
@@ -357,9 +351,9 @@ export function damageMinionsByOwner(
 // ===== Integration Helpers =====
 
 export function syncMinionsToState(state: GameState): void {
-  // Sync global activeMinions to state for UI
-  (state as any).playerMinions = getPlayerMinions();
-  (state as any).enemyMinions = getEnemyMinions();
+  // ก๊อปอาร์เรย์ระดับโมดูลลง state ให้ UI อ่านได้ (ดูหมายเหตุที่ `playerMinions`)
+  state.playerMinions = getPlayerMinions();
+  state.enemyMinions = getEnemyMinions();
 }
 
 export function initializeCombatMinions(state: GameState): void {

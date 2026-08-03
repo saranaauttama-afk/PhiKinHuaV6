@@ -20,6 +20,7 @@ import ClassSelectScreen from './components/ClassSelectScreen';
 import JourneyTrail from './components/JourneyTrail';
 import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
+import BlessingView from './components/BlessingView';
 import PlayerStatusBar from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
 import { useRouter } from 'expo-router';
@@ -37,6 +38,7 @@ export default function Home() {
   const [showDebugTools, setShowDebugTools] = useState(false);
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [pickingClass, setPickingClass] = useState(false);
+  const [blessingsOpen, setBlessingsOpen] = useState(false);
 
   const [fontsLoaded] = useAppFonts();
 
@@ -270,6 +272,7 @@ export default function Home() {
           <PlayerStatusBar
             state={state}
             onOpenDeck={() => dispatch({ type: 'OpenDeck' })}
+            onOpenBlessings={() => setBlessingsOpen(true)}
           />
 
         </Scrim>
@@ -281,6 +284,13 @@ export default function Home() {
       {/* สำรับเป็นจอทับเต็มจอ วางนอก Scrim เพื่อให้อยู่เหนือทุกอย่าง
           เดิมวางเป็นบล็อกไหลอยู่ในคอลัมน์กลางแผนที่ จึงล้นออกนอกจอ */}
       <DeckView state={state} dispatch={dispatch} />
+
+      {blessingsOpen && (
+        <BlessingView
+          blessings={state.blessings}
+          onClose={() => setBlessingsOpen(false)}
+        />
+      )}
 
     </View>
   );

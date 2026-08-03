@@ -171,7 +171,10 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     description: 'กำลังร่ายเวทย์อันทรงพลัง - ห้ามขัดจังหวะ',
     defaultDuration: 0, // จัดการพิเศษโดยระบบเวทย์
     stackable: false,
-    tags: ['special', 'casting'],
+    // ติดแท็ก buff เพิ่ม เพราะแถบสถานะต้องตอบให้ได้ว่าสถานะนี้ดีหรือร้าย
+    // "กำลังร่ายเวทย์" เป็นผลบวกของฝ่ายที่ร่าย — ฝั่งตรงข้ามอ่านว่าอันตราย
+    // จากตำแหน่งที่มันขึ้น (ใต้ตัวศัตรู) ไม่ใช่จากสี
+    tags: ['special', 'casting', 'buff'],
     onApply: (target) => {
       console.log(`${target} เริ่มร่ายเวทย์อันทรงพลัง...`);
     },

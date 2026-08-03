@@ -15,6 +15,9 @@ import VictoryOverlay from './components/battle/VictoryOverlay';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
+import StatusStrip from './components/battle/StatusStrip';
+import MinionRow from './components/battle/MinionRow';
+import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 import { useAppFonts } from './useAppFonts';
@@ -93,6 +96,7 @@ export default function BattlePage() {
 
   /** กองที่กำลังเปิดดู — บนหน้าจอเท่านั้น ไม่ใช่สเตตของเกม */
   const [openPile, setOpenPile] = React.useState<PileId | null>(null);
+  const [blessingsOpen, setBlessingsOpen] = React.useState(false);
 
   const handlePlayCard = (card: any, index: number) => {
     if (phase !== 'player') return;
@@ -326,6 +330,16 @@ export default function BattlePage() {
           />
         ))}
 
+        {/* ผีที่เรียกมา — วางเหนือมือ ใต้ฉากกลาง ซ้ายของเรา ขวาของศัตรู */}
+        <View style={{ position: 'absolute', bottom: 210, left: 0, right: 0, zIndex: 200 }}>
+          <MinionRow player={gameState.playerMinions} enemy={gameState.enemyMinions} />
+        </View>
+
+        {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้ */}
+        <View style={{ position: 'absolute', bottom: 118, left: 0, right: 0, zIndex: 200 }}>
+          <StatusStrip effects={player.statusEffects} />
+        </View>
+
         <PlayerHand
           cards={playerHand}
           playedCardIds={playedCardIds}
@@ -347,6 +361,32 @@ export default function BattlePage() {
           onOpenPiles={() => setOpenPile('draw')}
           isEnemyTurn={phase === 'enemy'}
         />
+
+        {/* พรติดตัว — กดดูได้ระหว่างสู้ เพราะพรทุกอย่างกำลังทำงานอยู่ตอนนี้ */}
+        {(gameState.blessings?.length ?? 0) > 0 && (
+          <Pressable
+            onPress={() => setBlessingsOpen(true)}
+            hitSlop={8}
+            style={{
+              position: 'absolute', top: 34, right: 60, zIndex: 600,
+              paddingHorizontal: 10, paddingVertical: 4,
+              borderRadius: 999,
+              backgroundColor: tint.moonSoft,
+              borderWidth: 1, borderColor: palette.lineStrong,
+            }}
+          >
+            <Text style={{ color: palette.moon, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>
+              พร {gameState.blessings.length}
+            </Text>
+          </Pressable>
+        )}
+
+        {blessingsOpen && (
+          <BlessingView
+            blessings={gameState.blessings}
+            onClose={() => setBlessingsOpen(false)}
+          />
+        )}
 
         {/* กองจั่ว/กองทิ้ง/กองเผา — ดูได้ทุกจังหวะ ไม่ต้องหยุดเทิร์น */}
         <PileView

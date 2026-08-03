@@ -28,6 +28,7 @@ const GROUP_TITLE: Record<ArtSlot['group'], string> = {
   blessing: 'พรติดตัว',
   event: 'ภาพประกอบเหตุการณ์',
   chapter: 'ภาพประกอบบทคั่น',
+  minion: 'ผีที่เรียกมาช่วย',
   encounter: 'ภาพบนการ์ดโหนด',
   node: 'ไอคอนบนแถบเส้นทาง',
 };

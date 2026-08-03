@@ -1,134 +1,399 @@
 [
   {
-    "id": "temple_blade", "name": "ฟันดาบวัด", "type": "attack", "cost": 1, "dmg": 8,
-    "rarity": "Common", "inShop": true, "tags": ["attack", "thai", "warrior"],
+    "id": "temple_blade",
+    "name": "ฟันดาบวัด",
+    "type": "attack",
+    "cost": 1,
+    "dmg": 8,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "thai",
+      "warrior"
+    ],
     "desc": "ฟาดดาบที่ปลุกเสกจากวัด สร้างความเสียหาย 8"
   },
   {
-    "id": "muay_stance", "name": "ตั้งท่ามวย", "type": "skill", "cost": 1, "block": 9,
-    "rarity": "Common", "inShop": true, "tags": ["block", "thai", "warrior"],
+    "id": "muay_stance",
+    "name": "ตั้งท่ามวย",
+    "type": "skill",
+    "cost": 1,
+    "block": 9,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "block",
+      "thai",
+      "warrior"
+    ],
     "desc": "ตั้งการ์ดแบบมวยไทย Block 9"
   },
   {
-    "id": "flying_knee", "name": "เข่าลอย", "type": "attack", "cost": 2, "dmg": 15,
-    "rarity": "Uncommon", "inShop": true, "tags": ["attack", "thai", "warrior"],
+    "id": "flying_knee",
+    "name": "เข่าลอย",
+    "type": "attack",
+    "cost": 2,
+    "dmg": 15,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "thai",
+      "warrior"
+    ],
     "desc": "กระโดดเข่าลอยเข้าใส่ สร้างความเสียหาย 15"
   },
   {
-    "id": "parry_step", "name": "ปัดป้อง", "type": "skill", "cost": 1, "block": 5, "draw": 1,
-    "rarity": "Common", "inShop": true, "tags": ["block", "draw", "thai", "warrior"],
+    "id": "parry_step",
+    "name": "ปัดป้อง",
+    "type": "skill",
+    "cost": 1,
+    "block": 5,
+    "draw": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "block",
+      "draw",
+      "thai",
+      "warrior"
+    ],
     "desc": "ปัดหมัดแล้วก้าวออก Block 5 และจั่ว 1 ใบ"
   },
   {
-    "id": "thunder_clap", "name": "ตบมือลั่น", "type": "attack", "cost": 1, "dmg": 5,
-    "rarity": "Common", "inShop": true, "tags": ["attack", "weaken", "thai", "warrior"],
-    "statusEffect": { "target": "enemy", "effect": "weakness", "duration": 2, "value": 1 },
+    "id": "thunder_clap",
+    "name": "ตบมือลั่น",
+    "type": "attack",
+    "cost": 1,
+    "dmg": 5,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "weaken",
+      "thai",
+      "warrior"
+    ],
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    },
     "desc": "ตบมือดังลั่นทำให้ศัตรูเสียจังหวะ เสียหาย 5 และติดอ่อนแอ 2 เทิร์น"
   },
   {
-    "id": "stand_firm", "name": "ยืนหยัด", "type": "skill", "cost": 2, "block": 16,
-    "rarity": "Uncommon", "inShop": true, "tags": ["block", "thai", "warrior"],
+    "id": "stand_firm",
+    "name": "ยืนหยัด",
+    "type": "skill",
+    "cost": 2,
+    "block": 16,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "block",
+      "thai",
+      "warrior"
+    ],
     "desc": "ปักหลักไม่ถอย Block 16"
   },
   {
-    "id": "fighter_breath", "name": "ลมหายใจนักสู้", "type": "skill", "cost": 0, "energyGain": 1, "draw": 1,
-    "rarity": "Common", "inShop": true, "tags": ["energy", "draw", "thai", "warrior"],
+    "id": "fighter_breath",
+    "name": "ลมหายใจนักสู้",
+    "type": "skill",
+    "cost": 0,
+    "energyGain": 1,
+    "draw": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "energy",
+      "draw",
+      "thai",
+      "warrior"
+    ],
     "desc": "สูดลมลึก ได้พลังงาน 1 และจั่ว 1 ใบ"
   },
   {
-    "id": "iron_will", "name": "ใจเหล็ก", "type": "skill", "cost": 1,
-    "rarity": "Uncommon", "inShop": true,
-    "statusEffect": { "target": "player", "effect": "strength", "duration": 99, "value": 2 },
-    "tags": ["status", "thai", "warrior"],
+    "id": "iron_will",
+    "name": "ใจเหล็ก",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "statusEffect": {
+      "target": "player",
+      "effect": "strength",
+      "duration": 99,
+      "value": 2
+    },
+    "tags": [
+      "status",
+      "thai",
+      "warrior"
+    ],
     "desc": "รวบรวมใจ ได้พลังโจมตี +2 ตลอดไฟต์"
   },
-
   {
-    "id": "chant_sutra", "name": "สวดมนต์", "type": "skill", "cost": 1, "block": 7,
-    "rarity": "Common", "inShop": true, "tags": ["block", "thai", "nun"],
+    "id": "chant_sutra",
+    "name": "สวดมนต์",
+    "type": "skill",
+    "cost": 1,
+    "block": 7,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "block",
+      "thai",
+      "nun"
+    ],
     "desc": "สวดบทป้องกัน Block 7"
   },
   {
-    "id": "holy_water", "name": "น้ำมนต์", "type": "skill", "cost": 1, "heal": 7,
-    "rarity": "Common", "inShop": true, "tags": ["heal", "thai", "nun"],
+    "id": "holy_water",
+    "name": "น้ำมนต์",
+    "type": "skill",
+    "cost": 1,
+    "heal": 7,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "heal",
+      "thai",
+      "nun"
+    ],
     "desc": "พรมน้ำมนต์ ฟื้นพลังชีวิต 7"
   },
   {
-    "id": "loving_kindness", "name": "แผ่เมตตา", "type": "skill", "cost": 1, "block": 4, "heal": 4,
-    "rarity": "Common", "inShop": true, "tags": ["heal", "block", "thai", "nun"],
+    "id": "loving_kindness",
+    "name": "แผ่เมตตา",
+    "type": "skill",
+    "cost": 1,
+    "block": 4,
+    "heal": 4,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "heal",
+      "block",
+      "thai",
+      "nun"
+    ],
     "desc": "แผ่เมตตาให้สรรพสัตว์ Block 4 และฟื้น 4"
   },
   {
-    "id": "merit_shield", "name": "บุญคุ้มครอง", "type": "skill", "cost": 2, "block": 14,
-    "rarity": "Uncommon", "inShop": true, "tags": ["block", "thai", "nun"],
+    "id": "merit_shield",
+    "name": "บุญคุ้มครอง",
+    "type": "skill",
+    "cost": 2,
+    "block": 14,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "block",
+      "thai",
+      "nun"
+    ],
     "desc": "บุญเก่าคุ้มกาย Block 14"
   },
   {
-    "id": "dispel_ill", "name": "ปัดเป่า", "type": "skill", "cost": 0, "draw": 1,
-    "rarity": "Common", "inShop": true, "tags": ["draw", "cleanse", "thai", "nun"],
+    "id": "dispel_ill",
+    "name": "ปัดเป่า",
+    "type": "skill",
+    "cost": 0,
+    "draw": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "draw",
+      "cleanse",
+      "thai",
+      "nun"
+    ],
     "desc": "ปัดเป่าสิ่งไม่ดี จั่ว 1 ใบ"
   },
   {
-    "id": "alms_offering", "name": "สังฆทาน", "type": "skill", "cost": 0, "energyGain": 1, "heal": 2,
-    "rarity": "Common", "inShop": true, "tags": ["energy", "heal", "thai", "nun"],
+    "id": "alms_offering",
+    "name": "สังฆทาน",
+    "type": "skill",
+    "cost": 0,
+    "energyGain": 1,
+    "heal": 2,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "energy",
+      "heal",
+      "thai",
+      "nun"
+    ],
     "desc": "ถวายสังฆทาน ได้พลังงาน 1 และฟื้น 2"
   },
   {
-    "id": "dharma_wheel", "name": "ธรรมจักร", "type": "attack", "cost": 1, "dmg": 7,
-    "rarity": "Common", "inShop": true, "tags": ["attack", "thai", "nun"],
+    "id": "dharma_wheel",
+    "name": "ธรรมจักร",
+    "type": "attack",
+    "cost": 1,
+    "dmg": 7,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "thai",
+      "nun"
+    ],
     "desc": "หมุนธรรมจักรใส่อธรรม สร้างความเสียหาย 7"
   },
   {
-    "id": "five_precepts", "name": "ศีลห้า", "type": "skill", "cost": 1,
-    "rarity": "Uncommon", "inShop": true,
-    "statusEffect": { "target": "player", "effect": "regeneration", "duration": 5, "value": 3 },
-    "tags": ["status", "heal", "thai", "nun"],
+    "id": "five_precepts",
+    "name": "ศีลห้า",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "statusEffect": {
+      "target": "player",
+      "effect": "regeneration",
+      "duration": 5,
+      "value": 3
+    },
+    "tags": [
+      "status",
+      "heal",
+      "thai",
+      "nun"
+    ],
     "desc": "ถือศีลห้า ฟื้นพลังชีวิต 3 ต่อเทิร์น นาน 5 เทิร์น"
   },
-
   {
-    "id": "invite_spirit", "name": "เชิญร่าง", "type": "skill", "cost": 1,
-    "rarity": "Common", "inShop": true, "summonMinion": "ghost_ally",
-    "tags": ["minion", "thai", "medium"],
-    "desc": "เชิญวิญญาณเข้ามาช่วยรบ"
+    "id": "invite_spirit",
+    "name": "เชิญร่าง",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "summonMinion": "ghost_ally",
+    "tags": [
+      "minion",
+      "thai",
+      "medium"
+    ],
+    "desc": "เชิญวิญญาณเข้ามาช่วยรบ โจมตีศัตรู 4 ทุกต้นเทิร์นโดยทะลุการป้องกัน นาน 3 เทิร์น"
   },
   {
-    "id": "house_guardian", "name": "ผีเฝ้าเรือน", "type": "skill", "cost": 2, "block": 6,
-    "rarity": "Uncommon", "inShop": true, "summonMinion": "tree_guardian",
-    "tags": ["minion", "block", "thai", "medium"],
-    "desc": "เรียกผีเฝ้าเรือนมาคุ้มกัน Block 6 และได้ผู้พิทักษ์"
+    "id": "house_guardian",
+    "name": "ผีเฝ้าเรือน",
+    "type": "skill",
+    "cost": 2,
+    "block": 6,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "summonMinion": "tree_guardian",
+    "tags": [
+      "minion",
+      "block",
+      "thai",
+      "medium"
+    ],
+    "desc": "เรียกผีเฝ้าเรือนมาคุ้มกัน ได้ Block 3 ทุกต้นเทิร์นและพันศัตรูไว้ นาน 4 เทิร์น"
   },
   {
-    "id": "whisper_ear", "name": "เสียงกระซิบ", "type": "attack", "cost": 0, "dmg": 4, "draw": 1,
-    "rarity": "Common", "inShop": true, "tags": ["attack", "draw", "thai", "medium"],
+    "id": "whisper_ear",
+    "name": "เสียงกระซิบ",
+    "type": "attack",
+    "cost": 0,
+    "dmg": 4,
+    "draw": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "draw",
+      "thai",
+      "medium"
+    ],
     "desc": "กระซิบข้างหูให้เสียสมาธิ เสียหาย 4 และจั่ว 1 ใบ"
   },
   {
-    "id": "set_altar", "name": "ตั้งหิ้ง", "type": "skill", "cost": 0, "energyGain": 1,
-    "rarity": "Common", "inShop": true, "tags": ["energy", "thai", "medium"],
+    "id": "set_altar",
+    "name": "ตั้งหิ้ง",
+    "type": "skill",
+    "cost": 0,
+    "energyGain": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "energy",
+      "thai",
+      "medium"
+    ],
     "desc": "ตั้งหิ้งบูชา ได้พลังงาน 1"
   },
   {
-    "id": "yantra_cloth", "name": "ผ้ายันต์", "type": "skill", "cost": 1, "block": 8,
-    "rarity": "Common", "inShop": true, "tags": ["block", "thai", "medium"],
+    "id": "yantra_cloth",
+    "name": "ผ้ายันต์",
+    "type": "skill",
+    "cost": 1,
+    "block": 8,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "block",
+      "thai",
+      "medium"
+    ],
     "desc": "คลี่ผ้ายันต์บังกาย Block 8"
   },
   {
-    "id": "spirit_possess", "name": "ให้ผีเข้า", "type": "attack", "cost": 2, "dmg": 13,
-    "rarity": "Uncommon", "inShop": true, "tags": ["attack", "thai", "medium"],
+    "id": "spirit_possess",
+    "name": "ให้ผีเข้า",
+    "type": "attack",
+    "cost": 2,
+    "dmg": 13,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "thai",
+      "medium"
+    ],
     "desc": "ปล่อยให้วิญญาณเข้าสิงชั่วครู่ สร้างความเสียหาย 13"
   },
   {
-    "id": "call_phrai", "name": "เรียกพราย", "type": "skill", "cost": 2,
-    "rarity": "Uncommon", "inShop": true, "summonMinion": "poison_spirit",
-    "tags": ["minion", "thai", "medium"],
-    "desc": "เรียกผีพรายมาปล่อยพิษใส่ศัตรู"
+    "id": "call_phrai",
+    "name": "เรียกพราย",
+    "type": "skill",
+    "cost": 2,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "summonMinion": "poison_spirit",
+    "tags": [
+      "minion",
+      "thai",
+      "medium"
+    ],
+    "desc": "เรียกผีพรายมาวนอยู่รอบศัตรู ใส่พิษ 1 ชั้นทุกต้นเทิร์น นาน 4 เทิร์น"
   },
   {
-    "id": "phrai_oil", "name": "น้ำมันพราย", "type": "skill", "cost": 1,
-    "rarity": "Common", "inShop": true,
-    "statusEffect": { "target": "enemy", "effect": "poison", "duration": 4, "value": 3 },
-    "tags": ["status", "poison", "thai", "medium"],
+    "id": "phrai_oil",
+    "name": "น้ำมันพราย",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "poison",
+      "duration": 4,
+      "value": 3
+    },
+    "tags": [
+      "status",
+      "poison",
+      "thai",
+      "medium"
+    ],
     "desc": "ป้ายน้ำมันพราย ศัตรูติดพิษ 3 ต่อเทิร์น นาน 4 เทิร์น"
   }
 ]

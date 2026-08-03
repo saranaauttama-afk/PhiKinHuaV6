@@ -73,8 +73,12 @@ function Stat({
 }
 
 export default function PlayerStatusBar({
-  state, onOpenDeck,
-}: { state: GameState; onOpenDeck?: () => void }) {
+  state, onOpenDeck, onOpenBlessings,
+}: {
+  state: GameState;
+  onOpenDeck?: () => void;
+  onOpenBlessings?: () => void;
+}) {
   const p = state.player;
 
   return (
@@ -106,7 +110,9 @@ export default function PlayerStatusBar({
         {/* เดิมช่องนี้คือ "มือ" ซึ่งบนแผนที่เป็น 0 เสมอ (สเตตคอมแบตถูกล้างแล้ว)
             เปลี่ยนเป็นจำนวนการ์ดในสำรับ และทำให้กดเข้าไปดูทั้งสำรับได้ */}
         <Stat label="สำรับ"   value={`${(state.masterDeck ?? []).length}`} onPress={onOpenDeck} />
-        <Stat label="ค่าประสบการณ์" value={`${p.exp}/${p.expToNext}`} />
+        {/* พรสะสมได้ 4-9 อย่างต่อรันและทำงานตลอดเวลา แต่ไม่เคยมีที่ให้ดูเลย */}
+        <Stat label="พร"      value={`${(state.blessings ?? []).length}`} onPress={onOpenBlessings} />
+        <Stat label="ประสบการณ์" value={`${p.exp}/${p.expToNext}`} />
       </View>
     </ImageBackground>
   );

@@ -12,6 +12,7 @@ import { THAI_GHOST_POOLS } from '../core/monsters/thai-ghosts';
 import { CHARACTER_CLASSES, ALL_CLASS_IDS } from '../core/classes';
 import { STORY_EVENTS } from '../core/events/story';
 import { STORY_CHAPTERS } from '../core/story/chapters';
+import { THAI_MINIONS } from '../core/combat/minions/thai-minions';
 
 const blessings: Array<{ id: string; name: string; desc?: string }> =
   require('../data/packs/base/blessings.json');
@@ -28,7 +29,7 @@ export type ArtSlot = {
   /** ภาพนี้ควรเป็นอะไร — ใช้ทั้งบน placeholder และเป็นโจทย์ตอนไปหา/สร้างรูป */
   brief: string;
   /** จัดกลุ่มในลิสต์ */
-  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter' | 'event' | 'chapter';
+  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter' | 'event' | 'chapter' | 'minion';
   /**
    * ไฟล์ที่มีอยู่ยังเป็นพื้นทึบ ทั้งที่ช่องนี้ต้องการพื้นโปร่ง
    *
@@ -160,6 +161,25 @@ function chapterSlots(): ArtSlot[] {
   }));
 }
 
+/**
+ * ผีที่ถูกเรียกมาช่วยระหว่างไฟต์
+ *
+ * ตัวเล็ก อยู่ข้างตัวละครระหว่างสู้ ไม่ใช่ผีที่เราไปสู้ด้วย จึงเป็นคนละโจทย์
+ * กับ `monster/*` — ตัวนี้ต้องอ่านออกในขนาดจิ๋วและต้องดูเป็นมิตร/เป็นภัย
+ * ตามฝั่งของมัน
+ */
+function minionSlots(): ArtSlot[] {
+  return Object.values(THAI_MINIONS).map(m => ({
+    id: `minion/${m.id}`,
+    label: m.name,
+    file: `minions/${m.id}.png`,
+    size: [256, 256] as [number, number],
+    brief: `${m.abilities.map(a => a.description).join(' · ')} — ตัวเล็กครึ่งตัว `
+      + '**PNG พื้นโปร่ง** อ่านออกตอนย่อเหลือ 34px',
+    group: 'minion' as const,
+  }));
+}
+
 /** ช่องรูปทั้งหมดที่เกมต้องการ เรียงตามกลุ่ม */
 export const ART_CATALOG: ArtSlot[] = [
   ...SCENES,
@@ -168,6 +188,7 @@ export const ART_CATALOG: ArtSlot[] = [
   ...blessingSlots(),
   ...storyEventSlots(),
   ...chapterSlots(),
+  ...minionSlots(),
   ...ENCOUNTERS,
   ...NODES,
 ];

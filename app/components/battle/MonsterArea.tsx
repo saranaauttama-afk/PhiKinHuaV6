@@ -10,7 +10,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
 import Art from '../Art';
-import { palette, surface, tint } from '../../theme';
+import StatusStrip from './StatusStrip';
+import type { StatusEffect } from '../../../src/core/types_extended';
+import { palette, space, surface, tint } from '../../theme';
 
 type Props = {
   monsterId: string | string[];
@@ -18,7 +20,7 @@ type Props = {
   enemy?: {
     hp: number; maxHp: number; name: string;
     block?: number; maxEnergy?: number; handSize?: number;
-    statusEffects?: { id: string; stacks?: number }[];
+    statusEffects?: StatusEffect[];
   } | null;
 };
 
@@ -123,7 +125,14 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       </View>
 
       {/* ไม่มีป้ายบอกท่าล่วงหน้าแล้ว — ศัตรูตัดสินใจตอนถึงตาของตัวเอง
-          ผู้เล่นรู้ว่าโดนอะไรตอนที่โดนจริง */}
+          ผู้เล่นรู้ว่าโดนอะไรตอนที่โดนจริง
+
+          แต่สถานะที่ติดตัวศัตรูอยู่ต้องเห็น — พิษที่เราใส่ไว้จะทำงานอีกกี่เทิร์น
+          คือข้อมูลที่ตัดสินว่าเทิร์นนี้ควรตีต่อหรือควรตั้งการ์ด
+          prop `statusEffects` ประกาศค้างอยู่ตรงนี้มานานแล้วโดยไม่เคยถูกใช้ */}
+      <View style={{ marginTop: space.sm, marginBottom: space.xs }}>
+        <StatusStrip effects={enemy?.statusEffects} compact />
+      </View>
 
       {enemy && (
         <View style={{
