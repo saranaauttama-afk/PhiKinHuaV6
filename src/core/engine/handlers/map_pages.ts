@@ -674,6 +674,11 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
       mp.current.resolved[ix] = true;
       consumeToken(mp, offer);
 
+      // จำผีที่ปราบแล้ว เพื่อไม่ให้โผล่บนแผนที่อีก (ดู replaceDefeatedMonsters)
+      if (offer.kind === 'monster' || offer.kind === 'boss') {
+        s.defeatedEnemyIds = [...(s.defeatedEnemyIds ?? []), offer.enemyId];
+      }
+
       if (offer.kind === 'boss') {
         s.equipmentTempSlots = 0;
         removeTemporaryEquipment(s);

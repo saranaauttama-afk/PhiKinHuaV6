@@ -12,6 +12,8 @@ import {
 } from './journey';
 import type { JourneyNode } from './journey';
 import { initPageMap } from './pages';
+import { THAI_GHOST_POOLS, getMonsterById } from '../monsters/thai-ghosts';
+import { pickFrom } from '../rngState';
 
 /** รันนี้ใช้แผนที่แบบเดินทางอยู่หรือเปล่า */
 export function usesJourney(s: GameState): boolean {
@@ -37,7 +39,9 @@ export function startJourney(s: GameState, r: RNG): RNG {
 export function syncOffersFromJourney(s: GameState): void {
   if (!s.journey || !s.pages) return;
 
-  const offers = reachableNodes(s.journey).map(n => n.offer);
+  const nodes = reachableNodes(s.journey);
+  replaceDefeatedMonsters(s, nodes);
+  const offers = nodes.map(n => n.offer);
 
   s.pages.current = { offers, resolved: offers.map(() => false) };
   s.pages._activeOfferIndex = undefined;
@@ -46,6 +50,76 @@ export function syncOffersFromJourney(s: GameState): void {
   s.pages._resolvesOnPage = 0;
   // ให้ตัวนับหน้าเดินตามชั้นบนเส้นทาง เพื่อให้ id ของร้านที่สร้างใหม่ไม่ชนกัน
   s.pages.pageIndex = s.journey.rowIndex;
+}
+
+/**
+ * ผีที่ปราบไปแล้วต้องไม่โผล่อีก — เปลี่ยนตัวตอนแสดงผล
+ *
+ * ทำตรงนี้ไม่ใช่ตอนสร้างแผนที่ เพราะเส้นทางถูกวางล่วงหน้าทั้งเส้น มีโหนดสู้ 28 โหนด
+ * แต่ผีที่ไม่ใช่บอสมีแค่ 24 ตน — สร้างแบบไม่ซ้ำเลยตั้งแต่ต้นเป็นไปไม่ได้
+ * และตอนสร้างเราก็ยังไม่รู้ว่าผู้เล่นจะเดินทางไหน ตัวที่ไม่ได้เดินผ่านก็ไม่ได้ถูกฆ่า
+ *
+ * ผู้เล่นสู้จริงแค่ 13 ไฟต์ปกติ เลือกจาก 24 ตนจึงพอเสมอ
+ *
+ * บอสไม่เปลี่ยน — pool มีตัวเดียวสองตัว และบอสไม่โผล่ซ้ำอยู่แล้ว
+ */
+/** ลำดับ tier ที่ใช้ค้นหาตัวแทน — ไม่รวมบอส */
+const TIER_ORDER: (keyof typeof THAI_GHOST_POOLS)[] = ['T1', 'T2', 'T3', 'T4', 'T5', 'Elite'];
+
+/**
+ * ผีที่ยังไม่เคยถูกปราบ ไล่จาก tier เดิมออกไปหา tier ใกล้เคียง
+ * ขึ้นก่อนแล้วค่อยลง — ถ้าต้องเพี้ยนจากระดับที่ตั้งใจไว้ ให้เพี้ยนไปทางยากกว่า
+ */
+function freshInNearbyTiers(
+  tier: keyof typeof THAI_GHOST_POOLS,
+  defeated: string[],
+  onRow: Set<string>
+) {
+  const at = TIER_ORDER.indexOf(tier);
+  const order = at < 0
+    ? TIER_ORDER
+    : [tier, ...TIER_ORDER.slice(at + 1), ...TIER_ORDER.slice(0, at).reverse()];
+
+  for (const t of order) {
+    const fresh = THAI_GHOST_POOLS[t].filter(
+      m => !defeated.includes(m.id) && !onRow.has(m.id)
+    );
+    if (fresh.length > 0) return fresh;
+  }
+  return [];
+}
+
+function replaceDefeatedMonsters(s: GameState, nodes: JourneyNode[]): void {
+  const defeated = s.defeatedEnemyIds ?? [];
+  if (defeated.length === 0) return;
+
+  // ผีที่อยู่บนแถวนี้แล้ว — ห้ามเปลี่ยนไปชนกันเอง
+  const onRow = new Set(
+    nodes.map(n => (n.offer as any).enemyId as string | undefined).filter(Boolean) as string[]
+  );
+
+  for (const node of nodes) {
+    if (node.offer.kind !== 'monster') continue;
+    if (!defeated.includes(node.offer.enemyId)) continue;
+
+    const tier: keyof typeof THAI_GHOST_POOLS =
+      node.offer.tier === 'elite' ? 'Elite' : (getMonsterById(node.offer.enemyId)?.tier ?? 'T1');
+
+    onRow.delete(node.offer.enemyId);
+
+    // ต้องหาข้าม tier ได้ด้วย — pool ของ T5 มีแค่ 3 ตน พอถึงช่วงท้ายรัน
+    // มักถูกปราบครบทั้ง tier แล้ว ถ้าจำกัดอยู่ tier เดียวจะไม่เหลือตัวให้เปลี่ยน
+    // ไล่ tier ใกล้เคียงโดยขึ้นก่อน — เจอผีแรงกว่านิดหน่อยดีกว่าเจอตัวเดิมซ้ำ
+    const picked = pickFrom(s, freshInNearbyTiers(tier, defeated, onRow));
+
+    // ไม่เหลือผีที่ยังไม่เคยปราบเลยจริงๆ ก็ปล่อยไว้ตามเดิม (ไม่ควรเกิดใน 15 ไฟต์)
+    if (picked) {
+      node.offer = { ...node.offer, enemyId: picked.id };
+      s.log.push(`เปลี่ยนผีที่ปราบไปแล้วเป็น ${picked.name}`);
+    }
+
+    onRow.add((node.offer as any).enemyId);
+  }
 }
 
 /** โหนดที่ตรงกับ offer ลำดับที่ ix ของชั้นปัจจุบัน */

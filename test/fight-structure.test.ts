@@ -213,3 +213,34 @@ describe('ชนะบอสกลางแล้วเดินทางต่�
     expect(state.phase).toBe('run_complete');
   });
 });
+
+describe('ไม่สู้กับผีตัวเดิมซ้ำในรันเดียว', () => {
+  /**
+   * เส้นทางถูกสร้างล่วงหน้าทั้งเส้น มีโหนดสู้ 28 โหนดจากผีที่ไม่ใช่บอส 24 ตน
+   * จึงสร้างแบบไม่ซ้ำเลยตั้งแต่ต้นไม่ได้ — แต่ผู้เล่นสู้จริงแค่ 13 ไฟต์ปกติ
+   * `replaceDefeatedMonsters` จึงเปลี่ยนตัวตอนแสดงผลแทน
+   */
+  it('เดินจนจบรัน ไม่มีผีตัวไหนถูกสู้สองครั้ง', () => {
+    for (const seed of ['nodup-1', 'nodup-2', 'nodup-3', 'nodup-4', 'nodup-5']) {
+      const { fights } = playFullRun(seed, { hpRatioAtFinal: 0.2 });
+      const ids = fights.map(f => f.enemyId);
+
+      const seen = new Map<string, number[]>();
+      ids.forEach((id, i) => {
+        if (!seen.has(id)) seen.set(id, []);
+        seen.get(id)!.push(i + 1);
+      });
+      const repeats = [...seen.entries()]
+        .filter(([, at]) => at.length > 1)
+        .map(([id, at]) => `${id} ที่ไฟต์ ${at.join(', ')}`);
+
+      expect(repeats, `seed ${seed}`).toEqual([]);
+      expect(ids.length, `seed ${seed}`).toBe(FINAL_BOSS_FIGHT);
+    }
+  });
+
+  it('ผีที่ปราบแล้วถูกบันทึกไว้ครบ', () => {
+    const { state, fights } = playFullRun('nodup-1', { hpRatioAtFinal: 0.2 });
+    expect(state.defeatedEnemyIds ?? []).toEqual(fights.map(f => f.enemyId));
+  });
+});

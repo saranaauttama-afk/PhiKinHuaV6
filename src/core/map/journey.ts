@@ -236,21 +236,56 @@ function pickMonster(
   }
 
   // Elite ยังไล่ระดับตามช่วงไฟต์ ไม่ใช่สุ่มจากทั้ง pool
-  const pool = isElite ? eliteSubPoolForFight(fightIndex) : THAI_GHOST_POOLS[ghostTier];
+  const poolFor = (t: keyof typeof THAI_GHOST_POOLS) =>
+    t === 'Elite' ? eliteSubPoolForFight(fightIndex) : THAI_GHOST_POOLS[t];
 
-  // `banned` คือผีที่ผู้เล่นอาจเพิ่งสู้มาเมื่อกี้ — ห้ามซ้ำเด็ดขาด จึงผ่อนเป็นอันสุดท้าย
-  const allowed = pool.filter(m => !banned.includes(m.id));
-  const base = allowed.length > 0 ? allowed : pool;
+  /**
+   * เงื่อนไขแข็งสองข้อ ผ่อนไม่ได้ทั้งคู่:
+   *   `banned` — ผีที่ผู้เล่นอาจเพิ่งสู้มาเมื่อกี้ (ห้ามเจอตัวเดิมสองไฟต์ติด)
+   *   `inRow`  — ผีที่อยู่อีกทางของแถวเดียวกัน (ทางแยกที่สองทางเหมือนกันไม่ใช่ทางแยก)
+   *
+   * เดิม `inRow` ถูกผ่อนทิ้งเป็นขั้นสุดท้ายเวลาตัวเลือกเหลือน้อย ผลคือบางแถว
+   * มีผีตัวเดียวกันทั้งสองฝั่ง — วัดได้จริง 1-2 แถวต่อรัน
+   */
+  const hardOk = (id: string) => !banned.includes(id) && !inRow.includes(id);
 
-  const fresh    = base.filter(m => !recent.includes(m.id) && !inRow.includes(m.id));
-  const notInRow = base.filter(m => !inRow.includes(m.id));
-  const choices  = fresh.length > 0 ? fresh : notInRow.length > 0 ? notInRow : base;
+  // pool ของบาง tier มีแค่ 3 ตน ถ้าชนเงื่อนไขจนหมดให้ขยับ tier แทนที่จะยอมซ้ำ
+  // ไล่ขึ้นก่อนเพราะเจอผีแรงกว่านิดหน่อยดีกว่าเจอตัวเดิมซ้ำ
+  const ORDER: (keyof typeof THAI_GHOST_POOLS)[] = ['T1', 'T2', 'T3', 'T4', 'T5', 'Elite'];
+  const startAt = ORDER.indexOf(ghostTier);
+  const tierTry: (keyof typeof THAI_GHOST_POOLS)[] = [
+    ghostTier,
+    ...ORDER.slice(startAt + 1),
+    ...ORDER.slice(0, Math.max(0, startAt)).reverse(),
+  ];
 
-  const pick = int(r, 0, choices.length - 1); r = pick.rng;
-  const monster = choices[pick.value];
+  let chosenTier = ghostTier;
+  let choices = poolFor(ghostTier).filter(m => hardOk(m.id));
+
+  for (const t of tierTry) {
+    const ok = poolFor(t).filter(m => hardOk(m.id));
+    if (ok.length > 0) { chosenTier = t; choices = ok; break; }
+  }
+
+  // ทุก tier ชนหมดจริงๆ (ไม่ควรเกิด แต่ต้องไม่ crash) — ยอมผ่อน inRow เป็นอันสุดท้าย
+  if (choices.length === 0) {
+    choices = poolFor(ghostTier).filter(m => !banned.includes(m.id));
+    if (choices.length === 0) choices = poolFor(ghostTier);
+  }
+
+  // `recent` เป็นเงื่อนไขอ่อน — ใช้เพื่อความหลากหลาย ผ่อนได้ถ้าชนกับเงื่อนไขแข็ง
+  const fresh = choices.filter(m => !recent.includes(m.id));
+  const finalChoices = fresh.length > 0 ? fresh : choices;
+
+  const pick = int(r, 0, finalChoices.length - 1); r = pick.rng;
+  const monster = finalChoices[pick.value];
 
   return {
-    offer: { kind: 'monster', tier: isElite ? 'elite' : 'normal', enemyId: monster.id },
+    offer: {
+      kind: 'monster',
+      tier: chosenTier === 'Elite' ? 'elite' : 'normal',
+      enemyId: monster.id,
+    },
     rng: r,
   };
 }

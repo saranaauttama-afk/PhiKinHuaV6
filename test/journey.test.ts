@@ -274,3 +274,18 @@ describe('ซ้ำได้ตาม seed', () => {
     expect(shapes.size).toBe(SEEDS.length);
   });
 });
+
+describe('ไม่เจอผีตัวเดิมซ้ำ', () => {
+  it('ไม่มีแถวไหนที่ทางแยกสองทางเป็นผีตัวเดียวกัน', () => {
+    // ทางแยกที่สองทางเหมือนกันไม่ใช่ทางแยก — วัดได้จริง 1-2 แถวต่อรันก่อนแก้
+    for (const seed of [...SEEDS, 'dup-1', 'dup-2', 'dup-3', 'dup-4', 'dup-5', 'dup-6']) {
+      const { journey } = buildJourney(makeRng(seed));
+      journey.rows.forEach((row, i) => {
+        const ids = row
+          .map(id => (journey.nodes[id].offer as any).enemyId as string | undefined)
+          .filter(Boolean);
+        expect(new Set(ids).size, `seed ${seed} ชั้น ${i}: ${ids.join(' / ')}`).toBe(ids.length);
+      });
+    }
+  });
+});
