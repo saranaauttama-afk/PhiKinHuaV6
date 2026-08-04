@@ -26,6 +26,7 @@ export type DamageSource =
   | { kind: 'combo'; comboId: string }
   | { kind: 'status'; effectId: string }
   | { kind: 'minion'; minionId: string; ignoresBlock?: boolean }
+  | { kind: 'equipment'; equipmentId: string }
   | { kind: 'event' };
 
 /**
@@ -57,6 +58,10 @@ function rulesFor(source: DamageSource): DamageRules {
       return { useBlock: true, attackerMods: true, defenderMods: true };
     case 'minion':
       return { useBlock: !source.ignoresBlock, attackerMods: false, defenderMods: true };
+    // equipment (หนามสะท้อน ฯลฯ): โดน block ตามปกติ แต่ไม่สืบทอด buff ของผู้สวม
+    // ด้วยเหตุผลเดียวกับ minion — แรงมาจากตัวของ ไม่ใช่จากคนถือ
+    case 'equipment':
+      return { useBlock: true, attackerMods: false, defenderMods: true };
     case 'status':
     case 'event':
       return { useBlock: false, attackerMods: false, defenderMods: false };
@@ -165,6 +170,20 @@ export function dealDamage(
     sourceKind,
   });
   if (died) emit(state, { t: 'Died', who: to });
+
+  // ★ ของประจำกายที่ทำงานตอนโดน/ทำดาเมจ (หนามสะท้อน, ลดดาเมจที่รับ)
+  //
+  // hook นี้มีมาตั้งแต่ต้นแต่ **ไม่เคยมีใครเรียก** — `luang_pu_amulet` (Rare)
+  // จึงเป็นของที่ผู้เล่นซื้อมาแล้วไม่เกิดอะไรขึ้นเลย
+  //
+  // ส่ง `hpLoss` ไม่ใช่ `modified`: ของพวกนี้พูดถึงดาเมจที่เข้าตัวจริง
+  // กัน block ไว้ได้หมด = ไม่มีอะไรให้สะท้อนหรือให้ลด
+  //
+  // ดาเมจที่มาจากของประจำกายเองไม่ยิง hook ซ้ำ — กันวนไม่รู้จบระหว่างของสองชิ้น
+  if (sourceKind !== 'equipment' && hpLoss > 0) {
+    const { runEquipmentDamageDealt } = require('../equipmentRuntime');
+    runEquipmentDamageDealt(state, { amount: hpLoss, side: from, target: to });
+  }
 
   return { raw, modified, blocked, hpLoss, died };
 }

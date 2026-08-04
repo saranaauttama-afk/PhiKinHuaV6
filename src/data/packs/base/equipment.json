@@ -26,7 +26,11 @@
     "rarity": "Common",
     "slotCost": 1,
     "desc": "ฟื้นฟู 2 HP ต้นเทิร์น",
-    "tags": ["thai", "shaman", "heal"]
+    "tags": [
+      "thai",
+      "shaman",
+      "heal"
+    ]
   },
   {
     "id": "luang_pu_amulet",
@@ -34,7 +38,11 @@
     "rarity": "Uncommon",
     "slotCost": 1,
     "desc": "ลดดาเมจที่รับ 1 แต้ม",
-    "tags": ["thai", "shaman", "defense"]
+    "tags": [
+      "thai",
+      "shaman",
+      "defense"
+    ]
   },
   {
     "id": "prayer_beads",
@@ -42,15 +50,23 @@
     "rarity": "Uncommon",
     "slotCost": 1,
     "desc": "เมื่อเล่นการ์ดโจมตี +1 ดาเมจ",
-    "tags": ["thai", "shaman", "attack"]
+    "tags": [
+      "thai",
+      "shaman",
+      "attack"
+    ]
   },
   {
     "id": "nang_tani_skull",
     "name": "กะโหลกนางตานี",
     "rarity": "Rare",
     "slotCost": 1,
-    "desc": "เมื่อศัตรูตาย จั่วการ์ด 1 ใบ",
-    "tags": ["thai", "shaman", "draw"]
+    "desc": "ต้นเทิร์น จั่วการ์ดเพิ่ม 1 ใบ",
+    "tags": [
+      "thai",
+      "shaman",
+      "draw"
+    ]
   },
   {
     "id": "shaman_staff",
@@ -58,6 +74,82 @@
     "rarity": "Rare",
     "slotCost": 1,
     "desc": "การ์ดแรกแต่ละเทิร์น ใช้ Energy -1",
-    "tags": ["thai", "shaman", "energy"]
+    "tags": [
+      "thai",
+      "shaman",
+      "energy"
+    ]
+  },
+  {
+    "id": "iron_bracer",
+    "name": "กำไลเหล็ก",
+    "rarity": "Uncommon",
+    "slotCost": 1,
+    "desc": "ต้นเทิร์น ถ้าเลือดเหลือไม่ถึงครึ่ง ได้ Block 8",
+    "tags": [
+      "thai",
+      "warrior",
+      "defense"
+    ]
+  },
+  {
+    "id": "war_drum_gear",
+    "name": "กลองศึกประจำกาย",
+    "rarity": "Rare",
+    "slotCost": 1,
+    "desc": "เริ่มไฟต์ด้วยแข็งแกร่ง +2 ตลอดไฟต์",
+    "tags": [
+      "thai",
+      "warrior",
+      "strength"
+    ]
+  },
+  {
+    "id": "alms_bowl",
+    "name": "บาตรพระ",
+    "rarity": "Uncommon",
+    "slotCost": 1,
+    "desc": "เล่นการ์ดที่ฟื้น HP ฟื้นเพิ่มอีก 2",
+    "tags": [
+      "thai",
+      "nun",
+      "heal"
+    ]
+  },
+  {
+    "id": "white_robe",
+    "name": "ผ้าขาวห่ม",
+    "rarity": "Rare",
+    "slotCost": 1,
+    "desc": "เริ่มไฟต์ด้วยฟื้นฟูต่อเนื่อง 3 ตลอดไฟต์",
+    "tags": [
+      "thai",
+      "nun",
+      "regen"
+    ]
+  },
+  {
+    "id": "spirit_house",
+    "name": "ศาลพระภูมิย่อ",
+    "rarity": "Uncommon",
+    "slotCost": 1,
+    "desc": "เริ่มไฟต์ เรียกผีเฝ้าเรือนมา 1 ตน",
+    "tags": [
+      "thai",
+      "medium",
+      "minion"
+    ]
+  },
+  {
+    "id": "ghost_mirror",
+    "name": "กระจกผี",
+    "rarity": "Rare",
+    "slotCost": 1,
+    "desc": "ศัตรูตีเราแล้วโดนสะท้อนกลับ 2",
+    "tags": [
+      "thai",
+      "medium",
+      "reflect"
+    ]
   }
 ]

@@ -458,7 +458,7 @@
     "inShop": true,
     "equipmentId": "nang_tani_skull",
     "slotCost": 1,
-    "desc": "Equipment Card: ติดตั้งกะโหลกนางตานี เมื่อศัตรูตาย จั่วการ์ด 1 ใบ",
+    "desc": "ติดกะโหลกนางตานีไว้กับตัว มันกระซิบทางให้ — ต้นเทิร์นจั่วเพิ่ม 1 ใบ",
     "tags": [
       "equipment",
       "thai",

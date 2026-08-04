@@ -1,4 +1,7 @@
 import type { EquipmentData, GameState } from './types';
+import { dealDamage, gainBlock, heal } from './combat/damage';
+import { applyStatusEffect } from './combat/status-effects';
+import { summonMinion } from './minionRuntime';
 
 // ===== New: shared types =====
 type TurnSide = 'player' | 'enemy';
@@ -94,12 +97,13 @@ const REGISTRY: Record<string, EquipBehavior> = {
   // เครื่องรางหลวงปู่: ลดดาเมจที่รับ 1 แต้ม
   luang_pu_amulet: {
     on_damage_dealt: ({ state: s, side, target, amount }) => {
-      if (target === 'player' && side === 'enemy') {
-        // ลดดาเมจที่ผู้เล่นรับจากศัตรู
-        const reduction = Math.min(1, amount);
-        s.player.hp += reduction;
-        s.log.push(`เครื่องรางหลวงปู่: ลดดาเมจ ${reduction} แต้ม`);
-      }
+      if (target !== 'player' || side !== 'enemy') return;
+      // คืนแต้มที่ควรจะไม่โดนตั้งแต่แรก — แต่ถ้าหมัดนั้นพาลงไปถึงศูนย์แล้ว
+      // ก็คือตายไปแล้ว เครื่องรางลดดาเมจ ไม่ใช่ชุบชีวิต
+      if (s.player.hp <= 0) return;
+      const reduction = Math.min(1, amount);
+      s.player.hp = Math.min(s.player.maxHp, s.player.hp + reduction);
+      s.log.push(`เครื่องรางหลวงปู่: ลดดาเมจ ${reduction} แต้ม`);
     },
   },
 
@@ -116,9 +120,92 @@ const REGISTRY: Record<string, EquipBehavior> = {
     },
   },
 
-  // กะโหลกนางตานี: เมื่อศัตรูตาย จั่วการ์ด 1 ใบ
+  // กะโหลกนางตานี: ต้นเทิร์นจั่วเพิ่ม 1 ใบ
+  //
+  // เดิมเขียนไว้ว่า "เมื่อศัตรูตาย จั่วการ์ด 1 ใบ" แล้วปล่อยตัว behavior ว่าง —
+  // ของ Rare ที่ซื้อมาแล้วไม่เกิดอะไรขึ้น และต่อให้ต่อสายให้จริง การจั่วตอน
+  // ศัตรูตายก็คือจั่วตอนไฟต์จบแล้ว ไม่มีค่าอะไร จึงเปลี่ยนเป็นสิ่งที่มีผลจริง
   nang_tani_skull: {
-    // Note: จะต้องเรียกผ่าน event อื่นเมื่อศัตรูตาย
+    on_turn_start: ({ state: s, side }) => {
+      if (side !== 'player') return;
+      const { drawUpTo } = require('./commands');
+      const { nextStateRng } = require('./rngState');
+      const before = s.piles.hand.length;
+      const out = drawUpTo(s, nextStateRng(s), before + 1);
+      Object.assign(s, out.state);
+      if (s.piles.hand.length > before) s.log.push('กะโหลกนางตานี: จั่วเพิ่ม 1 ใบ');
+    },
+  },
+
+  // === ของประจำกายของคลาสอื่น ===
+  //
+  // ทั้งสามคลาสเคยไม่มี equipment ของตัวเองเลย — ของทั้งห้าชิ้นเดิมติดแท็ก
+  // `shaman` หมด ซึ่งแปลว่าคลาสอื่นเดินจนจบรันโดยไม่เคยเห็นช่องของประจำกาย
+  // ทำงานเลยสักครั้ง (ร้านและรางวัลกรองตามแท็กคลาส — ดู `rollThreeCards`)
+
+  // กำไลเหล็ก (นักรบ): ยิ่งเลือดน้อยยิ่งยืนแน่น
+  iron_bracer: {
+    on_turn_start: ({ state: s, side }) => {
+      if (side !== 'player') return;
+      if (s.player.hp * 2 > s.player.maxHp) return;
+      gainBlock(s, 'player', 8);
+      s.log.push('กำไลเหล็ก: เลือดน้อยแล้ว — Block +8');
+    },
+  },
+
+  // กลองศึกประจำกาย (นักรบ): ลั่นตั้งแต่ก่อนเริ่ม
+  war_drum_gear: {
+    on_battle_start: ({ state: s, side }) => {
+      if (side !== 'player') return;
+      applyStatusEffect('player', s, 'strength', 99, 2);
+      s.log.push('กลองศึก: แข็งแกร่ง +2 ตลอดไฟต์');
+    },
+  },
+
+  // บาตรพระ (แม่ชี): บุญที่รับมาก็มากขึ้นตาม
+  //
+  // ผูกกับ `card.heal` ไม่ใช่กับ id การ์ด — การ์ดฟื้นเลือดใบใหม่ที่เพิ่มทีหลัง
+  // จึงได้ผลนี้เองโดยไม่ต้องกลับมาแก้ตรงนี้
+  alms_bowl: {
+    on_card_played: ({ state: s, side }, card) => {
+      if (side !== 'player') return;
+      if (!card?.heal || card.heal <= 0) return;
+      const healed = heal(s, 'player', 2);
+      if (healed > 0) s.log.push(`บาตรพระ: ฟื้นเพิ่ม ${healed}`);
+    },
+  },
+
+  // ผ้าขาวห่ม (แม่ชี): แผลปิดเองทั้งไฟต์
+  white_robe: {
+    on_battle_start: ({ state: s, side }) => {
+      if (side !== 'player') return;
+      applyStatusEffect('player', s, 'regeneration', 99, 3);
+      s.log.push('ผ้าขาว: ฟื้นฟูต่อเนื่อง 3 ตลอดไฟต์');
+    },
+  },
+
+  // ศาลพระภูมิย่อ (ร่างทรง): ที่ไหนก็มีผีเฝ้าเรือนตามมา
+  spirit_house: {
+    on_battle_start: ({ state: s, side }) => {
+      if (side !== 'player') return;
+      summonMinion(s, 'tree_guardian', 'player', 1);
+    },
+  },
+
+  // กระจกผี (ร่างทรง): ใครตีเราจะเห็นหน้าตัวเอง
+  //
+  // สะท้อนเมื่อ **ดาเมจเข้าตัวจริง** เท่านั้น (amount คือส่วนที่ทะลุ block มาแล้ว)
+  // กัน block ไว้หมด = ไม่มีอะไรให้สะท้อน ซึ่งตรงกับที่ข้อความบนของบอก
+  ghost_mirror: {
+    on_damage_dealt: ({ state: s, side, target, amount }) => {
+      if (side !== 'enemy' || target !== 'player') return;
+      if (amount <= 0 || !s.enemy) return;
+      dealDamage(s, {
+        from: 'player', to: 'enemy', raw: 2,
+        source: { kind: 'equipment', equipmentId: 'ghost_mirror' },
+      });
+      s.log.push('กระจกผี: สะท้อนกลับ 2');
+    },
   },
 
   // ไม้เท้าหมอผี: การ์ดแรกแต่ละเทิร์น ใช้ Energy -1
@@ -244,4 +331,16 @@ export function runEquipmentDamageDealt(
     if (!fn) continue;
     fn({ state: s, side: payload.side, target: payload.target, amount: payload.amount });
   }
+}
+
+/**
+ * id ของอุปกรณ์ที่ "ทำอะไรได้จริง" — มี hook อย่างน้อยหนึ่งตัว
+ *
+ * มีไว้ให้เทสต์ยืนยันว่าไม่มีอุปกรณ์ในไฟล์ข้อมูลที่ผู้เล่นซื้อมาแล้วไม่เกิดอะไรขึ้น
+ * (`nang_tani_skull` เคยเป็นแบบนั้นอยู่นาน เพราะ behavior เป็นอ็อบเจ็กต์ว่าง)
+ */
+export function equipmentBehaviorIds(): string[] {
+  return Object.entries(REGISTRY)
+    .filter(([, bh]) => Object.keys(bh).some(k => k.startsWith('on_')))
+    .map(([id]) => id);
 }
