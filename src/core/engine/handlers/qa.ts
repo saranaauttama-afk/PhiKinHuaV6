@@ -301,15 +301,13 @@ export function qaResetAILearning(state: GameState, cmd: Command & { type: 'QA_R
 }
 
 export function qaDebugCombos(state: GameState, cmd: Command & { type: 'QA_DebugCombos' }, rng: RNG) {
-  const { debugCombos } = require('../../cardComboSystem');
-  debugCombos(state);
-  state.log.push('✨ Combo system debug info logged to console');
+  state.log.push(`คอมโบ: ${JSON.stringify(state.combo ?? {})}`);
   return { state, rng };
 }
 
 export function qaTriggerCombo(state: GameState, cmd: Command & { type: 'QA_TriggerCombo' }, rng: RNG) {
-  const { getAllCombos } = require('../../cardComboSystem');
-  const allCombos = getAllCombos();
+  const { COMBOS } = require('../../combat/combos');
+  const allCombos = COMBOS;
   const combo = allCombos.find((c: any) => c.id === cmd.comboId);
   
   if (!combo) {
@@ -318,16 +316,18 @@ export function qaTriggerCombo(state: GameState, cmd: Command & { type: 'QA_Trig
     return { state, rng };
   }
 
-  // Force trigger combo
-  const { executeComboEffects } = require('../../cardComboSystem');
-  executeComboEffects(state, combo);
-  state.log.push(`🎆 Force triggered combo: ${combo.name}`);
+  // QA: ยัดการ์ดที่คอมโบต้องการเข้าไปในความคืบหน้าให้ครบทีเดียว
+  const { onCardPlayed } = require('../../combat/combos');
+  for (const id of combo.requiredCards ?? []) {
+    onCardPlayed(state, { id, name: id, type: 'skill', cost: 0, tags: [] }, combo.classTag);
+  }
+  state.log.push(`บังคับติดคอมโบ ${combo.name}`);
   return { state, rng };
 }
 
 export function qaClearCombos(state: GameState, cmd: Command & { type: 'QA_ClearCombos' }, rng: RNG) {
-  const { initializeCombatCombos } = require('../../cardComboSystem');
-  initializeCombatCombos(state);
+  const { resetCombos } = require('../../combat/combos');
+  resetCombos(state);
   state.log.push('🧹 All combo progress cleared');
   return { state, rng };
 }

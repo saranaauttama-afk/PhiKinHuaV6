@@ -154,7 +154,8 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   // Import all advanced systems
   const { canPlayAttackCards } = require('./statusEffectsRuntime');
   const { onPlayerCardPlayed } = require('./adaptiveAI');
-  const { applyComboCardModifiers, onCardPlayedForCombos } = require('./cardComboSystem');
+  const { applyComboCardModifiers, onCardPlayed: onCardPlayedForCombos } = require('./combat/combos');
+  const { getClass } = require('./classes');
 
   // Check if attack cards can be played (entangle check)
   if (card.type === 'attack' && !canPlayAttackCards(state)) {
@@ -255,7 +256,7 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   }
   
   // ★ Trigger combo system after card effects
-  onCardPlayedForCombos(state, modifiedCard);
+  onCardPlayedForCombos(state, modifiedCard, getClass(state.classId).cardTag);
   
   // ★ AI learning from player card usage
   onPlayerCardPlayed(state, modifiedCard);
@@ -281,11 +282,11 @@ export function endPlayerTurn(state: GameState) {
 export function endEnemyTurn(state: GameState) {
   // ★ Process all advanced systems before enemy turn
   const { processEnemyTurnBehaviors } = require('./enemyBehaviorRuntime');  
-  const { onTurnEndForCombos } = require('./cardComboSystem');
+  const { expireCombos } = require('./combat/combos');
   const { onPlayerTurnEnd } = require('./adaptiveAI');
   
   // Process combos and AI learning
-  onTurnEndForCombos(state);
+  expireCombos(state);
   onPlayerTurnEnd(state, { energyUsed: 0, blockGained: state.player.block });
   
   // (Environment system removed)

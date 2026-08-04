@@ -1,0 +1,219 @@
+[
+  {
+    "id": "ghost_summoning_ritual",
+    "classTag": "shaman",
+    "name": "พิธีเชิญผี",
+    "desc": "เรียกผีเก่า + กระซิบวิญญาณ — ผีที่มาช่วยแรงกว่าเดิม",
+    "requiredCards": ["call_old_ghost", "spirit_whisper"],
+    "maxTurns": 2,
+    "effects": [
+      { "type": "summon", "value": 1, "target": "player", "minionId": "ghost_ally", "desc": "ผีเก่ามาอีกตน" },
+      { "type": "damage", "value": 6, "target": "enemy", "desc": "แรงวิญญาณกระแทกใส่ศัตรู" }
+    ]
+  },
+  {
+    "id": "curse_amplification",
+    "classTag": "shaman",
+    "name": "สาปซ้ำสาปซ้อน",
+    "desc": "สวดสาป + เข็มอาถรรพ์ — คำสาปเกาะลึกกว่าเดิม",
+    "requiredCards": ["curse_chant", "cursed_needle"],
+    "maxTurns": 2,
+    "effects": [
+      { "type": "status", "value": 3, "target": "enemy", "statusId": "curse", "desc": "ใส่คำสาป 3 ชั้น" },
+      { "type": "damage", "value": 15, "target": "enemy", "desc": "คำสาปกัดกินเนื้อ" }
+    ]
+  },
+  {
+    "id": "protection_ritual",
+    "classTag": "shaman",
+    "name": "พิธีคุ้มครองครบชุด",
+    "desc": "ผงเจ้าพ่อ + ผ้าเย็น + เสียงระฆัง — เกราะคุ้มครองเต็มรูปแบบ",
+    "requiredCards": ["holy_powder", "cooling_cloth", "bell_sound"],
+    "maxTurns": 2,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "heal", "value": 8, "target": "player", "desc": "พิธีเรียกขวัญคืน" },
+      { "type": "status", "value": 3, "target": "player", "statusId": "block_next", "desc": "กันความเสียหายครั้งหน้า" },
+      { "type": "status", "value": 2, "target": "enemy", "statusId": "weakness", "desc": "ศัตรูอ่อนแรงลง" }
+    ]
+  },
+  {
+    "id": "spirit_possession_combo",
+    "classTag": "shaman",
+    "name": "ผีเข้าเต็มร่าง",
+    "desc": "ผีสิง + วิญญาณบรรพบุรุษ — ร่างนี้ไม่ใช่ของเราแล้ว",
+    "requiredCards": ["ghost_possession", "ancestral_spirits"],
+    "maxTurns": 3,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "energy", "value": 2, "target": "player", "desc": "พลังวิญญาณไหลเข้า" },
+      { "type": "draw", "value": 3, "target": "player", "desc": "ความรู้ของบรรพบุรุษ" },
+      { "type": "freeCards", "value": 3, "target": "player", "desc": "การ์ดสามใบถัดไปไม่เสียพลังงาน" }
+    ]
+  },
+  {
+    "id": "hell_gate_ritual",
+    "classTag": "shaman",
+    "name": "เปิดประตูนรก",
+    "desc": "ประตูนรก + ดูดวิญญาณ + อาถรรพ์ดำ — เปิดทางให้สิ่งที่ไม่ควรเปิด",
+    "requiredCards": ["hell_gate", "soul_drain", "black_magic"],
+    "maxTurns": 4,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "damage", "value": 25, "target": "enemy", "desc": "ไฟนรกพุ่งขึ้นมา" },
+      { "type": "summon", "value": 3, "target": "player", "minionId": "demon_minion", "desc": "ปีศาจสามตนขึ้นมาจากรอยแยก" },
+      { "type": "heal", "value": 15, "target": "player", "desc": "ดูดชีวิตจากสิ่งที่ตายไปแล้ว" }
+    ]
+  },
+  {
+    "id": "divine_intervention",
+    "classTag": "shaman",
+    "name": "เทพเจ้าลงมา",
+    "desc": "เทพารักษ์ + ยาชาววัง + พิธีบวงสรวง — สิ่งที่ไม่ควรเรียกได้ยิน",
+    "requiredCards": ["divine_protection", "royal_medicine", "sacred_ritual"],
+    "maxTurns": 5,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "heal", "value": 999, "target": "player", "desc": "ฟื้นเต็มหลอด" },
+      { "type": "status", "value": 5, "target": "player", "statusId": "strength", "desc": "พลังของเทพ" },
+      { "type": "status", "value": 5, "target": "player", "statusId": "regeneration", "desc": "เลือดไหลกลับเอง" },
+      { "type": "debuffImmunity", "value": 1, "target": "player", "desc": "สถานะลบเข้าไม่ได้ตลอดไฟต์" }
+    ]
+  },
+  {
+    "id": "ultimate_thai_mastery",
+    "classTag": "shaman",
+    "name": "สุดวิชา",
+    "desc": "เล่นการ์ดวิชาไทยครบ 7 ใบในไฟต์เดียว",
+    "requiredTags": ["thai"],
+    "requiredCount": 7,
+    "maxTurns": 999,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "damage", "value": 30, "target": "enemy", "desc": "วิชาทั้งหมดรวมเป็นหนึ่ง" },
+      { "type": "heal", "value": 20, "target": "player", "desc": "จิตนิ่งจนแผลสมาน" },
+      { "type": "energy", "value": 3, "target": "player", "desc": "ลมปราณเต็มเปี่ยม" },
+      { "type": "draw", "value": 5, "target": "player", "desc": "เห็นทุกอย่างทะลุ" }
+    ]
+  },
+
+  {
+    "id": "muay_combination",
+    "classTag": "warrior",
+    "name": "ลูกไม้มวย",
+    "desc": "ตั้งท่ามวย + เข่าลอย — ตั้งหลักแล้วเข้าเต็มแรง",
+    "requiredCards": ["muay_stance", "flying_knee"],
+    "maxTurns": 2,
+    "effects": [
+      { "type": "damage", "value": 12, "target": "enemy", "desc": "เข่าซ้ำจุดเดิม" },
+      { "type": "status", "value": 2, "target": "player", "statusId": "strength", "desc": "จังหวะเข้าตัว" }
+    ]
+  },
+  {
+    "id": "temple_discipline",
+    "classTag": "warrior",
+    "name": "วินัยลานวัด",
+    "desc": "ฟันดาบวัด + ปัดป้อง + ยืนหยัด — รับแล้วสวน ไม่ถอยสักก้าว",
+    "requiredCards": ["temple_blade", "parry_step", "stand_firm"],
+    "maxTurns": 3,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "block", "value": 15, "target": "player", "desc": "ยืนเป็นกำแพง" },
+      { "type": "damage", "value": 14, "target": "enemy", "desc": "สวนกลับเต็มแรง" },
+      { "type": "status", "value": 2, "target": "enemy", "statusId": "vulnerable", "desc": "ศัตรูเสียหลัก" }
+    ]
+  },
+  {
+    "id": "fighter_second_wind",
+    "classTag": "warrior",
+    "name": "ลมหายใจที่สอง",
+    "desc": "ลมหายใจนักสู้ + ใจเหล็ก — เหนื่อยแล้วแต่ยังไม่ล้ม",
+    "requiredCards": ["fighter_breath", "iron_will"],
+    "maxTurns": 3,
+    "effects": [
+      { "type": "energy", "value": 2, "target": "player", "desc": "สูดลมเข้าเต็มปอด" },
+      { "type": "draw", "value": 2, "target": "player", "desc": "ตาสว่างขึ้น" },
+      { "type": "heal", "value": 6, "target": "player", "desc": "ฝืนไหว" }
+    ]
+  },
+
+  {
+    "id": "merit_circle",
+    "classTag": "nun",
+    "name": "วงบุญ",
+    "desc": "สวดมนต์ + แผ่เมตตา — บุญที่แผ่ออกไปวนกลับมา",
+    "requiredCards": ["chant_sutra", "loving_kindness"],
+    "maxTurns": 2,
+    "effects": [
+      { "type": "heal", "value": 8, "target": "player", "desc": "ใจสงบ แผลเบาลง" },
+      { "type": "block", "value": 8, "target": "player", "desc": "เมตตาเป็นเกราะ" }
+    ]
+  },
+  {
+    "id": "purification_rite",
+    "classTag": "nun",
+    "name": "พิธีชำระ",
+    "desc": "น้ำมนต์ + ปัดเป่า + ศีลห้า — ล้างทุกอย่างที่เกาะอยู่",
+    "requiredCards": ["holy_water", "dispel_ill", "five_precepts"],
+    "maxTurns": 3,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "cleanse", "value": 1, "target": "player", "desc": "สถานะลบหลุดหมด" },
+      { "type": "status", "value": 4, "target": "player", "statusId": "regeneration", "desc": "เลือดไหลกลับเอง" },
+      { "type": "status", "value": 3, "target": "enemy", "statusId": "weakness", "desc": "สิ่งไม่ดีถอยห่าง" }
+    ]
+  },
+  {
+    "id": "dharma_shield",
+    "classTag": "nun",
+    "name": "ธรรมคุ้มภัย",
+    "desc": "บุญคุ้มครอง + ธรรมจักร — ยิ่งถูกตี ยิ่งคุ้ม",
+    "requiredCards": ["merit_shield", "dharma_wheel"],
+    "maxTurns": 2,
+    "effects": [
+      { "type": "block", "value": 12, "target": "player", "desc": "บุญเก่าคุ้มไว้" },
+      { "type": "damage", "value": 10, "target": "enemy", "desc": "ธรรมจักรหมุนกลับ" }
+    ]
+  },
+
+  {
+    "id": "altar_binding",
+    "classTag": "medium",
+    "name": "ผูกหิ้ง",
+    "desc": "ตั้งหิ้ง + ผ้ายันต์ — ตั้งที่ให้ผีอยู่ แล้วผีก็อยู่จริง",
+    "requiredCards": ["set_altar", "yantra_cloth"],
+    "maxTurns": 2,
+    "effects": [
+      { "type": "block", "value": 10, "target": "player", "desc": "ยันต์กันไว้" },
+      { "type": "summon", "value": 1, "target": "player", "minionId": "tree_guardian", "desc": "ผีเฝ้าเรือนมาประจำที่" }
+    ]
+  },
+  {
+    "id": "full_possession",
+    "classTag": "medium",
+    "name": "เข้าทรงเต็มตัว",
+    "desc": "เชิญร่าง + ให้ผีเข้า — ไม่ใช่เราแล้วตั้งแต่ตอนนี้",
+    "requiredCards": ["invite_spirit", "spirit_possess"],
+    "maxTurns": 3,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "damage", "value": 18, "target": "enemy", "desc": "แรงที่ไม่ใช่ของคน" },
+      { "type": "energy", "value": 2, "target": "player", "desc": "ผีออกแรงแทน" },
+      { "type": "freeCards", "value": 2, "target": "player", "desc": "การ์ดสองใบถัดไปไม่เสียพลังงาน" }
+    ]
+  },
+  {
+    "id": "phrai_ritual",
+    "classTag": "medium",
+    "name": "พิธีพราย",
+    "desc": "เรียกพราย + น้ำมันพราย + เสียงกระซิบ — พิษที่มาพร้อมเสียงเรียก",
+    "requiredCards": ["call_phrai", "phrai_oil", "whisper_ear"],
+    "maxTurns": 3,
+    "oncePerCombat": true,
+    "effects": [
+      { "type": "status", "value": 5, "target": "enemy", "statusId": "poison", "desc": "พิษพรายเกาะลึก" },
+      { "type": "damage", "value": 12, "target": "enemy", "desc": "เสียงเรียกเจาะเข้าไปในหัว" },
+      { "type": "draw", "value": 2, "target": "player", "desc": "พรายกระซิบทางให้" }
+    ]
+  }
+]

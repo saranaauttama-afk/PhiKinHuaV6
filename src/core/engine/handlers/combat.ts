@@ -197,7 +197,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
   const { processMinionsEndTurn }         = require('../../minionRuntime');
   const { processEnemyTurnBehaviors }     = require('../../enemyBehaviorRuntime');
-  const { onTurnEndForCombos }            = require('../../cardComboSystem');
+  const { expireCombos }                  = require('../../combat/combos');
   const { onPlayerTurnEnd }              = require('../../adaptiveAI');
   const { enemyDrawUpToHand, enemyDiscardHand } = require('./enemy');
 
@@ -207,7 +207,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   runEquipmentTurnHook(s, 'on_turn_end', 'player');
   runBlessingsTurnHook(s, 'on_turn_end');
   resetBlessingTurnFlags(s);
-  onTurnEndForCombos(s);
+  expireCombos(s);
   onPlayerTurnEnd(s, { energyUsed: 0, blockGained: s.player.block });
   s.turn = 1;
 

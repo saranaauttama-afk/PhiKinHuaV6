@@ -289,6 +289,15 @@ export type GameState = {
    */
   minions?: import('./types_extended').MinionData[];
 
+  /**
+   * สถานะคอมโบของไฟต์นี้ — ความคืบหน้า คอมโบที่ติดไปแล้ว และผลที่ยังค้างอยู่
+   *
+   * เดิมกระจายอยู่สองที่ที่แย่พอกัน: อาร์เรย์ระดับโมดูลใน `cardComboSystem.ts`
+   * กับฟิลด์ที่แปะบน `(state as any)` อีกสามตัว — ไม่มีไทป์ ไม่ถูกเซฟ
+   * และค้างข้ามไฟต์
+   */
+  combo?: import('./combat/combos').ComboState;
+
   enemyEnergy?: number;
   enemyLastPlayed?: string[];  // card IDs played last enemy turn, for UI animation
 

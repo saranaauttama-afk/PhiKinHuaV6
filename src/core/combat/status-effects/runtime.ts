@@ -41,6 +41,20 @@ export function applyStatusEffect(
   value?: number,
   sourceId?: string
 ): StatusEffectResult {
+  // คอมโบ "เทพเจ้าลงมา" ให้ภูมิคุ้มกันสถานะลบตลอดไฟต์ — เดิมมีตัวธงกับฟังก์ชัน
+  // `shouldBlockDebuff` ครบ แต่ไม่มีใครเรียกมันเลย ภูมิคุ้มกันจึงไม่เคยกันอะไร
+  if (target === 'player') {
+    const { shouldBlockDebuff } = require('../combos');
+    const def0 = getStatusEffectDefinition(statusId);
+    if (def0?.tags?.includes('debuff') && shouldBlockDebuff(state)) {
+      return {
+        success: false,
+        message: `${def0.name} ถูกกันไว้`,
+        logMessages: [`${def0.name} เข้าไม่ได้ — มีภูมิคุ้มกันอยู่`],
+      };
+    }
+  }
+
   // ดึงข้อมูลเป้าหมาย
   const targetState = target === 'player' ? state.player : state.enemy;
   if (!targetState) {

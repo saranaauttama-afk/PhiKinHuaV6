@@ -40,7 +40,7 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
     cardTag: 'shaman',
     startHp: 50,
     startEnergy: 3,
-    startHandSize: 3,
+    startHandSize: 5,
     starterDeck: {
       bamboo_dart: 4,
       cooling_cloth: 4,
@@ -60,7 +60,7 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
     cardTag: 'warrior',
     startHp: 66,
     startEnergy: 3,
-    startHandSize: 3,
+    startHandSize: 5,
     starterDeck: {
       temple_blade: 4,
       muay_stance: 4,
@@ -80,7 +80,7 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
     cardTag: 'nun',
     startHp: 44,
     startEnergy: 3,
-    startHandSize: 4,
+    startHandSize: 6,
     starterDeck: {
       chant_sutra: 3,
       dharma_wheel: 3,
@@ -101,7 +101,7 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
     cardTag: 'medium',
     startHp: 46,
     startEnergy: 4,
-    startHandSize: 3,
+    startHandSize: 5,
     starterDeck: {
       whisper_ear: 3,
       yantra_cloth: 3,

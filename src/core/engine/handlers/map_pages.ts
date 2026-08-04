@@ -27,6 +27,7 @@ import {
 } from '../../map/journeySync';
 import { fireChapter } from '../../story/chapters';
 import { winRun } from './runEnd';
+import { resetCombos } from '../../combat/combos';
 
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
@@ -212,6 +213,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
       initializeEnemyBehaviors(s);
       // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
+      // คอมโบเริ่มนับใหม่ทุกไฟต์ — เดิมไม่มีใครล้าง คอมโบที่ติดไปแล้วจึงติดค้าง
+      // ทั้งรัน และความคืบหน้าค้างจากไฟต์ก่อนทำให้ติดคอมโบด้วยการ์ดใบเดียว
+      resetCombos(s);
       
       // ตั้ง intent แสดงล่วงหน้า (ไพ่บนสุดของ draw)
       (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
@@ -281,6 +285,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
       initializeEnemyBehaviors(s);
       // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
+      // คอมโบเริ่มนับใหม่ทุกไฟต์ — เดิมไม่มีใครล้าง คอมโบที่ติดไปแล้วจึงติดค้าง
+      // ทั้งรัน และความคืบหน้าค้างจากไฟต์ก่อนทำให้ติดคอมโบด้วยการ์ดใบเดียว
+      resetCombos(s);
       
       (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
 
