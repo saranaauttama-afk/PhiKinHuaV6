@@ -17,6 +17,7 @@ import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
 import StatusStrip from './components/battle/StatusStrip';
 import ComboStrip from './components/battle/ComboStrip';
+import TrapRow from './components/battle/TrapRow';
 import MinionRow from './components/battle/MinionRow';
 import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
@@ -339,6 +340,8 @@ export default function BattlePage() {
         {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้
             คอมโบอยู่เหนือขึ้นไปหนึ่งชั้น เพราะมันคือสิ่งที่กำลังจะเกิด ไม่ใช่สิ่งที่เป็นอยู่ */}
         <View style={{ position: 'absolute', bottom: 118, left: 0, right: 0, zIndex: 200, gap: 4 }}>
+          {/* กับดักอยู่บนสุด เพราะมันคือสิ่งที่เราวางไว้แล้วรออยู่ */}
+          <TrapRow traps={gameState.traps} />
           <ComboStrip state={gameState} />
           <StatusStrip effects={player.statusEffects} />
         </View>

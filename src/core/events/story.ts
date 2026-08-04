@@ -24,6 +24,8 @@ export type EventEffect =
   | { kind: 'randomCard' }
   /** ถอดการ์ดสุ่มออกจากสำรับหนึ่งใบ */
   | { kind: 'removeRandomCard' }
+  /** ยัดการ์ดคำสาปเข้าสำรับ — ราคาที่จ่ายโดยไม่เสียเลือด */
+  | { kind: 'curse'; count?: number }
   | { kind: 'blessing' };
 
 export type EventRequirement =
@@ -138,6 +140,18 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
       s.masterDeck = deck;
       s.log.push(`${gone.name} หลุดจากสำรับ`);
       return roll.rng;
+    }
+
+    case 'curse': {
+      const { CURSE_CARDS } = require('../pack');
+      const { addCurse } = require('../cards/curse');
+      let rr = r;
+      for (let i = 0; i < (eff.count ?? 1); i++) {
+        const roll = int(rr, 0, CURSE_CARDS.length - 1);
+        rr = roll.rng;
+        addCurse(s, CURSE_CARDS[roll.value]);
+      }
+      return rr;
     }
 
     case 'blessing': {

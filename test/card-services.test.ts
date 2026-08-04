@@ -5,7 +5,9 @@ import { baseNewState } from '../src/core/commands';
 import type { CardData, Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import { buildJourney } from '../src/core/map/journey';
-import { upgradeCard, canUpgrade, UPGRADE_BONUS } from '../src/core/engine/shared';
+import {
+  upgradeCard, canUpgrade, upgradeLevelOf, UPGRADE_BONUS, MAX_UPGRADE_LEVEL,
+} from '../src/core/engine/shared';
 import { upgradeCostForCount, removeCostForCount } from '../src/core/balance/economy';
 import cardsJson from '../src/data/packs/base/cards.json';
 
@@ -49,16 +51,36 @@ describe('สูตรปลุกเสก', () => {
   });
 
   /**
-   * ข้อนี้คือกฎที่เปลี่ยนจากของเดิม: เดิมปลุกซ้ำได้ไม่จำกัด
-   * ทางที่ดีที่สุดคือทุ่มทองใส่ใบเดียวแล้วถือยาว ("ฟันดาบ + + +")
+   * เดิมปลุกซ้ำได้ไม่จำกัด ทางที่ดีที่สุดคือทุ่มทองใส่ใบเดียวแล้วถือยาว
+   * ("ฟันดาบ + + +") ตอนนี้มีเพดานที่ 3 ขั้น
    */
-  it('ปลุกได้ครั้งเดียวต่อใบ — ปลุกซ้ำแล้วไม่มีอะไรเปลี่ยน', () => {
-    const once = upgradeCard(attack());
-    expect(canUpgrade(once)).toBe(false);
+  it('ปลุกได้ถึงขั้นสูงสุดแล้วหยุด', () => {
+    let c = attack();
+    for (let lvl = 1; lvl <= MAX_UPGRADE_LEVEL; lvl++) {
+      expect(canUpgrade(c), `ขั้น ${lvl - 1} ควรปลุกต่อได้`).toBe(true);
+      c = upgradeCard(c);
+      expect(upgradeLevelOf(c)).toBe(lvl);
+      expect(c.dmg).toBe(6 + UPGRADE_BONUS * lvl);
+    }
 
-    const twice = upgradeCard(once);
-    expect(twice.dmg).toBe(once.dmg);
-    expect(twice.name).toBe(once.name);
+    expect(canUpgrade(c), 'เต็มขั้นแล้วยังปลุกได้อีก').toBe(false);
+    const over = upgradeCard(c);
+    expect(over.dmg).toBe(c.dmg);
+    expect(over.name).toBe(c.name);
+  });
+
+  it('ชื่อบอกขั้นปัจจุบัน ไม่ใช่ต่อ + ไปเรื่อยๆ', () => {
+    let c = attack();
+    c = upgradeCard(c);
+    expect(c.name).toBe('ฟันดาบ +1');
+    c = upgradeCard(c);
+    expect(c.name, 'ชื่อกลายเป็น "ฟันดาบ +1 +2"').toBe('ฟันดาบ +2');
+  });
+
+  it('การ์ดคำสาปปลุกเสกไม่ได้', () => {
+    const curse = { id: 'c1', name: 'คำสาป', type: 'curse', cost: 0 } as CardData;
+    expect(canUpgrade(curse)).toBe(false);
+    expect(upgradeCard(curse)).toEqual(curse);
   });
 
   /**
@@ -111,15 +133,31 @@ describe('ร้านปลุกเสก', () => {
     expect(out.player.gold).toBe(0);
   });
 
-  it('ปลุกใบเดิมซ้ำไม่ได้ และไม่เสียทองฟรี', () => {
-    let s = shopState([attack()]);
-    s = go(s, { type: 'ShopUpgradeBuy', index: 0 });
-    const goldAfterFirst = s.player.gold;
-    const dmgAfterFirst = s.masterDeck[0].dmg;
+  it('ปลุกใบเดิมได้จนสุดขั้น แล้วกดต่อไม่เสียทองฟรี', () => {
+    let s = shopState([attack()], 99999);
+    for (let i = 0; i < MAX_UPGRADE_LEVEL; i++) {
+      s = go(s, { type: 'ShopUpgradeBuy', index: 0 });
+    }
+    expect(upgradeLevelOf(s.masterDeck[0])).toBe(MAX_UPGRADE_LEVEL);
 
+    const goldAtCap = s.player.gold;
+    const dmgAtCap = s.masterDeck[0].dmg;
     const out = go(s, { type: 'ShopUpgradeBuy', index: 0 });
-    expect(out.player.gold, 'เสียทองทั้งที่ไม่มีอะไรเปลี่ยน').toBe(goldAfterFirst);
-    expect(out.masterDeck[0].dmg).toBe(dmgAfterFirst);
+
+    expect(out.player.gold, 'เสียทองทั้งที่ไม่มีอะไรเปลี่ยน').toBe(goldAtCap);
+    expect(out.masterDeck[0].dmg).toBe(dmgAtCap);
+  });
+
+  it('ปลุกขั้นสูงแพงกว่าปลุกขั้นแรก', () => {
+    const cheap = shopState([attack()], 99999);
+    const first = cheap.player.gold - go(cheap, { type: 'ShopUpgradeBuy', index: 0 }).player.gold;
+
+    let s = shopState([attack()], 99999);
+    s = go(s, { type: 'ShopUpgradeBuy', index: 0 });
+    const before = s.player.gold;
+    const second = before - go(s, { type: 'ShopUpgradeBuy', index: 0 }).player.gold;
+
+    expect(second, 'ปั้นใบเดียวให้สุดควรแพงขึ้นเรื่อยๆ').toBeGreaterThan(first);
   });
 
   it('ราคาแพงขึ้นทุกครั้งที่ใช้', () => {

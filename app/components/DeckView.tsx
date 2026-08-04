@@ -20,9 +20,12 @@ import { font, palette, radius, size, space, surface, tint } from '../theme';
 const TYPE_LABEL: Record<string, string> = {
   attack: 'การ์ดโจมตี',
   skill: 'การ์ดวิชา',
+  trap: 'การ์ดดัก',
   equipment: 'เครื่องราง',
+  curse: 'คำสาป',
 };
-const TYPE_ORDER = ['attack', 'skill', 'equipment'] as const;
+// คำสาปอยู่ท้ายสุด — มันคือของที่อยากถอนออก ไม่ใช่ของที่อยากดู
+const TYPE_ORDER = ['attack', 'skill', 'trap', 'equipment', 'curse'] as const;
 
 type Props = {
   state: GameState;

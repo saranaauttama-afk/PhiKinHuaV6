@@ -9,6 +9,8 @@ export const ACTIVE_PACK = 'base' as const;
 // --- JSON imports (ต้องเปิด resolveJsonModule ใน tsconfig)
 import cardsJson from '../data/packs/base/cards.json';
 import classCardsJson from '../data/packs/base/class_cards.json';
+import trapCardsJson from '../data/packs/base/trap_cards.json';
+import curseCardsJson from '../data/packs/base/curse_cards.json';
 // import enemiesJson from '../data/packs/base/enemies.json'; // เปลี่ยนใช้ระบบไทยใหม่
 import blessingsJson from '../data/packs/base/blessings.json';
 import EQUIP_LIST from '../data/packs/base/equipment.json';
@@ -23,7 +25,18 @@ type BlessingMeta = { id: string; name: string; rarity: Rarity; desc?: string; o
 
 // การ์ดของคลาสอื่นอยู่คนละไฟล์ แต่รวมเป็นคลังเดียวกัน
 // (การ์ดใน cards.json ทั้งหมดติดแท็ก shaman อยู่แล้ว)
-const CARD_LIST: CardJson[] = [...(cardsJson as any), ...(classCardsJson as any)];
+const CARD_LIST: CardJson[] = [
+  ...(cardsJson as any), ...(classCardsJson as any), ...(trapCardsJson as any),
+];
+
+/**
+ * การ์ดคำสาปอยู่นอกคลังปกติ — มันเข้าสำรับได้ทางเดียวคือถูกยัดเข้ามา
+ * ไม่ใช่ของที่ซื้อได้หรือได้เป็นรางวัล ถ้าปนอยู่ในคลังเดียวกันมันจะไปโผล่ในร้าน
+ */
+export const CURSE_CARDS: CardData[] = curseCardsJson as any;
+export function curseById(id: string): CardData | undefined {
+  return CURSE_CARDS.find(c => c.id === id);
+}
 // const ENEMY_LIST: EnemyJson[] = enemiesJson as any; // ใช้ระบบไทยแทน
 const BLESSING_LIST: BlessingMeta[] = blessingsJson as any;
 

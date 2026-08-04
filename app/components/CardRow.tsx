@@ -78,7 +78,11 @@ export default function CardRow({ card, count, spent = false }: Props) {
             </Text>
           )}
           {/* ใบที่ใช้แล้วหายคือข้อมูลที่ต้องเห็นก่อนกด ไม่ใช่หลังกด */}
-          {card.exhaust && <Badge label={spent ? 'ใช้ไปแล้ว' : 'ใช้แล้วหาย'} tone="blood" />}
+          {card.type === 'trap' && <Badge label="ตั้งดัก" />}
+          {card.type === 'curse' && <Badge label="เล่นไม่ได้" tone="blood" />}
+          {card.exhaust && card.type !== 'trap' && (
+            <Badge label={spent ? 'ใช้ไปแล้ว' : 'ใช้แล้วหาย'} tone="blood" />
+          )}
           {card.upgraded && <Badge label="ปลุกเสกแล้ว" />}
           {isFused(card) && <Badge label="ผสาน" />}
         </View>

@@ -8,7 +8,7 @@ import { START_ENERGY } from '../../balance/core';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
 import { SHOP_STOCK_SIZE, SHOP_POWER_BIAS } from '../../balance/weights';
-import { upgradeCard, canUpgrade, grantBlessing } from '../shared';
+import { upgradeCard, canUpgrade, upgradeLevelOf, grantBlessing } from '../shared';
 import { replaceSingleOffer } from './map_pages';
 import { consumeToken } from '../../map/pages';
 import { loseRun } from './runEnd';
@@ -154,19 +154,22 @@ export function doWellDismiss(s: GameState, _cmd: Extract<Command, { type: 'DoWe
 
 export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'ShopUpgradeBuy' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'upgrade') return { state: s, rng: r };
-  const count = (s.runCounters?.upgradeShopCount ?? 0);
-  const price = upgradeCostForCount(count);
-  if ((s.player.gold ?? 0) < price) {
-    s.log.push(`Upgrade shop: Not enough gold (${price}g).`);
-    return { state: s, rng: r };
-  }
   const i = cmd.index;
   if (i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
 
-  // ใบที่ปลุกเสกไปแล้วปลุกซ้ำไม่ได้ — กันไว้ที่นี่ด้วย ไม่ใช่แค่ซ่อนปุ่มใน UI
+  // ใบที่เต็มขั้นแล้วปลุกต่อไม่ได้ — กันไว้ที่นี่ด้วย ไม่ใช่แค่ซ่อนปุ่มใน UI
   // ไม่งั้นเสียทองฟรีโดยไม่มีอะไรเปลี่ยน
   if (!canUpgrade(s.masterDeck[i])) {
-    s.log.push('การ์ดใบนี้ปลุกเสกไปแล้ว');
+    s.log.push('การ์ดใบนี้ปลุกเสกจนสุดแล้ว');
+    return { state: s, rng: r };
+  }
+
+  // ราคาคิดจากทั้งจำนวนครั้งที่ใช้ร้าน **และขั้นของใบนั้น** — ปั้นใบเดียวให้สุด
+  // จึงแพงกว่าไล่ปลุกหลายใบขั้นละหนึ่ง ซึ่งเป็นการแลกที่ควรรู้สึกได้
+  const count = (s.runCounters?.upgradeShopCount ?? 0);
+  const price = upgradeCostForCount(count + upgradeLevelOf(s.masterDeck[i]));
+  if ((s.player.gold ?? 0) < price) {
+    s.log.push(`ทองไม่พอ (ต้องการ ${price})`);
     return { state: s, rng: r };
   }
 

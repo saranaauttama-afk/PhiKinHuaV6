@@ -11,6 +11,8 @@ import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRun
 import { getEquipmentById } from '../../pack';
 import { dealDamage, gainBlock, emit } from '../../combat/damage';
 import { loseRun } from './runEnd';
+import { isTrapCard, armTrap, springTraps, tickTraps } from '../../combat/traps';
+import { isCurseCard, discardCurses } from '../../cards/curse';
 
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
   if (s.phase !== 'combat' || s.combatVictoryLock) return { state: s, rng: r };
@@ -18,6 +20,27 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   const idx = cmd.index;
   if (idx < 0 || idx >= s.piles.hand.length) return { state: s, rng: r };
   const played = s.piles.hand[idx];
+
+  // การ์ดคำสาปเล่นไม่ได้ — มันมีไว้ถ่วงมือ ทิ้งเองท้ายเทิร์น
+  if (isCurseCard(played)) {
+    s.log.push(`${played.name} เล่นไม่ได้`);
+    return { state: s, rng: r };
+  }
+
+  // การ์ดดัก: จ่ายพลังงานแล้วไปนอนรอ ไม่เกิดผลทันที
+  if (isTrapCard(played)) {
+    const cost = Math.max(0, Math.floor(played.cost ?? 0));
+    if ((s.player.energy ?? 0) < cost) {
+      s.log.push(`พลังงานไม่พอ (ต้องการ ${cost})`);
+      return { state: s, rng: r };
+    }
+    s.player.energy -= cost;
+    armTrap(s, played);
+    const [tc] = s.piles.hand.splice(idx, 1);
+    // การ์ดดักที่ตั้งไปแล้วไม่กลับเข้ากองจั่วในไฟต์นี้ — ไม่งั้นตั้งซ้ำได้ไม่จำกัด
+    s.piles.exhaust.push(tc);
+    return { state: s, rng: r };
+  }
 
   // Equipment cards
   if (played.type === 'equipment' && played.equipmentId) {
@@ -204,6 +227,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   // จบเทิร์น player
   processStatusEffectsOnTurnEnd('player', s);
   processMinionsEndTurn(s);
+  tickTraps(s);
+  discardCurses(s);
   runEquipmentTurnHook(s, 'on_turn_end', 'player');
   runBlessingsTurnHook(s, 'on_turn_end');
   resetBlessingTurnFlags(s);
@@ -245,6 +270,15 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         dmg: def.dmg ?? 0,
         block: def.block ?? 0,
       });
+
+      // กับดักที่ตั้งไว้ทำงานก่อนการ์ดของศัตรูจะมีผล — ดักที่ยกเลิกได้
+      // ต้องยกเลิกก่อนดาเมจเข้า ไม่งั้นมันคือการ "ยกเลิกหลังโดนแล้ว"
+      const trapped = springTraps(s, def.type === 'attack' ? 'attack' : 'skill');
+      if (isDefeat(s)) { loseRun(s); break; }
+      if (trapped.negated) {
+        s.log.push(`${def.name ?? def.id} ถูกขัดจังหวะ`);
+        continue;
+      }
 
       if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
         const result = dealDamage(s, {

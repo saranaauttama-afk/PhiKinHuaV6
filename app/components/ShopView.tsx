@@ -15,6 +15,7 @@ import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
 import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
+import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import FusionAltarView from './FusionAltarView';
 import Panel, { GameButton } from './Panel';
 import { font, palette, radius, size, space, surface, tint } from '../theme';
@@ -201,7 +202,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         <Lead>โต๊ะพิธีตั้งอยู่กลางลาน ธูปยังไหม้ค้าง เจ้าพิธีรอเราอยู่แล้ว</Lead>
         <Money state={state} />
         <Text style={{ color: palette.moonDim, fontSize: size.label, marginBottom: space.md, fontFamily: font.ui }}>
-          ค่าพิธี {cost} ทอง · ปลุกเสกไปแล้ว {count} ใบ · ใบหนึ่งปลุกเสกได้ครั้งเดียว
+          ปลุกเสกไปแล้ว {count} ครั้ง · ใบหนึ่งปลุกได้ถึงขั้น {MAX_UPGRADE_LEVEL} · ราคาขึ้นตามขั้นของใบ
         </Text>
         <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
           {deck.map((card, i) => (
@@ -211,8 +212,12 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
               line={cardLine(card)}
               // ใบที่ปลุกไปแล้วยังโชว์อยู่แต่กดไม่ได้ — ซ่อนทิ้งจะทำให้ลำดับ index
               // ที่ส่งเข้า dispatch เพี้ยนจากสำรับจริง
-              note={card.upgraded ? 'ปลุกเสกแล้ว' : undefined}
-              disabled={!!card.upgraded}
+              note={
+                canUpgrade(card)
+                  ? `ขั้น ${upgradeLevelOf(card)} → ${upgradeLevelOf(card) + 1} · ${upgradeCostForCount(count + upgradeLevelOf(card))} ทอง`
+                  : 'สุดขั้นแล้ว'
+              }
+              disabled={!canUpgrade(card)}
               onPress={() => dispatch({ type: 'ShopUpgradeBuy', index: i })}
             />
           ))}

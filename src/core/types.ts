@@ -13,7 +13,13 @@ export type BlessingDef = {
 };
 
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Legendary';
-export type CardType = 'attack' | 'skill' | 'equipment';
+/**
+ * ชนิดการ์ด
+ *
+ * `trap`  — ตั้งไว้แล้วรอศัตรูทำสิ่งที่ตรงเงื่อนไข (ดู `combat/traps.ts`)
+ * `curse` — เล่นไม่ได้ ยัดเข้าสำรับเพื่อถ่วง ทิ้งเองท้ายเทิร์น
+ */
+export type CardType = 'attack' | 'skill' | 'equipment' | 'trap' | 'curse';
 
 export type CardData = {
   id: string;
@@ -34,8 +40,11 @@ export type CardData = {
    * ทุกที่ที่ใช้จึงต้อง cast เป็น any — และ UI ก็เลยไม่เคยแสดงมันเลย
    */
   exhaust?: boolean;
-  /** ปลุกเสกไปแล้ว — ใบหนึ่งปลุกเสกได้ครั้งเดียว (ดู `upgradeCard`) */
+  /** ปลุกเสกไปแล้วกี่ขั้น (ดู `upgradeCard`) */
   upgraded?: boolean;
+  upgradeLevel?: number;
+  /** เฉพาะการ์ดชนิด `trap` — ดักอะไรและเด้งกลับยังไง */
+  trap?: import('./combat/traps').TrapSpec;
   tags?: string[];
   rarity?: Rarity;
   equipmentId?: string;
@@ -197,7 +206,7 @@ export type CombatEvent =
       blocked: number;
       hpLoss: number;
       died: boolean;
-      sourceKind: 'card' | 'combo' | 'status' | 'minion' | 'event';
+      sourceKind: 'card' | 'combo' | 'status' | 'minion' | 'equipment' | 'event';
     }
   | { t: 'BlockGained'; target: CombatEventTarget; amount: number }
   | { t: 'Healed'; target: CombatEventTarget; amount: number }
@@ -297,6 +306,9 @@ export type GameState = {
    * และค้างข้ามไฟต์
    */
   combo?: import('./combat/combos').ComboState;
+
+  /** กับดักที่ตั้งไว้และยังไม่ทำงาน — เป็นสเตตของไฟต์ ไม่ถูกเก็บลงเซฟ */
+  traps?: import('./combat/traps').ArmedTrap[];
 
   enemyEnergy?: number;
   enemyLastPlayed?: string[];  // card IDs played last enemy turn, for UI animation
