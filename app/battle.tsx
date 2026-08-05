@@ -352,6 +352,7 @@ export default function BattlePage() {
           playedCardIds={playedCardIds}
           hoveredCardId={hoveredCardId}
           energy={player.energy}
+          cardsPlayedThisTurn={gameState.turnFlags?.cardsPlayed ?? 0}
           onPlayCard={handlePlayCard}
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />

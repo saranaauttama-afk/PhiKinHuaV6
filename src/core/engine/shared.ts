@@ -4,6 +4,7 @@ import type { RNG } from '../rng';
 import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
 import { rollLevelUpChoice, rollTwoBlessings, type LevelBucket } from '../level';
 import { rollCardReward } from '../cards/reward';
+import { hitsOf } from '../cards/mechanics';
 import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
 import { applyClassVictoryPassive, getClass } from '../classes';
 
@@ -96,9 +97,23 @@ export function upgradeCard(c: CardData): CardData {
     return up;
   }
 
+  // การ์ดที่ถือไว้ก็ทำงาน — ค่าตอนค้างมือคือตัวตนของมัน ถ้าไม่ขยับด้วย
+  // การปลุกเสกจะเปลี่ยนแค่ครึ่งเดียวของสิ่งที่การ์ดใบนั้นเป็น
+  if (up.whileHeld) {
+    up.whileHeld = { ...up.whileHeld };
+    if (up.whileHeld.block) up.whileHeld.block += 1;
+    if (up.whileHeld.heal) up.whileHeld.heal += 1;
+  }
+
   const hasNumbers = typeof up.dmg === 'number' || typeof up.block === 'number';
   if (hasNumbers) {
-    if (typeof up.dmg === 'number') up.dmg += UPGRADE_BONUS;
+    // การ์ดหลายหมัดบวกทีละหมัด — ถ้าบวกเต็ม UPGRADE_BONUS ให้ทุกหมัด
+    // ใบ 8 หมัดจะได้ +32 ในขณะที่ใบหมัดเดียวได้ +4 จากราคาปลุกเสกเท่ากัน
+    // เฉลี่ยให้ผลรวมใกล้เคียงกัน แต่ไม่ต่ำกว่า +1 ต่อหมัด
+    const hits = hitsOf(up);
+    if (typeof up.dmg === 'number') {
+      up.dmg += hits > 1 ? Math.max(1, Math.round(UPGRADE_BONUS / hits)) : UPGRADE_BONUS;
+    }
     if (typeof up.block === 'number') up.block += UPGRADE_BONUS;
     return up;
   }

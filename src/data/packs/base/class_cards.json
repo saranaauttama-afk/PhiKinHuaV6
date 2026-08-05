@@ -1059,5 +1059,434 @@
       "duration": 99,
       "value": 2
     }
+  },
+  {
+    "id": "triple_knee",
+    "name": "เข่าสามชั้น",
+    "type": "attack",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "multihit",
+      "thai",
+      "warrior"
+    ],
+    "desc": "ยกเข่าสามที ทีละ 4 — เกราะกินได้ทีละหมัด และแรงที่สะสมไว้เข้าทุกหมัด",
+    "dmg": 4,
+    "hits": 3
+  },
+  {
+    "id": "bamboo_volley",
+    "name": "ปาไผ่รัว",
+    "type": "attack",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "multihit",
+      "thai",
+      "shaman"
+    ],
+    "desc": "ขว้างไผ่ทีละดุ้นสี่ครั้ง ทีละ 3",
+    "dmg": 3,
+    "hits": 4
+  },
+  {
+    "id": "thousand_needles",
+    "name": "เข็มพันเล่ม",
+    "type": "attack",
+    "cost": 2,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "multihit",
+      "poison",
+      "thai",
+      "medium"
+    ],
+    "desc": "ปักเข็มห้าครั้ง ทีละ 4 และศัตรูติดพิษ 3",
+    "dmg": 4,
+    "hits": 5,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "poison",
+      "duration": 4,
+      "value": 3
+    }
+  },
+  {
+    "id": "prayer_rain",
+    "name": "ฝนบทสวด",
+    "type": "attack",
+    "cost": 2,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "multihit",
+      "thai",
+      "nun"
+    ],
+    "desc": "สวดรัวเป็นสายฝน โดนหกครั้ง ทีละ 3",
+    "dmg": 3,
+    "hits": 6
+  },
+  {
+    "id": "shadow_flurry",
+    "name": "เงาซัดรัว",
+    "type": "attack",
+    "cost": 3,
+    "rarity": "Legendary",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "multihit",
+      "strength",
+      "thai",
+      "warrior"
+    ],
+    "desc": "แปดหมัดติด ทีละ 5 — ยิ่งแข็งแกร่งยิ่งต่างกันมาก",
+    "dmg": 5,
+    "hits": 8
+  },
+  {
+    "id": "death_throes",
+    "name": "ดิ้นตาย",
+    "type": "attack",
+    "cost": 1,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "conditional",
+      "thai",
+      "warrior"
+    ],
+    "desc": "ยิ่งใกล้ตายยิ่งแรง โจมตี 8 — ถ้าเลือดเหลือไม่ถึงครึ่ง โจมตี 20",
+    "dmg": 8,
+    "conditional": {
+      "when": {
+        "kind": "player_hp_below",
+        "value": 50
+      },
+      "bonus": {
+        "dmg": 12
+      }
+    }
+  },
+  {
+    "id": "counter_punch",
+    "name": "สวนหมัด",
+    "type": "attack",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "conditional",
+      "thai",
+      "warrior"
+    ],
+    "desc": "รับแล้วสวน โจมตี 6 — ถ้ามี Block ตั้งแต่ 10 โจมตีอีก 2 หมัด",
+    "dmg": 6,
+    "conditional": {
+      "when": {
+        "kind": "player_block_at_least",
+        "value": 10
+      },
+      "bonus": {
+        "hits": 2
+      }
+    }
+  },
+  {
+    "id": "salt_in_wound",
+    "name": "ซ้ำเติมแผล",
+    "type": "attack",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "conditional",
+      "poison",
+      "thai",
+      "medium"
+    ],
+    "desc": "โจมตี 5 — ถ้าศัตรูติดพิษอยู่แล้ว โจมตี 14",
+    "dmg": 5,
+    "conditional": {
+      "when": {
+        "kind": "enemy_has_status",
+        "statusId": "poison"
+      },
+      "bonus": {
+        "dmg": 9
+      }
+    }
+  },
+  {
+    "id": "all_or_nothing",
+    "name": "หมดหน้าตัก",
+    "type": "attack",
+    "cost": 2,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "conditional",
+      "thai",
+      "shaman"
+    ],
+    "desc": "โจมตี 10 — ถ้าไม่มีการ์ดอื่นเหลือในมือแล้ว โจมตี 30 และจั่ว 2 ใบ",
+    "dmg": 10,
+    "conditional": {
+      "when": {
+        "kind": "hand_empty"
+      },
+      "bonus": {
+        "dmg": 20,
+        "draw": 2
+      }
+    }
+  },
+  {
+    "id": "last_rite",
+    "name": "สวดส่งวิญญาณ",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "block",
+      "heal",
+      "conditional",
+      "thai",
+      "nun"
+    ],
+    "desc": "ได้ Block 6 — ถ้าเลือดเหลือไม่ถึง 40% ฟื้นอีก 12",
+    "block": 6,
+    "conditional": {
+      "when": {
+        "kind": "player_hp_below",
+        "value": 40
+      },
+      "bonus": {
+        "heal": 12
+      }
+    }
+  },
+  {
+    "id": "lean_deck",
+    "name": "สำรับคม",
+    "type": "skill",
+    "cost": 0,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": [
+      "draw",
+      "energy",
+      "conditional",
+      "thai",
+      "medium"
+    ],
+    "desc": "จั่ว 1 ใบ — ถ้าสำรับเหลือไม่เกิน 15 ใบ จั่วอีก 2 และได้พลังงาน 1",
+    "draw": 1,
+    "conditional": {
+      "when": {
+        "kind": "deck_at_most",
+        "value": 15
+      },
+      "bonus": {
+        "draw": 2,
+        "energyGain": 1
+      }
+    }
+  },
+  {
+    "id": "yantra_in_hand",
+    "name": "ยันต์ในมือ",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "block",
+      "held",
+      "thai",
+      "shaman"
+    ],
+    "desc": "ปล่อยได้ Block 12 — หรือถือไว้เฉยๆ ก็ได้ Block 4 ทุกท้ายเทิร์น",
+    "block": 12,
+    "whileHeld": {
+      "block": 4
+    }
+  },
+  {
+    "id": "wrist_thread",
+    "name": "ด้ายผูกข้อมือ",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "heal",
+      "held",
+      "thai",
+      "nun"
+    ],
+    "desc": "ปล่อยฟื้น 10 — หรือถือไว้ก็ฟื้น 3 ทุกท้ายเทิร์น",
+    "heal": 10,
+    "whileHeld": {
+      "heal": 3
+    }
+  },
+  {
+    "id": "held_charm",
+    "name": "เครื่องรางกำไว้",
+    "type": "skill",
+    "cost": 2,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "block",
+      "strength",
+      "held",
+      "thai",
+      "warrior"
+    ],
+    "desc": "ปล่อยได้ Block 14 และแข็งแกร่ง 2 — หรือกำไว้ก็ได้ Block 3 ทุกท้ายเทิร์น",
+    "block": 14,
+    "whileHeld": {
+      "block": 3
+    },
+    "statusEffect": {
+      "target": "player",
+      "effect": "strength",
+      "duration": 99,
+      "value": 2
+    }
+  },
+  {
+    "id": "spirit_lamp",
+    "name": "ตะเกียงผี",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": [
+      "heal",
+      "held",
+      "regen",
+      "thai",
+      "medium"
+    ],
+    "desc": "ปล่อยฟื้น 8 และฟื้นฟูต่อเนื่อง 4 สี่เทิร์น — หรือถือไว้ก็ได้ฟื้นฟูต่อเนื่อง 1 ทุกท้ายเทิร์น",
+    "heal": 8,
+    "whileHeld": {
+      "status": {
+        "effect": "regeneration",
+        "duration": 2,
+        "value": 1
+      }
+    },
+    "statusEffect": {
+      "target": "player",
+      "effect": "regeneration",
+      "duration": 4,
+      "value": 4
+    }
+  },
+  {
+    "id": "flowing_chant",
+    "name": "คาถาไหลลื่น",
+    "type": "attack",
+    "cost": 3,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "cheapen",
+      "thai",
+      "shaman"
+    ],
+    "desc": "โจมตี 16 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 0",
+    "dmg": 16,
+    "costRule": {
+      "kind": "per_card_played",
+      "step": 1,
+      "min": 0
+    }
+  },
+  {
+    "id": "gathering_merit",
+    "name": "บุญสะสม",
+    "type": "skill",
+    "cost": 3,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": [
+      "block",
+      "heal",
+      "cheapen",
+      "thai",
+      "nun"
+    ],
+    "desc": "ได้ Block 12 และฟื้น 6 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 1",
+    "block": 12,
+    "heal": 6,
+    "costRule": {
+      "kind": "per_card_played",
+      "step": 1,
+      "min": 1
+    }
+  },
+  {
+    "id": "war_momentum",
+    "name": "ได้จังหวะ",
+    "type": "attack",
+    "cost": 4,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": [
+      "attack",
+      "multihit",
+      "cheapen",
+      "thai",
+      "warrior"
+    ],
+    "desc": "ตีสี่หมัด ทีละ 7 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 1",
+    "dmg": 7,
+    "hits": 4,
+    "costRule": {
+      "kind": "per_card_played",
+      "step": 1,
+      "min": 1
+    }
+  },
+  {
+    "id": "trance_deepens",
+    "name": "ทรงลึกขึ้น",
+    "type": "skill",
+    "cost": 3,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": [
+      "minion",
+      "cheapen",
+      "thai",
+      "medium"
+    ],
+    "desc": "เรียกวิญญาณเพื่อนมาช่วยรบ 3 เทิร์น — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 0",
+    "summonMinion": "ghost_ally",
+    "costRule": {
+      "kind": "per_card_played",
+      "step": 1,
+      "min": 0
+    }
   }
 ]

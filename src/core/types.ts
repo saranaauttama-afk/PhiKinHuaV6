@@ -45,6 +45,16 @@ export type CardData = {
   upgradeLevel?: number;
   /** เฉพาะการ์ดชนิด `trap` — ดักอะไรและเด้งกลับยังไง */
   trap?: import('./combat/traps').TrapSpec;
+
+  // ── กลไกที่ตัวเลขอย่างเดียวทำแทนไม่ได้ (ดู `cards/mechanics.ts`) ──
+  /** ตีกี่ครั้ง — แต่ละครั้งเจอ block/strength/vulnerable แยกกัน */
+  hits?: number;
+  /** อ่านสภาพสนามแล้วแรงไม่เท่ากัน */
+  conditional?: import('./cards/mechanics').CardConditional;
+  /** ถือไว้ไม่เล่นก็มีผลท้ายเทิร์น */
+  whileHeld?: import('./cards/mechanics').HeldEffect;
+  /** ค่าร่ายที่เปลี่ยนตามสถานการณ์ — ต้องอ่านผ่าน `effectiveCost` เสมอ */
+  costRule?: import('./cards/mechanics').CostRule;
   tags?: string[];
   rarity?: Rarity;
   equipmentId?: string;
@@ -377,6 +387,8 @@ export type GameState = {
   turnFlags: {
     blessingOnce: Record<string, boolean>;
     equipmentOnce?: Record<string, boolean>;
+    /** เล่นการ์ดไปแล้วกี่ใบในเทิร์นนี้ — การ์ดค่าร่ายลื่นอ่านค่านี้ */
+    cardsPlayed?: number;
   };
   runCounters?: RunCounters;
   combatVictoryLock?: boolean;

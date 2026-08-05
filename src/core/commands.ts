@@ -120,6 +120,8 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
 
   // ★ รีเซ็ต once-per-turn ของอุปกรณ์สำหรับเทิร์นใหม่นี้
   resetEquipmentTurnFlags(state);
+  // การ์ดค่าร่ายลื่นนับจากศูนย์ใหม่ทุกเทิร์น
+  require('./cards/mechanics').resetCardsPlayed(state);
 
   // ขั้นตอนพื้นฐาน
   state.player.energy = state.player.maxEnergy ?? START_ENERGY;
@@ -164,29 +166,41 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   }
 
   // ★ Apply combo system modifiers first
-  const modifiedCard = applyComboCardModifiers(state, card);
+  //   เงื่อนไขคิดหลังคอมโบ เพราะคอมโบเปลี่ยนตัวเลขบนการ์ด แต่เงื่อนไขอ่าน
+  //   **สภาพสนาม** ซึ่งยังไม่เปลี่ยนจนกว่าจะลงผลจริง
+  const { withConditional, hitsOf } = require('./cards/mechanics');
+  const modifiedCard = withConditional(state, applyComboCardModifiers(state, card));
 
   // หมายเหตุ: energy ถูกหักไปแล้วโดย combat handler
 
   // Effect - Damage (ผ่าน dealDamage ที่เดียว — ดู src/core/combat/damage.ts)
+  //
+  // การ์ดหลายหมัดตี **ทีละหมัดแยกกัน** ไม่ใช่คูณแล้วตีทีเดียว — นั่นคือทั้งหมด
+  // ของกลไกนี้ block ดูดทีละหมัด strength บวกทุกหมัด vulnerable คูณทุกหมัด
+  const hits = hitsOf(modifiedCard);
   if (modifiedCard.dmg && state.enemy) {
-    const result = dealDamage(state, {
-      from: 'player',
-      to: 'enemy',
-      raw: modifiedCard.dmg,
-      source: { kind: 'card', cardId: card.id },
-    });
+    for (let h = 0; h < hits; h++) {
+      if (!state.enemy || state.enemy.hp <= 0) break;  // ตายแล้วไม่ต้องตีต่อ
 
-    if (result.blocked > 0) {
-      state.log.push(
-        `💥 ${result.modified} damage vs ${result.blocked} block → ${result.hpLoss} HP lost, ${state.enemy.block} block remaining`
-      );
-    } else {
-      state.log.push(`💥 ${result.modified} damage dealt → ${result.hpLoss} HP lost`);
-    }
+      const result = dealDamage(state, {
+        from: 'player',
+        to: 'enemy',
+        raw: modifiedCard.dmg,
+        source: { kind: 'card', cardId: card.id },
+      });
 
-    if (result.modified !== result.raw) {
-      state.log.push(`Damage modified: ${result.raw} → ${result.modified}`);
+      const tag = hits > 1 ? ` (หมัดที่ ${h + 1}/${hits})` : '';
+      if (result.blocked > 0) {
+        state.log.push(
+          `💥 ${result.modified} damage vs ${result.blocked} block → ${result.hpLoss} HP lost, ${state.enemy.block} block remaining${tag}`
+        );
+      } else {
+        state.log.push(`💥 ${result.modified} damage dealt → ${result.hpLoss} HP lost${tag}`);
+      }
+
+      if (result.modified !== result.raw) {
+        state.log.push(`Damage modified: ${result.raw} → ${result.modified}`);
+      }
     }
   }
 

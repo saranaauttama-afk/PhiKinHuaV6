@@ -7,6 +7,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import type { CardData } from '../../src/core/types';
 import { isFused } from '../../src/core/cards/fusion';
+import { hitsOf, conditionLabel } from '../../src/core/cards/mechanics';
 import { font, palette, radius, size, space, surface, tint } from '../theme';
 
 /** ป้ายเล็กบอกคุณสมบัติพิเศษของใบนี้ */
@@ -34,6 +35,16 @@ function Chip({ label, tone = 'dim' }: { label: string; tone?: 'dim' | 'blood' |
   return (
     <Text style={{ color, fontSize: size.label, fontFamily: font.ui }}>{label}</Text>
   );
+}
+
+/** สรุปผลของการ์ดที่ค้างอยู่ในมือเป็นบรรทัดเดียว */
+function heldLabel(card: CardData): string {
+  const e = card.whileHeld!;
+  const parts: string[] = [];
+  if (e.block) parts.push(`กัน ${e.block}`);
+  if (e.heal) parts.push(`ฟื้น ${e.heal}`);
+  if (e.status) parts.push(`${e.status.effect} ${e.status.value}`);
+  return `ค้างอยู่ในมือท้ายเทิร์น → ${parts.join(' · ')}`;
 }
 
 type Props = {
@@ -85,6 +96,9 @@ export default function CardRow({ card, count, spent = false }: Props) {
           )}
           {card.upgraded && <Badge label="ปลุกเสกแล้ว" />}
           {isFused(card) && <Badge label="ผสาน" />}
+          {hitsOf(card) > 1 && <Badge label={`${hitsOf(card)} หมัด`} tone="blood" />}
+          {!!card.whileHeld && <Badge label="ถือไว้ก็ทำงาน" />}
+          {!!card.costRule && <Badge label="ยิ่งร่ายยิ่งถูก" />}
         </View>
 
         <View style={{ flexDirection: 'row', gap: space.md, marginTop: 2, flexWrap: 'wrap' }}>
@@ -94,6 +108,25 @@ export default function CardRow({ card, count, spent = false }: Props) {
           {!!card.energyGain && <Chip label={`พลังงาน +${card.energyGain}`} />}
           {!!card.draw       && <Chip label={`จั่ว ${card.draw}`} />}
         </View>
+
+        {/* เงื่อนไขต้องอ่านออกก่อนกด ไม่ใช่หลังกดแล้วงงว่าทำไมแรงไม่เท่าเดิม */}
+        {!!card.conditional && (
+          <Text style={{
+            color: palette.moonDim, fontSize: size.label,
+            fontFamily: font.ui, marginTop: 2,
+          }}>
+            {conditionLabel(card.conditional)}
+          </Text>
+        )}
+
+        {!!card.whileHeld && (
+          <Text style={{
+            color: palette.moonDim, fontSize: size.label,
+            fontFamily: font.ui, marginTop: 2,
+          }}>
+            {heldLabel(card)}
+          </Text>
+        )}
 
         {!!card.desc && (
           <Text style={{

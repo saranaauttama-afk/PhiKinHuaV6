@@ -12,6 +12,7 @@ import { getEquipmentById } from '../../pack';
 import { dealDamage, gainBlock, emit } from '../../combat/damage';
 import { loseRun } from './runEnd';
 import { isTrapCard, armTrap, springTraps, tickTraps } from '../../combat/traps';
+import { effectiveCost, countCardPlayed, applyHeldEffects } from '../../cards/mechanics';
 import { isCurseCard, discardCurses } from '../../cards/curse';
 
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
@@ -29,12 +30,13 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
 
   // การ์ดดัก: จ่ายพลังงานแล้วไปนอนรอ ไม่เกิดผลทันที
   if (isTrapCard(played)) {
-    const cost = Math.max(0, Math.floor(played.cost ?? 0));
+    const cost = effectiveCost(s, played);
     if ((s.player.energy ?? 0) < cost) {
       s.log.push(`พลังงานไม่พอ (ต้องการ ${cost})`);
       return { state: s, rng: r };
     }
     s.player.energy -= cost;
+    countCardPlayed(s);
     armTrap(s, played);
     const [tc] = s.piles.hand.splice(idx, 1);
     // การ์ดดักที่ตั้งไปแล้วไม่กลับเข้ากองจั่วในไฟต์นี้ — ไม่งั้นตั้งซ้ำได้ไม่จำกัด
@@ -68,8 +70,10 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     return { state: s, rng: r };
   }
 
-  // Energy check
-  const cost = Math.max(0, Math.floor(typeof (played as any).cost === 'number' ? (played as any).cost : 0));
+  // Energy check — ค่าร่ายอ่านผ่าน `effectiveCost` ที่เดียว เพราะการ์ดบางใบ
+  // ค่าร่ายลดลงตามจำนวนการ์ดที่เล่นไปแล้วในเทิร์นนี้ ถ้าตัวเลขบนหน้าจอกับ
+  // ตัวเลขที่หักจริงมาคนละที่ ผู้เล่นจะวางแผนจากเลขที่โกหก
+  const cost = effectiveCost(s, played);
   if (cost > 0) {
     const cur = s.player.energy ?? 0;
     if (cur < cost) {
@@ -78,6 +82,8 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     }
     s.player.energy = cur - cost;
   }
+  // นับหลังจ่ายเรียบร้อย — ไม่งั้นการ์ดใบนี้จะลดค่าร่ายให้ตัวเอง
+  countCardPlayed(s);
 
   applyCardEffect(s, idx);
   runEquipmentCardPlayed(s, played, 'player');
@@ -116,55 +122,17 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   return { state: s, rng: r };
 }
 
-export function endTurn(s: GameState, cmd: Extract<Command, { type: 'EndTurn' }>, r: RNG) {
-  if (s.phase !== 'combat') return { state: s, rng: r };
-
-  const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
-  const { processMinionsEndTurn } = require('../../minionRuntime');
-
-  processStatusEffectsOnTurnEnd('player', s);
-  processMinionsEndTurn(s);
-  runEquipmentTurnHook(s, 'on_turn_end', 'player');
-
-  const enemyHandlers = require('./enemy');
-  if (s.enemy && s.enemyPiles) {
-    s.enemyEnergy = s.enemy.maxEnergy || 2;
-
-    if (s.enemyPiles.hand.length === 0) {
-      enemyHandlers.enemyDrawUpToHand(s);
-    }
-    s.enemyLastPlayed = [...s.enemyPiles.hand];
-
-    endEnemyTurn(s);
-  } else {
-    endEnemyTurn(s);
-  }
-
-  if (isVictory(s)) {
-    r = grantExpAndQueueLevelUp(s, r);
-    s.combatVictoryLock = true;
-    const { clearAllMinions } = require('../../minionRuntime');
-    clearAllMinions(s);
-    advanceAfterVictory(s);
-    return { state: s, rng: r };
-  }
-
-  if (isDefeat(s)) {
-    loseRun(s);
-    s.log.push('Defeat..');
-    const { clearAllMinions } = require('../../minionRuntime');
-    clearAllMinions(s);
-    s.equipmentTempSlots = 0;
-    if (s.equipped) {
-      s.equipped = s.equipped.filter(eq => !eq.temporary);
-    }
-    return { state: s, rng: r };
-  }
-
-  runBlessingsTurnHook(s, 'on_turn_end');
-  s.turn = 1;
-
-  return { state: s, rng: r };
+/**
+ * จบเทิร์นผู้เล่น — ส่งต่อให้ `resolveEnemyTurn` ทั้งดุ้น
+ *
+ * เดิมตรงนี้เป็นสำเนาที่สองของลำดับจบเทิร์นทั้งชุด และมันแตกออกจากกันไปเรื่อยๆ
+ * ตามของที่เพิ่มเข้ามาทีหลัง — ไม่มีกับดักนับถอยหลัง ไม่มีการทิ้งคำสาป
+ * ไม่มีคอมโบหมดอายุ ไม่มีการ์ดค้างมือ เกมจริงไม่เคยเรียก `EndTurn` เลยสักครั้ง
+ * (`battle.tsx` ส่ง `ResolveEnemyTurn` ทางเดียว) มีแต่เทสต์ที่ยังเรียก —
+ * ซึ่งแปลว่าเทสต์กำลังตรวจเส้นทางที่เกมไม่ได้ใช้
+ */
+export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }>, r: RNG) {
+  return resolveEnemyTurn(s, { type: 'ResolveEnemyTurn' }, r);
 }
 
 export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { type: 'StartPlayerTurn' }>, r: RNG) {
@@ -215,6 +183,9 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   // จบเทิร์น player
   processStatusEffectsOnTurnEnd('player', s);
   processMinionsEndTurn(s);
+  // การ์ดที่ยังค้างอยู่ในมือทำงานก่อนเทิร์นศัตรู — ทั้งหมดของกลไกนี้คือ
+  // "ถือไว้แล้วมันกันให้" ถ้าไปทำงานหลังโดนตีแล้วก็ไม่มีความหมาย
+  applyHeldEffects(s);
   tickTraps(s);
   discardCurses(s);
   runEquipmentTurnHook(s, 'on_turn_end', 'player');

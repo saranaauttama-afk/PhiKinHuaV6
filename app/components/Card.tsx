@@ -24,6 +24,8 @@ interface CardProps {
   onHoverChange?: (isHovered: boolean) => void;
   isPlayed?: boolean;
   animationDelay?: number; // For staggered entrance
+  /** ค่าร่ายจริง ณ ตอนนี้ — การ์ดบางใบถูกลงตามจำนวนใบที่เล่นไปแล้วในเทิร์น */
+  costNow?: number;
 }
 
 export default function Card({
@@ -36,7 +38,8 @@ export default function Card({
   onDragPlay,
   onHoverChange,
   isPlayed = false,
-  animationDelay = 0
+  animationDelay = 0,
+  costNow,
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -200,7 +203,7 @@ export default function Card({
             textShadowOffset: { width: 1, height: 1 },
             textShadowRadius: 2,
           }}>
-            {card.cost}
+            {costNow ?? card.cost}
           </Text>
         </View>
 
