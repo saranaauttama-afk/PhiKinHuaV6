@@ -20,6 +20,31 @@ import type { GameState } from './types';
 export const SAVE_VERSION = 2;
 
 /**
+ * คำสั่งที่ควรเซฟอัตโนมัติหลังทำ — จุดที่ "ความคืบหน้าเปลี่ยนจริง"
+ *
+ * อยู่ตรงนี้ไม่ใช่ใน store เพราะมันเป็น **นโยบายการเซฟ** ไม่ใช่เรื่องของ UI
+ * และเทสต์ต้องอ่านมันได้โดยไม่ต้องลาก zustand กับ AsyncStorage มาด้วย
+ *
+ * **เงื่อนไขที่ต้องรักษา**: คำสั่งในรายการนี้ต้องไม่ยิงตอนที่ผลของไฟต์ยัง
+ * ไม่ปิดบัญชี — ตอนชนะแล้วแต่ยังไม่กด `CompleteNode` นั้น exp/ทอง/การ์ดรางวัล
+ * เข้ากระเป๋าไปแล้ว แต่โหนดบนแผนที่ยัง `resolved: false` เซฟตรงนั้นแล้วโหลดกลับ
+ * = สู้โหนดเดิมซ้ำได้ไม่จำกัด (วัดจริง: รอบสองได้ทอง +35 การ์ดอีกใบ EXP อีกก้อน)
+ *
+ * เดิม `ChooseLevelUp` / `ChooseLevelUpOption` / `SkipLevelUp` อยู่ในรายการนี้
+ * ด้วยเหตุผลที่ถูก (ปิดแอปกลางหน้าเลเวลอัปแล้วไม่อยากให้ผลหาย) แต่มันคือ
+ * ช่วงเวลานั้นพอดี — `CompleteNode` ตามมาติดๆ อยู่แล้ว เสียแค่การกดหนึ่งครั้ง
+ */
+export const AUTO_SAVE_COMMANDS = [
+  'CompleteNode', 'ChooseOffer', 'Proceed',
+  'ChooseStarterBlessing',
+  'TakeShop', 'TakeShopEquipment', 'ShopRemoveBuy', 'ShopUpgradeBuy',
+  'TakeTreasureCard', 'TakeSingleTreasureCard',
+  'UseWell', 'UseHealingShrine',
+  'EventChooseBlessing',
+  'ChooseEventOption', 'FuseCards',
+] as const;
+
+/**
  * ฟิลด์ที่ตั้งใจไม่เก็บ — เป็นของชั่วคราวระหว่างคอมแบตหรือของ view
  * โหลดกลับมาผู้เล่นจะยืนอยู่บนแผนที่เสมอ ไม่ใช่กลางไฟต์
  */

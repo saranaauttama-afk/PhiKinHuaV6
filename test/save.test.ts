@@ -4,7 +4,7 @@ import { makeRng } from '../src/core/rng';
 import { baseNewState } from '../src/core/commands';
 import type { Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
-import { toSave, fromSave, isPlayableSave, summarize, SAVE_VERSION } from '../src/core/save';
+import { AUTO_SAVE_COMMANDS, toSave, fromSave, isPlayableSave, summarize, SAVE_VERSION } from '../src/core/save';
 import { isFused } from '../src/core/cards/fusion';
 import { resolveStoryIfAny, resolveRewardIfAny, leaveRestRow } from './helpers';
 
@@ -233,5 +233,78 @@ describe('เล่นต่อได้จริงหลังโหลด', (
     const back = roundTrip(s);
     expect(back.journey?.currentId).toBe(s.journey?.currentId);
     expect(back.journey?.rowIndex).toBe(s.journey?.rowIndex);
+  });
+});
+
+describe('เซฟอัตโนมัติ — ห้ามเซฟตอนไฟต์ยังไม่ปิดบัญชี', () => {
+  // ชนะไฟต์แล้ว exp/ทอง/การ์ดรางวัลเข้ากระเป๋าทันที แต่โหนดบนแผนที่ยัง
+  // `resolved: false` จนกว่าจะกด `CompleteNode` — ถ้าเซฟตรงกลางนั้นแล้วโหลดกลับ
+  // ผู้เล่นจะสู้โหนดเดิมซ้ำได้ไม่จำกัด วัดจริงตอนที่ยังมีบั๊ก:
+  // รอบสองได้ทอง +35 การ์ดอีกใบ และ EXP อีกก้อน จากผีตัวเดิมโหนดเดิม
+
+  /** เดินจนชนะไฟต์แรก แล้วคืนตัวขับที่ยังไม่ได้กด CompleteNode */
+  function winFirstFight(seed = 'as-1') {
+    let s: any = { seed, phase: 'start', turn: 0 };
+    let r = makeRng(seed);
+    const done: Command['type'][] = [];
+    const go = (c: Command) => {
+      const o = applyCommand(s, c, r); s = o.state; r = o.rng; done.push(c.type);
+    };
+    const sk = () => { let g = 0; while (s.chapter && g++ < 30) go({ type: 'SkipChapter' } as Command); };
+
+    go({ type: 'NewRun', seed } as Command); sk();
+    go({ type: 'ChooseStarterBlessing', index: 0 }); sk();
+
+    const offers = s.pages.current.offers;
+    const ix = offers.findIndex((o: any) => o.kind === 'monster' || o.kind === 'boss');
+    go({ type: 'ChooseOffer', index: ix });
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    go({ type: 'PlayCard', index: 0 });
+
+    return { get: () => s as GameState, go, ix, lastCmd: () => done[done.length - 1] };
+  }
+
+  it('ทุกคำสั่งระหว่างชนะกับปิดโหนด ไม่อยู่ในรายการเซฟอัตโนมัติ', () => {
+    const auto = new Set<string>(AUTO_SAVE_COMMANDS);
+    const t = winFirstFight();
+
+    // ไล่ปิดหน้าที่ค้างอยู่หลังชนะ ทีละคำสั่ง
+    let guard = 0;
+    while (guard++ < 10) {
+      const p = t.get().phase;
+      if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
+      else if (p === 'reward') t.go({ type: 'ChooseCardReward', index: 0 });
+      else break;
+
+      const cmd = t.lastCmd();
+      const resolved = t.get().pages!.current!.resolved[t.ix];
+      expect(
+        auto.has(cmd) && !resolved,
+        `${cmd} เซฟอัตโนมัติทั้งที่โหนดยังไม่ปิดบัญชี — โหลดกลับแล้วสู้ซ้ำได้`
+      ).toBe(false);
+    }
+
+    expect(t.get().phase).toBe('victory');
+  });
+
+  it('โหลดเซฟจากจุดที่เซฟได้จริง แล้วสู้โหนดเดิมซ้ำไม่ได้', () => {
+    const t = winFirstFight();
+    let guard = 0;
+    while (guard++ < 10) {
+      const p = t.get().phase;
+      if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
+      else if (p === 'reward') t.go({ type: 'ChooseCardReward', index: 0 });
+      else break;
+    }
+    t.go({ type: 'CompleteNode' });   // ← จุดเซฟจริงจุดแรกหลังชนะ
+
+    const before = t.get();
+    const back = fromSave(toSave(before));
+
+    expect(back.fightCount).toBe(before.fightCount);
+    // โหนดที่สู้ไปแล้วต้องไม่กลับมาให้สู้ใหม่
+    const offers = back.pages?.current?.offers ?? [];
+    expect(offers.filter(Boolean).length).toBeGreaterThan(0);
+    expect(back.defeatedEnemyIds?.length).toBe(1);
   });
 });

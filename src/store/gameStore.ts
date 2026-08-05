@@ -7,29 +7,18 @@ import { baseNewState } from '../../src/core/commands';
 import {
   saveGame, loadGame, getSaveSlots, autoSave, clearAutoSave, type SaveSlotInfo,
 } from '../../src/core/storage';
+import { AUTO_SAVE_COMMANDS } from '../../src/core/save';
 import { HAND_SIZE, START_ENERGY, START_HP } from '../../src/core/balance/core';
 import { nextExpForLevel } from '../../src/core/balance/progression';
 import { makeRng, seedFromString, type RNG } from '../../src/core/rng';
 import { START_GOLD } from '../../src/core/balance';
 
 /**
- * คำสั่งที่ควรเซฟหลังทำ — จุดที่ "ความคืบหน้าเปลี่ยนจริง"
- *
- * เดิมขาดคำสั่งที่เพิ่มมาทีหลังทั้งหมด (เลือกเหตุการณ์ ผสานการ์ด เลือกของเลเวลอัป)
- * ปิดแอปหลังทำสิ่งเหล่านั้นแล้วกลับมา ผลจะหายไป
+ * คำสั่งที่ควรเซฟหลังทำ — รายการอยู่ใน `core/save.ts` เพราะมันเป็นนโยบาย
+ * การเซฟ ไม่ใช่เรื่องของ UI (และเทสต์ต้องอ่านได้โดยไม่ต้องลาก store มาด้วย)
  */
 function shouldAutoSave(cmdType: Command['type']): boolean {
-  const autoSaveCommands: Command['type'][] = [
-    'CompleteNode', 'ChooseOffer', 'Proceed',
-    'ChooseStarterBlessing',
-    'ChooseLevelUp', 'ChooseLevelUpOption', 'SkipLevelUp',
-    'TakeShop', 'TakeShopEquipment', 'ShopRemoveBuy', 'ShopUpgradeBuy',
-    'TakeTreasureCard', 'TakeSingleTreasureCard',
-    'UseWell', 'UseHealingShrine',
-    'EventChooseBlessing',
-    'ChooseEventOption', 'FuseCards',
-  ];
-  return autoSaveCommands.includes(cmdType);
+  return (AUTO_SAVE_COMMANDS as readonly string[]).includes(cmdType);
 }
 
 type Store = {
