@@ -6,7 +6,7 @@ import { buildAndShuffleDeck, drawUpTo, applyCardEffect, endEnemyTurn, isVictory
 import { resetBlessingTurnFlags, runBlessingsTurnHook, getCardPlayedFns } from '../../blessingRuntime';
 import { planEnemyIntent } from '../../combat/intent';
 import { START_ENERGY } from '../../balance/core';
-import { grantExpAndQueueLevelUp } from '../shared';
+import { grantExpAndQueueLevelUp, advanceAfterVictory } from '../shared';
 import { runEquipmentCardPlayed, runEquipmentTurnHook } from '../../equipmentRuntime';
 import { getEquipmentById } from '../../pack';
 import { dealDamage, gainBlock, emit } from '../../combat/damage';
@@ -111,13 +111,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     s.combatVictoryLock = true;
     const { clearAllMinions } = require('../../minionRuntime');
     clearAllMinions(s);
-    if (s.levelUp && !s.levelUp.consumed) {
-      s.phase = 'levelup';
-      s.log.push('Level Up!');
-    } else {
-      s.phase = 'victory';
-      s.log.push('Victory!');
-    }
+    advanceAfterVictory(s);
   }
   return { state: s, rng: r };
 }
@@ -151,13 +145,7 @@ export function endTurn(s: GameState, cmd: Extract<Command, { type: 'EndTurn' }>
     s.combatVictoryLock = true;
     const { clearAllMinions } = require('../../minionRuntime');
     clearAllMinions(s);
-    if (s.levelUp && !s.levelUp.consumed) {
-      s.phase = 'levelup';
-      s.log.push('Level Up!');
-    } else {
-      s.phase = 'victory';
-      s.log.push('Victory!');
-    }
+    advanceAfterVictory(s);
     return { state: s, rng: r };
   }
 

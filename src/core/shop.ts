@@ -5,9 +5,12 @@ import { int, shuffle } from './rng';
 
 // โหลดพูลการ์ดจากแพ็ค base (ให้ Metro bundle ได้)
 // ต้องรวมการ์ดของคลาสอื่นด้วย ไม่งั้นร้านจะมีแต่การ์ดหมอผีสำหรับทุกคลาส
+// การ์ดดักอยู่คนละไฟล์และเคยตกหล่นจากตรงนี้ — ทุกใบติด `inShop: true` ไว้
+// แต่ร้านไม่เคยขายเลยสักครั้งเพราะมันไม่เคยถูกโหลดเข้ามาในพูล
 const cardsBase: CardData[] = [
   ...require('../data/packs/base/cards.json'),
   ...require('../data/packs/base/class_cards.json'),
+  ...require('../data/packs/base/trap_cards.json'),
 ];
 
 // จัดกลุ่มตาม Rarity จาก cards.json (อนุญาตเฉพาะใบที่ขายได้)

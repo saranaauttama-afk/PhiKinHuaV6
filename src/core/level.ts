@@ -4,14 +4,16 @@ import { int, next, shuffle } from './rng';
 import type { GameState, CardData, BlessingDef } from './types';
 import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
 
+// การ์ดใหม่ไม่ได้มาจากเลเวลอัปแล้ว — ย้ายไปเป็นรางวัลของการชนะไฟต์
+// (ดู `cards/reward.ts`) ตารางนี้จึงเหลือแต่ของที่ไม่ใช่การ์ด
 export type LevelBucket =
   | 'max_hp' | 'max_energy' | 'max_hand'
-  | 'cards' | 'blessing'
+  | 'blessing'
   | 'remove' | 'upgrade' | 'gold'
   | 'equipment_slot' | 'gold_skip';
 
 const BASE_BUCKET_W: Record<LevelBucket, number> = {
-  max_hp: 30, max_energy: 20, max_hand: 10, cards: 24, blessing: 12, 
+  max_hp: 30, max_energy: 20, max_hand: 10, blessing: 12,
   remove: 10, upgrade: 8, gold: 2, equipment_slot: 15, gold_skip: 8,
 };
 
@@ -28,9 +30,11 @@ const CHOICE_PAIRS: Array<[LevelBucket, LevelBucket]> = [
   ['max_energy', 'max_hand'],         // Energy for combos vs Hand size for options
   ['max_hp', 'equipment_slot'],       // Survivability vs Equipment power
   
-  // Build direction choices  
-  ['cards', 'blessing'],              // Direct cards vs Passive effects
-  ['cards', 'gold_skip'],             // Cards now vs Gold for later
+  // Build direction choices
+  // (เดิมสองคู่นี้เป็น ['cards','blessing'] กับ ['cards','gold_skip'] —
+  //  การ์ดย้ายไปเป็นรางวัลชนะไฟต์แล้ว ที่ว่างจึงยกให้ตัวเลือกที่หายากอยู่)
+  ['blessing', 'gold_skip'],          // Passive power vs Gold for later
+  ['upgrade', 'max_hp'],              // Improve cards vs Survivability
   
   // Deck refinement choices
   ['remove', 'upgrade'],              // Clean deck vs Improve cards
@@ -58,7 +62,7 @@ function deriveWeights(s: GameState): Record<LevelBucket, number> {
 // Legacy single bucket function (kept for compatibility)
 export function rollLevelUpBucket(rng: RNG, s: GameState): { rng: RNG; bucket: LevelBucket } {
   const w = deriveWeights(s);
-  const order: LevelBucket[] = ['max_hp','max_energy','max_hand','cards','blessing','remove','upgrade','gold'];
+  const order: LevelBucket[] = ['max_hp','max_energy','max_hand','blessing','remove','upgrade','gold'];
   const total = order.reduce((a,k)=>a + w[k], 0);
   const ro = int(rng, 0, Math.max(0, total - 1));
   let r = ro.rng;
@@ -110,11 +114,11 @@ function getViableChoicePairs(s: GameState, level: number): Array<[LevelBucket, 
     // Prioritize basic power scaling and early game cards
     const earlyPairs = pairs.filter(pair => {
       const buckets = [...pair];
-      return buckets.includes('max_hp') || buckets.includes('max_energy') || 
-             buckets.includes('cards') || buckets.includes('max_hand');
+      return buckets.includes('max_hp') || buckets.includes('max_energy') ||
+             buckets.includes('max_hand');
     });
     // Include some early game gold for shop opportunities
-    earlyPairs.push(['cards', 'gold_skip'], ['max_hp', 'gold']);
+    earlyPairs.push(['max_hp', 'gold']);
     return earlyPairs;
   }
   
@@ -143,10 +147,6 @@ function generateChoiceContext(s: GameState, optionA: LevelBucket, optionB: Leve
   // Context based on choice type and level
   if (buckets.includes('max_hp') && buckets.includes('equipment_slot')) {
     return level <= 3 ? "Early survival vs equipment power:" : "Durability vs versatility:";
-  }
-  
-  if (buckets.includes('cards') && buckets.includes('blessing')) {
-    return level <= 3 ? "Immediate cards vs passive power:" : "Direct strength vs ongoing effects:";
   }
   
   if (buckets.includes('remove') && buckets.includes('upgrade')) {
@@ -269,8 +269,6 @@ export function getBucketDisplayInfo(bucket: LevelBucket): { name: string; descr
       return { name: '+1 Max Energy', description: 'Play more cards each turn', icon: '⚡' };
     case 'max_hand':
       return { name: '+1 Hand Size', description: 'More options and combos', icon: '🎴' };
-    case 'cards':
-      return { name: 'Choose Cards', description: 'Add new abilities to deck', icon: '🃏' };
     case 'blessing':
       return { name: 'Choose Blessing', description: 'Permanent passive power', icon: '✨' };
     case 'remove':

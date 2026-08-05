@@ -17,7 +17,6 @@ const BUCKET_LABEL: Record<string, { title: string; detail: string }> = {
   max_hp:         { title: 'พลังชีวิต',      detail: 'เพิ่มพลังชีวิตสูงสุด 8 และฟื้นทันที 8' },
   max_energy:     { title: 'พลังงาน',        detail: 'เพิ่มพลังงานต่อเทิร์น 1' },
   max_hand:       { title: 'ขนาดมือ',        detail: 'จั่วการ์ดได้มากขึ้น 1 ใบต่อเทิร์น' },
-  cards:          { title: 'การ์ดใหม่',      detail: 'เลือกการ์ดเข้าสำรับ 1 ใบ' },
   blessing:       { title: 'พร',             detail: 'รับพรติดตัว 1 อย่าง' },
   remove:         { title: 'สละการ์ด',       detail: 'ถอดการ์ดออกจากสำรับ' },
   upgrade:        { title: 'ปลุกเสก',        detail: 'อัปเกรดการ์ดในสำรับ' },
@@ -29,8 +28,8 @@ const BUCKET_LABEL: Record<string, { title: string; detail: string }> = {
 const labelOf = (bucket: string) =>
   BUCKET_LABEL[bucket] ?? { title: bucket, detail: '' };
 
-/** ตัวเลือกที่ต้องเลือกของย่อยอีกชั้น (การ์ด/พร) */
-const NEEDS_PICK = new Set(['cards', 'blessing']);
+/** ตัวเลือกที่ต้องเลือกของย่อยอีกชั้น */
+const NEEDS_PICK = new Set(['blessing']);
 
 type Props = {
   state: GameState;
@@ -62,14 +61,6 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
 
   const subChoices = (opt: 'A' | 'B'): SubChoice[] => {
     const bucket = bucketOf(opt);
-    if (bucket === 'cards') {
-      return (state.levelUp?.cardChoices ?? []).map((c, i) => ({
-        key: c.instanceId ?? `${c.id}-${i}`,
-        title: c.name,
-        detail: c.desc ?? '',
-        card: c,
-      }));
-    }
     if (bucket === 'blessing') {
       return (state.levelUp?.blessingChoices ?? []).map((b, i) => ({
         key: b.id ?? `${i}`,
@@ -136,17 +127,6 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         </View>
       ) : (
         <View>
-          {/* เลือกการ์ดโดยไม่รู้ว่าสำรับมีกี่ใบคือการเลือกแบบไม่มีข้อมูล
-              สำรับใหญ่ขึ้นหนึ่งใบ = โอกาสจั่วเจอใบที่ต้องการลดลงทุกใบ */}
-          {bucketOf(pending) === 'cards' && (
-            <Text style={{
-              color: palette.textFaint, fontSize: size.label,
-              fontFamily: font.ui, textAlign: 'center', marginBottom: space.md,
-            }}>
-              สำรับตอนนี้ {deck.length} ใบ · หยิบแล้วจะเป็น {deck.length + 1} ใบ
-            </Text>
-          )}
-
           <ScrollView style={{ maxHeight: 340 }} contentContainerStyle={{ gap: 12 }}>
             {subChoices(pending).map((sc, i) => (
               <Pressable

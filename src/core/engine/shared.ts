@@ -2,7 +2,8 @@
 import type { GameState, CardData, BlessingDef } from '../types';
 import type { RNG } from '../rng';
 import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
-import { rollLevelUpChoice, rollTwoBlessings, rollThreeCards, type LevelBucket } from '../level';
+import { rollLevelUpChoice, rollTwoBlessings, type LevelBucket } from '../level';
+import { rollCardReward } from '../cards/reward';
 import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
 import { applyClassVictoryPassive, getClass } from '../classes';
 
@@ -151,21 +152,43 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
     if (!s.levelUp || s.levelUp.consumed) {
       const rolled = rollLevelUpChoice(r, s); r = rolled.rng;
       const choice = rolled.choice;
-      let cardChoices, blessingChoices;
-      
-      // Check if either option needs additional choices (cards/blessings)
-      if (choice.optionA === 'cards' || choice.optionB === 'cards') {
-        const rr = rollThreeCards(r, s.player.level, getClass(s.classId).cardTag); r = rr.rng; cardChoices = rr.list;
-      }
+      let blessingChoices;
+
       if (choice.optionA === 'blessing' || choice.optionB === 'blessing') {
         const owned = (s.blessings ?? []).map(b => b.id);
         const bb = rollTwoBlessings(r, owned); r = bb.rng; blessingChoices = bb.list;
       }
-      
-      s.levelUp = { choice, cardChoices, blessingChoices, consumed: false };
+
+      s.levelUp = { choice, blessingChoices, consumed: false };
     } else {
       s.log.push('LevelUp queued (multiple levels).');
     }
   }
+
+  // การ์ดรางวัลเป็นของ "ชนะไฟต์" ไม่ใช่ของ "เลเวลอัป" — ทุกไฟต์ที่ชนะได้เลือก
+  r = rollCardReward(s, r);
+
   return r;
+}
+
+/**
+ * ชนะไฟต์แล้วต้องไปหน้าไหนต่อ — จุดเดียวที่ตัดสิน
+ *
+ * มีของค้างให้เลือกได้สองอย่างและมันมาไม่พร้อมกัน (เลเวลอัปมาเฉพาะไฟต์ที่
+ * ดันข้ามขั้น การ์ดรางวัลมาทุกไฟต์) ถ้าปล่อยให้แต่ละที่ตัดสินเอง จะมีเส้นทาง
+ * ที่กระโดดข้ามรางวัลไปเงียบๆ — ซึ่งเคยเกิดมาแล้วกับ phase 'levelup' ที่ถูก
+ * VictoryOverlay กลืนไปทั้ง phase
+ */
+export function advanceAfterVictory(s: GameState): void {
+  if (s.levelUp && !s.levelUp.consumed) {
+    s.phase = 'levelup';
+    s.log.push('Level Up!');
+    return;
+  }
+  if (s.cardReward) {
+    s.phase = 'reward';
+    return;
+  }
+  s.phase = 'victory';
+  s.log.push('Victory!');
 }

@@ -14,6 +14,7 @@ import DiscardOverlay from './components/battle/DiscardOverlay';
 import VictoryOverlay from './components/battle/VictoryOverlay';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
+import CardRewardOverlay from './components/battle/CardRewardOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
 import StatusStrip from './components/battle/StatusStrip';
 import ComboStrip from './components/battle/ComboStrip';
@@ -422,6 +423,17 @@ export default function BattlePage() {
               dispatch({ type: 'ChooseLevelUpOption', option, index })
             }
             onSkip={() => dispatch({ type: 'SkipLevelUp' })}
+          />
+        )}
+
+        {/* การ์ดรางวัลมาหลังเลเวลอัป และมาก่อนหน้าชนะ — ทั้งสามอันเป็น
+            phase คนละอัน ลำดับตัดสินที่ `advanceAfterVictory` ที่เดียว */}
+        {gameState.phase === 'reward' && gameState.cardReward && (
+          <CardRewardOverlay
+            choices={gameState.cardReward.choices}
+            deck={gameState.masterDeck ?? []}
+            onChoose={(index) => dispatch({ type: 'ChooseCardReward', index })}
+            onSkip={() => dispatch({ type: 'SkipCardReward' })}
           />
         )}
 

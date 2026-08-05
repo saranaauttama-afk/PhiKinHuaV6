@@ -69,6 +69,24 @@ export function resolveStoryIfAny(s: GameState, go: (c: Command) => void): void 
   go({ type: 'ChooseEventOption', index: index >= 0 ? index : 0 });
 }
 
+/**
+ * ถ้ามีการ์ดรางวัลค้างอยู่ ให้ตอบก่อน — ไม่งั้นรันจะค้างที่ phase 'reward'
+ *
+ * ชนะไฟต์แล้วได้เลือกการ์ดทุกครั้ง (ดู `cards/reward.ts`) ตัวขับรันเต็มรัน
+ * จึงต้องรู้จักตอบเหมือนที่ต้องรู้จักตอบเหตุการณ์เล่าเรื่อง
+ *
+ * @param take หยิบใบแรกไหม — `false` คือกดข้าม (ใช้ตอนวัดเรื่องอื่นที่ไม่อยาก
+ *             ให้สำรับโตจนไปกวนผลการวัด)
+ */
+export function resolveRewardIfAny(
+  s: GameState,
+  go: (c: Command) => void,
+  take = false
+): void {
+  if (s.phase !== 'reward' || !s.cardReward) return;
+  go(take ? { type: 'ChooseCardReward', index: 0 } : { type: 'SkipCardReward' });
+}
+
 export function attackCard(dmg: number, over: Partial<CardData> = {}): CardData {
   return { id: 'test_attack', name: 'Test Attack', type: 'attack', cost: 0, dmg, ...over };
 }

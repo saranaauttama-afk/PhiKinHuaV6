@@ -6,7 +6,7 @@ import type { Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import { toSave, fromSave, isPlayableSave, summarize, SAVE_VERSION } from '../src/core/save';
 import { isFused } from '../src/core/cards/fusion';
-import { resolveStoryIfAny } from './helpers';
+import { resolveStoryIfAny, resolveRewardIfAny } from './helpers';
 
 /**
  * เซฟ/โหลด
@@ -44,8 +44,10 @@ function runInProgress(seed = 'save', classId: any = 'warrior'): GameState {
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    resolveRewardIfAny(s, go);
     go({ type: 'CompleteNode' });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    resolveRewardIfAny(s, go);
   }
 
   return s;

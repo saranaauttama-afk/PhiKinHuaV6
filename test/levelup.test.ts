@@ -56,13 +56,19 @@ describe('เข้าสู่หน้าเลเวลอัป', () => {
 });
 
 describe('เลือกรางวัล', () => {
-  it('เลือกแล้ว consumed และกลับไป phase victory', () => {
+  it('เลือกแล้ว consumed และไปต่อที่การ์ดรางวัล', () => {
+    // เดิมเลเวลอัปจบแล้วไป 'victory' ตรงๆ — ตอนนี้ทุกไฟต์ที่ชนะมีการ์ดรางวัล
+    // รออยู่อีกด่าน (ดู `advanceAfterVictory`) ถ้าโดดข้ามไป victory
+    // แปลว่ารางวัลหายไปเงียบๆ
     let s = reachLevelUp();
     s = step(s, { type: 'ChooseLevelUpOption', option: 'A', index: 0 });
 
     expect(s.levelUp!.consumed).toBe(true);
-    expect(s.phase).toBe('victory');
+    expect(s.phase).toBe('reward');
     expect(s.levelUp!.choice!.selectedOption).toBe('A');
+
+    s = step(s, { type: 'SkipCardReward' });
+    expect(s.phase).toBe('victory');
   });
 
   it('เลือกซ้ำอีกครั้งไม่มีผล (กันกดรัว)', () => {
@@ -72,21 +78,6 @@ describe('เลือกรางวัล', () => {
 
     s = step(s, { type: 'ChooseLevelUpOption', option: 'B', index: 0 });
     expect(JSON.stringify(s.player)).toBe(snapshot);
-  });
-
-  it('ตัวเลือกที่ให้การ์ดใส่การ์ดเข้าสำรับจริง', () => {
-    let s = reachLevelUp();
-    const choice = s.levelUp!.choice!;
-    const opt: 'A' | 'B' | null =
-      choice.optionA === 'cards' ? 'A' : choice.optionB === 'cards' ? 'B' : null;
-    if (!opt) return; // seed นี้ไม่ได้ให้ตัวเลือกการ์ด
-
-    const before = s.masterDeck.length;
-    const picked = s.levelUp!.cardChoices![0];
-    s = step(s, { type: 'ChooseLevelUpOption', option: opt, index: 0 });
-
-    expect(s.masterDeck.length).toBe(before + 1);
-    expect(s.masterDeck.some(c => c.id === picked.id)).toBe(true);
   });
 
   it('ตัวเลือกที่เพิ่มค่าสถานะมีผลกับผู้เล่นจริง', () => {

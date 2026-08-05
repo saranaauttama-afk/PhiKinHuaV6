@@ -112,11 +112,15 @@ export type EquipmentData = {
 export type Phase =
   | 'start' | 'menu' | 'map' | 'combat' | 'victory' | 'defeat'
   | 'event' | 'shop' | 'levelup' | 'starter'
+  /** ชนะไฟต์แล้ว กำลังเลือกการ์ดรางวัล (ดู `cards/reward.ts`) */
+  | 'reward'
   | 'run_complete'; // จบรันแล้ว (ชนะบอสสุดท้าย) — แสดงจอสรุป
 
+// หมายเหตุ: เคยมี 'cards' อยู่ในนี้ — การ์ดใหม่ย้ายไปเป็นรางวัลชนะไฟต์แล้ว
+// (ดู `cards/reward.ts`) เลเวลอัปเหลือแต่ของที่ไม่ใช่การ์ด
 export type Bucket =
   | 'max_hp' | 'max_energy' | 'max_hand'
-  | 'cards' | 'blessing' | 'remove' | 'upgrade' | 'gold'
+  | 'blessing' | 'remove' | 'upgrade' | 'gold'
   | 'equipment_slot' | 'gold_skip';
 
 export type PlayerState = {
@@ -391,10 +395,12 @@ export type GameState = {
       contextDescription?: string;
       selectedOption?: 'A' | 'B';
     };
-    cardChoices?: CardData[];
     blessingChoices?: BlessingDef[];
     consumed?: boolean;
   } | null;
+
+  /** การ์ดรางวัลที่รอให้เลือกหลังชนะไฟต์ — ดู `cards/reward.ts` */
+  cardReward?: import('./cards/reward').CardReward;
 
   // Starter
   starter?: { choices: BlessingDef[]; consumed?: boolean } | null;
@@ -431,6 +437,10 @@ export type Command =
   | { type: 'ChooseLevelUpOption'; option: 'A' | 'B'; index?: number }
   | { type: 'CancelLevelUpChoice' }
   | { type: 'SkipLevelUp' }
+
+  // การ์ดรางวัลหลังชนะไฟต์
+  | { type: 'ChooseCardReward'; index: number }
+  | { type: 'SkipCardReward' }
 
   // UI
   | { type: 'OpenDeck' }

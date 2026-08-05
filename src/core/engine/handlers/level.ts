@@ -1,7 +1,7 @@
 // src/core/engine/handlers/level.ts
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
-import { upgradeCard, canUpgrade, grantBlessing } from '../shared';
+import { upgradeCard, canUpgrade, grantBlessing, advanceAfterVictory } from '../shared';
 
 export function chooseLevelUp(s: GameState, cmd: Extract<Command, { type: 'ChooseLevelUp' }>, r: RNG) {
   if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed) return { state: s, rng: r };
@@ -12,7 +12,7 @@ export function chooseLevelUp(s: GameState, cmd: Extract<Command, { type: 'Choos
     const idx = cmd.index ?? 0;
     applyBucketChoice(s, b, idx);
     s.levelUp.consumed = true;
-    s.phase = 'victory';
+    advanceAfterVictory(s);
     return { state: s, rng: r };
   }
   
@@ -31,9 +31,9 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
   
   applyBucketChoice(s, selectedBucket, idx);
   s.levelUp.consumed = true;
-  
-  // After level up choice, go to victory phase
-  s.phase = 'victory';
+
+  // เลเวลอัปเสร็จแล้ว ยังอาจมีการ์ดรางวัลรออยู่
+  advanceAfterVictory(s);
   return { state: s, rng: r };
 }
 
@@ -50,11 +50,6 @@ function applyBucketChoice(s: GameState, bucket: string, idx: number) {
       s.player.maxHandSize += 1;
       s.log.push(`Hand size: ${s.player.maxHandSize}`);
       break;
-    case 'cards': {
-      const c = s.levelUp?.cardChoices?.[idx]; if (!c) break;
-      s.masterDeck.push(JSON.parse(JSON.stringify(c)));
-      break;
-    }
     case 'blessing': {
       const bsel = s.levelUp?.blessingChoices?.[idx]; if (!bsel) break;
       grantBlessing(s, bsel);
@@ -108,8 +103,7 @@ export function skipLevelUp(s: GameState, _cmd: Extract<Command, { type: 'SkipLe
   if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed) return { state: s, rng: r };
   s.player.gold += 25;
   s.levelUp.consumed = true;
-  
-  // After skipping level up, go to victory phase
-  s.phase = 'victory';
+
+  advanceAfterVictory(s);
   return { state: s, rng: r };
 }

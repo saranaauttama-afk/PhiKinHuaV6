@@ -10,7 +10,7 @@ import {
 import { ART_BY_ID } from '../src/art/catalog';
 import { screenForState } from '../app/screenRouter';
 import { toSave, fromSave, isPlayableSave } from '../src/core/save';
-import { resolveStoryIfAny } from './helpers';
+import { resolveStoryIfAny, resolveRewardIfAny } from './helpers';
 
 /**
  * บทคั่นเล่าเรื่อง
@@ -93,8 +93,10 @@ function playRun(seed: string, opts: {
     ];
     go({ type: 'PlayCard', index: 0 });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    resolveRewardIfAny(s, go);
     go({ type: 'CompleteNode' });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    resolveRewardIfAny(s, go);
     closeChapter();
   }
 
@@ -294,8 +296,10 @@ describe('จุดที่บทขึ้นระหว่างเล่น'
       s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
       go({ type: 'PlayCard', index: 0 });
       if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    resolveRewardIfAny(s, go);
       go({ type: 'CompleteNode' });
       if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    resolveRewardIfAny(s, go);
       close();
     }
     throw new Error('เดินไม่ถึงบอสสุดท้าย');
