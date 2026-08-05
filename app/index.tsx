@@ -24,6 +24,8 @@ import PlayerStatusBar from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
 import { useRouter } from 'expo-router';
 import { screenForState, mapIsReady } from './screenRouter';
+import { onRestRow, restBudgetLeft } from '../src/core/map/restPage';
+import { nextRowPreview } from '../src/core/map/journeySync';
 import { palette, font, size, space } from './theme';
 
 
@@ -44,8 +46,12 @@ export default function Home() {
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
 
-  // ตัวเลือกบนแผนที่คือ "โหนดที่เดินไปได้จากตรงที่ยืนอยู่" ไม่ใช่ถาดที่สุ่มใหม่ได้
-  // เลือกทางไหนก็เดินไปทางนั้น ไม่มีปุ่มข้าม ไม่มีการวนเก็บให้ครบก่อนไปต่อ
+  // ชั้นสู้: เลือกทางไหนก็เดินไปทางนั้น ไม่มีการวนเก็บให้ครบก่อนไปต่อ
+  // ชั้นพัก: เคลียร์ได้ทุกช่อง ช่องที่เคลียร์แล้วมีของใหม่ขึ้นแทนจนโควตาหมด
+  //          แล้วกดเดินต่อเมื่อไหร่ก็ได้ (ดู `map/restPage.ts`)
+  const restRow = onRestRow(state);
+  const ahead   = restRow ? nextRowPreview(state) : undefined;
+  const refills = restRow ? restBudgetLeft(state) : 0;
 
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
@@ -218,6 +224,8 @@ export default function Home() {
             paddingBottom: 140,
           }}>
             {offers.map((offer, i) => {
+              // ช่องที่หมดของแล้วเป็น undefined — ข้ามไป ไม่ใช่วาดกรอบเปล่า
+              if (!offer) return null;
               const d = describeOffer(offer, i);
               const resolved = page?.resolved[i] ?? false;
               const picked = selectedCard === i;
@@ -256,7 +264,29 @@ export default function Home() {
             })}
           </View>
 
-          {/* ไม่มีปุ่ม "เดินทางต่อ" อีกแล้ว — เลือกทางแยกคือการเดินทางต่อในตัวเอง */}
+          {/* ปุ่มเดินต่อมีเฉพาะบนชั้นพัก — ชั้นสู้เดินต่อเองเมื่อจบไฟต์
+              เขียนว่าข้างหน้าเป็นอะไรด้วย เพราะแผนที่แบบเส้นทางรู้อยู่แล้ว
+              ผู้เล่นควรตัดสินใจได้ว่าจะเก็บของต่อหรือพอ โดยรู้ว่าอีกก้าวจะเจอบอส */}
+          {restRow && ahead && (
+            <View style={{ position: 'absolute', left: 0, right: 0, bottom: 96, alignItems: 'center' }}>
+              <GameButton
+                label={`เดินต่อ → ${ahead.label}`}
+                tone={ahead.kind === 'boss' ? 'danger' : 'primary'}
+                onPress={() => {
+                  setSelectedCard(null);
+                  dispatch({ type: 'Proceed' });
+                }}
+              />
+              <Text style={{
+                color: palette.textFaint, fontSize: size.tiny,
+                fontFamily: font.ui, marginTop: space.xs,
+              }}>
+                {refills > 0
+                  ? `แวะเก็บของต่อได้ · ยังเหลืออีก ${refills} อย่างในทาง`
+                  : 'ของบนทางนี้หมดแล้ว'}
+              </Text>
+            </View>
+          )}
 
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}

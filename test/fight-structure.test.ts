@@ -9,7 +9,7 @@ import {
 import { SECRET_BOSS_HP_RATIO } from '../src/core/balance/weights';
 import { THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
 import { buildJourney } from '../src/core/map/journey';
-import { resolveStoryIfAny, resolveRewardIfAny } from './helpers';
+import { resolveStoryIfAny, resolveRewardIfAny, leaveRestRow } from './helpers';
 
 /**
  * โครงสร้างรันตาม gameSpec.txt — 15 ไฟต์, บอสกลางที่ไฟต์ 7, บอสสุดท้ายที่ 15
@@ -55,6 +55,7 @@ function playFullRun(seed: string, opts: { hpRatioAtFinal?: number } = {}): RunR
       go({ type: 'ChooseOffer', index: 0 });
       resolveStoryIfAny(s, go);
       go({ type: 'CompleteNode' });
+      leaveRestRow(s, go);
       continue;
     }
 

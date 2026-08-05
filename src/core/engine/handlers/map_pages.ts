@@ -23,8 +23,9 @@ import { deckForMonster } from '../../monsters/monster-decks';
 import { applyClassCombatStart } from '../../classes';
 import { getEquipmentById } from '../../pack';
 import {
-  usesJourney, enterNode, advanceJourney, unlockSecretBossRows,
+  usesJourney, enterNode, advanceJourney, unlockSecretBossRows, leaveRestRow,
 } from '../../map/journeySync';
+import { onRestRow, refillRestSlot, spendRestToken } from '../../map/restPage';
 import { fireChapter } from '../../story/chapters';
 import { winRun } from './runEnd';
 import { resetCombos } from '../../combat/combos';
@@ -645,11 +646,12 @@ export function proceed(s: GameState, _cmd: Extract<Command, { type: 'Proceed' }
   const got = ensurePages(s, r);
   let { rng, mp } = got;
 
-  // บนเส้นทางไม่มีปุ่ม "ไปหน้าถัดไป" — ชั้นถัดไปเปิดเองเมื่อจบโหนดปัจจุบัน
+  // บนเส้นทาง ปุ่มนี้มีความหมายเฉพาะที่ชั้นพัก — ชั้นสู้เดินต่อเองเมื่อจบไฟต์
   if (usesJourney(s)) {
     s.phase = 'map';
     (s as any).nodePhase = 'map_ready';
-    advanceJourney(s);
+    if (onRestRow(s)) leaveRestRow(s);
+    else advanceJourney(s);
     return { state: s, rng };
   }
 
@@ -848,8 +850,18 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
     // บนเส้นทางไม่มีการรีเฟรช — จบโหนดแล้วเปิดชั้นถัดไปแทน
     if (onJourney) {
       if (ix != null && mp.current?.resolved[ix]) {
+        const done: PageOffer = (mp.current.offers as PageOffer[])[ix] as PageOffer;
         mp._activeOfferIndex = undefined;
         mp._shopUsed = false;
+
+        // ชั้นพัก: เคลียร์ช่องหนึ่งแล้วมีของใหม่ขึ้นแทน ยังไม่เดินต่อ
+        // (ดู `map/restPage.ts` — เดินต่อเมื่อผู้เล่นกดเอง)
+        if (done && isRestOfferKind(done.kind) && onRestRow(s)) {
+          spendRestToken(s, done);
+          rng = refillRestSlot(s, ix, rng);
+          return { state: s, rng };
+        }
+
         advanceJourney(s);
       }
       return { state: s, rng };

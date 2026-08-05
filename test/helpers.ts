@@ -70,6 +70,17 @@ export function resolveStoryIfAny(s: GameState, go: (c: Command) => void): void 
 }
 
 /**
+ * เดินออกจากชั้นพัก
+ *
+ * ชั้นพักไม่เดินต่อเองแล้ว — เคลียร์ช่องหนึ่งแล้วมีของใหม่ขึ้นแทน ผู้เล่น
+ * (และตัวขับรัน) ต้องกดเดินต่อเอง ไม่งั้นจะวนเคลียร์ของบนชั้นเดิมไม่รู้จบ
+ */
+export function leaveRestRow(s: GameState, go: (c: Command) => void): void {
+  if (s.phase !== 'map') return;
+  go({ type: 'Proceed' });
+}
+
+/**
  * ถ้ามีการ์ดรางวัลค้างอยู่ ให้ตอบก่อน — ไม่งั้นรันจะค้างที่ phase 'reward'
  *
  * ชนะไฟต์แล้วได้เลือกการ์ดทุกครั้ง (ดู `cards/reward.ts`) ตัวขับรันเต็มรัน

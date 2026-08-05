@@ -11,7 +11,7 @@ import type { Command, GameState } from '../src/core/types';
 import { FINAL_BOSS_FIGHT } from '../src/core/map/pages';
 import { CHARACTER_CLASSES } from '../src/core/classes';
 import { takeCardReward } from '../src/core/cards/reward';
-import { resolveStoryIfAny } from './helpers';
+import { resolveStoryIfAny, leaveRestRow } from './helpers';
 
 /** เดินรันจนจบ เลือกการ์ดรางวัลใบแรกทุกครั้ง (`take`) หรือกดข้ามทุกครั้ง */
 function playRun(seed: string, classId: string, take: boolean) {
@@ -56,6 +56,7 @@ function playRun(seed: string, classId: string, take: boolean) {
       go({ type: 'ChooseOffer', index: 0 });
       resolveStoryIfAny(s, go);
       go({ type: 'CompleteNode' });
+      leaveRestRow(s, go);
       continue;
     }
 

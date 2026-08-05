@@ -6,7 +6,7 @@ import type { PageOffer } from '../src/core/map/pages';
 import { FINAL_BOSS_FIGHT, MID_BOSS_FIGHT } from '../src/core/map/pages';
 import { getMonsterById, THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
 import { EXP_BY_TIER, GOLD_BY_TIER, nextExpForLevel } from '../src/core/balance/progression';
-import { resolveStoryIfAny, resolveRewardIfAny } from './helpers';
+import { resolveStoryIfAny, resolveRewardIfAny, leaveRestRow } from './helpers';
 
 /**
  * เป้าหมายสมดุลจาก gameSpec.txt — ล็อกไว้กันค่าเลื่อนโดยไม่ตั้งใจ
@@ -48,6 +48,7 @@ function playRun(seed: string): { fights: FightLog[]; levelAtFinalBoss: number }
       go({ type: 'ChooseOffer', index: 0 });
       resolveStoryIfAny(s, go);
       go({ type: 'CompleteNode' });
+      leaveRestRow(s, go);
       continue;
     }
 

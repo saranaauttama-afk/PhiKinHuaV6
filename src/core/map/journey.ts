@@ -139,22 +139,51 @@ const REST_WEIGHTS: Array<[PageOffer['kind'], number]> = [
   ['treasure_single', 2],
 ];
 
-function pickRestKind(r: RNG): { kind: PageOffer['kind']; rng: RNG } {
-  const total = REST_WEIGHTS.reduce((a, [, w]) => a + w, 0);
+/**
+ * สุ่มชนิดโหนดพักหนึ่งชนิด
+ *
+ * @param allow กรองชนิดที่ยังเหลือโควตา — ตอนสร้างแผนที่ไม่กรอง (ยังไม่รู้ว่า
+ *              ผู้เล่นจะเดินทางไหน) ตอนเติมช่องบนชั้นพักถึงจะกรองตามโควตาที่เหลือ
+ *              คืน `undefined` เมื่อไม่มีชนิดไหนเหลือแล้ว
+ */
+export function pickRestKind(
+  r: RNG,
+  allow?: (kind: PageOffer['kind']) => boolean
+): { kind: PageOffer['kind'] | undefined; rng: RNG } {
+  const pool = allow ? REST_WEIGHTS.filter(([k]) => allow(k)) : REST_WEIGHTS;
+  if (pool.length === 0) return { kind: undefined, rng: r };
+
+  const total = pool.reduce((a, [, w]) => a + w, 0);
   const roll = int(r, 1, total);
   let acc = 0;
-  for (const [kind, w] of REST_WEIGHTS) {
+  for (const [kind, w] of pool) {
     acc += w;
     if (roll.value <= acc) return { kind, rng: roll.rng };
   }
-  return { kind: REST_WEIGHTS[0][0], rng: roll.rng };
+  return { kind: pool[0][0], rng: roll.rng };
+}
+
+/** ชนิดโหนดพักทั้งหมดที่มีในตาราง — ใช้ผูกกับตัวนับโควตา */
+export function restKinds(): PageOffer['kind'][] {
+  return REST_WEIGHTS.map(([k]) => k);
+}
+
+/**
+ * เหตุการณ์เล่าเรื่องที่ยังไม่เคยเจอในรันนี้ — เจอเรื่องเดิมสองรอบแล้วมนตร์ขลังหายหมด
+ * ถ้าเจอครบทุกเรื่องแล้วค่อยยอมให้ซ้ำ
+ */
+export function pickStoryEventId(r: RNG, usedEvents: string[]): { eventId: string; rng: RNG } {
+  const fresh = STORY_EVENTS.filter(e => !usedEvents.includes(e.id));
+  const pool = fresh.length > 0 ? fresh : STORY_EVENTS;
+  const pick = int(r, 0, pool.length - 1);
+  return { eventId: pool[pick.value].id, rng: pick.rng };
 }
 
 /**
  * @param act ภาคที่ 1 (ก่อนบอสกลาง) หรือ 2 — ร้านปลุกเสก/สละต้องรู้
  *            เพราะโครงสร้าง offer ของสองชนิดนี้มีฟิลด์ `phase` ติดมาแต่เดิม
  */
-function makeRestOffer(
+export function makeRestOffer(
   kind: PageOffer['kind'], id: string, eventId = '', act: 1 | 2 = 1
 ): PageOffer {
   switch (kind) {
@@ -400,18 +429,16 @@ function growJourney(j: JourneyMap, plan: RowPlan[], r: RNG): RNG {
 
       } else {
         const kRoll = pickRestKind(r); r = kRoll.rng;
+        const kind = kRoll.kind ?? 'shop_card';
 
         let eventId = '';
-        if (kRoll.kind === 'story_event') {
-          // เหตุการณ์ไม่ซ้ำภายในรันเดียว — เจอเรื่องเดิมสองรอบแล้วมนตร์ขลังหายหมด
-          const fresh = STORY_EVENTS.filter(e => !usedEvents.includes(e.id));
-          const pool = fresh.length > 0 ? fresh : STORY_EVENTS;
-          const pick = int(r, 0, pool.length - 1); r = pick.rng;
-          eventId = pool[pick.value].id;
+        if (kind === 'story_event') {
+          const ev = pickStoryEventId(r, usedEvents); r = ev.rng;
+          eventId = ev.eventId;
           usedEvents.push(eventId);
         }
 
-        j.nodes[id].offer = makeRestOffer(kRoll.kind, id, eventId, act);
+        j.nodes[id].offer = makeRestOffer(kind, id, eventId, act);
         memo[id] = banned;
       }
     });
@@ -468,6 +495,11 @@ export function isJourneyComplete(j: JourneyMap): boolean {
 export function rowIsFight(j: JourneyMap, rowIdx: number): boolean {
   const p = j.plans[rowIdx];
   return !!p && p.kind !== 'rest';
+}
+
+/** ชั้นนี้เป็นชั้นพักไหม — ชั้นพักเคลียร์ได้ทุกช่อง ชั้นสู้เลือกได้ทางเดียว */
+export function rowIsRest(j: JourneyMap, rowIdx: number): boolean {
+  return j.plans[rowIdx]?.kind === 'rest';
 }
 
 /** จำนวนชั้นสู้ทั้งเส้นทาง (ใช้แสดงความคืบหน้า) */

@@ -8,7 +8,7 @@ import type { GameState } from '../types';
 import type { RNG } from '../rng';
 import {
   buildJourney, reachableNodes, moveTo, isJourneyComplete,
-  appendRows, planSecretRows,
+  appendRows, planSecretRows, rowIsRest,
 } from './journey';
 import type { JourneyNode } from './journey';
 import { initPageMap } from './pages';
@@ -129,13 +129,42 @@ export function nodeForOfferIndex(s: GameState, ix: number): JourneyNode | undef
   return reachableNodes(s.journey)[ix];
 }
 
-/** ย้ายไปยืนที่โหนดนั้น (เรียกตอนผู้เล่นเลือก) */
+/**
+ * ย้ายไปยืนที่โหนดนั้น (เรียกตอนผู้เล่นเลือก)
+ *
+ * **ชั้นพักไม่ย้าย** — ย้ายเมื่อไหร่ ช่องที่เหลือบนชั้นเดียวกันจะกลายเป็นโหนด
+ * ที่เดินไปไม่ถึงทันที ซึ่งเป็นสิ่งที่เราเพิ่งเลิกทำ ชั้นพักย้ายตอนกดเดินต่อ
+ * (ดู `leaveRestRow`) ระหว่างนั้นแค่ทำเครื่องหมายว่าแวะแล้วเพื่อให้แผนที่วาดถูก
+ */
 export function enterNode(s: GameState, ix: number): JourneyNode | undefined {
   const node = nodeForOfferIndex(s, ix);
   if (!node || !s.journey) return undefined;
+
+  if (rowIsRest(s.journey, node.row)) {
+    node.visited = true;
+    return node;
+  }
+
   moveTo(s.journey, node.id);
   if (s.pages) s.pages.pageIndex = s.journey.rowIndex;
   return node;
+}
+
+/**
+ * กดเดินต่อจากชั้นพัก — ย้ายไปยืนที่โหนดใดโหนดหนึ่งของชั้นนั้น แล้วเปิดชั้นถัดไป
+ *
+ * ยืนโหนดไหนก็ได้: ชั้นถัดจากชั้นพักเป็นชั้นสู้ (กว้าง 2) หรือชั้นบอส (กว้าง 1)
+ * เสมอ และ `linkRow` ต่อทุกโหนดของชั้นพักไปถึงทุกโหนดของชั้นถัดไปครบ
+ * (มีเทสต์ยืนยันคุณสมบัตินี้ไว้ — ถ้าโครงกราฟเปลี่ยนจะรู้ทันที)
+ */
+export function leaveRestRow(s: GameState): void {
+  if (!s.journey) return;
+  const nodes = reachableNodes(s.journey);
+  if (nodes.length === 0 || !rowIsRest(s.journey, nodes[0].row)) return;
+
+  moveTo(s.journey, nodes[0].id);
+  if (s.pages) s.pages.pageIndex = s.journey.rowIndex;
+  advanceJourney(s);
 }
 
 /** จบโหนดปัจจุบันแล้ว — เปิดตัวเลือกของชั้นถัดไป */
@@ -166,4 +195,45 @@ export function journeyFinished(s: GameState): boolean {
 export function unlockSecretBossRows(s: GameState, r: RNG): RNG {
   if (!s.journey) return r;
   return appendRows(s.journey, planSecretRows(), r);
+}
+
+/**
+ * ข้างหน้าเป็นอะไร — ใช้เขียนบนปุ่มเดินต่อ
+ *
+ * แผนที่แบบเส้นทางมองเห็นล่วงหน้าได้อยู่แล้ว ปุ่มที่เขียนแค่ "เดินต่อ" ลอยๆ
+ * คือการทิ้งข้อมูลที่เรามีอยู่ในมือ — ผู้เล่นควรตัดสินใจได้ว่าจะเก็บของต่อ
+ * หรือพอแล้ว โดยรู้ว่าอีกก้าวเดียวจะเจอบอส
+ */
+export type NextRowPreview = {
+  kind: 'fight' | 'boss' | 'rest' | 'end';
+  /** จำนวนทางเลือกในชั้นถัดไป */
+  count: number;
+  label: string;
+};
+
+export function nextRowPreview(s: GameState): NextRowPreview | undefined {
+  if (!s.journey) return undefined;
+  const here = reachableNodes(s.journey);
+  if (here.length === 0) return undefined;
+
+  const nextIds = new Set<string>();
+  for (const n of here) for (const id of n.next) nextIds.add(id);
+  const next = [...nextIds].map(id => s.journey!.nodes[id]).filter(Boolean);
+  if (next.length === 0) return { kind: 'end', count: 0, label: 'สุดทาง' };
+
+  const boss = next.find(n => n.offer.kind === 'boss');
+  if (boss) {
+    const bt = (boss.offer as any).bossType;
+    const name =
+      bt === 'mid' ? 'บอสกลาง'
+      : bt === 'final' ? 'บอสสุดท้าย'
+      : 'ศึกลับ';
+    return { kind: 'boss', count: 1, label: name };
+  }
+
+  if (next.some(n => n.offer.kind === 'monster')) {
+    return { kind: 'fight', count: next.length, label: `ชั้นสู้ (${next.length} ทาง)` };
+  }
+
+  return { kind: 'rest', count: next.length, label: `ชั้นพัก (${next.length} ทาง)` };
 }

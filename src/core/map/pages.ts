@@ -28,8 +28,10 @@ export type MapStatePages = {
     shopCard: number; shopEquipment: number; 
     shopRemove1: number; shopRemove2: number;
     shopUpgrade1: number; shopUpgrade2: number;
-    wells: number; healingShrine: number; 
+    wells: number; healingShrine: number;
     treasure: number; treasureSingle: number; nextEvent: number;
+    /** เหตุการณ์เล่าเรื่องกับแท่นผสาน — เดิมไม่มีโควตาเพราะไม่เคยเติมช่องซ้ำ */
+    storyEvent: number; fusionAltar: number;
   };
   // Track deleted shops for sequential logic
   deletedShops: string[];
@@ -45,6 +47,8 @@ export type MapStatePages = {
   _activeOfferIndex?: number;  // index ของช่องที่เปิดร้านอยู่
   _resolvesOnPage?: number; // นับจำนวน encounter ที่ resolve ในหน้านี้ (engine ใช้)
   _shopUsed?: boolean;         // ซื้อของอย่างน้อย 1 ครั้งในร้านนี้แล้ว
+  /** นับจำนวนช่องที่เติมใหม่บนชั้นพัก — ใช้ทำ id ร้านที่ไม่ซ้ำของเดิม */
+  _restRefills?: number;
 };
 
 export function initPageMap(r: RNG) {

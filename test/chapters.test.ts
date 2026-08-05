@@ -10,7 +10,7 @@ import {
 import { ART_BY_ID } from '../src/art/catalog';
 import { screenForState } from '../app/screenRouter';
 import { toSave, fromSave, isPlayableSave } from '../src/core/save';
-import { resolveStoryIfAny, resolveRewardIfAny } from './helpers';
+import { resolveStoryIfAny, resolveRewardIfAny, leaveRestRow } from './helpers';
 
 /**
  * บทคั่นเล่าเรื่อง
@@ -63,6 +63,7 @@ function playRun(seed: string, opts: {
       go({ type: 'ChooseOffer', index: 0 });
       resolveStoryIfAny(s, go);
       go({ type: 'CompleteNode' });
+      leaveRestRow(s, go);
       closeChapter();
       continue;
     }
@@ -288,6 +289,7 @@ describe('จุดที่บทขึ้นระหว่างเล่น'
         go({ type: 'ChooseOffer', index: 0 });
         resolveStoryIfAny(s, go);
         go({ type: 'CompleteNode' });
+        leaveRestRow(s, go);
         close();
         continue;
       }

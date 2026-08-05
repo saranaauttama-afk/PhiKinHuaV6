@@ -28,11 +28,23 @@ export const POOL_DEFAULT = {
   shopRemove2: 1, // Phase 2: late game (after phase 1 deleted)
   shopUpgrade1: 1, // Phase 1: early game
   shopUpgrade2: 1, // Phase 2: late game (after phase 1 deleted)
-  wells: 2,
-  healingShrine: 2,
-  treasure: 3, // Free card treasures per part
-  treasureSingle: 2, // Single card treasure with random option
+  // ── โควตาการ "เติมช่อง" บนชั้นพัก (ดู `map/restPage.ts`) ──
+  //
+  // ตัวเลขพวกนี้คุมเฉพาะของที่ **เติมเข้ามาใหม่** หลังผู้เล่นเคลียร์ช่องไป
+  // ของที่วางไว้บนแผนที่ตั้งแต่ต้นรัน (~14 โหนดพัก) ไม่ถูกคุม เพราะตอนสร้าง
+  // แผนที่ยังไม่รู้ว่าผู้เล่นจะเดินทางไหน
+  //
+  // ของฟรีตั้งเป็น 0 = ได้เท่าที่วางไว้บนแผนที่ ไม่มีเติม
+  // วัดจริง 40 รันแบบเคลียร์ทุกช่อง: ศาล 2.05 → 1.4, บ่อ 1.90 → 0.9
+  // ถ้าปล่อยให้เติมได้ด้วย รันจะง่ายลงชัดเจนโดยที่ไม่มีใครตั้งใจ —
+  // ร้านที่คิดเงินคุมตัวเองได้ด้วยกระเป๋าอยู่แล้ว ของฟรีไม่มีอะไรคุม
+  wells: 0,
+  healingShrine: 0,
+  treasure: 1, // Free card treasures per part
+  treasureSingle: 0, // Single card treasure with random option
   nextEvent: 2, // next_page แบบ event พิเศษ
+  storyEvent: 2,
+  fusionAltar: 1,
 };
 
 export const WEIGHTS = {
