@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { palette, surface, tint } from '../../theme';
+import { palette, surface, tint, layer } from '../../theme';
 
 /**
  * จอแฟลชสีแดงตอนโดนโจมตี — วางเป็น sibling ที่ root ของหน้าต่อสู้
@@ -40,7 +40,7 @@ const ScreenFlash = React.forwardRef<ScreenFlashHandle, { color?: string }>(
     return (
       <Animated.View
         pointerEvents="none"
-        style={[StyleSheet.absoluteFill, { backgroundColor: color, zIndex: 500 }, style]}
+        style={[StyleSheet.absoluteFill, { backgroundColor: color, zIndex: layer.battleOverlay }, style]}
       />
     );
   }

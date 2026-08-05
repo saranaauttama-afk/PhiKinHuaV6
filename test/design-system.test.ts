@@ -23,6 +23,11 @@ const NOT_YET_MIGRATED = new Set<string>([]);
 /** สีที่อนุญาตให้เขียนตรงๆ ได้ — โปร่งใส ขาวดำล้วนที่ใช้เป็นม่าน/เงา */
 const ALLOWED_LITERALS = /^(transparent|#fff|#ffffff|#000|#000000)$/i;
 
+/** ตัดคอมเมนต์ออกก่อนตรวจ — คำอธิบายที่ยกตัวอย่างเลขเก่าไม่ใช่โค้ด */
+function stripComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+}
+
 function tsxFiles(dir: string, base = ''): string[] {
   const out: string[] = [];
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -119,5 +124,89 @@ describe('การโหลดตัวอักษร', () => {
       expect(loader, `ฟอนต์ ${family} ถูกใช้แต่ไม่ได้โหลด`).toContain(family);
     }
     expect(used.size).toBeGreaterThan(2);
+  });
+});
+
+/**
+ * ตาข่ายกันของทับกัน
+ *
+ * แถบสถานะผู้เล่นเป็นแผงลอยที่ก้นจอ (สูง 170 + เว้นล่าง 24) และถูกวางไว้
+ * **ท้ายสุด** ใน JSX ของหน้าแผนที่ ทุกอย่างที่อยู่ในแถบนั้นจึงถูกทับ:
+ *
+ *   - ปุ่ม "เดินต่อ" บนชั้นพักตั้งไว้ที่ `bottom: 96` โผล่มาแค่ขอบบนโค้งๆ กดไม่ได้
+ *   - ปุ่ม "เดินทางต่อ" กับ "ทำลายทิ้ง" ก้นหน้าร้านโดนทับ เพราะ `ShopView`
+ *     ไม่ได้ตั้ง zIndex ขณะที่ `DeckView`/`BlessingView` ตั้งไว้ 2000
+ *
+ * ทั้งสองอันมาจากรากเดียวกัน: ระยะกับลำดับชั้นถูกเดาเป็นตัวเลขรายจุด
+ * แทนที่จะอ้างของกลาง เทสต์นี้กันไม่ให้เลขเดาไหลกลับเข้ามา —
+ * สำคัญเป็นพิเศษเพราะเจ้าของโปรเจกต์รันแอปเองไม่ได้ เห็นได้จากภาพหน้าจอเท่านั้น
+ */
+describe('เลย์เอาต์ — ของต้องไม่ทับกัน', () => {
+  /** โอเวอร์เลย์เต็มจอทุกอันต้องอยู่เหนือแถบสถานะ */
+  const OVERLAYS = [
+    'components/ShopView.tsx',
+    'components/StoryEventView.tsx',
+    'components/DeckView.tsx',
+    'components/BlessingView.tsx',
+  ];
+
+  it('โอเวอร์เลย์เต็มจอทุกอันตั้งลำดับชั้นไว้', () => {
+    for (const f of OVERLAYS) {
+      const src = fs.readFileSync(path.join(APP, f), 'utf8');
+      expect(src.includes('layer.overlay'), `${f} ไม่ได้ตั้ง zIndex — แถบสถานะจะทับปุ่มที่ก้นหน้า`)
+        .toBe(true);
+    }
+  });
+
+  it('ไม่มีใครเขียน zIndex เป็นเลขตรงๆ', () => {
+    // เลขที่เขียนตรงๆ คือเลขที่ไม่มีใครรู้ว่าต้องสัมพันธ์กับอะไร
+    for (const f of tsxFiles(APP)) {
+      const src = stripComments(fs.readFileSync(path.join(APP, f), 'utf8'));
+      const raw = [...src.matchAll(/zIndex:\s*(\d+)/g)].map(m => m[1]);
+      expect(raw, `${f} เขียน zIndex เป็นเลขตรงๆ: ${raw.join(', ')}`).toEqual([]);
+    }
+  });
+
+  it('ไม่มีใครเดาระยะขอบบนเป็นเลขตรงๆ อีก', () => {
+    // `paddingTop: 56` เคยอยู่ 6 ไฟล์ — เป็นตัวเลขที่มาจากเครื่องเดียว
+    // เครื่องที่รอยบากลึกกว่านั้นข้อความไปทับนาฬิกากับแบตเตอรี่
+    for (const f of tsxFiles(APP)) {
+      const src = stripComments(fs.readFileSync(path.join(APP, f), 'utf8'));
+      expect(/paddingTop:\s*(4[0-9]|5[0-9]|6[0-9])\b/.test(src),
+        `${f} เดาระยะขอบบนเป็นเลขตรงๆ — ใช้ useScreenPadding()`).toBe(false);
+    }
+  });
+
+  it('หน้าแผนที่กันที่ให้แถบสถานะจากค่าเดียวกับที่แถบใช้เอง', () => {
+    const src = fs.readFileSync(path.join(APP, 'index.tsx'), 'utf8');
+    expect(src.includes('STATUS_BAR_SPACE'),
+      'index.tsx ไม่ได้อ้าง STATUS_BAR_SPACE — ระยะจะเพี้ยนทันทีที่แถบเปลี่ยนความสูง')
+      .toBe(true);
+    // และต้องไม่มีเลขเดาค้างอยู่
+    expect(/paddingBottom:\s*140\b/.test(src)).toBe(false);
+    expect(/bottom:\s*96\b/.test(src)).toBe(false);
+  });
+
+  it('แถบสถานะบอกความสูงของตัวเองออกมาให้คนอื่นใช้', () => {
+    const src = fs.readFileSync(path.join(APP, 'components/PlayerStatusBar.tsx'), 'utf8');
+    expect(src.includes('export const STATUS_BAR_SPACE')).toBe(true);
+  });
+
+  it('แอปหุ้มด้วย SafeAreaProvider จริง ไม่งั้น useSafeAreaInsets คืน 0', () => {
+    const src = fs.readFileSync(path.join(APP, '_layout.tsx'), 'utf8');
+    expect(src.includes('SafeAreaProvider')).toBe(true);
+  });
+});
+
+describe('ลำดับชั้น — อ่านจากบนลงล่างต้องเป็นล่างขึ้นบน', () => {
+  it('ค่าใน layer เรียงจากน้อยไปมากตามลำดับที่เขียน', () => {
+    // สเกลที่ตั้งชื่อไว้แต่เรียงมั่วคือสเกลที่อ่านแล้วเข้าใจผิด —
+    // เห็นชื่อเรียงกันแล้วนึกว่านั่นคือลำดับการซ้อน ทั้งที่ไม่ใช่
+    const src = fs.readFileSync(path.join(APP, 'theme.ts'), 'utf8');
+    const block = src.slice(src.indexOf('export const layer = {'));
+    const values = [...block.slice(0, block.indexOf('} as const;')).matchAll(/:\s*(\d+),/g)]
+      .map(m => Number(m[1]));
+    expect(values.length).toBeGreaterThan(3);
+    expect(values, `เรียงผิด: ${values.join(' → ')}`).toEqual([...values].sort((a, b) => a - b));
   });
 });

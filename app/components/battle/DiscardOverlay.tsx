@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import { palette, surface, tint } from '../../theme';
+import { palette, surface, tint, layer } from '../../theme';
 
 interface CardItem {
   instanceId?: string;
@@ -40,7 +40,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
     <View style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimFull,
-      zIndex: 500,
+      zIndex: layer.battleOverlay,
       justifyContent: 'center',
       alignItems: 'center',
     }}>

@@ -14,7 +14,8 @@ import type { Command, GameState } from '../../src/core/types';
 import { groupCards } from '../../src/core/cards/group';
 import CardRow from './CardRow';
 import { GameButton } from './Panel';
-import { font, palette, radius, size, space, surface, tint } from '../theme';
+import { font, palette, radius, size, space, surface, tint, layer } from '../theme';
+import { useScreenPadding } from '../useScreenPadding';
 
 /** ชื่อชนิดการ์ดเป็นภาษาไทย — เดิมเอาค่า type ดิบมาต่อกับคำว่า "Cards" */
 const TYPE_LABEL: Record<string, string> = {
@@ -33,6 +34,7 @@ type Props = {
 };
 
 export default function DeckView({ state, dispatch }: Props) {
+  const pad = useScreenPadding();
   if (!state.deckOpen) return null;
 
   const deck = state.masterDeck ?? [];
@@ -48,11 +50,11 @@ export default function DeckView({ state, dispatch }: Props) {
     <View style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimFull,
-      zIndex: 2000,
+      zIndex: layer.overlay,
     }}>
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        paddingHorizontal: space.xl, paddingTop: 56, paddingBottom: space.md,
+        paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,
       }}>
         <View>
           <Text style={{ color: palette.moon, fontSize: size.title, fontFamily: font.display }}>

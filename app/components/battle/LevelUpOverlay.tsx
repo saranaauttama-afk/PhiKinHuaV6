@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { CardData, GameState } from '../../../src/core/types';
 import CardRow from '../CardRow';
-import { palette, surface, tint, font, size, space } from '../../theme';
+import { palette, surface, tint, font, size, space, layer } from '../../theme';
 
 /**
  * หน้าเลือกรางวัลตอนเลเวลอัป
@@ -84,7 +84,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimHeavy,
       justifyContent: 'center', paddingHorizontal: 22,
-      zIndex: 1000,
+      zIndex: layer.overlay,
     }}>
       <Text style={{
         color: palette.moon, fontSize: 24, textAlign: 'center',

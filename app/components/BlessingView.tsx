@@ -14,7 +14,8 @@ import type { BlessingDef } from '../../src/core/types';
 import { groupBlessings } from '../../src/core/blessing/group';
 import Art from './Art';
 import { GameButton } from './Panel';
-import { font, palette, radius, size, space, surface } from '../theme';
+import { font, palette, radius, size, space, surface, layer } from '../theme';
+import { useScreenPadding } from '../useScreenPadding';
 
 type Props = {
   blessings?: BlessingDef[];
@@ -22,6 +23,7 @@ type Props = {
 };
 
 export default function BlessingView({ blessings, onClose }: Props) {
+  const pad = useScreenPadding();
   const list = blessings ?? [];
   const rows = groupBlessings(list);
 
@@ -29,11 +31,11 @@ export default function BlessingView({ blessings, onClose }: Props) {
     <View style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimFull,
-      zIndex: 2000,
+      zIndex: layer.overlay,
     }}>
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        paddingHorizontal: space.xl, paddingTop: 56, paddingBottom: space.md,
+        paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,
       }}>
         <View>
           <Text style={{ color: palette.moon, fontSize: size.title, fontFamily: font.display }}>

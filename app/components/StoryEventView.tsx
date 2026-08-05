@@ -11,7 +11,8 @@ import type { Command, GameState } from '../../src/core/types';
 import { getStoryEvent, choiceLocked } from '../../src/core/events/story';
 import Art from './Art';
 import Panel, { GameButton, Scrim } from './Panel';
-import { font, palette, radius, size, space, surface, tint } from '../theme';
+import { font, palette, radius, size, space, surface, tint, layer } from '../theme';
+import { useScreenPadding } from '../useScreenPadding';
 
 type Props = {
   state: GameState;
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export default function StoryEventView({ state, dispatch }: Props) {
+  const pad = useScreenPadding();
   const story = state.story;
   if (state.phase !== 'event' || !story) return null;
 
@@ -28,13 +30,13 @@ export default function StoryEventView({ state, dispatch }: Props) {
   const decided = story.result != null;
 
   return (
-    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: layer.overlay }}>
       <ImageBackground
         source={require('../../assets/scence/abandonedHut.png')}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <Scrim heavy style={{ padding: space.xl, paddingTop: 56 }}>
+        <Scrim heavy style={{ padding: space.xl, paddingTop: pad.top }}>
           <ScrollView contentContainerStyle={{ paddingBottom: 28 }}>
 
             <Text style={{

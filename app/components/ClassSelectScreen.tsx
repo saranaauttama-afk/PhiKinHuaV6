@@ -4,6 +4,7 @@ import { ALL_CLASS_IDS, CHARACTER_CLASSES, type ClassId } from '../../src/core/c
 import Art from './Art';
 import { GameButton } from './Panel';
 import { font, palette, size, space, surface } from '../theme';
+import { useScreenPadding } from '../useScreenPadding';
 
 /**
  * หน้าเลือกคลาสก่อนเริ่มรัน
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export default function ClassSelectScreen({ onPick, onBack }: Props) {
+  const pad = useScreenPadding();
   const [selected, setSelected] = React.useState<ClassId | null>(null);
 
   return (
@@ -28,7 +30,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <View style={{ flex: 1, backgroundColor: palette.scrim, paddingTop: 56, paddingHorizontal: 20 }}>
+        <View style={{ flex: 1, backgroundColor: palette.scrim, paddingTop: pad.top, paddingHorizontal: 20 }}>
           <Text style={{
             color: 'white', fontSize: 24, textAlign: 'center',
             fontFamily: 'Prompt_700Bold',

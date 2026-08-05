@@ -24,7 +24,7 @@ import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 import { useAppFonts } from './useAppFonts';
-import { palette, surface, tint } from './theme';
+import { palette, surface, tint, layer } from './theme';
 
 type Phase = 'player' | 'discard' | 'enemy';
 
@@ -241,7 +241,7 @@ export default function BattlePage() {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <View style={{ position: 'absolute', top: 30, right: 10, zIndex: 100 }}>
+        <View style={{ position: 'absolute', top: 30, right: 10, zIndex: layer.statusBar }}>
           <Pressable onPress={() => router.back()}>
             <Image
               source={require('../assets/images/btnDelete.png')}
@@ -257,7 +257,7 @@ export default function BattlePage() {
           <Pressable
             onPress={timeline.skip}
             style={{
-              position: 'absolute', top: 34, left: 14, zIndex: 600,
+              position: 'absolute', top: 34, left: 14, zIndex: layer.control,
               paddingHorizontal: 14, paddingVertical: 6,
               borderRadius: 14,
               backgroundColor: surface.glassDim,
@@ -298,7 +298,7 @@ export default function BattlePage() {
         {/* Enemy takes damage — ใกล้ monster */}
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', top: 280, left: 0, right: 0, alignItems: 'center', zIndex: 999 }}
+          style={{ position: 'absolute', top: 280, left: 0, right: 0, alignItems: 'center', zIndex: layer.popup }}
         >
           {enemyDamagePopups.map(popup => (
             <DamagePopup
@@ -312,7 +312,7 @@ export default function BattlePage() {
         {/* Player takes damage — ใกล้ Player HUD */}
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', bottom: 115, left: 0, right: 0, alignItems: 'center', zIndex: 999 }}
+          style={{ position: 'absolute', bottom: 115, left: 0, right: 0, alignItems: 'center', zIndex: layer.popup }}
         >
           {damagePopups.map(popup => (
             <DamagePopup
@@ -334,13 +334,13 @@ export default function BattlePage() {
         ))}
 
         {/* ผีที่เรียกมา — วางเหนือมือ ใต้ฉากกลาง ซ้ายของเรา ขวาของศัตรู */}
-        <View style={{ position: 'absolute', bottom: 210, left: 0, right: 0, zIndex: 200 }}>
+        <View style={{ position: 'absolute', bottom: 210, left: 0, right: 0, zIndex: layer.decor }}>
           <MinionRow minions={gameState.minions} />
         </View>
 
         {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้
             คอมโบอยู่เหนือขึ้นไปหนึ่งชั้น เพราะมันคือสิ่งที่กำลังจะเกิด ไม่ใช่สิ่งที่เป็นอยู่ */}
-        <View style={{ position: 'absolute', bottom: 118, left: 0, right: 0, zIndex: 200, gap: 4 }}>
+        <View style={{ position: 'absolute', bottom: 118, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
           {/* กับดักอยู่บนสุด เพราะมันคือสิ่งที่เราวางไว้แล้วรออยู่ */}
           <TrapRow traps={gameState.traps} />
           <ComboStrip state={gameState} />
@@ -376,7 +376,7 @@ export default function BattlePage() {
             onPress={() => setBlessingsOpen(true)}
             hitSlop={8}
             style={{
-              position: 'absolute', top: 34, right: 60, zIndex: 600,
+              position: 'absolute', top: 34, right: 60, zIndex: layer.control,
               paddingHorizontal: 10, paddingVertical: 4,
               borderRadius: 999,
               backgroundColor: tint.moonSoft,

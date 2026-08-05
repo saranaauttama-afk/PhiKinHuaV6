@@ -9,7 +9,7 @@ import { useAppFonts } from '../useAppFonts';
 import { loadAutoSaveSummary } from '../../src/core/storage';
 import type { SaveSummary } from '../../src/core/save';
 import { getClass } from '../../src/core/classes';
-import { font, palette, size, space, surface } from '../theme';
+import { font, palette, size, space, surface, layer } from '../theme';
 
 interface StartPageProps {
   onStartGame: () => void;
@@ -82,7 +82,7 @@ function StartPage({ onStartGame, onContinue }: StartPageProps) {
           backgroundColor: surface.glassDim,
         }} />
 
-        <View style={{ zIndex: 1, top: 150, alignItems: 'center', gap: space.xs }}>
+        <View style={{ zIndex: layer.badge, top: 150, alignItems: 'center', gap: space.xs }}>
           {/* เดินทางต่อมาก่อน — คนที่ค้างไว้กลับมาเพื่อสิ่งนี้ */}
           {canContinue && (
             <MenuButton
@@ -108,7 +108,7 @@ function StartPage({ onStartGame, onContinue }: StartPageProps) {
           )}
         </View>
 
-        <View style={{ position: 'absolute', bottom: 40, alignItems: 'center', zIndex: 1 }}>
+        <View style={{ position: 'absolute', bottom: 40, alignItems: 'center', zIndex: layer.badge }}>
           <Text style={{
             fontSize: size.label, color: palette.textFaint,
             fontFamily: font.ui,

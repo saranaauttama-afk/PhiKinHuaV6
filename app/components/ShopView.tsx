@@ -18,7 +18,8 @@ import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import FusionAltarView from './FusionAltarView';
 import Panel, { GameButton } from './Panel';
-import { font, palette, radius, size, space, surface, tint } from '../theme';
+import { font, palette, radius, size, space, surface, tint, layer } from '../theme';
+import { useScreenPadding } from '../useScreenPadding';
 
 interface ShopViewProps {
   state: GameState;
@@ -122,6 +123,7 @@ function Lead({ children }: { children: React.ReactNode }) {
 }
 
 export default function ShopView({ state, dispatch }: ShopViewProps) {
+  const pad = useScreenPadding();
   if (state.phase !== 'shop') return null;
   const kind = state.shopKind;
 
@@ -344,8 +346,9 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     <View style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimHeavy,
+      zIndex: layer.overlay,
     }}>
-      <ScrollView contentContainerStyle={{ padding: space.lg, paddingTop: 56, paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ padding: space.lg, paddingTop: pad.top, paddingBottom: pad.bottom + space.xl }}>
         {kind === 'card'            && cardShop()}
         {kind === 'equipment'       && equipmentShop()}
         {kind === 'remove'          && removeShop()}

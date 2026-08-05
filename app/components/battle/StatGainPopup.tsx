@@ -3,7 +3,7 @@ import { useWindowDimensions } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, Easing,
 } from 'react-native-reanimated';
-import { palette, surface, tint } from '../../theme';
+import { palette, surface, tint, layer } from '../../theme';
 
 type StatType = 'block' | 'energy';
 type Side     = 'player' | 'enemy';
@@ -67,7 +67,7 @@ export default function StatGainPopup({ amount, statType, side, onDone }: Props)
         textShadowColor: palette.scrimHeavy,
         textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3,
         pointerEvents: 'none',
-        zIndex: 999,
+        zIndex: layer.popup,
       }, animStyle]}>
         {icon}+{amount}
       </Animated.Text>
@@ -85,7 +85,7 @@ export default function StatGainPopup({ amount, statType, side, onDone }: Props)
       textShadowColor: palette.scrimHeavy,
       textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3,
       pointerEvents: 'none',
-      zIndex: 999,
+      zIndex: layer.popup,
     }, animStyle]}>
       {icon}+{amount}
     </Animated.Text>

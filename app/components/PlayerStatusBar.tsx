@@ -14,9 +14,18 @@
 import React from 'react';
 import { ImageBackground, Pressable, Text, View } from 'react-native';
 import type { GameState } from '../../src/core/types';
-import { palette, font, size, radius, tint } from '../theme';
+import { palette, font, size, radius, tint, layer } from '../theme';
 
 const PANEL_H = 170;
+const BOTTOM_GAP = 24;
+
+/**
+ * พื้นที่ที่แถบนี้กินไปจากก้นจอ
+ *
+ * หน้าไหนวางปุ่มหรือเนื้อหาไว้ล่างสุดต้องกันที่เท่านี้ — ปุ่ม "เดินต่อ" บนชั้นพัก
+ * เคยตั้ง `bottom: 96` ซึ่งอยู่ในแถบนี้พอดี โผล่มาแค่ขอบบนโค้งๆ กดไม่ได้
+ */
+export const STATUS_BAR_SPACE = PANEL_H + BOTTOM_GAP;
 
 /** พื้นที่ใช้งานจริงข้างในกรอบ วัดเป็นสัดส่วนจากไฟล์ bgUserPanel.png */
 const INNER = { top: 0.34, height: 0.44, left: 0.09, right: 0.09 };
@@ -86,10 +95,11 @@ export default function PlayerStatusBar({
       source={require('../../assets/images/bgUserPanel.png')}
       style={{
         position: 'absolute',
-        bottom: 24,
+        bottom: BOTTOM_GAP,
         left: 12,
         right: 12,
         height: PANEL_H,
+        zIndex: layer.statusBar,
       }}
       resizeMode="stretch"
     >

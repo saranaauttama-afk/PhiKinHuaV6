@@ -4,7 +4,7 @@ import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withDelay, withSequence, Easing,
 } from 'react-native-reanimated';
-import { palette, surface, tint } from '../../theme';
+import { palette, surface, tint, layer } from '../../theme';
 
 type Props = {
   onHome: () => void;
@@ -39,7 +39,7 @@ export default function DefeatOverlay({ onHome }: Props) {
     <Animated.View style={[{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimHeavy,
-      justifyContent: 'center', alignItems: 'center', zIndex: 500,
+      justifyContent: 'center', alignItems: 'center', zIndex: layer.battleOverlay,
     }, bgStyle]}>
       <Animated.View style={[{ alignItems: 'center' }, cardStyle]}>
 

@@ -11,7 +11,7 @@ import Animated, {
   runOnJS
 } from 'react-native-reanimated';
 import type { CardData } from '../../src/core/types';
-import { palette, surface, tint } from '../theme';
+import { palette, surface, tint, layer } from '../theme';
 
 interface CardProps {
   card: CardData;
@@ -184,7 +184,7 @@ export default function Card({
           height: 24,
           justifyContent: 'center',
           alignItems: 'center',
-          zIndex: 10,
+          zIndex: layer.badge,
         }}>
           <Image
             source={require('../../assets/images/players/iEnergy.png')}

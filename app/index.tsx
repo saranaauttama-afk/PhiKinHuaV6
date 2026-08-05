@@ -20,10 +20,11 @@ import JourneyTrail from './components/JourneyTrail';
 import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
 import BlessingView from './components/BlessingView';
-import PlayerStatusBar from './components/PlayerStatusBar';
+import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
 import { useRouter } from 'expo-router';
 import { screenForState, mapIsReady } from './screenRouter';
+import { useScreenPadding } from './useScreenPadding';
 import { onRestRow, restBudgetLeft } from '../src/core/map/restPage';
 import { nextRowPreview } from '../src/core/map/journeySync';
 import { palette, font, size, space } from './theme';
@@ -42,6 +43,7 @@ export default function Home() {
   const [blessingsOpen, setBlessingsOpen] = useState(false);
 
   const [fontsLoaded] = useAppFonts();
+  const pad = useScreenPadding();
 
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
@@ -206,7 +208,7 @@ export default function Home() {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <Scrim style={{ paddingTop: 46 }}>
+        <Scrim style={{ paddingTop: pad.top }}>
 
           {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
           <JourneyTrail state={state} />
@@ -221,7 +223,8 @@ export default function Home() {
             alignItems: 'center',
             gap: space.sm,
             paddingHorizontal: space.sm,
-            paddingBottom: 140,
+            // กันที่ให้แถบสถานะเป๊ะๆ — เดิมเดาไว้ 140 ซึ่งน้อยกว่าที่แถบกินจริง
+            paddingBottom: STATUS_BAR_SPACE + space.lg,
           }}>
             {offers.map((offer, i) => {
               // ช่องที่หมดของแล้วเป็น undefined — ข้ามไป ไม่ใช่วาดกรอบเปล่า
@@ -268,7 +271,11 @@ export default function Home() {
               เขียนว่าข้างหน้าเป็นอะไรด้วย เพราะแผนที่แบบเส้นทางรู้อยู่แล้ว
               ผู้เล่นควรตัดสินใจได้ว่าจะเก็บของต่อหรือพอ โดยรู้ว่าอีกก้าวจะเจอบอส */}
           {restRow && ahead && (
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom: 96, alignItems: 'center' }}>
+            <View style={{
+              position: 'absolute', left: 0, right: 0,
+              bottom: STATUS_BAR_SPACE + space.sm,
+              alignItems: 'center',
+            }}>
               <GameButton
                 label={`เดินต่อ → ${ahead.label}`}
                 tone={ahead.kind === 'boss' ? 'danger' : 'primary'}
