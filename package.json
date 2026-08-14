@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "test": "vitest run",
     "test:watch": "vitest",
-    "art:checklist": "vite-node scripts/art-checklist.ts"
+    "art:checklist": "vite-node scripts/art-checklist.ts",
+    "art:prompts": "vite-node scripts/art-prompts.ts"
   },
   "dependencies": {
     "@expo-google-fonts/chakra-petch": "^0.4.0",

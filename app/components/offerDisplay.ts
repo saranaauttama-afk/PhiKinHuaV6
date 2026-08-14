@@ -95,6 +95,10 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
         type: 'story_event',
         name: ev?.title ?? 'เหตุการณ์',
         description: 'มีบางอย่างเกิดขึ้นระหว่างทาง',
+        // เหตุการณ์แต่ละเรื่องมีช่องรูปของตัวเองอยู่แล้ว (`event/<id>`)
+        // เดิมขอ `encounter/story_event` ซึ่งไม่มีใน catalog — placeholder เลย
+        // ตกไปแสดง id ดิบเป็นภาษาอังกฤษบนการ์ดกลางหน้าแผนที่
+        artSlot: `event/${offer.eventId}`,
       };
     }
 

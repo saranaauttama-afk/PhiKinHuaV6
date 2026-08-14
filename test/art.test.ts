@@ -4,6 +4,9 @@ import * as path from 'node:path';
 import { ART_CATALOG, ART_BY_ID, artSlot } from '../src/art/catalog';
 import { THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
 import { ALL_CLASS_IDS } from '../src/core/classes';
+import { STORY_EVENTS } from '../src/core/events/story';
+import { restKinds } from '../src/core/map/journey';
+import { describeOffer } from '../app/components/offerDisplay';
 
 /**
  * ทะเบียนอาร์ต — ช่องรูปทั้งหมดที่เกมต้องการ อยู่ที่ `src/art/catalog.ts`
@@ -66,14 +69,38 @@ describe('catalog ครบและไม่ขัดกันเอง', () =>
   });
 
   it('ทุก slot ที่ describeOffer ใช้ มีอยู่ใน catalog', () => {
-    // ชนิด encounter ที่โผล่บนแผนที่ได้จริง (ไม่รวม monster/boss ที่ใช้ slot ของผี)
-    const kinds = [
-      'shop_card', 'shop_equipment', 'shop_remove', 'shop_upgrade',
-      'well', 'healing_shrine', 'treasure', 'treasure_single',
-    ];
+    // **ห้ามพิมพ์รายชื่อชนิดเองที่นี่** — ของเดิมเป็นลิสต์ที่เขียนด้วยมือ 8 ชนิด
+    // แล้วมันหลุดจากความจริง: `story_event` กับ `next_event` โผล่บนแผนที่ได้
+    // แต่ไม่อยู่ในลิสต์ เทสต์จึงเขียวทั้งที่การ์ดเหตุการณ์กลางหน้าแผนที่แสดง
+    // ข้อความ `encounter/story_event` เป็นภาษาอังกฤษให้ผู้เล่นเห็น
+    //
+    // ตอนนี้ถามจากของจริง: ชนิดโหนดพักมาจากตาราง `REST_WEIGHTS` ที่ใช้สร้าง
+    // แผนที่จริงๆ เพิ่มชนิดใหม่เข้าตารางแล้วเทสต์นี้จะทวงช่องรูปให้เอง
+    const kinds = [...restKinds(), 'next_event'];
     for (const k of kinds) {
+      // เหตุการณ์เล่าเรื่องใช้ช่องรูปของเรื่องนั้นๆ (`event/<id>`) ไม่ใช่ช่องรวม
+      if (k === 'story_event') continue;
       expect(artSlot(`encounter/${k}`), `encounter/${k}`).toBeDefined();
     }
+  });
+
+  it('ทุกเหตุการณ์เล่าเรื่องมีช่องรูปของตัวเอง', () => {
+    for (const e of STORY_EVENTS) {
+      expect(artSlot(`event/${e.id}`), `event/${e.id}`).toBeDefined();
+    }
+  });
+
+  it('การ์ดบนแผนที่ไม่แสดง id ดิบให้ผู้เล่นเห็น', () => {
+    // placeholder จะตกไปโชว์ id ดิบเมื่อ slot ที่ขอไม่มีใน catalog
+    // ผู้เล่นเห็นข้อความอย่าง `encounter/story_event` กลางการ์ด ซึ่งอ่านเป็นบั๊ก
+    const seen: string[] = [];
+    for (const e of STORY_EVENTS) {
+      const d = describeOffer(
+        { kind: 'story_event', shopId: 'x', eventId: e.id } as any, 0
+      );
+      if (!artSlot(d.artSlot)) seen.push(`${e.id} → ${d.artSlot}`);
+    }
+    expect(seen, `ช่องรูปที่ไม่มีใน catalog: ${seen.join(', ')}`).toEqual([]);
   });
 });
 
