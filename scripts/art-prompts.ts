@@ -25,11 +25,12 @@ const OUT = path.join(ROOT, 'docs', 'art-prompts.md');
  * ซึ่งแย่กว่าไม่มีรูป เพราะกลายเป็นภาพปะติดปะต่อ
  */
 const STYLE = [
-  'hand-painted storybook illustration',
-  'Thai rural folk-horror',
-  'muted desaturated palette of umber, olive and deep ink',
-  'single warm light source (moonlight or oil lamp)',
-  'soft painterly edges, visible brush texture',
+  'rough hand-drawn Thai one-baht horror comic print from the late 1980s to 1990s',
+  'expressive heavy uneven black ink outlines',
+  'flat fills in 4 to 5 faded colors',
+  'visible coarse halftone dots and slight print misregistration',
+  'simple local clothing and readable silhouettes',
+  'no cinematic lighting, no ornate fantasy details',
   'no text, no watermark, no signature',
 ].join(', ');
 
@@ -37,7 +38,8 @@ const STYLE = [
 const NEGATIVE = [
   'european fairytale', 'gothic castle', 'anime', 'chibi',
   '3d render', 'photorealistic', 'glossy plastic', 'neon colors',
-  'text', 'watermark', 'logo', 'signature', 'frame border',
+  'painterly concept art', 'cinematic lighting', 'ornate fantasy costume',
+  'smooth gradients', 'text', 'watermark', 'logo', 'signature', 'frame border',
 ].join(', ');
 
 /** คำเฉพาะทางผีไทยที่แปลตรงตัวแล้วเพี้ยน */
@@ -135,15 +137,15 @@ const GROUP_TITLE: Record<ArtSlot['group'], string> = {
 /** ของแถมเฉพาะกลุ่ม — ภาพคนละหน้าที่ต้องการองค์ประกอบคนละแบบ */
 const GROUP_EXTRA: Record<ArtSlot['group'], string> = {
   scene:     'full-bleed vertical background, subject small in frame, empty space in the middle third for UI',
-  class:     'single character, waist-up, facing viewer, plain dark background, transparent background',
-  monster:   'single creature, full body, plain dark background, transparent background',
-  boss:      'single imposing creature, full body, dramatic low angle, plain dark background, transparent background',
-  blessing:  'a single small object on plain dark ground, centred, icon-like, transparent background',
+  class:     'single full-body character, facing viewer, genuinely transparent background, no backdrop or halo',
+  monster:   'single creature, waist-up, genuinely transparent background, no backdrop or halo',
+  boss:      'single imposing creature, full body, genuinely transparent background, no backdrop or halo',
+  blessing:  'a single small object, centred, icon-like, genuinely transparent background',
   event:     'wide establishing shot of a place, no main character in frame',
   chapter:   'wide cinematic establishing shot, no main character in frame',
   node:      'flat symbolic icon, high contrast, centred in a circle, transparent background',
   encounter: 'a single place or object seen from a short distance, square composition',
-  minion:    'a small spirit companion, full body, plain dark background, transparent background',
+  minion:    'a small spirit companion, full body, genuinely transparent background, no backdrop or halo',
 };
 
 /** ช่องนี้ได้คำบรรยายตัวแบบจากตารางแปลไหม — ถ้าไม่ คำสั่งจะมีแต่สไตล์กับองค์ประกอบ */

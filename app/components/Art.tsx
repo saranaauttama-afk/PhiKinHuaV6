@@ -24,7 +24,13 @@ export const ART_SOURCES: Record<string, any> = {
   'scene/hut':    require('../../assets/scence/abandonedHut.png'),
   'scene/battle': require('../../assets/scence/battleScence1.png'),
 
+  'class/shaman': require('../../assets/classes/shaman.png'),
+  'class/warrior': require('../../assets/classes/warrior.png'),
+  'class/nun': require('../../assets/classes/nun.png'),
+  'class/medium': require('../../assets/classes/medium.png'),
+
   'monster/phi-krasue': require('../../assets/monsters/phi-krasue.png'),
+  'monster/phi-pop': require('../../assets/monsters/phi-pop.png'),
 
   'encounter/shop_card': require('../../assets/encounters/enShopCardMini.png'),
   'encounter/treasure':  require('../../assets/encounters/enTreasureOpenMini.png'),
