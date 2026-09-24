@@ -10,7 +10,7 @@
 
 ## รอบแรก
 
-เพิ่ม `assets/monsters/{phi-pop,nang-tanee,phi-nang-ram,phi-pong-kang}.png`, `assets/classes/{shaman,warrior,nun,medium}.png` และ `assets/scence/{rest,boss}.png` แล้วผูกไว้ใน `ART_SOURCES`. ภาพสร้างด้วย built-in imagegen; ตรวจ alpha และย่อเป็นขนาดตาม catalog ก่อนนำเข้า
+เพิ่ม `assets/monsters/{phi-pop,nang-tanee,phi-nang-ram,phi-pong-kang}.png`, `assets/classes/{shaman,warrior,nun,medium}.png` และ `assets/scence/{rest,boss}.jpg` แล้วผูกไว้ใน `ART_SOURCES`. ภาพสร้างด้วย built-in imagegen; ตรวจ alpha และย่อเป็นขนาดตาม catalog ก่อนนำเข้า
 
 ## Prompt หลัก
 

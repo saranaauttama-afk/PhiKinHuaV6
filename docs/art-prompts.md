@@ -108,7 +108,7 @@ an abandoned Thai temple hall with a tiered roof, full-bleed vertical background
 
 ### ✅ ฉากจุดพัก
 
-`assets/scence/rest.png` · 1080×1920px
+`assets/scence/rest.jpg` · 1080×1920px
 
 ```
 a small open roadside pavilion, full-bleed vertical background, subject small in frame, empty space in the middle third for UI. rough hand-drawn Thai one-baht horror comic print from the late 1980s to 1990s, expressive heavy uneven black ink outlines, flat fills in 4 to 5 faded colors, visible coarse halftone dots and slight print misregistration, simple local clothing and readable silhouettes, no cinematic lighting, no ornate fantasy details, no text, no watermark, no signature. --ar 9:16
@@ -118,7 +118,7 @@ a small open roadside pavilion, full-bleed vertical background, subject small in
 
 ### ✅ ฉากศึกบอส
 
-`assets/scence/boss.png` · 1080×1920px
+`assets/scence/boss.jpg` · 1080×1920px
 
 ```
 an abandoned Thai temple hall with a tiered roof, full-bleed vertical background, subject small in frame, empty space in the middle third for UI. rough hand-drawn Thai one-baht horror comic print from the late 1980s to 1990s, expressive heavy uneven black ink outlines, flat fills in 4 to 5 faded colors, visible coarse halftone dots and slight print misregistration, simple local clothing and readable silhouettes, no cinematic lighting, no ornate fantasy details, no text, no watermark, no signature. --ar 9:16

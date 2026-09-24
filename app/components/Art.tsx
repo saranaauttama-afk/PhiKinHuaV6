@@ -23,8 +23,8 @@ export const ART_SOURCES: Record<string, any> = {
   'scene/swamp':  require('../../assets/scence/swamp.png'),
   'scene/hut':    require('../../assets/scence/abandonedHut.png'),
   'scene/battle': require('../../assets/scence/battleScence1.png'),
-  'scene/rest': require('../../assets/scence/rest.png'),
-  'scene/boss': require('../../assets/scence/boss.png'),
+  'scene/rest': require('../../assets/scence/rest.jpg'),
+  'scene/boss': require('../../assets/scence/boss.jpg'),
 
   'class/shaman': require('../../assets/classes/shaman.png'),
   'class/warrior': require('../../assets/classes/warrior.png'),

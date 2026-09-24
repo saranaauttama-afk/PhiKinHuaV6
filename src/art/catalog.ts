@@ -56,8 +56,8 @@ const SCENES: ArtSlot[] = [
   { id: 'scene/swamp',   label: 'ฉากหนองน้ำ',       file: 'scence/swamp.png',          size: [1080, 1920], brief: 'หนองน้ำยามค่ำ หมอกลอย ใช้เป็นพื้นหลังหน้าแผนที่', group: 'scene' },
   { id: 'scene/hut',     label: 'ฉากกระท่อมร้าง',   file: 'scence/abandonedHut.png',   size: [1080, 1920], brief: 'กระท่อมไม้ร้างกลางทุ่ง ใช้เป็นพื้นหลังหน้าเหตุการณ์', group: 'scene' },
   { id: 'scene/battle',  label: 'ฉากต่อสู้',        file: 'scence/battleScence1.png',  size: [1080, 1920], brief: 'ลานดินหน้าวัด/ดงไม้ ใช้เป็นพื้นหลังหน้าต่อสู้', group: 'scene' },
-  { id: 'scene/rest',    label: 'ฉากจุดพัก',        file: 'scence/rest.png',           size: [1080, 1920], brief: 'ศาลาริมทาง กองไฟ ใช้เป็นพื้นหลังโหนดพักบนเส้นทาง', group: 'scene' },
-  { id: 'scene/boss',    label: 'ฉากศึกบอส',        file: 'scence/boss.png',           size: [1080, 1920], brief: 'โบสถ์ร้าง/ต้นไม้ใหญ่ตอนพระจันทร์เต็มดวง ใช้เฉพาะไฟต์บอส', group: 'scene' },
+  { id: 'scene/rest',    label: 'ฉากจุดพัก',        file: 'scence/rest.jpg',           size: [1080, 1920], brief: 'ศาลาริมทาง กองไฟ ใช้เป็นพื้นหลังโหนดพักบนเส้นทาง', group: 'scene' },
+  { id: 'scene/boss',    label: 'ฉากศึกบอส',        file: 'scence/boss.jpg',           size: [1080, 1920], brief: 'โบสถ์ร้าง/ต้นไม้ใหญ่ตอนพระจันทร์เต็มดวง ใช้เฉพาะไฟต์บอส', group: 'scene' },
 ];
 
 /** ภาพกลางการ์ด encounter บนหน้าแผนที่ (โหนดที่ไม่ใช่การต่อสู้) */
