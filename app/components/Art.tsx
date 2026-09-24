@@ -23,6 +23,8 @@ export const ART_SOURCES: Record<string, any> = {
   'scene/swamp':  require('../../assets/scence/swamp.png'),
   'scene/hut':    require('../../assets/scence/abandonedHut.png'),
   'scene/battle': require('../../assets/scence/battleScence1.png'),
+  'scene/rest': require('../../assets/scence/rest.png'),
+  'scene/boss': require('../../assets/scence/boss.png'),
 
   'class/shaman': require('../../assets/classes/shaman.png'),
   'class/warrior': require('../../assets/classes/warrior.png'),
@@ -31,6 +33,9 @@ export const ART_SOURCES: Record<string, any> = {
 
   'monster/phi-krasue': require('../../assets/monsters/phi-krasue.png'),
   'monster/phi-pop': require('../../assets/monsters/phi-pop.png'),
+  'monster/nang-tanee': require('../../assets/monsters/nang-tanee.png'),
+  'monster/phi-nang-ram': require('../../assets/monsters/phi-nang-ram.png'),
+  'monster/phi-pong-kang': require('../../assets/monsters/phi-pong-kang.png'),
 
   'encounter/shop_card': require('../../assets/encounters/enShopCardMini.png'),
   'encounter/treasure':  require('../../assets/encounters/enTreasureOpenMini.png'),

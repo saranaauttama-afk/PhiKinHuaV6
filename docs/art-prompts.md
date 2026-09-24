@@ -2,7 +2,7 @@
 
 สร้างจาก `src/art/catalog.ts` — อย่าแก้ไฟล์นี้ตรงๆ แก้ที่ catalog แล้วรัน `npm run art:prompts`
 
-ตอนนี้มีรูปแล้ว **12/94** ช่อง
+ตอนนี้มีรูปแล้ว **17/94** ช่อง
 
 ## ⚠️ ต้องเขียนคำบรรยายเอง
 
@@ -106,7 +106,7 @@ an abandoned Thai temple hall with a tiered roof, full-bleed vertical background
 
 > โจทย์เดิม: ลานดินหน้าวัด/ดงไม้ ใช้เป็นพื้นหลังหน้าต่อสู้
 
-### ⬜ ฉากจุดพัก
+### ✅ ฉากจุดพัก
 
 `assets/scence/rest.png` · 1080×1920px
 
@@ -116,7 +116,7 @@ a small open roadside pavilion, full-bleed vertical background, subject small in
 
 > โจทย์เดิม: ศาลาริมทาง กองไฟ ใช้เป็นพื้นหลังโหนดพักบนเส้นทาง
 
-### ⬜ ฉากศึกบอส
+### ✅ ฉากศึกบอส
 
 `assets/scence/boss.png` · 1080×1920px
 
@@ -190,7 +190,7 @@ Phi Pop — a gaunt villager possessed by an organ-eating spirit, single creatur
 
 > โจทย์เดิม: ผีที่เข้าสิงในคนเพื่อกินของสกปรก มีแรงเร้นกินเลือด — ครึ่งตัว หันหน้าเข้าหาผู้เล่น **PNG พื้นโปร่งเท่านั้น** โทนเดียวกับฉาก (ดินเผา-เขียวมะกอก ตัดไฟอุ่น) ไม่ใช่สีสดแบบการ์ตูน
 
-### ⬜ นางตานี
+### ✅ นางตานี
 
 `assets/monsters/nang-tanee.png` · 512×512px
 
@@ -200,7 +200,7 @@ Nang Tani — a pale woman in traditional green Thai silk haunting a wild banana
 
 > โจทย์เดิม: ผีหญิงสวยที่อยู่ในต้นกล้วย มักหลอกลวงคนให้หลงใหล — ครึ่งตัว หันหน้าเข้าหาผู้เล่น **PNG พื้นโปร่งเท่านั้น** โทนเดียวกับฉาก (ดินเผา-เขียวมะกอก ตัดไฟอุ่น) ไม่ใช่สีสดแบบการ์ตูน
 
-### ⬜ ผีนางรำ
+### ✅ ผีนางรำ
 
 `assets/monsters/phi-nang-ram.png` · 512×512px
 
@@ -210,7 +210,7 @@ the ghost of a Thai classical dancer in full costume and headdress, mid-pose, si
 
 > โจทย์เดิม: วิญญาณนักรำโบราณที่ยังคงเต้นรำในความมืด — ครึ่งตัว หันหน้าเข้าหาผู้เล่น **PNG พื้นโปร่งเท่านั้น** โทนเดียวกับฉาก (ดินเผา-เขียวมะกอก ตัดไฟอุ่น) ไม่ใช่สีสดแบบการ์ตูน
 
-### ⬜ ผีโป่งค่าง
+### ✅ ผีโป่งค่าง
 
 `assets/monsters/phi-pong-kang.png` · 512×512px
 
