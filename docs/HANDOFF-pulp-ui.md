@@ -1,4 +1,4 @@
-# Pulp UI — version 1.0.2
+# Pulp UI — delivered version 1.0.3
 
 User approved the visual overhaul on 2026-10-04. Balance is deferred. No changes to src/core or src/data.
 
@@ -43,3 +43,14 @@ The full native build at `733e4cf` (run 37192802625) passed audit/UI flow, but s
 
 ### Camera verification and final small-button adjustment
 Run 37194228647 (`a2b7f61`) passed audit and full Android UI smoke through victory/rewards/rest/event. Pre-choice scene pixel difference was 67.48 (threshold 3), confirming camera travel; source remained the lantern scene after fade. Cover/title/buttons visually passed. Card-preview buttons still showed an Android percentage-width sizing issue: the raster was narrower than its Pressable. Updated shared GameButton to measure the actual Pressable width and draw its background using numeric width. Latest smoke is scoped to cover/map/battle/card-preview/use because camera and flow code are unchanged; its result is pending.
+
+## Verified delivery — 2026-10-04
+
+Final UI implementation: `e40db28f7517c814faf353f688ba00abf705b15c`, branch `work/pulp-arrival-v3`.
+[Final APK and scoped Android layout smoke](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37195190241): **success**. TypeScript and all 543 tests passed. Downloaded actual APK and matched CI SHA256/CRC/embedded bundle. APK artifact `11301255315`, version 1.0.3/code 4, 82,084,371 bytes; SHA256 `a9be82508d264f071a56b9508c90831897bb8928af4b38bcb9b8e5d58da1f53b`.
+
+Android API 36 layout smoke launched, selected class/blessing, reached combat, previewed and used a real card. Visually reviewed final cover, card preview, small buttons and after-use screenshots: raster paper covers labels and buttons are readable. This final follow-up changed only shared button measurement, its test script/workflow, and documentation.
+
+The unchanged scene/flow implementation was fully smoke-tested at `a2b7f61` in [37194228647](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37194228647): victory before upgrades/reward, rest/event decisions, and next-location continuation. Pre-choice scene pixel difference **67.48** (gate >3); inspected before/during/after frames showing camera movement, and retained lantern scene after fade. Evidence artifact `11300920320` includes arrival video and frames. Final layout evidence artifact: `11300832154`.
+
+No physical-device playtest or human pacing/fun measurement is claimed. Balance, core and data are unchanged. Earlier pending statements above describe the iterations, not the final delivery.
