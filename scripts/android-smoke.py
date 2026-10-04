@@ -61,7 +61,7 @@ for turn in range(12):
         if has(root,'ชนะ!'): won=True;break
         assert not has(root,'ของที่เก็บได้'), 'Reward appeared before victory'
         assert not any(t.startswith('เลเวล ') for t in labels(root)), 'Upgrade appeared before victory'
-        if discard_if_needed(root): time.sleep(7);break
+        if discard_if_needed(root): time.sleep(.5);continue
         candidates=[n for n in root.iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc','')) and n.get('content-desc') not in attempted]
         candidates.sort(key=lambda n: 0 if re.search('ฟัน|ปรบ|สวน|เตะ|หมัด',n.get('content-desc','')) else 1)
         if not candidates:break
