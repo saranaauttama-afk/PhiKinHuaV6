@@ -191,3 +191,6 @@ export const pulpColors = {'selectedPaper': '#f2dba5', 'healthTrack': '#b8a17b',
 
 /** Pigments sampled from the ritual UI raster artwork. */
 export const ritualColors={chalk:"#f2e7ca",circle:"#b45139",current:"#d78161",label:"#edac8a",chalkWash:"rgba(242,231,202,.08)",shadow:"#110c07"} as const;
+
+/** Clean ivory text fields and coarse comic ink for character selection. */
+export const notebookColors = { paper: '#fff7e5', ink: '#171410', red: '#751c28', disabled: '#514c43' } as const;

@@ -1,147 +1,115 @@
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
-import { View, Text, Pressable, ScrollView, ImageBackground } from 'react-native';
+import { View, Text, Pressable, ScrollView, Image, StyleSheet, useWindowDimensions } from 'react-native';
 import { ALL_CLASS_IDS, CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
 import Art from './Art';
-import { GameButton } from './Panel';
-import { font, size, space } from '../theme';
+import { font, notebookColors as colors } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
-/**
- * หน้าเลือกคลาสก่อนเริ่มรัน
- *
- * เดิมเกมมีผู้เล่นแบบเดียว เด็คตั้งต้นชุดเดียว เล่นรอบสองได้ประสบการณ์เกือบเหมือนเดิม
- * คลาสคือสิ่งที่ทำให้เล่นซ้ำแล้วเกมเปลี่ยน — เด็คคนละแบบ ค่าสถานะคนละแบบ
- * และพรติดตัวที่เปลี่ยนวิธีเล่นทั้งรัน
- */
-
-type Props = {
-  onPick: (id: ClassId) => void;
-  onBack?: () => void;
+const panel = require('../../assets/ui/character-comic-panel.png');
+const summaries: Record<ClassId, string> = {
+  shaman: 'คาถา พิษ และของขลัง', warrior: 'ตั้งรับแน่น สวนกลับหนัก',
+  nun: 'ฟื้นเลือด ยืนระยะยาว', medium: 'เรียกวิญญาณมาช่วยต่อสู้',
 };
+type Props = { onPick: (id: ClassId) => void; onBack?: () => void };
 
+/** Live text stays on clean ivory; raster ink scenery belongs to the portrait. */
 export default function ClassSelectScreen({ onPick, onBack }: Props) {
   const pad = useScreenPadding();
+  const { width } = useWindowDimensions();
+  const pageWidth = Math.min(width - 24, 600);
   const [selected, setSelected] = React.useState<ClassId | null>(null);
-
+  const picked = selected ? CHARACTER_CLASSES[selected] : null;
   return (
-    <View style={{ flex: 1 }}>
-      <ImageBackground
-        source={require('../../assets/scence/episode-village.jpg')}
-        style={{ flex: 1 }}
-        resizeMode="cover"
-      >
-        <View style={{ flex: 1, backgroundColor: palette.scrim, paddingTop: pad.top, paddingHorizontal: 20 }}>
-      <PaperTexture />
-          <Text style={{
-            color: palette.text, fontSize: 24, textAlign: 'center',
-            fontFamily: 'Prompt_700Bold',
-          }}>
-            เลือกผู้เดินทาง
-          </Text>
-          <Text style={{
-            color: palette.textDim, fontSize: 14,
-            textAlign: 'center', marginTop: 4, marginBottom: 18,
-          }}>
-            แต่ละคนถือสำรับและวิชาคนละอย่าง
-          </Text>
-
-          <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
-            {ALL_CLASS_IDS.map(id => {
-              const c = CHARACTER_CLASSES[id];
-              const isOn = selected === id;
-              return (
-                <Pressable
-                  key={id}
-                  onPress={() => setSelected(id)}
-                  style={{
-                    padding: 16, borderRadius: 16,
-                    backgroundColor: isOn ? surface.panelRaise : surface.panelSunk,
-                    borderWidth: isOn ? 2 : 1,
-                    borderColor: isOn ? palette.lineStrong : palette.line,
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', gap: 12 }}>
-                    {/* ยังไม่มีภาพตัวละคร — <Art> วาง placeholder พร้อมโจทย์ภาพไว้ให้ */}
-                    <Art slot={`class/${id}`} width={72} compact />
-
-                    <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-                        <Text style={{ color: palette.moon, fontSize: 19, fontFamily: 'Prompt_700Bold' }}>
-                          {c.name}
-                        </Text>
-                        <Text style={{ color: palette.textFaint, fontSize: 13 }}>
-                          {c.title}
-                        </Text>
-                      </View>
-
-                      <Text style={{
-                        color: palette.textDim, fontSize: size.bodyLg,
-                        fontFamily: font.body, lineHeight: 25, marginTop: 6,
-                      }}>
-                        {c.desc}
-                      </Text>
-
-                      <View style={{ flexDirection: 'row', gap: 16, marginTop: 10 }}>
-                        <Stat label="พลังชีวิต" value={`${c.startHp}`} />
-                        <Stat label="พลังงาน" value={`${c.startEnergy}`} />
-                        <Stat label="ขนาดมือ" value={`${c.startHandSize}`} />
-                      </View>
+    <View style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
+      <View style={[styles.page, { width: pageWidth }]}>
+        <View style={styles.header}>
+          <Text accessibilityRole="header" style={styles.title}>เลือกผู้เดินทาง</Text>
+          <View style={styles.rule} />
+          <Text style={styles.subtitle}>แต่ละคนถือสำรับและวิชาคนละอย่าง</Text>
+        </View>
+        <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
+          {ALL_CLASS_IDS.map(id => {
+            const c = CHARACTER_CLASSES[id];
+            const isOn = selected === id;
+            return (
+              <Pressable key={id} accessibilityRole="button" accessibilityLabel={`เลือก${c.name}`}
+                accessibilityState={{ selected: isOn }} onPress={() => setSelected(id)}
+                style={[styles.record, { borderColor: isOn ? colors.red : colors.ink }]}>
+                <View collapsable={false} style={styles.recordBody}>
+                  <Image source={panel} resizeMode="stretch"
+                    style={{ position: 'absolute', width: pageWidth - 6, height: 156 }} />
+                  <View style={styles.portrait}>
+                    <Art slot={`class/${id}`} width={Math.max(76, pageWidth * .27)} height={142} compact />
+                  </View>
+                  <View style={styles.copy}>
+                    <View style={styles.nameRow}>
+                      <Text style={styles.name}>{c.name}</Text>
+                      <Text accessibilityLabel={isOn ? 'เลือกแล้ว' : undefined}
+                        style={[styles.check, { opacity: isOn ? 1 : 0 }]}>✓</Text>
+                    </View>
+                    <Text style={styles.description}>{summaries[id]}</Text>
+                    <View style={styles.statRule} />
+                    <View style={styles.stats}>
+                      <Stat label="ชีวิต" value={c.startHp} />
+                      <Stat label="พลังงาน" value={c.startEnergy} />
+                      <Stat label="มือ" value={c.startHandSize} />
                     </View>
                   </View>
-
-                  {isOn && (
-                    <View style={{
-                      marginTop: 12, paddingTop: 10,
-                      borderTopWidth: 1, borderTopColor: palette.line,
-                    }}>
-                      <Text style={{ color: palette.moon, fontSize: 14, fontFamily: 'Prompt_600SemiBold' }}>
-                        {c.passiveName}
-                      </Text>
-                      <Text style={{ color: palette.textDim, fontSize: 13, marginTop: 2 }}>
-                        {c.passiveDesc}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <View style={{ paddingVertical: 14, gap: 10 }}>
-            <Pressable
-              onPress={() => selected && onPick(selected)}
-              disabled={!selected}
-              style={{
-                alignSelf: 'center',
-                paddingHorizontal: 34, paddingVertical: 12, borderRadius: 14,
-                opacity: selected ? 1 : 0.4,
-                backgroundColor: surface.panelSunk,
-                borderWidth: 1, borderColor: palette.lineStrong,
-              }}
-            >
-              <Text style={{ color: palette.moon, fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
-                {selected ? 'ออกเดินทาง' : 'เลือกผู้เดินทางก่อน'}
-              </Text>
-            </Pressable>
-
-            {onBack && (
-              <Pressable onPress={onBack} style={{ alignSelf: 'center' }}>
-                <Text style={{ color: palette.textFaint, fontSize: 13 }}>◂ ย้อนกลับ</Text>
+                </View>
               </Pressable>
-            )}
-          </View>
+            );
+          })}
+          {picked && (
+            <View style={styles.details} accessibilityLiveRegion="polite">
+              <Text style={styles.detailTitle}>{picked.name} · {picked.title}</Text>
+              <Text style={styles.detailText}>{picked.desc}</Text>
+              <Text style={styles.detailTitle}>{picked.passiveName}</Text>
+              <Text style={styles.detailText}>{picked.passiveDesc}</Text>
+            </View>
+          )}
+        </ScrollView>
+        <View style={styles.footer}>
+          <Pressable accessibilityRole="button" accessibilityState={{ disabled: !selected }}
+            disabled={!selected} onPress={() => selected && onPick(selected)}
+            style={({ pressed }) => [styles.depart, { backgroundColor: selected ? colors.red : colors.disabled, opacity: pressed ? .85 : 1 }]}>
+            <Text style={styles.departLabel}>{selected ? 'ออกเดินทาง  →' : 'เลือกผู้เดินทางก่อน'}</Text>
+          </Pressable>
+          {onBack && <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
+            <Text style={styles.backLabel}>◂ ย้อนกลับ</Text>
+          </Pressable>}
         </View>
-      </ImageBackground>
+      </View>
     </View>
   );
 }
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-      <Text style={{ color: palette.textFaint, fontSize: 12 }}>{label}</Text>
-      <Text style={{ color: palette.text, fontSize: 15, fontFamily: 'Prompt_700Bold' }}>{value}</Text>
-    </View>
-  );
+function Stat({ label, value }: { label: string; value: number }) {
+  return <View style={styles.stat}><Text style={styles.statLabel}>{label}</Text><Text style={styles.statValue}>{value}</Text></View>;
 }
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.paper, alignItems: 'center' }, page: { flex: 1 },
+  header: { paddingHorizontal: 6, paddingBottom: 12 },
+  title: { color: colors.ink, fontFamily: font.display, fontSize: 28, textAlign: 'center' },
+  rule: { height: 3, backgroundColor: colors.red, marginHorizontal: 22, marginTop: 5 },
+  subtitle: { color: colors.ink, fontFamily: font.ui, fontSize: 12, textAlign: 'center', marginTop: 7 },
+  list: { flex: 1 }, listContent: { gap: 10, paddingBottom: 12 },
+  record: { borderWidth: 3, backgroundColor: colors.paper },
+  recordBody: { flexDirection: 'row', minHeight: 156, overflow: 'hidden' },
+  portrait: { width: '34%', alignItems: 'center', justifyContent: 'center', paddingVertical: 7 },
+  copy: { flex: 1, backgroundColor: colors.paper, marginVertical: 9, marginRight: 9, paddingHorizontal: 10, paddingVertical: 3 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  name: { color: colors.ink, fontFamily: font.display, fontSize: 23 },
+  check: { color: colors.red, fontFamily: font.display, fontSize: 22 },
+  description: { color: colors.ink, fontFamily: font.bodyBold, fontSize: 20, lineHeight: 22, marginTop: 3 },
+  statRule: { height: 1, backgroundColor: colors.ink, marginTop: 9, marginBottom: 5 },
+  stats: { flexDirection: 'row', justifyContent: 'space-between', gap: 3 },
+  stat: { alignItems: 'center' }, statLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 10 },
+  statValue: { color: colors.ink, fontFamily: font.display, fontSize: 21, lineHeight: 27 },
+  details: { borderLeftWidth: 4, borderColor: colors.red, paddingLeft: 12, paddingVertical: 6 },
+  detailTitle: { color: colors.ink, fontFamily: font.heading, fontSize: 14, marginTop: 4 },
+  detailText: { color: colors.ink, fontFamily: font.body, fontSize: 20, lineHeight: 24 },
+  footer: { paddingTop: 8 },
+  depart: { minHeight: 54, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: colors.ink },
+  departLabel: { color: colors.paper, fontFamily: font.display, fontSize: 20, textAlign: 'center' },
+  back: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  backLabel: { color: colors.ink, fontFamily: font.heading, fontSize: 14 },
+});
