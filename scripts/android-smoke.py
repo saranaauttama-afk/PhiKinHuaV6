@@ -100,6 +100,14 @@ for frame, delay in [('arrival-step-1', .1), ('arrival-step-2', .8), ('arrival-s
     time.sleep(delay)
     with open(out/(frame+'.png'),'wb') as f:
         subprocess.run(['adb','exec-out','screencap','-p'],stdout=f,check=True,timeout=20)
+# The two pre-choice frames must differ in the scene, not just the clock.
+from PIL import Image, ImageChops, ImageStat
+a=Image.open(out/'arrival-step-1.png').convert('RGB')
+b=Image.open(out/'arrival-step-2.png').convert('RGB')
+roi=(0,round(a.height*.1),a.width,round(a.height*.45))
+motion=sum(ImageStat.Stat(ImageChops.difference(a.crop(roi),b.crop(roi))).mean)
+assert motion>3, 'Scene stayed static during arrival: '+str(motion)
+(out/'camera-motion.txt').write_text('Pre-choice image difference: '+str(motion)+'\n')
 adb('shell','pkill','-2','screenrecord')
 recording.wait(timeout=15)
 adb('pull','/sdcard/arrival.mp4',str(out/'arrival.mp4'))

@@ -1,56 +1,51 @@
 import React from 'react';
-import { Animated, Easing, View, ImageSourcePropType, StyleSheet } from 'react-native';
+import { View, Image, ImageSourcePropType, StyleSheet } from 'react-native';
 import { pulpColors } from '../theme';
 import { useGameSettings } from './Settings';
 
-type Props = {
-  source: ImageSourcePropType;
-  sceneKey: string;
-  children: React.ReactNode;
-};
+type Props = { source: ImageSourcePropType; sceneKey: string; children: React.ReactNode };
+const WALK_MS = 2600;
+const FADE_MS = 450;
 
-/** Visual transition only; animation callbacks never change game state. */
+/** A presentation-only camera; no callbacks dispatch rewards or game commands. */
 export default function SceneArrival({ source, sceneKey, children }: Props) {
   const reducedMotion = useGameSettings(s => s.reducedMotion);
-  const progress = React.useRef(new Animated.Value(0)).current;
-  const fade = React.useRef(new Animated.Value(0)).current;
-  const [readyScene, setReadyScene] = React.useState<string | null>(null);
-  const ready = readyScene === sceneKey;
-
+  const [frame, setFrame] = React.useState({ key: '', elapsed: 0 });
   React.useEffect(() => {
-    setReadyScene(null);
-    progress.setValue(0);
-    fade.setValue(0);
-    const arrival = Animated.sequence([
-      Animated.timing(progress, { toValue: 1, duration: reducedMotion ? 0 : 2600, easing: Easing.linear, useNativeDriver: true }),
-      Animated.timing(fade, { toValue: 1, duration: reducedMotion ? 0 : 450, useNativeDriver: true }),
-    ]);
-    arrival.start(({ finished }) => { if (finished) setReadyScene(sceneKey); });
-    return () => arrival.stop();
-  }, [sceneKey, reducedMotion, progress, fade]);
-
+    if (reducedMotion) {
+      setFrame({ key: sceneKey, elapsed: WALK_MS + FADE_MS });
+      return;
+    }
+    let handle = 0;
+    let start: number | undefined;
+    setFrame({ key: sceneKey, elapsed: 0 });
+    const draw = (timestamp: number) => {
+      start ??= timestamp;
+      const elapsed = Math.min(timestamp - start, WALK_MS + FADE_MS);
+      // React commits the wrapper transform every frame. The previous native
+      // Animated.Image path stayed static on the tested Android/Fabric build.
+      setFrame({ key: sceneKey, elapsed });
+      if (elapsed < WALK_MS + FADE_MS) handle = requestAnimationFrame(draw);
+    };
+    handle = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(handle);
+  }, [sceneKey, reducedMotion]);
+  const elapsed = frame.key === sceneKey ? frame.elapsed : 0;
+  const travel = Math.min(elapsed / WALK_MS, 1);
+  const opacity = reducedMotion ? 1 : Math.max(0, Math.min((elapsed - WALK_MS) / FADE_MS, 1));
+  const ready = frame.key === sceneKey && (reducedMotion || elapsed >= WALK_MS + FADE_MS);
   return (
     <View style={{ flex: 1, overflow: 'hidden', backgroundColor: pulpColors.sceneInk }}>
-      {/* The image is outside the fading UI and keeps its final camera transform. */}
-      <Animated.Image
-        source={source}
-        resizeMode="cover"
-        style={[StyleSheet.absoluteFill, {
-          width: '100%', height: '100%',
-          transform: [
-            { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1.04, reducedMotion ? 1.04 : 1.28] }) },
-            { translateY: progress.interpolate({ inputRange: [0, .12, .25, .37, .5, .62, .75, .87, 1], outputRange: reducedMotion ? [0,0,0,0,0,0,0,0,0] : [0, 10, -8, 10, -8, 10, -8, 6, 0] }) },
-          ],
-        }]}
-      />
-      <Animated.View
-        pointerEvents={ready ? 'auto' : 'none'}
-        accessibilityElementsHidden={!ready}
-        importantForAccessibility={ready ? 'auto' : 'no-hide-descendants'}
-        style={{ flex: 1, opacity: fade }}
-      >
+      <View pointerEvents="none" style={[StyleSheet.absoluteFill, { transform: [
+        { scale: reducedMotion ? 1.04 : 1.04 + travel * .24 },
+        { translateY: reducedMotion ? 0 : Math.sin(travel * Math.PI * 8) * 10 * (1 - travel * .35) },
+      ] }]}>
+        <Image source={source} resizeMode="cover" style={{width:'100%',height:'100%'}} />
+      </View>
+      <View pointerEvents={ready ? 'auto' : 'none'} accessibilityElementsHidden={!ready}
+        importantForAccessibility={ready ? 'auto' : 'no-hide-descendants'} style={{flex:1,opacity}}>
         {children}
-      </Animated.View>
+      </View>
     </View>
   );
 }

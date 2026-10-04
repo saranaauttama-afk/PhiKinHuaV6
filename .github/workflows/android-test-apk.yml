@@ -1,7 +1,7 @@
 name: Android first chapter APK
 on:
   push:
-    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/pulp-arrival-v3']
+    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
