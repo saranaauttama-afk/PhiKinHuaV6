@@ -208,7 +208,7 @@ export default function Home() {
 
   return (
     <View style={{ flex: 1 }}>
-      <SceneArrival sceneKey={`${state.journey?.currentId??'start'}-${state.fightCount??0}`} source={restRow?require('../assets/scence/lantern-hut.jpg'):(state.fightCount??0)>=2?require('../assets/scence/boss.jpg'):require('../assets/scence/episode-village.jpg')}>
+      <SceneArrival sceneKey={`${state.journey?.currentId??'start'}-${state.fightCount??0}`} source={restRow?require('../assets/scence/lantern-hut.jpg'):(state.fightCount??0)>=2?require('../assets/scence/menu-haunted.jpg'):require('../assets/scence/episode-village.jpg')}>
         <Scrim style={{ paddingTop: pad.top }}>
 
           {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
