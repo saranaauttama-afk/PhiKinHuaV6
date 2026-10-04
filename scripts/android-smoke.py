@@ -72,7 +72,7 @@ if '--layout-only' in sys.argv:
     logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
     assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs)
     assert adb('shell','pidof',package).strip()
-    (out/'result.txt').write_text('PASS: scoped Android layout smoke — cover, character, prologue, map, battle, card preview and use. Full victory/event/camera smoke previously passed at a2b7f61; this follow-up changes only shared button sizing. Physical device not tested.\n')
+    (out/'result.txt').write_text('PASS: scoped Android layout smoke — cover, character, prologue, map, battle, card preview and use. Physical device not tested.\n')
     print((out/'result.txt').read_text());sys.exit(0)
 won=False;played=False
 for turn in range(12):
