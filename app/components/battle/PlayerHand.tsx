@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, Dimensions } from 'react-native';
+import { View, Text, Pressable, Dimensions, ScrollView } from 'react-native';
 import Card from '../Card';
 import { font, palette, surface, layer } from '../../theme';
 import { costWithRule } from '../../../src/core/cards/mechanics';
@@ -41,6 +41,8 @@ export default function PlayerHand({
   else if (count <= 5) spacing = 70;
   else spacing = Math.max(50, (screenWidth - 40) / (count + 1));
 
+  const wideHand = count > 5;
+  const canvasW = wideHand ? count * 118 + 24 : screenWidth;
   return (
     <View style={{
       position: 'absolute', bottom: 120,
@@ -57,9 +59,11 @@ export default function PlayerHand({
           <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={{ minHeight: 44, justifyContent: 'center' }}><Text style={{ fontFamily: font.ui, color: palette.text }}>ปิด</Text></Pressable>
         </View>
       </View>}
+      <ScrollView horizontal scrollEnabled={wideHand} showsHorizontalScrollIndicator={wideHand} style={{ width: screenWidth, height: 164 }} contentContainerStyle={{ width: canvasW, height: 164 }}>
+      <View style={{ width: canvasW, height: 164 }}>
       {cards.map((card, index) => {
         const offset = index - centerIndex;
-        const rotation = centerIndex !== 0 ? (offset / centerIndex) * maxRotation : 0;
+        const rotation = wideHand ? 0 : centerIndex !== 0 ? (offset / centerIndex) * maxRotation : 0;
         const xOffset = offset * spacing;
         const identifier = card.instanceId ?? card.id;
         const isPlayed = playedCardIds.includes(identifier);
@@ -74,7 +78,7 @@ export default function PlayerHand({
             style={{
               position: 'absolute',
               bottom: 0,
-              left: screenWidth / 2 + xOffset - 55,
+              left: wideHand ? 12 + index * 118 : screenWidth / 2 + xOffset - 55,
               transform: [{ rotate: `${rotation}deg` }],
               zIndex: hoveredCardId === identifier ? 999 : index,
             }}
@@ -95,6 +99,8 @@ export default function PlayerHand({
           </View>
         );
       })}
+      </View>
+      </ScrollView>
     </View>
   );
 }

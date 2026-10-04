@@ -13,6 +13,7 @@
 - Separate install identity `com.phikinhua.episode`, version 1.0.1 / code 2, signed standalone offline APK, ARM64+x86_64. Avoids collisions with the old app/signature/save data. Still uses the Expo test signing key; production key management is future work.
 - Authored three-fight route with two short rests, a visible objective, explicit risk/card/heal lantern decision, mutually exclusive healing/upgrade before a 54 HP finale, and a chapter ending. Episode HP: 30 / 36 / 54; finale enemy energy 3. Normal full-run rules remain behind the existing mode default.
 - Episode enemy card IDs are planned before player decisions and used unchanged at enemy turn. Damage estimates refresh after player debuffs, with UI stating limitations (block/status/traps).
+- Oversized hands scroll horizontally; vertical card drags yield to horizontal scrolling. Simulations include the UI's mandatory hand-size discard.
 - Hand cards support tap → readable details → explicit use, with drag still supported. Controls and ink frames restyled, contrast improved; existing class/monster illustrations reused.
 - Two imagegen assets created, checked and connected: village JPEG and transparent Krasue PNG. Chapter/event illustrations share the location; existing rest art is reused. See `first-night-art.md` for prompts.
 - Automatic save when entering combat now checkpoints the prior map decision rather than an entered node with combat state removed. Midcombat manual saves remain legacy behavior; use autosave to resume this episode safely. No claim of complete full-game save-system audit.

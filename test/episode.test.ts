@@ -41,6 +41,10 @@ function playFight(d: ReturnType<typeof driver>): number {
       d.go({ type: 'PlayCard', index: choices[0].index });
     }
     if (d.state.phase !== 'combat') break;
+    // Mirror the UI's mandatory discard before ending an oversized hand.
+    while (d.state.piles.hand.length > d.state.player.maxHandSize) {
+      d.go({ type: 'DiscardCard', index: d.state.piles.hand.length - 1 });
+    }
     d.go({ type: 'ResolveEnemyTurn' });
     if (d.state.phase === 'combat') d.go({ type: 'StartPlayerTurn' });
     turns++;

@@ -101,6 +101,8 @@ export default function Card({
   };
 
   const panGesture = Gesture.Pan()
+    .activeOffsetY([-10, 10])
+    .failOffsetX([-20, 20])
     .onBegin(() => {
       'worklet';
       // Lift the card — dragOffsetY handles finger follow independently
