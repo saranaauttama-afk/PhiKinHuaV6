@@ -22,9 +22,15 @@
 
 ## Verification at implementation time
 
-- All 534 tests passed (31 files). Typecheck and Android/web export are checked before the implementation commit; final results below are updated after CI.
+- All 534 tests passed (31 files), locally and in final CI. Typecheck passed. Android export passed during implementation; final native prebuild/assembleRelease and web export passed.
+- Web UI automation at 412×915 passed: cover, character selection, prologue, starter blessing, map, card preview/use and next turn; no page errors. Initial missing Thai fallback glyphs were a browser-environment issue, resolved by providing its system font configuration with the repository's Prompt font, without a game-code change.
 - Emulator and physical-device results are separate: no physical device has been tested by the assistant.
-- CI build/install/UI smoke: pending the implementation push. Do not infer success from this document until the actual run status is recorded.
+- Final tested implementation commit: `c461ec5e004f9abc558c3d3e3c7d7f94dc1ad48b` (episode implementation parent `ba0a2a30f4577d85a2597572a71564ef2d15bde1`). Documentation-only follow-up does not change APK code.
+- Final Actions run [37172630069](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37172630069): **success**, both Android build/audit and emulator jobs.
+- APK artifact `11291479213`, audit artifact `11291908580`, emulator evidence artifact `11291534344`. Downloaded/extracted the actual APK, matched CI SHA256, and repeated metadata/offline bundle/64-bit ELF+ZIP checks locally.
+- Actual APK: `PhiKinHua-FirstNight-v1.0.1.apk`, 82,892,319 bytes, SHA256 `1cd2716bbff9ff098eeb29c095ddb741afbb88951311330d4769aa4240a2baf9`; package `com.phikinhua.episode`, version 1.0.1 / code 2, minSDK 24, targetSDK 36, ARM64+x86_64. apksigner verified v2 signature; certificate SHA256 matches the test key listed in the audit. zipalign and 16 KB native checks passed.
+- Real automated API 36 (Android 16) x86_64 emulator: APK installed and launched; chose shaman, skipped prologue, chose blessing/Pop, opened card preview, used a card and completed an enemy turn. Process remained alive; smoke logcat checks found no fatal exception/JS bundle failure/ANR. Downloaded and visually inspected cover, map, fight, card preview and next-turn screenshots: Thai text and main controls visible, preview readable, oversized hand displayed as a horizontal strip.
+- Scope of emulator proof is the first fight only; the complete three-fight ending/rewards are covered by engine simulations, not an end-to-end Android UI run. No ARM64 or physical-device installation/playthrough has been performed. Human 5–10 minute duration and enjoyment remain unmeasured.
 
 ## Remaining user playtest
 
