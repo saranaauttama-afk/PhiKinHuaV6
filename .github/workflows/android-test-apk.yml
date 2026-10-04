@@ -1,7 +1,7 @@
 name: Android first chapter APK
 on:
   push:
-    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui']
+    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/pulp-arrival-v3']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -21,6 +21,7 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
+      - run: python -m pip install Pillow
       - run: npm ci
       - run: npm test
       - run: npx tsc --noEmit
@@ -38,13 +39,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='4' versionName='1.0.3'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FirstNight-v1.0.3.apk
-          sha256sum PhiKinHua-FirstNight-v1.0.3.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='5' versionName='1.0.4'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FirstNight-v1.0.4.apk
+          sha256sum PhiKinHua-FirstNight-v1.0.4.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FirstNight-APK
-          path: PhiKinHua-FirstNight-v1.0.3.apk
+          path: PhiKinHua-FirstNight-v1.0.4.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -73,8 +74,8 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FirstNight-v1.0.3.apk
-            python scripts/android-smoke.py
+            adb install PhiKinHua-FirstNight-v1.0.4.apk
+            timeout 900 python -u scripts/android-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

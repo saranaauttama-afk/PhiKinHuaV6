@@ -13,7 +13,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { CardData } from '../../src/core/types';
 import { palette, surface, tint, layer, font } from '../theme';
-import Paper,{paper} from './Paper';
+import {paper} from './Paper';
+import RitualSurface from './RitualSurface';
 import InkIcon from './InkIcon';
 
 interface CardProps {
@@ -170,13 +171,13 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <Paper style={{width:'100%',height:'100%',padding:7,paddingTop:10,backgroundColor:selected?pulpColors.selectedPaper:paper.bg,borderWidth:selected?2:1,borderColor:selected?paper.red:paper.line,opacity:disabled?.68:1}}>
+      <RitualSurface kind="palm" style={{width:'100%',height:'100%',padding:7,paddingTop:10,borderWidth:selected?2:0,borderColor:selected?paper.red:paper.line,opacity:disabled?.68:1}}>
         <View style={{position:'absolute',top:4,left:4,width:25,height:25,borderRadius:13,backgroundColor:paper.ink,alignItems:'center',justifyContent:'center',zIndex:layer.badge}}><Text style={{color:paper.light,fontFamily:font.heading,fontSize:14}}>{costNow??card.cost}</Text></View>
-        <View style={{alignItems:'center',justifyContent:'center',height:height*.27,marginTop:8,borderBottomWidth:1,borderColor:paper.line}}><InkIcon name={card.type==='attack'?'attack':card.type==='equipment'?'gold':card.type==='trap'?'block':'blessing'} size={height*.21} color={card.type==='attack'?paper.red:paper.ink}/></View>
+        <View style={{alignItems:'center',justifyContent:'center',height:height*.27,marginTop:8,borderBottomWidth:1,borderColor:paper.line}}><Image accessible={false} source={/มีด|ฟัน|แทง|โจมตี|หมัด|เตะ|สวน|ปรบ/.test(card.name)?require('../../assets/ui/ritual-knife.png'):/ผ้า|ยันต์|เกราะ|ตั้ง/.test(card.name)?require('../../assets/ui/ritual-cloth.png'):/หม้อ|ผนึก|วิญญาณ/.test(card.name)?require('../../assets/ui/ritual-jar.png'):require('../../assets/ui/ritual-palm.png')} resizeMode="contain" style={{width:height*.25,height:height*.23}}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:width>130?17:11,lineHeight:width>130?24:14,color:paper.ink,textAlign:'center',marginTop:6}}>{card.name}</Text>
         <Text numberOfLines={width>130?8:2} style={{fontFamily:font.body,fontSize:width>130?23:16,lineHeight:width>130?26:16,color:paper.muted,textAlign:'center',marginTop:4}}>{card.desc}</Text>
         {card.exhaust&&<Text style={{position:'absolute',bottom:4,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:9}}>ใช้แล้วหาย</Text>}
-      </Paper>
+      </RitualSurface>
       </Animated.View>
     </GestureDetector>
   );

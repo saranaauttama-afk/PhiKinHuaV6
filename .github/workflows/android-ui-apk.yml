@@ -1,7 +1,7 @@
 name: Android parchment UI patch APK
 on:
   push:
-    branches: ['work/pulp-ui-fix', 'work/pulp-arrival-v3']
+    branches: ['work/pulp-ui-fix']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:

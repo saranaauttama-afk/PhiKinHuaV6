@@ -1,0 +1,18 @@
+# Ritual map and battle UI — v1.0.4
+
+Approved 2026-10-04. Scope: map/encounter selection and combat. Character notebook redesign remains backlog issue #2; not implemented here. Balance/core/data unchanged.
+
+## Visual system
+- Chalk route on battered timber-framed slate with red current-location circle.
+- Ghost choices are torn notice sheets with ink portraits and red seal/fingerprints.
+- Map player stats on frayed protective cloth with sacred thread.
+- Monster health/stats on dark scratched wood, cream text.
+- Player hand uses bound palm-leaf manuscript texture, ritual knife/cloth/pot artwork where the card name matches those motifs; other spells use manuscript artwork. Names/descriptions/costs remain live text; these are presentation motifs, not new card mechanics.
+- Card preview uses protective cloth; combat HUD uses slate; end turn is a sacred-thread spirit pot with press tilt and label. Enemy turn disables it as before.
+- Raised hand/preview anchor reserves space for the taller pot HUD.
+
+Assets: `assets/ui/ritual-{slate,palm,wood,cloth,notice,jar,knife}.png`, generated with built-in imagegen, real alpha, cropped/resized/palette PNG. Prompts: single isolated UI object; bold coarse ink/halftone vintage Thai one-baht ghost comic; muted charcoal/ochre/ivory/vermilion; no writing; blank centers for slate/wood/cloth/notice/palm; frayed/torn edges and sparse dried red stains. Jar wrapped in sacred thread and knife with carved wooden handle. Full prompts saved in `docs/ritual-asset-prompts.json`.
+
+Native raster surfaces use measured numeric dimensions to avoid previously observed Android intrinsic Image sizing errors. Live labels/accessibility remain intact. App 1.0.4/code5, same package and signing. Assets require a full native build, never JS-only repack against the old asset baseline.
+
+Validation: local TypeScript check and all 543 tests passed (2 workers; initial parallel run had an unrelated long simulation timeout). Full Android build, audit, UI smoke and visual screenshot review pending.

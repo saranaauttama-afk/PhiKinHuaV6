@@ -188,3 +188,6 @@ export const paperPalette = {
 export const paperSurface={panel:paper.light,panelRaise:'#efdfb4',panelSunk:'#d4be91',panelDim:'#d1be9c',panelWell:'#cfb889',panelDeep:'#cbb280',panelActive:'#e7c88d',glass:'#c5ae82',glassDim:'#d1bc96'} as const;
 
 export const pulpColors = {'selectedPaper': '#f2dba5', 'healthTrack': '#b8a17b', 'routeCurrent': '#e6b963', 'primaryPaper': '#e8c77b', 'pressedPaper': '#c1a675', 'expTrack': '#b7a17b', 'expFill': '#705231', 'sceneInk': '#14100a', 'switchOff': '#998566', 'switchOn': '#7b4b28', 'lanternGlow': '#bc793c', 'enemyBack': '#453126', 'enemyInk': '#bda16d', 'bone': '#e8dcc0', 'black': '#000', 'paperEdge': '#917448', 'paperSpeck': '#725436', 'paperWear': '#886a3d', 'storySceneShade': 'rgba(12,9,5,.2)', 'storyTextShade': 'rgba(12,9,5,.78)', 'loadingShade': 'rgba(12,9,5,.25)', 'mapShade': 'rgba(12,9,5,.32)', 'settingsShade': 'rgba(12,9,5,.95)', 'menuShade': 'rgba(12,9,5,.15)', 'eventTextShade': 'rgba(12,9,5,.76)'} as const;
+
+/** Pigments sampled from the ritual UI raster artwork. */
+export const ritualColors={chalk:"#f2e7ca",circle:"#b45139",current:"#d78161",label:"#edac8a",chalkWash:"rgba(242,231,202,.08)",shadow:"#110c07"} as const;

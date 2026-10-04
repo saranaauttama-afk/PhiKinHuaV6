@@ -10,7 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
 import Art from '../Art';
-import Paper,{paper} from '../Paper';
+import {paper} from '../Paper';
+import RitualSurface,{chalk} from '../RitualSurface';
 import InkIcon,{type InkSymbol} from '../InkIcon';
 import HealthBar from '../HealthBar';
 import StatusStrip from './StatusStrip';
@@ -94,7 +95,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
       </Animated.View>
 
-      <Paper style={{width:250,padding:10,marginTop:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName}/></Paper>
+      <RitualSurface kind="wood" style={{width:270,paddingHorizontal:20,paddingVertical:13,marginTop:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/></RitualSurface>
       {/* ไม่มีป้ายบอกท่าล่วงหน้าแล้ว — ศัตรูตัดสินใจตอนถึงตาของตัวเอง
           ผู้เล่นรู้ว่าโดนอะไรตอนที่โดนจริง
 
@@ -105,19 +106,19 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <StatusStrip effects={enemy?.statusEffects} compact />
       </View>
 
-      {enemy && <Paper style={{ flexDirection: 'row', gap: 16, padding: 8, marginTop: 4 }}>
+      {enemy && <RitualSurface kind="wood" style={{ flexDirection: 'row', gap: 16, paddingHorizontal: 18, paddingVertical: 10, marginTop: 4 }}>
         <EnemyStatItem icon="block" label="เกราะ" value={`${enemy.block ?? 0}`} />
         {enemy.maxEnergy != null && <EnemyStatItem icon="energy" label="พลัง" value={`${enemy.maxEnergy}`} />}
         {enemy.handSize != null && <EnemyStatItem icon="hand" label="มือ" value={`${enemy.handSize}`} />}
-      </Paper>}
+      </RitualSurface>}
     </View>
   );
 });
 
 function EnemyStatItem({ icon, label, value }: { icon: InkSymbol; label: string; value: string }) {
   return <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-    <InkIcon name={icon} size={20} color={paper.red} />
-    <Text style={{ color: paper.ink, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>{label} {value}</Text>
+    <InkIcon name={icon} size={20} color={chalk} />
+    <Text style={{ color: chalk, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>{label} {value}</Text>
   </View>;
 }
 
