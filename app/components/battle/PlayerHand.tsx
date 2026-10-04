@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Dimensions } from 'react-native';
+import { View, Text, Pressable, Dimensions } from 'react-native';
 import Card from '../Card';
+import { font, palette, surface, layer } from '../../theme';
 import { costWithRule } from '../../../src/core/cards/mechanics';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -27,6 +28,10 @@ export default function PlayerHand({
   cards, playedCardIds, hoveredCardId, energy,
   cardsPlayedThisTurn = 0, onPlayCard, onHoverChange,
 }: Props) {
+  const [selected, setSelected] = React.useState<string | null>(null);
+  const previewIndex = cards.findIndex(c => (c.instanceId ?? c.id) === selected);
+  const preview = cards[previewIndex];
+  const previewCost = preview ? costWithRule(preview as any, cardsPlayedThisTurn) : 0;
   const count = cards.length;
   const maxRotation = Math.min(25, count * 2.5);
   const centerIndex = (count - 1) / 2;
@@ -42,6 +47,16 @@ export default function PlayerHand({
       left: 0, right: 0, height: 160,
       alignItems: 'center', justifyContent: 'flex-end',
     }}>
+      {preview && <View style={{ position: 'absolute', bottom: 174, left: 16, right: 16, zIndex: layer.control, backgroundColor: surface.panelRaise, borderWidth: 3, borderColor: palette.ink, padding: 12, gap: 6 }}>
+        <Text style={{ fontFamily: font.heading, color: palette.moon, fontSize: 17 }}>{preview.name} · พลัง {previewCost}</Text>
+        <Text style={{ fontFamily: font.ui, color: palette.text, fontSize: 14 }}>{preview.desc}</Text>
+        <View style={{ flexDirection: 'row', gap: 16 }}>
+          <Pressable accessibilityRole="button" disabled={previewCost > energy} onPress={() => { onPlayCard(preview, previewIndex); setSelected(null); }} style={{ minHeight: 44, paddingHorizontal: 16, justifyContent: 'center', backgroundColor: palette.paperDeep, opacity: previewCost > energy ? 0.4 : 1 }}>
+            <Text style={{ fontFamily: font.heading, color: palette.text }}>{previewCost > energy ? 'พลังไม่พอ' : 'ใช้การ์ด'}</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={{ minHeight: 44, justifyContent: 'center' }}><Text style={{ fontFamily: font.ui, color: palette.text }}>ปิด</Text></Pressable>
+        </View>
+      </View>}
       {cards.map((card, index) => {
         const offset = index - centerIndex;
         const rotation = centerIndex !== 0 ? (offset / centerIndex) * maxRotation : 0;
@@ -68,7 +83,8 @@ export default function PlayerHand({
               card={card as any}
               width={110}
               height={140}
-              onPress={() => {}}
+              onPress={() => setSelected(selected === identifier ? null : identifier)}
+              selected={selected === identifier}
               onDragPlay={() => onPlayCard(card, index)}
               onHoverChange={(isHovered: boolean) => onHoverChange(card, isHovered)}
               isPlayed={isPlayed}

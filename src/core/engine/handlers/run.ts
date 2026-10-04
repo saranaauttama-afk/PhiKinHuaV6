@@ -3,6 +3,7 @@ import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { baseNewState } from '../../commands';
 import { rollTwoBlessings } from '../../level';
+import { EPISODE } from '../../balance/episode';
 import { START_ENERGY } from '../../balance/core';
 import { initPageMap } from '../../map/pages';
 import { startJourney } from '../../map/journeySync';
@@ -137,6 +138,8 @@ export function newRun(
   r: RNG
 ) {
   s = baseNewState(cmd.seed);
+  s.runMode = cmd.runMode ?? 'full';
+  if (s.runMode === 'episode') s.player.gold = EPISODE.startingGold;
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };
@@ -185,6 +188,9 @@ export function newRun(
   // บทเปิดเรื่องของคลาส — ขึ้นก่อนหน้าเลือกพร เพื่อให้รู้ว่ากำลังเล่นเป็นใคร
   // และออกเดินทางเพราะอะไร ก่อนจะถูกถามว่าจะเอาพรอะไรติดตัว
   fireChapter(s, { kind: 'prologue', classId: cls.id });
+  if (s.runMode === 'episode') {
+    s.chapter = { id: 'episode_open', paragraph: 0 };
+  }
 
   return { state: s, rng: r };
 }

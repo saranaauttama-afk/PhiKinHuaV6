@@ -26,7 +26,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={require('../../assets/scence/swamp.png')}
+        source={require('../../assets/scence/episode-village.jpg')}
         style={{ flex: 1 }}
         resizeMode="cover"
       >

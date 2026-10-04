@@ -38,8 +38,8 @@ export const palette = {
 
   // ── ตัวอักษร
   text:       '#e8dcc0',   // สีกระดูก อ่านบนพื้นมืด
-  textDim:    'rgba(232,220,192,0.62)',
-  textFaint:  'rgba(232,220,192,0.36)',
+  textDim:    'rgba(232,220,192,0.82)',
+  textFaint:  'rgba(232,220,192,0.64)',
 
   // ── เส้นขอบ
   line:       'rgba(201,171,95,0.26)',
@@ -123,7 +123,7 @@ export const space = {
 } as const;
 
 export const radius = {
-  sm: 8, md: 12, lg: 16, pill: 999,
+  sm: 3, md: 4, lg: 5, pill: 999,
 } as const;
 
 /**

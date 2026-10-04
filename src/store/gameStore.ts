@@ -25,7 +25,7 @@ type Store = {
   state: GameState;
   rng: RNG;
   dispatch: (cmd: Command) => void;
-  newRun: (seed: string, classId?: ClassId) => void;
+  newRun: (seed: string, classId?: ClassId, runMode?: 'episode' | 'full') => void;
   saveToSlot: (slot: number) => Promise<void>;
   loadFromSlot: (slot: number) => Promise<void>;
   continueRun: () => Promise<boolean>;
@@ -66,16 +66,19 @@ export const useGame = create<Store>((set, get) => ({
     }
 
     if (shouldAutoSave(cmd.type)) {
-      setTimeout(() => autoSave(result.state), 100);
+      // Combat saves resume at the last map decision, before entering the node.
+      // Saving the entered node with dropped combat state could skip/mismatch a fight.
+      const checkpoint = cmd.type === 'ChooseOffer' && result.state.phase === 'combat' ? state : result.state;
+      setTimeout(() => autoSave(checkpoint), 100);
     }
   },
 
-  newRun: (seed: string, classId?: ClassId) => {
+  newRun: (seed: string, classId?: ClassId, runMode: 'episode' | 'full' = 'full') => {
     // ต้องผ่านคำสั่ง NewRun จริง ไม่ใช่สร้าง state เปล่าเอง
     // เดิมตั้ง phase เป็น 'menu' ตรงๆ ทำให้ข้ามการเซ็ตอัพรันทั้งหมด
     // (เด็คตั้งต้น, pages, พรตั้งต้น) หน้าเลือกพรจึงไม่มีทางขึ้น
     const newRng = makeRng(seed);
-    const result = applyCommand(makeEmptyState(), { type: 'NewRun', seed, classId }, newRng);
+    const result = applyCommand(makeEmptyState(), { type: 'NewRun', seed, classId, runMode }, newRng);
     set({ state: result.state, rng: result.rng });
   },
 

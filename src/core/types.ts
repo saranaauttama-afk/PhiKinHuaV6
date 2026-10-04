@@ -252,6 +252,7 @@ export type GameState = {
 
   /** คลาสที่ผู้เล่นเลือกไว้ตอนเริ่มรัน — กำหนดเด็ค ค่าสถานะ และพรติดตัว */
   classId?: import('./classes').ClassId;
+  runMode?: 'episode' | 'full';
 
   /** ศัตรูจะทำอะไรเทิร์นหน้า — UI แสดงระหว่างเทิร์นผู้เล่น */
   enemyIntent?: EnemyIntent;
@@ -429,7 +430,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; classId?: import('./classes').ClassId }
+  | { type: 'NewRun'; seed: string; classId?: import('./classes').ClassId; runMode?: 'episode' | 'full' }
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }
 

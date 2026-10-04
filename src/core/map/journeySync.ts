@@ -11,6 +11,7 @@ import {
   appendRows, planSecretRows, rowIsRest,
 } from './journey';
 import type { JourneyNode } from './journey';
+import { buildEpisode } from './episode';
 import { initPageMap } from './pages';
 import { THAI_GHOST_POOLS, getMonsterById } from '../monsters/thai-ghosts';
 import { pickFrom } from '../rngState';
@@ -27,7 +28,7 @@ export function startJourney(s: GameState, r: RNG): RNG {
     const init = initPageMap(r); r = init.rng;
     s.pages = init.map;
   }
-  const out = buildJourney(r);
+  const out = s.runMode === 'episode' ? { journey: buildEpisode(), rng: r } : buildJourney(r);
   s.journey = out.journey;
   syncOffersFromJourney(s);
   return out.rng;
@@ -140,7 +141,7 @@ export function enterNode(s: GameState, ix: number): JourneyNode | undefined {
   const node = nodeForOfferIndex(s, ix);
   if (!node || !s.journey) return undefined;
 
-  if (rowIsRest(s.journey, node.row)) {
+  if (rowIsRest(s.journey, node.row) && s.runMode !== 'episode') {
     node.visited = true;
     return node;
   }

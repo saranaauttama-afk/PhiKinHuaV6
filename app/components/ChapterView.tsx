@@ -61,7 +61,7 @@ export default function ChapterView({ state, dispatch }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={require('../../assets/scence/swamp.png')}
+        source={require('../../assets/scence/episode-village.jpg')}
         style={{ flex: 1 }}
         resizeMode="cover"
       >

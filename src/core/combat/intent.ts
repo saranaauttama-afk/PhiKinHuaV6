@@ -67,3 +67,14 @@ export function planEnemyIntent(s: GameState): void {
       : 'wait',
   };
 }
+
+/** Refresh numeric hints after debuffs without changing committed cards. */
+export function refreshIntentEstimate(s: GameState): void {
+  if (!s.enemyIntent) return;
+  s.enemyIntent.damage = s.enemyIntent.cardIds.reduce((sum, id) => {
+    const c = enemyCardById(id);
+    return sum + (c?.type === 'attack' && c.dmg ? computeModifiedDamage(s, {
+      from: 'enemy', to: 'player', raw: c.dmg, source: { kind: 'card', cardId: id },
+    }) : 0);
+  }, 0);
+}

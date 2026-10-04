@@ -1,182 +1,22 @@
 import React from 'react';
-import { View, Text, Image, Pressable } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSequence,
-} from 'react-native-reanimated';
-import { palette, surface, tint } from '../../theme';
-
+import { View, Text, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { font, palette, surface } from '../../theme';
 type Props = {
-  hp: number;
-  maxHp: number;
-  energy: number;
-  maxEnergy: number;
-  block: number;
-  maxHandSize: number;
-  /** เหลือในกองจั่วกี่ใบ — ไม่ใช่ขนาดสำรับทั้งหมด (ดูหมายเหตุที่ battle.tsx) */
-  drawCount: number;
-  onEndTurn: () => void;
-  /** แตะเลขกองจั่วเพื่อเปิดหน้ากองการ์ด */
-  onOpenPiles?: () => void;
-  isEnemyTurn?: boolean;
-  hudFlashKey?: number;
+  hp: number; maxHp: number; energy: number; maxEnergy: number;
+  block: number; maxHandSize: number; drawCount: number;
+  onEndTurn: () => void; onOpenPiles?: () => void; isEnemyTurn?: boolean; hudFlashKey?: number;
 };
-
-export default function PlayerHUD({
-  hp, maxHp, energy, maxEnergy, block, maxHandSize, drawCount, onEndTurn,
-  onOpenPiles, isEnemyTurn, hudFlashKey,
-}: Props) {
-  const flashOpacity = useSharedValue(0);
-  const hudShakeX = useSharedValue(0);
-  const prevHpRef = React.useRef(hp);
-
-  React.useEffect(() => {
-    if (hp < prevHpRef.current) {
-      // Flash red
-      flashOpacity.value = withSequence(
-        withTiming(0.7, { duration: 80 }),
-        withTiming(0, { duration: 250 })
-      );
-      // Shake HUD
-      hudShakeX.value = withSequence(
-        withTiming(6, { duration: 50 }),
-        withTiming(-6, { duration: 50 }),
-        withTiming(4, { duration: 50 }),
-        withTiming(0, { duration: 50 })
-      );
-    }
-    prevHpRef.current = hp;
-  }, [hp]);
-
-  const hudShakeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: hudShakeX.value }],
-  }));
-
-  const flashStyle = useAnimatedStyle(() => ({
-    opacity: flashOpacity.value,
-  }));
-
-  return (
-    <Animated.View style={[{ position: 'absolute', bottom: 10, left: 0, right: 0, alignItems: 'center' }, hudShakeStyle]}>
-      <View style={{ position: 'relative' }}>
-        <Image
-          source={require('../../../assets/images/players/badgePlayer.png')}
-          style={{ width: 350, height: 100 }}
-          resizeMode="contain"
-        />
-
-        {/* Red flash overlay */}
-        <Animated.View style={[{
-          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: tint.bloodLine, borderRadius: 8,
-          pointerEvents: 'none',
-        }, flashStyle]} />
-
-        {/* HP + End Turn row */}
-        <View style={{
-          position: 'absolute', top: 18, left: 60, right: 80,
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        }}>
-          {/* HP */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-            <Image
-              source={require('../../../assets/images/players/iHp.png')}
-              style={{ width: 20, height: 20, marginRight: 6 }}
-              resizeMode="contain"
-            />
-            <View style={{ position: 'relative' }}>
-              <View style={{
-                width: 100, height: 14,
-                backgroundColor: surface.glassDim, borderRadius: 7,
-                borderWidth: 1, borderColor: palette.line,
-              }}>
-                <View style={{
-                  width: `${(hp / maxHp) * 100}%`,
-                  height: '100%', backgroundColor: palette.bloodDeep, borderRadius: 6,
-                }} />
-              </View>
-              <Text style={{
-                position: 'absolute', top: -2, left: 0, right: 0,
-                color: palette.text, fontSize: 10,
-                fontFamily: 'Prompt_600SemiBold', textAlign: 'center',
-                textShadowColor: palette.shadow,
-                textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2,
-              }}>
-                {hp}/{maxHp}
-              </Text>
-            </View>
-          </View>
-
-          {/* End Turn */}
-          <Pressable
-            onPress={onEndTurn}
-            disabled={isEnemyTurn}
-            style={{
-              width: 70, height: 22,
-              backgroundColor: palette.blood, borderRadius: 11,
-              borderWidth: 2, borderColor: palette.line,
-              justifyContent: 'center', alignItems: 'center',
-              opacity: isEnemyTurn ? 0.5 : 1,
-            }}
-          >
-            <Text style={{
-              color: palette.text, fontSize: 9,
-              fontFamily: 'Prompt_600SemiBold',
-              textShadowColor: palette.shadow,
-              textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2,
-            }}>
-              จบเทิร์น
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* Stats row */}
-        <View style={{
-          position: 'absolute', top: 40, left: 80, right: 80,
-          flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-        }}>
-          <StatItem icon={require('../../../assets/images/players/iEnergy.png')} value={`${energy}/${maxEnergy}`} />
-          <StatItem icon={require('../../../assets/images/players/iMaxHand.png')} value={`${maxHandSize}`} />
-          <StatItem icon={require('../../../assets/images/players/iBlock.png')} value={`${block}`} />
-          <StatItem
-            icon={require('../../../assets/images/players/iDeck.png')}
-            value={`${drawCount}`}
-            onPress={onOpenPiles}
-          />
-        </View>
-      </View>
-    </Animated.View>
-  );
-}
-
-function StatItem({ icon, value, onPress }: { icon: any; value: string; onPress?: () => void }) {
-  const inner = (
-    <>
-      <Image source={icon} style={{ width: 24, height: 24, marginRight: 4 }} resizeMode="contain" />
-      <Text style={{
-        color: palette.text, fontSize: 11,
-        fontFamily: 'Prompt_600SemiBold',
-        // ค่าที่กดได้ต้องดูต่างจากค่าที่ดูอย่างเดียว ไม่งั้นไม่มีใครลองกด
-        textDecorationLine: onPress ? 'underline' : 'none',
-      }}>
-        {value}
-      </Text>
-    </>
-  );
-
-  if (!onPress) {
-    return <View style={{ flexDirection: 'row', alignItems: 'center' }}>{inner}</View>;
-  }
-
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={10}
-      style={{ flexDirection: 'row', alignItems: 'center' }}
-    >
-      {inner}
-    </Pressable>
-  );
+export default function PlayerHUD(p: Props) {
+  const pad = useSafeAreaInsets();
+  return <View style={{ position: 'absolute', bottom: pad.bottom + 8, left: 12, right: 12, borderWidth: 3, borderColor: palette.ink, backgroundColor: surface.panelRaise, padding: 10, gap: 6 }}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View><Text style={{ color: palette.text, fontFamily: font.heading, fontSize: 16 }}>เลือด {p.hp}/{p.maxHp}</Text>
+        <Text style={{ color: palette.moon, fontFamily: font.ui, fontSize: 12 }}>พลัง {p.energy}/{p.maxEnergy} · เกราะ {p.block}</Text></View>
+      <Pressable accessibilityRole="button" onPress={p.onEndTurn} disabled={p.isEnemyTurn} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, backgroundColor: palette.paperDeep, borderWidth: 2, borderColor: palette.moon, opacity: p.isEnemyTurn ? 0.5 : 1 }}>
+        <Text style={{ color: palette.text, fontFamily: font.heading }}>{p.isEnemyTurn ? 'ตาของผี…' : 'จบเทิร์น'}</Text>
+      </Pressable>
+    </View>
+    <Pressable accessibilityRole="button" onPress={p.onOpenPiles} hitSlop={8}><Text style={{ color: palette.textDim, fontFamily: font.ui, fontSize: 11 }}>กองจั่ว {p.drawCount} ใบ · จั่วเทิร์นละ {p.maxHandSize} · แตะดูกอง</Text></Pressable>
+  </View>;
 }

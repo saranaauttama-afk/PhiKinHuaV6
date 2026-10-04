@@ -27,6 +27,8 @@ import {
 } from '../../map/journeySync';
 import { onRestRow, refillRestSlot, spendRestToken } from '../../map/restPage';
 import { fireChapter } from '../../story/chapters';
+import { EPISODE } from '../../balance/episode';
+import { planEnemyIntent } from '../../combat/intent';
 import { winRun } from './runEnd';
 import { resetCombos } from '../../combat/combos';
 import { resetTraps } from '../../combat/traps';
@@ -206,6 +208,15 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         handSize: deck.handSize,
         intentCardId: null,
       };
+      if (s.runMode === 'episode') {
+        const hp = (s.fightCount ?? 0) === 0 ? EPISODE.firstHp : EPISODE.secondHp;
+        s.enemy.hp = s.enemy.maxHp = hp;
+      }
+      if (s.runMode === 'episode' && offer.enemyId === 'phi-pong-kang') {
+        s.enemy.hp = s.enemy.maxHp = EPISODE.finaleHp;
+        s.enemy.maxEnergy = EPISODE.finaleEnergy;
+        s.enemy.name = 'โป่งค่างเฝ้าบ้านร้าง';
+      }
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
       // ไม่ประกาศท่าล่วงหน้าแล้ว — ศัตรูเลือกไพ่ตอนถึงตาของตัวเอง
       // พรติดตัวของคลาสที่ทำงานตอนเริ่มไฟต์
@@ -235,6 +246,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       resetBlessingTurnFlags(s);
       runBlessingsTurnHook(s, 'on_turn_start');
 
+      if (s.runMode === 'episode') planEnemyIntent(s);
       mp._activeOfferIndex = ix;
       mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
@@ -305,6 +317,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       resetBlessingTurnFlags(s);
       runBlessingsTurnHook(s, 'on_turn_start');
 
+      if (s.runMode === 'episode') planEnemyIntent(s);
       mp._activeOfferIndex = ix;
       mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
@@ -334,7 +347,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Set current shop ID for saving
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_card (${existingShop.inventory.length} items)`);
         return { state: s, rng };
@@ -348,7 +361,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const out = ShopEv.openShopCard(s, rng);
       s = out.state; rng = out.rng;
       s.currentShopId = offer.shopId; // Track current shop ID
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_card (${offer.shopId})`);
       return { state: s, rng };
@@ -364,7 +377,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current shop ID
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_remove (${offer.shopId})`);
         return { state: s, rng };
@@ -378,7 +391,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const out = ShopEv.openShopRemove(s, rng);
       s = out.state; rng = out.rng;
       s.currentShopId = offer.shopId; // Track current shop ID
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_remove (${offer.shopId})`);
       return { state: s, rng };
@@ -394,7 +407,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current shop ID
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_upgrade (${offer.shopId})`);
         return { state: s, rng };
@@ -408,7 +421,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const out = ShopEv.openShopUpgrade(s, rng);
       s = out.state; rng = out.rng;
       s.currentShopId = offer.shopId; // Track current shop ID
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_upgrade (${offer.shopId})`);
       return { state: s, rng };
@@ -425,7 +438,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current shop ID
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_equipment (${existingShop.inventory.length} items)`);
         return { state: s, rng };
@@ -439,7 +452,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const out = ShopEv.openShopEquipment(s, rng);
       s = out.state; rng = out.rng;
       s.currentShopId = offer.shopId; // Track current shop ID
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_equipment (${offer.shopId})`);
   return { state: s, rng };
@@ -455,7 +468,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current well ID
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
         (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing well (${offer.shopId})`);
         return { state: s, rng };
@@ -466,7 +479,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s.shopBoughtItems = []; // Reset bought items tracker
       s.currentShopId = offer.shopId; // Track current well ID
       s.phase = 'shop';
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
       (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new well (${offer.shopId})`);
       return { state: s, rng };
@@ -482,7 +495,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current shrine ID
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
         (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing healing_shrine (${offer.shopId})`);
         return { state: s, rng };
@@ -493,7 +506,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s.shopBoughtItems = []; // Reset bought items tracker
       s.currentShopId = offer.shopId; // Track current shrine ID
       s.phase = 'shop';
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
       (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new healing_shrine (${offer.shopId})`);
       return { state: s, rng };
@@ -510,7 +523,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current treasure ID
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
         (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing treasure (${offer.shopId})`);
         return { state: s, rng };
@@ -536,7 +549,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         itemsBought: 0,
       });
       
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
       (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new treasure chest (${offer.shopId})`);
       return { state: s, rng };
@@ -553,7 +566,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.shopBoughtItems = []; // Reset bought items tracker
         s.currentShopId = offer.shopId; // Track current treasure ID
         s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
+          mp._activeOfferIndex = ix; mp._shopUsed = false;
         (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing single treasure (${offer.shopId})`);
         return { state: s, rng };
@@ -579,7 +592,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         itemsBought: 0,
       });
       
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
       (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new single treasure (${offer.shopId})`);
       return { state: s, rng };
@@ -592,7 +605,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s.shopStock = undefined;
       s.currentShopId = offer.shopId;
       s.phase = 'event';
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
       s.log.push(`ChooseOffer → เหตุการณ์ (${offer.eventId})`);
       return { state: s, rng };
     }
@@ -606,7 +619,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       // นับใหม่ทุกแท่น — แท่นละหนึ่งครั้ง
       s.fusionAltar = { timesUsed: 0 };
       s.phase = 'shop';
-      mp._activeOfferIndex = ix; mp._shopUsed = false;
+        mp._activeOfferIndex = ix; mp._shopUsed = false;
       s.log.push(`ChooseOffer → แท่นผสาน (${offer.shopId})`);
       return { state: s, rng };
     }
@@ -683,6 +696,15 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
       // จำผีที่ปราบแล้ว เพื่อไม่ให้โผล่บนแผนที่อีก (ดู replaceDefeatedMonsters)
       if (offer.kind === 'monster' || offer.kind === 'boss') {
         s.defeatedEnemyIds = [...(s.defeatedEnemyIds ?? []), offer.enemyId];
+      }
+
+      if (s.runMode === 'episode' && (s.fightCount ?? 0) >= EPISODE.fights) {
+        s.equipmentTempSlots = 0;
+        removeTemporaryEquipment(s);
+        clearCombatState(s);
+        winRun(s, false);
+        s.chapter = { id: 'episode_end', paragraph: 0 };
+        return { state: s, rng };
       }
 
       if (offer.kind === 'boss') {

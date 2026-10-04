@@ -19,6 +19,12 @@ import { font, palette, radius, surface } from '../theme';
  * key ต้องตรงกับ `id` ใน `src/art/catalog.ts` เป๊ะ (มีเทสต์คุมให้)
  */
 export const ART_SOURCES: Record<string, any> = {
+  'scene/episode': require('../../assets/scence/episode-village.jpg'),
+  'event/episode_lantern': require('../../assets/scence/episode-village.jpg'),
+  'chapter/episode_open': require('../../assets/scence/episode-village.jpg'),
+  'chapter/episode_end': require('../../assets/scence/episode-village.jpg'),
+  'encounter/healing_shrine': require('../../assets/scence/rest.jpg'),
+  'encounter/shop_upgrade': require('../../assets/scence/rest.jpg'),
   'scene/start':  require('../../assets/scence/startPage.png'),
   'scene/swamp':  require('../../assets/scence/swamp.png'),
   'scene/hut':    require('../../assets/scence/abandonedHut.png'),
@@ -31,7 +37,7 @@ export const ART_SOURCES: Record<string, any> = {
   'class/nun': require('../../assets/classes/nun.png'),
   'class/medium': require('../../assets/classes/medium.png'),
 
-  'monster/phi-krasue': require('../../assets/monsters/phi-krasue.png'),
+  'monster/phi-krasue': require('../../assets/monsters/phi-krasue-pulp.png'),
   'monster/phi-pop': require('../../assets/monsters/phi-pop.png'),
   'monster/nang-tanee': require('../../assets/monsters/nang-tanee.png'),
   'monster/phi-nang-ram': require('../../assets/monsters/phi-nang-ram.png'),
@@ -114,7 +120,7 @@ export default function Art({
       );
     }
 
-    return img;
+    return <View style={style}>{img}</View>;
   }
 
   const tiny = compact || w < 90 || h < 90;

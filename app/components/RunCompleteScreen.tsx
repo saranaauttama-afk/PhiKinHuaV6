@@ -24,21 +24,21 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
   // (`phase='defeat'` ตกไปหน้าแผนที่ของรันที่ผู้เล่นเพิ่งตาย)
   const headline = !s.won
     ? 'ไปไม่ถึงเช้า'
-    : s.beatSecretBoss ? 'ท้ามัจจุราชสำเร็จ' : 'จบการเดินทาง';
+    : state.runMode === 'episode' ? 'รอดคืนแรก!' : s.beatSecretBoss ? 'ท้ามัจจุราชสำเร็จ' : 'จบการเดินทาง';
   const subline = !s.won
     ? 'คืนนี้จบลงกลางทาง — แต่พระจันทร์เต็มดวงยังมีอีกทุกเดือน'
-    : s.beatSecretBoss ? 'แม้แต่เจ้าแห่งความตายก็ยังต้องถอย' : 'คุณผ่านค่ำคืนนี้มาได้';
+    : state.runMode === 'episode' ? 'รอดคืนแรก!' : s.beatSecretBoss ? 'แม้แต่เจ้าแห่งความตายก็ยังต้องถอย' : 'คุณผ่านค่ำคืนนี้มาได้';
 
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={require('../../assets/scence/swamp.png')}
+        source={require('../../assets/scence/episode-village.jpg')}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
         <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
           <Text style={{
-            color: !s.won ? palette.blood : s.beatSecretBoss ? palette.moon : palette.text,
+            color: !s.won ? palette.blood : state.runMode === 'episode' ? 'รอดคืนแรก!' : s.beatSecretBoss ? palette.moon : palette.text,
             fontSize: size.display, textAlign: 'center',
             fontFamily: font.display,
           }}>

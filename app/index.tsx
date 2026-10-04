@@ -97,7 +97,7 @@ export default function Home() {
   if (screen === 'class-select') {
     return (
       <ClassSelectScreen
-        onPick={(classId) => { setPickingClass(false); newRun(seed, classId); }}
+        onPick={(classId) => { setPickingClass(false); newRun(`episode-${Date.now()}`, classId, 'episode'); }}
         onBack={() => setPickingClass(false)}
       />
     );
@@ -118,7 +118,7 @@ export default function Home() {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground
-          source={require('../assets/scence/swamp.png')}
+          source={require('../assets/scence/episode-village.jpg')}
           style={{ flex: 1 }}
           resizeMode="cover"
         >
@@ -140,6 +140,8 @@ export default function Home() {
               {(state.starter?.choices ?? []).map((b, i) => (
                 <Pressable
                   key={b.id ?? i}
+                  accessibilityRole="button"
+                  accessibilityLabel={`พรติดตัว ${i + 1}: ${b.name}`}
                   onPress={() => dispatch({ type: 'ChooseStarterBlessing', index: i })}
                 >
                   <Panel emphasis>
@@ -172,7 +174,7 @@ export default function Home() {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground
-          source={require('../assets/scence/swamp.png')}
+          source={require('../assets/scence/episode-village.jpg')}
           style={{ flex: 1 }}
           resizeMode="cover"
         >
@@ -204,13 +206,19 @@ export default function Home() {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={require('../assets/scence/swamp.png')}
+        source={require('../assets/scence/episode-village.jpg')}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
         <Scrim style={{ paddingTop: pad.top }}>
 
           {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
+          {state.runMode === 'episode' && (
+            <View style={{ paddingHorizontal: space.lg, paddingBottom: space.sm }}>
+              <Text style={{ color: palette.moon, fontFamily: font.heading, fontSize: size.heading }}>คืนแรกที่บ้านร้าง</Text>
+              <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'เลือกพักหรือปลุกเสกได้หนึ่งอย่าง หรือเดินผ่าน' : 'แตะเลือกทาง แล้วกดจับผี'}</Text>
+            </View>
+          )}
           <JourneyTrail state={state} />
 
           {/* ทางแยกตรงหน้า — มาจากโหนดที่เดินไปได้จริงบนเส้นทาง

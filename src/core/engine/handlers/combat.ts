@@ -112,6 +112,9 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     ({ state: s, rng: r } = drawUpTo(s, r, target));
   }
 
+  if (s.runMode === 'episode' && s.enemyIntent) {
+    require('../../combat/intent').refreshIntentEstimate(s);
+  }
   if (isVictory(s)) {
     r = grantExpAndQueueLevelUp(s, r);
     s.combatVictoryLock = true;
@@ -140,6 +143,7 @@ export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { ty
   ({ state: s, rng: r } = startPlayerTurn(s, r));
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
+  if (s.runMode === 'episode') planEnemyIntent(s);
   return { state: s, rng: r };
 }
 
@@ -207,7 +211,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     // เดิมต้องเลือกไว้ล่วงหน้าเพราะต้องเอาไปโชว์บนป้าย intent พอเลิกโชว์แล้ว
     // การเลื่อนมาตัดสินใจตรงนี้ดีกว่าในเชิงกฎเกม — ศัตรูเห็นกระดานจริงตอนนั้น
     // ทั้งการ์ดที่ผู้เล่นเพิ่งตั้งและเลือดที่เพิ่งเสีย ไม่ใช่ภาพเมื่อเทิร์นที่แล้ว
-    planEnemyIntent(s);
+    // The episode commits to the displayed cards. Full runs retain existing AI.
+    if (s.runMode !== 'episode' || !s.enemyIntent) planEnemyIntent(s);
     const toPlay: string[] = [...(s.enemyIntent?.cardIds ?? [])];
 
     s.enemyLastPlayed = toPlay;

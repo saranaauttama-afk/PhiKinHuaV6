@@ -52,6 +52,7 @@ export const STYLE_BRIEF =
 
 /** ฉากพื้นหลังเต็มจอ */
 const SCENES: ArtSlot[] = [
+  { id: 'scene/episode', label: 'หมู่บ้านคืนแรก', file: 'scence/episode-village.jpg', size: [768, 1152], brief: 'ทางเดินหมู่บ้านและบ้านร้าง ภาพพิมพ์หมึกดำสำหรับช่วงเล่นแรก', group: 'scene' },
   { id: 'scene/start',   label: 'หน้าเริ่มเกม',     file: 'scence/startPage.png',      size: [1080, 1920], brief: 'ปกเกม — ตัวเอกยืนหันหลังมองทางเข้าป่า/หมู่บ้านยามค่ำ', group: 'scene' },
   { id: 'scene/swamp',   label: 'ฉากหนองน้ำ',       file: 'scence/swamp.png',          size: [1080, 1920], brief: 'หนองน้ำยามค่ำ หมอกลอย ใช้เป็นพื้นหลังหน้าแผนที่', group: 'scene' },
   { id: 'scene/hut',     label: 'ฉากกระท่อมร้าง',   file: 'scence/abandonedHut.png',   size: [1080, 1920], brief: 'กระท่อมไม้ร้างกลางทุ่ง ใช้เป็นพื้นหลังหน้าเหตุการณ์', group: 'scene' },
@@ -89,7 +90,7 @@ function monsterSlots(): ArtSlot[] {
       out.push({
         id: `monster/${m.id}`,
         label: m.name,
-        file: `monsters/${m.id}.png`,
+        file: m.id === 'phi-krasue' ? 'monsters/phi-krasue-pulp.png' : `monsters/${m.id}.png`,
         // บอสวาดใหญ่กว่า เพราะกินพื้นที่กลางจอตอนสู้
         size: isBoss ? [768, 768] : [512, 512],
         brief: (m.description ? `${m.description} — ` : '')
@@ -97,7 +98,7 @@ function monsterSlots(): ArtSlot[] {
           + 'โทนเดียวกับฉาก (ดินเผา-เขียวมะกอก ตัดไฟอุ่น) ไม่ใช่สีสดแบบการ์ตูน',
         group: isBoss ? 'boss' : 'monster',
         // ไฟล์เดียวที่มีตอนนี้เป็นพื้นทึบ ดูหมายเหตุที่ `opaqueSource`
-        opaqueSource: m.id === 'phi-krasue',
+        opaqueSource: false,
       });
     }
   }

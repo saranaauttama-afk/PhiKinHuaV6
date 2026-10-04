@@ -95,7 +95,7 @@ export default function Card({
   };
 
   const handlePress = () => {
-    if (onPress && !disabled) {
+    if (onPress) {
       onPress();
     }
   };
@@ -157,7 +157,7 @@ export default function Card({
 
   return (
     <GestureDetector gesture={isPlayed ? Gesture.Tap() : composedGesture}>
-      <Animated.View style={[
+      <Animated.View accessible accessibilityRole="button" accessibilityLabel={`การ์ด ${card.name} พลัง ${costNow ?? card.cost}`} style={[
         {
           width,
           height,
@@ -165,15 +165,16 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <ImageBackground
-        source={require('../../assets/images/players/bgCardPlayer.png')}
+      <View
         style={{
           width: '100%',
           height: '100%',
+          backgroundColor: surface.panelRaise,
+          borderWidth: 3, borderColor: selected ? palette.moon : palette.ink,
+          paddingHorizontal: 4,
           alignItems: 'center',
           justifyContent: 'flex-start',
         }}
-        resizeMode="stretch"
       >
         {/* Card Cost */}
         <View style={{
@@ -186,15 +187,6 @@ export default function Card({
           alignItems: 'center',
           zIndex: layer.badge,
         }}>
-          <Image
-            source={require('../../assets/images/players/iEnergy.png')}
-            style={{
-              width: 24,
-              height: 24,
-              position: 'absolute',
-            }}
-            resizeMode="contain"
-          />
           <Text style={{
             color: palette.text,
             fontSize: 10,
@@ -212,15 +204,7 @@ export default function Card({
           alignItems: 'center',
           marginTop: 8,
         }}>
-          <Image
-            source={require('../../assets/images/cardIcon.png')}
-            style={{
-              width: 40,
-              height: 40,
-              marginBottom: 4,
-            }}
-            resizeMode="contain"
-          />
+          <Text style={{ color: palette.moon, fontSize: 18, fontFamily: 'Prompt_700Bold', marginBottom: 3 }}>{card.type === 'attack' ? 'ฟาด' : card.type === 'equipment' ? 'ของ' : 'ยันต์'}</Text>
 
           {/* Card Name */}
           <Text style={{
@@ -238,7 +222,7 @@ export default function Card({
           {/* Card Description */}
           <Text style={{
             color: palette.text,
-            fontSize: 8,
+            fontSize: 10,
             fontFamily: 'Prompt_400Regular',
             textAlign: 'center',
             marginTop: 2,
@@ -273,7 +257,7 @@ export default function Card({
             </Text>
           </View>
         )}
-      </ImageBackground>
+      </View>
       </Animated.View>
     </GestureDetector>
   );

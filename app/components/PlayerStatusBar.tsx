@@ -14,7 +14,7 @@
 import React from 'react';
 import { ImageBackground, Pressable, Text, View } from 'react-native';
 import type { GameState } from '../../src/core/types';
-import { palette, font, size, radius, tint, layer } from '../theme';
+import { surface, palette, font, size, radius, tint, layer } from '../theme';
 
 const PANEL_H = 170;
 const BOTTOM_GAP = 24;
@@ -91,17 +91,16 @@ export default function PlayerStatusBar({
   const p = state.player;
 
   return (
-    <ImageBackground
-      source={require('../../assets/images/bgUserPanel.png')}
+    <View
       style={{
         position: 'absolute',
         bottom: BOTTOM_GAP,
         left: 12,
         right: 12,
         height: PANEL_H,
+        backgroundColor: surface.panel, borderWidth: 3, borderColor: palette.ink,
         zIndex: layer.statusBar,
       }}
-      resizeMode="stretch"
     >
       <View
         style={{
@@ -124,6 +123,6 @@ export default function PlayerStatusBar({
         <Stat label="พร"      value={`${(state.blessings ?? []).length}`} onPress={onOpenBlessings} />
         <Stat label="ประสบการณ์" value={`${p.exp}/${p.expToNext}`} />
       </View>
-    </ImageBackground>
+    </View>
   );
 }

@@ -3,8 +3,8 @@
     "name": "PhiKinHua",
     "slug": "PhiKinHua",
     "scheme": "phikinhua",
-    "version": "1.0.0",
-    "userInterfaceStyle": "automatic",
+    "version": "1.0.1",
+    "userInterfaceStyle": "dark",
     "orientation": "portrait",
     "plugins": [
       "expo-router",
@@ -22,8 +22,8 @@
       "./assets/fonts/"
     ],
     "android": {
-      "package": "com.phikinhua.app",
-      "versionCode": 1,
+      "package": "com.phikinhua.episode",
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1a0a00"
@@ -31,7 +31,7 @@
     },
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/scence/startPage.png",
+      "image": "./assets/scence/episode-village.jpg",
       "resizeMode": "cover",
       "backgroundColor": "#1a0a00"
     },

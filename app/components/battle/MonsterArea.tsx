@@ -11,12 +11,14 @@ import Animated, {
 import { useBattleLayout } from './battleLayout';
 import Art from '../Art';
 import StatusStrip from './StatusStrip';
+import type { EnemyIntent } from '../../../src/core/types';
 import type { StatusEffect } from '../../../src/core/types_extended';
 import { palette, space, surface, tint } from '../../theme';
 
 type Props = {
   monsterId: string | string[];
   monsterName?: string | string[];
+  intent?: EnemyIntent;
   enemy?: {
     hp: number; maxHp: number; name: string;
     block?: number; maxEnergy?: number; handSize?: number;
@@ -31,7 +33,7 @@ export type MonsterAreaHandle = {
 const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterArea({
   monsterId,
   monsterName,
-  enemy,
+  enemy, intent,
 }, ref) {
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
@@ -91,37 +93,17 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
       </Animated.View>
 
-      <View style={{ marginBottom: -8 }}>
-        <Image
-          source={require('../../../assets/images/badgeMonster.png')}
-          style={{ width: 300, height: 80 }}
-          resizeMode="contain"
-        />
-        <Text style={{
-          position: 'absolute', top: 20, left: 60,
-          color: palette.textFaint, fontSize: 12,
-          fontFamily: 'Prompt_400Regular',
-        }}>
-          {displayName}
-        </Text>
-        <View style={{
-          position: 'absolute', top: 38, left: 60,
-          width: 180, height: 12,
-          backgroundColor: surface.glassDim, borderRadius: 6,
-          borderWidth: 1, borderColor: palette.line,
-        }}>
-          <View style={{
-            width: `${(hp / maxHp) * 100}%`,
-            height: '100%', backgroundColor: palette.bloodDeep, borderRadius: 5,
-          }} />
+      {intent && (
+        <View style={{ backgroundColor: surface.panel, borderColor: palette.lineStrong, borderWidth: 2, padding: 8, maxWidth: 310 }}>
+          <Text style={{ color: palette.moon, fontFamily: 'Prompt_600SemiBold', fontSize: 13 }}>ท่าถัดไป: {intent.damage > 0 ? `โจมตี ${intent.damage}` : 'ร่ายวิชา'}{intent.block > 0 ? ` · กัน ${intent.block}` : ''}</Text>
+          <Text style={{ color: palette.textDim, fontFamily: 'Prompt_400Regular', fontSize: 10 }}>แรงโจมตีก่อนหักเกราะ · สถานะและกับดักอาจเปลี่ยนผล</Text>
         </View>
-        <Text style={{
-          position: 'absolute', top: 35, left: 50, width: 200,
-          color: palette.textFaint, fontSize: 10,
-          fontFamily: 'Prompt_400Regular', textAlign: 'center',
-        }}>
-          {hp}/{maxHp}
-        </Text>
+      )}
+      <View style={{ width: 250, backgroundColor: surface.panel, borderWidth: 3, borderColor: palette.ink, padding: 8, marginTop: 6 }}>
+        <Text style={{ color: palette.text, fontFamily: 'Prompt_600SemiBold', fontSize: 14, textAlign: 'center' }}>{displayName} · {hp}/{maxHp}</Text>
+        <View style={{ height: 7, backgroundColor: palette.ink, marginTop: 4 }}>
+          <View style={{ width: `${Math.max(0, hp / maxHp) * 100}%`, height: '100%', backgroundColor: palette.blood }} />
+        </View>
       </View>
 
       {/* ไม่มีป้ายบอกท่าล่วงหน้าแล้ว — ศัตรูตัดสินใจตอนถึงตาของตัวเอง

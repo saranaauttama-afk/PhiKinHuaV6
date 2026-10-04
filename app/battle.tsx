@@ -237,7 +237,7 @@ export default function BattlePage() {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={require('../assets/scence/battleScence1.png')}
+        source={require('../assets/scence/episode-village.jpg')}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
@@ -278,6 +278,7 @@ export default function BattlePage() {
           monsterId={monsterId}
           monsterName={monsterName}
           enemy={enemy ?? null}
+          intent={gameState.runMode === 'episode' && phase === 'player' ? gameState.enemyIntent : undefined}
         />
 
         <ScreenFlash ref={flashRef} />

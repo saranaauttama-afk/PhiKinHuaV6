@@ -1,16 +1,15 @@
-name: Android test APK
-
+name: Android first chapter APK
 on:
   push:
-    branches: [forCodex]
+    branches: [forCodex, 'work/first-chapter-apk']
+    paths-ignore: ['**/*.md']
   workflow_dispatch:
-
+permissions:
+  contents: read
 jobs:
   android:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,21 +20,64 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install dependencies
-        run: npm ci
-      - name: Test game and art catalog
-        run: npm test
-      - name: Typecheck
-        run: npx tsc --noEmit
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit
       - name: Generate Android project
-        run: npx expo prebuild --platform android --non-interactive
-      - name: Build standalone test APK
+        run: CI=1 npx expo prebuild --platform android
+      - name: Build offline universal test APK
         working-directory: android
-        run: ./gradlew :app:assembleRelease --no-daemon
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64
+      - name: Verify package, signing and 16KB compatibility
+        run: |
+          mkdir -p apk-audit
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
+          "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
+          python scripts/check-apk.py "$APK" > apk-audit/libraries.json
+          grep "package: name='com.phikinhua.episode' versionCode='2' versionName='1.0.1'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FirstNight-v1.0.1.apk
+          sha256sum PhiKinHua-FirstNight-v1.0.1.apk > apk-audit/sha256.txt
+      - uses: actions/upload-artifact@v4
         with:
-          name: PhiKinHua-test-APK
-          path: android/app/build/outputs/apk/release/*.apk
+          name: PhiKinHua-FirstNight-APK
+          path: PhiKinHua-FirstNight-v1.0.1.apk
           if-no-files-found: error
           retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: APK-audit
+          path: apk-audit/
+  emulator:
+    needs: android
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-FirstNight-APK
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-FirstNight-v1.0.1.apk
+            python scripts/android-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Android-emulator-smoke
+          path: smoke-output/
+          if-no-files-found: warn
