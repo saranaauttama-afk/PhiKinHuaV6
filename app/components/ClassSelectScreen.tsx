@@ -1,9 +1,10 @@
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
 import { View, Text, Pressable, ScrollView, ImageBackground } from 'react-native';
 import { ALL_CLASS_IDS, CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
 import Art from './Art';
 import { GameButton } from './Panel';
-import { font, palette, size, space, surface } from '../theme';
+import { font, size, space } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
 /**
@@ -31,8 +32,9 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
         resizeMode="cover"
       >
         <View style={{ flex: 1, backgroundColor: palette.scrim, paddingTop: pad.top, paddingHorizontal: 20 }}>
+      <PaperTexture />
           <Text style={{
-            color: 'white', fontSize: 24, textAlign: 'center',
+            color: palette.text, fontSize: 24, textAlign: 'center',
             fontFamily: 'Prompt_700Bold',
           }}>
             เลือกผู้เดินทาง
@@ -139,7 +141,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
       <Text style={{ color: palette.textFaint, fontSize: 12 }}>{label}</Text>
-      <Text style={{ color: 'white', fontSize: 15, fontFamily: 'Prompt_700Bold' }}>{value}</Text>
+      <Text style={{ color: palette.text, fontSize: 15, fontFamily: 'Prompt_700Bold' }}>{value}</Text>
     </View>
   );
 }

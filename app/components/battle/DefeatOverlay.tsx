@@ -1,10 +1,11 @@
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withDelay, withSequence, Easing,
 } from 'react-native-reanimated';
-import { palette, surface, tint, layer } from '../../theme';
+import { tint, layer } from '../../theme';
 
 type Props = {
   onHome: () => void;
@@ -39,8 +40,9 @@ export default function DefeatOverlay({ onHome }: Props) {
     <Animated.View style={[{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimHeavy,
-      justifyContent: 'center', alignItems: 'center', zIndex: layer.battleOverlay,
+      justifyContent: 'center', alignItems: 'center', zIndex: layer.overlay,
     }, bgStyle]}>
+      <PaperTexture />
       <Animated.View style={[{ alignItems: 'center' }, cardStyle]}>
 
         {/* Title */}

@@ -4,13 +4,14 @@
 // ผลลัพธ์คำนวณด้วย `fuseCards` ตัวเดียวกับที่ engine ใช้จริง — ตัวเลขที่เห็น
 // ก่อนกดจึงตรงกับการ์ดที่ได้เสมอ ไม่ใช่ตัวอย่างที่คำนวณคนละทาง
 
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState } from '../../src/core/types';
 import { canFuse, fuseCards, isFused, FUSION_MAX_TOTAL_COST } from '../../src/core/cards/fusion';
 import { FUSIONS_PER_ALTAR } from '../../src/core/engine/handlers/fusion';
 import Panel, { GameButton } from './Panel';
-import { font, palette, radius, size, space, surface, tint } from '../theme';
+import { font, radius, size, space, tint } from '../theme';
 
 type Props = {
   state: GameState;

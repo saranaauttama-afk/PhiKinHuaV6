@@ -1,10 +1,12 @@
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
 import React from 'react';
+import InkIcon from '../InkIcon';
 import { View, Text, Pressable } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withDelay, withSequence, Easing,
 } from 'react-native-reanimated';
-import { palette, surface, tint, layer } from '../../theme';
+import { tint, layer } from '../../theme';
 
 type Props = {
   enemyName: string;
@@ -49,10 +51,12 @@ export default function VictoryOverlay({
     <Animated.View style={[{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimHeavy,
-      justifyContent: 'center', alignItems: 'center', zIndex: layer.battleOverlay,
+      justifyContent: 'center', alignItems: 'center', zIndex: layer.overlay,
     }, bgStyle]}>
+      <PaperTexture />
       <Animated.View style={[{ width: 300, alignItems: 'center' }, cardStyle]}>
 
+        <InkIcon name="blessing" size={70} color={palette.blood}/>
         {/* Title */}
         <Text style={{
           color: palette.moon, fontSize: 42,
@@ -74,7 +78,7 @@ export default function VictoryOverlay({
         <View style={{ width: '100%', marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
             <Text style={{ color: palette.moonDim, fontSize: 12, fontFamily: 'Prompt_400Regular' }}>
-              Lv.{playerLevel}  EXP
+              เลเวล {playerLevel} · ประสบการณ์
             </Text>
             <Text style={{ color: palette.moon, fontSize: 13, fontFamily: 'Prompt_700Bold' }}>
               +{expGained}
@@ -88,7 +92,7 @@ export default function VictoryOverlay({
           }}>
             <Animated.View style={[{
               height: '100%',
-              backgroundColor: palette.lineStrong, borderRadius: 5,
+              backgroundColor: palette.blood, borderRadius: 5,
             }, barStyle]} />
           </View>
           <Text style={{
@@ -102,7 +106,7 @@ export default function VictoryOverlay({
 
         {/* Gold row */}
         <Animated.View style={[{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 36 }, goldStyle]}>
-          <Text style={{ fontSize: 28 }}>💰</Text>
+          <InkIcon name="gold" size={32}/>
           <Text style={{
             color: palette.moon, fontSize: 28,
             fontFamily: 'Prompt_700Bold',

@@ -152,6 +152,7 @@ export const layer = {
   popup: 999,
   /** โอเวอร์เลย์เต็มจอ — เหนือทุกอย่างรวมถึงแถบสถานะ */
   overlay: 2000,
+  settings:3000,
 } as const;
 
 /**
@@ -175,3 +176,15 @@ export const encounterFrame = {
 } as const;
 
 export default { palette, surface, font, size, space, radius, encounterFrame };
+
+export const paper = { bg: '#ddc89a', light: '#eddfba', ink: '#302319', muted: '#68523a', red: '#8a3025', line: '#9e8052' };
+
+export const paperPalette = {
+ ink:paper.ink,inkSoft:'#4a3826',umber:paper.bg,olive:'#736342',
+ paperDeep:'#b89459',paper:'#cfb483',paperLight:paper.light,moon:paper.ink,moonDim:paper.muted,
+ blood:paper.red,bloodDeep:'#62261e',bloodLit:paper.red,text:paper.ink,textDim:paper.muted,textFaint:'#786047',
+ line:'#b0976e',lineStrong:'#7b5c35',scrim:paper.bg,scrimHeavy:paper.bg,scrimFull:paper.bg,shadow:'transparent'
+} as const;
+export const paperSurface={panel:paper.light,panelRaise:'#efdfb4',panelSunk:'#d4be91',panelDim:'#d1be9c',panelWell:'#cfb889',panelDeep:'#cbb280',panelActive:'#e7c88d',glass:'#c5ae82',glassDim:'#d1bc96'} as const;
+
+export const pulpColors = {'selectedPaper': '#f2dba5', 'healthTrack': '#b8a17b', 'routeCurrent': '#e6b963', 'primaryPaper': '#e8c77b', 'pressedPaper': '#c1a675', 'expTrack': '#b7a17b', 'expFill': '#705231', 'sceneInk': '#14100a', 'switchOff': '#998566', 'switchOn': '#7b4b28', 'lanternGlow': '#bc793c', 'enemyBack': '#453126', 'enemyInk': '#bda16d', 'bone': '#e8dcc0', 'black': '#000', 'paperEdge': '#917448', 'paperSpeck': '#725436', 'paperWear': '#886a3d', 'storySceneShade': 'rgba(12,9,5,.2)', 'storyTextShade': 'rgba(12,9,5,.78)', 'loadingShade': 'rgba(12,9,5,.25)', 'mapShade': 'rgba(12,9,5,.32)', 'settingsShade': 'rgba(12,9,5,.95)', 'menuShade': 'rgba(12,9,5,.15)', 'eventTextShade': 'rgba(12,9,5,.76)'} as const;

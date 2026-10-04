@@ -1,8 +1,10 @@
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
 import React from 'react';
+import InkIcon from '../InkIcon';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { CardData, GameState } from '../../../src/core/types';
 import CardRow from '../CardRow';
-import { palette, surface, tint, font, size, space, layer } from '../../theme';
+import { tint, font, size, space, layer } from '../../theme';
 
 /**
  * หน้าเลือกรางวัลตอนเลเวลอัป
@@ -86,6 +88,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
       justifyContent: 'center', paddingHorizontal: 22,
       zIndex: layer.overlay,
     }}>
+      <PaperTexture />
       <Text style={{
         color: palette.moon, fontSize: 24, textAlign: 'center',
         fontFamily: 'Prompt_700Bold', marginBottom: 4,
@@ -96,7 +99,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         color: palette.textDim, fontSize: 14,
         textAlign: 'center', marginBottom: 18,
       }}>
-        {pending ? 'เลือกหนึ่งอย่าง' : choice.contextDescription || 'เลือกทางเดินของคุณ'}
+        {pending ? 'เลือกหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนาหนึ่งอย่าง'}
       </Text>
 
       {pending === null ? (
@@ -113,6 +116,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                   borderWidth: 1, borderColor: palette.lineStrong,
                 }}
               >
+                <InkIcon name={bucketOf(opt)==='max_energy'?'energy':bucketOf(opt)==='max_hand'?'hand':bucketOf(opt)==='max_hp'?'hp':'blessing'} size={32} color={palette.blood}/>
                 <Text style={{ color: palette.moon, fontSize: 18, fontFamily: 'Prompt_600SemiBold' }}>
                   {l.title}
                 </Text>

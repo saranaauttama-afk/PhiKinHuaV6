@@ -1,8 +1,9 @@
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { CardData } from '../../../src/core/types';
 import CardRow from '../CardRow';
-import { palette, surface, tint, font, size, space, radius, layer } from '../../theme';
+import { tint, font, size, space, radius, layer } from '../../theme';
 
 /**
  * เลือกการ์ดรางวัลหลังชนะไฟต์
@@ -31,6 +32,7 @@ export default function CardRewardOverlay({ choices, deck, onChoose, onSkip }: P
       justifyContent: 'center', paddingHorizontal: space.xl,
       zIndex: layer.overlay,
     }}>
+      <PaperTexture />
       <Text style={{
         color: palette.moon, fontSize: size.display, textAlign: 'center',
         fontFamily: font.display, marginBottom: space.xs,

@@ -1,8 +1,9 @@
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
 import { View, Text, Pressable, ImageBackground } from 'react-native';
 import type { GameState } from '../../src/core/types';
 import Panel, { GameButton, Scrim } from './Panel';
-import { palette, font, size, space } from '../theme';
+import { font, size, space } from '../theme';
 
 /**
  * จอสรุปตอนจบรัน
@@ -36,9 +37,10 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
+        <Scrim heavy style={{ backgroundColor: palette.scrimHeavy, justifyContent: 'center', paddingHorizontal: space.xl }}>
+          <PaperTexture />
           <Text style={{
-            color: !s.won ? palette.blood : state.runMode === 'episode' ? 'รอดคืนแรก!' : s.beatSecretBoss ? palette.moon : palette.text,
+            color: !s.won ? palette.blood : palette.text,
             fontSize: size.display, textAlign: 'center',
             fontFamily: font.display,
           }}>

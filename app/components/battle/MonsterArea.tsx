@@ -10,15 +10,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
 import Art from '../Art';
+import Paper,{paper} from '../Paper';
+import InkIcon,{type InkSymbol} from '../InkIcon';
+import HealthBar from '../HealthBar';
 import StatusStrip from './StatusStrip';
-import type { EnemyIntent } from '../../../src/core/types';
 import type { StatusEffect } from '../../../src/core/types_extended';
 import { palette, space, surface, tint } from '../../theme';
 
 type Props = {
   monsterId: string | string[];
   monsterName?: string | string[];
-  intent?: EnemyIntent;
   enemy?: {
     hp: number; maxHp: number; name: string;
     block?: number; maxEnergy?: number; handSize?: number;
@@ -33,7 +34,7 @@ export type MonsterAreaHandle = {
 const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterArea({
   monsterId,
   monsterName,
-  enemy, intent,
+  enemy,
 }, ref) {
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
@@ -93,19 +94,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
       </Animated.View>
 
-      {intent && (
-        <View style={{ backgroundColor: surface.panel, borderColor: palette.lineStrong, borderWidth: 2, padding: 8, maxWidth: 310 }}>
-          <Text style={{ color: palette.moon, fontFamily: 'Prompt_600SemiBold', fontSize: 13 }}>ท่าถัดไป: {intent.damage > 0 ? `โจมตี ${intent.damage}` : 'ร่ายวิชา'}{intent.block > 0 ? ` · กัน ${intent.block}` : ''}</Text>
-          <Text style={{ color: palette.textDim, fontFamily: 'Prompt_400Regular', fontSize: 10 }}>แรงโจมตีก่อนหักเกราะ · สถานะและกับดักอาจเปลี่ยนผล</Text>
-        </View>
-      )}
-      <View style={{ width: 250, backgroundColor: surface.panel, borderWidth: 3, borderColor: palette.ink, padding: 8, marginTop: 6 }}>
-        <Text style={{ color: palette.text, fontFamily: 'Prompt_600SemiBold', fontSize: 14, textAlign: 'center' }}>{displayName} · {hp}/{maxHp}</Text>
-        <View style={{ height: 7, backgroundColor: palette.ink, marginTop: 4 }}>
-          <View style={{ width: `${Math.max(0, hp / maxHp) * 100}%`, height: '100%', backgroundColor: palette.blood }} />
-        </View>
-      </View>
-
+      <Paper style={{width:250,padding:10,marginTop:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName}/></Paper>
       {/* ไม่มีป้ายบอกท่าล่วงหน้าแล้ว — ศัตรูตัดสินใจตอนถึงตาของตัวเอง
           ผู้เล่นรู้ว่าโดนอะไรตอนที่โดนจริง
 
@@ -116,47 +105,20 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <StatusStrip effects={enemy?.statusEffects} compact />
       </View>
 
-      {enemy && (
-        <View style={{
-          flexDirection: 'row', gap: 14, alignItems: 'center',
-          backgroundColor: surface.glassDim, borderRadius: 12,
-          paddingHorizontal: 14, paddingVertical: 6,
-          borderWidth: 1, borderColor: palette.line,
-        }}>
-          <EnemyStatItem
-            icon={require('../../../assets/images/players/iBlock.png')}
-            value={`${enemy.block ?? 0}`}
-          />
-          {enemy.maxEnergy != null && (
-            <EnemyStatItem
-              icon={require('../../../assets/images/players/iEnergy.png')}
-              value={`${enemy.maxEnergy}`}
-            />
-          )}
-          {enemy.handSize != null && (
-            <EnemyStatItem
-              icon={require('../../../assets/images/players/iMaxHand.png')}
-              value={`${enemy.handSize}`}
-            />
-          )}
-        </View>
-      )}
+      {enemy && <Paper style={{ flexDirection: 'row', gap: 16, padding: 8, marginTop: 4 }}>
+        <EnemyStatItem icon="block" label="เกราะ" value={`${enemy.block ?? 0}`} />
+        {enemy.maxEnergy != null && <EnemyStatItem icon="energy" label="พลัง" value={`${enemy.maxEnergy}`} />}
+        {enemy.handSize != null && <EnemyStatItem icon="hand" label="มือ" value={`${enemy.handSize}`} />}
+      </Paper>}
     </View>
   );
 });
 
-function EnemyStatItem({ icon, value }: { icon: ImageSourcePropType; value: string }) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-      <Image source={icon} style={{ width: 18, height: 18 }} resizeMode="contain" />
-      <Text style={{
-        color: palette.text, fontSize: 11,
-        fontFamily: 'Prompt_600SemiBold',
-      }}>
-        {value}
-      </Text>
-    </View>
-  );
+function EnemyStatItem({ icon, label, value }: { icon: InkSymbol; label: string; value: string }) {
+  return <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+    <InkIcon name={icon} size={20} color={paper.red} />
+    <Text style={{ color: paper.ink, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>{label} {value}</Text>
+  </View>;
 }
 
 export default MonsterArea;

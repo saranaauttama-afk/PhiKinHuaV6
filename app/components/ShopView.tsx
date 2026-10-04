@@ -11,6 +11,7 @@
 // พฤติกรรมทุกอย่างเหมือนเดิมเป๊ะ — คำสั่งที่ dispatch, เงื่อนไขที่กดได้/ไม่ได้,
 // จำนวนครั้งที่ใช้ได้ ยกมาครบ เปลี่ยนแค่หน้าตากับภาษา
 
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
@@ -18,7 +19,7 @@ import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import FusionAltarView from './FusionAltarView';
 import Panel, { GameButton } from './Panel';
-import { font, palette, radius, size, space, surface, tint, layer } from '../theme';
+import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
 interface ShopViewProps {
@@ -348,6 +349,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
       backgroundColor: palette.scrimHeavy,
       zIndex: layer.overlay,
     }}>
+      <PaperTexture />
       <ScrollView contentContainerStyle={{ padding: space.lg, paddingTop: pad.top, paddingBottom: pad.bottom + space.xl }}>
         {kind === 'card'            && cardShop()}
         {kind === 'equipment'       && equipmentShop()}

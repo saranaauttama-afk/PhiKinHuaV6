@@ -19,6 +19,9 @@ import ClassSelectScreen from './components/ClassSelectScreen';
 import JourneyTrail from './components/JourneyTrail';
 import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
+import SceneArrival from './components/SceneArrival';
+import LoadingScreen from './components/LoadingScreen';
+import {paper} from './components/Paper';
 import BlessingView from './components/BlessingView';
 import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
@@ -77,7 +80,7 @@ export default function Home() {
   };
 
   if (!fontsLoaded) {
-    return null;
+    return <LoadingScreen />;
   }
 
   // หน้าไหนควรขึ้น ตัดสินที่ `screenForState` ซึ่งเป็นฟังก์ชันบริสุทธิ์และมีเทสต์คุม
@@ -146,13 +149,13 @@ export default function Home() {
                 >
                   <Panel emphasis>
                     <Text style={{
-                      color: palette.moon, fontSize: size.heading, fontFamily: font.heading,
+                      color: paper.ink, fontSize: size.heading, fontFamily: font.heading,
                     }}>
                       {b.name ?? b.id}
                     </Text>
                     {!!b.desc && (
                       <Text style={{
-                        color: palette.textDim, fontSize: size.bodyLg,
+                        color: paper.muted, fontSize: size.bodyLg,
                         fontFamily: font.body, marginTop: space.xs, lineHeight: 24,
                       }}>
                         {b.desc}
@@ -205,11 +208,7 @@ export default function Home() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ImageBackground
-        source={require('../assets/scence/episode-village.jpg')}
-        style={{ flex: 1 }}
-        resizeMode="cover"
-      >
+      <SceneArrival sceneKey={`${state.journey?.currentId??'start'}-${state.fightCount??0}`} source={restRow?require('../assets/scence/lantern-hut.jpg'):(state.fightCount??0)>=2?require('../assets/scence/boss.jpg'):require('../assets/scence/episode-village.jpg')}>
         <Scrim style={{ paddingTop: pad.top }}>
 
           {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
@@ -319,7 +318,7 @@ export default function Home() {
           />
 
         </Scrim>
-      </ImageBackground>
+      </SceneArrival>
 
       {/* BlessingDialog/EncounterDialog แบบ mock ถูกแทนด้วยหน้าเลือกพรจริง
           และการ์ด encounter ที่มาจาก state.pages แล้ว */}

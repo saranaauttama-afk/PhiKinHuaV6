@@ -1,3 +1,4 @@
+import {pulpColors} from '../theme';
 import React, { useState } from 'react';
 import { View, Text, Image, ImageBackground } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -11,7 +12,9 @@ import Animated, {
   runOnJS
 } from 'react-native-reanimated';
 import type { CardData } from '../../src/core/types';
-import { palette, surface, tint, layer } from '../theme';
+import { palette, surface, tint, layer, font } from '../theme';
+import Paper,{paper} from './Paper';
+import InkIcon from './InkIcon';
 
 interface CardProps {
   card: CardData;
@@ -167,99 +170,13 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <View
-        style={{
-          width: '100%',
-          height: '100%',
-          backgroundColor: surface.panelRaise,
-          borderWidth: 3, borderColor: selected ? palette.moon : palette.ink,
-          paddingHorizontal: 4,
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-        }}
-      >
-        {/* Card Cost */}
-        <View style={{
-          position: 'absolute',
-          top: -10,
-          left: -10,
-          width: 24,
-          height: 24,
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: layer.badge,
-        }}>
-          <Text style={{
-            color: palette.text,
-            fontSize: 10,
-            fontFamily: 'Prompt_600SemiBold',
-            textShadowColor: palette.shadow,
-            textShadowOffset: { width: 1, height: 1 },
-            textShadowRadius: 2,
-          }}>
-            {costNow ?? card.cost}
-          </Text>
-        </View>
-
-        {/* Card Icon */}
-        <View style={{
-          alignItems: 'center',
-          marginTop: 8,
-        }}>
-          <Text style={{ color: palette.moon, fontSize: 18, fontFamily: 'Prompt_700Bold', marginBottom: 3 }}>{card.type === 'attack' ? 'ฟาด' : card.type === 'equipment' ? 'ของ' : 'ยันต์'}</Text>
-
-          {/* Card Name */}
-          <Text style={{
-            color: palette.text,
-            fontSize: 11,
-            fontFamily: 'Prompt_600SemiBold',
-            textAlign: 'center',
-            textShadowColor: palette.shadow,
-            textShadowOffset: { width: 1, height: 1 },
-            textShadowRadius: 2,
-          }}>
-            {card.name}
-          </Text>
-
-          {/* Card Description */}
-          <Text style={{
-            color: palette.text,
-            fontSize: 10,
-            fontFamily: 'Prompt_400Regular',
-            textAlign: 'center',
-            marginTop: 2,
-            paddingHorizontal: 6,
-            textShadowColor: palette.shadow,
-            textShadowOffset: { width: 1, height: 1 },
-            textShadowRadius: 2,
-          }}>
-            {card.desc}
-          </Text>
-        </View>
-
-        {/* ใบที่เล่นแล้วหายไปจากไฟต์เลย — ต้องเห็นก่อนกด ไม่ใช่รู้ตอนมันหายไปแล้ว
-            คำอธิบายบางใบเขียน "(ใช้ได้ครั้งเดียว)" ไว้ แต่ตัวหนังสือ 8px
-            ท้ายย่อหน้าไม่ใช่สิ่งที่คนอ่านทันตอนกำลังคิดว่าจะเล่นใบไหน */}
-        {card.exhaust && (
-          <View style={{
-            position: 'absolute', bottom: 4, alignSelf: 'center',
-            paddingHorizontal: 6, paddingVertical: 1,
-            borderRadius: 999,
-            backgroundColor: tint.bloodSoft,
-            borderWidth: 1, borderColor: tint.bloodLine,
-          }}>
-            <Text style={{
-              color: palette.bloodLit, fontSize: 7,
-              fontFamily: 'Prompt_600SemiBold',
-              textShadowColor: palette.shadow,
-              textShadowOffset: { width: 1, height: 1 },
-              textShadowRadius: 2,
-            }}>
-              ใช้แล้วหาย
-            </Text>
-          </View>
-        )}
-      </View>
+      <Paper style={{width:'100%',height:'100%',padding:7,paddingTop:10,backgroundColor:selected?pulpColors.selectedPaper:paper.bg,borderWidth:selected?2:1,borderColor:selected?paper.red:paper.line,opacity:disabled?.68:1}}>
+        <View style={{position:'absolute',top:4,left:4,width:25,height:25,borderRadius:13,backgroundColor:paper.ink,alignItems:'center',justifyContent:'center',zIndex:layer.badge}}><Text style={{color:paper.light,fontFamily:font.heading,fontSize:14}}>{costNow??card.cost}</Text></View>
+        <View style={{alignItems:'center',justifyContent:'center',height:height*.27,marginTop:8,borderBottomWidth:1,borderColor:paper.line}}><InkIcon name={card.type==='attack'?'attack':card.type==='equipment'?'gold':card.type==='trap'?'block':'blessing'} size={height*.21} color={card.type==='attack'?paper.red:paper.ink}/></View>
+        <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:width>130?17:11,lineHeight:width>130?24:14,color:paper.ink,textAlign:'center',marginTop:6}}>{card.name}</Text>
+        <Text numberOfLines={width>130?8:2} style={{fontFamily:font.body,fontSize:width>130?23:16,lineHeight:width>130?26:16,color:paper.muted,textAlign:'center',marginTop:4}}>{card.desc}</Text>
+        {card.exhaust&&<Text style={{position:'absolute',bottom:4,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:9}}>ใช้แล้วหาย</Text>}
+      </Paper>
       </Animated.View>
     </GestureDetector>
   );

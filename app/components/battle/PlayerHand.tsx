@@ -1,106 +1,21 @@
+import {pulpColors} from '../../theme';
 import React from 'react';
-import { View, Text, Pressable, Dimensions, ScrollView } from 'react-native';
+import {View,Text,ScrollView,useWindowDimensions} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Card from '../Card';
-import { font, palette, surface, layer } from '../../theme';
-import { costWithRule } from '../../../src/core/cards/mechanics';
-
-const { width: screenWidth } = Dimensions.get('window');
-
-type CardItem = {
-  id: string;
-  instanceId?: string;
-  name: string;
-  [key: string]: any;
-};
-
-type Props = {
-  cards: CardItem[];
-  playedCardIds: string[];
-  hoveredCardId: string | null;
-  energy: number;
-  /** เล่นการ์ดไปแล้วกี่ใบเทิร์นนี้ — การ์ดค่าร่ายลื่นใช้คำนวณเลขที่โชว์ */
-  cardsPlayedThisTurn?: number;
-  onPlayCard: (card: CardItem, index: number) => void;
-  onHoverChange: (card: CardItem, isHovered: boolean) => void;
-};
-
-export default function PlayerHand({
-  cards, playedCardIds, hoveredCardId, energy,
-  cardsPlayedThisTurn = 0, onPlayCard, onHoverChange,
-}: Props) {
-  const [selected, setSelected] = React.useState<string | null>(null);
-  const previewIndex = cards.findIndex(c => (c.instanceId ?? c.id) === selected);
-  const preview = cards[previewIndex];
-  const previewCost = preview ? costWithRule(preview as any, cardsPlayedThisTurn) : 0;
-  const count = cards.length;
-  const maxRotation = Math.min(25, count * 2.5);
-  const centerIndex = (count - 1) / 2;
-
-  let spacing: number;
-  if (count <= 3) spacing = 100;
-  else if (count <= 5) spacing = 70;
-  else spacing = Math.max(50, (screenWidth - 40) / (count + 1));
-
-  const wideHand = count > 5;
-  const canvasW = wideHand ? count * 118 + 24 : screenWidth;
-  return (
-    <View style={{
-      position: 'absolute', bottom: 120,
-      left: 0, right: 0, height: 160,
-      alignItems: 'center', justifyContent: 'flex-end',
-    }}>
-      {preview && <View style={{ position: 'absolute', bottom: 174, left: 16, right: 16, zIndex: layer.control, backgroundColor: surface.panelRaise, borderWidth: 3, borderColor: palette.ink, padding: 12, gap: 6 }}>
-        <Text style={{ fontFamily: font.heading, color: palette.moon, fontSize: 17 }}>{preview.name} · พลัง {previewCost}</Text>
-        <Text style={{ fontFamily: font.ui, color: palette.text, fontSize: 14 }}>{preview.desc}</Text>
-        <View style={{ flexDirection: 'row', gap: 16 }}>
-          <Pressable accessibilityRole="button" disabled={previewCost > energy} onPress={() => { onPlayCard(preview, previewIndex); setSelected(null); }} style={{ minHeight: 44, paddingHorizontal: 16, justifyContent: 'center', backgroundColor: palette.paperDeep, opacity: previewCost > energy ? 0.4 : 1 }}>
-            <Text style={{ fontFamily: font.heading, color: palette.text }}>{previewCost > energy ? 'พลังไม่พอ' : 'ใช้การ์ด'}</Text>
-          </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={{ minHeight: 44, justifyContent: 'center' }}><Text style={{ fontFamily: font.ui, color: palette.text }}>ปิด</Text></Pressable>
-        </View>
-      </View>}
-      <ScrollView horizontal scrollEnabled={wideHand} showsHorizontalScrollIndicator={wideHand} style={{ width: screenWidth, height: 164 }} contentContainerStyle={{ width: canvasW, height: 164 }}>
-      <View style={{ width: canvasW, height: 164 }}>
-      {cards.map((card, index) => {
-        const offset = index - centerIndex;
-        const rotation = wideHand ? 0 : centerIndex !== 0 ? (offset / centerIndex) * maxRotation : 0;
-        const xOffset = offset * spacing;
-        const identifier = card.instanceId ?? card.id;
-        const isPlayed = playedCardIds.includes(identifier);
-        // เลขที่โชว์กับเลขที่ใช้ตัดสินว่ากดได้ไหม ต้องมาจากสูตรเดียวกัน
-        // ไม่งั้นการ์ดค่าร่ายลื่นจะโชว์ 0 แต่กดไม่ได้
-        const costNow = costWithRule(card as any, cardsPlayedThisTurn);
-        const isDisabled = costNow > energy;
-
-        return (
-          <View
-            key={identifier}
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: wideHand ? 12 + index * 118 : screenWidth / 2 + xOffset - 55,
-              transform: [{ rotate: `${rotation}deg` }],
-              zIndex: hoveredCardId === identifier ? 999 : index,
-            }}
-          >
-            <Card
-              card={card as any}
-              width={110}
-              height={140}
-              onPress={() => setSelected(selected === identifier ? null : identifier)}
-              selected={selected === identifier}
-              onDragPlay={() => onPlayCard(card, index)}
-              onHoverChange={(isHovered: boolean) => onHoverChange(card, isHovered)}
-              isPlayed={isPlayed}
-              disabled={isDisabled}
-              animationDelay={index * 80}
-              costNow={costNow}
-            />
-          </View>
-        );
-      })}
-      </View>
-      </ScrollView>
-    </View>
-  );
+import Paper,{paper} from '../Paper';
+import {GameButton} from '../Panel';
+import {font,layer} from '../../theme';
+import {costWithRule} from '../../../src/core/cards/mechanics';
+type CardItem={id:string;instanceId?:string;name:string;[key:string]:any};
+type Props={cards:CardItem[];playedCardIds:string[];hoveredCardId:string|null;energy:number;cardsPlayedThisTurn?:number;onPlayCard:(card:CardItem,index:number)=>void;onHoverChange:(card:CardItem,isHovered:boolean)=>void};
+export default function PlayerHand({cards,playedCardIds,hoveredCardId,energy,cardsPlayedThisTurn=0,onPlayCard,onHoverChange}:Props){
+ const [selected,setSelected]=React.useState<string|null>(null);const {width}=useWindowDimensions();const pad=useSafeAreaInsets();const cardW=Math.min(110,Math.max(72,(width-32-Math.min(cards.length-1,4)*6)/Math.min(Math.max(cards.length,1),5)));
+ const index=cards.findIndex(c=>(c.instanceId??c.id)===selected);const preview=cards[index];const cost=preview?costWithRule(preview as any,cardsPlayedThisTurn):0;
+ return <View style={{position:'absolute',bottom:pad.bottom+143,left:0,right:0,height:180,zIndex:layer.control}}>
+ {preview&&<Paper style={{position:'absolute',bottom:190,left:18,right:18,padding:16,gap:10,zIndex:layer.overlay}}><Text style={{fontFamily:font.heading,color:paper.ink,fontSize:18}}>{preview.name} · พลัง {cost}</Text><Text style={{fontFamily:font.body,color:paper.ink,fontSize:25,lineHeight:28}}>{preview.desc}</Text><View style={{flexDirection:'row',gap:12}}><GameButton label={cost>energy?'พลังไม่พอ':'ใช้การ์ด'} tone="primary" disabled={cost>energy} onPress={()=>{onPlayCard(preview,index);setSelected(null)}} style={{flex:1}}/><GameButton label="ปิด" onPress={()=>setSelected(null)} style={{flex:1}}/></View></Paper>}
+ <Text style={{fontFamily:font.ui,color:pulpColors.bone,fontSize:10,marginHorizontal:18,marginBottom:5}}>แตะการ์ดเพื่ออ่าน · ลากขึ้นเพื่อใช้{cards.length>5?' · เลื่อนดูใบอื่น':''}</Text>
+ <ScrollView horizontal showsHorizontalScrollIndicator={cards.length>5} contentContainerStyle={{paddingHorizontal:16,paddingTop:6,paddingBottom:8,gap:6,alignItems:'flex-end'}}>
+ {cards.map((c,i)=>{const id=c.instanceId??c.id;const now=costWithRule(c as any,cardsPlayedThisTurn);return <View key={id} style={{transform:[{translateY:selected===id?-5:0}],zIndex:hoveredCardId===id?999:i}}><Card card={c as any} width={cardW} height={150} selected={selected===id} onPress={()=>setSelected(selected===id?null:id)} onDragPlay={()=>{onPlayCard(c,i);setSelected(null)}} onHoverChange={v=>onHoverChange(c,v)} isPlayed={playedCardIds.includes(id)} disabled={now>energy} animationDelay={i*55} costNow={now}/></View>})}
+ </ScrollView></View>;
 }

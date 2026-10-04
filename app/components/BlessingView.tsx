@@ -8,13 +8,14 @@
 // **ตอนนี้พรซ้ำผลซ้อนกัน** — "ผีป้องกัน" สองใบได้ Block 4 ต่อการ์ดโจมตี
 // ซึ่งไม่ได้ตั้งใจออกแบบไว้ แต่ยังไม่แก้ในรอบนี้ หน้านี้อย่างน้อยทำให้เห็นมัน
 
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import type { BlessingDef } from '../../src/core/types';
 import { groupBlessings } from '../../src/core/blessing/group';
 import Art from './Art';
 import { GameButton } from './Panel';
-import { font, palette, radius, size, space, surface, layer } from '../theme';
+import { font, radius, size, space, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
 type Props = {
@@ -33,6 +34,7 @@ export default function BlessingView({ blessings, onClose }: Props) {
       backgroundColor: palette.scrimFull,
       zIndex: layer.overlay,
     }}>
+      <PaperTexture />
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,

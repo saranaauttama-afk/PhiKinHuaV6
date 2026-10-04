@@ -1,3 +1,4 @@
+import {pulpColors} from '../../theme';
 import React from 'react';
 import { View, Image, Text } from 'react-native';
 import Animated, {
@@ -8,7 +9,9 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
-import { palette, surface, tint } from '../../theme';
+import {font} from '../../theme';
+import Paper,{paper} from '../Paper';
+import InkIcon from '../InkIcon';
 
 const CARD_W      = 110;
 const CARD_H      = 150;
@@ -125,53 +128,18 @@ export default function EnemyHandCard({
   }));
 
   const isAttack = card.damage > 0;
-  const bgColor  = isAttack ? tint.bloodSoft : tint.moonFaint;
+
 
   return (
     <Animated.View style={containerStyle}>
       {/* Back face (face-down) */}
       <Animated.View style={backStyle}>
-        <Image
-          source={require('../../../assets/images/monsters/bgMonsterCardBackMini.png')}
-          style={{ width: '100%', height: '100%', borderRadius: 10 }}
-          resizeMode="cover"
-        />
+        <Paper style={{flex:1,alignItems:'center',justifyContent:'center',padding:5,backgroundColor:pulpColors.enemyBack,borderWidth:2,borderColor:pulpColors.enemyInk}}><InkIcon name="blessing" size={66} color={pulpColors.enemyInk}/></Paper>
       </Animated.View>
 
       {/* Front face */}
       <Animated.View style={frontStyle}>
-        <View style={{
-          flex: 1, borderRadius: 10,
-          backgroundColor: bgColor,
-          overflow: 'hidden',
-        }}>
-          <Image
-            source={require('../../../assets/images/monsters/bgCardMonster.png')}
-            style={{ position: 'absolute', width: '100%', height: '100%' }}
-            resizeMode="cover"
-          />
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10, gap: 8 }}>
-            <Text style={{
-              color: palette.text, fontSize: 11,
-              fontFamily: 'Prompt_600SemiBold', textAlign: 'center',
-            }}>
-              {card.name}
-            </Text>
-            {card.damage > 0 && (
-              <Text style={{ color: palette.bloodLit, fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
-                ⚔ {card.damage}
-              </Text>
-            )}
-            {card.block > 0 && (
-              <Text style={{ color: palette.moon, fontSize: 36, fontFamily: 'Prompt_700Bold' }}>
-                🛡 {card.block}
-              </Text>
-            )}
-            {card.damage === 0 && card.block === 0 && (
-              <Text style={{ color: palette.textDim, fontSize: 22 }}>✦</Text>
-            )}
-          </View>
-        </View>
+        <Paper style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10,borderWidth:2,borderColor:paper.red}}><InkIcon name={isAttack?'attack':'blessing'} size={40} color={paper.red}/><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:13,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</Paper>
       </Animated.View>
 
     </Animated.View>

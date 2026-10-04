@@ -3,7 +3,7 @@
     "name": "PhiKinHua",
     "slug": "PhiKinHua",
     "scheme": "phikinhua",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "userInterfaceStyle": "dark",
     "orientation": "portrait",
     "plugins": [
@@ -23,15 +23,15 @@
     ],
     "android": {
       "package": "com.phikinhua.episode",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-pulp.png",
         "backgroundColor": "#1a0a00"
       }
     },
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-pulp.png",
     "splash": {
-      "image": "./assets/scence/episode-village.jpg",
+      "image": "./assets/scence/menu-haunted.jpg",
       "resizeMode": "cover",
       "backgroundColor": "#1a0a00"
     },

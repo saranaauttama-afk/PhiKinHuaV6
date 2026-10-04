@@ -12,6 +12,8 @@ import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
 import DiscardOverlay from './components/battle/DiscardOverlay';
 import VictoryOverlay from './components/battle/VictoryOverlay';
+import {needsVictoryIntro} from './postBattleFlow';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import CardRewardOverlay from './components/battle/CardRewardOverlay';
@@ -43,6 +45,8 @@ type EnemyHandCardData = {
 
 export default function BattlePage() {
   const router    = useRouter();
+  const safe = useSafeAreaInsets();
+  const [celebratedFight,setCelebratedFight] = React.useState(-1);
   const gameState = useGame((s) => s.state);
   const dispatch  = useGame((s) => s.dispatch);
   const { monsterId, monsterName } = useLocalSearchParams();
@@ -231,6 +235,10 @@ export default function BattlePage() {
     }
   }, [currentEvent]);
 
+  const victoryIntro=needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
+  React.useEffect(()=>{
+    if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying){dispatch({type:'CompleteNode'});router.replace('/');}
+  },[gameState.phase,celebratedFight,timeline.isPlaying]);
   // hook ทั้งหมดต้องถูกเรียกก่อนถึงจะ return ได้ ไม่งั้นลำดับ hook เพี้ยน
   if (!fontsLoaded) return null;
 
@@ -241,7 +249,7 @@ export default function BattlePage() {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <View style={{ position: 'absolute', top: 30, right: 10, zIndex: layer.statusBar }}>
+        <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
           <Pressable onPress={() => router.back()}>
             <Image
               source={require('../assets/images/btnDelete.png')}
@@ -257,7 +265,7 @@ export default function BattlePage() {
           <Pressable
             onPress={timeline.skip}
             style={{
-              position: 'absolute', top: 34, left: 14, zIndex: layer.control,
+              position: 'absolute', top: safe.top + 8, left: 14, zIndex: layer.control,
               paddingHorizontal: 14, paddingVertical: 6,
               borderRadius: 14,
               backgroundColor: surface.glassDim,
@@ -278,7 +286,6 @@ export default function BattlePage() {
           monsterId={monsterId}
           monsterName={monsterName}
           enemy={enemy ?? null}
-          intent={gameState.runMode === 'episode' && phase === 'player' ? gameState.enemyIntent : undefined}
         />
 
         <ScreenFlash ref={flashRef} />
@@ -335,13 +342,13 @@ export default function BattlePage() {
         ))}
 
         {/* ผีที่เรียกมา — วางเหนือมือ ใต้ฉากกลาง ซ้ายของเรา ขวาของศัตรู */}
-        <View style={{ position: 'absolute', bottom: 210, left: 0, right: 0, zIndex: layer.decor }}>
+        <View style={{ position: 'absolute', bottom: safe.bottom + 330, left: 0, right: 0, zIndex: layer.decor }}>
           <MinionRow minions={gameState.minions} />
         </View>
 
         {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้
             คอมโบอยู่เหนือขึ้นไปหนึ่งชั้น เพราะมันคือสิ่งที่กำลังจะเกิด ไม่ใช่สิ่งที่เป็นอยู่ */}
-        <View style={{ position: 'absolute', bottom: 118, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
+        <View style={{ position: 'absolute', bottom: safe.bottom + 330, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
           {/* กับดักอยู่บนสุด เพราะมันคือสิ่งที่เราวางไว้แล้วรออยู่ */}
           <TrapRow traps={gameState.traps} />
           <ComboStrip state={gameState} />
@@ -377,7 +384,7 @@ export default function BattlePage() {
             onPress={() => setBlessingsOpen(true)}
             hitSlop={8}
             style={{
-              position: 'absolute', top: 34, right: 60, zIndex: layer.control,
+              position: 'absolute', top: safe.top + 8, right: 60, zIndex: layer.control,
               paddingHorizontal: 10, paddingVertical: 4,
               borderRadius: 999,
               backgroundColor: tint.moonSoft,
@@ -417,7 +424,7 @@ export default function BattlePage() {
 
         {/* เลเวลอัปต้องมาก่อนหน้าชนะ — เดิม VictoryOverlay กลืน phase นี้ไป
             ทำให้ผู้เล่นไม่เคยได้เลือกรางวัลเลย */}
-        {gameState.phase === 'levelup' && gameState.levelUp?.choice && (
+        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'levelup' && gameState.levelUp?.choice && (
           <LevelUpOverlay
             state={gameState}
             playerLevel={player.level}
@@ -430,7 +437,7 @@ export default function BattlePage() {
 
         {/* การ์ดรางวัลมาหลังเลเวลอัป และมาก่อนหน้าชนะ — ทั้งสามอันเป็น
             phase คนละอัน ลำดับตัดสินที่ `advanceAfterVictory` ที่เดียว */}
-        {gameState.phase === 'reward' && gameState.cardReward && (
+        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'reward' && gameState.cardReward && (
           <CardRewardOverlay
             choices={gameState.cardReward.choices}
             deck={gameState.masterDeck ?? []}
@@ -439,7 +446,7 @@ export default function BattlePage() {
           />
         )}
 
-        {gameState.phase === 'victory' && (
+        {victoryIntro && (
           <VictoryOverlay
             enemyName={enemy?.name ?? (Array.isArray(monsterName) ? monsterName[0] : monsterName) ?? 'ศัตรู'}
             expGained={reward.exp}
@@ -450,8 +457,7 @@ export default function BattlePage() {
             onContinue={() => {
               // ปิด node บนแผนที่ก่อนกลับ — engine จะ mark resolved,
               // หัก token ของ pool แล้วพากลับสู่ phase 'map' ให้เอง
-              dispatch({ type: 'CompleteNode' });
-              router.replace('/');
+              setCelebratedFight(gameState.fightCount??0);
             }}
           />
         )}

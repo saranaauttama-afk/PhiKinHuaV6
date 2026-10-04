@@ -10,13 +10,14 @@
 // **กองจั่วเรียงตามชื่อ ไม่ใช่ตามลำดับจริง** — บอกลำดับที่จะจั่วเท่ากับยกเลิก
 // การสับไพ่ทิ้ง ที่นี่ตอบว่า "เหลืออะไรบ้าง" ไม่ใช่ "ใบไหนมาก่อน"
 
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, DeckPiles } from '../../../src/core/types';
 import { groupCards } from '../../../src/core/cards/group';
 import CardRow from '../CardRow';
 import { GameButton } from '../Panel';
-import { font, palette, radius, size, space, surface, tint, layer } from '../../theme';
+import { font, radius, size, space, tint, layer } from '../../theme';
 import { useScreenPadding } from '../../useScreenPadding';
 
 export type PileId = 'draw' | 'discard' | 'exhaust' | 'all';
@@ -63,6 +64,7 @@ export default function PileView({ piles, deck, open, onChangePile, onClose }: P
       backgroundColor: palette.scrimFull,
       zIndex: layer.overlay,
     }}>
+      <PaperTexture />
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,

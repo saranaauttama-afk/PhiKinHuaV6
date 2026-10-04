@@ -8,13 +8,14 @@
 // จึงล้นออกนอกจอ) และปุ่มปิดเป็นตัวหนังสือสีเลือดบนพื้นสีเลือด — มองไม่เห็น
 // ส่วนของเครื่องรางก็ยังเป็น className ของ NativeWind ปนกับ StyleSheet อยู่
 
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { Command, GameState } from '../../src/core/types';
 import { groupCards } from '../../src/core/cards/group';
 import CardRow from './CardRow';
 import { GameButton } from './Panel';
-import { font, palette, radius, size, space, surface, tint, layer } from '../theme';
+import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
 /** ชื่อชนิดการ์ดเป็นภาษาไทย — เดิมเอาค่า type ดิบมาต่อกับคำว่า "Cards" */
@@ -52,6 +53,7 @@ export default function DeckView({ state, dispatch }: Props) {
       backgroundColor: palette.scrimFull,
       zIndex: layer.overlay,
     }}>
+      <PaperTexture />
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,

@@ -3,12 +3,14 @@
 // ใช้ทั้งในหน้าสำรับ (นอกไฟต์) และหน้าดูกองการ์ด (ในไฟต์) — สองที่นี้ต้องอ่าน
 // เหมือนกันเป๊ะ ไม่งั้นผู้เล่นต้องเรียนรู้สองแบบสำหรับข้อมูลชุดเดียวกัน
 
+import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
 import React from 'react';
+import InkIcon from './InkIcon';
 import { Text, View } from 'react-native';
 import type { CardData } from '../../src/core/types';
 import { isFused } from '../../src/core/cards/fusion';
 import { hitsOf, conditionLabel } from '../../src/core/cards/mechanics';
-import { font, palette, radius, size, space, surface, tint } from '../theme';
+import { font, radius, size, space, tint } from '../theme';
 
 /** ป้ายเล็กบอกคุณสมบัติพิเศษของใบนี้ */
 function Badge({ label, tone = 'moon' }: { label: string; tone?: 'moon' | 'blood' }) {
@@ -66,6 +68,7 @@ export default function CardRow({ card, count, spent = false }: Props) {
       borderColor: spent ? palette.line : surface.panelWell,
       opacity: spent ? 0.45 : 1,
     }}>
+      <PaperTexture />
       {/* ค่าร่าย — อ่านเป็นเลขเดียวโดดๆ เหมือนมุมการ์ดจริง */}
       <View style={{
         width: 26, height: 26, borderRadius: radius.pill,
@@ -78,6 +81,7 @@ export default function CardRow({ card, count, spent = false }: Props) {
         </Text>
       </View>
 
+      <InkIcon name={card.type === 'attack' ? 'attack' : card.type === 'trap' ? 'block' : 'blessing'} size={30} color={palette.blood} />
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, flexWrap: 'wrap' }}>
           <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.uiMed }}>
