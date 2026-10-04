@@ -56,6 +56,7 @@ export default function BattlePage() {
 
   const player = gameState.player;
   const enemy  = gameState.enemy;
+  const bootstrapped = React.useRef(false);
 
   const [phase, setPhase] = React.useState<Phase>('player');
 
@@ -81,7 +82,9 @@ export default function BattlePage() {
   // ปกติ ChooseOffer บนหน้าแผนที่เซ็ตอัพคอมแบตมาให้ครบแล้ว (ศัตรู เด็ค มือแรก)
   // เหลือไว้เป็นทางสำรองกรณีเปิดหน้านี้ตรงๆ เช่นตอน dev
   React.useEffect(() => {
-    if (monsterId && !enemy && gameState.phase !== 'combat') {
+    if (!monsterId || bootstrapped.current) return;
+    bootstrapped.current = true;
+    if (!enemy && (gameState.phase === 'start' || gameState.phase === 'map')) {
       dispatch({ type: 'StartCombat', monsterId: monsterId as string });
     }
   }, [monsterId, enemy, gameState.phase]);
@@ -106,7 +109,7 @@ export default function BattlePage() {
   const [blessingsOpen, setBlessingsOpen] = React.useState(false);
 
   const handlePlayCard = (card: any, index: number) => {
-    if (phase !== 'player') return;
+    if (phase !== 'player' || gameState.phase !== 'combat') return;
     const identifier = card.instanceId ?? card.id;
     setPlayedCardIds(prev => [...prev, identifier]);
 
@@ -147,7 +150,7 @@ export default function BattlePage() {
   };
 
   const handleEndTurn = () => {
-    if (phase !== 'player') return;
+    if (phase !== 'player' || gameState.phase !== 'combat') return;
     if (playerHand.length > player.maxHandSize) {
       setPhase('discard');
       return;
@@ -422,8 +425,7 @@ export default function BattlePage() {
           />
         )}
 
-        {/* เลเวลอัปต้องมาก่อนหน้าชนะ — เดิม VictoryOverlay กลืน phase นี้ไป
-            ทำให้ผู้เล่นไม่เคยได้เลือกรางวัลเลย */}
+        {/* หลังรับทราบชัยชนะ จึงแสดงตัวเลือกเลเวลอัปที่ engine เตรียมไว้ */}
         {!victoryIntro && !timeline.isPlaying && gameState.phase === 'levelup' && gameState.levelUp?.choice && (
           <LevelUpOverlay
             state={gameState}
@@ -435,8 +437,7 @@ export default function BattlePage() {
           />
         )}
 
-        {/* การ์ดรางวัลมาหลังเลเวลอัป และมาก่อนหน้าชนะ — ทั้งสามอันเป็น
-            phase คนละอัน ลำดับตัดสินที่ `advanceAfterVictory` ที่เดียว */}
+        {/* หลังรับทราบชัยชนะและเลือกอัปเกรด จึงแสดงการ์ดรางวัล */}
         {!victoryIntro && !timeline.isPlaying && gameState.phase === 'reward' && gameState.cardReward && (
           <CardRewardOverlay
             choices={gameState.cardReward.choices}

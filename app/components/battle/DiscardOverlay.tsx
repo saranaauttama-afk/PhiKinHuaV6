@@ -89,7 +89,7 @@ export default function DiscardOverlay({ cards, maxHandSize, onConfirm, onCancel
                 borderRadius: 10,
                 borderWidth: isSelected ? 2.5 : 1,
                 borderColor: isSelected ? palette.bloodLit : palette.line,
-                backgroundColor: isSelected ? palette.bloodDeep : surface.panel,
+                backgroundColor: isSelected ? surface.panelActive : surface.panel,
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: 8,
