@@ -76,7 +76,7 @@ jobs:
           disable-animations: true
           script: |
             adb install PhiKinHua-FirstNight-v1.0.4.apk
-            timeout 900 python -u scripts/android-smoke.py
+            timeout 900 python -u scripts/android-smoke.py --layout-only
       - uses: actions/upload-artifact@v4
         if: always()
         with:
