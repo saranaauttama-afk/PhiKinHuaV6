@@ -1,0 +1,84 @@
+name: Android parchment UI patch APK
+on:
+  push:
+    branches: ['work/pulp-ui-fix']
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  ui-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - run: npm test && npx tsc --noEmit
+      - name: Confirm assets and native configuration match audited baseline
+        run: |
+          test -z "$(git diff --name-only aad2805f7598b06be04291a69f93f02db31a20d1 HEAD -- assets app.json package.json package-lock.json metro.config.js babel.config.js)"
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-FirstNight-APK
+          run-id: 37184012483
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: audited-base/
+      - run: CI=1 npx expo prebuild --platform android
+      - name: Compile release Hermes JS and existing asset references
+        working-directory: android
+        run: ./gradlew :app:createBundleReleaseJsAndAssets --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64
+      - name: Package, align, sign and audit updated APK
+        run: |
+          python scripts/repack-ui-apk.py audited-base/PhiKinHua-FirstNight-v1.0.2.apk android/app/build/generated/assets/react/release/index.android.bundle ui-unsigned.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/zipalign" -P 16 -f 4 ui-unsigned.apk ui-aligned.apk
+          "$BT/apksigner" sign --ks android/app/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v1-signing-enabled false --v2-signing-enabled true --v3-signing-enabled false --v4-signing-enabled false --out PhiKinHua-FirstNight-v1.0.2.apk ui-aligned.apk
+          mkdir -p apk-audit
+          "$BT/apksigner" verify --verbose --print-certs PhiKinHua-FirstNight-v1.0.2.apk > apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 PhiKinHua-FirstNight-v1.0.2.apk > apk-audit/zipalign.txt
+          "$BT/aapt" dump badging PhiKinHua-FirstNight-v1.0.2.apk > apk-audit/package.txt
+          python scripts/check-apk.py PhiKinHua-FirstNight-v1.0.2.apk > apk-audit/libraries.json
+          grep "package: name='com.phikinhua.episode' versionCode='3' versionName='1.0.2'" apk-audit/package.txt
+          grep 'fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c' apk-audit/signature.txt
+          sha256sum PhiKinHua-FirstNight-v1.0.2.apk > apk-audit/sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhiKinHua-FirstNight-APK
+          path: PhiKinHua-FirstNight-v1.0.2.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: APK-audit
+          path: apk-audit/
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-FirstNight-v1.0.2.apk
+            timeout 900 python -u scripts/android-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Android-emulator-smoke
+          path: smoke-output/
+          if-no-files-found: warn
