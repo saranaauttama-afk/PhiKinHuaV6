@@ -1,15 +1,27 @@
 """Real Android UI smoke. Cached bounds, bounded runtime, no engine shortcuts."""
-import os, re, sys, subprocess, time, xml.etree.ElementTree as ET
+import os, re, sys, subprocess, time, atexit, xml.etree.ElementTree as ET
 from pathlib import Path
 out = Path('smoke-output'); out.mkdir(exist_ok=True)
 package = 'com.phikinhua.episode'
 started = time.monotonic()
 def adb(*args): return subprocess.check_output(['adb', *args], text=True, timeout=25)
+def collect_failure_logs():
+    if not (out/'logcat.txt').exists():
+        try: (out/'logcat.txt').write_text(adb('logcat','-d'))
+        except Exception as e: (out/'logcat-error.txt').write_text(str(e))
+atexit.register(collect_failure_logs)
 def dump():
-    adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml')
-    xml = adb('shell', 'cat', '/sdcard/window.xml')
-    (out / 'latest-ui.xml').write_text(xml)
-    return ET.fromstring(xml)
+    for attempt in range(3):
+        adb('shell','rm','-f','/sdcard/window.xml')
+        adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml')
+        try:
+            xml = adb('shell', 'cat', '/sdcard/window.xml')
+            root = ET.fromstring(xml)
+            (out / 'latest-ui.xml').write_text(xml)
+            return root
+        except (subprocess.CalledProcessError, ET.ParseError):
+            if attempt==2: raise
+            time.sleep(.4)
 def fields(n): return [n.get('text',''), n.get('content-desc','')]
 def find(root, label, contains=False):
     return next((n for n in root.iter('node') if any(label in t if contains else label == t for t in fields(n))), None)
