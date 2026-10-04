@@ -10,7 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useBattleLayout } from './battleLayout';
 import {font} from '../../theme';
-import Paper,{paper} from '../Paper';
+import {paper} from '../Paper';
+import RitualSurface from '../RitualSurface';
 import InkIcon from '../InkIcon';
 
 const CARD_W      = 110;
@@ -134,12 +135,12 @@ export default function EnemyHandCard({
     <Animated.View style={containerStyle}>
       {/* Back face (face-down) */}
       <Animated.View style={backStyle}>
-        <Paper style={{flex:1,alignItems:'center',justifyContent:'center',padding:5,backgroundColor:pulpColors.enemyBack,borderWidth:2,borderColor:pulpColors.enemyInk}}><InkIcon name="blessing" size={66} color={pulpColors.enemyInk}/></Paper>
+        <RitualSurface kind="palm" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5,borderWidth:2,borderColor:pulpColors.enemyInk}}><InkIcon name="blessing" size={66} color={pulpColors.enemyInk}/></RitualSurface>
       </Animated.View>
 
       {/* Front face */}
       <Animated.View style={frontStyle}>
-        <Paper style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10,borderWidth:2,borderColor:paper.red}}><InkIcon name={isAttack?'attack':'blessing'} size={40} color={paper.red}/><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:13,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</Paper>
+        <RitualSurface kind="palm" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10,borderWidth:2,borderColor:paper.red}}><InkIcon name={isAttack?'attack':'blessing'} size={40} color={paper.red}/><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:13,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</RitualSurface>
       </Animated.View>
 
     </Animated.View>

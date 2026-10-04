@@ -345,13 +345,13 @@ export default function BattlePage() {
         ))}
 
         {/* ผีที่เรียกมา — วางเหนือมือ ใต้ฉากกลาง ซ้ายของเรา ขวาของศัตรู */}
-        <View style={{ position: 'absolute', bottom: safe.bottom + 330, left: 0, right: 0, zIndex: layer.decor }}>
+        <View style={{ position: 'absolute', bottom: safe.bottom + 365, left: 0, right: 0, zIndex: layer.decor }}>
           <MinionRow minions={gameState.minions} />
         </View>
 
         {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้
             คอมโบอยู่เหนือขึ้นไปหนึ่งชั้น เพราะมันคือสิ่งที่กำลังจะเกิด ไม่ใช่สิ่งที่เป็นอยู่ */}
-        <View style={{ position: 'absolute', bottom: safe.bottom + 330, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
+        <View style={{ position: 'absolute', bottom: safe.bottom + 365, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
           {/* กับดักอยู่บนสุด เพราะมันคือสิ่งที่เราวางไว้แล้วรออยู่ */}
           <TrapRow traps={gameState.traps} />
           <ComboStrip state={gameState} />

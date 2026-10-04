@@ -1,7 +1,7 @@
 name: Android parchment UI patch APK
 on:
   push:
-    branches: ['work/pulp-ui-fix']
+    branches: ['work/pulp-ui-fix', 'work/pulp-arrival-v3']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -29,11 +29,11 @@ jobs:
       - run: npm test && npx tsc --noEmit
       - name: Confirm assets and native configuration match audited baseline
         run: |
-          test -z "$(git diff --name-only 733e4cfd1ab08c1c56e0ad953654a9f1050c5d0b HEAD -- assets app.json package.json package-lock.json metro.config.js babel.config.js)"
+          test -z "$(git diff --name-only f0327b4d188ca50bd039d98cbfcd612d5875ae37 HEAD -- assets app.json package.json package-lock.json metro.config.js babel.config.js)"
       - uses: actions/download-artifact@v4
         with:
           name: PhiKinHua-FirstNight-APK
-          run-id: 37192802625
+          run-id: 37201605166
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: audited-base/
       - run: CI=1 npx expo prebuild --platform android
@@ -42,22 +42,22 @@ jobs:
         run: ./gradlew :app:createBundleReleaseJsAndAssets --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64
       - name: Package, align, sign and audit updated APK
         run: |
-          python scripts/repack-ui-apk.py audited-base/PhiKinHua-FirstNight-v1.0.3.apk android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle ui-unsigned.apk
+          python scripts/repack-ui-apk.py audited-base/PhiKinHua-FirstNight-v1.0.4.apk android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle ui-unsigned.apk
           BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
           "$BT/zipalign" -P 16 -f 4 ui-unsigned.apk ui-aligned.apk
-          "$BT/apksigner" sign --ks android/app/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v1-signing-enabled false --v2-signing-enabled true --v3-signing-enabled false --v4-signing-enabled false --out PhiKinHua-FirstNight-v1.0.3.apk ui-aligned.apk
+          "$BT/apksigner" sign --ks android/app/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v1-signing-enabled false --v2-signing-enabled true --v3-signing-enabled false --v4-signing-enabled false --out PhiKinHua-FirstNight-v1.0.4.apk ui-aligned.apk
           mkdir -p apk-audit
-          "$BT/apksigner" verify --verbose --print-certs PhiKinHua-FirstNight-v1.0.3.apk > apk-audit/signature.txt
-          "$BT/zipalign" -c -P 16 -v 4 PhiKinHua-FirstNight-v1.0.3.apk > apk-audit/zipalign.txt
-          "$BT/aapt" dump badging PhiKinHua-FirstNight-v1.0.3.apk > apk-audit/package.txt
-          python scripts/check-apk.py PhiKinHua-FirstNight-v1.0.3.apk > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='4' versionName='1.0.3'" apk-audit/package.txt
+          "$BT/apksigner" verify --verbose --print-certs PhiKinHua-FirstNight-v1.0.4.apk > apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 PhiKinHua-FirstNight-v1.0.4.apk > apk-audit/zipalign.txt
+          "$BT/aapt" dump badging PhiKinHua-FirstNight-v1.0.4.apk > apk-audit/package.txt
+          python scripts/check-apk.py PhiKinHua-FirstNight-v1.0.4.apk > apk-audit/libraries.json
+          grep "package: name='com.phikinhua.episode' versionCode='5' versionName='1.0.4'" apk-audit/package.txt
           grep 'fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c' apk-audit/signature.txt
-          sha256sum PhiKinHua-FirstNight-v1.0.3.apk > apk-audit/sha256.txt
+          sha256sum PhiKinHua-FirstNight-v1.0.4.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FirstNight-APK
-          path: PhiKinHua-FirstNight-v1.0.3.apk
+          path: PhiKinHua-FirstNight-v1.0.4.apk
       - uses: actions/upload-artifact@v4
         with:
           name: APK-audit
@@ -75,8 +75,8 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FirstNight-v1.0.3.apk
-            timeout 900 python -u scripts/android-smoke.py --layout-only
+            adb install PhiKinHua-FirstNight-v1.0.4.apk
+            timeout 900 python -u scripts/android-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

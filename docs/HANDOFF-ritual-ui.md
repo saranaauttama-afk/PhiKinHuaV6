@@ -16,3 +16,5 @@ Assets: `assets/ui/ritual-{slate,palm,wood,cloth,notice,jar,knife}.png`, generat
 Native raster surfaces use measured numeric dimensions to avoid previously observed Android intrinsic Image sizing errors. Live labels/accessibility remain intact. App 1.0.4/code5, same package and signing. Assets require a full native build, never JS-only repack against the old asset baseline.
 
 Validation: local TypeScript check and all 543 tests passed (2 workers; initial parallel run had an unrelated long simulation timeout). Full Android build, audit, UI smoke and visual screenshot review pending.
+
+Follow-up: enemy reveal cards also use palm-leaf textures. Minion/status anchors move up 35px with the hand to avoid overlaps. TypeScript and 543 tests pass again. UI-only patch workflow pins native asset baseline f0327b4 / run37201605166 and runs full native smoke; new assets/config still require full native build.

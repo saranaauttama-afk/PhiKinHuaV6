@@ -1,26 +1,34 @@
-[
-  [
-    "slate",
-    "A single landscape old Thai classroom slate board, aspect ratio 3:1, chipped dark brown timber frame, charcoal black center with faint wiped chalk smudges, two faded dried vermilion fingerprints at corners. CENTER blank and dark for white UI text, no writing."
-  ],
-  [
-    "palm",
-    "A single portrait palm leaf manuscript game card, aspect ratio 1:2, many narrow horizontal dried palm-leaf strips bound by a dark thread through two holes near left edge, warm aged ivory ochre, sparse incised geometric mystical marks ONLY at outer margins, quiet blank center for live text. Frayed irregular edges and a small dried red stain in corner."
-  ],
-  [
-    "jar",
-    "A single haunted Thai terracotta spirit sealing pot with a separate-looking closed lid, wrapped with frayed white sacred sai sin thread and a small ivory paper talisman with abstract ink markings (no readable words), dark ochre clay and dried vermilion stains. Front view, squat shape, full silhouette, transparent outside. This is a tappable end-turn game prop, should read clearly at 70 pixels."
-  ],
-  [
-    "wood",
-    "A single landscape old rough wooden sign, aspect ratio 4:1, dark scorched brown wood with carved scratches and a few dried red smears along edges. Quiet dark brown blank CENTER for cream live UI text. Jagged broken corners."
-  ],
-  [
-    "cloth",
-    "A single landscape old Thai ivory protective talisman cloth, aspect ratio 3:1, ragged frayed edges, stains and muted red geometric ritual ink along margins only, white sacred thread stretched across top edge. CENTER quiet pale aged linen, empty for live UI stats."
-  ],
-  [
-    "notice",
-    "A single portrait torn aged Thai ghost notice paper sheet, aspect ratio 1:2, rough irregular torn edges, creases, yellowed ivory center blank for ghost portrait and live UI text, small red stamped circle without words at top corner and faint dried red fingerprints at bottom edge."
+{
+  "generator": "built-in imagegen",
+  "transparent_background": true,
+  "assets": [
+    {
+      "path": "assets/ui/ritual-slate.png",
+      "prompt": "Use case: stylized-concept. Production raster UI asset for a Thai horror card game. A single landscape old Thai classroom slate board, aspect ratio 3:1, chipped dark brown timber frame, charcoal black center with faint wiped chalk smudges, two faded dried vermilion fingerprints at corners. CENTER blank and dark for white UI text, no writing. Style: cheap vintage Thai one-baht horror comic, coarse bold black hand ink, visible halftone and rough print texture, muted charcoal ochre ivory vermilion, flat hand drawn object, NOT photorealistic or glossy 3D. One object centered fully visible, outside genuinely transparent, NO text, no watermark, no extra objects."
+    },
+    {
+      "path": "assets/ui/ritual-palm.png",
+      "prompt": "Use case: stylized-concept. Production raster UI asset for a Thai horror card game. A single portrait palm leaf manuscript game card, aspect ratio 1:2, many narrow horizontal dried palm-leaf strips bound by a dark thread through two holes near left edge, warm aged ivory ochre, sparse incised geometric mystical marks ONLY at outer margins, quiet blank center for live text. Frayed irregular edges and a small dried red stain in corner. Style: cheap vintage Thai one-baht horror comic, coarse bold black hand ink, visible halftone and rough print texture, muted charcoal ochre ivory vermilion, flat hand drawn object, NOT photorealistic or glossy 3D. One object centered fully visible, outside genuinely transparent, NO text, no watermark, no extra objects."
+    },
+    {
+      "path": "assets/ui/ritual-jar.png",
+      "prompt": "Use case: stylized-concept. Production raster UI asset for a Thai horror card game. A single haunted Thai terracotta spirit sealing pot with a separate-looking closed lid, wrapped with frayed white sacred sai sin thread and a small ivory paper talisman with abstract ink markings (no readable words), dark ochre clay and dried vermilion stains. Front view, squat shape, full silhouette, transparent outside. This is a tappable end-turn game prop, should read clearly at 70 pixels. Style: cheap vintage Thai one-baht horror comic, coarse bold black hand ink, visible halftone and rough print texture, muted charcoal ochre ivory vermilion, flat hand drawn object, NOT photorealistic or glossy 3D. One object centered fully visible, outside genuinely transparent, NO text, no watermark, no extra objects."
+    },
+    {
+      "path": "assets/ui/ritual-wood.png",
+      "prompt": "Use case: stylized-concept. Production raster UI asset for a Thai horror card game. A single landscape old rough wooden sign, aspect ratio 4:1, dark scorched brown wood with carved scratches and a few dried red smears along edges. Quiet dark brown blank CENTER for cream live UI text. Jagged broken corners. Style: cheap vintage Thai one-baht horror comic, coarse bold black hand ink, visible halftone and rough print texture, muted charcoal ochre ivory vermilion, flat hand drawn object, NOT photorealistic or glossy 3D. One object centered fully visible, outside genuinely transparent, NO text, no watermark, no extra objects."
+    },
+    {
+      "path": "assets/ui/ritual-cloth.png",
+      "prompt": "Use case: stylized-concept. Production raster UI asset for a Thai horror card game. A single landscape old Thai ivory protective talisman cloth, aspect ratio 3:1, ragged frayed edges, stains and muted red geometric ritual ink along margins only, white sacred thread stretched across top edge. CENTER quiet pale aged linen, empty for live UI stats. Style: cheap vintage Thai one-baht horror comic, coarse bold black hand ink, visible halftone and rough print texture, muted charcoal ochre ivory vermilion, flat hand drawn object, NOT photorealistic or glossy 3D. One object centered fully visible, outside genuinely transparent, NO text, no watermark, no extra objects."
+    },
+    {
+      "path": "assets/ui/ritual-notice.png",
+      "prompt": "Use case: stylized-concept. Production raster UI asset for a Thai horror card game. A single portrait torn aged Thai ghost notice paper sheet, aspect ratio 1:2, rough irregular torn edges, creases, yellowed ivory center blank for ghost portrait and live UI text, small red stamped circle without words at top corner and faint dried red fingerprints at bottom edge. Style: cheap vintage Thai one-baht horror comic, coarse bold black hand ink, visible halftone and rough print texture, muted charcoal ochre ivory vermilion, flat hand drawn object, NOT photorealistic or glossy 3D. One object centered fully visible, outside genuinely transparent, NO text, no watermark, no extra objects."
+    },
+    {
+      "path": "assets/ui/ritual-knife.png",
+      "prompt": "Use case stylized-concept. Single Thai mor phi ritual knife (มีดหมอ), aged short steel blade with tiny engraved mystical marks, dark carved wooden handle wrapped with ivory sacred thread, vermilion dried stains at handle. Diagonal full silhouette centered, genuinely transparent outside, bold rough black hand ink and coarse halftone muted ochre ivory red palette, vintage cheap Thai one-baht ghost comic style. Production game card icon readable at 40px. No text, no extra objects, not glossy or 3D."
+    }
   ]
-]
+}
