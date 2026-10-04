@@ -40,3 +40,6 @@ Asset generation: built-in imagegen. Title prompt: exact “ผีกินห�
 
 ### Android visual QA correction
 The full native build at `733e4cf` (run 37192802625) passed audit/UI flow, but screenshots exposed intrinsic Image sizing issues in the cover/button and video exposed static camera frames. Fixed explicit logo/button heights and moved camera/fade to React requestAnimationFrame updates. Smoke now requires different scene pixels between two pre-choice frames. A JS-only repack reuses the audited native APK only after an unchanged-assets/native-config guard; final result is pending.
+
+### Camera verification and final small-button adjustment
+Run 37194228647 (`a2b7f61`) passed audit and full Android UI smoke through victory/rewards/rest/event. Pre-choice scene pixel difference was 67.48 (threshold 3), confirming camera travel; source remained the lantern scene after fade. Cover/title/buttons visually passed. Card-preview buttons still showed an Android percentage-width sizing issue: the raster was narrower than its Pressable. Updated shared GameButton to measure the actual Pressable width and draw its background using numeric width. Latest smoke is scoped to cover/map/battle/card-preview/use because camera and flow code are unchanged; its result is pending.

@@ -1,5 +1,5 @@
 """Real Android UI smoke. Cached bounds, bounded runtime, no engine shortcuts."""
-import os, re, subprocess, time, xml.etree.ElementTree as ET
+import os, re, sys, subprocess, time, xml.etree.ElementTree as ET
 from pathlib import Path
 out = Path('smoke-output'); out.mkdir(exist_ok=True)
 package = 'com.phikinhua.episode'
@@ -52,6 +52,16 @@ wait_for('คืนแรกที่บ้านร้าง');shot('03-prologu
 tap('ข้ามบทนี้');tap('พรติดตัว 1:',contains=True)
 wait_for('ผีปอบ');shot('04-map');tap('ผีปอบ');tap('จับผี')
 wait_for('จบเทิร์น');shot('05-battle')
+if '--layout-only' in sys.argv:
+    cards=[n for n in dump().iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc',''))]
+    assert cards, 'No hand cards available for layout check'
+    touch(cards[0]);wait_for('ใช้การ์ด');shot('06-card-preview')
+    tap('ใช้การ์ด');shot('07-after-use')
+    logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
+    assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs)
+    assert adb('shell','pidof',package).strip()
+    (out/'result.txt').write_text('PASS: scoped Android layout smoke — cover, character, prologue, map, battle, card preview and use. Full victory/event/camera smoke previously passed at a2b7f61; this follow-up changes only shared button sizing. Physical device not tested.\n')
+    print((out/'result.txt').read_text());sys.exit(0)
 won=False;played=False
 for turn in range(12):
     attempted=set()
