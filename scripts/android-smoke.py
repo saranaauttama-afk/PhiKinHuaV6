@@ -61,7 +61,7 @@ for turn in range(12):
         if has(root,'ชนะ!'): won=True;break
         assert not has(root,'ของที่เก็บได้'), 'Reward appeared before victory'
         assert not any(t.startswith('เลเวล ') for t in labels(root)), 'Upgrade appeared before victory'
-        if discard_if_needed(root): time.sleep(7);break
+        if discard_if_needed(root): attempted.clear();continue
         candidates=[n for n in root.iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc','')) and n.get('content-desc') not in attempted]
         candidates.sort(key=lambda n: 0 if re.search('ฟัน|ปรบ|สวน|เตะ|หมัด',n.get('content-desc','')) else 1)
         if not candidates:break
@@ -92,9 +92,20 @@ for _ in range(12):
     if skip is not None:shot('09-level-up');touch(skip)
     elif reward is not None:shot('10-card-reward');touch(reward)
     else:break
-wait_for('ตะเกียงใต้ถุน');shot('11-rest-arrival');tap('ตะเกียงใต้ถุน');tap('แวะที่นี่')
+wait_for('ตะเกียงใต้ถุน');shot('11-rest-arrival');tap('ตะเกียงใต้ถุน')
+# Record the actual native arrival, including the image before choices appear.
+recording = subprocess.Popen(['adb','shell','screenrecord','--time-limit','25','/sdcard/arrival.mp4'])
+tap('แวะที่นี่')
+for frame, delay in [('arrival-step-1', .1), ('arrival-step-2', .8), ('arrival-settled', 2.5)]:
+    time.sleep(delay)
+    with open(out/(frame+'.png'),'wb') as f:
+        subprocess.run(['adb','exec-out','screencap','-p'],stdout=f,check=True,timeout=20)
+adb('shell','pkill','-2','screenrecord')
+recording.wait(timeout=15)
+adb('pull','/sdcard/arrival.mp4',str(out/'arrival.mp4'))
 wait_for('นั่งพักข้างตะเกียง',contains=True);shot('12-event-choices');tap('นั่งพักข้างตะเกียง',contains=True)
 wait_for('เดินทางต่อ');shot('13-event-result');tap('เดินทางต่อ')
+wait_for('กระสือ',contains=True);shot('14-next-location')
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'
 assert adb('shell','pidof',package).strip(),'App exited'

@@ -145,7 +145,7 @@ describe('เลย์เอาต์ — ของต้องไม่ทั�
   /** โอเวอร์เลย์เต็มจอทุกอันต้องอยู่เหนือแถบสถานะ */
   const OVERLAYS = [
     'components/ShopView.tsx',
-    'components/StoryEventView.tsx',
+    // StoryEventView is a standalone route, outside the map/status bar.
     'components/DeckView.tsx',
     'components/BlessingView.tsx',
   ];

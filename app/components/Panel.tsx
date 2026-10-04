@@ -1,6 +1,6 @@
 import {pulpColors} from '../theme';
 import React from 'react';
-import { Pressable, StyleProp, Text, View, ViewStyle } from 'react-native';
+import { Image, Pressable, StyleProp, Text, View, ViewStyle } from 'react-native';
 import { font, palette, space } from '../theme';
 import Paper, { paper } from './Paper';
 import InkIcon from './InkIcon';
@@ -8,6 +8,9 @@ type Props={children?:React.ReactNode;title?:string;subtitle?:string;style?:Styl
 export default function Panel({children,title,subtitle,style,emphasis,padded=true}:Props){return <Paper style={[{padding:padded?16:0,borderWidth:emphasis?2:0,borderColor:paper.red},style]}>{title&&<Text style={{fontFamily:font.heading,color:paper.ink,fontSize:17,marginBottom:8}}>{title}</Text>}{children}{subtitle&&<Text style={{fontFamily:font.ui,color:paper.muted,fontSize:12,marginTop:8}}>{subtitle}</Text>}</Paper>;}
 export function GameButton({label,onPress,tone='normal',disabled=false,style}:{label:string;onPress?:()=>void;tone?:'normal'|'primary'|'danger';disabled?:boolean;style?:StyleProp<ViewStyle>}){
  return <Pressable accessibilityRole="button" onPress={onPress} disabled={disabled} style={({pressed})=>[{minHeight:48,opacity:disabled?.4:1,transform:[{translateY:pressed?2:0}],alignSelf:'stretch'},style]}>
- <Paper style={{paddingVertical:12,paddingHorizontal:18,backgroundColor:tone==='primary'?pulpColors.primaryPaper:paper.light,borderBottomWidth:3,borderColor:tone==='danger'?paper.red:paper.line,flexDirection:'row',alignItems:'center',justifyContent:'center',gap:8}}>{tone==='primary'&&<InkIcon name="lantern" size={20}/>}<Text style={{color:tone==='danger'?paper.red:paper.ink,fontSize:14,fontFamily:font.heading,textAlign:'center'}}>{label}</Text></Paper></Pressable>;
+ <View style={{minHeight:52,paddingVertical:16,paddingHorizontal:20,flexDirection:'row',alignItems:'center',justifyContent:'center',gap:8}}>
+ <Image source={require('../../assets/ui/paper-button.png')} resizeMode="stretch" style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',opacity:tone==='primary'?1:.92}}/>
+ {tone==='primary'&&<InkIcon name="lantern" size={20}/>}
+ <Text style={{color:tone==='danger'?paper.red:paper.ink,fontSize:14,fontFamily:font.heading,textAlign:'center',flexShrink:1}}>{label}</Text></View></Pressable>;
 }
 export function Scrim({children,heavy=false,style}:{children?:React.ReactNode;heavy?:boolean;style?:StyleProp<ViewStyle>}){return <View style={[{flex:1,backgroundColor:heavy?palette.scrimHeavy:pulpColors.mapShade},style]}>{children}</View>;}

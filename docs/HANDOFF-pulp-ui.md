@@ -24,3 +24,16 @@ Local TypeScript check and all 541 tests pass, including seven presentation-orde
 ## Deferred
 
 Card balance, costs, character HP/energy, drop rates and rewards remain unchanged. Settings currently offers reduced arrival motion; there is no audio system to control yet.
+
+## Follow-up — v1.0.3 (2026-10-04)
+
+Branch `work/pulp-arrival-v3`, based on `3ac58d8`. Addresses backlog issue #1.
+- Raster brush-lettered Thai title (`assets/ui/title-pulp.png`) on cover/loading.
+- Actual generated worn paper strip (`assets/ui/paper-button.png`) replaces SVG button frames; labels remain accessible live text.
+- Arrival camera now travels 1.04→1.28 scale with visible step bob over 2.6 seconds, then fades controls. Final transform is retained. Reduced motion still skips arrival.
+- Events render as standalone full-screen content, not nested inside the map fade. The nested fade previously concealed much of the event camera travel.
+- Map scene is selected by reachable destination row, not last visited node/fight count; ending uses the haunted house instead of initial village. Each arrival retains the same source before/after fade.
+- UI changes only; balance untouched. Version 1.0.3 / code 4, same package/signing.
+- TypeScript and 543 tests pass, including destination scene regression cases. Web export passes. Android build/emulator result must be checked in Actions; not yet claimed. Smoke records an arrival video and before/during/after screenshots.
+
+Asset generation: built-in imagegen. Title prompt: exact “ผีกินหัว”, hand brush Thai one-baht ghost comic lettering, aged ivory with coarse red/black outline, real alpha. Button prompt: blank wide old comic paper strip, fibers, torn edges, folded corners, quiet ivory label area, real alpha. Cropped to alpha bounds, resized and palette-compressed for bundling.

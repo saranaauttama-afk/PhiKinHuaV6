@@ -2,6 +2,10 @@
 
 Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current deliverable is a short, complete first chapter, targeting 5–10 minutes of human play before expanding the game. Duration and enjoyment are playtest goals, not measured device results.
 
+## Latest UI follow-up
+
+`work/pulp-arrival-v3`: v1.0.3/code 4 fixes scene arrival visibility and destination persistence, adds raster comic title and old-paper buttons. Read `docs/HANDOFF-pulp-ui.md`. Android build/emulator verification status is recorded there. Balance unchanged.
+
 ## Current source
 
 Work branch: `work/first-chapter-apk`, based on `forCodex` at `0cd4dc4aabde2410be9c3d46a8d1a2577f7e4238`. `main` is older. Read `docs/HANDOFF-first-night.md` first; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.

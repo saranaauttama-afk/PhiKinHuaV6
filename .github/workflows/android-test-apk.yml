@@ -1,7 +1,7 @@
 name: Android first chapter APK
 on:
   push:
-    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui']
+    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/pulp-arrival-v3']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -38,13 +38,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='3' versionName='1.0.2'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FirstNight-v1.0.2.apk
-          sha256sum PhiKinHua-FirstNight-v1.0.2.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='4' versionName='1.0.3'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FirstNight-v1.0.3.apk
+          sha256sum PhiKinHua-FirstNight-v1.0.3.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FirstNight-APK
-          path: PhiKinHua-FirstNight-v1.0.2.apk
+          path: PhiKinHua-FirstNight-v1.0.3.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -73,7 +73,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FirstNight-v1.0.2.apk
+            adb install PhiKinHua-FirstNight-v1.0.3.apk
             python scripts/android-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()

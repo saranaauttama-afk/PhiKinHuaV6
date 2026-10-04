@@ -22,7 +22,7 @@ export const ART_SOURCES: Record<string, any> = {
   'scene/episode': require('../../assets/scence/episode-village.jpg'),
   'event/episode_lantern': require('../../assets/scence/lantern-hut.jpg'),
   'chapter/episode_open': require('../../assets/scence/episode-village.jpg'),
-  'chapter/episode_end': require('../../assets/scence/episode-village.jpg'),
+  'chapter/episode_end': require('../../assets/scence/menu-haunted.jpg'),
   'encounter/healing_shrine': require('../../assets/scence/rest.jpg'),
   'encounter/shop_upgrade': require('../../assets/scence/rest.jpg'),
   'scene/start':  require('../../assets/scence/startPage.png'),

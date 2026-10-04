@@ -21,6 +21,7 @@ import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
 import SceneArrival from './components/SceneArrival';
 import LoadingScreen from './components/LoadingScreen';
+import { mapScene } from './scenePresentation';
 import {paper} from './components/Paper';
 import BlessingView from './components/BlessingView';
 import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
@@ -206,9 +207,14 @@ export default function Home() {
     );
   }
 
+  // Events own their full-screen arrival; never start it inside a fading map.
+  if (state.phase === 'event' && state.story) {
+    return <StoryEventView state={state} dispatch={dispatch} />;
+  }
+  const location = mapScene(state);
   return (
     <View style={{ flex: 1 }}>
-      <SceneArrival sceneKey={`${state.journey?.currentId??'start'}-${state.fightCount??0}`} source={restRow?require('../assets/scence/lantern-hut.jpg'):(state.fightCount??0)>=2?require('../assets/scence/menu-haunted.jpg'):require('../assets/scence/episode-village.jpg')}>
+      <SceneArrival sceneKey={location.key} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
 
           {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
@@ -308,7 +314,7 @@ export default function Home() {
               กับ "Page X/Y" ซึ่งไม่มีความหมายอีกแล้วบนแผนที่แบบเส้นทาง
               และยังมีรายการทางเลือกซ้ำกับการ์ด encounter ด้านบนอีกชุด */}
           <ShopView state={state} dispatch={dispatch} />
-          <StoryEventView state={state} dispatch={dispatch} />
+
 
 
           <PlayerStatusBar

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, View, ImageSourcePropType, StyleSheet } from 'react-native';
+import { Animated, Easing, View, ImageSourcePropType, StyleSheet } from 'react-native';
 import { pulpColors } from '../theme';
 import { useGameSettings } from './Settings';
 
@@ -22,7 +22,7 @@ export default function SceneArrival({ source, sceneKey, children }: Props) {
     progress.setValue(0);
     fade.setValue(0);
     const arrival = Animated.sequence([
-      Animated.timing(progress, { toValue: 1, duration: reducedMotion ? 0 : 2500, useNativeDriver: true }),
+      Animated.timing(progress, { toValue: 1, duration: reducedMotion ? 0 : 2600, easing: Easing.linear, useNativeDriver: true }),
       Animated.timing(fade, { toValue: 1, duration: reducedMotion ? 0 : 450, useNativeDriver: true }),
     ]);
     arrival.start(({ finished }) => { if (finished) setReadyScene(sceneKey); });
@@ -30,15 +30,16 @@ export default function SceneArrival({ source, sceneKey, children }: Props) {
   }, [sceneKey, reducedMotion, progress, fade]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: pulpColors.sceneInk }}>
+    <View style={{ flex: 1, overflow: 'hidden', backgroundColor: pulpColors.sceneInk }}>
+      {/* The image is outside the fading UI and keeps its final camera transform. */}
       <Animated.Image
         source={source}
         resizeMode="cover"
         style={[StyleSheet.absoluteFill, {
           width: '100%', height: '100%',
           transform: [
-            { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1.02, reducedMotion ? 1.02 : 1.1] }) },
-            { translateY: progress.interpolate({ inputRange: [0, .16, .32, .48, .64, .8, 1], outputRange: [0, 3, -2, 3, -2, 2, 0] }) },
+            { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1.04, reducedMotion ? 1.04 : 1.28] }) },
+            { translateY: progress.interpolate({ inputRange: [0, .12, .25, .37, .5, .62, .75, .87, 1], outputRange: reducedMotion ? [0,0,0,0,0,0,0,0,0] : [0, 10, -8, 10, -8, 10, -8, 6, 0] }) },
           ],
         }]}
       />
