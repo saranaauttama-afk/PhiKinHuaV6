@@ -8,14 +8,15 @@ const surfaces={
  wood:require('../../assets/ui/ritual-wood.png'),
  cloth:require('../../assets/ui/ritual-cloth.png'),
  notice:require('../../assets/ui/ritual-notice.png'),
+ occupationPage:require('../../assets/ui/occupation-page.png'),
 };
 export const chalk=ritualColors.chalk;
 /** Numeric measured bounds avoid native Image intrinsic/percentage sizing surprises. */
-export default function RitualSurface({kind,children,style}:{kind:keyof typeof surfaces;children?:React.ReactNode;style?:StyleProp<ViewStyle>}){
+export default function RitualSurface({kind,children,style,accessibilityViewIsModal}:{kind:keyof typeof surfaces;children?:React.ReactNode;style?:StyleProp<ViewStyle>;accessibilityViewIsModal?:boolean}){
  const [size,setSize]=React.useState({width:0,height:0});
  // Preserve the native parent when borders/opacity change; avoid Fabric reparenting on exit.
  // Keep the image mounted: measurement changes dimensions, never the child hierarchy.
- return <View collapsable={false} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setSize(s=>s.width===width&&s.height===height?s:{width,height})}} style={[{padding:16},style]}>
+ return <View collapsable={false} accessibilityViewIsModal={accessibilityViewIsModal} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setSize(s=>s.width===width&&s.height===height?s:{width,height})}} style={[{padding:16},style]}>
   <Image accessible={false} source={surfaces[kind]} resizeMode="stretch" style={{position:'absolute',left:0,top:0,width:size.width,height:size.height}}/>
   {children}
  </View>;

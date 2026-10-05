@@ -21,6 +21,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
   const sceneWidth = bounds.width;
   const sceneHeight = bounds.height;
   const detailWidth = Math.min(width - 24, 480);
+  const portraitHeight = Math.min(290, height * .32);
   const [selected, setSelected] = React.useState<ClassId | null>(null);
   const picked = selected ? CHARACTER_CLASSES[selected] : null;
   return <View collapsable={false} onLayout={e => { const { width: w, height: h } = e.nativeEvent.layout; setBounds(b => b.width === w && b.height === h ? b : { width: w, height: h }); }} style={styles.screen}>
@@ -45,29 +46,33 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
             <Image accessible={false} source={artSource(`class/${sheet.id}`)} resizeMode="contain"
               style={{ width: sceneWidth * sheet.w * .88, height: sceneWidth * sheet.w * 1.32 }} />
           </View>
-          <Text pointerEvents="none" numberOfLines={1} style={[styles.sheetLabel, {
-            bottom: sceneHeight * sheet.h * .05, left: 3, right: 3,
-            fontSize: Math.max(11, sceneWidth * .034),
-          }]}>{CHARACTER_CLASSES[sheet.id].name}</Text>
         </Pressable>
       </View>)}
       <View pointerEvents="none" style={[styles.hintWrap, { bottom: pad.bottom + 12 }]}><Text style={styles.hint}>แตะใบอาชีพบนโต๊ะเพื่อดูรายละเอียด</Text></View>
     </View>
     <Modal visible={!!picked} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
       <View style={[styles.scrim, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
-        {picked && <View collapsable={false} accessibilityViewIsModal style={[styles.detail, { width: detailWidth, maxHeight: height - pad.top - pad.bottom }]}>
+        {picked && <RitualSurface kind="occupationPage" accessibilityViewIsModal style={[styles.detail, { width: detailWidth, maxHeight: height - pad.top - pad.bottom }]}>
           <ScrollView contentContainerStyle={styles.detailContent}>
             <Text accessibilityRole="header" style={styles.detailName}>{picked.name}</Text><Text style={styles.detailTitle}>{picked.title}</Text>
-            <RitualSurface kind="notice" style={styles.portrait}><Art slot={`class/${picked.id}`} width={detailWidth - 76} height={Math.min(300, height * .3)} /></RitualSurface>
+            <View collapsable={false} style={[styles.portrait, { width: detailWidth - 44, height: portraitHeight }]}>
+              <Image accessible={false} source={require('../../assets/ui/occupation-temple.jpg')} resizeMode="stretch"
+                style={{ position: 'absolute', width: detailWidth - 44, height: portraitHeight }} />
+              <Art slot={`class/${picked.id}`} width={portraitHeight * 2 / 3} height={portraitHeight} />
+            </View>
             <Text style={styles.copy}>{picked.desc}</Text>
             <View style={styles.stats}><Stat label="ชีวิต" value={picked.startHp} /><Stat label="พลังงาน" value={picked.startEnergy} /><Stat label="ไพ่ในมือ" value={picked.startHandSize} /></View>
             <Text style={styles.passive}>{picked.passiveName}</Text><Text style={styles.copy}>{picked.passiveDesc}</Text>
           </ScrollView>
           <View style={styles.actions}>
-            <Pressable accessibilityRole="button" onPress={() => { const id = picked.id; setSelected(null); onPick(id); }} style={styles.depart} android_ripple={{ color: sceneColors.pressWash }}><Text style={styles.departLabel}>เลือก{picked.name} · ออกเดินทาง →</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => { const id = picked.id; setSelected(null); onPick(id); }} style={styles.depart} android_ripple={{ color: sceneColors.pressWash }}>
+              <Image accessible={false} source={require('../../assets/ui/paper-button.png')} resizeMode="stretch" tintColor={colors.red}
+                style={{ position: 'absolute', width: detailWidth - 48, height: 56 }} />
+              <Text style={styles.departLabel}>เลือก{picked.name} · ออกเดินทาง →</Text>
+            </Pressable>
             <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={styles.close}><Text style={styles.closeLabel}>กลับไปเลือกอาชีพ</Text></Pressable>
           </View>
-        </View>}
+        </RitualSurface>}
       </View>
     </Modal>
   </View>;
@@ -84,21 +89,20 @@ const styles = StyleSheet.create({
   back: { position: 'absolute', top: 10, left: 10, width: 44, height: 44, backgroundColor: sceneColors.backShade, borderWidth: 2, borderColor: sceneColors.backEdge, alignItems: 'center', justifyContent: 'center' },
   backLabel: { color: sceneColors.backInk, fontSize: 38, lineHeight: 40 },
   sheetButton: { width: '100%', height: '100%' },
-  sheetLabel: { position: 'absolute', textAlign: 'center', color: sceneColors.labelInk, fontFamily: font.display },
   hintWrap: { position: 'absolute', bottom: '4%', left: 10, right: 10, alignItems: 'center' },
   hint: { color: sceneColors.cream, backgroundColor: sceneColors.hintShade, fontFamily: font.ui, fontSize: 12, paddingHorizontal: 12, paddingVertical: 7, textAlign: 'center' },
   scrim: { flex: 1, backgroundColor: sceneColors.scrim, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
-  detail: { backgroundColor: colors.paper, borderWidth: 3, borderColor: sceneColors.detailEdge, flexShrink: 1 },
-  detailContent: { padding: 16, alignItems: 'center' },
+  detail: { padding: 0, paddingVertical: 24, flexShrink: 1 },
+  detailContent: { paddingHorizontal: 24, alignItems: 'center' },
   detailName: { color: colors.ink, fontFamily: font.display, fontSize: 30 },
   detailTitle: { color: sceneColors.mutedInk, fontFamily: font.ui, fontSize: 14, textAlign: 'center' },
-  portrait: { marginVertical: 12, alignItems: 'center', padding: 14 },
+  portrait: { marginVertical: 8, alignItems: 'center', justifyContent: 'center' },
   copy: { color: colors.ink, fontFamily: font.body, fontSize: 20, lineHeight: 26, alignSelf: 'stretch' },
   stats: { flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', paddingVertical: 12, marginVertical: 10, borderTopWidth: 1, borderBottomWidth: 1, borderColor: sceneColors.rule },
   stat: { alignItems: 'center' }, statValue: { color: colors.red, fontFamily: font.display, fontSize: 24 }, statLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 12 },
   passive: { color: colors.red, fontFamily: font.heading, fontSize: 17, alignSelf: 'stretch', marginBottom: 4 },
-  actions: { paddingHorizontal: 12, paddingTop: 8, borderTopWidth: 1, borderColor: sceneColors.rule },
-  depart: { minHeight: 52, backgroundColor: colors.red, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  actions: { paddingHorizontal: 24, paddingTop: 8 },
+  depart: { minHeight: 56, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 },
   departLabel: { color: colors.paper, fontFamily: font.heading, fontSize: 16, textAlign: 'center' },
   close: { minHeight: 48, alignItems: 'center', justifyContent: 'center' }, closeLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 14 },
 });

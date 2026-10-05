@@ -39,3 +39,14 @@ Final native screen evidence (extracted from this exact run):
 https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37266241599/artifacts/11326970512
 
 The evidence workflow on `work/occupation-evidence` only reads the native smoke artifact and uploads the class screenshots plus its PASS result.
+
+## Approved detail mockup — v1.0.6 / code 7
+
+User approved the two-screen preview on 2026-10-05. Remove visible names from tabletop sheets; retain accessibility labels and unchanged touch wrappers. Replace the flat modal rectangle and redundant portrait parchment with a torn paper page, lantern-lit temple background, original class sprite and crimson raster paper departure button. All four classes share this background and keep their exact images, descriptions, stats and passives. Scrollable content and fixed confirm/back actions remain.
+
+Assets produced with built-in imagegen from the approved preview:
+- `assets/ui/occupation-temple.jpg`: square rural Thai wooden temple courtyard at night, amber lanterns, slate-blue sky, coarse black ink, faded ochre and printed paper texture. No people or UI. Central path clear for the original sprite; soft parchment wear at top/bottom. Prepared as 768×768 RGB JPEG.
+- `assets/ui/occupation-page.png`: blank 3:5 torn parchment page, pale quiet center, sparse faint crimson stains only at perimeter; transparent outside irregular edge; no text, characters, scene, stamps or buttons. Prepared as 600×1000 indexed PNG with transparency.
+- Existing `paper-button.png` is tinted crimson at runtime; button text stays live.
+
+TypeScript, diff check and all 543 tests pass locally. Full Android build, audit and emulator validation for v1.0.6 are pending. The v1.0.5 results above apply only to the earlier APK.
