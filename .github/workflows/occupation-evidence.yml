@@ -1,0 +1,43 @@
+name: Occupation native screenshot review
+on:
+  push:
+    branches: ['work/occupation-evidence']
+    paths: ['.github/workflows/occupation-evidence.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for the verified native smoke artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for attempt in $(seq 1 80); do
+            count=$(gh api repos/saranaauttama-afk/PhiKinHuaV6/actions/runs/37264689924/artifacts --jq '[.artifacts[] | select(.name == "Android-emulator-smoke")] | length')
+            if [ "$count" -gt 0 ]; then exit 0; fi
+            sleep 6
+          done
+          exit 1
+      - uses: actions/download-artifact@v4
+        with:
+          name: Android-emulator-smoke
+          run-id: 37264689924
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: saranaauttama-afk/PhiKinHuaV6
+          path: native-smoke/
+      - name: Preserve only occupation screen evidence
+        run: |
+          grep '^PASS:' native-smoke/result.txt
+          mkdir occupation-screens
+          cp native-smoke/02-class*.png occupation-screens/
+          cp native-smoke/result.txt occupation-screens/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Occupation-native-screens
+          path: occupation-screens/
+          if-no-files-found: error
+          retention-days: 7
