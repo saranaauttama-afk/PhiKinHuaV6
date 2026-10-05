@@ -1,7 +1,7 @@
 name: Android first chapter APK
 on:
   push:
-    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui']
+    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -23,7 +23,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: python -m pip install Pillow
       - run: npm ci
-      - run: npm test
+      - run: npm test -- --maxWorkers=2 --testTimeout=30000
       - run: npx tsc --noEmit
       - name: Generate Android project
         run: CI=1 npx expo prebuild --platform android
