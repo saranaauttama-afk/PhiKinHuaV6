@@ -17,7 +17,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for attempt in $(seq 1 80); do
-            count=$(gh api repos/saranaauttama-afk/PhiKinHuaV6/actions/runs/37264689924/artifacts --jq '[.artifacts[] | select(.name == "Android-emulator-smoke")] | length')
+            count=$(gh api repos/saranaauttama-afk/PhiKinHuaV6/actions/runs/37264540561/artifacts --jq '[.artifacts[] | select(.name == "Android-emulator-smoke")] | length')
             if [ "$count" -gt 0 ]; then exit 0; fi
             sleep 6
           done
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Android-emulator-smoke
-          run-id: 37264689924
+          run-id: 37264540561
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: saranaauttama-afk/PhiKinHuaV6
           path: native-smoke/
