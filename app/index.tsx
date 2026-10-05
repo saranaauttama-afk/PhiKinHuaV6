@@ -17,6 +17,7 @@ import BtnEncounter from './components/BtnEncounter';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
 import JourneyTrail from './components/JourneyTrail';
+import StarterBlessingScreen from './components/StarterBlessingScreen';
 import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
 import SceneArrival from './components/SceneArrival';
@@ -119,57 +120,7 @@ export default function Home() {
 
   // เลือกพรตั้งต้นก่อนเข้าหน้าแรก
   if (screen === 'starter-blessing') {
-    return (
-      <View style={{ flex: 1 }}>
-        <ImageBackground
-          source={require('../assets/scence/episode-village.jpg')}
-          style={{ flex: 1 }}
-          resizeMode="cover"
-        >
-          <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
-            <Text style={{
-              color: palette.moon, fontSize: size.display, textAlign: 'center',
-              fontFamily: font.display,
-            }}>
-              เลือกพรติดตัว
-            </Text>
-            <Text style={{
-              color: palette.textFaint, fontSize: size.ui, textAlign: 'center',
-              fontFamily: font.ui, marginTop: space.xs, marginBottom: space.xl,
-            }}>
-              สิ่งที่ติดตัวไปตลอดการเดินทาง เลือกได้อย่างเดียว
-            </Text>
-
-            <View style={{ gap: space.md }}>
-              {(state.starter?.choices ?? []).map((b, i) => (
-                <Pressable
-                  key={b.id ?? i}
-                  accessibilityRole="button"
-                  accessibilityLabel={`พรติดตัว ${i + 1}: ${b.name}`}
-                  onPress={() => dispatch({ type: 'ChooseStarterBlessing', index: i })}
-                >
-                  <Panel emphasis>
-                    <Text style={{
-                      color: paper.ink, fontSize: size.heading, fontFamily: font.heading,
-                    }}>
-                      {b.name ?? b.id}
-                    </Text>
-                    {!!b.desc && (
-                      <Text style={{
-                        color: paper.muted, fontSize: size.bodyLg,
-                        fontFamily: font.body, marginTop: space.xs, lineHeight: 24,
-                      }}>
-                        {b.desc}
-                      </Text>
-                    )}
-                  </Panel>
-                </Pressable>
-              ))}
-            </View>
-          </Scrim>
-        </ImageBackground>
-      </View>
-    );
+    return <StarterBlessingScreen choices={state.starter?.choices ?? []} onPick={index => dispatch({ type: 'ChooseStarterBlessing', index })} />;
   }
 
   // มาถึงหน้าแผนที่โดยไม่มีเส้นทาง = หลุดมาผิดทาง (เช่นเซฟเก่าก่อนมีระบบเส้นทาง)
@@ -237,7 +188,7 @@ export default function Home() {
             gap: space.sm,
             paddingHorizontal: space.sm,
             // กันที่ให้แถบสถานะเป๊ะๆ — เดิมเดาไว้ 140 ซึ่งน้อยกว่าที่แถบกินจริง
-            paddingBottom: STATUS_BAR_SPACE + space.lg,
+            paddingBottom: STATUS_BAR_SPACE + pad.bottom + space.lg,
           }}>
             {offers.map((offer, i) => {
               // ช่องที่หมดของแล้วเป็น undefined — ข้ามไป ไม่ใช่วาดกรอบเปล่า
@@ -286,7 +237,7 @@ export default function Home() {
           {restRow && ahead && (
             <View style={{
               position: 'absolute', left: 0, right: 0,
-              bottom: STATUS_BAR_SPACE + space.sm,
+              bottom: STATUS_BAR_SPACE + pad.bottom + space.sm,
               alignItems: 'center',
             }}>
               <GameButton

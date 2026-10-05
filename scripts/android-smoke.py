@@ -69,8 +69,16 @@ for class_name, hp in [('หมอผี', '50'), ('นักรบวัด', '
     wait_for('เลือก'+class_name)
 tap('เลือกนักรบวัด');shot('02-class');tap('เลือกนักรบวัด · ออกเดินทาง →')
 wait_for('คืนแรกที่บ้านร้าง');shot('03-prologue')
-tap('ข้ามบทนี้');tap('พรติดตัว 1:',contains=True)
-wait_for('ผีปอบ');shot('04-map');tap('ผีปอบ');tap('จับผี')
+tap('ข้ามบทนี้');wait_for('พรติดตัว 1:',contains=True);shot('03-starter-blessing')
+tap('พรติดตัว 1:',contains=True)
+wait_for('ผีปอบ');shot('04-map')
+tap('ข้อมูลผู้เดินทาง');wait_for('ปิดข้อมูลผู้เดินทาง');root=shot('04-player-details')
+assert any(t.startswith('พลังงาน ') for t in labels(root)), 'Energy missing from player details'
+assert any(t.startswith('EXP ') for t in labels(root)), 'EXP missing from player details'
+tap('ปิดข้อมูลผู้เดินทาง');wait_for('ผีปอบ')
+tap('สำรับ ',contains=True);wait_for('สำรับของเรา');shot('04-deck');tap('ปิด');wait_for('ผีปอบ')
+tap('พร ',contains=True);wait_for('พรติดตัว');shot('04-blessings');tap('ปิด');wait_for('ผีปอบ')
+tap('ผีปอบ');tap('จับผี')
 wait_for('จบเทิร์น');shot('05-battle')
 if '--layout-only' in sys.argv:
     cards=[n for n in dump().iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc',''))]
@@ -147,5 +155,5 @@ wait_for('กระสือ',contains=True);shot('14-next-location')
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'
 assert adb('shell','pidof',package).strip(),'App exited'
-(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, blessing, map, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event. Physical device not tested.\n')
+(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, map route, player details, deck and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event. Physical device not tested.\n')
 print((out/'result.txt').read_text(),flush=True)

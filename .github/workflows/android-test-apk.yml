@@ -39,13 +39,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='7' versionName='1.0.6'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FirstNight-v1.0.6.apk
-          sha256sum PhiKinHua-FirstNight-v1.0.6.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='8' versionName='1.0.7'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FirstNight-v1.0.7.apk
+          sha256sum PhiKinHua-FirstNight-v1.0.7.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FirstNight-APK
-          path: PhiKinHua-FirstNight-v1.0.6.apk
+          path: PhiKinHua-FirstNight-v1.0.7.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -75,7 +75,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FirstNight-v1.0.6.apk
+            adb install PhiKinHua-FirstNight-v1.0.7.apk
             timeout 900 python -u scripts/android-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
@@ -83,6 +83,20 @@ jobs:
           name: Occupation-native-screens
           path: |
             smoke-output/02-class*.png
+            smoke-output/result.txt
+          if-no-files-found: warn
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Map-HUD-native-screens
+          path: |
+            smoke-output/03-starter-blessing.png
+            smoke-output/04-map.png
+            smoke-output/04-player-details.png
+            smoke-output/04-deck.png
+            smoke-output/04-blessings.png
+            smoke-output/11-rest-arrival.png
             smoke-output/result.txt
           if-no-files-found: warn
           retention-days: 7

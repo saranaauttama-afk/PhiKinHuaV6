@@ -1,11 +1,63 @@
-import {ritualColors} from '../theme';
-import {pulpColors} from '../theme';
 import React from 'react';
-import {View,Text,ScrollView} from 'react-native';
-import Svg,{Path} from 'react-native-svg';
-import type {GameState} from '../../src/core/types';
-import {paper} from './Paper';
-import RitualSurface,{chalk} from './RitualSurface';
-import InkIcon from './InkIcon';
-import {font} from '../theme';
-export default function JourneyTrail({state}:{state:GameState}){const j=state.journey;const scroll=React.useRef<ScrollView>(null);const row=j?.currentId?(j.nodes[j.currentId]?.row??0)+1:0;React.useEffect(()=>{scroll.current?.scrollTo({x:Math.max(0,(row-2)*60),animated:true})},[row]);if(!j)return null;const fights=j.plans.filter(p=>p.kind!=='rest').length;const done=j.plans.slice(0,row).filter(p=>p.kind!=='rest').length;return <RitualSurface kind="slate" style={{marginHorizontal:12,paddingHorizontal:20,paddingVertical:16,marginBottom:4}}><Text style={{fontFamily:font.ui,color:chalk,fontSize:11}}>เส้นทาง · ศึกที่ {Math.min(done+1,fights)} จาก {fights}</Text><ScrollView ref={scroll} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{height:78,paddingTop:8}}>{j.rows.map((_,i)=>{const plan=j.plans[i];const current=i===row;const past=i<row;const rest=plan?.kind==='rest';return <View key={i} style={{width:60,alignItems:'center',paddingTop:i%2?8:0}}>{i<j.rows.length-1&&<View pointerEvents="none" style={{position:'absolute',left:30,top:18,width:60,height:30}}><Svg width="60" height="30"><Path d={i%2?'M0 16Q30 -2 60 8':'M0 8Q30 28 60 16'} stroke={chalk} strokeWidth="2" fill="none" strokeDasharray="3 3"/></Svg></View>}<View style={{width:38,height:38,alignItems:'center',justifyContent:'center',backgroundColor:'transparent',borderWidth:current?2:0,borderRadius:22,borderColor:ritualColors.circle,opacity:past?.45:current?1:.7}}><InkIcon name={past?'check':current?'lantern':rest?'rest':'house'} size={28} color={current?ritualColors.current:chalk}/></View><Text style={{fontFamily:font.ui,color:current?ritualColors.label:chalk,fontSize:9,marginTop:3}}>{current?'อยู่ที่นี่':rest?'พัก':`ศึก ${'fightIndex' in (plan??{})?(plan as any).fightIndex??'':''}`}</Text></View>})}</ScrollView></RitualSurface>;}
+import { View, Text, Image, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
+import type { GameState } from '../../src/core/types';
+import RitualSurface, { chalk } from './RitualSurface';
+import { font, ritualColors } from '../theme';
+
+const routeArt = {
+  ghost: require('../../assets/ui/trail-ghost.png'),
+  rest: require('../../assets/ui/trail-rest.png'),
+  house: require('../../assets/ui/trail-house.png'),
+};
+export default function JourneyTrail({ state }: { state: GameState }) {
+  const j = state.journey;
+  const { width } = useWindowDimensions();
+  const [trailWidth, setTrailWidth] = React.useState(width - 64);
+  const scroll = React.useRef<ScrollView>(null);
+  const row = j?.currentId ? (j.nodes[j.currentId]?.row ?? 0) + 1 : 0;
+  const nodeWidth = Math.max(54, trailWidth / Math.min(j?.rows.length || 1, 5));
+  React.useEffect(() => {
+    scroll.current?.scrollTo({ x: Math.max(0, (row - 2) * nodeWidth), animated: true });
+  }, [row, nodeWidth]);
+  if (!j) return null;
+  const fights = j.plans.filter(p => p.kind !== 'rest').length;
+  const done = j.plans.slice(0, row).filter(p => p.kind !== 'rest').length;
+  return <RitualSurface kind="slate" style={styles.slate}>
+    <Text style={styles.heading}>เส้นทาง · ศึกที่ {Math.min(done + 1, fights)} จาก {fights}</Text>
+    <View onLayout={e => setTrailWidth(e.nativeEvent.layout.width)}>
+      <ScrollView ref={scroll} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.trail}>
+        {j.rows.map((_, i) => {
+          const plan = j.plans[i];
+          const current = i === row;
+          const past = i < row;
+          const rest = plan?.kind === 'rest';
+          const finale = plan?.kind === 'boss' || (!rest && i === j.rows.length - 1);
+          const label = rest ? 'พัก' : `ศึก ${plan && 'fightIndex' in plan ? plan.fightIndex : ''}`;
+          return <View key={i} accessible accessibilityLabel={label + (current ? ' อยู่ที่นี่' : past ? ' ผ่านแล้ว' : '')}
+            style={[styles.node, { width: nodeWidth, paddingTop: i % 2 ? 6 : 0 }]}>
+            {i < j.rows.length - 1 && <View pointerEvents="none" style={{ position: 'absolute', left: nodeWidth / 2, top: 22 }}>
+              <Svg width={nodeWidth} height={30}><Path d={i % 2 ? `M0 16Q${nodeWidth / 2} -2 ${nodeWidth} 8` : `M0 8Q${nodeWidth / 2} 28 ${nodeWidth} 16`}
+                stroke={chalk} strokeWidth={1.5} fill="none" strokeDasharray="3 3" /></Svg>
+            </View>}
+            <View style={[styles.illustration, { borderWidth: current ? 2 : 0, opacity: past ? .45 : current ? 1 : .75 }]}>
+              <Image accessible={false} source={routeArt[rest ? 'rest' : finale ? 'house' : 'ghost']} resizeMode="contain" style={styles.icon} />
+            </View>
+            <Text style={styles.label}>{label}</Text>
+            {current && <Text style={styles.current}>อยู่ที่นี่</Text>}
+          </View>;
+        })}
+      </ScrollView>
+    </View>
+  </RitualSurface>;
+}
+const styles = StyleSheet.create({
+  slate: { marginHorizontal: 12, paddingHorizontal: 20, paddingVertical: 14, marginBottom: 4 },
+  heading: { fontFamily: font.ui, color: chalk, fontSize: 11 },
+  trail: { height: 96, paddingTop: 6 },
+  node: { alignItems: 'center' },
+  illustration: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 26, borderColor: ritualColors.circle },
+  icon: { width: 44, height: 44 },
+  label: { fontFamily: font.ui, color: chalk, fontSize: 10, marginTop: 2 },
+  current: { fontFamily: font.heading, color: ritualColors.label, fontSize: 9 },
+});

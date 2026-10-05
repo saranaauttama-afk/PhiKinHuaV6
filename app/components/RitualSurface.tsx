@@ -9,6 +9,9 @@ const surfaces={
  cloth:require('../../assets/ui/ritual-cloth.png'),
  notice:require('../../assets/ui/ritual-notice.png'),
  occupationPage:require('../../assets/ui/occupation-page.png'),
+ hudPaper:require('../../assets/ui/paper-button.png'),
+ blessingHerbs:require('../../assets/ui/blessing-herbs.png'),
+ blessingAncestor:require('../../assets/ui/blessing-ancestor.png'),
 };
 export const chalk=ritualColors.chalk;
 /** Numeric measured bounds avoid native Image intrinsic/percentage sizing surprises. */

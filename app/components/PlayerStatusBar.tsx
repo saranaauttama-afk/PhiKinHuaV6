@@ -1,16 +1,71 @@
-import {pulpColors} from '../theme';
 import React from 'react';
-import {Pressable,Text,View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import type {GameState} from '../../src/core/types';
-import {paper} from './Paper';
+import { Pressable, Text, View, Image, Modal, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { GameState } from '../../src/core/types';
+import { CHARACTER_CLASSES } from '../../src/core/classes';
+import { artSource } from './Art';
 import RitualSurface from './RitualSurface';
-import HealthBar from './HealthBar';
-import InkIcon,{InkSymbol} from './InkIcon';
-import {font,layer} from '../theme';
-export const STATUS_BAR_SPACE=200;
-export default function PlayerStatusBar({state,onOpenDeck,onOpenBlessings}:{state:GameState;onOpenDeck?:()=>void;onOpenBlessings?:()=>void}){
- const p=state.player;const pad=useSafeAreaInsets();
- const stats: {icon:InkSymbol;label:string;value:string;onPress?:()=>void}[]=[{icon:'energy',label:'พลัง',value:`${p.energy}/${p.maxEnergy}`},{icon:'gold',label:'ทอง',value:`${p.gold??0}`},{icon:'deck',label:'สำรับ',value:`${state.masterDeck?.length??0}`,onPress:onOpenDeck},{icon:'blessing',label:'พร',value:`${state.blessings?.length??0}`,onPress:onOpenBlessings}];
- return <RitualSurface kind="cloth" style={{position:'absolute',bottom:pad.bottom+8,left:12,right:12,paddingHorizontal:38,paddingVertical:28,zIndex:layer.statusBar,gap:8}}><HealthBar hp={p.hp} maxHp={p.maxHp}/><View style={{flexDirection:'row',gap:6}}>{stats.map(s=><Pressable key={s.label} accessibilityRole={s.onPress?'button':undefined} accessibilityLabel={`${s.label} ${s.value}`} disabled={!s.onPress} onPress={s.onPress} style={({pressed})=>({flex:1,minHeight:44,alignItems:'center',justifyContent:'center',gap:3,backgroundColor:s.onPress?(pressed?pulpColors.pressedPaper:paper.light):'transparent',borderBottomWidth:s.onPress?2:0,borderColor:paper.line})}><View style={{flexDirection:'row',gap:4,alignItems:'center'}}><InkIcon name={s.icon} size={20}/><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:14}}>{s.value}</Text></View><Text style={{color:paper.muted,fontFamily:font.ui,fontSize:10}}>{s.label}{s.onPress?' ›':''}</Text></Pressable>)}</View><View style={{flexDirection:'row',alignItems:'center',gap:8}}><Text style={{fontFamily:font.ui,color:paper.muted,fontSize:10}}>เลเวล {p.level} · EXP {p.exp}/{p.expToNext}</Text><View style={{flex:1,height:4,backgroundColor:pulpColors.expTrack}}><View style={{width:`${Math.min(1,p.exp/Math.max(1,p.expToNext))*100}%`,height:4,backgroundColor:pulpColors.expFill}}/></View></View></RitualSurface>;
+import { font, layer, paper, pulpColors, palette } from '../theme';
+
+export const STATUS_BAR_SPACE = 140;
+export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: {
+  state: GameState; onOpenDeck?: () => void; onOpenBlessings?: () => void;
+}) {
+  const p = state.player;
+  const pad = useSafeAreaInsets();
+  const character = CHARACTER_CLASSES[state.classId ?? 'shaman'];
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
+  const health = Math.max(0, Math.min(1, p.hp / Math.max(1, p.maxHp)));
+  return <>
+    <RitualSurface kind="hudPaper" style={[styles.hud, { bottom: pad.bottom + 8 }]}>
+      <Pressable accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={() => setDetailsOpen(true)} style={styles.portrait}>
+        <Image accessible={false} source={artSource(`class/${character.id}`)} resizeMode="contain" style={styles.portraitImage} />
+      </Pressable>
+      <View style={styles.content}>
+        <View style={styles.nameRow}><Text style={styles.name}>{character.name}</Text><Text style={styles.hp}>{p.hp}/{p.maxHp}</Text></View>
+        <View accessible accessibilityRole="progressbar" accessibilityLabel="พลังชีวิต" accessibilityValue={{ min: 0, max: p.maxHp, now: p.hp }}
+          style={styles.healthRow}><Text style={styles.healthLabel}>พลังชีวิต</Text><View style={styles.track}><View style={[styles.fill, { width: `${health * 100}%` }]} /></View></View>
+        <View style={styles.links}>
+          <View style={styles.link}><Text style={styles.linkText}>ทอง {p.gold ?? 0}</Text></View>
+          <Pressable accessibilityRole="button" accessibilityLabel={`สำรับ ${state.masterDeck?.length ?? 0}`} disabled={!onOpenDeck}
+            onPress={onOpenDeck} android_ripple={{ color: pulpColors.pressedPaper }} style={styles.link}><Text style={styles.linkText}>สำรับ {state.masterDeck?.length ?? 0} ›</Text></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel={`พร ${state.blessings?.length ?? 0}`} disabled={!onOpenBlessings}
+            onPress={onOpenBlessings} android_ripple={{ color: pulpColors.pressedPaper }} style={styles.link}><Text style={styles.linkText}>พร {state.blessings?.length ?? 0} ›</Text></Pressable>
+        </View>
+      </View>
+    </RitualSurface>
+    <Modal visible={detailsOpen} transparent animationType="fade" onRequestClose={() => setDetailsOpen(false)}>
+      <View style={[styles.scrim, { paddingTop: pad.top + 16, paddingBottom: pad.bottom + 16 }]}>
+        <RitualSurface kind="occupationPage" accessibilityViewIsModal style={styles.details}>
+          <Text accessibilityRole="header" style={styles.detailTitle}>ข้อมูลผู้เดินทาง</Text>
+          <Text style={styles.detailText}>{character.name} · เลเวล {p.level}</Text>
+          <Text style={styles.detailText}>พลังชีวิต {p.hp}/{p.maxHp}</Text>
+          <Text style={styles.detailText}>พลังงาน {p.energy}/{p.maxEnergy}</Text>
+          <Text style={styles.detailText}>EXP {p.exp}/{p.expToNext}</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="ปิดข้อมูลผู้เดินทาง" onPress={() => setDetailsOpen(false)} style={styles.close}><Text style={styles.linkText}>กลับไปเลือกทาง</Text></Pressable>
+        </RitualSurface>
+      </View>
+    </Modal>
+  </>;
 }
+const styles = StyleSheet.create({
+  hud: { position: 'absolute', left: 12, right: 12, height: 128, paddingHorizontal: 20, paddingVertical: 14, zIndex: layer.statusBar, flexDirection: 'row', gap: 8 },
+  portrait: { width: 64, height: 100, overflow: 'hidden', alignItems: 'center' },
+  portraitImage: { position: 'absolute', top: 0, width: 98, height: 147 },
+  content: { flex: 1, justifyContent: 'center' },
+  nameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 4 },
+  name: { fontFamily: font.heading, color: paper.ink, fontSize: 16 },
+  hp: { fontFamily: font.heading, color: paper.red, fontSize: 17 },
+  healthRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  healthLabel: { fontFamily: font.ui, color: paper.ink, fontSize: 10 },
+  track: { flex: 1, height: 8, backgroundColor: pulpColors.healthTrack, overflow: 'hidden' },
+  fill: { height: '100%', backgroundColor: paper.red },
+  links: { flexDirection: 'row', borderTopWidth: 1, borderColor: paper.line, marginTop: 7 },
+  link: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  linkText: { fontFamily: font.ui, color: paper.ink, fontSize: 12 },
+  scrim: { flex: 1, backgroundColor: palette.scrimHeavy, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
+  details: { width: '100%', maxWidth: 380, paddingHorizontal: 28, paddingVertical: 36, gap: 10 },
+  detailTitle: { fontFamily: font.heading, color: paper.ink, fontSize: 20 },
+  detailText: { fontFamily: font.ui, color: paper.ink, fontSize: 15 },
+  close: { minHeight: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+});
