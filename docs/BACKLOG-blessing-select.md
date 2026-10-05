@@ -1,6 +1,6 @@
 # Backlog: หน้าเลือกพรติดตัว — แบบกระชับที่อนุมัติ
 
-สถานะ: นำแบบกระชับที่อนุมัติมา implement แล้ว รอตรวจ native Android ใน build 1.0.7
+สถานะ: เสร็จแล้วใน v1.0.7 / code 8 — build, audit และ Android API 36 native smoke ผ่าน ตรวจภาพหน้าจอแล้ว
 อนุมัติ: 5 ตุลาคม 2026 เวลา 16:39 น. (Asia/Bangkok)
 โปรเจกต์: PhiKinHuaV6
 ภาพที่เลือก: แบบปรับให้กระชับล่าสุด ไม่ใช่แบบแรกที่หัวข้อและใบพรใหญ่เกินไป
@@ -42,3 +42,13 @@
 
 ภาพอ้างอิงอยู่ที่ `docs/mockups/blessing-select-compact-approved.jpg` เป็นสำเนา JPEG ของ mockup ล่าสุดที่อนุมัติ implementation รอบ 1.0.7 ใช้ภาพประกอบใบพรแยกจากข้อความจริงและ flow เดิม
 
+
+## ผลตรวจรับ
+
+Implementation: `aa2e5f2377da25fe6094254d78eb1e0b81bff60e`
+
+APK: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37328381137/artifacts/11353947800
+
+Native evidence: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37328381137/artifacts/11353744731
+
+รอบ emulator สุ่มพรอื่น จึงตรวจ layout กระดาษ fallback กับข้อความจริงและเลือกเข้าสู่แผนที่ได้ ภาพสมุนไพร/บรรพบุรุษตรวจเป็น production asset แยก รายละเอียดทั้งหมดอยู่ใน `docs/HANDOFF-map-hud.md`

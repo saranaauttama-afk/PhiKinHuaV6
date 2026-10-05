@@ -4,13 +4,15 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest UI follow-up
 
+`work/occupation-table`: **v1.0.7/code 8** implements the approved chalk/ink route icons, compact player HUD with actual class portrait and working deck/blessing links, and compact starter blessing screen from Backlog #4. All 543 tests, TypeScript, APK audit and Android API 36 full native smoke passed; native screens were inspected. [Download verified v1.0.7 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37328381137/artifacts/11353947800). Read `docs/HANDOFF-map-hud.md` for details.
+
 `work/occupation-table`: v1.0.6/code 7 implements the approved occupation detail mockup: portrait-only tabletop sheets, torn paper page, a lantern-lit temple background behind the existing character sprites and a crimson raster paper departure button. All 543 tests, TypeScript, APK audit and Android API 36 native smoke passed. All four class details and live actions were visually inspected. [Download verified v1.0.6 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37272830307/artifacts/11329089015). Read `docs/HANDOFF-occupation-table.md` for current details.
 
 `work/pulp-arrival-v3`: **v1.0.4/code 5** adds ritual map/battle UI: chalk slate route, torn ghost notices, protective cloth, wood enemy badges, palm-leaf cards and sacred-thread pot end-turn control. Native-parent preservation fixes an Android Fabric crash at victory transition. [Download verified APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37205064645/artifacts/11304288187). Read `docs/HANDOFF-ritual-ui.md` for exact validation and `docs/HANDOFF-pulp-ui.md` for v1.0.3 title/button/arrival work. Balance unchanged. Character notebook design stays in backlog issue #2.
 
 ## Current source
 
-Current work branch: `work/occupation-table`, extending the character and ritual UI branches and `work/first-chapter-apk`. `main` is older. Read `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
+Current work branch: `work/occupation-table`, extending the character and ritual UI branches and `work/first-chapter-apk`. `main` is older. Read `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
 
 ## First chapter
 
@@ -33,7 +35,7 @@ npx expo export --platform web
 
 ## Android deliverable
 
-GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.6`, versionCode `7`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
+GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.7`, versionCode `8`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
 
 Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. A dependent Android API 36 x86_64 emulator job installs and launches the APK, navigates into a fight, previews/plays a real card and ends a turn. Screenshots, UI XML and logcat are uploaded as separate evidence. See the handoff for actual run results; successful build alone does not prove installation or launch.
 
