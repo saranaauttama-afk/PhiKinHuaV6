@@ -194,3 +194,6 @@ export const ritualColors={chalk:"#f2e7ca",circle:"#b45139",current:"#d78161",la
 
 /** Clean ivory text fields and coarse comic ink for character selection. */
 export const notebookColors = { paper: '#fff7e5', ink: '#171410', red: '#751c28', disabled: '#514c43' } as const;
+
+/** Pigments and shades for the illustrated occupation table. */
+export const occupationColors = {"night": "#100d09", "cream": "#f4dfb7", "subtitleShade": "#17110bd9", "backShade": "#261b12e8", "backEdge": "#a37c4c", "backInk": "#f2dfb7", "pressWash": "#ffe5a533", "pressEdge": "#efc979", "labelInk": "#21180f", "hintShade": "#17110be6", "scrim": "#080603e8", "detailEdge": "#6b452b", "mutedInk": "#674331", "rule": "#bc9b72"} as const;

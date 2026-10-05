@@ -1,115 +1,90 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView, Image, StyleSheet, useWindowDimensions } from 'react-native';
-import { ALL_CLASS_IDS, CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
+import { View, Text, Pressable, ScrollView, Image, Modal, StyleSheet, useWindowDimensions } from 'react-native';
+import { CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
 import Art from './Art';
-import { font, notebookColors as colors } from '../theme';
+import RitualSurface from './RitualSurface';
+import { font, occupationColors as sceneColors, notebookColors as colors } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
-
-const panel = require('../../assets/ui/character-comic-panel.png');
-const summaries: Record<ClassId, string> = {
-  shaman: 'คาถา พิษ และของขลัง', warrior: 'ตั้งรับแน่น สวนกลับหนัก',
-  nun: 'ฟื้นเลือด ยืนระยะยาว', medium: 'เรียกวิญญาณมาช่วยต่อสู้',
-};
+const scene = require('../../assets/ui/occupation-table.jpg');
+// One normalized coordinate system keeps illustrated sheets and tap targets aligned.
+const sheets: { id: ClassId; x: number; y: number; w: number; h: number; angle: string }[] = [
+  { id: 'shaman', x: .112, y: .409, w: .224, h: .16, angle: '16deg' },
+  { id: 'warrior', x: .301, y: .437, w: .223, h: .16, angle: '15deg' },
+  { id: 'nun', x: .511, y: .464, w: .223, h: .16, angle: '13deg' },
+  { id: 'medium', x: .737, y: .491, w: .223, h: .16, angle: '9deg' },
+];
 type Props = { onPick: (id: ClassId) => void; onBack?: () => void };
-
-/** Live text stays on clean ivory; raster ink scenery belongs to the portrait. */
 export default function ClassSelectScreen({ onPick, onBack }: Props) {
   const pad = useScreenPadding();
-  const { width } = useWindowDimensions();
-  const pageWidth = Math.min(width - 24, 600);
+  const { width, height } = useWindowDimensions();
+  const sceneWidth = Math.min(width, (height - pad.top - pad.bottom) * 2 / 3);
+  const sceneHeight = sceneWidth * 1.5;
+  const detailWidth = Math.min(width - 24, 480);
   const [selected, setSelected] = React.useState<ClassId | null>(null);
   const picked = selected ? CHARACTER_CLASSES[selected] : null;
-  return (
-    <View style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
-      <View style={[styles.page, { width: pageWidth }]}>
-        <View style={styles.header}>
-          <Text accessibilityRole="header" style={styles.title}>เลือกผู้เดินทาง</Text>
-          <View style={styles.rule} />
-          <Text style={styles.subtitle}>แต่ละคนถือสำรับและวิชาคนละอย่าง</Text>
-        </View>
-        <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
-          {ALL_CLASS_IDS.map(id => {
-            const c = CHARACTER_CLASSES[id];
-            const isOn = selected === id;
-            return (
-              <Pressable key={id} accessibilityRole="button" accessibilityLabel={`เลือก${c.name}`}
-                accessibilityState={{ selected: isOn }} onPress={() => setSelected(id)}
-                style={[styles.record, { borderColor: isOn ? colors.red : colors.ink }]}>
-                <View collapsable={false} style={styles.recordBody}>
-                  <Image source={panel} resizeMode="stretch"
-                    style={{ position: 'absolute', width: pageWidth - 6, height: 156 }} />
-                  <View style={styles.portrait}>
-                    <Art slot={`class/${id}`} width={Math.max(76, pageWidth * .27)} height={142} compact />
-                  </View>
-                  <View style={styles.copy}>
-                    <View style={styles.nameRow}>
-                      <Text style={styles.name}>{c.name}</Text>
-                      <Text accessibilityLabel={isOn ? 'เลือกแล้ว' : undefined}
-                        style={[styles.check, { opacity: isOn ? 1 : 0 }]}>✓</Text>
-                    </View>
-                    <Text style={styles.description}>{summaries[id]}</Text>
-                    <View style={styles.statRule} />
-                    <View style={styles.stats}>
-                      <Stat label="ชีวิต" value={c.startHp} />
-                      <Stat label="พลังงาน" value={c.startEnergy} />
-                      <Stat label="มือ" value={c.startHandSize} />
-                    </View>
-                  </View>
-                </View>
-              </Pressable>
-            );
-          })}
-          {picked && (
-            <View style={styles.details} accessibilityLiveRegion="polite">
-              <Text style={styles.detailTitle}>{picked.name} · {picked.title}</Text>
-              <Text style={styles.detailText}>{picked.desc}</Text>
-              <Text style={styles.detailTitle}>{picked.passiveName}</Text>
-              <Text style={styles.detailText}>{picked.passiveDesc}</Text>
-            </View>
-          )}
-        </ScrollView>
-        <View style={styles.footer}>
-          <Pressable accessibilityRole="button" accessibilityState={{ disabled: !selected }}
-            disabled={!selected} onPress={() => selected && onPick(selected)}
-            style={({ pressed }) => [styles.depart, { backgroundColor: selected ? colors.red : colors.disabled, opacity: pressed ? .85 : 1 }]}>
-            <Text style={styles.departLabel}>{selected ? 'ออกเดินทาง  →' : 'เลือกผู้เดินทางก่อน'}</Text>
-          </Pressable>
-          {onBack && <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
-            <Text style={styles.backLabel}>◂ ย้อนกลับ</Text>
-          </Pressable>}
-        </View>
+  return <View style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
+    <Image accessible={false} source={scene} resizeMode="cover" blurRadius={10} style={{ position: 'absolute', width, height, opacity: .35 }} />
+    <View collapsable={false} style={{ width: sceneWidth, height: sceneHeight }}>
+      <Image accessible={false} source={scene} resizeMode="stretch" style={{ position: 'absolute', width: sceneWidth, height: sceneHeight }} />
+      <View style={styles.heading}>
+        <RitualSurface kind="notice" style={styles.titlePaper}><Text accessibilityRole="header" style={styles.title}>เลือกอาชีพ</Text></RitualSurface>
+        <Text style={styles.subtitle}>คืนมืดกำลังรอ… คุณจะเป็นใคร</Text>
       </View>
+      {onBack && <Pressable accessibilityRole="button" accessibilityLabel="ย้อนกลับ" onPress={onBack} style={styles.back}><Text style={styles.backLabel}>‹</Text></Pressable>}
+      {sheets.map(sheet => <Pressable key={sheet.id} accessibilityRole="button" accessibilityLabel={`เลือก${CHARACTER_CLASSES[sheet.id].name}`}
+        accessibilityHint="เปิดภาพใหญ่และรายละเอียดอาชีพ" onPress={() => setSelected(sheet.id)}
+        style={({ pressed }) => [{ position: 'absolute', left: sceneWidth * sheet.x, top: sceneHeight * sheet.y,
+          width: sceneWidth * sheet.w, height: sceneHeight * sheet.h, transform: [{ rotate: sheet.angle }] }, pressed && styles.pressedSheet]}>
+        <Text numberOfLines={1} style={[styles.sheetLabel, { fontSize: Math.max(10, sceneWidth * .034) }]}>{CHARACTER_CLASSES[sheet.id].name}</Text>
+      </Pressable>)}
+      <View pointerEvents="none" style={styles.hintWrap}><Text style={styles.hint}>แตะใบอาชีพบนโต๊ะเพื่อดูรายละเอียด</Text></View>
     </View>
-  );
+    <Modal visible={!!picked} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
+      <View style={[styles.scrim, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
+        {picked && <View collapsable={false} accessibilityViewIsModal style={[styles.detail, { width: detailWidth, maxHeight: height - pad.top - pad.bottom }]}>
+          <ScrollView contentContainerStyle={styles.detailContent}>
+            <Text accessibilityRole="header" style={styles.detailName}>{picked.name}</Text><Text style={styles.detailTitle}>{picked.title}</Text>
+            <RitualSurface kind="notice" style={styles.portrait}><Art slot={`class/${picked.id}`} width={detailWidth - 76} height={Math.min(300, height * .3)} /></RitualSurface>
+            <Text style={styles.copy}>{picked.desc}</Text>
+            <View style={styles.stats}><Stat label="ชีวิต" value={picked.startHp} /><Stat label="พลังงาน" value={picked.startEnergy} /><Stat label="ไพ่ในมือ" value={picked.startHandSize} /></View>
+            <Text style={styles.passive}>{picked.passiveName}</Text><Text style={styles.copy}>{picked.passiveDesc}</Text>
+          </ScrollView>
+          <View style={styles.actions}>
+            <Pressable accessibilityRole="button" onPress={() => { const id = picked.id; setSelected(null); onPick(id); }} style={({ pressed }) => [styles.depart, pressed && { opacity: .8 }]}><Text style={styles.departLabel}>เลือก{picked.name} · ออกเดินทาง →</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={styles.close}><Text style={styles.closeLabel}>กลับไปเลือกอาชีพ</Text></Pressable>
+          </View>
+        </View>}
+      </View>
+    </Modal>
+  </View>;
 }
 function Stat({ label, value }: { label: string; value: number }) {
-  return <View style={styles.stat}><Text style={styles.statLabel}>{label}</Text><Text style={styles.statValue}>{value}</Text></View>;
+  return <View style={styles.stat}><Text style={styles.statValue}>{value}</Text><Text style={styles.statLabel}>{label}</Text></View>;
 }
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.paper, alignItems: 'center' }, page: { flex: 1 },
-  header: { paddingHorizontal: 6, paddingBottom: 12 },
-  title: { color: colors.ink, fontFamily: font.display, fontSize: 28, textAlign: 'center' },
-  rule: { height: 3, backgroundColor: colors.red, marginHorizontal: 22, marginTop: 5 },
-  subtitle: { color: colors.ink, fontFamily: font.ui, fontSize: 12, textAlign: 'center', marginTop: 7 },
-  list: { flex: 1 }, listContent: { gap: 10, paddingBottom: 12 },
-  record: { borderWidth: 3, backgroundColor: colors.paper },
-  recordBody: { flexDirection: 'row', minHeight: 156, overflow: 'hidden' },
-  portrait: { width: '34%', alignItems: 'center', justifyContent: 'center', paddingVertical: 7 },
-  copy: { flex: 1, backgroundColor: colors.paper, marginVertical: 9, marginRight: 9, paddingHorizontal: 10, paddingVertical: 3 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  name: { color: colors.ink, fontFamily: font.display, fontSize: 23 },
-  check: { color: colors.red, fontFamily: font.display, fontSize: 22 },
-  description: { color: colors.ink, fontFamily: font.bodyBold, fontSize: 20, lineHeight: 22, marginTop: 3 },
-  statRule: { height: 1, backgroundColor: colors.ink, marginTop: 9, marginBottom: 5 },
-  stats: { flexDirection: 'row', justifyContent: 'space-between', gap: 3 },
-  stat: { alignItems: 'center' }, statLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 10 },
-  statValue: { color: colors.ink, fontFamily: font.display, fontSize: 21, lineHeight: 27 },
-  details: { borderLeftWidth: 4, borderColor: colors.red, paddingLeft: 12, paddingVertical: 6 },
-  detailTitle: { color: colors.ink, fontFamily: font.heading, fontSize: 14, marginTop: 4 },
-  detailText: { color: colors.ink, fontFamily: font.body, fontSize: 20, lineHeight: 24 },
-  footer: { paddingTop: 8 },
-  depart: { minHeight: 54, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: colors.ink },
-  departLabel: { color: colors.paper, fontFamily: font.display, fontSize: 20, textAlign: 'center' },
-  back: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  backLabel: { color: colors.ink, fontFamily: font.heading, fontSize: 14 },
+  screen: { flex: 1, backgroundColor: sceneColors.night, alignItems: 'center', justifyContent: 'center' },
+  heading: { position: 'absolute', top: '5%', left: '16%', right: '5%', alignItems: 'center' },
+  titlePaper: { width: '100%', paddingTop: 14, paddingBottom: 25 },
+  title: { color: colors.ink, fontFamily: font.display, fontSize: 30, textAlign: 'center' },
+  subtitle: { color: sceneColors.cream, backgroundColor: sceneColors.subtitleShade, fontFamily: font.ui, fontSize: 12, textAlign: 'center', marginTop: 4, padding: 5 },
+  back: { position: 'absolute', top: 10, left: 10, width: 44, height: 44, backgroundColor: sceneColors.backShade, borderWidth: 2, borderColor: sceneColors.backEdge, alignItems: 'center', justifyContent: 'center' },
+  backLabel: { color: sceneColors.backInk, fontSize: 38, lineHeight: 40 },
+  pressedSheet: { backgroundColor: sceneColors.pressWash, borderWidth: 2, borderColor: sceneColors.pressEdge },
+  sheetLabel: { position: 'absolute', bottom: '5%', left: '4%', right: '4%', textAlign: 'center', color: sceneColors.labelInk, fontFamily: font.display },
+  hintWrap: { position: 'absolute', bottom: '4%', left: 10, right: 10, alignItems: 'center' },
+  hint: { color: sceneColors.cream, backgroundColor: sceneColors.hintShade, fontFamily: font.ui, fontSize: 12, paddingHorizontal: 12, paddingVertical: 7, textAlign: 'center' },
+  scrim: { flex: 1, backgroundColor: sceneColors.scrim, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
+  detail: { backgroundColor: colors.paper, borderWidth: 3, borderColor: sceneColors.detailEdge, flexShrink: 1 },
+  detailContent: { padding: 16, alignItems: 'center' },
+  detailName: { color: colors.ink, fontFamily: font.display, fontSize: 30 },
+  detailTitle: { color: sceneColors.mutedInk, fontFamily: font.ui, fontSize: 14, textAlign: 'center' },
+  portrait: { marginVertical: 12, alignItems: 'center', padding: 14 },
+  copy: { color: colors.ink, fontFamily: font.body, fontSize: 20, lineHeight: 26, alignSelf: 'stretch' },
+  stats: { flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', paddingVertical: 12, marginVertical: 10, borderTopWidth: 1, borderBottomWidth: 1, borderColor: sceneColors.rule },
+  stat: { alignItems: 'center' }, statValue: { color: colors.red, fontFamily: font.display, fontSize: 24 }, statLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 12 },
+  passive: { color: colors.red, fontFamily: font.heading, fontSize: 17, alignSelf: 'stretch', marginBottom: 4 },
+  actions: { paddingHorizontal: 12, paddingTop: 8, borderTopWidth: 1, borderColor: sceneColors.rule },
+  depart: { minHeight: 52, backgroundColor: colors.red, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  departLabel: { color: colors.paper, fontFamily: font.heading, fontSize: 16, textAlign: 'center' },
+  close: { minHeight: 48, alignItems: 'center', justifyContent: 'center' }, closeLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 14 },
 });
