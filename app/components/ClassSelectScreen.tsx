@@ -64,7 +64,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
             <Text style={styles.passive}>{picked.passiveName}</Text><Text style={styles.copy}>{picked.passiveDesc}</Text>
           </ScrollView>
           <View style={styles.actions}>
-            <Pressable accessibilityRole="button" onPress={() => { const id = picked.id; setSelected(null); onPick(id); }} style={({ pressed }) => [styles.depart, pressed && { opacity: .8 }]}><Text style={styles.departLabel}>เลือก{picked.name} · ออกเดินทาง →</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => { const id = picked.id; setSelected(null); onPick(id); }} style={styles.depart} android_ripple={{ color: sceneColors.pressWash }}><Text style={styles.departLabel}>เลือก{picked.name} · ออกเดินทาง →</Text></Pressable>
             <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={styles.close}><Text style={styles.closeLabel}>กลับไปเลือกอาชีพ</Text></Pressable>
           </View>
         </View>}
