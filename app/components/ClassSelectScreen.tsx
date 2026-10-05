@@ -1,43 +1,57 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, Image, Modal, StyleSheet, useWindowDimensions } from 'react-native';
 import { CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
-import Art from './Art';
+import Art, { artSource } from './Art';
 import RitualSurface from './RitualSurface';
-import { font, occupationColors as sceneColors, notebookColors as colors } from '../theme';
+import { font, layer, occupationColors as sceneColors, notebookColors as colors } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
-const scene = require('../../assets/ui/occupation-table.jpg');
+const scene = require('../../assets/ui/occupation-table-tall.jpg');
 // One normalized coordinate system keeps illustrated sheets and tap targets aligned.
 const sheets: { id: ClassId; x: number; y: number; w: number; h: number; angle: string }[] = [
-  { id: 'shaman', x: .112, y: .409, w: .224, h: .16, angle: '16deg' },
-  { id: 'warrior', x: .301, y: .437, w: .223, h: .16, angle: '15deg' },
-  { id: 'nun', x: .511, y: .464, w: .223, h: .16, angle: '13deg' },
-  { id: 'medium', x: .737, y: .491, w: .223, h: .16, angle: '9deg' },
+  { id: 'shaman', x: .112, y: .447, w: .224, h: .108, angle: '16deg' },
+  { id: 'warrior', x: .301, y: .465, w: .223, h: .108, angle: '15deg' },
+  { id: 'nun', x: .511, y: .482, w: .223, h: .108, angle: '13deg' },
+  { id: 'medium', x: .737, y: .50, w: .223, h: .108, angle: '9deg' },
 ];
 type Props = { onPick: (id: ClassId) => void; onBack?: () => void };
 export default function ClassSelectScreen({ onPick, onBack }: Props) {
   const pad = useScreenPadding();
   const { width, height } = useWindowDimensions();
-  const sceneWidth = Math.min(width, (height - pad.top - pad.bottom) * 2 / 3);
-  const sceneHeight = sceneWidth * 1.5;
+  const [bounds, setBounds] = React.useState({ width, height });
+  const sceneWidth = bounds.width;
+  const sceneHeight = bounds.height;
   const detailWidth = Math.min(width - 24, 480);
   const [selected, setSelected] = React.useState<ClassId | null>(null);
   const picked = selected ? CHARACTER_CLASSES[selected] : null;
-  return <View style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
-    <Image accessible={false} source={scene} resizeMode="cover" blurRadius={10} style={{ position: 'absolute', width, height, opacity: .35 }} />
+  return <View collapsable={false} onLayout={e => { const { width: w, height: h } = e.nativeEvent.layout; setBounds(b => b.width === w && b.height === h ? b : { width: w, height: h }); }} style={styles.screen}>
     <View collapsable={false} style={{ width: sceneWidth, height: sceneHeight }}>
       <Image accessible={false} source={scene} resizeMode="stretch" style={{ position: 'absolute', width: sceneWidth, height: sceneHeight }} />
-      <View style={styles.heading}>
+      <View pointerEvents="box-none" style={[styles.heading, { top: pad.top + 12 }]}>
         <RitualSurface kind="notice" style={styles.titlePaper}><Text accessibilityRole="header" style={styles.title}>เลือกอาชีพ</Text></RitualSurface>
         <Text style={styles.subtitle}>คืนมืดกำลังรอ… คุณจะเป็นใคร</Text>
       </View>
-      {onBack && <Pressable accessibilityRole="button" accessibilityLabel="ย้อนกลับ" onPress={onBack} style={styles.back}><Text style={styles.backLabel}>‹</Text></Pressable>}
-      {sheets.map(sheet => <Pressable key={sheet.id} accessibilityRole="button" accessibilityLabel={`เลือก${CHARACTER_CLASSES[sheet.id].name}`}
-        accessibilityHint="เปิดภาพใหญ่และรายละเอียดอาชีพ" onPress={() => setSelected(sheet.id)}
-        style={({ pressed }) => [{ position: 'absolute', left: sceneWidth * sheet.x, top: sceneHeight * sheet.y,
-          width: sceneWidth * sheet.w, height: sceneHeight * sheet.h, transform: [{ rotate: sheet.angle }] }, pressed && styles.pressedSheet]}>
-        <Text numberOfLines={1} style={[styles.sheetLabel, { fontSize: Math.max(10, sceneWidth * .034) }]}>{CHARACTER_CLASSES[sheet.id].name}</Text>
-      </Pressable>)}
-      <View pointerEvents="none" style={styles.hintWrap}><Text style={styles.hint}>แตะใบอาชีพบนโต๊ะเพื่อดูรายละเอียด</Text></View>
+      {onBack && <Pressable accessibilityRole="button" accessibilityLabel="ย้อนกลับ" onPress={onBack} style={[styles.back, { top: pad.top + 12 }]}><Text style={styles.backLabel}>‹</Text></Pressable>}
+      {sheets.map(sheet => <View key={sheet.id} collapsable={false} pointerEvents="box-none" style={{
+        position: 'absolute', left: sceneWidth * sheet.x, top: sceneHeight * sheet.y,
+        width: sceneWidth * sheet.w, height: sceneHeight * sheet.h,
+        transform: [{ rotate: sheet.angle }], zIndex: layer.badge,
+      }}>
+        <Pressable collapsable={false} testID={`occupation-${sheet.id}`} accessibilityRole="button"
+          accessibilityLabel={`เลือก${CHARACTER_CLASSES[sheet.id].name}`} accessibilityHint="เปิดภาพใหญ่และรายละเอียดอาชีพ"
+          onPress={() => setSelected(sheet.id)} android_ripple={{ color: sceneColors.pressWash }}
+          style={styles.sheetButton}>
+          <View pointerEvents="none" collapsable={false} style={{ position: 'absolute', top: sceneHeight * sheet.h * .03,
+            left: sceneWidth * sheet.w * .06, width: sceneWidth * sheet.w * .88, height: sceneHeight * sheet.h * .76, overflow: 'hidden' }}>
+            <Image accessible={false} source={artSource(`class/${sheet.id}`)} resizeMode="contain"
+              style={{ width: sceneWidth * sheet.w * .88, height: sceneWidth * sheet.w * 1.32 }} />
+          </View>
+          <Text pointerEvents="none" numberOfLines={1} style={[styles.sheetLabel, {
+            bottom: sceneHeight * sheet.h * .05, left: 3, right: 3,
+            fontSize: Math.max(11, sceneWidth * .034),
+          }]}>{CHARACTER_CLASSES[sheet.id].name}</Text>
+        </Pressable>
+      </View>)}
+      <View pointerEvents="none" style={[styles.hintWrap, { bottom: pad.bottom + 12 }]}><Text style={styles.hint}>แตะใบอาชีพบนโต๊ะเพื่อดูรายละเอียด</Text></View>
     </View>
     <Modal visible={!!picked} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
       <View style={[styles.scrim, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
@@ -69,8 +83,8 @@ const styles = StyleSheet.create({
   subtitle: { color: sceneColors.cream, backgroundColor: sceneColors.subtitleShade, fontFamily: font.ui, fontSize: 12, textAlign: 'center', marginTop: 4, padding: 5 },
   back: { position: 'absolute', top: 10, left: 10, width: 44, height: 44, backgroundColor: sceneColors.backShade, borderWidth: 2, borderColor: sceneColors.backEdge, alignItems: 'center', justifyContent: 'center' },
   backLabel: { color: sceneColors.backInk, fontSize: 38, lineHeight: 40 },
-  pressedSheet: { backgroundColor: sceneColors.pressWash, borderWidth: 2, borderColor: sceneColors.pressEdge },
-  sheetLabel: { position: 'absolute', bottom: '5%', left: '4%', right: '4%', textAlign: 'center', color: sceneColors.labelInk, fontFamily: font.display },
+  sheetButton: { width: '100%', height: '100%' },
+  sheetLabel: { position: 'absolute', textAlign: 'center', color: sceneColors.labelInk, fontFamily: font.display },
   hintWrap: { position: 'absolute', bottom: '4%', left: 10, right: 10, alignItems: 'center' },
   hint: { color: sceneColors.cream, backgroundColor: sceneColors.hintShade, fontFamily: font.ui, fontSize: 12, paddingHorizontal: 12, paddingVertical: 7, textAlign: 'center' },
   scrim: { flex: 1, backgroundColor: sceneColors.scrim, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },

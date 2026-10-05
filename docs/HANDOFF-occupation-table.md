@@ -12,3 +12,11 @@ Validation: TypeScript and web export pass. All 543 tests pass (2 workers, 30-se
 
 Prompt used with built-in imagegen:
 Edit approved Thai one-baht cheap horror comic scene, preserve exact worried-villager night village, shoulder/hand foreground, lantern, table, coarse ink and ochre/red texture. Remove back arrow/title/subtitle for live UI. Preserve four parchment locations, blank lower labels. Left to right: male Thai shaman with ritual blade; temple warrior in muted red sleeveless shirt with sword; shaved-head female Buddhist nun in white; long-haired female spirit medium with doll. No UI labels or buttons.
+
+## Native correction — v1.0.5 / code6
+
+User's installed v1.0.4 showed missing live labels and unresponsive sheets. Original native run37259621503 built the APK but emulator smoke failed to locate warrior; latest UI hierarchy omits all four sheets. Previous web evidence is not native proof. Replaced function-valued absolute Pressable layout with non-collapsible numeric native wrapper and static fill Pressable; added actual class image children. Each sheet now uses the same ART_SOURCES class PNG as the detail modal, preserving identity rather than synthesizing another face. Tall 4:9 scene replaces letterboxing and blur; scene and hit targets use measured parent bounds. Header/footer alone respect safe areas.
+
+New raster `assets/ui/occupation-table-tall.jpg`, built-in imagegen: extend original scene vertically to phone 4:9 with painted trees/sky and foreground shoulder/table; preserve villagers and paper positions. Second edit erases only paper portraits, reconstructing blank matching parchment. Actual character PNGs are rendered at runtime on those blank sheets. No character replacements were generated. Source and enlarged portraits are identical assets.
+
+Android smoke now opens all four sheets by live accessibility label, checks the correct HP, captures each modal, closes each, then confirms warrior and continues full gameplay regression. Full build/audit and native smoke required before declaring corrected delivery. Package and signing stay the same. Version is bumped to1.0.5/code6 to distinguish this corrected APK. Core and balance unchanged.

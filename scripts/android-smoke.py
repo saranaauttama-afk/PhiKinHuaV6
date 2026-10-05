@@ -59,7 +59,15 @@ def discard_if_needed(root):
     raise AssertionError('Could not complete discard selection')
 adb('logcat','-c');adb('shell','am','start','-W','-n',package+'/.MainActivity')
 wait_for('เริ่มเกม');shot('01-cover')
-tap('เริ่มเกม');tap('นักรบวัด');shot('02-class');tap('ออกเดินทาง')
+tap('เริ่มเกม');shot('02-class-table')
+for class_name, hp in [('หมอผี', '50'), ('นักรบวัด', '66'), ('แม่ชี', '44'), ('คนทรง', '46')]:
+    tap('เลือก'+class_name)
+    wait_for('เลือก'+class_name+' · ออกเดินทาง →')
+    root=shot('02-class-'+str(hp))
+    assert has(root,hp), 'Class stats not visible: '+class_name
+    tap('กลับไปเลือกอาชีพ')
+    wait_for('เลือก'+class_name)
+tap('เลือกนักรบวัด');shot('02-class');tap('เลือกนักรบวัด · ออกเดินทาง →')
 wait_for('คืนแรกที่บ้านร้าง');shot('03-prologue')
 tap('ข้ามบทนี้');tap('พรติดตัว 1:',contains=True)
 wait_for('ผีปอบ');shot('04-map');tap('ผีปอบ');tap('จับผี')
