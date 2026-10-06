@@ -15,6 +15,21 @@ import { isTrapCard, armTrap, springTraps, tickTraps } from '../../combat/traps'
 import { effectiveCost, countCardPlayed, applyHeldEffects } from '../../cards/mechanics';
 import { isCurseCard, discardCurses } from '../../cards/curse';
 
+/** Resolve deaths from helper/status/trap effects as well as direct played cards. */
+function settleCombat(s: GameState, r: RNG): RNG {
+  if (s.phase !== 'combat') return r;
+  if (isDefeat(s)) {
+    loseRun(s);
+    require('../../minionRuntime').clearAllMinions(s);
+  } else if (isVictory(s) && !s.combatVictoryLock) {
+    r = grantExpAndQueueLevelUp(s, r);
+    s.combatVictoryLock = true;
+    require('../../minionRuntime').clearAllMinions(s);
+    advanceAfterVictory(s);
+  }
+  return r;
+}
+
 export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, r: RNG) {
   if (s.phase !== 'combat' || s.combatVictoryLock) return { state: s, rng: r };
 
@@ -143,7 +158,8 @@ export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { ty
   ({ state: s, rng: r } = startPlayerTurn(s, r));
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
-  if (s.runMode === 'episode') planEnemyIntent(s);
+  r = settleCombat(s, r);
+  if (s.phase === 'combat' && s.runMode === 'episode') planEnemyIntent(s);
   return { state: s, rng: r };
 }
 
@@ -200,6 +216,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   s.turn = 1;
 
   emit(s, { t: 'TurnEnded', who: 'player' });
+  r = settleCombat(s, r);
+  if (s.phase !== 'combat') return { state: s, rng: r };
 
   // ── เทิร์นศัตรู
   if (s.enemy && (s as any).enemyPiles) {
@@ -207,7 +225,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     s.enemy.block = 0;
 
     require('../../minionRuntime').processEnemyTurnMinions(s);
-    if (isDefeat(s)) { loseRun(s); emit(s, { t: 'TurnEnded', who: 'enemy' }); return { state: s, rng: r }; }
+    r = settleCombat(s, r);
+    if (s.phase !== 'combat') { emit(s, { t: 'TurnEnded', who: 'enemy' }); return { state: s, rng: r }; }
 
     // ศัตรูตัดสินใจ ณ ตอนที่ถึงตาจริง ไม่ใช่ตั้งแต่ท้ายเทิร์นก่อน
     //
@@ -242,7 +261,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       // กับดักที่ตั้งไว้ทำงานก่อนการ์ดของศัตรูจะมีผล — ดักที่ยกเลิกได้
       // ต้องยกเลิกก่อนดาเมจเข้า ไม่งั้นมันคือการ "ยกเลิกหลังโดนแล้ว"
       const trapped = springTraps(s, def.type === 'attack' ? 'attack' : 'skill');
-      if (isDefeat(s)) { loseRun(s); break; }
+      r = settleCombat(s, r);
+      if (s.phase !== 'combat') break;
       if (trapped.negated) {
         s.log.push(`${def.name ?? def.id} ถูกขัดจังหวะ`);
         continue;
@@ -263,11 +283,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         s.log.push(`Enemy plays ${def.name ?? def.id}`);
       }
 
-      if (isDefeat(s)) {
-        loseRun(s);
-        const { clearAllMinions } = require('../../minionRuntime');
-        clearAllMinions(s);
-      }
+      r = settleCombat(s, r);
     }
   }
 

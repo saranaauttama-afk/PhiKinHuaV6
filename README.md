@@ -4,7 +4,7 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest UI follow-up
 
-`work/occupation-table`: **v1.0.10/code 11** adds compact illustrated battle HUD/hand, sequential enemy-card presentation frames, and nine summoned-helper sprites with activity/expiry. Local TypeScript and 546 tests passed. APK/native validation pending. See `docs/HANDOFF-battle-cards-minions.md`.
+`work/occupation-table`: **v1.0.10/code 11** adds compact illustrated battle HUD/hand, sequential enemy-card presentation frames, and nine summoned-helper sprites with activity/expiry. Local TypeScript and 547 tests passed. APK/native validation pending. See `docs/HANDOFF-battle-cards-minions.md`.
 
 `work/occupation-table`: **v1.0.9/code 10** presents protective blessings on a lantern-lit wooden shelf with symbolic art and tap-to-read details, uses เบี้ย/cowrie currency across the UI, and replaces the repeated primary-button lantern with a forward arrow. All 543 tests, TypeScript, APK audit and Android API 36 full native smoke passed; native cover/HUD/blessing/detail screens were visually inspected. [Download verified v1.0.9 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37416831768/artifacts/11391163420). Read `docs/HANDOFF-blessing-cowrie.md` for assets/prompts and evidence.
 

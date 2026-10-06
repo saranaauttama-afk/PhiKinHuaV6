@@ -183,7 +183,7 @@ for _ in range(40):
     root=dump()
     if has(root,'จบเทิร์น'):break
     time.sleep(.5)
-root=wait_for('วิญญาณเพื่อน เหลือ 2 เทิร์น');shot('17-helper-after-action')
+wait_for('วิญญาณเพื่อน เหลือ 2 เทิร์น');root=shot('17-helper-after-action')
 assert has(root,'26/30'), 'Helper attack did not remove real enemy HP'
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'

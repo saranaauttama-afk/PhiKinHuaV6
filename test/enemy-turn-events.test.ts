@@ -151,3 +151,15 @@ it('enemy helper acts before cards and cannot continue attacking after lethal da
   expect(kinds(out)).toContain('MinionActing');
   expect(kinds(out)).not.toContain('EnemyCardRevealed');
 });
+
+
+it('finishes combat when a player helper kills the ghost without another card',()=>{
+  const {state}=makeCombatState({playerHp:40,enemyHp:2});
+  state.minions=[{id:'ghost_ally_test',name:'วิญญาณเพื่อน',duration:3,owner:'player',abilities:[{type:'attack',trigger:'turn_start',target:'enemy',value:4,description:'โจมตี'}]}];
+  const out=applyCommand(state,{type:'StartPlayerTurn'},rng()).state;
+  expect(out.enemy?.hp).toBe(0);
+  expect(out.combatVictoryLock).toBe(true);
+  expect(out.phase).not.toBe('combat');
+  expect(kinds(out)).toContain('MinionActing');
+  expect(kinds(out)).toContain('Died');
+});
