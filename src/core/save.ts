@@ -16,6 +16,7 @@
 // เพิ่มฟิลด์ใหม่ใน GameState ทีหลังแล้วเซฟจะตามไปเอง ไม่พังซ้ำรอยเดิม
 
 import type { GameState } from './types';
+import type { RNG } from './rng';
 
 export const SAVE_VERSION = 2;
 
@@ -59,6 +60,8 @@ const DROP_ON_SAVE = [
 
 export type SaveV2 = {
   version: 2;
+  /** Explicit settled player-turn snapshot; legacy map checkpoints remain unchanged. */
+  battleRng?: RNG;
   /** สถานะทั้งก้อนที่ตัดสเตตคอมแบตออกแล้ว */
   state: Partial<GameState> & { seed: string };
 };
@@ -85,12 +88,24 @@ export function toSave(s: GameState): SaveV2 {
   return { version: SAVE_VERSION, state: copy };
 }
 
+export function toBattleSave(s: GameState, rng: RNG): SaveV2 {
+  if (s.phase !== 'combat' || !s.enemy || s.runSummary) throw new Error('Battle is not resumable');
+  const state: GameState = JSON.parse(JSON.stringify(s));
+  state.pendingEvents = [];
+  state.deckOpen = false;
+  return {version: SAVE_VERSION, state, battleRng: {...rng}};
+}
+
 export function fromSave(data: SaveV2): GameState {
   if (data.version !== SAVE_VERSION) {
     throw new Error(`เซฟเวอร์ชัน ${data.version} ใช้กับเกมเวอร์ชันนี้ไม่ได้`);
   }
 
   const s = data.state as GameState;
+  if (data.battleRng) {
+    if (s.phase !== 'combat' || !s.enemy || !s.piles || !Number.isInteger(data.battleRng.s)) throw new Error('Invalid battle snapshot');
+    return {...JSON.parse(JSON.stringify(s)), pendingEvents: [], deckOpen: false};
+  }
 
   // เติมสเตตที่ตัดออกตอนเซฟกลับมาเป็นค่าเริ่มต้น
   return {

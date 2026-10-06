@@ -656,6 +656,7 @@ export function dismiss(s: GameState, cmd: Extract<Command, { type: 'DismissOffe
 }
 
 export function proceed(s: GameState, _cmd: Extract<Command, { type: 'Proceed' }>, r: RNG) {
+  if (['combat','levelup','reward','defeat'].includes(s.phase)) return {state:s,rng:r};
   const got = ensurePages(s, r);
   let { rng, mp } = got;
 
@@ -678,6 +679,7 @@ export function proceed(s: GameState, _cmd: Extract<Command, { type: 'Proceed' }
 }
 
 export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'CompleteNode' }>, r: RNG) {
+  if (['combat','levelup','reward','defeat'].includes(s.phase)) return {state:s,rng:r};
   const got = ensurePages(s, r);
   let { rng, mp } = got;
 

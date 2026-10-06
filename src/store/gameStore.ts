@@ -5,7 +5,7 @@ import type { ClassId } from '../core/classes';
 import { applyCommand } from '../../src/core/reducer';
 import { baseNewState } from '../../src/core/commands';
 import {
-  saveGame, loadGame, getSaveSlots, autoSave, clearAutoSave, type SaveSlotInfo,
+  saveGame, loadGame, loadGameSnapshot, saveBattle, getSaveSlots, autoSave, clearAutoSave, type SaveSlotInfo,
 } from '../../src/core/storage';
 import { AUTO_SAVE_COMMANDS } from '../../src/core/save';
 import { HAND_SIZE, START_ENERGY, START_HP } from '../../src/core/balance/core';
@@ -21,6 +21,9 @@ function shouldAutoSave(cmdType: Command['type']): boolean {
   return (AUTO_SAVE_COMMANDS as readonly string[]).includes(cmdType);
 }
 
+let autoSaveTimer: ReturnType<typeof setTimeout> | undefined;
+let autoSavePending:Promise<void>=Promise.resolve();
+
 type Store = {
   state: GameState;
   rng: RNG;
@@ -29,6 +32,7 @@ type Store = {
   saveToSlot: (slot: number) => Promise<void>;
   loadFromSlot: (slot: number) => Promise<void>;
   continueRun: () => Promise<boolean>;
+  suspendBattle: () => Promise<void>;
   getSaveSlots: () => Promise<SaveSlotInfo[]>;
   autoSaveEnabled: boolean;
 };
@@ -61,6 +65,7 @@ export const useGame = create<Store>((set, get) => ({
     // ไม่งั้นปุ่ม "เดินทางต่อ" จะพากลับเข้ารันเดิม: ตายแล้วย้อนไปยืนก่อนไฟต์ที่ตาย
     // ซึ่งแปลว่าแพ้ได้ไม่จำกัดครั้ง การตายจึงไม่มีความหมายอะไรเลย
     if (result.state.runSummary) {
+      clearTimeout(autoSaveTimer);
       setTimeout(() => { void clearAutoSave(); }, 0);
       return;
     }
@@ -69,11 +74,13 @@ export const useGame = create<Store>((set, get) => ({
       // Combat saves resume at the last map decision, before entering the node.
       // Saving the entered node with dropped combat state could skip/mismatch a fight.
       const checkpoint = cmd.type === 'ChooseOffer' && result.state.phase === 'combat' ? state : result.state;
-      setTimeout(() => autoSave(checkpoint), 100);
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => { autoSavePending=autoSave(checkpoint).catch(()=>{}); }, 100);
     }
   },
 
   newRun: (seed: string, classId?: ClassId, runMode: 'episode' | 'full' = 'full') => {
+    clearTimeout(autoSaveTimer);
     // ต้องผ่านคำสั่ง NewRun จริง ไม่ใช่สร้าง state เปล่าเอง
     // เดิมตั้ง phase เป็น 'menu' ตรงๆ ทำให้ข้ามการเซ็ตอัพรันทั้งหมด
     // (เด็คตั้งต้น, pages, พรตั้งต้น) หน้าเลือกพรจึงไม่มีทางขึ้น
@@ -95,12 +102,19 @@ export const useGame = create<Store>((set, get) => ({
     }
   },
 
+  suspendBattle: async () => {
+    clearTimeout(autoSaveTimer);
+    await autoSavePending;
+    const {state,rng}=get();
+    await saveBattle(state,rng);
+  },
+
   /** เล่นต่อจากเซฟอัตโนมัติ — คืน false ถ้าไม่มีหรือเล่นต่อไม่ได้ */
   continueRun: async () => {
     try {
-      const loaded = await loadGame(-1);
-      if (!loaded?.journey) return false;
-      set({ state: loaded, rng: makeRng(loaded.seed || 'demo-fallback') });
+      const loaded = await loadGameSnapshot(-1);
+      if (!loaded.state?.journey) return false;
+      set({ state: loaded.state, rng: loaded.rng ?? makeRng(loaded.state.seed || 'demo-fallback') });
       return true;
     } catch {
       return false;

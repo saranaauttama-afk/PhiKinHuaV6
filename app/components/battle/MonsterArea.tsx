@@ -22,6 +22,8 @@ import { palette, space, surface, tint } from '../../theme';
 type Props = {
   monsterId: string | string[];
   monsterName?: string | string[];
+  turnLabel?: string;
+  helpers?:React.ReactNode;
   enemy?: {
     hp: number; maxHp: number; name: string;
     block?: number; maxEnergy?: number; handSize?: number;
@@ -37,6 +39,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   monsterId,
   monsterName,
   enemy,
+  turnLabel,
+  helpers,
 }, ref) {
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
@@ -92,23 +96,13 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   return (
     <View pointerEvents="box-none" style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
-      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+8,left:20,width:210,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/></RitualSurface>
+      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+8,left:20,right:112,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} compact />{helpers}</RitualSurface>
       <Animated.View style={floatStyle}>
         {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
       </Animated.View>
 
-      {/* ไม่มีป้ายบอกท่าล่วงหน้าแล้ว — ศัตรูตัดสินใจตอนถึงตาของตัวเอง
-          ผู้เล่นรู้ว่าโดนอะไรตอนที่โดนจริง
 
-          แต่สถานะที่ติดตัวศัตรูอยู่ต้องเห็น — พิษที่เราใส่ไว้จะทำงานอีกกี่เทิร์น
-          คือข้อมูลที่ตัดสินว่าเทิร์นนี้ควรตีต่อหรือควรตั้งการ์ด
-          prop `statusEffects` ประกาศค้างอยู่ตรงนี้มานานแล้วโดยไม่เคยถูกใช้ */}
-      <View style={{ marginTop: space.sm, marginBottom: space.xs }}>
-        <StatusStrip effects={enemy?.statusEffects} compact />
-      </View>
-
-      {!!enemy?.block && <Text style={{color:chalk,fontFamily:'Prompt_600SemiBold'}}>เกราะ {enemy.block}</Text>}
     </View>
   );
 });

@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, ImageBackground, Pressable, Image, Text } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler } from 'react-native';
+import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
 import type { CombatEvent, CombatFrame } from '../src/core/types';
 
@@ -27,7 +27,13 @@ import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 import { useAppFonts } from './useAppFonts';
-import { palette, surface, tint, layer } from './theme';
+import { palette, surface, tint, layer, font } from './theme';
+
+import Settings from './components/Settings';
+import StartPage from './components/StartPage';
+import RitualSurface from './components/RitualSurface';
+import {GameButton} from './components/Panel';
+import {baseNewState} from '../src/core/commands';
 
 type Phase = 'player' | 'discard' | 'enemy';
 
@@ -47,6 +53,13 @@ type EnemyHandCardData = {
 export default function BattlePage() {
   const router    = useRouter();
   const safe = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const [paused,setPaused]=React.useState(false);
+  const [settingsOpen,setSettingsOpen]=React.useState(false);
+  const [mainMenu,setMainMenu]=React.useState(false);
+  const [saving,setSaving]=React.useState(false);
+  const [saveError,setSaveError]=React.useState('');
+  const allowLeave=React.useRef(false);
   const [celebratedFight,setCelebratedFight] = React.useState(-1);
   const gameState = useGame((s) => s.state);
   const dispatch  = useGame((s) => s.dispatch);
@@ -110,6 +123,37 @@ export default function BattlePage() {
   /** กองที่กำลังเปิดดู — บนหน้าจอเท่านั้น ไม่ใช่สเตตของเกม */
   const [openPile, setOpenPile] = React.useState<PileId | null>(null);
   const [blessingsOpen, setBlessingsOpen] = React.useState(false);
+
+  const openPause = () => {
+    // Finish only presentation callbacks, including the next-player helper queue.
+    // No CompleteNode/Proceed/StartCombat command is issued here.
+    timeline.skip(); timeline.skip();
+    setPaused(true);
+  };
+  React.useEffect(()=>{
+    const back=BackHandler.addEventListener('hardwareBackPress',()=>{
+      if(mainMenu)return false;
+      if(settingsOpen){setSettingsOpen(false);return true;}
+      if(openPile){setOpenPile(null);return true;}
+      if(blessingsOpen){setBlessingsOpen(false);return true;}
+      if(paused){setPaused(false);return true;}
+      openPause();return true;
+    });
+    return ()=>back.remove();
+  },[mainMenu,settingsOpen,openPile,blessingsOpen,paused]);
+  React.useEffect(()=>navigation.addListener('beforeRemove',(e)=>{
+    if(allowLeave.current || useGame.getState().state.phase!=='combat')return;
+    e.preventDefault();openPause();
+  }),[navigation]);
+  const goToMenu=async()=>{
+    if(saving)return;
+    setSaving(true);setSaveError('');
+    try {await useGame.getState().suspendBattle();setPaused(false);setMainMenu(true);}
+    catch {setSaveError('บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง');}
+    finally {setSaving(false);}
+  };
+
+
 
   const handlePlayCard = (card: any, index: number) => {
     if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
@@ -259,6 +303,7 @@ export default function BattlePage() {
   },[gameState.phase,celebratedFight,timeline.isPlaying]);
   // hook ทั้งหมดต้องถูกเรียกก่อนถึงจะ return ได้ ไม่งั้นลำดับ hook เพี้ยน
   if (!fontsLoaded) return null;
+  if(mainMenu)return <StartPage onStartGame={()=>{allowLeave.current=true;useGame.setState({state:baseNewState('')});router.replace({pathname:'/',params:{chooseClass:'1'}});}} onContinue={()=>{setMainMenu(false);}}/>;
 
   return (
     <View style={{ flex: 1 }}>
@@ -268,7 +313,7 @@ export default function BattlePage() {
         resizeMode="cover"
       >
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
-          <Pressable onPress={() => { timeline.skip(); router.back(); }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="พักการต่อสู้" onPress={openPause} style={{minWidth:44,minHeight:44,alignItems:'center',justifyContent:'center'}}>
             <Image
               source={require('../assets/images/btnDelete.png')}
               style={{ width: 40, height: 40 }}
@@ -283,7 +328,7 @@ export default function BattlePage() {
           <Pressable
             onPress={timeline.skip}
             style={{
-              position: 'absolute', top: safe.top + 66, left: 14, zIndex: layer.control,
+              position: 'absolute', top: safe.top + 110, left: 14, zIndex: layer.control,
               paddingHorizontal: 14, paddingVertical: 6,
               borderRadius: 14,
               backgroundColor: surface.glassDim,
@@ -304,9 +349,11 @@ export default function BattlePage() {
           monsterId={monsterId}
           monsterName={monsterName}
           enemy={enemy ?? null}
+          turnLabel={`เทิร์น ${gameState.turn} · ${phase==='enemy'?'ตาผี':'ตาเรา'}`}
+          helpers={<MinionRow owner="enemy" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/> }
         />
 
-        {phase === 'enemy' && <View pointerEvents="none" style={{position:'absolute',top:safe.top+54,left:12,right:12,alignItems:'center',zIndex:layer.control}}><Text style={{color:palette.moon,fontFamily:'Prompt_600SemiBold',fontSize:13}}>{currentEvent?.t==='MinionActing'?`${currentEvent.name} ช่วยเหลือ`:`ตาของ ${enemy?.name??'ศัตรู'}`}</Text></View>}
+
 
         <ScreenFlash ref={flashRef} />
 
@@ -361,22 +408,8 @@ export default function BattlePage() {
           />
         ))}
 
-        {/* ผีที่เรียกมา — วางเหนือมือ ใต้ฉากกลาง ซ้ายของเรา ขวาของศัตรู */}
-        <View style={{ position: 'absolute', bottom: safe.bottom + 330, left: 0, right: 0, zIndex: layer.decor }}>
-          <MinionRow minions={presentation?.minions ?? gameState.minions} activeId={currentEvent?.t === 'MinionActing' ? currentEvent.minionId : undefined} />
-        </View>
-
-        {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้
-            คอมโบอยู่เหนือขึ้นไปหนึ่งชั้น เพราะมันคือสิ่งที่กำลังจะเกิด ไม่ใช่สิ่งที่เป็นอยู่ */}
-        <View style={{ position: 'absolute', bottom: safe.bottom + 305, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
-          {/* กับดักอยู่บนสุด เพราะมันคือสิ่งที่เราวางไว้แล้วรออยู่ */}
-          <TrapRow traps={gameState.traps} />
-          <ComboStrip state={gameState} />
-          <StatusStrip effects={player.statusEffects} />
-        </View>
-
         <PlayerHand
-          enabled={phase === 'player' && gameState.phase === 'combat'}
+          enabled={!paused && phase === 'player' && gameState.phase === 'combat'}
           cards={playerHand}
           playedCardIds={playedCardIds}
           hoveredCardId={hoveredCardId}
@@ -387,6 +420,8 @@ export default function BattlePage() {
         />
 
         <PlayerHUD
+          helpers={<MinionRow owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
+          statuses={<View><TrapRow traps={gameState.traps}/><ComboStrip state={gameState}/><StatusStrip effects={player.statusEffects}/></View>}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
           hp={player.hp}
@@ -486,6 +521,18 @@ export default function BattlePage() {
         {!timeline.isPlaying && !presentation && gameState.phase === 'defeat' && (
           <DefeatOverlay onHome={() => router.replace('/')} />
         )}
+        <Modal visible={paused} transparent animationType="fade" onRequestClose={()=>settingsOpen?setSettingsOpen(false):setPaused(false)}>
+          <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:24,justifyContent:'center'}}>
+            <RitualSurface kind="wood" style={{padding:24,gap:14}}>
+              <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:22,textAlign:'center'}}>พักการต่อสู้</Text>
+              <GameButton label="สู้ต่อ" onPress={()=>setPaused(false)}/>
+              <GameButton label="ตั้งค่า" onPress={()=>setSettingsOpen(true)}/>
+              {gameState.phase==='combat'&&<GameButton label={saving?'กำลังบันทึก…':'กลับเมนูหลัก'} onPress={()=>{void goToMenu();}}/>}
+              {!!saveError&&<Text style={{fontFamily:font.ui,color:palette.moon}}>{saveError}</Text>}
+            </RitualSurface>
+            {settingsOpen&&<Settings onClose={()=>setSettingsOpen(false)}/>}
+          </View>
+        </Modal>
       </ImageBackground>
     </View>
   );

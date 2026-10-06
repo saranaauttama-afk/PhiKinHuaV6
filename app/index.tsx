@@ -28,7 +28,7 @@ import {paper} from './components/Paper';
 import BlessingView from './components/BlessingView';
 import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { screenForState, mapIsReady } from './screenRouter';
 import { useScreenPadding } from './useScreenPadding';
 import { onRestRow, restBudgetLeft } from '../src/core/map/restPage';
@@ -39,17 +39,22 @@ import { palette, font, size, space, surface } from './theme';
 export default function Home() {
   const { state, dispatch, newRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
   const router = useRouter();
+  const {chooseClass}=useLocalSearchParams();
   const [seed, setSeed] = useState('demo-001');
   const [saveSlots, setSaveSlots] = useState<SaveSlotInfo[]>([]);
   const [showSaveLoad, setShowSaveLoad] = useState(false);
   const [saveLoadError, setSaveLoadError] = useState<string>('');
   const [showDebugTools, setShowDebugTools] = useState(false);
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
-  const [pickingClass, setPickingClass] = useState(false);
+  const [pickingClass, setPickingClass] = useState(chooseClass==='1');
   const [blessingsOpen, setBlessingsOpen] = useState(false);
 
   const [fontsLoaded] = useAppFonts();
   const pad = useScreenPadding();
+
+  useEffect(() => {
+    if (state.phase === 'combat' && state.enemy) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
+  },[state.phase,state.enemy?.id]);
 
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
@@ -65,15 +70,7 @@ export default function Home() {
   const enterOffer = (offer: PageOffer, index: number) => {
     dispatch({ type: 'ChooseOffer', index });
 
-    const d = describeOffer(offer, index);
-    if (d.isCombat) {
-      // ChooseOffer เซ็ตอัพคอมแบตให้ครบแล้ว (ศัตรู เด็ค มือแรก)
-      // หน้าต่อสู้แค่แสดงผล ไม่ต้อง StartCombat ซ้ำ
-      router.push({
-        pathname: '/battle',
-        params: { monsterId: d.id, monsterName: d.name },
-      });
-    }
+    // Restored and newly entered fights share the combat redirect above.
   };
 
   /** ข้ามโหนดนี้ไป — เดินผ่านร้านโดยไม่แวะ แล้วไปต่อชั้นถัดไป */

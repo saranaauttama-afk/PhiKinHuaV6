@@ -94,6 +94,23 @@ if '--helpers-only' not in sys.argv:
     assert find(dump(),'เผชิญหน้า →') is None, 'Confirm action remained after deselection'
     tap('ผีปอบ');tap('เผชิญหน้า →')
     wait_for('จบเทิร์น');shot('05-battle')
+    # Closing a fight must pause, never return to the next map node.
+    before=dump(); hand_before=sorted(t for t in labels(before) if t.startswith('การ์ด ') and ' พลัง ' in t)
+    tap('พักการต่อสู้');wait_for('สู้ต่อ');shot('05-pause')
+    assert find(dump(),'เดินทางต่อ') is None, 'Pause exposed a map progression control'
+    tap('ตั้งค่า');wait_for('ลดการเคลื่อนไหวของฉาก');tap('กลับ');tap('สู้ต่อ')
+    wait_for('จบเทิร์น');assert has(dump(),'30/30'), 'Pause changed enemy HP'
+    tap('ดูกองการ์ด');wait_for('ปิดกองการ์ด');root=shot('05-piles')
+    pile_cards=[n for n in root.iter('node') if n.get('content-desc','').startswith('ดูการ์ด ')]
+    assert pile_cards, 'Battle piles do not contain illustrated tappable cards'
+    touch(pile_cards[0]);wait_for('กลับไปดูกองการ์ด');shot('05-pile-detail');tap('กลับไปดูกองการ์ด');tap('ปิดกองการ์ด')
+    tap('พักการต่อสู้');tap('กลับเมนูหลัก');wait_for('เล่นต่อ',contains=True);shot('05-suspended-menu')
+    adb('shell','am','force-stop',package);adb('shell','am','start','-W','-n',package+'/.MainActivity')
+    wait_for('เล่นต่อ',contains=True);tap('เล่นต่อ',contains=True);wait_for('จบเทิร์น');root=shot('05-restored-battle')
+    assert has(root,'30/30'), 'Restored battle changed enemy HP'
+    assert sorted(t for t in labels(root) if t.startswith('การ์ด ') and ' พลัง ' in t)==hand_before, 'Restored battle changed the hand'
+    adb('shell','input','keyevent','4');wait_for('สู้ต่อ');tap('สู้ต่อ');wait_for('จบเทิร์น')
+
     if '--layout-only' in sys.argv:
         cards=[n for n in dump().iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc',''))]
         assert cards, 'No hand cards available for layout check'
@@ -186,7 +203,7 @@ wait_for('ผีปอบ');tap('ผีปอบ');tap('เผชิญหน้
 root=wait_for('วิญญาณเพื่อน เหลือ 3 เทิร์น');shot('15-helper-summoned')
 tap('วิญญาณเพื่อน เหลือ 3 เทิร์น');root=shot('16-helper-details')
 assert find(root,'โจมตีด้วยพลังวิญญาณทะลุการป้องกัน',contains=True) is not None, 'Helper real effect missing'
-tap('วิญญาณเพื่อน เหลือ 3 เทิร์น');tap('จบเทิร์น')
+tap('ปิดรายละเอียดมินเนี่ยน');tap('จบเทิร์น')
 for _ in range(40):
     root=dump()
     if has(root,'จบเทิร์น'):break

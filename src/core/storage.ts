@@ -3,15 +3,23 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { GameState } from './types';
+import type { RNG } from './rng';
 import {
   toSave, fromSave, isPlayableSave, summarize,
-  type SaveV2, type SaveSummary,
+  toBattleSave, type SaveV2, type SaveSummary,
 } from './save';
 
 // Storage keys
 const SAVE_SLOT_PREFIX = 'phikinhua_save_';
 const AUTO_SAVE_KEY = 'phikinhua_autosave';
 const SETTINGS_KEY = 'phikinhua_settings';
+// Serialize autosave writes: an older map checkpoint must never overwrite a
+// later explicit battle snapshot while AsyncStorage is still completing IO.
+let saveWrites:Promise<void>=Promise.resolve();
+function persistSave(key:string,value:string){
+  const write=saveWrites.catch(()=>{}).then(()=>AsyncStorage.setItem(key,value));
+  saveWrites=write;return write;
+}
 
 // Settings type
 export type GameSettings = {
@@ -47,7 +55,7 @@ export async function saveGame(state: GameState, slot: number = 0): Promise<void
       slot: slot === -1 ? 'auto' : slot,
     };
 
-    await AsyncStorage.setItem(key, JSON.stringify(enrichedSave));
+    await persistSave(key, JSON.stringify(enrichedSave));
     
     // Update last played slot if it's not auto-save
     if (slot !== -1) {
@@ -60,7 +68,15 @@ export async function saveGame(state: GameState, slot: number = 0): Promise<void
   }
 }
 
+export async function saveBattle(state: GameState, rng: RNG): Promise<void> {
+  await persistSave(AUTO_SAVE_KEY, JSON.stringify({...toBattleSave(state,rng),savedAt:new Date().toISOString(),slot:'auto'}));
+}
+
 export async function loadGame(slot: number = 0): Promise<GameState> {
+  return (await loadGameSnapshot(slot)).state;
+}
+
+export async function loadGameSnapshot(slot: number = 0): Promise<{state:GameState;rng?:RNG}> {
   try {
     const key = slot === -1 ? AUTO_SAVE_KEY : `${SAVE_SLOT_PREFIX}${slot}`;
     const saved = await AsyncStorage.getItem(key);
@@ -70,7 +86,7 @@ export async function loadGame(slot: number = 0): Promise<GameState> {
     }
 
     const saveData = JSON.parse(saved) as SaveV2 & { savedAt?: string; slot?: string | number };
-    return fromSave(saveData);
+    return {state:fromSave(saveData),rng:saveData.battleRng};
   } catch (error) {
     console.error('Failed to load game:', error);
     throw new Error(`Failed to load game: ${error}`);
@@ -157,7 +173,8 @@ export async function hasAutoSave(): Promise<boolean> {
 }
 
 export async function clearAutoSave(): Promise<void> {
-  try { await AsyncStorage.removeItem(AUTO_SAVE_KEY); } catch {}
+  const clear=saveWrites.catch(()=>{}).then(()=>AsyncStorage.removeItem(AUTO_SAVE_KEY));
+  saveWrites=clear;try{await clear;}catch{}
 }
 
 // === Settings ===

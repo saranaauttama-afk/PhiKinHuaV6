@@ -4,6 +4,8 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest UI follow-up
 
+`work/occupation-table`: **v1.0.11/code 12** replaces summoned-helper bodies with small head portraits above their owner HUD, consolidates enemy turn/block/statuses, removes enemy-card rectangles, updates battle piles to illustrated cards on the mat, and fixes close/back to pause with exact combat/RNG suspension. TypeScript, 551 tests and web export passed; APK/native CI pending. See `docs/HANDOFF-battle-hud-pause.md`.
+
 `work/occupation-table`: **v1.0.10/code 11** adds compact illustrated battle HUD/hand, sequential enemy-card presentation frames, and nine summoned-helper sprites with activity/expiry. TypeScript, all 547 tests, APK package/signature/16 KB audit and full Android API 36 native smoke passed. Battle/card/helper screenshots and native sequential enemy-turn video were inspected. [Download verified v1.0.10 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37436044358/artifacts/11399588476). See `docs/HANDOFF-battle-cards-minions.md`.
 
 `work/occupation-table`: **v1.0.9/code 10** presents protective blessings on a lantern-lit wooden shelf with symbolic art and tap-to-read details, uses เบี้ย/cowrie currency across the UI, and replaces the repeated primary-button lantern with a forward arrow. All 543 tests, TypeScript, APK audit and Android API 36 full native smoke passed; native cover/HUD/blessing/detail screens were visually inspected. [Download verified v1.0.9 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37416831768/artifacts/11391163420). Read `docs/HANDOFF-blessing-cowrie.md` for assets/prompts and evidence.
@@ -41,7 +43,7 @@ npx expo export --platform web
 
 ## Android deliverable
 
-GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.10`, versionCode `11`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
+GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.11`, versionCode `12`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
 
 Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. A dependent Android API 36 x86_64 emulator job installs and launches the APK, navigates into a fight, previews/plays a real card and ends a turn. Screenshots, UI XML and logcat are uploaded as separate evidence. See the handoff for actual run results; successful build alone does not prove installation or launch.
 

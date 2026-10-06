@@ -10,9 +10,11 @@
 // **กองจั่วเรียงตามชื่อ ไม่ใช่ตามลำดับจริง** — บอกลำดับที่จะจั่วเท่ากับยกเลิก
 // การสับไพ่ทิ้ง ที่นี่ตอบว่า "เหลืออะไรบ้าง" ไม่ใช่ "ใบไหนมาก่อน"
 
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
+import {palette, surface, paper} from '../../theme';
+import DeckCard, {CardGlyphArt} from '../DeckCard';
+import RitualSurface from '../RitualSurface';
 import React from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ImageBackground, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, DeckPiles } from '../../../src/core/types';
 import { groupCards } from '../../../src/core/cards/group';
 import CardRow from '../CardRow';
@@ -50,6 +52,8 @@ type Props = {
 
 export default function PileView({ piles, deck, open, onChangePile, onClose }: Props) {
   const pad = useScreenPadding();
+  const [selected,setSelected] = React.useState<{card:CardData;count:number}|null>(null);
+  React.useEffect(()=>setSelected(null),[open]);
   if (!open) return null;
 
   const cardsIn = (id: PileId): CardData[] =>
@@ -59,12 +63,11 @@ export default function PileView({ piles, deck, open, onChangePile, onClose }: P
   const total = cardsIn(open).length;
 
   return (
-    <View style={{
+    <ImageBackground source={require('../../../assets/ui/deck-mat.jpg')} resizeMode="cover" style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimFull,
       zIndex: layer.overlay,
     }}>
-      <PaperTexture />
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,
@@ -72,7 +75,7 @@ export default function PileView({ piles, deck, open, onChangePile, onClose }: P
         <Text style={{ color: palette.moon, fontSize: size.title, fontFamily: font.display }}>
           กองการ์ด
         </Text>
-        <GameButton label="ปิด" onPress={onClose} />
+        <Pressable accessibilityRole="button" accessibilityLabel="ปิดกองการ์ด" onPress={onClose}><RitualSurface kind="wood" style={{minHeight:44,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.heading}}>ปิด</Text></RitualSurface></Pressable>
       </View>
 
       {/* สลับกองได้ในจอเดียว — ปิดแล้วเปิดใหม่ทุกครั้งที่อยากเทียบคือความรำคาญ */}
@@ -85,6 +88,8 @@ export default function PileView({ piles, deck, open, onChangePile, onClose }: P
           return (
             <Pressable
               key={id}
+              accessibilityRole="button"
+              accessibilityLabel={`${PILE_LABEL[id]} ${cardsIn(id).length} ใบ`}
               onPress={() => onChangePile(id)}
               style={{
                 flex: 1, alignItems: 'center',
@@ -129,16 +134,19 @@ export default function PileView({ piles, deck, open, onChangePile, onClose }: P
             ไม่มีการ์ดใน{PILE_LABEL[open]}
           </Text>
         ) : (
-          rows.map(r => (
-            <CardRow
-              key={r.card.id}
-              card={r.card}
-              count={r.count}
-              spent={open === 'exhaust'}
-            />
-          ))
+          <View style={{flexDirection:'row',flexWrap:'wrap',justifyContent:'space-between',rowGap:12}}>
+            {rows.map(r => <DeckCard key={r.card.id} card={r.card} count={r.count} onPress={()=>setSelected(r)}/>)}
+          </View>
         )}
       </ScrollView>
-    </View>
+      <Modal visible={!!selected} transparent animationType="fade" onRequestClose={()=>setSelected(null)}>
+        <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:20,paddingTop:pad.top+16,paddingBottom:pad.bottom+16,justifyContent:'center'}}>
+          {selected&&<RitualSurface kind="occupationPage" style={{maxHeight:'95%',padding:24}}>
+            <ScrollView><View style={{alignItems:'center'}}><CardGlyphArt card={selected.card} size={110}/></View><CardRow card={selected.card} count={selected.count} spent={open==='exhaust'} plain/></ScrollView>
+            <Pressable accessibilityRole="button" accessibilityLabel="กลับไปดูกองการ์ด" onPress={()=>setSelected(null)} style={{minHeight:48,justifyContent:'center',alignItems:'center'}}><Text style={{color:paper.ink,fontFamily:font.heading}}>กลับไปดูกองการ์ด</Text></Pressable>
+          </RitualSurface>}
+        </View>
+      </Modal>
+    </ImageBackground>
   );
 }
