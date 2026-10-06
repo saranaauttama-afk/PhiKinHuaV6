@@ -1,4 +1,4 @@
-name: Inspect Android battle evidence
+name: Android battle HUD overlay APK
 on:
   push:
     branches: ['work/occupation-table']
@@ -8,38 +8,129 @@ permissions:
   contents: read
   actions: read
 jobs:
-  inspect:
+  android:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
         with:
-          name: Android-emulator-smoke
-          run-id: 37486347510
-          github-token: ${{ github.token }}
-      - name: Summarize native error and last screen
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: python -m pip install Pillow
+      - name: Verify only the HUD stacking property changed
         run: |
           python - <<'PY'
+          import subprocess
           from pathlib import Path
-          import re,xml.etree.ElementTree as ET
-          log=Path('logcat.txt').read_text()
-          hits=[line for line in log.splitlines() if re.search(r'ReactNativeJS|FATAL EXCEPTION|JavascriptException|Error:',line)]
-          Path('native-error.txt').write_text('\n'.join(hits[-160:]))
-          print('\n'.join(hits[-80:]))
-          root=ET.parse('latest-ui.xml').getroot()
-          for n in root.iter('node'):
-              text=n.get('text') or n.get('content-desc')
-              if text:print(text)
+          baseline='ff38b01e6a2bcea118ddc9903eeee1fb6bc351c1'
+          path='app/components/battle/MonsterArea.tsx'
+          old=subprocess.check_output(['git','show',baseline+':'+path],text=True)
+          assert Path(path).read_text()==old.replace('right:112,paddingHorizontal:15','right:112,zIndex:20,paddingHorizontal:15',1)
+          changed=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
+          assert all(p==path or p.startswith('.github/') or p.endswith('.md') for p in changed), changed
+          print('Native configuration, dependencies, assets and gameplay code match the verified APK.')
           PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-FirstNight-APK
+          run-id: 37486347510
+          github-token: ${{ github.token }}
+          path: native-base
+      - run: npm ci
+      - run: npm test -- --maxWorkers=2 --testTimeout=30000
+      - run: npx tsc --noEmit
+      - name: Generate unchanged Android signing configuration
+        run: CI=1 npx expo prebuild --platform android --no-install
+      - name: Build current production JavaScript and Hermes bytecode
+        run: |
+          mkdir -p overlay-bundle
+          CI=1 NODE_ENV=production npx expo export:embed --platform android --dev false --minify false --entry-file node_modules/expo-router/entry.js --bundle-output overlay-bundle/index.android.js --assets-dest overlay-bundle/resources
+          node_modules/react-native/sdks/hermesc/linux64-bin/hermesc -O -emit-binary -out overlay-bundle/index.android.bundle overlay-bundle/index.android.js
+      - name: Package bytecode with the verified unchanged native binaries
+        run: |
+          echo '52e04d58760bd63ac3b963d5f93d5dd789f8ed9e4af3b765c2903582cc45190c  native-base/PhiKinHua-FirstNight-v1.0.11.apk' | sha256sum -c -
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          new=Path('overlay-bundle/index.android.bundle').read_bytes()
+          with ZipFile('native-base/PhiKinHua-FirstNight-v1.0.11.apk') as base:
+              old=base.read('assets/index.android.bundle')
+              assert old[:12]==new[:12], 'Hermes bytecode version mismatch'
+              assert old!=new, 'Current UI change did not reach the bundle'
+              with ZipFile('overlay-bundle/unsigned.apk','w') as out:
+                  for info in base.infolist():
+                      if info.filename.startswith('META-INF/') and info.filename.upper().endswith(('.RSA','.DSA','.EC','.SF','.MF')):
+                          continue
+                      out.writestr(info,new if info.filename=='assets/index.android.bundle' else base.read(info.filename))
+          PY
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/zipalign" -f -P 16 4 overlay-bundle/unsigned.apk overlay-bundle/aligned.apk
+          "$BT/apksigner" sign --ks android/app/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out PhiKinHua-FirstNight-v1.0.11.apk overlay-bundle/aligned.apk
+      - name: Verify package, signing and 16KB compatibility
+        run: |
+          mkdir -p apk-audit
+          APK=PhiKinHua-FirstNight-v1.0.11.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
+          grep 'certificate SHA-256 digest: fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c' apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
+          "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
+          grep "package: name='com.phikinhua.episode' versionCode='12' versionName='1.0.11'" apk-audit/package.txt
+          python scripts/check-apk.py "$APK" > apk-audit/libraries.json
+          sha256sum "$APK" > apk-audit/sha256.txt
+          printf '%s\n' 'Current Hermes bundle; unchanged audited native binaries from run 37486347510.' > apk-audit/build-method.txt
+          git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
+        with:
+          name: PhiKinHua-FirstNight-APK
+          path: PhiKinHua-FirstNight-v1.0.11.apk
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: APK-audit
+          path: apk-audit/
+  emulator:
+    needs: android
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - run: python -m pip install Pillow
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-FirstNight-APK
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-FirstNight-v1.0.11.apk
+            timeout 900 python -u scripts/android-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: Battle-native-review
           path: |
-            native-error.txt
-            latest-ui.xml
-            logcat.txt
-            result.txt
-            05-battle.png
-            05-piles.png
-            07-enemy-card.png
-            15-helper-summoned.png
-            16-helper-details.png
+            smoke-output/05-battle.png
+            smoke-output/05-piles.png
+            smoke-output/15-helper-summoned.png
+            smoke-output/16-helper-details.png
+            smoke-output/result.txt
+            smoke-output/latest-ui.xml
+            smoke-output/logcat.txt
+          retention-days: 14
