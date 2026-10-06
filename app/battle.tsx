@@ -283,7 +283,7 @@ export default function BattlePage() {
           <Pressable
             onPress={timeline.skip}
             style={{
-              position: 'absolute', top: safe.top + 8, left: 14, zIndex: layer.control,
+              position: 'absolute', top: safe.top + 66, left: 14, zIndex: layer.control,
               paddingHorizontal: 14, paddingVertical: 6,
               borderRadius: 14,
               backgroundColor: surface.glassDim,

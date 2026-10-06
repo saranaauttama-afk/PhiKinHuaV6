@@ -169,8 +169,24 @@ adb('pull','/sdcard/arrival.mp4',str(out/'arrival.mp4'))
 wait_for('นั่งพักข้างตะเกียง',contains=True);shot('12-event-choices');tap('นั่งพักข้างตะเกียง',contains=True)
 wait_for('เดินทางต่อ');shot('13-event-result');tap('เดินทางต่อ')
 wait_for('กระสือ',contains=True);shot('14-next-location')
+# Fresh real medium run validates summon art and an actual helper attack.
+adb('shell','am','force-stop',package);adb('shell','pm','clear',package)
+adb('shell','am','start','-W','-n',package+'/.MainActivity')
+wait_for('เริ่มเกม');tap('เริ่มเกม');tap('เลือกคนทรง');tap('เลือกคนทรง · ออกเดินทาง →')
+wait_for('ข้ามบทนี้');tap('ข้ามบทนี้');wait_for('พรติดตัว 1:',contains=True);tap('พรติดตัว 1:',contains=True)
+wait_for('ผีปอบ');tap('ผีปอบ');tap('เผชิญหน้า →');wait_for('จบเทิร์น')
+root=wait_for('วิญญาณเพื่อน เหลือ 3 เทิร์น');shot('15-helper-summoned')
+tap('วิญญาณเพื่อน เหลือ 3 เทิร์น');root=shot('16-helper-details')
+assert has(root,'โจมตีด้วยพลังวิญญาณทะลุการป้องกัน'), 'Helper real effect missing'
+tap('วิญญาณเพื่อน เหลือ 3 เทิร์น');tap('จบเทิร์น')
+for _ in range(40):
+    root=dump()
+    if has(root,'จบเทิร์น'):break
+    time.sleep(.5)
+root=wait_for('วิญญาณเพื่อน เหลือ 2 เทิร์น');shot('17-helper-after-action')
+assert has(root,'26/30'), 'Helper attack did not remove real enemy HP'
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'
 assert adb('shell','pidof',package).strip(),'App exited'
-(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, in-scene ghost selection/switch/deselect, map route, player details, mat deck/card details and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event. Physical device not tested.\n')
+(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, in-scene ghost selection/switch/deselect, map route, player details, mat deck/card details and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event, medium summon/details/real helper attack. Physical device not tested.\n')
 print((out/'result.txt').read_text(),flush=True)

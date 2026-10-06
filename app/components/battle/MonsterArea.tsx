@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
   cancelAnimation,
 } from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import { useBattleLayout } from './battleLayout';
 import Art from '../Art';
 import {paper} from '../Paper';
@@ -42,6 +43,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   // ขนาด/ตำแหน่งของภาพผีมาจากไฟล์เดียวกับที่การ์ดศัตรูใช้อ้างอิง
   // เปลี่ยนขนาดที่นี่แล้วการ์ดจะขยับตามเอง (ดู battleLayout.ts)
   const layout = useBattleLayout();
+  const safe = useSafeAreaInsets();
 
   const monsterY      = useSharedValue(0);
   const monsterX      = useSharedValue(0);
@@ -90,7 +92,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   return (
     <View pointerEvents="box-none" style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
-      <RitualSurface kind="wood" style={{position:'absolute',top:28,left:20,width:210,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/></RitualSurface>
+      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+8,left:20,width:210,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/></RitualSurface>
       <Animated.View style={floatStyle}>
         {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
