@@ -36,7 +36,9 @@ def touch(n):
     x1,y1,x2,y2 = map(int, re.findall(r'\d+', n.attrib['bounds']))
     assert x2>x1 and y2>y1, 'Clipped/inverted accessibility bounds: ' + str(fields(n))
     print('TAP', fields(n), n.attrib['bounds'], flush=True)
-    adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2)); time.sleep(.6)
+    # Battle cards overlap; their centers can belong to the next card.
+    x = x1 + min(24, (x2-x1)//4) if n.get('content-desc','').startswith('การ์ด ') else (x1+x2)//2
+    adb('shell','input','tap',str(x),str((y1+y2)//2)); time.sleep(.6)
 def tap(label, contains=False): touch(wait_for(label, contains))
 def shot(name):
     root = dump()
