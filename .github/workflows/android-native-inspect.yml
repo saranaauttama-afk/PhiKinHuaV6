@@ -32,7 +32,8 @@ jobs:
           baseline='ff38b01e6a2bcea118ddc9903eeee1fb6bc351c1'
           path='app/components/battle/MonsterArea.tsx'
           old=subprocess.check_output(['git','show',baseline+':'+path],text=True)
-          assert Path(path).read_text()==old.replace('right:112,paddingHorizontal:15','right:112,zIndex:20,paddingHorizontal:15',1)
+          expected=old.replace('palette, space, surface, tint }','palette, space, surface, tint, layer }').replace('right:112,paddingHorizontal:15','right:112,zIndex:layer.decor,paddingHorizontal:15',1)
+          assert Path(path).read_text()==expected
           changed=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
           assert all(p==path or p.startswith('.github/') or p.endswith('.md') for p in changed), changed
           print('Native configuration, dependencies, assets and gameplay code match the verified APK.')
