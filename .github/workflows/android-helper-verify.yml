@@ -1,8 +1,5 @@
-name: Android helper APK verification
+name: Android v1.0.10 APK verification
 on:
-  push:
-    branches: ['work/occupation-table']
-    paths: ['scripts/android-smoke.py']
   workflow_dispatch:
 permissions:
   contents: read
