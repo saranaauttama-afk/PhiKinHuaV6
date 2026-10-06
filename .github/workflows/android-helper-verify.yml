@@ -1,0 +1,46 @@
+name: Android helper APK verification
+on:
+  push:
+    branches: ['work/occupation-table']
+    paths: ['scripts/android-smoke.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  helpers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: python -m pip install Pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-FirstNight-APK
+          run-id: 37436044358
+          github-token: ${{ github.token }}
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-FirstNight-v1.0.10.apk
+            timeout 480 python -u scripts/android-smoke.py --helpers-only
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Helper-native-screens
+          path: smoke-output/
+          retention-days: 14

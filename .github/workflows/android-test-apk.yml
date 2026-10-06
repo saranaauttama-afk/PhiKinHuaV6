@@ -2,7 +2,7 @@ name: Android first chapter APK
 on:
   push:
     branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table']
-    paths-ignore: ['**/*.md']
+    paths-ignore: ['**/*.md', 'scripts/android-smoke.py', '.github/workflows/android-helper-verify.yml']
   workflow_dispatch:
 permissions:
   contents: read
