@@ -85,6 +85,19 @@ jobs:
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           grep "package: name='com.phikinhua.episode' versionCode='12' versionName='1.0.11'" apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          checked=0
+          with ZipFile('native-base/PhiKinHua-FirstNight-v1.0.11.apk') as base, ZipFile('PhiKinHua-FirstNight-v1.0.11.apk') as built:
+              for name in base.namelist():
+                  if name=='assets/index.android.bundle' or name.startswith('META-INF/'):
+                      continue
+                  assert base.read(name)==built.read(name), 'Unexpected native/resource change: '+name
+                  checked+=1
+          Path('apk-audit/reused-native.txt').write_text('Verified unchanged native, DEX, manifest and resources: '+str(checked)+' entries.\n')
+          print(Path('apk-audit/reused-native.txt').read_text())
+          PY
           sha256sum "$APK" > apk-audit/sha256.txt
           printf '%s\n' 'Current Hermes bundle; unchanged audited native binaries from run 37486347510.' > apk-audit/build-method.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
