@@ -1,4 +1,4 @@
-name: Inspect Android native failure
+name: Inspect Android battle evidence
 on:
   push:
     branches: ['work/occupation-table']
@@ -14,7 +14,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Android-emulator-smoke
-          run-id: 37477945476
+          run-id: 37486347510
           github-token: ${{ github.token }}
       - name: Summarize native error and last screen
         run: |
@@ -32,8 +32,14 @@ jobs:
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: Native-error-details
+          name: Battle-native-review
           path: |
             native-error.txt
             latest-ui.xml
             logcat.txt
+            result.txt
+            05-battle.png
+            05-piles.png
+            07-enemy-card.png
+            15-helper-summoned.png
+            16-helper-details.png
