@@ -19,6 +19,15 @@ import { font, palette, radius, surface } from '../theme';
  * key ต้องตรงกับ `id` ใน `src/art/catalog.ts` เป๊ะ (มีเทสต์คุมให้)
  */
 export const ART_SOURCES: Record<string, any> = {
+  'minion/kuman_spirit': require('../../assets/minions/kuman_spirit.png'),
+  'minion/ghost_ally': require('../../assets/minions/ghost_ally.png'),
+  'minion/demon_minion': require('../../assets/minions/demon_minion.png'),
+  'minion/poison_spirit': require('../../assets/minions/poison_spirit.png'),
+  'minion/shadow_clone': require('../../assets/minions/shadow_clone.png'),
+  'minion/tree_guardian': require('../../assets/minions/tree_guardian.png'),
+  'minion/ancient_warrior_spirit': require('../../assets/minions/ancient_warrior_spirit.png'),
+  'minion/spirit_snail': require('../../assets/minions/spirit_snail.png'),
+  'minion/forest_demon': require('../../assets/minions/forest_demon.png'),
   'scene/episode': require('../../assets/scence/episode-village.jpg'),
   'event/episode_lantern': require('../../assets/scence/lantern-hut.jpg'),
   'chapter/episode_open': require('../../assets/scence/episode-village.jpg'),

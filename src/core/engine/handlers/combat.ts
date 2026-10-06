@@ -206,6 +206,9 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
     s.enemy.block = 0;
 
+    require('../../minionRuntime').processEnemyTurnMinions(s);
+    if (isDefeat(s)) { loseRun(s); emit(s, { t: 'TurnEnded', who: 'enemy' }); return { state: s, rng: r }; }
+
     // ศัตรูตัดสินใจ ณ ตอนที่ถึงตาจริง ไม่ใช่ตั้งแต่ท้ายเทิร์นก่อน
     //
     // เดิมต้องเลือกไว้ล่วงหน้าเพราะต้องเอาไปโชว์บนป้าย intent พอเลิกโชว์แล้ว
@@ -233,6 +236,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         name: def.name ?? def.id,
         dmg: def.dmg ?? 0,
         block: def.block ?? 0,
+        cost: def.energyCost ?? 1,
       });
 
       // กับดักที่ตั้งไว้ทำงานก่อนการ์ดของศัตรูจะมีผล — ดักที่ยกเลิกได้

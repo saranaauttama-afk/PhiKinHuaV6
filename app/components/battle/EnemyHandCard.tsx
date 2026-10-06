@@ -13,16 +13,17 @@ import {font} from '../../theme';
 import {paper} from '../Paper';
 import RitualSurface from '../RitualSurface';
 import InkIcon from '../InkIcon';
+import {CardGlyphArt} from '../DeckCard';
 
-const CARD_W      = 110;
-const CARD_H      = 150;
-const IDLE_SCALE  = 0.28;   // เล็กลง — นั่งอยู่เหนือ badge enemy
+const CARD_W      = 150;
+const CARD_H      = 200;
+const IDLE_SCALE  = 0.32;   // เล็กลง — นั่งอยู่เหนือ badge enemy
 const SLOT_W      = 40;
 
 const PHASE_ENTER = 450;
 const PHASE_FLIP  = 300;
 const PHASE_RISE  = 350;
-const PHASE_HOLD  = 500;
+const PHASE_HOLD  = 1300;
 const PHASE_EXIT  = 200;
 
 export const ENEMY_PLAY_TOTAL      = PHASE_FLIP + PHASE_RISE + PHASE_HOLD + PHASE_EXIT; // 1350ms
@@ -33,7 +34,7 @@ const easeBack = Easing.out(Easing.back(1.4));
 const easeIn   = Easing.in(Easing.quad);
 
 interface Props {
-  card: { name: string; damage: number; block: number };
+  card: { name: string; damage: number; block: number; cost?: number };
   cardIndex: number;
   totalCards: number;
   delay: number;    // slide-in delay (staggered)
@@ -62,17 +63,19 @@ export default function EnemyHandCard({
 
   // Phase 1: slide in to slot (face-down)
   React.useEffect(() => {
+    if (playing) return;
     const t = setTimeout(() => {
       posY.value    = withTiming(idlePosY, { duration: PHASE_ENTER, easing: easeOut });
       opacity.value = withTiming(1, { duration: 350 });
     }, delay);
     return () => clearTimeout(t);
-  }, []);
+  }, [playing]);
 
   // Phase 2: when playing=true → flip, rise, hold, exit
   React.useEffect(() => {
     if (!playing) return;
 
+    opacity.value = 1;
     flip.value = withTiming(1, { duration: PHASE_FLIP, easing: easeOut });
 
     posX.value = withSequence(
@@ -97,12 +100,6 @@ export default function EnemyHandCard({
       withTiming(0, { duration: PHASE_EXIT, easing: easeIn }),
     );
 
-    // จอแฟลชตอนการ์ดโจมตีขึ้นเต็มขนาด — วาดที่ root ของหน้า (ดู ScreenFlash)
-    // ไม่ใช่ในการ์ดใบนี้ เพราะ container ของการ์ดถูก scale/translate อยู่
-    if (card.damage > 0) {
-      const t = setTimeout(() => onAttackPeak?.(), PHASE_FLIP + PHASE_RISE);
-      return () => clearTimeout(t);
-    }
   }, [playing]);
 
   const containerStyle = useAnimatedStyle(() => ({
@@ -135,12 +132,12 @@ export default function EnemyHandCard({
     <Animated.View style={containerStyle}>
       {/* Back face (face-down) */}
       <Animated.View style={backStyle}>
-        <RitualSurface kind="palm" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5,borderWidth:2,borderColor:pulpColors.enemyInk}}><InkIcon name="blessing" size={66} color={pulpColors.enemyInk}/></RitualSurface>
+        <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5,borderWidth:2,borderColor:pulpColors.enemyInk}}><InkIcon name="blessing" size={66} color={pulpColors.enemyInk}/></RitualSurface>
       </Animated.View>
 
       {/* Front face */}
       <Animated.View style={frontStyle}>
-        <RitualSurface kind="palm" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10,borderWidth:2,borderColor:paper.red}}><InkIcon name={isAttack?'attack':'blessing'} size={40} color={paper.red}/><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:13,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</RitualSurface>
+        <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10,borderWidth:2,borderColor:paper.red}}><Image source={isAttack?require('../../../assets/ui/trail-ghost.png'):require('../../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:70,height:70}}/><Text style={{color:paper.ink,fontFamily:font.ui,fontSize:11}}>พลัง {card.cost??1}</Text><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:16,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</RitualSurface>
       </Animated.View>
 
     </Animated.View>

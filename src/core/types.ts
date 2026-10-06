@@ -207,9 +207,13 @@ export interface EquipmentRuntimeState {
 
 export type CombatEventTarget = 'player' | 'enemy';
 
-export type CombatEvent =
+export type CombatFrame = {
+  player: GameState["player"]; enemy: GameState["enemy"]; minions: GameState["minions"];
+};
+
+export type CombatEvent = (
   /** ศัตรูเปิดการ์ดใบหนึ่ง — view ใช้จังหวะนี้พลิกการ์ด */
-  | { t: 'EnemyCardRevealed'; cardId: string; name: string; dmg: number; block: number }
+  | { t: 'EnemyCardRevealed'; cardId: string; name: string; dmg: number; block: number; cost?: number }
   | {
       t: 'Damage';
       target: CombatEventTarget;
@@ -226,7 +230,10 @@ export type CombatEvent =
   | { t: 'Healed'; target: CombatEventTarget; amount: number }
   | { t: 'StatusApplied'; target: CombatEventTarget; effectId: string; stacks: number }
   | { t: 'Died'; who: CombatEventTarget }
-  | { t: 'TurnEnded'; who: CombatEventTarget };
+  | { t: 'TurnEnded'; who: CombatEventTarget }
+  | { t: 'MinionResolved'; minionId: string }
+  | { t: 'MinionActing'; minionId: string; name: string; owner: CombatEventTarget }
+) & { frame?: CombatFrame };
 
 /**
  * สิ่งที่ศัตรูตั้งใจจะทำ "เทิร์นหน้า" — ตัดสินใจไว้ล่วงหน้าตั้งแต่จบเทิร์นก่อน

@@ -2,8 +2,9 @@ import React from 'react';
 import { View, ImageBackground, Pressable, Image, Text } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
-import type { CombatEvent } from '../src/core/types';
+import type { CombatEvent, CombatFrame } from '../src/core/types';
 
+import { combatFrame } from '../src/core/combat/damage';
 import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
 import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
@@ -36,7 +37,7 @@ const eventKey = (_ev: CombatEvent) => `${++_popupSeq}`;
 
 type EnemyHandCardData = {
   key: string;
-  card: { name: string; damage: number; block: number };
+  card: { name: string; damage: number; block: number; cost?: number };
   cardIndex: number;
   totalCards: number;
   delay: number;
@@ -54,9 +55,11 @@ export default function BattlePage() {
   // เดินผ่านหน้าแผนที่ก่อนเสมอ แต่ expo-router เปิดตรงเข้าหน้านี้ได้
   const [fontsLoaded] = useAppFonts();
 
-  const player = gameState.player;
-  const enemy  = gameState.enemy;
+  const [presentation, setPresentation] = React.useState<CombatFrame | null>(null);
+  const player = presentation?.player ?? gameState.player;
+  const enemy = presentation?.enemy ?? gameState.enemy;
   const bootstrapped = React.useRef(false);
+  const turnLocked = React.useRef(false);
 
   const [phase, setPhase] = React.useState<Phase>('player');
 
@@ -109,7 +112,7 @@ export default function BattlePage() {
   const [blessingsOpen, setBlessingsOpen] = React.useState(false);
 
   const handlePlayCard = (card: any, index: number) => {
-    if (phase !== 'player' || gameState.phase !== 'combat') return;
+    if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
     const identifier = card.instanceId ?? card.id;
     setPlayedCardIds(prev => [...prev, identifier]);
 
@@ -150,7 +153,7 @@ export default function BattlePage() {
   };
 
   const handleEndTurn = () => {
-    if (phase !== 'player' || gameState.phase !== 'combat') return;
+    if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
     if (playerHand.length > player.maxHandSize) {
       setPhase('discard');
       return;
@@ -175,7 +178,10 @@ export default function BattlePage() {
    * ที่เหลือเป็นเรื่องภาพล้วนๆ
    */
   const startEnemyTurn = () => {
+    if (turnLocked.current || useGame.getState().state.phase !== 'combat') return;
+    turnLocked.current = true;
     setPhase('enemy');
+    setPresentation(combatFrame(useGame.getState().state));
 
     dispatch({ type: 'ResolveEnemyTurn' });
 
@@ -187,7 +193,7 @@ export default function BattlePage() {
     setEnemyHandCards(
       revealOrder.map((e, i) => ({
         key: `${i}-${e.cardId}`,
-        card: { name: e.name, damage: e.dmg, block: e.block },
+        card: { name: e.name, damage: e.dmg, block: e.block, cost: e.cost },
         cardIndex: i,
         totalCards: revealOrder.length,
         delay: i * 100,
@@ -197,9 +203,15 @@ export default function BattlePage() {
 
     timeline.play(events, () => {
       setEnemyHandCards([]);
+      setPresentation(null);
       if (useGame.getState().state.phase === 'combat') {
+        const before = combatFrame(useGame.getState().state);
         dispatch({ type: 'StartPlayerTurn' });
-        setPhase('player');
+        const startEvents = useGame.getState().state.pendingEvents ?? [];
+        if (startEvents.some(e => e.t === 'MinionActing')) {
+          setPresentation(before);
+          timeline.play(startEvents, () => { setPresentation(null); turnLocked.current = false; setPhase('player'); });
+        } else { turnLocked.current = false; setPhase('player'); }
       }
     });
   };
@@ -208,6 +220,7 @@ export default function BattlePage() {
   const currentEvent = timeline.current;
   React.useEffect(() => {
     if (!currentEvent) return;
+    if (currentEvent.frame) setPresentation(currentEvent.frame);
 
     switch (currentEvent.t) {
       case 'EnemyCardRevealed': {
@@ -221,6 +234,8 @@ export default function BattlePage() {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง ไม่ใช่ค่าบนการ์ด
         if (currentEvent.hpLoss <= 0) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss };
+        if (currentEvent.target === 'player') flashRef.current?.flash();
+        else monsterRef.current?.shake();
         if (currentEvent.target === 'player') setDamagePopups(prev => [...prev, popup]);
         else setEnemyDamagePopups(prev => [...prev, popup]);
         break;
@@ -238,7 +253,7 @@ export default function BattlePage() {
     }
   }, [currentEvent]);
 
-  const victoryIntro=needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
+  const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
     if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying){dispatch({type:'CompleteNode'});router.replace('/');}
   },[gameState.phase,celebratedFight,timeline.isPlaying]);
@@ -253,7 +268,7 @@ export default function BattlePage() {
         resizeMode="cover"
       >
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
-          <Pressable onPress={() => router.back()}>
+          <Pressable onPress={() => { timeline.skip(); router.back(); }}>
             <Image
               source={require('../assets/images/btnDelete.png')}
               style={{ width: 40, height: 40 }}
@@ -291,6 +306,8 @@ export default function BattlePage() {
           enemy={enemy ?? null}
         />
 
+        {phase === 'enemy' && <View pointerEvents="none" style={{position:'absolute',top:safe.top+54,left:12,right:12,alignItems:'center',zIndex:layer.control}}><Text style={{color:palette.moon,fontFamily:'Prompt_600SemiBold',fontSize:13}}>{currentEvent?.t==='MinionActing'?`${currentEvent.name} ช่วยเหลือ`:`ตาของ ${enemy?.name??'ศัตรู'}`}</Text></View>}
+
         <ScreenFlash ref={flashRef} />
 
         {/* Enemy hand cards — absolute overlay, same card does slide-in + flip + rise */}
@@ -323,7 +340,7 @@ export default function BattlePage() {
         {/* Player takes damage — ใกล้ Player HUD */}
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', bottom: 115, left: 0, right: 0, alignItems: 'center', zIndex: layer.popup }}
+          style={{ position: 'absolute', bottom: safe.bottom + 240, left: 0, right: 0, alignItems: 'center', zIndex: layer.popup }}
         >
           {damagePopups.map(popup => (
             <DamagePopup
@@ -345,13 +362,13 @@ export default function BattlePage() {
         ))}
 
         {/* ผีที่เรียกมา — วางเหนือมือ ใต้ฉากกลาง ซ้ายของเรา ขวาของศัตรู */}
-        <View style={{ position: 'absolute', bottom: safe.bottom + 373, left: 0, right: 0, zIndex: layer.decor }}>
-          <MinionRow minions={gameState.minions} />
+        <View style={{ position: 'absolute', bottom: safe.bottom + 330, left: 0, right: 0, zIndex: layer.decor }}>
+          <MinionRow minions={presentation?.minions ?? gameState.minions} activeId={currentEvent?.t === 'MinionActing' ? currentEvent.minionId : undefined} />
         </View>
 
         {/* สถานะที่ติดตัวเรา — ติดกับ HUD เพราะมันคือสภาพของเราตอนนี้
             คอมโบอยู่เหนือขึ้นไปหนึ่งชั้น เพราะมันคือสิ่งที่กำลังจะเกิด ไม่ใช่สิ่งที่เป็นอยู่ */}
-        <View style={{ position: 'absolute', bottom: safe.bottom + 373, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
+        <View style={{ position: 'absolute', bottom: safe.bottom + 305, left: 0, right: 0, zIndex: layer.decor, gap: 4 }}>
           {/* กับดักอยู่บนสุด เพราะมันคือสิ่งที่เราวางไว้แล้วรออยู่ */}
           <TrapRow traps={gameState.traps} />
           <ComboStrip state={gameState} />
@@ -359,6 +376,7 @@ export default function BattlePage() {
         </View>
 
         <PlayerHand
+          enabled={phase === 'player' && gameState.phase === 'combat'}
           cards={playerHand}
           playedCardIds={playedCardIds}
           hoveredCardId={hoveredCardId}
@@ -369,6 +387,8 @@ export default function BattlePage() {
         />
 
         <PlayerHUD
+          classId={gameState.classId}
+          discardCount={gameState.piles.discard.length}
           hp={player.hp}
           maxHp={player.maxHp}
           energy={player.energy}
@@ -463,7 +483,7 @@ export default function BattlePage() {
           />
         )}
 
-        {gameState.phase === 'defeat' && (
+        {!timeline.isPlaying && !presentation && gameState.phase === 'defeat' && (
           <DefeatOverlay onHome={() => router.replace('/')} />
         )}
       </ImageBackground>

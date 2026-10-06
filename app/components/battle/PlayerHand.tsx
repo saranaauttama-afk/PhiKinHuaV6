@@ -1,23 +1,29 @@
 import {pulpColors} from '../../theme';
 import React from 'react';
-import {View,Text,ScrollView,useWindowDimensions} from 'react-native';
+import {View,Text,ScrollView,useWindowDimensions,ImageBackground,BackHandler} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Card from '../Card';
+import { CardGlyphArt } from '../DeckCard';
 import {paper} from '../Paper';
 import RitualSurface from '../RitualSurface';
 import {GameButton} from '../Panel';
 import {font,layer} from '../../theme';
 import {costWithRule} from '../../../src/core/cards/mechanics';
 type CardItem={id:string;instanceId?:string;name:string;[key:string]:any};
-type Props={cards:CardItem[];playedCardIds:string[];hoveredCardId:string|null;energy:number;cardsPlayedThisTurn?:number;onPlayCard:(card:CardItem,index:number)=>void;onHoverChange:(card:CardItem,isHovered:boolean)=>void};
-export default function PlayerHand({cards,playedCardIds,hoveredCardId,energy,cardsPlayedThisTurn=0,onPlayCard,onHoverChange}:Props){
- const [selected,setSelected]=React.useState<string|null>(null);const {width}=useWindowDimensions();const pad=useSafeAreaInsets();const cardW=Math.min(110,Math.max(72,(width-32-Math.min(cards.length-1,4)*6)/Math.min(Math.max(cards.length,1),5)));
- const index=cards.findIndex(c=>(c.instanceId??c.id)===selected);const preview=cards[index];const cost=preview?costWithRule(preview as any,cardsPlayedThisTurn):0;const cannotPlay=preview?.type==='curse';const overflow=cardW*cards.length+6*Math.max(0,cards.length-1)+32>width;
+type Props={enabled?:boolean;cards:CardItem[];playedCardIds:string[];hoveredCardId:string|null;energy:number;cardsPlayedThisTurn?:number;onPlayCard:(card:CardItem,index:number)=>void;onHoverChange:(card:CardItem,isHovered:boolean)=>void};
+export default function PlayerHand({enabled=true,cards,playedCardIds,hoveredCardId,energy,cardsPlayedThisTurn=0,onPlayCard,onHoverChange}:Props){
+ const [selected,setSelected]=React.useState<string|null>(null);const {width,height}=useWindowDimensions();const pad=useSafeAreaInsets();const cardW=Math.min(116,Math.max(96,width*.265));
+ React.useEffect(()=>{if(!enabled)setSelected(null)},[enabled]);
+ React.useEffect(()=>{if(!selected)return;const sub=BackHandler.addEventListener('hardwareBackPress',()=>{setSelected(null);return true});return ()=>sub.remove()},[selected]);
+ const index=cards.findIndex(c=>(c.instanceId??c.id)===selected);const preview=cards[index];const cost=preview?costWithRule(preview as any,cardsPlayedThisTurn):0;const cannotPlay=preview?.type==='curse';const overflow=cardW*cards.length+(cards.length<=5?-18:4)*Math.max(0,cards.length-1)+32>width;
  return <View pointerEvents="box-none" style={{position:'absolute',top:0,bottom:0,left:0,right:0,zIndex:layer.control}}>
- {preview&&<RitualSurface kind="cloth" style={{position:'absolute',bottom:pad.bottom+373,left:18,right:18,paddingHorizontal:48,paddingVertical:28,gap:10,zIndex:layer.overlay}}><Text style={{fontFamily:font.heading,color:paper.ink,fontSize:18}}>{preview.name} · พลัง {cost}</Text><Text style={{fontFamily:font.body,color:paper.ink,fontSize:25,lineHeight:28}}>{preview.desc}</Text><View style={{flexDirection:'row',gap:12}}><GameButton label={cannotPlay?'คำสาป · เล่นไม่ได้':cost>energy?'พลังไม่พอ':'ใช้การ์ด'} tone="primary" disabled={cannotPlay||cost>energy} onPress={()=>{onPlayCard(preview,index);setSelected(null)}} style={{flex:1}}/><GameButton label="ปิด" onPress={()=>setSelected(null)} style={{flex:1}}/></View></RitualSurface>}
- <View style={{position:'absolute',bottom:pad.bottom+186,left:0,right:0,height:180}}>
+ {preview&&enabled&&<RitualSurface kind="wood" style={{position:'absolute',bottom:pad.bottom+320,left:12,right:12,padding:18,gap:8,zIndex:layer.overlay,maxHeight:height*.4}}>
+ <View style={{flexDirection:'row',gap:12}}><CardGlyphArt card={preview as any} size={68}/><View style={{flex:1}}><Text style={{fontFamily:font.heading,color:pulpColors.bone,fontSize:17}}>{preview.name} · พลัง {cost}</Text><ScrollView style={{maxHeight:height*.18}}><Text style={{fontFamily:font.body,color:pulpColors.bone,fontSize:20,lineHeight:25}}>{preview.desc}</Text></ScrollView></View></View>
+ <View style={{flexDirection:'row',gap:12}}><GameButton label={cannotPlay?'คำสาป · เล่นไม่ได้':cost>energy?'พลังไม่พอ':'ใช้การ์ด'} tone="primary" disabled={cannotPlay||cost>energy} onPress={()=>{onPlayCard(preview,index);setSelected(null)}} style={{flex:1}}/><GameButton label="ปิด" onPress={()=>enabled&&setSelected(null)} style={{flex:1}}/></View></RitualSurface>}
+
+ <View style={{position:'absolute',bottom:pad.bottom+64,left:0,right:0,height:155}}>
  <Text style={{fontFamily:font.ui,color:pulpColors.bone,fontSize:10,marginHorizontal:18,marginBottom:5}}>แตะการ์ดเพื่ออ่าน · ลากขึ้นเพื่อใช้{overflow?' · เลื่อนดูใบอื่น':''}</Text>
- <ScrollView horizontal showsHorizontalScrollIndicator={overflow} contentContainerStyle={{paddingHorizontal:16,paddingTop:6,paddingBottom:8,gap:6,alignItems:'flex-end'}}>
- {cards.map((c,i)=>{const id=c.instanceId??c.id;const now=costWithRule(c as any,cardsPlayedThisTurn);return <View key={id} style={{transform:[{translateY:selected===id?-5:0}],zIndex:hoveredCardId===id?999:i}}><Card card={c as any} width={cardW} height={150} selected={selected===id} onPress={()=>setSelected(selected===id?null:id)} onDragPlay={()=>{onPlayCard(c,i);setSelected(null)}} onHoverChange={v=>onHoverChange(c,v)} isPlayed={playedCardIds.includes(id)} disabled={c.type==='curse'||now>energy} animationDelay={i*55} costNow={now}/></View>})}
+ <ScrollView horizontal showsHorizontalScrollIndicator={overflow} contentContainerStyle={{paddingHorizontal:16,paddingTop:6,paddingBottom:8,gap:0,alignItems:'flex-end'}}>
+ {cards.map((c,i)=>{const id=c.instanceId??c.id;const now=costWithRule(c as any,cardsPlayedThisTurn);return <View key={id} style={{marginRight:cards.length<=5?-18:4,transform:[{translateY:selected===id?-12:0}],zIndex:selected===id?999:i,opacity:!enabled?.45:selected&&selected!==id?.65:1}}><Card card={c as any} width={cardW} height={128} selected={selected===id} onPress={()=>enabled&&setSelected(selected===id?null:id)} onDragPlay={()=>{onPlayCard(c,i);setSelected(null)}} onHoverChange={v=>onHoverChange(c,v)} isPlayed={playedCardIds.includes(id)} disabled={!enabled||c.type==='curse'||now>energy} animationDelay={i*55} costNow={now}/></View>})}
  </ScrollView></View></View>;
 }

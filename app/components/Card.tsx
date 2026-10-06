@@ -16,6 +16,8 @@ import { palette, surface, tint, layer, font } from '../theme';
 import {paper} from './Paper';
 import RitualSurface from './RitualSurface';
 import InkIcon from './InkIcon';
+import { CardGlyphArt } from './DeckCard';
+import { cardSummary } from '../cardPresentation';
 
 interface CardProps {
   card: CardData;
@@ -171,12 +173,12 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <RitualSurface kind="palm" style={{width:'100%',height:'100%',padding:7,paddingTop:10,borderWidth:selected?2:0,borderColor:selected?paper.red:paper.line,opacity:disabled?.68:1}}>
-        <View style={{position:'absolute',top:4,left:4,width:25,height:25,borderRadius:13,backgroundColor:paper.ink,alignItems:'center',justifyContent:'center',zIndex:layer.badge}}><Text style={{color:paper.light,fontFamily:font.heading,fontSize:14}}>{costNow??card.cost}</Text></View>
-        <View style={{alignItems:'center',justifyContent:'center',height:height*.27,marginTop:8,borderBottomWidth:1,borderColor:paper.line}}><Image accessible={false} source={/มีด|ฟัน|แทง|โจมตี|หมัด|เตะ|สวน|ปรบ/.test(card.name)?require('../../assets/ui/ritual-knife.png'):/ผ้า|ยันต์|เกราะ|ตั้ง/.test(card.name)?require('../../assets/ui/ritual-cloth.png'):/หม้อ|ผนึก|วิญญาณ/.test(card.name)?require('../../assets/ui/ritual-jar.png'):require('../../assets/ui/ritual-palm.png')} resizeMode="contain" style={{width:height*.25,height:height*.23}}/></View>
-        <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:width>130?17:11,lineHeight:width>130?24:14,color:paper.ink,textAlign:'center',marginTop:6}}>{card.name}</Text>
-        <Text numberOfLines={width>130?8:2} style={{fontFamily:font.body,fontSize:width>130?23:16,lineHeight:width>130?26:16,color:paper.muted,textAlign:'center',marginTop:4}}>{card.desc}</Text>
-        {card.exhaust&&<Text style={{position:'absolute',bottom:4,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:9}}>ใช้แล้วหาย</Text>}
+      <RitualSurface kind="occupationPage" style={{width:'100%',height:'100%',padding:9,paddingTop:28,opacity:disabled?.68:1}}>
+        <View style={{position:'absolute',top:5,left:6,width:25,height:25,borderRadius:13,backgroundColor:paper.ink,alignItems:'center',justifyContent:'center',zIndex:layer.badge}}><Text style={{color:paper.light,fontFamily:font.heading,fontSize:14}}>{costNow??card.cost}</Text></View>
+        <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
+        <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={height*.4}/></View>
+        <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:10,lineHeight:14,color:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>
+        {card.exhaust&&<Text style={{position:'absolute',bottom:5,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:8}}>ใช้แล้วหาย</Text>}
       </RitualSurface>
       </Animated.View>
     </GestureDetector>

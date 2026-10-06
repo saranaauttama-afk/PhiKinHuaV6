@@ -89,13 +89,13 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const maxHp        = enemy?.maxHp ?? 20;
 
   return (
-    <View style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
+    <View pointerEvents="box-none" style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
+      <RitualSurface kind="wood" style={{position:'absolute',top:28,left:20,width:210,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/></RitualSurface>
       <Animated.View style={floatStyle}>
         {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
       </Animated.View>
 
-      <RitualSurface kind="wood" style={{width:270,paddingHorizontal:20,paddingVertical:13,marginTop:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/></RitualSurface>
       {/* ไม่มีป้ายบอกท่าล่วงหน้าแล้ว — ศัตรูตัดสินใจตอนถึงตาของตัวเอง
           ผู้เล่นรู้ว่าโดนอะไรตอนที่โดนจริง
 
@@ -106,11 +106,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         <StatusStrip effects={enemy?.statusEffects} compact />
       </View>
 
-      {enemy && <RitualSurface kind="wood" style={{ flexDirection: 'row', gap: 16, paddingHorizontal: 18, paddingVertical: 10, marginTop: 4 }}>
-        <EnemyStatItem icon="block" label="เกราะ" value={`${enemy.block ?? 0}`} />
-        {enemy.maxEnergy != null && <EnemyStatItem icon="energy" label="พลัง" value={`${enemy.maxEnergy}`} />}
-        {enemy.handSize != null && <EnemyStatItem icon="hand" label="มือ" value={`${enemy.handSize}`} />}
-      </RitualSurface>}
+      {!!enemy?.block && <Text style={{color:chalk,fontFamily:'Prompt_600SemiBold'}}>เกราะ {enemy.block}</Text>}
     </View>
   );
 });

@@ -1,3 +1,4 @@
+import { emit, gainBlock } from './combat/damage';
 // src/core/minionRuntime.ts — Minion Combat System
 
 import type { GameState } from './types';
@@ -133,7 +134,9 @@ export function processMinionTurn(state: GameState, owner: 'player' | 'enemy'): 
   state.log.push(`⚔️ ${owner === 'player' ? 'Player' : 'Enemy'} minions attack!`);
 
   for (const minion of minions) {
+    emit(state, { t: 'MinionActing', minionId: minion.id, name: minion.name, owner });
     processMinionAction(state, minion, target, targetOwner);
+    emit(state, { t: 'MinionResolved', minionId: minion.id });
   }
 }
 
@@ -222,10 +225,8 @@ function processMinionAbility(
       break;
       
     case 'block':
-      if (actualTargetType === 'player') {
-        state.player.block += ability.value;
-        state.log.push(`🛡️ ${minion.name} grants ${ability.value} block`);
-      }
+      gainBlock(state, actualTargetType, ability.value);
+      state.log.push(`🛡️ ${minion.name} grants ${ability.value} block`);
       break;
       
     case 'status':

@@ -14,9 +14,13 @@ import {
   hasStatusEffect,
 } from './status-effects';
 
+export function combatFrame(state: GameState) {
+  return JSON.parse(JSON.stringify({ player: state.player, enemy: state.enemy, minions: state.minions ?? [] }));
+}
+
 /** ปล่อย event ให้ view เอาไปเล่นเป็นอนิเมชั่น (ดู CombatEvent ใน types.ts) */
 export function emit(state: GameState, ev: CombatEvent) {
-  (state.pendingEvents ??= []).push(ev);
+  (state.pendingEvents ??= []).push({ ...ev, frame: combatFrame(state) });
 }
 
 export type Side = 'player' | 'enemy';

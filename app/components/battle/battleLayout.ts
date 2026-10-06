@@ -45,8 +45,8 @@ export function useBattleLayout(): BattleLayout {
     monsterTop,
     monsterSize,
     // ใต้ภาพผีลงมานิดหน่อย เพื่อให้การ์ดคว่ำนั่งเหนือ badge
-    enemyHandCenterY: monsterTop + monsterSize - 20,
+    enemyHandCenterY: monsterTop + monsterSize - 30,
     centerX: screenW / 2,
-    centerY: screenH / 2 - 40,
+    centerY: screenH * .45,
   };
 }

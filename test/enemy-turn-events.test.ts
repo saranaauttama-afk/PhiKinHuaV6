@@ -114,3 +114,40 @@ describe('เทิร์นผู้เล่นก็คาย event ทาง
     expect(dmg).toMatchObject({ target: 'enemy', raw: 8, blocked: 3, hpLoss: 5 });
   });
 });
+
+describe('presentation frames preserve each card impact', () => {
+  it('keeps the unrevealed damage out of earlier HP/block frames', () => {
+    const {state} = makeCombatState({playerHp:50,playerBlock:4});
+    giveEnemyHand(state,['claw','claw']);
+    const {state:out}=resolveEnemyTurn(state);
+    const reveal=eventsOf(out).filter(e=>e.t==='EnemyCardRevealed');
+    const damage=eventsOf(out).filter(e=>e.t==='Damage');
+    expect(reveal.map(e=>e.frame?.player.hp)).toEqual([50,48]);
+    expect(damage.map(e=>e.frame?.player.hp)).toEqual([48,42]);
+    expect(damage.map(e=>e.frame?.player.block)).toEqual([0,0]);
+    out.player.hp=1;
+    expect(reveal[0].frame?.player.hp).toBe(50);
+    expect(damage[1].frame?.player.hp).toBe(42);
+  });
+});
+
+it('shows a summoned helper acting before its real result, then expires it', () => {
+  const {state}=makeCombatState({playerHp:40,playerBlock:0});
+  state.minions=[{id:'kuman_spirit_test',name:'กุมารทอง',duration:3,owner:'player',abilities:[{type:'heal',trigger:'turn_start',target:'owner',value:2,description:'ฟื้นฟู'}]}];
+  const out=applyCommand(state,{type:'StartPlayerTurn'},rng()).state;
+  const acting=eventsOf(out).find(e=>e.t==='MinionActing');
+  const resolved=eventsOf(out).find(e=>e.t==='MinionResolved');
+  expect(acting?.frame?.player.hp).toBe(40);
+  expect(resolved?.frame?.player.hp).toBe(42);
+  expect(out.player.hp).toBe(42);
+});
+
+it('enemy helper acts before cards and cannot continue attacking after lethal damage',()=>{
+  const {state}=makeCombatState({playerHp:3});
+  giveEnemyHand(state,['claw']);
+  state.minions=[{id:'shadow_clone_test',name:'โคลนเงา',duration:3,owner:'enemy',abilities:[{type:'attack',trigger:'turn_start',target:'enemy',value:8,description:'จู่โจม'}]}];
+  const out=resolveEnemyTurn(state).state;
+  expect(out.phase).toBe('defeat');
+  expect(kinds(out)).toContain('MinionActing');
+  expect(kinds(out)).not.toContain('EnemyCardRevealed');
+});

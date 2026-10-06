@@ -129,8 +129,14 @@ for turn in range(12):
     assert not has(root,'พ่ายแพ้'),'Smoke player lost'
     if discard_if_needed(root):time.sleep(7);continue
     end=find(root,'จบเทิร์น')
-    if end is not None:touch(end)
-    time.sleep(7)
+    if end is not None:
+        touch(end)
+        time.sleep(2.1)
+        if turn==0:shot('07-enemy-card')
+    for _ in range(30):
+        root=dump()
+        if has(root,'จบเทิร์น') or has(root,'ชนะ!') or has(root,'พ่ายแพ้'):break
+        time.sleep(.5)
     if turn==0:shot('07-next-turn')
 assert played,'No card was successfully tapped and used'
 assert won,'Fight did not finish'
