@@ -1,5 +1,8 @@
 # Ghosts in the scene and deck on a mat — v1.0.8
 
+Application commit: `e3ca6657d0ee3ca28eedc011c9d733475dab31ef`.
+Workflow: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37412767794
+
 Branch: `work/occupation-table`, based on verified v1.0.7 source/doc tree dbc979971e90d2901fcf7481ea89ba607597f2c6. User approved both designs on 2026-10-06.
 
 ## Behavior
@@ -28,6 +31,22 @@ Existing route slate/icons, player HUD/class portraits and ritual paper/wood/kni
 
 ## Validation
 
-Local TypeScript and 543 tests passed while implementing. Final asset/bundle/native results are pending and will be updated after build.
+Local and CI TypeScript and all 543 tests across 33 files passed. Final asset preparation, diff checks and Android bundle export passed. Both Android build and Android API 36 native emulator jobs completed successfully.
+
+Native smoke opened all four class details and confirmed warrior; selected a real starter blessing; opened/closed player details, deck and blessings; opened the grouped temple-sword card and asserted its exact name and ×4 count; returned to deck/map; selected Pop, switched to Tanee, deselected Tanee and verified confirmation disappeared, then confirmed Pop into combat. Full regression completed card play/preview, enemy turn, victory before rewards, lantern rest/event and next location.
+
+Final native screenshots were visually inspected: Pop/Tanee stand head-to-toe in the village clearing without a paper sheet or selection rectangle; selected Pop is brighter and Tanee/scene dim; description and wooden confirmation remain above the HUD. Deck screenshot shows all five warrior starter symbols and live count/cost/effects in two columns on the mat. Card details show sword art, correct text/count and close action. Later location shows floating Krasue and full-body dancer in the preserved haunted-hut scene. Pong Kang full-body art was inspected as a production asset, not reached in this native smoke.
+
+APK v1.0.8 / versionCode 9:
+https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37412767794/artifacts/11390855339
+
+Native evidence:
+https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37412767794/artifacts/11390238003
+
+APK SHA-256: `6e4607a56ca0fd7e5f5b4b4f3824848194200052cde377657db7371738831d32`.
+Certificate SHA-256 unchanged: `fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c`.
+Package `com.phikinhua.episode`, minSDK 24, targetSDK 36, ARM64/x86_64. APK signature v2 and 16 KB checks passed. Physical device has not been tested with this revision.
+
+Prepared sizes: backgrounds 900×1600 (mat 900×1599) RGB JPEG; five symbols 256×256 RGBA PNG; four full-body ghosts 384×576 indexed PNG retaining alpha.
 
 Native smoke adds ghost selection/switch/deselect, deck grouped card opening, exact card name/count and returning to the deck. Full existing smoke still covers all four class details, blessing, map, HUD links, battle play/turn/victory/rewards, rest/event and next location. Dedicated screen artifact includes initial/selected ghosts, deck and full card detail. Physical device has not been tested with this revision.

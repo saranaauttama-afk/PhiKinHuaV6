@@ -4,6 +4,8 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest UI follow-up
 
+`work/occupation-table`: **v1.0.8/code 9** puts ghosts directly in the scene with map-only full-body art and brightness selection, removes encounter paper/selection rectangles, and replaces the full-paper deck list with a woven-mat background, two-column symbolic cards and full tap-to-read details. All 543 tests, TypeScript, APK audit and Android API 36 full native smoke passed; native screens were visually inspected. [Download verified v1.0.8 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37412767794/artifacts/11390855339). Read `docs/HANDOFF-scene-deck.md` for prompts/assets, behavior and validation.
+
 `work/occupation-table`: **v1.0.7/code 8** implements the approved chalk/ink route icons, compact player HUD with actual class portrait and working deck/blessing links, and compact starter blessing screen from Backlog #4. All 543 tests, TypeScript, APK audit and Android API 36 full native smoke passed; native screens were inspected. [Download verified v1.0.7 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37328381137/artifacts/11353947800). Read `docs/HANDOFF-map-hud.md` for details.
 
 `work/occupation-table`: v1.0.6/code 7 implements the approved occupation detail mockup: portrait-only tabletop sheets, torn paper page, a lantern-lit temple background behind the existing character sprites and a crimson raster paper departure button. All 543 tests, TypeScript, APK audit and Android API 36 native smoke passed. All four class details and live actions were visually inspected. [Download verified v1.0.6 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37272830307/artifacts/11329089015). Read `docs/HANDOFF-occupation-table.md` for current details.
@@ -12,7 +14,7 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Current source
 
-Current work branch: `work/occupation-table`, extending the character and ritual UI branches and `work/first-chapter-apk`. `main` is older. Read `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
+Current work branch: `work/occupation-table`, extending the character and ritual UI branches and `work/first-chapter-apk`. `main` is older. Read `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
 
 ## First chapter
 
@@ -35,7 +37,7 @@ npx expo export --platform web
 
 ## Android deliverable
 
-GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.7`, versionCode `8`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
+GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.8`, versionCode `9`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
 
 Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. A dependent Android API 36 x86_64 emulator job installs and launches the APK, navigates into a fight, previews/plays a real card and ends a turn. Screenshots, UI XML and logcat are uploaded as separate evidence. See the handoff for actual run results; successful build alone does not prove installation or launch.
 
