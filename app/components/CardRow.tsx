@@ -55,20 +55,21 @@ type Props = {
   count?: number;
   /** ใบนี้ใช้ไปแล้วในไฟต์นี้ (อยู่ในกองเผา) — วาดจางลงและติดป้าย */
   spent?: boolean;
+  plain?: boolean;
 };
 
-export default function CardRow({ card, count, spent = false }: Props) {
+export default function CardRow({ card, count, spent = false, plain = false }: Props) {
   return (
     <View style={{
       flexDirection: 'row', alignItems: 'flex-start', gap: space.md,
       padding: space.md,
       borderRadius: radius.md,
-      backgroundColor: surface.panelSunk,
-      borderWidth: 1,
+      backgroundColor: plain ? 'transparent' : surface.panelSunk,
+      borderWidth: plain ? 0 : 1,
       borderColor: spent ? palette.line : surface.panelWell,
       opacity: spent ? 0.45 : 1,
     }}>
-      <PaperTexture />
+      {!plain && <PaperTexture />}
       {/* ค่าร่าย — อ่านเป็นเลขเดียวโดดๆ เหมือนมุมการ์ดจริง */}
       <View style={{
         width: 26, height: 26, borderRadius: radius.pill,
@@ -81,7 +82,7 @@ export default function CardRow({ card, count, spent = false }: Props) {
         </Text>
       </View>
 
-      <InkIcon name={card.type === 'attack' ? 'attack' : card.type === 'trap' ? 'block' : 'blessing'} size={30} color={palette.blood} />
+      {!plain && <InkIcon name={card.type === 'attack' ? 'attack' : card.type === 'trap' ? 'block' : 'blessing'} size={30} color={palette.blood} />}
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, flexWrap: 'wrap' }}>
           <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.uiMed }}>

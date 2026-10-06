@@ -14,6 +14,7 @@ import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
 import BtnEncounter from './components/BtnEncounter';
+import SceneGhostChoices from './components/SceneGhostChoices';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
 import JourneyTrail from './components/JourneyTrail';
@@ -32,7 +33,7 @@ import { screenForState, mapIsReady } from './screenRouter';
 import { useScreenPadding } from './useScreenPadding';
 import { onRestRow, restBudgetLeft } from '../src/core/map/restPage';
 import { nextRowPreview } from '../src/core/map/journeySync';
-import { palette, font, size, space } from './theme';
+import { palette, font, size, space, surface } from './theme';
 
 
 export default function Home() {
@@ -167,16 +168,24 @@ export default function Home() {
     <View style={{ flex: 1 }}>
       <SceneArrival sceneKey={location.key} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
+          <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: surface.glassDim, opacity: selectedCard !== null && offers.some((o, i) => o && describeOffer(o, i).isCombat) ? .55 : 0 }} />
 
           {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
           {state.runMode === 'episode' && (
             <View style={{ paddingHorizontal: space.lg, paddingBottom: space.sm }}>
               <Text style={{ color: palette.moon, fontFamily: font.heading, fontSize: size.heading }}>คืนแรกที่บ้านร้าง</Text>
-              <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'เลือกพักหรือปลุกเสกได้หนึ่งอย่าง หรือเดินผ่าน' : 'แตะเลือกทาง แล้วกดจับผี'}</Text>
+              <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'เลือกพักหรือปลุกเสกได้หนึ่งอย่าง หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
           <JourneyTrail state={state} />
 
+          {offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
+            <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>
+              <SceneGhostChoices choices={offers.flatMap((offer, index) => offer ? [{ display: describeOffer(offer, index), resolved: page?.resolved[index] ?? false, index }] : [])}
+                selected={selectedCard} onSelect={setSelectedCard}
+                onEnter={index => { const offer = offers[index]; if (offer && !page?.resolved[index]) { setSelectedCard(null); enterOffer(offer, index); } }} />
+            </View>
+          ) : <>
           {/* ทางแยกตรงหน้า — มาจากโหนดที่เดินไปได้จริงบนเส้นทาง
               การ์ดมีความกว้างตามสัดส่วนของกรอบ จึงจัดกลางแล้วเว้นช่องไฟ
               แทนที่จะยืด flex เต็มความกว้างจนกรอบบิดผิดสัดส่วน */}
@@ -230,6 +239,8 @@ export default function Home() {
               );
             })}
           </View>
+
+          </>}
 
           {/* ปุ่มเดินต่อมีเฉพาะบนชั้นพัก — ชั้นสู้เดินต่อเองเมื่อจบไฟต์
               เขียนว่าข้างหน้าเป็นอะไรด้วย เพราะแผนที่แบบเส้นทางรู้อยู่แล้ว

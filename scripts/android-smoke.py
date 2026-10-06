@@ -76,9 +76,17 @@ tap('ข้อมูลผู้เดินทาง');wait_for('ปิดข�
 assert any(t.startswith('พลังงาน ') for t in labels(root)), 'Energy missing from player details'
 assert any(t.startswith('EXP ') for t in labels(root)), 'EXP missing from player details'
 tap('ปิดข้อมูลผู้เดินทาง');wait_for('ผีปอบ')
-tap('สำรับ ',contains=True);wait_for('สำรับของเรา');shot('04-deck');tap('ปิด');wait_for('ผีปอบ')
+tap('สำรับ ',contains=True);wait_for('สำรับของเรา');shot('04-deck')
+tap('ดูการ์ด ฟันดาบวัด จำนวน 4 ใบ',contains=True);wait_for('รายละเอียดการ์ด');root=shot('04-deck-detail')
+assert has(root,'ฟันดาบวัด'), 'Wrong card detail opened'
+assert any('×4' in t for t in labels(root)), 'Grouped count missing in card detail'
+tap('กลับไปดูสำรับ');wait_for('สำรับของเรา');tap('ปิด');wait_for('ผีปอบ')
 tap('พร ',contains=True);wait_for('พรติดตัว');shot('04-blessings');tap('ปิด');wait_for('ผีปอบ')
-tap('ผีปอบ');tap('จับผี')
+tap('ผีปอบ');wait_for('เผชิญหน้า →');shot('04-ghost-selected')
+# Switching and clearing selection must not enter battle.
+tap('นางตานี');wait_for('เผชิญหน้า →');tap('นางตานี');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
+assert find(dump(),'เผชิญหน้า →') is None, 'Confirm action remained after deselection'
+tap('ผีปอบ');tap('เผชิญหน้า →')
 wait_for('จบเทิร์น');shot('05-battle')
 if '--layout-only' in sys.argv:
     cards=[n for n in dump().iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc',''))]
@@ -155,5 +163,5 @@ wait_for('กระสือ',contains=True);shot('14-next-location')
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'
 assert adb('shell','pidof',package).strip(),'App exited'
-(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, map route, player details, deck and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event. Physical device not tested.\n')
+(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, in-scene ghost selection/switch/deselect, map route, player details, mat deck/card details and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event. Physical device not tested.\n')
 print((out/'result.txt').read_text(),flush=True)

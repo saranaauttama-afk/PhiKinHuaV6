@@ -1,21 +1,13 @@
-// app/components/DeckView.tsx — สำรับทั้งหมดของผู้เล่น
-//
-// **หน้านี้เขียนเสร็จมานานแล้วแต่เปิดไม่ได้** — คำสั่ง `OpenDeck` ต่อสายเข้า
-// reducer เรียบร้อย แต่ไม่มีปุ่มไหนในเกมสั่งมันเลย เป็นหน้าจอที่ไม่มีประตู
-// ตอนนี้เข้าได้จากแถบสถานะบนแผนที่ และจากหน้าต่อสู้
-//
-// ของเดิมยังมีปัญหาอีกสองอย่าง: วางเป็นบล็อกไหลอยู่กลางหน้าแผนที่ (ไม่ใช่จอทับ
-// จึงล้นออกนอกจอ) และปุ่มปิดเป็นตัวหนังสือสีเลือดบนพื้นสีเลือด — มองไม่เห็น
-// ส่วนของเครื่องรางก็ยังเป็น className ของ NativeWind ปนกับ StyleSheet อยู่
-
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
+// Complete deck on a woven mat. Grouped cards open full live details; equipment actions stay available.
+import { paper } from '../theme';
 import React from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import type { Command, GameState } from '../../src/core/types';
+import { ImageBackground, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import type { CardData, Command, GameState } from '../../src/core/types';
 import { groupCards } from '../../src/core/cards/group';
 import CardRow from './CardRow';
-import { GameButton } from './Panel';
-import { font, radius, size, space, tint, layer } from '../theme';
+import DeckCard, { CardGlyphArt } from './DeckCard';
+import RitualSurface from './RitualSurface';
+import { font, radius, size, space, layer, palette, surface } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
 /** ชื่อชนิดการ์ดเป็นภาษาไทย — เดิมเอาค่า type ดิบมาต่อกับคำว่า "Cards" */
@@ -36,6 +28,8 @@ type Props = {
 
 export default function DeckView({ state, dispatch }: Props) {
   const pad = useScreenPadding();
+  const [selected, setSelected] = React.useState<{ card: CardData; count: number } | null>(null);
+  React.useEffect(() => { if (!state.deckOpen) setSelected(null); }, [state.deckOpen]);
   if (!state.deckOpen) return null;
 
   const deck = state.masterDeck ?? [];
@@ -48,12 +42,12 @@ export default function DeckView({ state, dispatch }: Props) {
   const equipmentCards = deck.filter(c => c.type === 'equipment');
 
   return (
-    <View style={{
+    <ImageBackground source={require('../../assets/ui/deck-mat.jpg')} resizeMode="cover" style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: palette.scrimFull,
       zIndex: layer.overlay,
     }}>
-      <PaperTexture />
+
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,
@@ -66,12 +60,12 @@ export default function DeckView({ state, dispatch }: Props) {
             ทั้งหมด {deck.length} ใบ
           </Text>
         </View>
-        <GameButton label="ปิด" onPress={() => dispatch({ type: 'CloseDeck' })} />
+        <SmallButton label="ปิด" onPress={() => dispatch({ type: 'CloseDeck' })} />
       </View>
 
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: space.xl, paddingBottom: space.xxl, gap: space.lg,
+          paddingHorizontal: space.xl, paddingBottom: pad.bottom + space.xxl, gap: space.lg,
         }}
       >
         {deck.length === 0 && (
@@ -178,21 +172,35 @@ export default function DeckView({ state, dispatch }: Props) {
 
           return (
             <Section key={type} title={`${TYPE_LABEL[type] ?? type} (${total} ใบ)`}>
-              {list.map(r => (
-                <CardRow key={r.card.id} card={r.card} count={r.count} />
-              ))}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 }}>
+                {list.map(r => <DeckCard key={r.card.id} card={r.card} count={r.count} onPress={() => setSelected(r)} />)}
+              </View>
             </Section>
           );
         })}
       </ScrollView>
-    </View>
+      <Modal visible={!!selected} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
+        <View style={{ flex: 1, backgroundColor: palette.scrimHeavy, paddingHorizontal: 20, paddingTop: pad.top + 16, paddingBottom: pad.bottom + 16, justifyContent: 'center' }}>
+          {selected && <RitualSurface kind="occupationPage" style={{ maxHeight: '95%', padding: 24 }}>
+            <ScrollView contentContainerStyle={{ paddingVertical: 12 }}>
+              <Text accessibilityRole="header" style={{ color: paper.ink, fontFamily: font.heading, fontSize: 18, textAlign: 'center' }}>รายละเอียดการ์ด</Text>
+              <View style={{ alignItems: 'center', marginTop: 10 }}><CardGlyphArt card={selected.card} size={110} /></View>
+              <CardRow card={selected.card} count={selected.count} plain />
+            </ScrollView>
+            <Pressable accessibilityRole="button" accessibilityLabel="กลับไปดูสำรับ" onPress={() => setSelected(null)} style={{ minHeight: 48, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: paper.ink, fontFamily: font.heading, fontSize: 14 }}>กลับไปดูสำรับ</Text>
+            </Pressable>
+          </RitualSurface>}
+        </View>
+      </Modal>
+    </ImageBackground>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={{ gap: space.sm }}>
-      <Text style={{ color: palette.moonDim, fontSize: size.heading, fontFamily: font.heading }}>
+      <Text style={{ color: title.startsWith('การ์ดโจมตี') ? palette.bloodLit : palette.text, fontSize: size.heading, fontFamily: font.heading }}>
         {title}
       </Text>
       <View style={{ gap: space.sm }}>{children}</View>
@@ -203,17 +211,18 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function SmallButton({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => ({
-        paddingHorizontal: space.lg, paddingVertical: space.sm,
-        borderRadius: radius.md,
-        backgroundColor: pressed ? tint.moonPick : tint.moonSoft,
-        borderWidth: 1, borderColor: palette.lineStrong,
-      })}
+      style={{
+        paddingHorizontal: 0, paddingVertical: 0,
+        minHeight: 44, justifyContent: 'center',
+        borderWidth: 0,
+      }}
     >
-      <Text style={{ color: palette.moon, fontSize: size.label, fontFamily: font.uiMed }}>
-        {label}
-      </Text>
+      <RitualSurface kind="wood" style={{ minHeight: 44, paddingHorizontal: 16, paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: palette.moon, fontSize: size.label, fontFamily: font.uiMed }}>{label}</Text>
+      </RitualSurface>
     </Pressable>
   );
 }

@@ -12,7 +12,7 @@ export function mapScene(state: GameState) {
   const row = mapSceneStage(state);
   const source = state.runMode === 'episode'
     ? [
-        require('../assets/scence/episode-village.jpg'),
+        require('../assets/ui/map-crossroads.jpg'),
         require('../assets/scence/lantern-hut.jpg'),
         require('../assets/scence/menu-haunted.jpg'),
         require('../assets/scence/rest.jpg'),
