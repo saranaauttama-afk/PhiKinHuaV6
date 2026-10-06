@@ -137,7 +137,7 @@ export default function EnemyHandCard({
 
       {/* Front face */}
       <Animated.View style={frontStyle}>
-        <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10,borderWidth:2,borderColor:paper.red}}><Image source={isAttack?require('../../../assets/ui/trail-ghost.png'):require('../../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:70,height:70}}/><Text style={{color:paper.ink,fontFamily:font.ui,fontSize:11}}>พลัง {card.cost??1}</Text><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:16,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</RitualSurface>
+        {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10,borderWidth:2,borderColor:paper.red}}><Image source={isAttack?require('../../../assets/ui/trail-ghost.png'):require('../../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:70,height:70}}/><Text style={{color:paper.ink,fontFamily:font.ui,fontSize:11}}>พลัง {card.cost??1}</Text><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:16,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</RitualSurface>}
       </Animated.View>
 
     </Animated.View>
