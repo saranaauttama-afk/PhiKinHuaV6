@@ -5,6 +5,7 @@ import type { GameState } from '../../src/core/types';
 import { CHARACTER_CLASSES } from '../../src/core/classes';
 import { artSource } from './Art';
 import RitualSurface from './RitualSurface';
+import InkIcon from './InkIcon';
 import { font, layer, paper, pulpColors, palette } from '../theme';
 
 export const STATUS_BAR_SPACE = 140;
@@ -26,7 +27,7 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: 
         <View accessible accessibilityRole="progressbar" accessibilityLabel="พลังชีวิต" accessibilityValue={{ min: 0, max: p.maxHp, now: p.hp }}
           style={styles.healthRow}><Text style={styles.healthLabel}>พลังชีวิต</Text><View style={styles.track}><View style={[styles.fill, { width: `${health * 100}%` }]} /></View></View>
         <View style={styles.links}>
-          <View style={styles.link}><Text style={styles.linkText}>ทอง {p.gold ?? 0}</Text></View>
+          <View style={[styles.link, { flexDirection: 'row', gap: 3 }]}><InkIcon name="gold" size={14} /><Text style={styles.linkText}>เบี้ย {p.gold ?? 0}</Text></View>
           <Pressable accessibilityRole="button" accessibilityLabel={`สำรับ ${state.masterDeck?.length ?? 0}`} disabled={!onOpenDeck}
             onPress={onOpenDeck} android_ripple={{ color: pulpColors.pressedPaper }} style={styles.link}><Text style={styles.linkText}>สำรับ {state.masterDeck?.length ?? 0} ›</Text></Pressable>
           <Pressable accessibilityRole="button" accessibilityLabel={`พร ${state.blessings?.length ?? 0}`} disabled={!onOpenBlessings}

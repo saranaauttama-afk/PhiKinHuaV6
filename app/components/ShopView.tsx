@@ -107,7 +107,7 @@ function Money({ state }: { state: GameState }) {
       color: palette.moonDim, fontSize: size.label,
       fontFamily: font.ui, marginBottom: space.md,
     }}>
-      ทองในย่าม {state.player.gold ?? 0}
+      เบี้ยในย่าม {state.player.gold ?? 0}
     </Text>
   );
 }
@@ -141,13 +141,13 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
             key={i}
             title={cardOf(item)?.name ?? 'ของไม่ทราบชนิด'}
             line={cardLine(cardOf(item))}
-            note={`${item.price} ทอง`}
+            note={`${item.price} เบี้ย`}
             onPress={() => dispatch({ type: 'TakeShop', index: i })}
           />
         ))}
       </View>
       <GameButton
-        label="ขอดูของชุดใหม่ (50 ทอง)"
+        label="ขอดูของชุดใหม่ (50 เบี้ย)"
         onPress={() => dispatch({ type: 'ShopReroll' })}
         style={{ marginTop: space.lg, alignSelf: 'flex-start' }}
       />
@@ -164,7 +164,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
             key={i}
             title={equipOf(item)?.name ?? 'ของไม่ทราบชนิด'}
             line={equipOf(item)?.desc}
-            note={`${item.price} ทอง · ${equipOf(item)?.rarity ?? ''}`}
+            note={`${item.price} เบี้ย · ${equipOf(item)?.rarity ?? ''}`}
             onPress={() => dispatch({ type: 'TakeShopEquipment', index: i })}
             wide
           />
@@ -181,7 +181,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         <Lead>กองไฟเล็กๆ ริมทาง เผาสิ่งที่ไม่อยากแบกต่อได้ที่นี่</Lead>
         <Money state={state} />
         <Text style={{ color: palette.moonDim, fontSize: size.label, marginBottom: space.md, fontFamily: font.ui }}>
-          ค่าเผา {cost} ทอง · สละไปแล้ว {count} ใบ
+          ค่าเผา {cost} เบี้ย · สละไปแล้ว {count} ใบ
         </Text>
         <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
           {deck.map((card, i) => (
@@ -217,7 +217,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
               // ที่ส่งเข้า dispatch เพี้ยนจากสำรับจริง
               note={
                 canUpgrade(card)
-                  ? `ขั้น ${upgradeLevelOf(card)} → ${upgradeLevelOf(card) + 1} · ${upgradeCostForCount(count + upgradeLevelOf(card))} ทอง`
+                  ? `ขั้น ${upgradeLevelOf(card)} → ${upgradeLevelOf(card) + 1} · ${upgradeCostForCount(count + upgradeLevelOf(card))} เบี้ย`
                   : 'สุดขั้นแล้ว'
               }
               disabled={!canUpgrade(card)}
@@ -241,12 +241,12 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
       <Panel title="ศาลพักใจ">
         <Lead>ศาลไม้เล็กๆ ใต้ต้นโพธิ์ ผ้าแพรสีซีดพลิ้วอยู่ทั้งที่ไม่มีลม</Lead>
         <Text style={{ color: palette.textDim, fontSize: size.label, marginBottom: space.md, fontFamily: font.ui }}>
-          ทอง {state.player.gold ?? 0} · เลือด {state.player.hp}/{state.player.maxHp} · ใช้ได้อีก {Math.max(0, maxUses - used)} ครั้ง
+          เบี้ย {state.player.gold ?? 0} · เลือด {state.player.hp}/{state.player.maxHp} · ใช้ได้อีก {Math.max(0, maxUses - used)} ครั้ง
         </Text>
 
         {canUse ? (
           <GameButton
-            label={`ขอพร ${cost} ทอง (ฟื้น ${missing})`}
+            label={`ขอพร ${cost} เบี้ย (ฟื้น ${missing})`}
             tone="primary"
             onPress={() => dispatch({ type: 'UseHealingShrine' })}
           />
@@ -255,7 +255,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
             text={
               used >= maxUses ? 'ศาลนี้หมดแรงแล้ว'
               : missing <= 0 ? 'เลือดเต็มอยู่แล้ว'
-              : 'ทองไม่พอ'
+              : 'เบี้ยไม่พอ'
             }
           />
         )}
@@ -277,7 +277,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
 
         {canUse ? (
           <GameButton
-            label="ตักขึ้นมาดื่ม (ฟื้น 10 · ไม่เสียทอง)"
+            label="ตักขึ้นมาดื่ม (ฟื้น 10 · ไม่เสียเบี้ย)"
             tone="primary"
             onPress={() => dispatch({ type: 'UseWell' })}
           />

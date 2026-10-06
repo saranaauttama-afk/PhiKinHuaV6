@@ -22,9 +22,9 @@ const BUCKET_LABEL: Record<string, { title: string; detail: string }> = {
   blessing:       { title: 'พร',             detail: 'รับพรติดตัว 1 อย่าง' },
   remove:         { title: 'สละการ์ด',       detail: 'ถอดการ์ดออกจากสำรับ' },
   upgrade:        { title: 'ปลุกเสก',        detail: 'อัปเกรดการ์ดในสำรับ' },
-  gold:           { title: 'ทรัพย์',         detail: 'รับทองเพิ่ม' },
+  gold:           { title: 'ทรัพย์',         detail: 'รับเบี้ยเพิ่ม' },
   equipment_slot: { title: 'ช่องเครื่องราง', detail: 'พกเครื่องรางได้มากขึ้น 1 ชิ้น' },
-  gold_skip:      { title: 'ข้ามรับทอง',     detail: 'ไม่รับอะไร แลกกับทอง' },
+  gold_skip:      { title: 'ข้ามรับเบี้ย',     detail: 'ไม่รับอะไร แลกกับเบี้ย' },
 };
 
 const labelOf = (bucket: string) =>

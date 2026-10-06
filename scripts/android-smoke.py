@@ -81,7 +81,10 @@ tap('ดูการ์ด ฟันดาบวัด จำนวน 4 ใบ'
 assert has(root,'ฟันดาบวัด'), 'Wrong card detail opened'
 assert any('×4' in t for t in labels(root)), 'Grouped count missing in card detail'
 tap('กลับไปดูสำรับ');wait_for('สำรับของเรา');tap('ปิด');wait_for('ผีปอบ')
-tap('พร ',contains=True);wait_for('พรติดตัว');shot('04-blessings');tap('ปิด');wait_for('ผีปอบ')
+root=dump();assert any('เบี้ย 25' in t for t in labels(root)), 'Currency label missing'
+tap('พร ',contains=True);wait_for('พรติดตัว');shot('04-blessings')
+tap('ดูพร ',contains=True);wait_for('รายละเอียดพร');shot('04-blessing-detail')
+tap('กลับไปดูพร');wait_for('พรติดตัว');tap('ปิด');wait_for('ผีปอบ')
 tap('ผีปอบ');wait_for('เผชิญหน้า →');shot('04-ghost-selected')
 # Switching and clearing selection must not enter battle.
 tap('นางตานี');wait_for('เผชิญหน้า →');tap('นางตานี');wait_for('เลือกผีที่คุณจะเผชิญหน้า')

@@ -158,7 +158,7 @@ export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'Shop
   if (i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
 
   // ใบที่เต็มขั้นแล้วปลุกต่อไม่ได้ — กันไว้ที่นี่ด้วย ไม่ใช่แค่ซ่อนปุ่มใน UI
-  // ไม่งั้นเสียทองฟรีโดยไม่มีอะไรเปลี่ยน
+  // ไม่งั้นเสียเบี้ยฟรีโดยไม่มีอะไรเปลี่ยน
   if (!canUpgrade(s.masterDeck[i])) {
     s.log.push('การ์ดใบนี้ปลุกเสกจนสุดแล้ว');
     return { state: s, rng: r };
@@ -169,7 +169,7 @@ export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'Shop
   const count = (s.runCounters?.upgradeShopCount ?? 0);
   const price = upgradeCostForCount(count + upgradeLevelOf(s.masterDeck[i]));
   if ((s.player.gold ?? 0) < price) {
-    s.log.push(`ทองไม่พอ (ต้องการ ${price})`);
+    s.log.push(`เบี้ยไม่พอ (ต้องการ ${price})`);
     return { state: s, rng: r };
   }
 

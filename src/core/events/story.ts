@@ -68,7 +68,7 @@ export function choiceLocked(s: GameState, choice: EventChoice): string | null {
   for (const req of choice.requires ?? []) {
     switch (req.kind) {
       case 'gold':
-        if ((s.player.gold ?? 0) < req.min) return `ต้องมีทองอย่างน้อย ${req.min}`;
+        if ((s.player.gold ?? 0) < req.min) return `ต้องมีเบี้ยอย่างน้อย ${req.min}`;
         break;
       case 'class':
         if (s.classId !== req.classId) return 'ไม่ใช่วิชาของเรา';
@@ -103,7 +103,7 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
 
     case 'gold': {
       s.player.gold = Math.max(0, (s.player.gold ?? 0) + eff.amount);
-      s.log.push(`ทอง ${s.player.gold}`);
+      s.log.push(`เบี้ย ${s.player.gold}`);
       return r;
     }
 
@@ -162,7 +162,7 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
       if (b && grantBlessing(s, b)) {
         s.log.push(`ได้พร ${b.name ?? b.id}`);
       } else {
-        // คลังพรหมดแล้ว — ให้ทองแทน ดีกว่าเหตุการณ์ที่กดแล้วไม่มีอะไรเกิดขึ้น
+        // คลังพรหมดแล้ว — ให้เบี้ยแทน ดีกว่าเหตุการณ์ที่กดแล้วไม่มีอะไรเกิดขึ้น
         s.player.gold = (s.player.gold ?? 0) + 40;
         s.log.push('ไม่มีพรใหม่เหลือแล้ว — ได้ทรัพย์ 40 แทน');
       }

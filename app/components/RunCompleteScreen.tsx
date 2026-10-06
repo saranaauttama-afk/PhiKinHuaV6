@@ -57,7 +57,7 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
           <Panel emphasis={!!s.beatSecretBoss} style={{ gap: space.md }}>
             <Row label={s.won ? 'ไฟต์ทั้งหมด' : 'ไปได้ถึงไฟต์ที่'} value={`${s.fights}`} />
             <Row label="เลเวลสุดท้าย" value={`${s.level}`} />
-            <Row label="ทรัพย์ที่เหลือ" value={`${s.gold}`} />
+            <Row label="เบี้ยที่เหลือ" value={`${s.gold}`} />
             <Row
               label="ศึกลับ"
               value={s.beatSecretBoss ? 'ชนะแล้ว' : 'ยังไม่ปลดล็อค'}
