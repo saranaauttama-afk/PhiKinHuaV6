@@ -19,16 +19,18 @@ export default function SceneGhostChoices({ choices, selected, onSelect, onEnter
   const [height, setHeight] = React.useState(382);
   const spriteHeight = Math.max(100, Math.min(240, height - 172));
   const picked = choices.find(c => c.index === selected && !c.resolved);
-  return <View onLayout={e => setHeight(e.nativeEvent.layout.height)} style={styles.scene}>
-    <View style={styles.figures}>
+  // Keep native parents stable while selection changes opacity and transforms.
+  // Fabric must not reparent the image layers when a layout-only view unflattens.
+  return <View collapsable={false} onLayout={e => setHeight(e.nativeEvent.layout.height)} style={styles.scene}>
+    <View collapsable={false} style={styles.figures}>
       {choices.map(({ display: d, resolved, index }) => {
         const active = selected === index && !resolved;
         const dim = !!picked && !active;
         const source = sceneArt[d.id] ?? artSource(d.artSlot);
-        return <Pressable key={`${d.id}-${index}`} accessibilityRole="button" accessibilityLabel={d.name}
+        return <Pressable collapsable={false} key={`${d.id}-${index}`} accessibilityRole="button" accessibilityLabel={d.name}
           accessibilityState={{ selected: active, disabled: resolved }} disabled={resolved}
           onPress={() => onSelect(active ? null : index)} style={[styles.figure, { opacity: resolved ? .25 : dim ? .35 : 1 }]}>
-          <View style={[styles.art, { height: spriteHeight, transform: [{ scale: active ? 1.04 : 1 }] }]}>
+          <View collapsable={false} style={[styles.art, { height: spriteHeight, transform: [{ scale: active ? 1.04 : 1 }] }]}>
             {source ? <>
               <Image accessible={false} source={source} resizeMode="contain" style={[styles.sprite, { opacity: active ? 1 : .68 }]} />
               <Image accessible={false} source={source} resizeMode="contain" style={[styles.sprite, { tintColor: palette.ink, opacity: active ? 0 : .35 }]} />
@@ -39,7 +41,7 @@ export default function SceneGhostChoices({ choices, selected, onSelect, onEnter
         </Pressable>;
       })}
     </View>
-    <View style={styles.decision}>
+    <View collapsable={false} style={styles.decision}>
       {picked ? <>
         <Text style={styles.description}>{picked.display.description}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel="เผชิญหน้า →" onPress={() => onEnter(picked.index)} style={styles.enter}>

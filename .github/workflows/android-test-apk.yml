@@ -112,6 +112,19 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
+          name: Battle-native-screens
+          path: |
+            smoke-output/05*.png
+            smoke-output/06*.png
+            smoke-output/07*.png
+            smoke-output/result.txt
+            smoke-output/latest-ui.xml
+            smoke-output/logcat.txt
+          if-no-files-found: warn
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
           name: Android-emulator-smoke
           path: smoke-output/
           if-no-files-found: warn
