@@ -4,7 +4,7 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest UI follow-up
 
-`work/occupation-table`: **v1.0.11/code 12** replaces summoned-helper bodies with small head portraits above their owner HUD, consolidates enemy turn/block/statuses, removes enemy-card rectangles, updates battle piles to illustrated cards on the mat, and fixes close/back to pause with exact combat/RNG suspension. TypeScript, 551 tests and web export passed; APK/native CI pending. See `docs/HANDOFF-battle-hud-pause.md`.
+`work/occupation-table`: **v1.0.11/code 12** replaces summoned-helper bodies with small head portraits above their owner HUD, consolidates enemy turn/block/statuses, removes enemy-card rectangles, updates battle piles to illustrated cards on the mat, and fixes close/back to pause with exact combat/RNG suspension. TypeScript, 551 tests, web export, APK audit and full Android API 36 smoke passed, including pause/settings, pile details, cold battle restore and actual helper damage. [Download verified v1.0.11 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37493232636/artifacts/11426118774). See `docs/HANDOFF-battle-hud-pause.md`.
 
 `work/occupation-table`: **v1.0.10/code 11** adds compact illustrated battle HUD/hand, sequential enemy-card presentation frames, and nine summoned-helper sprites with activity/expiry. TypeScript, all 547 tests, APK package/signature/16 KB audit and full Android API 36 native smoke passed. Battle/card/helper screenshots and native sequential enemy-turn video were inspected. [Download verified v1.0.10 APK](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37436044358/artifacts/11399588476). See `docs/HANDOFF-battle-cards-minions.md`.
 
@@ -20,11 +20,11 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Current source
 
-Current work branch: `work/occupation-table`, extending the character and ritual UI branches and `work/first-chapter-apk`. `main` is older. Read `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
+Current work branch: `work/occupation-table`, extending the character and ritual UI branches and `work/first-chapter-apk`. `main` is older. Read `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
 
 ## First chapter
 
-Cover → character → short story → starter blessing → choose Pop/Tanee → lantern decision (heal, risky card, or pass) → choose Krasue/dancer → choose healing or card upgrade → Pong Kang finale → card reward and ending. Three real battles, with the existing reducer/command, equipment, class, card-reward and status systems. Rest nodes do not refill in this mode. Enemy cards stay face down until played; no enemy intent is displayed. The underlying reducer/command rules remain unchanged.
+Cover → character → short story → starter blessing → choose Pop/Tanee → lantern decision (heal, risky card, or pass) → choose Krasue/dancer → choose healing or card upgrade → Pong Kang finale → card reward and ending. Three real battles, with the existing reducer/command, equipment, class, card-reward and status systems. Rest nodes do not refill in this mode. Enemy cards stay face down until played; no enemy intent is displayed. Combat balance and card mechanics remain unchanged.
 
 Tap a hand card to read it and press **ใช้การ์ด**, or drag upward. End turn with **จบเทิร์น**. Choose card rewards after winning. Old full-run engine mode remains available through `NewRun` without `runMode`; the current main menu starts the short chapter.
 
