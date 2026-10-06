@@ -1,0 +1,39 @@
+name: Inspect Android native failure
+on:
+  push:
+    branches: ['work/occupation-table']
+    paths: ['.github/workflows/android-native-inspect.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Android-emulator-smoke
+          run-id: 37477945476
+          github-token: ${{ github.token }}
+      - name: Summarize native error and last screen
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re,xml.etree.ElementTree as ET
+          log=Path('logcat.txt').read_text()
+          hits=[line for line in log.splitlines() if re.search(r'ReactNativeJS|FATAL EXCEPTION|JavascriptException|Error:',line)]
+          Path('native-error.txt').write_text('\n'.join(hits[-160:]))
+          print('\n'.join(hits[-80:]))
+          root=ET.parse('latest-ui.xml').getroot()
+          for n in root.iter('node'):
+              text=n.get('text') or n.get('content-desc')
+              if text:print(text)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Native-error-details
+          path: |
+            native-error.txt
+            latest-ui.xml
+            logcat.txt
