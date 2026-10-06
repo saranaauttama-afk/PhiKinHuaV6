@@ -122,7 +122,7 @@ if '--helpers-only' not in sys.argv:
             if not played:shot('06-card-preview')
             use=find(root,'ใช้การ์ด')
             if use is not None:
-                touch(use);played=True
+                touch(use);played=True;attempted.clear()
             else:
                 close=find(root,'ปิด')
                 if close is not None:touch(close)
