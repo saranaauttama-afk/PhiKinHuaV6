@@ -40,7 +40,9 @@ export default function JourneyTrail({ state }: { state: GameState }) {
               <Svg width={nodeWidth} height={30}><Path d={i % 2 ? `M0 16Q${nodeWidth / 2} -2 ${nodeWidth} 8` : `M0 8Q${nodeWidth / 2} 28 ${nodeWidth} 16`}
                 stroke={chalk} strokeWidth={1.5} fill="none" strokeDasharray="3 3" /></Svg>
             </View>}
-            <View style={[styles.illustration, { borderWidth: current ? 2 : 0, opacity: past ? .45 : current ? 1 : .75 }]}>
+            {/* Advancing the selected node changes border/opacity during navigation.
+                Keep the icon parent mounted so Fabric never reparents its image. */}
+            <View collapsable={false} style={[styles.illustration, { borderWidth: current ? 2 : 0, opacity: past ? .45 : current ? 1 : .75 }]}>
               <Image accessible={false} source={routeArt[rest ? 'rest' : finale ? 'house' : 'ghost']} resizeMode="contain" style={styles.icon} />
             </View>
             <Text style={styles.label}>{label}</Text>

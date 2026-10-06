@@ -117,6 +117,9 @@ jobs:
             smoke-output/05*.png
             smoke-output/06*.png
             smoke-output/07*.png
+            smoke-output/15*.png
+            smoke-output/16*.png
+            smoke-output/17*.png
             smoke-output/result.txt
             smoke-output/latest-ui.xml
             smoke-output/logcat.txt
