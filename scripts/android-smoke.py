@@ -129,14 +129,19 @@ for turn in range(12):
     assert not has(root,'พ่ายแพ้'),'Smoke player lost'
     if discard_if_needed(root):time.sleep(7);continue
     end=find(root,'จบเทิร์น')
+    enemy_recording=None
     if end is not None:
+        if turn==0:enemy_recording=subprocess.Popen(['adb','shell','screenrecord','--time-limit','12','/sdcard/enemy-turn.mp4'])
         touch(end)
-        time.sleep(2.1)
+        time.sleep(.5)
         if turn==0:shot('07-enemy-card')
     for _ in range(30):
         root=dump()
         if has(root,'จบเทิร์น') or has(root,'ชนะ!') or has(root,'พ่ายแพ้'):break
         time.sleep(.5)
+    if enemy_recording is not None:
+        adb('shell','pkill','-2','screenrecord');enemy_recording.wait(timeout=15)
+        adb('pull','/sdcard/enemy-turn.mp4',str(out/'enemy-turn.mp4'))
     if turn==0:shot('07-next-turn')
 assert played,'No card was successfully tapped and used'
 assert won,'Fight did not finish'

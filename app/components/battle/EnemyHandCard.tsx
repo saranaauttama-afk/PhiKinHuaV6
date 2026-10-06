@@ -95,10 +95,13 @@ export default function EnemyHandCard({
       withTiming(1.12,       { duration: PHASE_EXIT, easing: easeOut }),
     );
 
-    opacity.value = withSequence(
-      withTiming(1, { duration: PHASE_FLIP + PHASE_RISE + PHASE_HOLD }),
-      withTiming(0, { duration: PHASE_EXIT, easing: easeIn }),
-    );
+    // A timed opacity sequence collapses to zero under Android reduced motion.
+    // Keep the revealed information visible for the same JS timeline dwell time.
+    opacity.value = 1;
+    const exitTimer = setTimeout(() => {
+      opacity.value = withTiming(0, { duration: PHASE_EXIT, easing: easeIn });
+    }, PHASE_FLIP + PHASE_RISE + PHASE_HOLD);
+    return () => clearTimeout(exitTimer);
 
   }, [playing]);
 
