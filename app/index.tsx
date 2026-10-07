@@ -7,13 +7,13 @@ import { useAppFonts } from './useAppFonts';
 import type { SaveSlotInfo } from '../src/core/storage';
 import type { PageOffer } from '../src/core/map/pages';
 import { useGame } from '../src/store/gameStore';
-import { describeOffer, isShopLike } from './components/offerDisplay';
+import { describeOffer } from './components/offerDisplay';
 
 // Components
 import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
-import BtnEncounter from './components/BtnEncounter';
+import RestDestinations from './components/RestDestinations';
 import SceneGhostChoices from './components/SceneGhostChoices';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
@@ -31,7 +31,7 @@ import Panel, { GameButton, Scrim } from './components/Panel';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { screenForState, mapIsReady } from './screenRouter';
 import { useScreenPadding } from './useScreenPadding';
-import { onRestRow, restBudgetLeft } from '../src/core/map/restPage';
+import { onRestRow } from '../src/core/map/restPage';
 import { nextRowPreview } from '../src/core/map/journeySync';
 import { palette, font, size, space, surface } from './theme';
 
@@ -64,19 +64,12 @@ export default function Home() {
   //          แล้วกดเดินต่อเมื่อไหร่ก็ได้ (ดู `map/restPage.ts`)
   const restRow = onRestRow(state);
   const ahead   = restRow ? nextRowPreview(state) : undefined;
-  const refills = restRow ? restBudgetLeft(state) : 0;
 
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
     dispatch({ type: 'ChooseOffer', index });
 
     // Restored and newly entered fights share the combat redirect above.
-  };
-
-  /** ข้ามโหนดนี้ไป — เดินผ่านร้านโดยไม่แวะ แล้วไปต่อชั้นถัดไป */
-  const dismissOffer = (offer: PageOffer, index: number) => {
-    if (isShopLike(offer)) dispatch({ type: 'DeleteShopFromMap', index });
-    else dispatch({ type: 'DismissOffer', index });
   };
 
   if (!fontsLoaded) {
@@ -171,10 +164,10 @@ export default function Home() {
           {state.runMode === 'episode' && (
             <View style={{ paddingHorizontal: space.lg, paddingBottom: space.sm }}>
               <Text style={{ color: palette.moon, fontFamily: font.heading, fontSize: size.heading }}>คืนแรกที่บ้านร้าง</Text>
-              <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'เลือกพักหรือปลุกเสกได้หนึ่งอย่าง หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
+              <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
-          <JourneyTrail state={state} />
+          <JourneyTrail state={state} compact={restRow} />
 
           {offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
             <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>
@@ -182,91 +175,14 @@ export default function Home() {
                 selected={selectedCard} onSelect={setSelectedCard}
                 onEnter={index => { const offer = offers[index]; if (offer && !page?.resolved[index]) { setSelectedCard(null); enterOffer(offer, index); } }} />
             </View>
-          ) : <>
-          {/* ทางแยกตรงหน้า — มาจากโหนดที่เดินไปได้จริงบนเส้นทาง
-              การ์ดมีความกว้างตามสัดส่วนของกรอบ จึงจัดกลางแล้วเว้นช่องไฟ
-              แทนที่จะยืด flex เต็มความกว้างจนกรอบบิดผิดสัดส่วน */}
-          <View style={{
-            flex: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: space.sm,
-            paddingHorizontal: space.sm,
-            // กันที่ให้แถบสถานะเป๊ะๆ — เดิมเดาไว้ 140 ซึ่งน้อยกว่าที่แถบกินจริง
-            paddingBottom: STATUS_BAR_SPACE + pad.bottom + space.lg,
-          }}>
-            {offers.map((offer, i) => {
-              // ช่องที่หมดของแล้วเป็น undefined — ข้ามไป ไม่ใช่วาดกรอบเปล่า
-              if (!offer) return null;
-              const d = describeOffer(offer, i);
-              const resolved = page?.resolved[i] ?? false;
-              const picked = selectedCard === i;
-
-              return (
-                <View
-                  key={`${d.id}-${i}`}
-                  style={{
-                    opacity: resolved ? 0.35 : 1,
-                    // การ์ดที่เลือกอยู่ยกขึ้นเล็กน้อย ให้รู้ว่ากำลังตัดสินใจใบไหน
-                    transform: [{ translateY: picked ? -8 : 0 }],
-                  }}
-                >
-                  <BtnEncounter
-                    encounter={{
-                      id: d.id,
-                      type: d.type,
-                      name: d.name,
-                      description: d.description,
-                      artSlot: d.artSlot,
-                    }}
-                    height={offers.length >= 3 ? 232 : 264}
-                    onPress={() => !resolved && setSelectedCard(picked ? null : i)}
-                    showButtons={picked && !resolved}
-                    onEnter={() => {
-                      setSelectedCard(null);
-                      enterOffer(offer, i);
-                    }}
-                    onClose={() => {
-                      setSelectedCard(null);
-                      if (d.canDismiss) dismissOffer(offer, i);
-                    }}
-                  />
-                </View>
-              );
-            })}
-          </View>
-
-          </>}
-
-          {/* ปุ่มเดินต่อมีเฉพาะบนชั้นพัก — ชั้นสู้เดินต่อเองเมื่อจบไฟต์
-              เขียนว่าข้างหน้าเป็นอะไรด้วย เพราะแผนที่แบบเส้นทางรู้อยู่แล้ว
-              ผู้เล่นควรตัดสินใจได้ว่าจะเก็บของต่อหรือพอ โดยรู้ว่าอีกก้าวจะเจอบอส */}
-          {restRow && ahead && (
-            <View style={{
-              position: 'absolute', left: 0, right: 0,
-              bottom: STATUS_BAR_SPACE + pad.bottom + space.sm,
-              alignItems: 'center',
-            }}>
-              <GameButton
-                label={`เดินต่อ → ${ahead.label}`}
-                tone={ahead.kind === 'boss' ? 'danger' : 'primary'}
-                onPress={() => {
-                  setSelectedCard(null);
-                  dispatch({ type: 'Proceed' });
-                }}
-              />
-              <Text style={{
-                color: palette.textFaint, fontSize: size.tiny,
-                fontFamily: font.ui, marginTop: space.xs,
-              }}>
-                {refills > 0
-                  ? `แวะเก็บของต่อได้ · ยังเหลืออีก ${refills} อย่างในทาง`
-                  : 'ของบนทางนี้หมดแล้ว'}
-              </Text>
-            </View>
-          )}
-
+          ) : <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}>
+            <RestDestinations offers={offers} resolved={page?.resolved??[]} onEnter={(offer,index)=>{setSelectedCard(null);enterOffer(offer,index);}}>
+              {restRow&&ahead&&<View style={{gap:6}}>
+                <GameButton label="เดินผ่าน" onPress={()=>{setSelectedCard(null);dispatch({type:'Proceed'});}}/>
+                <Text style={{color:palette.textDim,fontFamily:font.ui,fontSize:12,textAlign:'center'}}>ถัดไป · {ahead.label}</Text>
+              </View>}
+            </RestDestinations>
+          </View>}
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
           {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool

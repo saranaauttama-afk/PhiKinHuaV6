@@ -1,15 +1,13 @@
-import {palette,surface,paper} from '../../theme';
+import {palette,surface} from '../../theme';
 import PostBattleSurface from './PostBattleSurface';
 import RitualSurface from '../RitualSurface';
 import {GameButton} from '../Panel';
-import {CardGlyphArt} from '../DeckCard';
 import {Image} from 'react-native';
 import React from 'react';
-import InkIcon from '../InkIcon';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { CardData, GameState } from '../../../src/core/types';
 import CardRow from '../CardRow';
-import { tint, font, size, space, layer } from '../../theme';
+import { font, size, space } from '../../theme';
 
 /**
  * หน้าเลือกรางวัลตอนเลเวลอัป
@@ -21,14 +19,14 @@ import { tint, font, size, space, layer } from '../../theme';
 
 /** คำอธิบายของแต่ละตัวเลือก — ตรงกับ applyBucketChoice ใน handlers/level.ts */
 const BUCKET_LABEL: Record<string, { title: string; detail: string }> = {
-  max_hp:         { title: 'พลังชีวิต',      detail: 'เพิ่มพลังชีวิตสูงสุด 8 และฟื้นทันที 8' },
-  max_energy:     { title: 'พลังงาน',        detail: 'เพิ่มพลังงานต่อเทิร์น 1' },
+  max_hp:         { title: 'พลังชีวิต',      detail: 'ชีวิตสูงสุด +8 · ฟื้นทันที 8' },
+  max_energy:     { title: 'พลังงาน',        detail: 'พลังงานต่อเทิร์น +1' },
   max_hand:       { title: 'ขนาดมือ',        detail: 'จั่วการ์ดได้มากขึ้น 1 ใบต่อเทิร์น' },
   blessing:       { title: 'พร',             detail: 'รับพรติดตัว 1 อย่าง' },
   remove:         { title: 'สละการ์ด',       detail: 'ถอดการ์ดออกจากสำรับ' },
   upgrade:        { title: 'ปลุกเสก',        detail: 'อัปเกรดการ์ดในสำรับ' },
   gold:           { title: 'ทรัพย์',         detail: 'รับเบี้ยเพิ่ม' },
-  equipment_slot: { title: 'ช่องเครื่องราง', detail: 'พกเครื่องรางได้มากขึ้น 1 ชิ้น' },
+  equipment_slot: { title: 'ช่องเครื่องราง', detail: 'พกเครื่องรางเพิ่ม 1 ชิ้น' },
   gold_skip:      { title: 'ข้ามรับเบี้ย',     detail: 'ไม่รับอะไร แลกกับเบี้ย' },
 };
 
@@ -89,47 +87,36 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
 
   return (
     <PostBattleSurface mat>
-      <Text style={{
-        color: palette.moon, fontSize: 24, textAlign: 'center',
-        fontFamily: 'Prompt_700Bold', marginBottom: 4,
-      }}>
-        เลเวล {playerLevel}
-      </Text>
-      <Text style={{
-        color: palette.textDim, fontSize: 14, fontFamily:font.ui,
-        textAlign: 'center', marginBottom: 18,
-      }}>
-        {pending ? 'เลือกหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนาหนึ่งอย่าง · แตะแล้วกดยืนยัน'}
+      <RitualSurface kind="wood" style={{paddingVertical:18,marginBottom:10}}>
+        <Text style={{color:palette.moon,fontSize:24,textAlign:'center',fontFamily:font.heading}}>เลเวล {playerLevel}</Text>
+      </RitualSurface>
+      <Text style={{color:palette.text,fontSize:14,fontFamily:font.ui,textAlign:'center',marginBottom:20}}>
+        {pending ? 'เลือกพรหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนา'}
       </Text>
 
       {pending === null ? (
-        <View style={{ gap: 14 }}>
-          {(['A', 'B'] as const).map(opt => {
-            const l = labelOf(bucketOf(opt));
-            return (
-              <Pressable
-                key={opt}
-                onPress={() => setSelected(opt)}
-                accessibilityRole="button" accessibilityState={{selected:selected===opt}}
-              >
-                <RitualSurface kind="palm" style={{padding:22}}>
-                <View style={{flexDirection:'row',alignItems:'center',gap:12}}>
-                <Image source={bucketOf(opt)==='max_hp'?require('../../../assets/images/players/iHp.png'):bucketOf(opt)==='equipment_slot'||bucketOf(opt)==='blessing'?require('../../../assets/ui/blessing-amulet.png'):require('../../../assets/ui/card-breath.png')} resizeMode="contain" style={{width:52,height:52}}/>
-                <View style={{flex:1}}>
-                <Text style={{ color: paper.ink, fontSize: 18, fontFamily: 'Prompt_600SemiBold' }}>
-                  {l.title}
-                </Text>
-                {!!l.detail && (
-                  <Text style={{ color: paper.ink, fontSize: 14, fontFamily:font.ui, marginTop: 4 }}>
-                    {l.detail}
-                  </Text>
-                )}
-                </View></View>
-                {selected===opt&&<Text style={{color:paper.red,fontFamily:font.heading,marginTop:8}}>เลือกไว้แล้ว</Text>}
-                </RitualSurface>
-              </Pressable>
-            );
+        <View style={{gap:20}}>
+          <View style={{flexDirection:'row',gap:12,alignItems:'stretch'}}>
+          {(['A','B'] as const).map(opt=>{
+            const bucket=bucketOf(opt);const l=labelOf(bucket);const picked=selected===opt;
+            const image=bucket==='equipment_slot'||bucket==='blessing'?require('../../../assets/ui/blessing-amulet.png')
+              :bucket==='max_hp'?require('../../../assets/ui/blessing-herb-object.png')
+              :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
+              :bucket==='upgrade'||bucket==='remove'?require('../../../assets/ui/ritual-knife.png')
+              :require('../../../assets/ui/card-breath.png');
+            return <Pressable key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked}}
+              onPress={()=>setSelected(opt)} style={{flex:1}}>
+              <Image accessible={false} source={image} resizeMode="contain" style={{width:'100%',height:140,marginBottom:12}}/>
+              <RitualSurface kind="darkCloth" style={{flex:1,minHeight:180,paddingHorizontal:17,paddingVertical:20}}>
+                <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:17,textAlign:'center'}}>{l.title}</Text>
+                <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:22,textAlign:'center',marginTop:8}}>{l.detail}</Text>
+                <View style={{minHeight:28,marginTop:10,justifyContent:'center'}}>
+                  {picked&&<Text style={{fontFamily:font.heading,color:palette.bloodLit,fontSize:12,textAlign:'center'}}>✓ เลือกไว้แล้ว</Text>}
+                </View>
+              </RitualSurface>
+            </Pressable>;
           })}
+          </View>
           <GameButton label="ยืนยันวิชา" tone="primary" disabled={!selected} onPress={()=>selected&&press(selected)}/>
         </View>
       ) : (
@@ -165,7 +152,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                       {sc.title}
                     </Text>
                     {!!sc.detail && (
-                      <Text style={{ color: palette.textDim, fontSize: 13, marginTop: 4 }}>
+                      <Text style={{ color: palette.textDim, fontFamily:font.ui,fontSize: 13, marginTop: 4 }}>
                         {sc.detail}
                       </Text>
                     )}
@@ -176,7 +163,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
           </ScrollView>
 
           <Pressable onPress={() => setPending(null)} style={{ marginTop: 14, alignSelf: 'center' }}>
-            <Text style={{ color: palette.textDim, fontSize: 14 }}>◂ ย้อนกลับ</Text>
+            <Text style={{ color: palette.textDim, fontFamily:font.ui,fontSize: 14 }}>◂ ย้อนกลับ</Text>
           </Pressable>
         </View>
       )}

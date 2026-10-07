@@ -173,7 +173,7 @@ if '--helpers-only' not in sys.argv:
             shot('09-level-up')
             option=next((n for n in root.iter('node') if n.get('clickable')=='true' and any('พลังชีวิต' in t or 'ช่องเครื่องราง' in t or 'พลังงาน' in t for t in fields(n))),None)
             if option is not None:
-                touch(option);wait_for('เลือกไว้แล้ว');shot('09-level-up-selected')
+                touch(option);wait_for('เลือกไว้แล้ว',contains=True);shot('09-level-up-selected')
             touch(wait_for('ข้ามไปก่อน'))
         elif reward is not None:
             shot('10-card-reward')
@@ -182,10 +182,12 @@ if '--helpers-only' not in sys.argv:
             touch(cards[0]);wait_for('รับ ',contains=True);shot('10-card-reward-preview')
             touch(wait_for('ไม่เอาสักใบ'))
         else:break
-    wait_for('ตะเกียงใต้ถุน');shot('11-rest-arrival');tap('ตะเกียงใต้ถุน')
+    wait_for('ตะเกียงใต้ถุน');root=shot('11-rest-arrival')
+    assert not has(root,'แวะที่นี่'), 'Rest still requires an intermediate enter button'
+    assert has(root,'เดินผ่าน'), 'Rest lacks its single proceed action'
     # Record the actual native arrival, including the image before choices appear.
     recording = subprocess.Popen(['adb','shell','screenrecord','--time-limit','25','/sdcard/arrival.mp4'])
-    tap('แวะที่นี่')
+    tap('ตะเกียงใต้ถุน')
     for frame, delay in [('arrival-step-1', .1), ('arrival-step-2', .8), ('arrival-settled', 2.5)]:
         time.sleep(delay)
         with open(out/(frame+'.png'),'wb') as f:
@@ -202,7 +204,9 @@ if '--helpers-only' not in sys.argv:
     recording.wait(timeout=15)
     adb('pull','/sdcard/arrival.mp4',str(out/'arrival.mp4'))
     wait_for('นั่งพักข้างตะเกียง',contains=True);shot('12-event-choices');tap('นั่งพักข้างตะเกียง',contains=True)
-    wait_for('เดินทางต่อ');shot('13-event-result');tap('เดินทางต่อ')
+    wait_for('เดินทางต่อ');root=shot('13-event-result')
+    assert not has(root,'นั่งพักข้างตะเกียง',contains=True), 'Event choices remain under the result'
+    tap('เดินทางต่อ')
     wait_for('กระสือ',contains=True);shot('14-next-location')
 # Fresh real medium run validates summon art and an actual helper attack.
 adb('shell','am','force-stop',package);adb('shell','pm','clear',package)

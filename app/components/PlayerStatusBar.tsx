@@ -8,7 +8,7 @@ import RitualSurface from './RitualSurface';
 import InkIcon from './InkIcon';
 import { font, layer, paper, pulpColors, palette } from '../theme';
 
-export const STATUS_BAR_SPACE = 140;
+export const STATUS_BAR_SPACE = 124;
 export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: {
   state: GameState; onOpenDeck?: () => void; onOpenBlessings?: () => void;
 }) {
@@ -50,9 +50,9 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: 
   </>;
 }
 const styles = StyleSheet.create({
-  hud: { position: 'absolute', left: 12, right: 12, height: 128, paddingHorizontal: 20, paddingVertical: 14, zIndex: layer.statusBar, flexDirection: 'row', gap: 8 },
-  portrait: { width: 64, height: 100, overflow: 'hidden', alignItems: 'center' },
-  portraitImage: { position: 'absolute', top: 0, width: 98, height: 147 },
+  hud: { position: 'absolute', left: 12, right: 12, height: 112, paddingHorizontal: 20, paddingVertical: 9, zIndex: layer.statusBar, flexDirection: 'row', gap: 8 },
+  portrait: { width: 52, height: 88, overflow: 'hidden', alignItems: 'center' },
+  portraitImage: { position: 'absolute', top: 0, width: 86, height: 128 },
   content: { flex: 1, justifyContent: 'center' },
   nameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 4 },
   name: { fontFamily: font.heading, color: paper.ink, fontSize: 16 },
