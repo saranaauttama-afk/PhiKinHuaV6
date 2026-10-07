@@ -21,3 +21,5 @@ Playwright rendered actual React Native web components at 360x640 and 393x852: b
 Balance evidence: 160 fixed-policy runs skipping all upgrades and new rest benefits: warrior first-affordable 36/40 (mean final HP 18.3), board-policy 30/40 (15.6); medium 22/40 (8.9) and 17/40 (8.5). Losses count as HP zero. Deliberately limited pilot completion floor now 40%, reflecting requested harder play rather than the prior 60% floor; these are not human win rates. The all-class episode driver now uses real level-up choices, one upgrade and blessing preparation; shaman completes 5/8, warrior 8/8, nun 7/8, medium 8/8. Shaman floor changed from 6 to 5; others retain 6. Its slower starter remains a tuning candidate. No simulated HP/damage bonuses were added. Further human playtesting is needed, particularly medium and shaman.
 
 Start a new run for new authored destinations and balances. Existing saves retain stored journey/card data.
+
+Source commit: `705ae550ed96c5fe4901195ec3ffcc15553c2447`. APK/native Actions run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37695456405 (pending at push).

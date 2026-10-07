@@ -4,7 +4,7 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest rest and difficulty pass
 
-`work/occupation-table`: **v1.0.16/code 17** shows all rest activities in one row, enters them immediately and returns to the same rest location. Adds equipment and blessing opportunities, grows ghost budgets 2/3/4, enlarges illustrated enemy reveals and themes discard/ending screens. See `docs/HANDOFF-rest-pressure-v16.md`. Android build pending.
+`work/occupation-table`: **v1.0.16/code 17** shows all rest activities in one row, enters them immediately and returns to the same rest location. Adds equipment and blessing opportunities, grows ghost budgets 2/3/4, enlarges illustrated enemy reveals and themes discard/ending screens. See `docs/HANDOFF-rest-pressure-v16.md`. [APK/native build](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37695456405) is running.
 
 ## Latest gameplay pass
 
