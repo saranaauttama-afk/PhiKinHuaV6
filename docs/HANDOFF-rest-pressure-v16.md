@@ -22,4 +22,6 @@ Balance evidence: 160 fixed-policy runs skipping all upgrades and new rest benef
 
 Start a new run for new authored destinations and balances. Existing saves retain stored journey/card data.
 
-Source commit: `705ae550ed96c5fe4901195ec3ffcc15553c2447`. APK/native Actions run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37695456405 (pending at push).
+Source commit: `705ae550ed96c5fe4901195ec3ffcc15553c2447`. APK/native Actions run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37695923691 (pending at push).
+
+Build pipeline fix: `37372a3ffd5104c8e1920f2d585f779f6fb2b548` updates the package audit and APK filenames to version 1.0.16/code 17. Initial run 37695456405 failed Maven Gson download with HTTP 403; a retry was started before identifying the old hardcoded version audit. The current canonical build is run 37695923691.
