@@ -89,7 +89,7 @@ const SIGNATURE_DECKS: Record<string, string[]> = {
   'nang-tanee': ['cursed_touch','death_wail','tanee_roots','tanee_roots','guard'],
   'phi-krasue': ['krasue_claw','night_hunt','krasue_guard','krasue_venom','krasue_venom'],
   'phi-nang-ram': ['graceful_strike','dancer_steps','dancer_steps','guard','brace'],
-  'phi-pong-kang': ['phantom_slash','swipe','maul','pong_fury','swipe'],
+  'phi-pong-kang': ['phantom_slash','swipe','maul','pong_fury','guard'],
 };
 
 /** เด็คประจำตัวของผีตนนี้ — ถ้าไม่ได้จับคู่ไว้ จะได้เด็คพื้นฐานแทน */

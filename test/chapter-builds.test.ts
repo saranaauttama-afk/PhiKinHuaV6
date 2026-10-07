@@ -47,8 +47,8 @@ function simulate(seed: string, cls: ClassId, tactical: boolean) {
     if(d.state.phase==='reward') d.go({type:'ChooseCardReward',index:0});
     if(d.state.phase!=='victory') break;
     d.go({type:'CompleteNode'});
-    if(fight===0){d.go({type:'ChooseOffer',index:0});d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}
-    else if(fight===1){d.go({type:'ChooseOffer',index:0});d.go({type:'UseHealingShrine'});d.go({type:'CompleteNode'});}
+    if(fight===0){d.go({type:'ChooseOffer',index:0});d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});d.go({type:'Proceed'});}
+    else if(fight===1){d.go({type:'ChooseOffer',index:0});d.go({type:'UseHealingShrine'});d.go({type:'CompleteNode'});d.go({type:'Proceed'});}
   }
   return {won:!!d.state.runSummary?.won, hp:d.state.player.hp, turns};
 }
@@ -106,7 +106,9 @@ describe('chapter class builds and ghost signatures',()=>{
       return {policy:tactical?'board-tactical':'first-affordable',wins:runs.filter(x=>x.won).length,meanHp:+(runs.reduce((a,x)=>a+x.hp,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((a,x)=>a+x.turns,0)/runs.length).toFixed(1)};
     });
     console.log('BUILD_PILOT',cls,JSON.stringify(results));
-    expect(results[1].wins).toBeGreaterThanOrEqual(24);
+    // Harder chapter: a deliberately limited policy skips every upgrade and new rest reward.
+    // Keep a 40% completion floor for this baseline; human win rates are not inferred.
+    expect(results[1].wins).toBeGreaterThanOrEqual(16);
     expect(results[1].meanHp).toBeLessThan(cls==='warrior'?60:43);
   });
 });

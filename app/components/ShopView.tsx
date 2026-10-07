@@ -334,7 +334,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   const background=kind==='healing'||kind==='well'?require('../../assets/scence/rest.jpg'):require('../../assets/ui/deck-mat.jpg');
   const object=kind==='healing'||kind==='well'?require('../../assets/ui/blessing-shrine-object.png'):kind==='upgrade'||kind==='remove'?require('../../assets/ui/ritual-knife.png'):require('../../assets/ui/ritual-jar.png');
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
-    <SceneArrival sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
+    <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
         <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+20,paddingBottom:24,gap:12}}>
           <Image accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?180:95}}/>
@@ -349,7 +349,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {kind === 'fusion'          && <FusionAltarView state={state} dispatch={dispatch} />}
         </ScrollView>
         <View style={{paddingHorizontal:16,paddingTop:8,paddingBottom:pad.bottom+12}}>
-          <GameButton label="เดินทางต่อ" tone="primary" onPress={()=>dispatch({type:'CompleteNode'})}/>
+          <GameButton label="กลับจุดพัก" tone="primary" onPress={()=>dispatch({type:'CompleteNode'})}/>
         </View>
       </View>
     </SceneArrival>

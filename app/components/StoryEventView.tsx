@@ -15,12 +15,12 @@ export default function StoryEventView({state,dispatch}:{state:GameState;dispatc
   const ev=getStoryEvent(story.eventId);if(!ev)return null;
   const decided=story.result!=null;
   return <View style={{flex:1}}>
-    <SceneArrival source={artSource(`event/${ev.id}`)??require('../../assets/scence/lantern-hut.jpg')} sceneKey={ev.id}>
+    <SceneArrival instant source={artSource(`event/${ev.id}`)??require('../../assets/scence/lantern-hut.jpg')} sceneKey={ev.id}>
       <ScrollView contentContainerStyle={{flexGrow:1,justifyContent:'flex-end',paddingHorizontal:16,paddingTop:pad.top+140,paddingBottom:pad.bottom+20}}>
         <RitualSurface kind="darkCloth" style={{paddingHorizontal:22,paddingVertical:24,gap:14}}>
           <Text accessibilityRole="header" style={{fontFamily:font.heading,color:palette.moon,fontSize:24}}>{ev.title}</Text>
           <Text style={{fontFamily:font.ui,color:palette.text,fontSize:15,lineHeight:26}}>{decided?story.result:ev.text}</Text>
-          {decided?<GameButton label="เดินทางต่อ" tone="primary" onPress={()=>dispatch({type:'CompleteNode'})}/>
+          {decided?<GameButton label="กลับจุดพัก" tone="primary" onPress={()=>dispatch({type:'CompleteNode'})}/>
           :<View style={{gap:10}}>{ev.choices.map((c,i)=>{
             const locked=choiceLocked(state,c);const parts=c.label.split(/ [·•] /);
             const image=i===0?require('../../assets/ui/trail-rest.png'):i===1?require('../../assets/ui/blessing-amulet.png'):require('../../assets/ui/card-stance.png');

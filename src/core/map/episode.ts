@@ -7,11 +7,13 @@ export function buildEpisode(): JourneyMap {
   const offers: PageOffer[][] = [
     [{ kind: 'monster', tier: 'normal', enemyId: 'phi-pop' },
      { kind: 'monster', tier: 'normal', enemyId: 'nang-tanee' }],
-    [{ kind: 'story_event', shopId: 'episode_lantern', eventId: EPISODE.eventId }],
+    [{ kind: 'story_event', shopId: 'episode_lantern', eventId: EPISODE.eventId },
+     { kind: 'shop_equipment', shopId: 'episode_equipment' }],
     [{ kind: 'monster', tier: 'normal', enemyId: 'phi-krasue' },
      { kind: 'monster', tier: 'normal', enemyId: 'phi-nang-ram' }],
     [{ kind: 'healing_shrine', shopId: 'episode_shrine' },
-     { kind: 'shop_upgrade', shopId: 'episode_upgrade', phase: 1 }],
+     { kind: 'shop_upgrade', shopId: 'episode_upgrade', phase: 1 },
+     { kind: 'story_event', shopId: 'episode_blessing', eventId: 'episode_blessing' }],
     [{ kind: 'monster', tier: 'elite', enemyId: 'phi-pong-kang' }],
   ];
   const plans: RowPlan[] = [

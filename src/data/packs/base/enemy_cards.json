@@ -374,9 +374,9 @@
     "statusEffect": {
       "target": "enemy",
       "effect": "strength",
-      "duration": 99,
+      "duration": 2,
       "value": 1
     },
-    "desc": "ป้องกัน 6 และแข็งแกร่ง 1 ตลอดไฟต์ ยิ่งยื้อนานยิ่งอันตราย"
+    "desc": "ป้องกัน 6 · เพิ่มพลังโจมตี 1 นาน 2 เทิร์น"
   }
 ]

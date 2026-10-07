@@ -15,8 +15,8 @@ import RitualSurface from '../RitualSurface';
 import InkIcon from '../InkIcon';
 import {CardGlyphArt} from '../DeckCard';
 
-const CARD_W      = 150;
-const CARD_H      = 200;
+const CARD_W      = 200;
+const CARD_H      = 270;
 const IDLE_SCALE  = 0.32;   // เล็กลง — นั่งอยู่เหนือ badge enemy
 const SLOT_W      = 40;
 
@@ -135,18 +135,18 @@ export default function EnemyHandCard({
     <Animated.View style={containerStyle}>
       {/* Back face (face-down) */}
       <Animated.View style={backStyle}>
-        <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5}}><InkIcon name="blessing" size={66} color={pulpColors.enemyInk}/></RitualSurface>
+        <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5}}><Image source={require('../../../assets/ui/trail-ghost.png')} resizeMode="contain" style={{width:100,height:140}}/></RitualSurface>
       </Animated.View>
 
       {/* Front face */}
       <Animated.View style={frontStyle}>
         {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:4}}>
           <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:10}}>พลัง {card.cost??1}</Text>
-          <CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'skill',cost:card.cost??1}} size={54}/>
-          <Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.heading,fontSize:13,textAlign:'center'}}>{card.name}</Text>
+          <CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'skill',cost:card.cost??1}} size={100}/>
+          <Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.heading,fontSize:16,textAlign:'center'}}>{card.name}</Text>
           {card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:16}}>โจมตี {card.damage}{(card.hits??1)>1?` ×${card.hits}`:''}</Text>}
           {card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:14}}>ป้องกัน {card.block}</Text>}
-          {!!card.desc&&<Text numberOfLines={3} style={{color:paper.ink,fontFamily:font.ui,fontSize:9,lineHeight:13,textAlign:'center'}}>{card.desc}</Text>}
+          {!!card.desc&&<Text numberOfLines={3} style={{color:paper.ink,fontFamily:font.ui,fontSize:12,lineHeight:18,textAlign:'center'}}>{card.desc}</Text>}
         </RitualSurface>}
       </Animated.View>
 

@@ -141,7 +141,7 @@ export function enterNode(s: GameState, ix: number): JourneyNode | undefined {
   const node = nodeForOfferIndex(s, ix);
   if (!node || !s.journey) return undefined;
 
-  if (rowIsRest(s.journey, node.row) && s.runMode !== 'episode') {
+  if (rowIsRest(s.journey, node.row)) {
     node.visited = true;
     return node;
   }

@@ -3,13 +3,14 @@ import { View, Image, ImageSourcePropType, StyleSheet } from 'react-native';
 import { pulpColors } from '../theme';
 import { useGameSettings } from './Settings';
 
-type Props = { source: ImageSourcePropType; sceneKey: string; children: React.ReactNode };
+type Props = { source: ImageSourcePropType; sceneKey: string; children: React.ReactNode; instant?: boolean };
 const WALK_MS = 2600;
 const FADE_MS = 450;
 
 /** A presentation-only camera; no callbacks dispatch rewards or game commands. */
-export default function SceneArrival({ source, sceneKey, children }: Props) {
-  const reducedMotion = useGameSettings(s => s.reducedMotion);
+export default function SceneArrival({ source, sceneKey, children, instant = false }: Props) {
+  const reducedMotionSetting = useGameSettings(s => s.reducedMotion);
+  const reducedMotion = instant || reducedMotionSetting;
   const [frame, setFrame] = React.useState({ key: '', elapsed: 0 });
   React.useEffect(() => {
     if (reducedMotion) {

@@ -3,7 +3,8 @@ import React from 'react';
 import { View, Text, Pressable, ImageBackground } from 'react-native';
 import type { GameState } from '../../src/core/types';
 import Panel, { GameButton, Scrim } from './Panel';
-import { font, size, space } from '../theme';
+import { font, size, space, palette as ink, pulpColors } from '../theme';
+import RitualSurface from './RitualSurface';
 
 /**
  * จอสรุปตอนจบรัน
@@ -28,7 +29,7 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
     : state.runMode === 'episode' ? 'รอดคืนแรก!' : s.beatSecretBoss ? 'ท้ามัจจุราชสำเร็จ' : 'จบการเดินทาง';
   const subline = !s.won
     ? 'คืนนี้จบลงกลางทาง — แต่พระจันทร์เต็มดวงยังมีอีกทุกเดือน'
-    : state.runMode === 'episode' ? 'รอดคืนแรก!' : s.beatSecretBoss ? 'แม้แต่เจ้าแห่งความตายก็ยังต้องถอย' : 'คุณผ่านค่ำคืนนี้มาได้';
+    : state.runMode === 'episode' ? 'พ้นบ้านร้างมาได้… แต่คืนนี้ยังไม่ใช่คืนสุดท้าย' : s.beatSecretBoss ? 'แม้แต่เจ้าแห่งความตายก็ยังต้องถอย' : 'คุณผ่านค่ำคืนนี้มาได้';
 
   return (
     <View style={{ flex: 1 }}>
@@ -37,10 +38,10 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        <Scrim heavy style={{ backgroundColor: palette.scrimHeavy, justifyContent: 'center', paddingHorizontal: space.xl }}>
-          <PaperTexture />
+        <Scrim heavy style={{ backgroundColor: pulpColors.storySceneShade, justifyContent: 'center', paddingHorizontal: space.xl }}>
+
           <Text style={{
-            color: !s.won ? palette.blood : palette.text,
+            color: !s.won ? palette.blood : ink.moon,
             fontSize: size.display, textAlign: 'center',
             fontFamily: font.display,
           }}>
@@ -48,21 +49,21 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
           </Text>
 
           <Text style={{
-            color: palette.textDim, fontSize: size.bodyLg, fontFamily: font.body,
+            color: ink.text, fontSize: size.bodyLg, fontFamily: font.body,
             textAlign: 'center', marginTop: space.sm, marginBottom: space.xl,
           }}>
             {subline}
           </Text>
 
-          <Panel emphasis={!!s.beatSecretBoss} style={{ gap: space.md }}>
+          <RitualSurface kind="darkCloth" style={{ gap: space.md }}>
             <Row label={s.won ? 'ไฟต์ทั้งหมด' : 'ไปได้ถึงไฟต์ที่'} value={`${s.fights}`} />
             <Row label="เลเวลสุดท้าย" value={`${s.level}`} />
             <Row label="เบี้ยที่เหลือ" value={`${s.gold}`} />
-            <Row
+            {state.runMode !== 'episode' && <Row
               label="ศึกลับ"
               value={s.beatSecretBoss ? 'ชนะแล้ว' : 'ยังไม่ปลดล็อค'}
-            />
-          </Panel>
+            />}
+          </RitualSurface>
 
           <GameButton
             label="ออกเดินทางอีกครั้ง"
@@ -79,8 +80,8 @@ export default function RunCompleteScreen({ state, onNewRun }: Props) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-      <Text style={{ color: palette.textDim, fontSize: size.ui, fontFamily: font.ui }}>{label}</Text>
-      <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.uiMed }}>
+      <Text style={{ color: ink.text, fontSize: size.ui, fontFamily: font.ui }}>{label}</Text>
+      <Text style={{ color: ink.moon, fontSize: size.ui, fontFamily: font.uiMed }}>
         {value}
       </Text>
     </View>

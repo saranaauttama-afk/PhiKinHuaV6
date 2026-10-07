@@ -2,9 +2,13 @@
 
 Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current deliverable is a short, complete first chapter, targeting 5–10 minutes of human play before expanding the game. Duration and enjoyment are playtest goals, not measured device results.
 
+## Latest rest and difficulty pass
+
+`work/occupation-table`: **v1.0.16/code 17** shows all rest activities in one row, enters them immediately and returns to the same rest location. Adds equipment and blessing opportunities, grows ghost budgets 2/3/4, enlarges illustrated enemy reveals and themes discard/ending screens. See `docs/HANDOFF-rest-pressure-v16.md`. Android build pending.
+
 ## Latest gameplay pass
 
-`work/occupation-table`: **v1.0.15/code 16** pilots warrior block/counter and strength/multiple-hit builds, medium spirit/poison builds, six new class cards, five real ghost signatures and 16 original card illustrations. Chapter rewards offer distinct attack/setup/engine options. The 160-run pilot uses real cards without hidden enemy-intent knowledge; 563 tests pass. Start a new run for the complete starter balance. [APK/native build in progress](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37658871240). See `docs/HANDOFF-chapter-builds.md` and `docs/card-art-prompts-v15.json`.
+`work/occupation-table`: **v1.0.15/code 16** pilots warrior block/counter and strength/multiple-hit builds, medium spirit/poison builds, six new class cards, five real ghost signatures and 16 original card illustrations. Chapter rewards offer distinct attack/setup/engine options. The 160-run pilot uses real cards without hidden enemy-intent knowledge; 563 tests pass. Start a new run for the complete starter balance. [Verified APK/native build](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37658871240). See `docs/HANDOFF-chapter-builds.md` and `docs/card-art-prompts-v15.json`.
 
 ## Latest UI follow-up
 
@@ -32,7 +36,7 @@ Current work branch: `work/occupation-table`, extending the character and ritual
 
 ## First chapter
 
-Cover → character → short story → starter blessing → choose Pop/Tanee → lantern decision (heal, risky card, or pass) → choose Krasue/dancer → choose healing or card upgrade → Pong Kang finale → card reward and ending. Three real battles, with the existing reducer/command, equipment, class, card-reward and status systems. Rest nodes do not refill in this mode. Enemy cards stay face down until played; no enemy intent is displayed. Combat balance and card mechanics remain unchanged.
+Cover → character → short story → starter blessing → choose Pop/Tanee → lantern decision (heal, risky card, or pass) and equipment shop → choose Krasue/dancer → choose healing, card upgrade and blessing activities → Pong Kang finale → card reward and ending. Three real battles, with the existing reducer/command, equipment, class, card-reward and status systems. Rest nodes do not refill in this mode. Enemy cards stay face down until played; no enemy intent is displayed. The current chapter has dedicated enemy pressure and class-card balance.
 
 Tap a hand card to read it and press **ใช้การ์ด**, or drag upward. End turn with **จบเทิร์น**. Choose card rewards after winning. Old full-run engine mode remains available through `NewRun` without `runMode`; the current main menu starts the short chapter.
 
@@ -51,7 +55,7 @@ npx expo export --platform web
 
 ## Android deliverable
 
-GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.14`, versionCode `15`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
+GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.16`, versionCode `17`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
 
 Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. A dependent Android API 36 x86_64 emulator job installs and launches the APK, navigates into a fight, previews/plays a real card and ends a turn. Screenshots, UI XML and logcat are uploaded as separate evidence. See the handoff for actual run results; successful build alone does not prove installation or launch.
 

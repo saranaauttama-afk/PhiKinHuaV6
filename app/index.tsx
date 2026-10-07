@@ -48,6 +48,7 @@ export default function Home() {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
   const [blessingsOpen, setBlessingsOpen] = useState(false);
+  const enteredRest = React.useRef<string | null>(null);
 
   const [fontsLoaded] = useAppFonts();
   const pad = useScreenPadding();
@@ -67,6 +68,7 @@ export default function Home() {
 
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
+    if (restRow) enteredRest.current = mapScene(state).key;
     dispatch({ type: 'ChooseOffer', index });
 
     // Restored and newly entered fights share the combat redirect above.
@@ -93,7 +95,7 @@ export default function Home() {
   if (screen === 'class-select') {
     return (
       <ClassSelectScreen
-        onPick={(classId) => { setPickingClass(false); newRun(`episode-${Date.now()}`, classId, 'episode'); }}
+        onPick={(classId) => { enteredRest.current = null; setPickingClass(false); newRun(`episode-${Date.now()}`, classId, 'episode'); }}
         onBack={() => setPickingClass(false)}
       />
     );
@@ -156,7 +158,7 @@ export default function Home() {
   const location = mapScene(state);
   return (
     <View style={{ flex: 1 }}>
-      <SceneArrival sceneKey={location.key} source={location.source}>
+      <SceneArrival instant={restRow && enteredRest.current === location.key} sceneKey={location.key} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
           <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: surface.glassDim, opacity: selectedCard !== null && offers.some((o, i) => o && describeOffer(o, i).isCombat) ? .55 : 0 }} />
 
@@ -178,7 +180,7 @@ export default function Home() {
           ) : <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}>
             <RestDestinations offers={offers} resolved={page?.resolved??[]} onEnter={(offer,index)=>{setSelectedCard(null);enterOffer(offer,index);}}>
               {restRow&&ahead&&<View style={{gap:6}}>
-                <GameButton label="เดินผ่าน" onPress={()=>{setSelectedCard(null);dispatch({type:'Proceed'});}}/>
+                <GameButton label="เดินทางต่อ" onPress={()=>{setSelectedCard(null);dispatch({type:'Proceed'});}}/>
                 <Text style={{color:palette.textDim,fontFamily:font.ui,fontSize:12,textAlign:'center'}}>ถัดไป · {ahead.label}</Text>
               </View>}
             </RestDestinations>

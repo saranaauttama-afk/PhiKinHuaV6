@@ -211,6 +211,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       if (s.runMode === 'episode') {
         const hp = (s.fightCount ?? 0) === 0 ? EPISODE.firstHp : EPISODE.secondHp;
         s.enemy.hp = s.enemy.maxHp = hp;
+        const energy = (s.fightCount ?? 0) === 0 ? EPISODE.firstEnergy : EPISODE.secondEnergy;
+        s.enemy.maxEnergy = deck.maxEnergy = energy;
+        s.enemy.handSize = deck.handSize = energy;
       }
       if (s.runMode === 'episode' && offer.enemyId === 'phi-pong-kang') {
         s.enemy.hp = s.enemy.maxHp = EPISODE.finaleHp;
@@ -454,6 +457,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       }
       const out = ShopEv.openShopEquipment(s, rng);
       s = out.state; rng = out.rng;
+      if (s.runMode === 'episode') s.shopStock = s.shopStock?.map(item => ({...item,price:Math.max(15,Math.round(item.price / 4))}));
       s.currentShopId = offer.shopId; // Track current shop ID
         mp._activeOfferIndex = ix; mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter

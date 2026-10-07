@@ -5,7 +5,9 @@ export const EPISODE = {
   firstHp: 42,
   secondHp: 50,
   finaleHp: 68,
-  finaleEnergy: 3,
+  firstEnergy: 2,
+  secondEnergy: 3,
+  finaleEnergy: 4,
   startingGold: 25,
   eventId: 'episode_lantern',
 } as const;
