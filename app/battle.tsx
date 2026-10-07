@@ -421,7 +421,7 @@ export default function BattlePage() {
 
         <PlayerHUD
           helpers={<MinionRow owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
-          statuses={<View><TrapRow traps={gameState.traps}/><ComboStrip state={gameState}/><StatusStrip effects={player.statusEffects}/></View>}
+          statuses={(gameState.traps?.length||gameState.combo?.progress?.length||gameState.combo?.done?.length||player.statusEffects?.length)?<View><TrapRow traps={gameState.traps}/><ComboStrip state={gameState}/><StatusStrip effects={player.statusEffects}/></View>:null}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
           hp={player.hp}

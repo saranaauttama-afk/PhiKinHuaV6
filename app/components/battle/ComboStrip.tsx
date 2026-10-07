@@ -25,6 +25,7 @@ export default function ComboStrip({ state }: { state: GameState }) {
   return (
     <View style={{ alignItems: 'center', gap: space.xs }}>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.xs, justifyContent: 'center' }}>
+        <Text style={{color:palette.text,fontFamily:font.uiMed,fontSize:size.tiny}}>คอมโบ</Text>
         {progress.map(p => {
           const combo = COMBO_BY_ID[p.comboId];
           if (!combo) return null;
@@ -40,11 +41,11 @@ export default function ComboStrip({ state }: { state: GameState }) {
                 flexDirection: 'row', alignItems: 'center', gap: 4,
                 paddingHorizontal: space.sm, paddingVertical: 2,
                 borderRadius: radius.pill,
-                backgroundColor: active ? tint.moonPick : tint.moonFaint,
+                backgroundColor: active ? surface.panelActive : surface.panel,
                 borderWidth: 1, borderColor: palette.line,
               }}
             >
-              <Text style={{ color: palette.moonDim, fontSize: size.tiny, fontFamily: font.uiMed }}>
+              <Text style={{ color: palette.text, fontSize: size.tiny, fontFamily: font.uiMed }}>
                 {combo.name}
               </Text>
               <Text style={{ color: palette.moon, fontSize: size.tiny, fontFamily: font.uiMed }}>
@@ -95,7 +96,7 @@ export default function ComboStrip({ state }: { state: GameState }) {
           {/* เหลือใบไหน — ข้อมูลที่ทำให้เล่นหาคอมโบได้จริง ไม่ใช่ติดโดยบังเอิญ */}
           {!!openedProgress && !!opened.requiredCards?.length && (
             <Text style={{
-              color: palette.moonDim, fontSize: size.tiny,
+              color: palette.text, fontSize: size.tiny,
               fontFamily: font.ui, textAlign: 'center', marginTop: 2,
             }}>
               เหลือ {opened.requiredCards.filter(id => !openedProgress.cardsPlayed.includes(id)).length} ใบ

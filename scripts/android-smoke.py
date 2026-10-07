@@ -127,7 +127,7 @@ if '--helpers-only' not in sys.argv:
         for play in range(14):
             assert time.monotonic()-started<720, 'UI smoke exceeded time budget'
             root=dump()
-            if has(root,'ชนะ!'): won=True;break
+            if has(root,'ปราบสำเร็จ'): won=True;break
             assert not has(root,'ของที่เก็บได้'), 'Reward appeared before victory'
             assert not any(t.startswith('เลเวล ') for t in labels(root)), 'Upgrade appeared before victory'
             if discard_if_needed(root): attempted.clear();continue
@@ -145,7 +145,7 @@ if '--helpers-only' not in sys.argv:
                 if close is not None:touch(close)
         if won:break
         root=dump()
-        if has(root,'ชนะ!'):won=True;break
+        if has(root,'ปราบสำเร็จ'):won=True;break
         assert not has(root,'พ่ายแพ้'),'Smoke player lost'
         if discard_if_needed(root):time.sleep(7);continue
         end=find(root,'จบเทิร์น')
@@ -157,7 +157,7 @@ if '--helpers-only' not in sys.argv:
             if turn==0:shot('07-enemy-card')
         for _ in range(30):
             root=dump()
-            if has(root,'จบเทิร์น') or has(root,'ชนะ!') or has(root,'พ่ายแพ้'):break
+            if has(root,'จบเทิร์น') or has(root,'ปราบสำเร็จ') or has(root,'พ่ายแพ้'):break
             time.sleep(.5)
         if enemy_recording is not None:
             adb('shell','pkill','-2','screenrecord');enemy_recording.wait(timeout=15)
@@ -169,8 +169,18 @@ if '--helpers-only' not in sys.argv:
     for _ in range(12):
         root=dump()
         skip=find(root,'ข้ามไปก่อน');reward=find(root,'ไม่เอาสักใบ')
-        if skip is not None:shot('09-level-up');touch(skip)
-        elif reward is not None:shot('10-card-reward');touch(reward)
+        if skip is not None:
+            shot('09-level-up')
+            option=next((n for n in root.iter('node') if n.get('clickable')=='true' and any('พลังชีวิต' in t or 'ช่องเครื่องราง' in t or 'พลังงาน' in t for t in fields(n))),None)
+            if option is not None:
+                touch(option);wait_for('เลือกไว้แล้ว');shot('09-level-up-selected')
+            touch(wait_for('ข้ามไปก่อน'))
+        elif reward is not None:
+            shot('10-card-reward')
+            cards=[n for n in root.iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc',''))]
+            assert cards, 'Reward lacks illustrated selectable cards'
+            touch(cards[0]);wait_for('รับ ',contains=True);shot('10-card-reward-preview')
+            touch(wait_for('ไม่เอาสักใบ'))
         else:break
     wait_for('ตะเกียงใต้ถุน');shot('11-rest-arrival');tap('ตะเกียงใต้ถุน')
     # Record the actual native arrival, including the image before choices appear.

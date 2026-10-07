@@ -1,3 +1,4 @@
+import {combatUiColors} from '../../theme';
 // app/components/battle/StatusStrip.tsx — สถานะที่ติดอยู่บนตัว ใช้ได้ทั้งสองฝั่ง
 //
 // ข้อมูลชุดนี้พร้อมใช้มาตลอด — สถานะ 13 อย่างในทะเบียนมีชื่อไทยและคำอธิบายไทย
@@ -48,19 +49,17 @@ export default function StatusStrip({ effects, compact = false, align = 'center'
               hitSlop={6}
               style={{
                 flexDirection: 'row', alignItems: 'center', gap: 3,
-                paddingHorizontal: compact ? 5 : space.sm,
-                paddingVertical: compact ? 1 : 2,
+                paddingHorizontal: space.sm,
+                paddingVertical: 4,
                 borderRadius: radius.pill,
-                backgroundColor: active
-                  ? (bad ? tint.bloodHint : tint.moonPick)
-                  : (bad ? tint.bloodSoft : tint.moonSoft),
+                backgroundColor: bad ? combatUiColors.statusDebuff : combatUiColors.statusBuff,
                 borderWidth: 1,
                 borderColor: bad ? tint.bloodLine : palette.line,
               }}
             >
               <Text style={{
-                color: bad ? palette.bloodLit : palette.moon,
-                fontSize: compact ? size.tiny : size.label,
+                color: palette.text,
+                fontSize: size.label,
                 fontFamily: font.uiMed,
               }}>
                 {e.name}
@@ -69,8 +68,8 @@ export default function StatusStrip({ effects, compact = false, align = 'center'
               {/* จำนวนชั้นขึ้นเมื่อซ้อนกันจริงเท่านั้น ชั้นเดียวไม่ต้องเขียน ×1 */}
               {(e.stacks ?? 1) > 1 && (
                 <Text style={{
-                  color: bad ? palette.bloodLit : palette.moon,
-                  fontSize: compact ? size.tiny : size.label,
+                  color: palette.text,
+                  fontSize: size.label,
                   fontFamily: font.uiMed,
                 }}>
                   ×{e.stacks}
@@ -79,10 +78,10 @@ export default function StatusStrip({ effects, compact = false, align = 'center'
 
               {/* เทิร์นที่เหลือคือข้อมูลที่ใช้ตัดสินใจจริง — จะทนอีกเทิร์นหรือรีบแก้ */}
               <Text style={{
-                color: palette.textFaint,
+                color: palette.text,
                 fontSize: size.tiny, fontFamily: font.ui,
               }}>
-                {e.duration >= 99 ? 'ตลอดไฟต์' : `${e.duration}ท`}
+                {e.duration >= 99 ? 'ตลอดไฟต์' : `${e.duration} เทิร์น`}
               </Text>
             </Pressable>
           );
@@ -98,7 +97,7 @@ export default function StatusStrip({ effects, compact = false, align = 'center'
           borderWidth: 1, borderColor: palette.line,
         }}>
           <Text style={{
-            color: palette.textDim, fontSize: size.body,
+            color: palette.text, fontSize: size.body,
             fontFamily: font.body, lineHeight: 20, textAlign: 'center',
           }}>
             {opened.description}

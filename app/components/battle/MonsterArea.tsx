@@ -96,7 +96,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   return (
     <View pointerEvents="box-none" style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
-      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+8,left:20,right:112,zIndex:layer.decor,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} compact />{helpers}</RitualSurface>
+      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+8,left:20,right:112,zIndex:layer.decor,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} compact align="flex-start" />{helpers}</RitualSurface>
       <Animated.View style={floatStyle}>
         {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />

@@ -39,13 +39,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='12' versionName='1.0.11'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FirstNight-v1.0.11.apk
-          sha256sum PhiKinHua-FirstNight-v1.0.11.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='13' versionName='1.0.12'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FirstNight-v1.0.12.apk
+          sha256sum PhiKinHua-FirstNight-v1.0.12.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FirstNight-APK
-          path: PhiKinHua-FirstNight-v1.0.11.apk
+          path: PhiKinHua-FirstNight-v1.0.12.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -75,7 +75,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FirstNight-v1.0.11.apk
+            adb install PhiKinHua-FirstNight-v1.0.12.apk
             timeout 900 python -u scripts/android-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()

@@ -1,4 +1,8 @@
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
+import {palette,surface,font} from '../../theme';
+import PostBattleSurface from './PostBattleSurface';
+import RitualSurface from '../RitualSurface';
+import {GameButton} from '../Panel';
+import {Image} from 'react-native';
 import React from 'react';
 import InkIcon from '../InkIcon';
 import { View, Text, Pressable } from 'react-native';
@@ -48,15 +52,12 @@ export default function VictoryOverlay({
   const goldStyle = useAnimatedStyle(() => ({ transform: [{ scale: goldScale.value }] }));
 
   return (
-    <Animated.View style={[{
-      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: palette.scrimHeavy,
-      justifyContent: 'center', alignItems: 'center', zIndex: layer.overlay,
-    }, bgStyle]}>
-      <PaperTexture />
-      <Animated.View style={[{ width: 300, alignItems: 'center' }, cardStyle]}>
+    <PostBattleSurface>
+      <Animated.View style={bgStyle}>
+      <Animated.View style={[{ width: '100%', alignItems: 'center' }, cardStyle]}>
 
-        <InkIcon name="blessing" size={70} color={palette.blood}/>
+        <Image source={require('../../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:80,height:80,marginBottom:12}}/>
+        <RitualSurface kind="wood" style={{width:'100%',alignItems:'center',padding:24}}>
         {/* Title */}
         <Text style={{
           color: palette.moon, fontSize: 42,
@@ -65,15 +66,17 @@ export default function VictoryOverlay({
           textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12,
           marginBottom: 4,
         }}>
-          ชนะ!
+          ปราบสำเร็จ
         </Text>
         <Text style={{
-          color: palette.textFaint, fontSize: 13,
-          fontFamily: 'Prompt_400Regular', marginBottom: 28,
+          color: palette.text, fontSize: 13,
+          fontFamily: 'Prompt_400Regular', marginBottom: 12,
         }}>
           {enemyName} ถูกปราบแล้ว
         </Text>
 
+        </RitualSurface>
+        <RitualSurface kind="slate" style={{width:'100%',padding:24,marginTop:12}}>
         {/* EXP row */}
         <View style={{ width: '100%', marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -117,26 +120,10 @@ export default function VictoryOverlay({
           </Text>
         </Animated.View>
 
-        {/* Continue button */}
-        <Pressable
-          onPress={onContinue}
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? palette.paperDeep : palette.paper,
-            paddingHorizontal: 48, paddingVertical: 13,
-            borderRadius: 22, borderWidth: 1.5,
-            borderColor: palette.lineStrong,
-          })}
-        >
-          <Text style={{
-            color: palette.text, fontSize: 15,
-            fontFamily: 'Prompt_600SemiBold',
-            textShadowColor: surface.glass,
-            textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2,
-          }}>
-            ดำเนินต่อ
-          </Text>
-        </Pressable>
+        </RitualSurface>
+        <GameButton label="ดำเนินต่อ" tone="primary" onPress={onContinue} style={{marginTop:18}}/>
       </Animated.View>
-    </Animated.View>
+      </Animated.View>
+    </PostBattleSurface>
   );
 }

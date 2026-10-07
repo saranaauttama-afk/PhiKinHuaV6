@@ -207,7 +207,7 @@ export function conditionLabel(c: CardConditional): string {
     switch (c.when.kind) {
       case 'player_hp_below':       return `ถ้าเลือดเราเหลือไม่ถึง ${c.when.value}%`;
       case 'player_block_at_least': return `ถ้าเรามี Block ตั้งแต่ ${c.when.value}`;
-      case 'enemy_has_status':      return `ถ้าศัตรูติด ${c.when.statusId}`;
+      case 'enemy_has_status':      return `ถ้าศัตรูติด${c.when.statusId === 'poison' ? 'พิษ' : ` ${c.when.statusId}`}`;
       case 'hand_empty':            return 'ถ้าไม่มีการ์ดอื่นเหลือในมือ';
       case 'deck_at_most':          return `ถ้าสำรับเหลือไม่เกิน ${c.when.value} ใบ`;
     }

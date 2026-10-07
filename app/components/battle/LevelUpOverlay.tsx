@@ -1,4 +1,10 @@
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
+import {combatUiColors} from '../../theme';
+import {palette,surface,paper} from '../../theme';
+import PostBattleSurface from './PostBattleSurface';
+import RitualSurface from '../RitualSurface';
+import {GameButton} from '../Panel';
+import {CardGlyphArt} from '../DeckCard';
+import {Image} from 'react-native';
 import React from 'react';
 import InkIcon from '../InkIcon';
 import { View, Text, Pressable, ScrollView } from 'react-native';
@@ -43,6 +49,7 @@ type Props = {
 export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }: Props) {
   const choice = state.levelUp?.choice;
   // ตัวเลือกไหนที่ผู้เล่นกดค้างไว้เพื่อเลือกของย่อยต่อ
+  const [selected,setSelected]=React.useState<'A'|'B'|null>(null);
   const [pending, setPending] = React.useState<'A' | 'B' | null>(null);
 
   if (!choice) return null;
@@ -82,13 +89,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
   };
 
   return (
-    <View style={{
-      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: palette.scrimHeavy,
-      justifyContent: 'center', paddingHorizontal: 22,
-      zIndex: layer.overlay,
-    }}>
-      <PaperTexture />
+    <PostBattleSurface mat>
       <Text style={{
         color: palette.moon, fontSize: 24, textAlign: 'center',
         fontFamily: 'Prompt_700Bold', marginBottom: 4,
@@ -99,7 +100,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         color: palette.textDim, fontSize: 14,
         textAlign: 'center', marginBottom: 18,
       }}>
-        {pending ? 'เลือกหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนาหนึ่งอย่าง'}
+        {pending ? 'เลือกหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนาหนึ่งอย่าง · แตะแล้วกดยืนยัน'}
       </Text>
 
       {pending === null ? (
@@ -109,25 +110,28 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
             return (
               <Pressable
                 key={opt}
-                onPress={() => press(opt)}
-                style={{
-                  padding: 18, borderRadius: 16,
-                  backgroundColor: surface.panel,
-                  borderWidth: 1, borderColor: palette.lineStrong,
-                }}
+                onPress={() => setSelected(opt)}
+                accessibilityRole="button" accessibilityState={{selected:selected===opt}}
               >
-                <InkIcon name={bucketOf(opt)==='max_energy'?'energy':bucketOf(opt)==='max_hand'?'hand':bucketOf(opt)==='max_hp'?'hp':'blessing'} size={32} color={palette.blood}/>
-                <Text style={{ color: palette.moon, fontSize: 18, fontFamily: 'Prompt_600SemiBold' }}>
+                <RitualSurface kind="palm" style={{padding:22,backgroundColor:selected===opt?combatUiColors.selectedPalm:'transparent'}}>
+                <View style={{flexDirection:'row',alignItems:'center',gap:12}}>
+                <Image source={bucketOf(opt)==='max_hp'?require('../../../assets/images/players/iHp.png'):bucketOf(opt)==='equipment_slot'||bucketOf(opt)==='blessing'?require('../../../assets/ui/blessing-amulet.png'):require('../../../assets/ui/card-breath.png')} resizeMode="contain" style={{width:52,height:52}}/>
+                <View style={{flex:1}}>
+                <Text style={{ color: paper.ink, fontSize: 18, fontFamily: 'Prompt_600SemiBold' }}>
                   {l.title}
                 </Text>
                 {!!l.detail && (
-                  <Text style={{ color: palette.textDim, fontSize: 14, marginTop: 4 }}>
+                  <Text style={{ color: paper.ink, fontSize: 14, marginTop: 4 }}>
                     {l.detail}
                   </Text>
                 )}
+                </View></View>
+                {selected===opt&&<Text style={{color:paper.red,fontFamily:font.heading,marginTop:8}}>เลือกไว้แล้ว</Text>}
+                </RitualSurface>
               </Pressable>
             );
           })}
+          <GameButton label="ยืนยันวิชา" tone="primary" disabled={!selected} onPress={()=>selected&&press(selected)}/>
         </View>
       ) : (
         <View>
@@ -138,7 +142,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                 onPress={() => onChoose(pending, i)}
                 style={{
                   padding: sc.card ? 0 : 16, borderRadius: 14,
-                  backgroundColor: sc.card ? 'transparent' : surface.panel,
+                  backgroundColor: surface.panel,
                   borderWidth: sc.card ? 0 : 1, borderColor: palette.line,
                 }}
               >
@@ -179,8 +183,8 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
       )}
 
       <Pressable onPress={onSkip} style={{ marginTop: 22, alignSelf: 'center' }}>
-        <Text style={{ color: palette.textFaint, fontSize: 13 }}>ข้ามไปก่อน</Text>
+        <Text style={{ color: palette.text, fontSize: 13, fontFamily:font.ui }}>ข้ามไปก่อน</Text>
       </Pressable>
-    </View>
+    </PostBattleSurface>
   );
 }
