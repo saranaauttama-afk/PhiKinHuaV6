@@ -25,3 +25,7 @@ No new artwork or balance changes. The unused legacy boss.jpg failed local image
 555 tests cover selected-card upgrades, exact HP rewards, invalid target preservation and distinct route scenes/current battle stage. TypeScript and final web export passed before push. Actual mobile web components were exercised at 393×852 and 360×640 with real reducer commands: selecting the second card + free level upgrade, service upgrade, healing and direct knife entry. Checked both destinations stay side by side with labels visible; upgrade card controls stay inside the viewport after purchase. Temporary QA route removed before final export/commit.
 
 Native smoke now confirms a real level stat choice rather than only skipping it. Existing APK signing, ID, ABI and package audit remain unchanged. New APK/native result pending; physical device follow-up still needed. Previous v1.0.13 build/native validation passed (run 37638483159).
+
+## Final build
+
+Source commit `b42e1b43cfdda190ef7dc651ba4c8e8cfa08c461`. Final APK/audit/API 36 smoke run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37652373221 . In progress at handoff; check the run before presenting an APK as verified.
