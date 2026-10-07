@@ -15,3 +15,7 @@ TypeScript, all 551 tests and web export pass. Actual components were inspected 
 ## Art
 
 New built-in imagegen asset: `assets/ui/ritual-dark-cloth.webp`, used through measured RitualSurface with its stable native image parent. Existing illustrated objects and wooden/paper controls reused. Live text remains code-rendered. Prompt: “Single blank 3:2 panel of very dark brown charcoal woven cotton, rough frayed edges and modest ochre stitching; flat hand-inked crosshatching like a Thai 1970s one-baht horror comic, quiet dark center, transparent exterior, no frame, text, symbols, objects or glow.” Converted to WebP with alpha for APK size. Generated original retained outside the repo.
+
+## Final build
+
+Final source commit: `793e57feb7b8aa9ded35617276caccf1c24888cd`. APK/package audit/API 36 smoke run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37638483159 . In progress when this handoff was written. The earlier v1.0.13 run 37638172898 predates the native assertion helper correction; use the final run above. The native assertion helpers were verified locally against sample accessibility XML.
