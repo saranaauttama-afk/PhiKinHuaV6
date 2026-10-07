@@ -1,4 +1,3 @@
-import {combatUiColors} from '../../theme';
 import {palette,surface,paper} from '../../theme';
 import PostBattleSurface from './PostBattleSurface';
 import RitualSurface from '../RitualSurface';
@@ -97,7 +96,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         เลเวล {playerLevel}
       </Text>
       <Text style={{
-        color: palette.textDim, fontSize: 14,
+        color: palette.textDim, fontSize: 14, fontFamily:font.ui,
         textAlign: 'center', marginBottom: 18,
       }}>
         {pending ? 'เลือกหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนาหนึ่งอย่าง · แตะแล้วกดยืนยัน'}
@@ -113,7 +112,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                 onPress={() => setSelected(opt)}
                 accessibilityRole="button" accessibilityState={{selected:selected===opt}}
               >
-                <RitualSurface kind="palm" style={{padding:22,backgroundColor:selected===opt?combatUiColors.selectedPalm:'transparent'}}>
+                <RitualSurface kind="palm" style={{padding:22}}>
                 <View style={{flexDirection:'row',alignItems:'center',gap:12}}>
                 <Image source={bucketOf(opt)==='max_hp'?require('../../../assets/images/players/iHp.png'):bucketOf(opt)==='equipment_slot'||bucketOf(opt)==='blessing'?require('../../../assets/ui/blessing-amulet.png'):require('../../../assets/ui/card-breath.png')} resizeMode="contain" style={{width:52,height:52}}/>
                 <View style={{flex:1}}>
@@ -121,7 +120,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                   {l.title}
                 </Text>
                 {!!l.detail && (
-                  <Text style={{ color: paper.ink, fontSize: 14, marginTop: 4 }}>
+                  <Text style={{ color: paper.ink, fontSize: 14, fontFamily:font.ui, marginTop: 4 }}>
                     {l.detail}
                   </Text>
                 )}

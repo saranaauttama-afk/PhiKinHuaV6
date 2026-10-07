@@ -10,7 +10,7 @@ import { Text, View } from 'react-native';
 import type { CardData } from '../../src/core/types';
 import { isFused } from '../../src/core/cards/fusion';
 import { hitsOf, conditionLabel } from '../../src/core/cards/mechanics';
-import { font, radius, size, space, tint } from '../theme';
+import { font, radius, size, space, tint, paper } from '../theme';
 
 /** ป้ายเล็กบอกคุณสมบัติพิเศษของใบนี้ */
 function Badge({ label, tone = 'moon' }: { label: string; tone?: 'moon' | 'blood' }) {
@@ -135,7 +135,7 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
 
         {!!card.desc && (
           <Text style={{
-            color: palette.textFaint, fontSize: size.body,
+            color: plain ? paper.ink : palette.textFaint, fontSize: size.body,
             fontFamily: font.body, marginTop: space.xs, lineHeight: 22,
           }}>
             {card.desc}

@@ -109,7 +109,7 @@ export default function VictoryOverlay({
 
         {/* Gold row */}
         <Animated.View style={[{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 36 }, goldStyle]}>
-          <InkIcon name="gold" size={32}/>
+          <InkIcon name="gold" size={32} color={palette.moon}/>
           <Text style={{
             color: palette.moon, fontSize: 28,
             fontFamily: 'Prompt_700Bold',
