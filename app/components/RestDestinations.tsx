@@ -22,7 +22,7 @@ export default function RestDestinations({offers,resolved,onEnter,children}:{
           :offer.kind==='story_event'?require('../../assets/ui/trail-rest.png')
           :offer.kind==='shop_equipment'?require('../../assets/ui/blessing-amulet.png')
           :require('../../assets/ui/ritual-jar.png');
-        return <Pressable key={d.id} disabled={done} accessibilityRole="button" accessibilityLabel={d.name} accessibilityState={{disabled:done}}
+        return <Pressable key={d.id} disabled={done} accessibilityRole="button" accessibilityLabel={d.name} accessibilityState={{disabled:done}} accessibilityHint={done?undefined:'เข้าสถานที่นี้ทันที'}
           onPress={()=>onEnter(offer,index)} style={({pressed})=>({width:offers.filter(Boolean).length===1?'85%':'47%',maxWidth:260,opacity:done?.45:pressed?.85:1})}>
           <Image accessible={false} source={image} resizeMode="contain" style={{height:150,width:'100%',marginBottom:8}}/>
           <RitualSurface kind="darkCloth" style={{paddingHorizontal:18,paddingVertical:18,minHeight:112,justifyContent:'center'}}>

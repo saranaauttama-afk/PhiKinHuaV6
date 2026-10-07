@@ -47,7 +47,7 @@ def shot(name):
     print('SCREEN',name,flush=True)
     return root
 def labels(root): return [s for n in root.iter('node') for s in fields(n)]
-def has(root,label): return find(root,label) is not None
+def has(root,label,contains=False): return find(root,label,contains) is not None
 def discard_if_needed(root):
     if not has(root,'เลือกการ์ดที่จะทิ้ง'): return False
     for _ in range(15):
