@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Pressable, Text, View, StyleSheet } from 'react-native';
 import type { CardData } from '../../src/core/types';
+import { CARD_ART_SOURCES } from '../cardArt';
 import { cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
 import { font, paper } from '../theme';
@@ -12,7 +13,7 @@ const glyphs = {
   equipment: require('../../assets/ui/ritual-jar.png'), curse: require('../../assets/ui/trail-ghost.png'),
 };
 export function CardGlyphArt({ card, size = 76 }: { card: CardData; size?: number }) {
-  return <Image accessible={false} source={glyphs[cardGlyph(card)]} resizeMode="contain" style={{ width: size, height: size, tintColor: cardGlyph(card) === 'curse' ? paper.red : undefined }} />;
+  return <Image accessible={false} source={CARD_ART_SOURCES[card.id] ?? glyphs[cardGlyph(card)]} resizeMode="contain" style={{ width: size, height: size, tintColor: !CARD_ART_SOURCES[card.id] && cardGlyph(card) === 'curse' ? paper.red : undefined }} />;
 }
 export default function DeckCard({ card, count, onPress }: { card: CardData; count: number; onPress: () => void }) {
   return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name ?? card.id} จำนวน ${count} ใบ`} accessibilityHint={`พลังงาน ${card.cost ?? 0} · ${cardSummary(card)}`} onPress={onPress} style={styles.touch}>

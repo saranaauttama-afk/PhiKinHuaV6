@@ -45,7 +45,7 @@ export function planEnemyIntent(s: GameState): void {
 
     if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
       // ใช้สูตรเดียวกับดาเมจจริง ไม่งั้นเลขที่โชว์จะไม่ตรงกับที่โดน
-      damage += computeModifiedDamage(s, {
+      damage += (def.hits ?? 1) * computeModifiedDamage(s, {
         from: 'enemy',
         to: 'player',
         raw: def.dmg!,
@@ -73,7 +73,7 @@ export function refreshIntentEstimate(s: GameState): void {
   if (!s.enemyIntent) return;
   s.enemyIntent.damage = s.enemyIntent.cardIds.reduce((sum, id) => {
     const c = enemyCardById(id);
-    return sum + (c?.type === 'attack' && c.dmg ? computeModifiedDamage(s, {
+    return sum + (c?.type === 'attack' && c.dmg ? (c.hits ?? 1) * computeModifiedDamage(s, {
       from: 'enemy', to: 'player', raw: c.dmg, source: { kind: 'card', cardId: id },
     }) : 0);
   }, 0);

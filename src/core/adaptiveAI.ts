@@ -1,6 +1,8 @@
 // src/core/adaptiveAI.ts — Advanced Adaptive AI System
 
 import type { GameState } from './types';
+import { next } from './rng';
+import { nextStateRng } from './rngState';
 import type { StatusEffectType } from './types_extended';
 
 // ===== Player Pattern Analysis =====
@@ -307,7 +309,7 @@ function counterPlayStyle(state: GameState): void {
       
     case 'balanced':
       // Vary tactics to keep player guessing
-      adaptationOf(state).aggressionLevel = 40 + Math.random() * 40;
+      adaptationOf(state).aggressionLevel = 40 + next(nextStateRng(state)).value * 40;
       adaptationOf(state).spellCastingPreference = 60;
       break;
   }

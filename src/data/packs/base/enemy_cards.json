@@ -9,44 +9,44 @@
     "desc": "Basic claw attack dealing moderate damage"
   },
   {
-    "id": "swipe", 
+    "id": "swipe",
     "owner": "global",
-    "name": "Swipe",
+    "name": "ตะปบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 8,
-    "desc": "Quick swipe attack with decent damage"
+    "desc": "โจมตี 8"
   },
   {
     "id": "maul",
     "owner": "global",
-    "name": "Maul",
-    "type": "attack", 
+    "name": "ฟาดแรง",
+    "type": "attack",
     "energyCost": 2,
     "dmg": 13,
-    "desc": "Heavy attack dealing high damage"
+    "desc": "โจมตี 13"
   },
   {
     "id": "guard",
     "owner": "global",
-    "name": "Guard",
+    "name": "ตั้งรับ",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
-    "desc": "Basic defensive stance"
+    "desc": "ป้องกัน 7"
   },
   {
     "id": "brace",
     "owner": "global",
-    "name": "Brace",
+    "name": "กำบังแน่น",
     "type": "skill",
     "energyCost": 2,
     "block": 12,
-    "desc": "Strong defensive stance"
+    "desc": "ป้องกัน 12"
   },
   {
     "id": "slime_poke",
-    "owner": "slime", 
+    "owner": "slime",
     "name": "Poke",
     "type": "attack",
     "energyCost": 1,
@@ -56,7 +56,7 @@
   {
     "id": "slime_guard",
     "owner": "slime",
-    "name": "Sticky Guard", 
+    "name": "Sticky Guard",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -74,24 +74,24 @@
   {
     "id": "death_wail",
     "owner": "spirit",
-    "name": "Death Wail",
-    "type": "attack", 
+    "name": "เสียงคร่ำครวญ",
+    "type": "attack",
     "energyCost": 1,
     "dmg": 8,
-    "desc": "A haunting cry that damages the soul"
+    "desc": "โจมตี 8"
   },
   {
     "id": "cursed_touch",
     "owner": "spirit",
-    "name": "Cursed Touch",
+    "name": "สัมผัสอาฆาต",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
-    "desc": "A touch that brings misfortune"
+    "desc": "โจมตี 7"
   },
   {
     "id": "death_curse",
-    "owner": "spirit", 
+    "owner": "spirit",
     "name": "Death Curse",
     "type": "attack",
     "energyCost": 3,
@@ -119,29 +119,29 @@
   {
     "id": "phase_strike",
     "owner": "phi_pop",
-    "name": "Phase Strike",
+    "name": "เข้าสิงกัดกิน",
     "type": "attack",
     "energyCost": 2,
     "dmg": 10,
-    "desc": "Phi Pop phases through defenses to strike"
+    "desc": "โจมตี 10"
   },
   {
     "id": "floating_dodge",
     "owner": "phi_pop",
-    "name": "Floating Dodge",
+    "name": "หลบในเงา",
     "type": "skill",
     "energyCost": 1,
     "block": 6,
-    "desc": "Phi Pop floats to avoid attacks"
+    "desc": "ป้องกัน 6"
   },
   {
     "id": "ghost_wail",
     "owner": "phi_pop",
-    "name": "Ghost Wail",
+    "name": "เสียงปอบคราง",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
-    "desc": "Ghostly wail that chills the soul"
+    "desc": "โจมตี 7"
   },
   {
     "id": "blood_drain",
@@ -155,11 +155,11 @@
   {
     "id": "night_hunt",
     "owner": "krasue",
-    "name": "Night Hunt",
+    "name": "ล่ากลางคืน",
     "type": "attack",
     "energyCost": 1,
     "dmg": 8,
-    "desc": "Hunting in the darkness of night"
+    "desc": "โจมตี 8"
   },
   {
     "id": "stealth_approach",
@@ -200,11 +200,11 @@
   {
     "id": "phantom_slash",
     "owner": "phi_krahang",
-    "name": "Phantom Slash",
+    "name": "กรงเล็บป่า",
     "type": "attack",
     "energyCost": 2,
     "dmg": 12,
-    "desc": "Ghostly sword slash from a headless warrior"
+    "desc": "โจมตี 12"
   },
   {
     "id": "warrior_stance",
@@ -227,11 +227,11 @@
   {
     "id": "graceful_strike",
     "owner": "kinnaree",
-    "name": "Graceful Strike",
+    "name": "ฟาดแขนนางรำ",
     "type": "attack",
     "energyCost": 2,
     "dmg": 10,
-    "desc": "Elegant and precise strike from a celestial being"
+    "desc": "โจมตี 10"
   },
   {
     "id": "dance_of_spirits",
@@ -281,20 +281,20 @@
   {
     "id": "krasue_claw",
     "owner": "phi-krasue",
-    "name": "Krasue Claw",
+    "name": "เล็บกระสือ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 6,
-    "desc": "Sharp claw attack from the floating ghost"
+    "desc": "โจมตี 6"
   },
   {
     "id": "krasue_guard",
     "owner": "phi-krasue",
-    "name": "Krasue Guard",
+    "name": "ม้วนเงาคุ้มกาย",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
-    "desc": "Protective stance using ethereal energy"
+    "desc": "ป้องกัน 5"
   },
   {
     "id": "krasue_swipe",
@@ -313,5 +313,70 @@
     "energyCost": 2,
     "block": 8,
     "desc": "Strong defensive posture with ghostly energy"
+  },
+  {
+    "id": "pop_feast",
+    "owner": "phi_pop",
+    "name": "หิวไม่สิ้น",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "heal": 2,
+    "desc": "โจมตี 6 และฟื้นชีวิต 2"
+  },
+  {
+    "id": "tanee_roots",
+    "owner": "tanee",
+    "name": "รากกล้วยรัด",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    },
+    "desc": "ป้องกัน 7 และทำให้อ่อนแอ 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "krasue_venom",
+    "owner": "krasue",
+    "name": "น้ำลายกระสือ",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 2,
+      "value": 2
+    },
+    "desc": "โจมตี 5 และใส่พิษ 2 นาน 2 เทิร์น"
+  },
+  {
+    "id": "dancer_steps",
+    "owner": "kinnaree",
+    "name": "รำสองจังหวะ",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 4,
+    "hits": 2,
+    "desc": "โจมตี 4 สองครั้ง พลังโจมตีมีผลแต่ละครั้ง"
+  },
+  {
+    "id": "pong_fury",
+    "owner": "phi_krahang",
+    "name": "โทสะเฝ้าเรือน",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 6,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 99,
+      "value": 1
+    },
+    "desc": "ป้องกัน 6 และแข็งแกร่ง 1 ตลอดไฟต์ ยิ่งยื้อนานยิ่งอันตราย"
   }
 ]

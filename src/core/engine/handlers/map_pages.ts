@@ -215,6 +215,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       if (s.runMode === 'episode' && offer.enemyId === 'phi-pong-kang') {
         s.enemy.hp = s.enemy.maxHp = EPISODE.finaleHp;
         s.enemy.maxEnergy = EPISODE.finaleEnergy;
+        s.enemy.handSize = 3;
+        deck.handSize = 3;
+        deck.maxEnergy = EPISODE.finaleEnergy;
         s.enemy.name = 'โป่งค่างเฝ้าบ้านร้าง';
       }
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));

@@ -7,7 +7,10 @@ export type EnemyCardDef = {
   energyCost: number;        // ค่าพลังงานที่ใช้
   dmg?: number;              // ความเสียหาย (ถ้าเป็น attack)
   block?: number;            // เกราะ (ถ้าเป็น skill)
-  desc?: string;             // คำอธิบายการ์ด
+  desc?: string;
+  hits?: number;
+  heal?: number;
+  statusEffect?: { target: 'player' | 'enemy'; effect: import('./combat/status-effects/types').StatusEffectType; duration: number; value: number };             // คำอธิบายการ์ด
 };
 
 // Initialize data

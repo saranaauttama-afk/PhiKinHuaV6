@@ -16,6 +16,7 @@
 import type { CardData, GameState } from '../types';
 import type { RNG } from '../rng';
 import { rollThreeCards } from '../level';
+import { rollChapterCards } from './chapterRewards';
 import { getClass } from '../classes';
 import { FINAL_BOSS_FIGHT } from '../map/pages';
 
@@ -38,7 +39,8 @@ export function rollCardReward(s: GameState, r: RNG): RNG {
   // และการเอาหน้าเลือกของมาคั่นก่อนจอสรุปทำให้จังหวะจบเรื่องสะดุด
   if ((s.fightCount ?? 0) >= FINAL_BOSS_FIGHT) return r;
 
-  const out = rollThreeCards(r, s.player.level, getClass(s.classId).cardTag);
+  const out = (s.runMode === 'episode' ? rollChapterCards(getClass(s.classId).id, r) : undefined)
+    ?? rollThreeCards(r, s.player.level, getClass(s.classId).cardTag);
   if (out.list.length > 0) {
     s.cardReward = { choices: out.list };
   }

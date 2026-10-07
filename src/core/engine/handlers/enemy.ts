@@ -207,20 +207,7 @@ s.log.push(`Enemy discards unknown card ${id}.`);
   (s as any).enemyEnergy = ((s as any).enemyEnergy ?? 0) - cost;
 
   // เล่นเอฟเฟ็กต์
-  if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-    const result = dealDamage(s, {
-      from: 'enemy',
-      to: 'player',
-      raw: Math.max(0, def.dmg!),
-      source: { kind: 'card', cardId: def.id },
-    });
-    s.log.push(`Enemy plays ${def.name ?? def.id}: Attack ${result.modified} (${result.hpLoss} dmg).`);
-  } else if (def.type === 'skill' && (def.block ?? 0) > 0) {
-    gainBlock(s, 'enemy', def.block ?? 0);
-    s.log.push(`Enemy plays ${def.name ?? def.id}: Block +${def.block}.`);
-  } else {
-    s.log.push(`Enemy plays ${def.name ?? def.id}.`);
-  }
+  require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
 
   // ย้ายการ์ดไป discard
   const [cardId] = piles.hand.splice(idx, 1);

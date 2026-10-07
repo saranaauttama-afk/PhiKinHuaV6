@@ -34,7 +34,7 @@ const easeBack = Easing.out(Easing.back(1.4));
 const easeIn   = Easing.in(Easing.quad);
 
 interface Props {
-  card: { name: string; damage: number; block: number; cost?: number };
+  card: { id?: string; name: string; damage: number; block: number; cost?: number; hits?: number; desc?: string };
   cardIndex: number;
   totalCards: number;
   delay: number;    // slide-in delay (staggered)
@@ -140,7 +140,14 @@ export default function EnemyHandCard({
 
       {/* Front face */}
       <Animated.View style={frontStyle}>
-        {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:10}}><Image source={isAttack?require('../../../assets/ui/trail-ghost.png'):require('../../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:70,height:70}}/><Text style={{color:paper.ink,fontFamily:font.ui,fontSize:11}}>พลัง {card.cost??1}</Text><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:16,textAlign:'center'}}>{card.name}</Text>{card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:24}}>โจมตี {card.damage}</Text>}{card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>เกราะ {card.block}</Text>}</RitualSurface>}
+        {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:4}}>
+          <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:10}}>พลัง {card.cost??1}</Text>
+          <CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'skill',cost:card.cost??1}} size={54}/>
+          <Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.heading,fontSize:13,textAlign:'center'}}>{card.name}</Text>
+          {card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:16}}>โจมตี {card.damage}{(card.hits??1)>1?` ×${card.hits}`:''}</Text>}
+          {card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:14}}>ป้องกัน {card.block}</Text>}
+          {!!card.desc&&<Text numberOfLines={3} style={{color:paper.ink,fontFamily:font.ui,fontSize:9,lineHeight:13,textAlign:'center'}}>{card.desc}</Text>}
+        </RitualSurface>}
       </Animated.View>
 
     </Animated.View>

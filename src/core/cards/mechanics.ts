@@ -45,6 +45,7 @@ export type CardCondition =
   | { kind: 'enemy_has_status'; statusId: string }
   /** ไม่มีการ์ดอื่นเหลือในมือแล้ว */
   | { kind: 'hand_empty' }
+  | { kind: 'player_minions_at_least'; value: number }
   /** สำรับ (ทั้งกอง) เหลือไม่เกิน value ใบ */
   | { kind: 'deck_at_most'; value: number };
 
@@ -72,6 +73,8 @@ export function conditionMet(s: GameState, cond: CardCondition, self?: CardData)
       return (s.player.block ?? 0) >= cond.value;
     case 'enemy_has_status':
       return !!s.enemy && hasStatusEffect('enemy', s, cond.statusId as StatusEffectType);
+    case 'player_minions_at_least':
+      return (s.minions ?? []).filter(m => m.owner === 'player' && m.duration > 0).length >= cond.value;
     case 'hand_empty':
       // "มือว่าง" หมายถึงไม่มีใบอื่นเหลือ — ใบที่กำลังเล่นอยู่ยังนับอยู่ในมือ
       return s.piles.hand.filter(c => c !== self).length === 0;
@@ -208,6 +211,7 @@ export function conditionLabel(c: CardConditional): string {
       case 'player_hp_below':       return `ถ้าเลือดเราเหลือไม่ถึง ${c.when.value}%`;
       case 'player_block_at_least': return `ถ้าเรามี Block ตั้งแต่ ${c.when.value}`;
       case 'enemy_has_status':      return `ถ้าศัตรูติด${c.when.statusId === 'poison' ? 'พิษ' : ` ${c.when.statusId}`}`;
+      case 'player_minions_at_least': return `ถ้ามีวิญญาณคู่กายอย่างน้อย ${c.when.value} ตน`;
       case 'hand_empty':            return 'ถ้าไม่มีการ์ดอื่นเหลือในมือ';
       case 'deck_at_most':          return `ถ้าสำรับเหลือไม่เกิน ${c.when.value} ใบ`;
     }

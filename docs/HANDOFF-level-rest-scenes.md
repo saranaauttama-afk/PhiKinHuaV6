@@ -28,4 +28,4 @@ Native smoke now confirms a real level stat choice rather than only skipping it.
 
 ## Final build
 
-Source commit `b42e1b43cfdda190ef7dc651ba4c8e8cfa08c461`. Final APK/audit/API 36 smoke run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37652373221 . In progress at handoff; check the run before presenting an APK as verified.
+Source commit `b42e1b43cfdda190ef7dc651ba4c8e8cfa08c461`. Final APK/audit/API 36 smoke run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37652373221 . APK/package audit succeeded. Emulator smoke failed at the initial-vs-restored hand comparison: the initial second dealt card was invisible, while the restored five-card hand was visible. v1.0.15 fixes dealt-card initial visibility and retains the exact native resume comparison. See `docs/HANDOFF-chapter-builds.md`.

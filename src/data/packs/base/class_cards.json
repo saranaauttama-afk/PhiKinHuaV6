@@ -4,7 +4,7 @@
     "name": "ฟันดาบวัด",
     "type": "attack",
     "cost": 1,
-    "dmg": 8,
+    "dmg": 7,
     "rarity": "Common",
     "inShop": true,
     "tags": [
@@ -12,14 +12,14 @@
       "thai",
       "warrior"
     ],
-    "desc": "ฟาดดาบที่ปลุกเสกจากวัด สร้างความเสียหาย 8"
+    "desc": "ฟันดาบวัด โจมตี 7"
   },
   {
     "id": "muay_stance",
     "name": "ตั้งท่ามวย",
     "type": "skill",
     "cost": 1,
-    "block": 9,
+    "block": 8,
     "rarity": "Common",
     "inShop": true,
     "tags": [
@@ -27,7 +27,7 @@
       "thai",
       "warrior"
     ],
-    "desc": "ตั้งการ์ดแบบมวยไทย Block 9"
+    "desc": "ตั้งท่ามวย ป้องกัน 8"
   },
   {
     "id": "flying_knee",
@@ -113,7 +113,8 @@
       "thai",
       "warrior"
     ],
-    "desc": "สูดลมลึก ได้พลังงาน 1 และจั่ว 1 ใบ"
+    "desc": "ได้พลังงาน 1 และจั่ว 1 ใบ ใช้ได้ครั้งเดียวต่อไฟต์",
+    "exhaust": true
   },
   {
     "id": "iron_will",
@@ -302,8 +303,8 @@
     "id": "whisper_ear",
     "name": "เสียงกระซิบ",
     "type": "attack",
-    "cost": 0,
-    "dmg": 4,
+    "cost": 1,
+    "dmg": 5,
     "draw": 1,
     "rarity": "Common",
     "inShop": true,
@@ -313,7 +314,7 @@
       "thai",
       "medium"
     ],
-    "desc": "กระซิบข้างหูให้เสียสมาธิ เสียหาย 4 และจั่ว 1 ใบ"
+    "desc": "โจมตี 5 และจั่ว 1 ใบ ใช้พลังงาน 1"
   },
   {
     "id": "set_altar",
@@ -892,9 +893,9 @@
       "thai",
       "medium"
     ],
-    "desc": "ยกถาดเซ่นให้ตามที่มันขอ ฟื้น 5 และได้พลังงาน 1",
+    "desc": "ฟื้นชีวิต 5 ใช้พลังงาน 1",
     "heal": 5,
-    "energyGain": 1
+    "energyGain": 0
   },
   {
     "id": "ghost_hand",
@@ -1064,7 +1065,7 @@
     "id": "triple_knee",
     "name": "เข่าสามชั้น",
     "type": "attack",
-    "cost": 1,
+    "cost": 2,
     "rarity": "Common",
     "inShop": true,
     "tags": [
@@ -1191,7 +1192,7 @@
       "thai",
       "warrior"
     ],
-    "desc": "รับแล้วสวน โจมตี 6 — ถ้ามี Block ตั้งแต่ 10 โจมตีอีก 2 หมัด",
+    "desc": "โจมตี 6 ถ้ามีป้องกันอย่างน้อย 10 โจมตี 2 ครั้ง",
     "dmg": 6,
     "conditional": {
       "when": {
@@ -1199,7 +1200,7 @@
         "value": 10
       },
       "bonus": {
-        "hits": 2
+        "hits": 1
       }
     }
   },
@@ -1305,7 +1306,8 @@
         "draw": 2,
         "energyGain": 1
       }
-    }
+    },
+    "exhaust": true
   },
   {
     "id": "yantra_in_hand",
@@ -1385,8 +1387,8 @@
       "thai",
       "medium"
     ],
-    "desc": "ปล่อยฟื้น 8 และฟื้นฟูต่อเนื่อง 4 สี่เทิร์น — หรือถือไว้ก็ได้ฟื้นฟูต่อเนื่อง 1 ทุกท้ายเทิร์น",
-    "heal": 8,
+    "desc": "ฟื้น 4 และฟื้นฟู 2 นาน 3 เทิร์น หรือถือไว้ได้ฟื้นฟู 1 ท้ายเทิร์น",
+    "heal": 4,
     "whileHeld": {
       "status": {
         "effect": "regeneration",
@@ -1397,8 +1399,8 @@
     "statusEffect": {
       "target": "player",
       "effect": "regeneration",
-      "duration": 4,
-      "value": 4
+      "duration": 3,
+      "value": 2
     }
   },
   {
@@ -1459,9 +1461,9 @@
       "thai",
       "warrior"
     ],
-    "desc": "ตีสี่หมัด ทีละ 7 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 1",
-    "dmg": 7,
-    "hits": 4,
+    "desc": "โจมตี 5 สามครั้ง ค่าร่ายลด 1 ต่อใบที่เล่นแล้ว ต่ำสุด 1",
+    "dmg": 5,
+    "hits": 3,
     "costRule": {
       "kind": "per_card_played",
       "step": 1,
@@ -1487,6 +1489,152 @@
       "kind": "per_card_played",
       "step": 1,
       "min": 0
+    }
+  },
+  {
+    "id": "ward_riposte",
+    "name": "ยันต์รับแล้วสวน",
+    "type": "attack",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "thai",
+      "warrior",
+      "build"
+    ],
+    "desc": "โจมตี 5 ถ้ามีป้องกันอย่างน้อย 10 โจมตี 14 ต้องตั้งรับก่อน",
+    "dmg": 5,
+    "conditional": {
+      "when": {
+        "kind": "player_block_at_least",
+        "value": 10
+      },
+      "bonus": {
+        "dmg": 9
+      }
+    }
+  },
+  {
+    "id": "last_stand_cut",
+    "name": "ดาบสุดแรง",
+    "type": "attack",
+    "cost": 2,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "thai",
+      "warrior",
+      "build"
+    ],
+    "desc": "โจมตี 10 ถ้าชีวิตต่ำกว่าครึ่ง โจมตี 24",
+    "dmg": 10,
+    "conditional": {
+      "when": {
+        "kind": "player_hp_below",
+        "value": 50
+      },
+      "bonus": {
+        "dmg": 14
+      }
+    }
+  },
+  {
+    "id": "threefold_strike",
+    "name": "เข่าครูมวย",
+    "type": "attack",
+    "cost": 2,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "thai",
+      "warrior",
+      "build"
+    ],
+    "desc": "โจมตี 3 สามครั้ง และได้แข็งแกร่ง 1 ตลอดไฟต์ แรงที่สะสมบวกทุกครั้ง",
+    "dmg": 3,
+    "hits": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "strength",
+      "duration": 99,
+      "value": 1
+    }
+  },
+  {
+    "id": "spirit_pact",
+    "name": "สัญญาคู่กาย",
+    "type": "skill",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "thai",
+      "medium",
+      "build"
+    ],
+    "desc": "จั่ว 1 ถ้ามีวิญญาณคู่กายอยู่ ได้พลังงาน 2 ใช้ได้ครั้งเดียวต่อไฟต์",
+    "draw": 1,
+    "exhaust": true,
+    "conditional": {
+      "when": {
+        "kind": "player_minions_at_least",
+        "value": 1
+      },
+      "bonus": {
+        "energyGain": 2
+      }
+    }
+  },
+  {
+    "id": "poison_echo",
+    "name": "พรายซ้ำพิษ",
+    "type": "attack",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "thai",
+      "medium",
+      "build"
+    ],
+    "desc": "โจมตี 6 ถ้าศัตรูติดพิษ จั่ว 2 ใบและได้ป้องกัน 5",
+    "dmg": 6,
+    "conditional": {
+      "when": {
+        "kind": "enemy_has_status",
+        "statusId": "poison"
+      },
+      "bonus": {
+        "draw": 2,
+        "block": 5
+      }
+    }
+  },
+  {
+    "id": "ancestor_council",
+    "name": "วงบรรพชน",
+    "type": "skill",
+    "cost": 2,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": [
+      "thai",
+      "medium",
+      "build"
+    ],
+    "desc": "ป้องกัน 6 ถ้ามีวิญญาณคู่กายอย่างน้อย 2 ตน ป้องกัน 12 และจั่ว 2 ใช้ได้ครั้งเดียวต่อไฟต์",
+    "block": 6,
+    "exhaust": true,
+    "conditional": {
+      "when": {
+        "kind": "player_minions_at_least",
+        "value": 2
+      },
+      "bonus": {
+        "block": 6,
+        "draw": 2
+      }
     }
   }
 ]

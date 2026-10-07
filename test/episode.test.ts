@@ -3,7 +3,7 @@ import { applyCommand } from '../src/core/reducer';
 import { baseNewState } from '../src/core/commands';
 import { makeRng } from '../src/core/rng';
 import type { Command, GameState } from '../src/core/types';
-import { effectiveCost } from '../src/core/cards/mechanics';
+import { effectiveCost, withConditional } from '../src/core/cards/mechanics';
 import { ALL_CLASS_IDS, type ClassId } from '../src/core/classes';
 import { toSave, fromSave, isPlayableSave } from '../src/core/save';
 import { EPISODE } from '../src/core/balance/episode';
@@ -30,11 +30,14 @@ function playFight(d: ReturnType<typeof driver>): number {
       const choices = s.piles.hand.map((card, index) => {
         if (effectiveCost(s, card) > s.player.energy) return { index, score: -Infinity };
         const needBlock = Math.max(0, (s.enemyIntent?.damage ?? 0) - s.player.block);
-        const score = (card.dmg ?? 0) * (card.hits ?? 1)
-          + Math.min(card.block ?? 0, needBlock) * 1.3
-          + (card.heal ?? 0) * (s.player.hp < s.player.maxHp ? 1 : 0)
-          + (card.energyGain ?? 0) * 9 + (card.draw ?? 0) * 3
-          + (card.tags?.includes('summon') ? 12 : 0);
+        const c = withConditional(s, card);
+        const score = (c.dmg ?? 0) * (c.hits ?? 1)
+          + Math.min(c.block ?? 0, needBlock) * (s.classId === 'warrior' ? 0.8 : 1.3)
+          + (c.heal ?? 0) * (s.player.hp < s.player.maxHp ? 1 : 0)
+          + (c.energyGain ?? 0) * 9 + (c.draw ?? 0) * 3
+          + (c.summonMinion ? 8 : 0)
+          + (c.statusEffect?.effect === 'poison' ? 8 : 0)
+          + (c.statusEffect?.effect === 'strength' ? 6 : 0);
         return { index, score };
       }).sort((a, b) => b.score - a.score);
       if (!choices.length || !Number.isFinite(choices[0].score)) break;

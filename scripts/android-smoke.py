@@ -95,11 +95,16 @@ if '--helpers-only' not in sys.argv:
     tap('ผีปอบ');tap('เผชิญหน้า →')
     wait_for('จบเทิร์น');shot('05-battle')
     # Closing a fight must pause, never return to the next map node.
-    before=dump(); hand_before=sorted(t for t in labels(before) if t.startswith('การ์ด ') and ' พลัง ' in t)
+    hand_before=[]
+    for _ in range(12):
+        before=dump(); hand_before=sorted(t for t in labels(before) if re.match(r'^การ์ด .+ พลัง \d+$',t))
+        if len(hand_before)==5: break
+        time.sleep(.3)
+    assert len(hand_before)==5, 'Initial hand did not show all five cards'
     tap('พักการต่อสู้');wait_for('สู้ต่อ');shot('05-pause')
     assert find(dump(),'เดินทางต่อ') is None, 'Pause exposed a map progression control'
     tap('ตั้งค่า');wait_for('ลดการเคลื่อนไหวของฉาก');tap('กลับ');tap('สู้ต่อ')
-    wait_for('จบเทิร์น');assert has(dump(),'30/30'), 'Pause changed enemy HP'
+    wait_for('จบเทิร์น');assert has(dump(),'42/42'), 'Pause changed enemy HP'
     tap('ดูกองการ์ด');wait_for('ปิดกองการ์ด');root=shot('05-piles')
     pile_cards=[n for n in root.iter('node') if n.get('content-desc','').startswith('ดูการ์ด ')]
     assert pile_cards, 'Battle piles do not contain illustrated tappable cards'
@@ -107,7 +112,7 @@ if '--helpers-only' not in sys.argv:
     tap('พักการต่อสู้');tap('กลับเมนูหลัก');wait_for('เล่นต่อ',contains=True);shot('05-suspended-menu')
     adb('shell','am','force-stop',package);adb('shell','am','start','-W','-n',package+'/.MainActivity')
     wait_for('เล่นต่อ',contains=True);tap('เล่นต่อ',contains=True);wait_for('จบเทิร์น');root=shot('05-restored-battle')
-    assert has(root,'30/30'), 'Restored battle changed enemy HP'
+    assert has(root,'42/42'), 'Restored battle changed enemy HP'
     assert sorted(t for t in labels(root) if t.startswith('การ์ด ') and ' พลัง ' in t)==hand_before, 'Restored battle changed the hand'
     adb('shell','input','keyevent','4');wait_for('สู้ต่อ');tap('สู้ต่อ');wait_for('จบเทิร์น')
 
@@ -226,11 +231,11 @@ for _ in range(40):
     if has(root,'จบเทิร์น'):break
     time.sleep(.5)
 wait_for('วิญญาณเพื่อน เหลือ 2 เทิร์น');root=shot('17-helper-after-action')
-assert has(root,'26/30'), 'Helper attack did not remove real enemy HP'
+assert has(root,'38/42'), 'Helper attack did not remove real enemy HP'
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'
 assert adb('shell','pidof',package).strip(),'App exited'
 (out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, in-scene ghost selection/switch/deselect, map route, player details, mat deck/card details and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event, medium summon/details/real helper attack. Physical device not tested.\n')
 if '--helpers-only' in sys.argv:
-    (out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': real medium summon, readable live helper details, duration 3 to 2 and actual enemy HP 30 to 26. Physical device not tested.\n')
+    (out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': real medium summon, readable live helper details, duration 3 to 2 and actual enemy HP 42 to 38. Physical device not tested.\n')
 print((out/'result.txt').read_text(),flush=True)

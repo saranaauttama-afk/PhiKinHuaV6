@@ -29,7 +29,7 @@ interface CardProps {
   onDragPlay?: () => void;
   onHoverChange?: (isHovered: boolean) => void;
   isPlayed?: boolean;
-  animationDelay?: number; // For staggered entrance
+  animationDelay?: number; // Compatibility prop: dealt cards now appear immediately.
   /** ค่าร่ายจริง ณ ตอนนี้ — การ์ดบางใบถูกลงตามจำนวนใบที่เล่นไปแล้วในเทิร์น */
   costNow?: number;
 }
@@ -44,7 +44,6 @@ export default function Card({
   onDragPlay,
   onHoverChange,
   isPlayed = false,
-  animationDelay = 0,
   costNow,
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -55,11 +54,11 @@ export default function Card({
       onHoverChange(hovered);
     }
   };
-  const translateY = useSharedValue(200);
+  const translateY = useSharedValue(0);
   const dragOffsetY = useSharedValue(0);
   const shakeX = useSharedValue(0);
-  const scale = useSharedValue(0.5);
-  const opacity = useSharedValue(0);
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
   const isPlayedShared = useSharedValue(false);
   const isDisabledShared = useSharedValue(disabled);
 
@@ -67,16 +66,8 @@ export default function Card({
     isDisabledShared.value = disabled;
   }, [disabled]);
 
-  // Entrance animation on mount
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      translateY.value = withTiming(0, { duration: 600 });
-      scale.value = withTiming(1, { duration: 600 });
-      opacity.value = withTiming(1, { duration: 600 });
-    }, animationDelay);
-
-    return () => clearTimeout(timer);
-  }, [animationDelay]);
+  // Dealt cards start visible and inside their touch bounds, including resume.
+  // Only a played card leaves the hand; entrance timing cannot hide a live card.
 
   React.useEffect(() => {
     if (isPlayed) {

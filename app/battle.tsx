@@ -44,7 +44,7 @@ const eventKey = (_ev: CombatEvent) => `${++_popupSeq}`;
 
 type EnemyHandCardData = {
   key: string;
-  card: { name: string; damage: number; block: number; cost?: number };
+  card: { id?: string; name: string; damage: number; block: number; cost?: number; hits?: number; desc?: string };
   cardIndex: number;
   totalCards: number;
   delay: number;
@@ -238,7 +238,7 @@ export default function BattlePage() {
     setEnemyHandCards(
       revealOrder.map((e, i) => ({
         key: `${i}-${e.cardId}`,
-        card: { name: e.name, damage: e.dmg, block: e.block, cost: e.cost },
+        card: { id: e.cardId, name: e.name, damage: e.dmg, block: e.block, cost: e.cost, hits: e.hits, desc: e.desc },
         cardIndex: i,
         totalCards: revealOrder.length,
         delay: i * 100,

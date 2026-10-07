@@ -2,9 +2,13 @@
 
 Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current deliverable is a short, complete first chapter, targeting 5–10 minutes of human play before expanding the game. Duration and enjoyment are playtest goals, not measured device results.
 
+## Latest gameplay pass
+
+`work/occupation-table`: **v1.0.15/code 16** pilots warrior block/counter and strength/multiple-hit builds, medium spirit/poison builds, six new class cards, five real ghost signatures and 16 original card illustrations. Chapter rewards offer distinct attack/setup/engine options. The 160-run pilot uses real cards without hidden enemy-intent knowledge; 563 tests pass. Start a new run for the complete starter balance. APK/native build pending. See `docs/HANDOFF-chapter-builds.md` and `docs/card-art-prompts-v15.json`.
+
 ## Latest UI follow-up
 
-`work/occupation-table`: **v1.0.14/code 15** adds explicit level-up card selection with before/after results, fixes native rest destination widths, themes upgrade/healing screens and removes the confusing delete-destination control. Episode map locations and battle arenas now use the actual route stage. See `docs/HANDOFF-level-rest-scenes.md`; APK/native validation for this release is pending.
+`work/occupation-table`: **v1.0.14/code 15** adds explicit level-up card selection with before/after results, fixes native rest destination widths, themes upgrade/healing screens and removes the confusing delete-destination control. Episode map locations and battle arenas now use the actual route stage. See `docs/HANDOFF-level-rest-scenes.md`; APK/audit succeeded, but native resume smoke exposed an initially hidden dealt card; v1.0.15 fixes dealt-card visibility and keeps the exact resume comparison.
 
 `work/occupation-table`: **v1.0.13/code 14** simplifies rest destinations to direct entry, shares a readable illustrated theme across level-up and story choices, and replaces story choices with the result in one panel. Local checks and mobile web interactions passed; APK audit and API 36 emulator smoke passed in run 37638483159. See `docs/HANDOFF-rest-flow.md`. The preceding v1.0.12 APK passed package audit and API 36 native smoke in run 37609561500.
 

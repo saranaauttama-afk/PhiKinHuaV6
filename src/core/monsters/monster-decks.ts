@@ -11,6 +11,7 @@ import type { ThaiGhostData } from './thai-ghosts';
 
 export type EnemyDeckConfig = {
   pool: { allowOwners: string[] };
+  lists?: Array<{ id: string; weight: number; cards: string[] }>;
   handSize: number;
   maxEnergy: number;
 };
@@ -27,10 +28,10 @@ const OWNERS_BY_MONSTER: Record<string, string[]> = {
   // ── T1
   'phi-krasue':    ['krasue', 'phi-krasue'],
   'phi-pop':       ['phi_pop'],
-  'nang-tanee':    ['spirit'],
+  'nang-tanee':    ['spirit', 'tanee', 'global'],
 
   // ── T2
-  'phi-nang-ram':  ['kinnaree'],
+  'phi-nang-ram':  ['kinnaree', 'global'],
   'phi-pong-kang': ['phi_krahang', 'global'],
   'ngu-phi-sang':  ['naga_minor'],
 
@@ -82,12 +83,22 @@ const BY_TIER: Record<ThaiGhostData['tier'], { handSize: number; maxEnergy: numb
   SecretBoss: { handSize: 4, maxEnergy: 6 },
 };
 
+// Stable attack/defense mix prevents all-guard/all-attack lottery decks.
+const SIGNATURE_DECKS: Record<string, string[]> = {
+  'phi-pop': ['phase_strike','ghost_wail','floating_dodge','pop_feast','ghost_wail'],
+  'nang-tanee': ['cursed_touch','death_wail','tanee_roots','tanee_roots','guard'],
+  'phi-krasue': ['krasue_claw','night_hunt','krasue_guard','krasue_venom','krasue_venom'],
+  'phi-nang-ram': ['graceful_strike','dancer_steps','dancer_steps','guard','brace'],
+  'phi-pong-kang': ['phantom_slash','swipe','maul','pong_fury','swipe'],
+};
+
 /** เด็คประจำตัวของผีตนนี้ — ถ้าไม่ได้จับคู่ไว้ จะได้เด็คพื้นฐานแทน */
 export function deckForMonster(monster: ThaiGhostData): EnemyDeckConfig {
   const tier = BY_TIER[monster.tier] ?? BY_TIER.T1;
   const owners = OWNERS_BY_MONSTER[monster.id] ?? ['global'];
   return {
     pool: { allowOwners: owners },
+    ...(SIGNATURE_DECKS[monster.id] ? { lists: [{ id: monster.id, weight: 1, cards: Array.from({ length: 15 }, (_, i) => SIGNATURE_DECKS[monster.id][i % 5]) }] } : {}),
     handSize: tier.handSize,
     maxEnergy: tier.maxEnergy,
   };

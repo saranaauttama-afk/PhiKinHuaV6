@@ -254,6 +254,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         cardId,
         name: def.name ?? def.id,
         dmg: def.dmg ?? 0,
+        hits: def.hits,
+        desc: def.desc,
         block: def.block ?? 0,
         cost: def.energyCost ?? 1,
       });
@@ -268,20 +270,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         continue;
       }
 
-      if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-        const result = dealDamage(s, {
-          from: 'enemy',
-          to: 'player',
-          raw: def.dmg!,
-          source: { kind: 'card', cardId: def.id },
-        });
-        s.log.push(`Enemy plays ${def.name ?? def.id}: -${result.hpLoss} HP`);
-      } else if ((def.block ?? 0) > 0) {
-        gainBlock(s, 'enemy', def.block ?? 0);
-        s.log.push(`Enemy plays ${def.name ?? def.id}: +${def.block} block`);
-      } else {
-        s.log.push(`Enemy plays ${def.name ?? def.id}`);
-      }
+      require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
 
       r = settleCombat(s, r);
     }
