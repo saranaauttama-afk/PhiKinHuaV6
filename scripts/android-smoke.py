@@ -52,9 +52,18 @@ def discard_if_needed(root):
     if not has(root,'เลือกการ์ดที่จะทิ้ง'): return False
     for _ in range(15):
         root=dump()
-        confirm=next((n for n in root.iter('node') if any(t.startswith('ยืนยัน (') for t in fields(n)) and n.get('clickable')=='true'),None)
+        confirm=next((n for n in root.iter('node') if any(t.startswith('ยืนยัน (') or re.match(r'^ทิ้ง \d+/\d+ ใบ$',t) for t in fields(n)) and n.get('clickable')=='true'),None)
         if confirm is not None and confirm.get('enabled')=='true': touch(confirm); return True
-        candidates=[n for n in root.iter('node') if n.get('clickable')=='true' and re.match(r'^\d+,',n.get('content-desc','')) and '✕' not in n.get('content-desc','')]
+        heading=find(root,'เลือกการ์ดที่จะทิ้ง')
+        top=int(re.findall(r'\d+',heading.get('bounds'))[3]) if heading is not None else 0
+        bottom=int(re.findall(r'\d+',confirm.get('bounds'))[1]) if confirm is not None else 0
+        def discard_candidate(n):
+            if n.get('clickable')!='true' or n.get('enabled')!='true' or n.get('selected')=='true': return False
+            desc=n.get('content-desc','')
+            if re.match(r'^\d+,',desc): return '✕' not in desc
+            bounds=list(map(int,re.findall(r'\d+',n.get('bounds',''))))
+            return bool(desc) and len(bounds)==4 and top<bounds[1]<bounds[3]<=bottom
+        candidates=[n for n in root.iter('node') if discard_candidate(n)]
         if candidates: touch(candidates[0])
         else:
             adb('shell','input','swipe','900','1200','180','1200','400');time.sleep(.5)
