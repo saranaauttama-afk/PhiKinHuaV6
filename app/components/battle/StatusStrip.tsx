@@ -1,109 +1,33 @@
-import {combatUiColors} from '../../theme';
-// app/components/battle/StatusStrip.tsx — สถานะที่ติดอยู่บนตัว ใช้ได้ทั้งสองฝั่ง
-//
-// ข้อมูลชุดนี้พร้อมใช้มาตลอด — สถานะ 13 อย่างในทะเบียนมีชื่อไทยและคำอธิบายไทย
-// ครบทุกตัว เก็บอยู่ใน `player.statusEffects` / `enemy.statusEffects` พร้อมจำนวน
-// ชั้นและเทิร์นที่เหลือ แต่ไม่เคยมีจอไหนแสดง `MonsterArea` ถึงกับประกาศ prop
-// `statusEffects` ไว้แล้วไม่เคยเรนเดอร์มันเลย
-//
-// **ดีบัฟขึ้นก่อนบัฟเสมอ** — สิ่งที่กำลังทำร้ายเราต้องเห็นก่อนสิ่งที่ช่วยเรา
-//
-// สีมีสองสีตามระบบ: ดีบัฟแดงเลือดหมู บัฟทองแสงจันทร์ ไม่แจกสีรายสถานะ
-// (13 สถานะ = 13 สี คือทางกลับไปเป็นแดชบอร์ดเว็บ)
-
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import type { StatusEffect } from '../../../src/core/types_extended';
-import { sortForDisplay, isDebuff } from '../../../src/core/combat/statusDisplay';
-import { font, palette, radius, size, space, surface, tint } from '../../theme';
-
-type Props = {
-  effects?: StatusEffect[];
-  /** ขนาดเล็กลงสำหรับฝั่งศัตรูที่พื้นที่แคบกว่า */
-  compact?: boolean;
-  align?: 'center' | 'flex-start';
-};
-
-export default function StatusStrip({ effects, compact = false, align = 'center' }: Props) {
-  const list = sortForDisplay(effects ?? []);
-  /** สถานะที่แตะค้างดูคำอธิบายอยู่ */
-  const [open, setOpen] = React.useState<string | null>(null);
-
-  if (list.length === 0) return null;
-
-  const opened = list.find(e => e.id === open);
-
-  return (
-    <View style={{ alignItems: align, gap: space.xs }}>
-      <View style={{
-        flexDirection: 'row', flexWrap: 'wrap', gap: space.xs,
-        justifyContent: align === 'center' ? 'center' : 'flex-start',
-      }}>
-        {list.map(e => {
-          const bad = isDebuff(e);
-          const active = e.id === open;
-          return (
-            <Pressable
-              key={e.id}
-              onPress={() => setOpen(active ? null : e.id)}
-              hitSlop={6}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 3,
-                paddingHorizontal: space.sm,
-                paddingVertical: 4,
-                borderRadius: radius.pill,
-                backgroundColor: bad ? combatUiColors.statusDebuff : combatUiColors.statusBuff,
-                borderWidth: 1,
-                borderColor: bad ? tint.bloodLine : palette.line,
-              }}
-            >
-              <Text style={{
-                color: palette.text,
-                fontSize: size.label,
-                fontFamily: font.uiMed,
-              }}>
-                {e.name}
-              </Text>
-
-              {/* จำนวนชั้นขึ้นเมื่อซ้อนกันจริงเท่านั้น ชั้นเดียวไม่ต้องเขียน ×1 */}
-              {(e.stacks ?? 1) > 1 && (
-                <Text style={{
-                  color: palette.text,
-                  fontSize: size.label,
-                  fontFamily: font.uiMed,
-                }}>
-                  ×{e.stacks}
-                </Text>
-              )}
-
-              {/* เทิร์นที่เหลือคือข้อมูลที่ใช้ตัดสินใจจริง — จะทนอีกเทิร์นหรือรีบแก้ */}
-              <Text style={{
-                color: palette.text,
-                fontSize: size.tiny, fontFamily: font.ui,
-              }}>
-                {e.duration >= 99 ? 'ตลอดไฟต์' : `${e.duration} เทิร์น`}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {!!opened && (
-        <View style={{
-          maxWidth: 260,
-          paddingHorizontal: space.md, paddingVertical: space.xs,
-          borderRadius: radius.sm,
-          backgroundColor: surface.panelDeep,
-          borderWidth: 1, borderColor: palette.line,
-        }}>
-          <Text style={{
-            color: palette.text, fontSize: size.body,
-            fontFamily: font.body, lineHeight: 20, textAlign: 'center',
-          }}>
-            {opened.description}
-          </Text>
-        </View>
-      )}
-    </View>
-  );
+import {Modal,Pressable,Text,View,ScrollView} from 'react-native';
+import type {StatusEffect} from '../../../src/core/types_extended';
+import {sortForDisplay,isDebuff} from '../../../src/core/combat/statusDisplay';
+import RitualSurface from '../RitualSurface';
+import {font,palette,badgeColors} from '../../theme';
+export type BattleBadge={id:string;name:string;symbol:string;detail:string;count?:string;bad?:boolean;neutral?:boolean};
+const symbols:Record<string,string>={fear:'กล',poison:'พิ',curse:'สาป',corruption:'เส',entangle:'พัน',weak:'อ่อ',weakness:'อ่อ',vulnerable:'เป',strength:'แรง',regeneration:'ฟื้น',regen:'ฟื้น',protection:'กัน',haste:'ไว',draw_reduction:'จั่ว',block_next:'กัน',energy_boost:'พลัง',spell_charging:'มนต์',burn:'ไฟ',bleed:'ช้ำ'};
+/** One bounded row; details open above combat without changing HUD height. */
+export default function StatusStrip({effects,extra=[],compact=false,align='center'}:{effects?:StatusEffect[];extra?:BattleBadge[];compact?:boolean;align?:'center'|'flex-start'}){
+ const [open,setOpen]=React.useState<string|null>(null);
+ const list:BattleBadge[]=[...extra,...sortForDisplay(effects??[]).map(e=>({id:`status:${e.id}`,name:e.name,symbol:symbols[e.id]??e.name.slice(0,2),bad:isDebuff(e),count:(e.stacks??1)>1?`${e.stacks}`:undefined,detail:`${e.description}\n${(e.stacks??1)>1?`${e.stacks} ชั้น · `:''}${e.duration>=99?'ตลอดการต่อสู้':`เหลือ ${e.duration} เทิร์น`}`}))];
+ const selected=list.find(e=>e.id===open);
+ if(!list.length)return null;
+ return <View style={{width:'100%'}}>
+  <ScrollView horizontal showsHorizontalScrollIndicator={list.length>7} style={{height:44}} contentContainerStyle={{gap:4,alignItems:'center',flexGrow:1,justifyContent:'flex-start',paddingHorizontal:2}}>
+   {list.map(e=><Pressable key={e.id} accessibilityRole="button" accessibilityLabel={`ดู${e.name}`} accessibilityHint={e.detail} onPress={()=>setOpen(e.id)} style={{width:40,height:44,alignItems:'center',justifyContent:'center'}}>
+    <View style={{width:compact?30:32,height:compact?30:32,borderRadius:18,backgroundColor:e.neutral?badgeColors.neutral:e.bad?badgeColors.negative:badgeColors.positive,borderWidth:1,borderColor:e.neutral?badgeColors.neutralLine:e.bad?badgeColors.negativeLine:badgeColors.positiveLine,alignItems:'center',justifyContent:'center'}}><Text numberOfLines={1} style={{fontFamily:font.heading,fontSize:10,color:badgeColors.ink}}>{e.symbol}</Text></View>
+    {!!e.count&&<View style={{position:'absolute',right:0,bottom:0,backgroundColor:badgeColors.counter,borderRadius:8,paddingHorizontal:3}}><Text style={{fontFamily:font.ui,fontSize:9,color:palette.moon}}>{e.count}</Text></View>}
+   </Pressable>)}
+  </ScrollView>
+  <Modal visible={!!selected} transparent animationType="fade" onRequestClose={()=>setOpen(null)}>
+   <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>
+    <Pressable accessibilityLabel="ปิดรายละเอียดสถานะ" onPress={()=>setOpen(null)} style={{position:'absolute',top:0,bottom:0,left:0,right:0}}/>
+    <RitualSurface kind="wood" style={{padding:24,gap:14,maxHeight:'75%'}}>
+     <Text style={{fontFamily:font.heading,fontSize:20,color:palette.moon}}>{selected?.name}</Text>
+     <ScrollView><Text style={{fontFamily:font.body,fontSize:21,lineHeight:29,color:palette.text}}>{selected?.detail}</Text></ScrollView>
+     <Pressable accessibilityRole="button" onPress={()=>setOpen(null)} style={{minHeight:44,alignItems:'center',justifyContent:'center'}}><Text style={{fontFamily:font.heading,color:palette.moon}}>ปิด</Text></Pressable>
+    </RitualSurface>
+   </View>
+  </Modal>
+ </View>;
 }

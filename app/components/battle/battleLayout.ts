@@ -1,4 +1,5 @@
 import { useWindowDimensions } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 /**
  * ตำแหน่งและขนาดของฉากต่อสู้ — จุดเดียวที่ทั้ง MonsterArea และ EnemyHandCard อ้างอิง
@@ -11,9 +12,7 @@ import { useWindowDimensions } from 'react-native';
  */
 
 /** สัดส่วนพื้นที่มอนสเตอร์เทียบกับความสูงจอ */
-const MONSTER_TOP_RATIO    = 0.11;  // ระยะจากขอบบนถึงหัวภาพผี
 const MONSTER_SIZE_RATIO   = 0.36;  // ขนาดภาพผี
-const MONSTER_SIZE_MIN     = 180;
 const MONSTER_SIZE_MAX     = 320;
 
 export type BattleLayout = {
@@ -33,10 +32,11 @@ export type BattleLayout = {
 export function useBattleLayout(): BattleLayout {
   const { width: screenW, height: screenH } = useWindowDimensions();
 
-  const monsterTop  = screenH * MONSTER_TOP_RATIO;
+  const safe=useSafeAreaInsets();
+  const monsterTop = safe.top + 168;
   const monsterSize = Math.min(
     MONSTER_SIZE_MAX,
-    Math.max(MONSTER_SIZE_MIN, screenH * MONSTER_SIZE_RATIO)
+    Math.max(80, Math.min(screenW-24, screenH * MONSTER_SIZE_RATIO, screenH-safe.bottom-380-monsterTop))
   );
 
   return {

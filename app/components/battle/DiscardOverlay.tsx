@@ -19,7 +19,7 @@ export default function DiscardOverlay({cards,maxHandSize,onConfirm,onCancel}:Pr
     <Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,textAlign:'center',marginTop:8}}>มือเต็ม · เลือก {mustDiscard} ใบ ({selected.length}/{mustDiscard})</Text>
    </RitualSurface>
    <ScrollView horizontal showsHorizontalScrollIndicator contentContainerStyle={{paddingHorizontal:16,paddingVertical:20,gap:12,alignItems:'center'}} style={{flexGrow:0}}>
-    {cards.map((item,i)=>{const card={...item,id:item.id??'',dmg:item.dmg??item.damage??item.effects?.damage,block:item.block??item.effects?.block} as CardData;const picked=selected.includes(i);return <Pressable key={`${item.instanceId??item.id??'card'}-${i}`} accessibilityRole="button" accessibilityLabel={item.name} accessibilityState={{selected:picked}} onPress={()=>toggle(i)} style={{width:150,opacity:!picked&&selected.length>=mustDiscard?.5:1}}>
+    {cards.map((item,i)=>{const card={...item,id:item.id??'',dmg:item.dmg??item.damage??item.effects?.damage,block:item.block??item.effects?.block} as CardData;const picked=selected.includes(i);return <Pressable key={`${item.instanceId??item.id??'card'}-${i}`} accessibilityRole="button" accessibilityLabel={item.name} accessibilityState={{selected:picked}} onPress={()=>toggle(i)} style={{width:150,opacity:picked?.4:1}}>
      <RitualSurface kind="occupationPage" style={{minHeight:255,padding:18,alignItems:'center',gap:8}}>
       <Text style={{fontFamily:font.heading,color:paper.red,fontSize:18,alignSelf:'flex-start'}}>{item.cost??0}</Text>
       <CardGlyphArt card={card} size={85}/>

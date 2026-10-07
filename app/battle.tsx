@@ -20,9 +20,8 @@ import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import CardRewardOverlay from './components/battle/CardRewardOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
-import StatusStrip from './components/battle/StatusStrip';
-import ComboStrip from './components/battle/ComboStrip';
-import TrapRow from './components/battle/TrapRow';
+import StatusStrip, {type BattleBadge} from './components/battle/StatusStrip';
+import {COMBO_BY_ID,comboTarget} from '../src/core/combat/combos';
 import MinionRow from './components/battle/MinionRow';
 import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
@@ -298,6 +297,11 @@ export default function BattlePage() {
     }
   }, [currentEvent]);
 
+  const badges:BattleBadge[]=[
+    ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${t.effects.map(e=>e.desc).join(' · ')}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
+    ...(gameState.combo?.progress??[]).flatMap(p=>{const c=COMBO_BY_ID[p.comboId];return c?[{id:`combo:${p.comboId}`,name:c.name,symbol:'ชุด',neutral:true,count:`${p.cardsPlayed.length}/${comboTarget(c)}`,detail:`${c.desc}\nเล่นแล้ว ${p.cardsPlayed.length}/${comboTarget(c)} ใบ`}]:[]}),
+    ...(gameState.combo?.done??[]).flatMap(id=>{const c=COMBO_BY_ID[id];return c?[{id:`done:${id}`,name:c.name,symbol:'✓',detail:`${c.desc}\nคอมโบทำงานแล้วในไฟต์นี้`}]:[]}),
+  ];
   const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
     if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying){dispatch({type:'CompleteNode'});router.replace('/');}
@@ -422,7 +426,7 @@ export default function BattlePage() {
 
         <PlayerHUD
           helpers={<MinionRow owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
-          statuses={(gameState.traps?.length||gameState.combo?.progress?.length||gameState.combo?.done?.length||player.statusEffects?.length)?<View><TrapRow traps={gameState.traps}/><ComboStrip state={gameState}/><StatusStrip effects={player.statusEffects}/></View>:null}
+          statuses={(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges}/>:null}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
           hp={player.hp}

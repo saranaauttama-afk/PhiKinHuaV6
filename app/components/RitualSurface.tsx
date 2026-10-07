@@ -10,6 +10,7 @@ const surfaces={
  cloth:require('../../assets/ui/ritual-cloth.png'),
  notice:require('../../assets/ui/ritual-notice.png'),
  occupationPage:require('../../assets/ui/occupation-page.png'),
+ grayCard:require('../../assets/ui/card-gray/occupation-page.webp'),
  hudPaper:require('../../assets/ui/paper-button.png'),
  blessingHerbs:require('../../assets/ui/blessing-herbs.png'),
  blessingAncestor:require('../../assets/ui/blessing-ancestor.png'),

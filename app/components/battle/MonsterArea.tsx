@@ -96,7 +96,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   return (
     <View pointerEvents="box-none" style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
-      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+8,left:20,right:112,zIndex:layer.decor,paddingHorizontal:15,paddingVertical:10}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>พลัง {enemy?.maxEnergy ?? 2} · เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} compact align="flex-start" />{helpers}</RitualSurface>
+      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+52,left:12,right:12,zIndex:layer.decor,paddingHorizontal:12,paddingVertical:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>พลัง {enemy?.maxEnergy ?? 2} · เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} compact align="flex-start" /></RitualSurface>
+      <View style={{position:"absolute",top:safe.top+2,left:12,right:112}}>{helpers}</View>
       <Animated.View style={floatStyle}>
         {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Pressable, Text, View, StyleSheet } from 'react-native';
 import type { CardData } from '../../src/core/types';
-import { CARD_ART_SOURCES } from '../cardArt';
+import { CARD_ART_SOURCES, GRAY_CARD_ART_SOURCES } from '../cardArt';
 import { cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
 import { font, paper } from '../theme';
@@ -12,8 +12,14 @@ const glyphs = {
   breath: require('../../assets/ui/card-breath.png'), trap: require('../../assets/ui/ritual-knife.png'),
   equipment: require('../../assets/ui/ritual-jar.png'), curse: require('../../assets/ui/trail-ghost.png'),
 };
-export function CardGlyphArt({ card, size = 76 }: { card: CardData; size?: number }) {
-  return <Image accessible={false} source={CARD_ART_SOURCES[card.id] ?? glyphs[cardGlyph(card)]} resizeMode="contain" style={{ width: size, height: size, tintColor: !CARD_ART_SOURCES[card.id] && cardGlyph(card) === 'curse' ? paper.red : undefined }} />;
+const grayGlyphs = {
+  clap: require('../../assets/ui/card-gray/card-clap.webp'), sword: require('../../assets/ui/card-gray/card-sword.webp'),
+  stance: require('../../assets/ui/card-gray/card-stance.webp'), parry: require('../../assets/ui/card-gray/card-parry.webp'),
+  breath: require('../../assets/ui/card-gray/card-breath.webp'), trap: require('../../assets/ui/card-gray/ritual-knife.webp'),
+  equipment: require('../../assets/ui/card-gray/ritual-jar.webp'), curse: require('../../assets/ui/card-gray/trail-ghost.webp'),
+};
+export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardData; size?: number; muted?: boolean }) {
+  return <Image accessible={false} source={muted ? (GRAY_CARD_ART_SOURCES[card.id] ?? grayGlyphs[cardGlyph(card)]) : (CARD_ART_SOURCES[card.id] ?? glyphs[cardGlyph(card)])} resizeMode="contain" style={{ width: size, height: size, tintColor: !muted && !CARD_ART_SOURCES[card.id] && cardGlyph(card) === 'curse' ? paper.red : undefined }} />;
 }
 export default function DeckCard({ card, count, onPress }: { card: CardData; count: number; onPress: () => void }) {
   return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name ?? card.id} จำนวน ${count} ใบ`} accessibilityHint={`พลังงาน ${card.cost ?? 0} · ${cardSummary(card)}`} onPress={onPress} style={styles.touch}>
