@@ -36,11 +36,13 @@ export default function SceneArrival({ source, sceneKey, children }: Props) {
   const ready = frame.key === sceneKey && (reducedMotion || elapsed >= WALK_MS + FADE_MS);
   return (
     <View style={{ flex: 1, overflow: 'hidden', backgroundColor: pulpColors.sceneInk }}>
+      <View pointerEvents="none" style={[StyleSheet.absoluteFill,{overflow:'hidden'}]}>
       <View collapsable={false} pointerEvents="none" style={[StyleSheet.absoluteFill, { transform: [
         { scale: reducedMotion ? 1.04 : 1.04 + travel * .24 },
         { translateY: reducedMotion ? 0 : Math.sin(travel * Math.PI * 8) * 10 * (1 - travel * .35) },
       ] }]}>
         <Image source={source} resizeMode="cover" style={{width:'100%',height:'100%'}} />
+      </View>
       </View>
       <View collapsable={false} pointerEvents={ready ? 'auto' : 'none'} accessibilityElementsHidden={!ready}
         importantForAccessibility={ready ? 'auto' : 'no-hide-descendants'} style={{flex:1,opacity}}>

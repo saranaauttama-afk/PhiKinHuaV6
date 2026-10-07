@@ -111,3 +111,26 @@ describe('ข้ามเลเวลอัป', () => {
     expect(s.levelUp?.consumed ?? true).toBe(true);
   });
 });
+
+describe('explicit level reward results',()=>{
+ it('upgrades the selected second card and shows its result',()=>{
+  let s=reachLevelUp();s.levelUp={choice:{optionA:'upgrade',optionB:'max_hp'}};
+  const before=s.masterDeck.map(c=>({...c}));
+  s=step(s,{type:'ChooseLevelUpOption',option:'A',index:1});
+  expect(s.masterDeck[0]).toEqual(before[0]);
+  expect(s.masterDeck[1].upgradeLevel).toBe(1);
+  expect(s.levelUp?.result?.text).toContain(s.masterDeck[1].name);
+ });
+ it('adds 8 max HP and heals 8 with an explicit before/after result',()=>{
+  let s=reachLevelUp();s.levelUp={choice:{optionA:'upgrade',optionB:'max_hp'}};s.player.maxHp=44;s.player.hp=30;
+  s=step(s,{type:'ChooseLevelUpOption',option:'B'});
+  expect(s.player.maxHp).toBe(52);expect(s.player.hp).toBe(38);
+  expect(s.levelUp?.result?.text).toContain('44 → 52');
+ });
+ it('does not consume an invalid card choice or upgrade another card silently',()=>{
+  let s=reachLevelUp();s.levelUp={choice:{optionA:'upgrade',optionB:'max_hp'}};
+  const before=s.masterDeck;
+  s=step(s,{type:'ChooseLevelUpOption',option:'A',index:999});
+  expect(s.masterDeck).toEqual(before);expect(s.phase).toBe('levelup');expect(s.levelUp?.consumed).not.toBe(true);
+ });
+});

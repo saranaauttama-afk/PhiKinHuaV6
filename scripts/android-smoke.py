@@ -174,7 +174,10 @@ if '--helpers-only' not in sys.argv:
             option=next((n for n in root.iter('node') if n.get('clickable')=='true' and any('พลังชีวิต' in t or 'ช่องเครื่องราง' in t or 'พลังงาน' in t for t in fields(n))),None)
             if option is not None:
                 touch(option);wait_for('เลือกไว้แล้ว',contains=True);shot('09-level-up-selected')
-            touch(wait_for('ข้ามไปก่อน'))
+                tap('ยืนยันวิชา')
+                wait_for('ของที่เก็บได้');root=shot('09-level-up-applied')
+                assert any('→' in t and any(x in t for x in ['ชีวิตสูงสุด','พลังงานต่อเทิร์น','ช่องเครื่องราง']) for t in labels(root)), 'Applied level reward result not visible'
+            else: touch(wait_for('ข้ามไปก่อน'))
         elif reward is not None:
             shot('10-card-reward')
             cards=[n for n in root.iter('node') if re.match(r'^การ์ด .+ พลัง \d+$',n.get('content-desc',''))]

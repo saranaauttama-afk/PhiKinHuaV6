@@ -26,11 +26,22 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
   const selectedBucket = cmd.option === 'A' ? choice.optionA : choice.optionB;
   const idx = cmd.index ?? 0;
   
+  if ((selectedBucket==='upgrade'||selectedBucket==='remove') &&
+      (idx<0||idx>=s.masterDeck.length||(selectedBucket==='upgrade'&&!canUpgrade(s.masterDeck[idx])))) return {state:s,rng:r};
+  const before={hp:s.player.hp,maxHp:s.player.maxHp,energy:s.player.maxEnergy,hand:s.player.maxHandSize,slots:s.equipmentSlotsMax??2,card:s.masterDeck[idx]?.name};
   // Store the selected option for UI display
   choice.selectedOption = cmd.option;
   
   applyBucketChoice(s, selectedBucket, idx);
   s.levelUp.consumed = true;
+  const text=selectedBucket==='max_hp'?`ชีวิตสูงสุด ${before.maxHp} → ${s.player.maxHp} · ชีวิต ${before.hp} → ${s.player.hp}`
+    :selectedBucket==='upgrade'?`ปลุกเสกสำเร็จ · ${s.masterDeck[idx]?.name}`
+    :selectedBucket==='remove'?`สละ ${before.card} ออกจากสำรับแล้ว`
+    :selectedBucket==='max_energy'?`พลังงานต่อเทิร์น ${before.energy} → ${s.player.maxEnergy}`
+    :selectedBucket==='max_hand'?`ขนาดมือ ${before.hand} → ${s.player.maxHandSize}`
+    :selectedBucket==='equipment_slot'?`ช่องเครื่องราง ${before.slots} → ${s.equipmentSlotsMax}`
+    :selectedBucket==='blessing'?`รับพร ${s.levelUp.blessingChoices?.[idx]?.name??''} แล้ว`:'รับเบี้ยเพิ่มแล้ว';
+  s.levelUp.result={fight:s.fightCount??0,text};s.log.push(text);
 
   // เลเวลอัปเสร็จแล้ว ยังอาจมีการ์ดรางวัลรออยู่
   advanceAfterVictory(s);

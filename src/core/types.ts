@@ -417,6 +417,7 @@ export type GameState = {
     };
     blessingChoices?: BlessingDef[];
     consumed?: boolean;
+    result?: { fight: number; text: string };
   } | null;
 
   /** การ์ดรางวัลที่รอให้เลือกหลังชนะไฟต์ — ดู `cards/reward.ts` */

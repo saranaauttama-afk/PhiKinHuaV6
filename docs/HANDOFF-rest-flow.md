@@ -10,7 +10,7 @@ User approved implementation of the three-screen mockup on 2026-10-07. Branch: `
 
 ## Checks
 
-TypeScript, all 551 tests and web export pass. Actual components were inspected at 393×852 and 360×640: selection + confirm dispatch, direct rest entry and choice-to-result replacement worked. Short-screen content scrolls above the reserved HUD. The temporary QA route was removed before export/commit. Android smoke now exercises the direct-entry path and asserts that intermediate rest buttons and previous story choices are absent. APK/native result is pending; do not claim a physical-device test.
+TypeScript, all 551 tests and web export pass. Actual components were inspected at 393×852 and 360×640: selection + confirm dispatch, direct rest entry and choice-to-result replacement worked. Short-screen content scrolls above the reserved HUD. The temporary QA route was removed before export/commit. Android smoke now exercises the direct-entry path and asserts that intermediate rest buttons and previous story choices are absent. APK audit and API 36 native smoke passed in final run 37638483159; do not claim a physical-device test.
 
 ## Art
 
@@ -18,4 +18,4 @@ New built-in imagegen asset: `assets/ui/ritual-dark-cloth.webp`, used through me
 
 ## Final build
 
-Final source commit: `793e57feb7b8aa9ded35617276caccf1c24888cd`. APK/package audit/API 36 smoke run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37638483159 . In progress when this handoff was written. The earlier v1.0.13 run 37638172898 predates the native assertion helper correction; use the final run above. The native assertion helpers were verified locally against sample accessibility XML.
+Final source commit: `793e57feb7b8aa9ded35617276caccf1c24888cd`. APK/package audit/API 36 smoke run: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37638483159 . Build, package/signing/16KB audit and API 36 native smoke verified successful on 2026-10-07. The earlier v1.0.13 run 37638172898 predates the native assertion helper correction; use the final run above. The native assertion helpers were verified locally against sample accessibility XML.

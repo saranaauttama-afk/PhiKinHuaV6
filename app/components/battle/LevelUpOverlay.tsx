@@ -7,6 +7,8 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { CardData, GameState } from '../../../src/core/types';
 import CardRow from '../CardRow';
+import UpgradeCardPicker from '../UpgradeCardPicker';
+import {canUpgrade} from '../../../src/core/engine/shared';
 import { font, size, space } from '../../theme';
 
 /**
@@ -34,7 +36,7 @@ const labelOf = (bucket: string) =>
   BUCKET_LABEL[bucket] ?? { title: bucket, detail: '' };
 
 /** ตัวเลือกที่ต้องเลือกของย่อยอีกชั้น */
-const NEEDS_PICK = new Set(['blessing']);
+const NEEDS_PICK = new Set(['blessing','upgrade','remove']);
 
 type Props = {
   state: GameState;
@@ -49,6 +51,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
   const [selected,setSelected]=React.useState<'A'|'B'|null>(null);
   const [pending, setPending] = React.useState<'A' | 'B' | null>(null);
 
+  const [cardIndex,setCardIndex]=React.useState<number|null>(null);
   if (!choice) return null;
 
   const bucketOf = (opt: 'A' | 'B') => (opt === 'A' ? choice.optionA : choice.optionB);
@@ -78,7 +81,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
   };
 
   const press = (opt: 'A' | 'B') => {
-    if (NEEDS_PICK.has(bucketOf(opt)) && subChoices(opt).length > 0) {
+    if (bucketOf(opt)==='upgrade'||bucketOf(opt)==='remove'||(NEEDS_PICK.has(bucketOf(opt)) && subChoices(opt).length > 0)) {
       setPending(opt);   // ต้องเลือกของย่อยก่อน
       return;
     }
@@ -91,7 +94,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         <Text style={{color:palette.moon,fontSize:24,textAlign:'center',fontFamily:font.heading}}>เลเวล {playerLevel}</Text>
       </RitualSurface>
       <Text style={{color:palette.text,fontSize:14,fontFamily:font.ui,textAlign:'center',marginBottom:20}}>
-        {pending ? 'เลือกพรหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนา'}
+        {pending ? bucketOf(pending)==='upgrade'?'เลือกการ์ดที่จะปลุกเสกฟรี 1 ใบ':bucketOf(pending)==='remove'?'เลือกการ์ดที่จะสละ 1 ใบ':'เลือกพรหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนา'}
       </Text>
 
       {pending === null ? (
@@ -104,12 +107,13 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
               :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
               :bucket==='upgrade'||bucket==='remove'?require('../../../assets/ui/ritual-knife.png')
               :require('../../../assets/ui/card-breath.png');
-            return <Pressable key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked}}
+            const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.length:false;
+            return <Pressable disabled={unavailable} key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked,disabled:unavailable}}
               onPress={()=>setSelected(opt)} style={{flex:1}}>
               <Image accessible={false} source={image} resizeMode="contain" style={{width:'100%',height:140,marginBottom:12}}/>
               <RitualSurface kind="darkCloth" style={{flex:1,minHeight:180,paddingHorizontal:17,paddingVertical:20}}>
                 <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:17,textAlign:'center'}}>{l.title}</Text>
-                <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:22,textAlign:'center',marginTop:8}}>{l.detail}</Text>
+                <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:22,textAlign:'center',marginTop:8}}>{unavailable?'ไม่มีการ์ดที่เลือกได้':l.detail}</Text>
                 <View style={{minHeight:28,marginTop:10,justifyContent:'center'}}>
                   {picked&&<Text style={{fontFamily:font.heading,color:palette.bloodLit,fontSize:12,textAlign:'center'}}>✓ เลือกไว้แล้ว</Text>}
                 </View>
@@ -121,7 +125,9 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         </View>
       ) : (
         <View>
-          <ScrollView style={{ maxHeight: 340 }} contentContainerStyle={{ gap: 12 }}>
+          {(bucketOf(pending)==='upgrade'||bucketOf(pending)==='remove')?<View style={{gap:16}}>
+            <UpgradeCardPicker cards={deck} selected={cardIndex} onSelect={setCardIndex} remove={bucketOf(pending)==='remove'} onConfirm={i=>onChoose(pending,i)}/>
+          </View>:<ScrollView style={{ maxHeight: 340 }} contentContainerStyle={{ gap: 12 }}>
             {subChoices(pending).map((sc, i) => (
               <Pressable
                 key={sc.key}
@@ -160,9 +166,9 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                 )}
               </Pressable>
             ))}
-          </ScrollView>
+          </ScrollView>}
 
-          <Pressable onPress={() => setPending(null)} style={{ marginTop: 14, alignSelf: 'center' }}>
+          <Pressable onPress={() => {setPending(null);setCardIndex(null);}} style={{ marginTop: 14, alignSelf: 'center' }}>
             <Text style={{ color: palette.textDim, fontFamily:font.ui,fontSize: 14 }}>◂ ย้อนกลับ</Text>
           </Pressable>
         </View>

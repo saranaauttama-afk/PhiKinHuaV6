@@ -27,3 +27,14 @@ describe('destination scene after completing a location', () => {
     expect(mapSceneStage(state)).toBe(2);
   });
 });
+
+import {episodeSceneId,battleSceneStage} from '../app/scenePresentation';
+it('uses five distinct episode destinations and the visited arena during combat',()=>{
+ const s=baseNewState('scene-route');s.runMode='episode';s.journey=buildEpisode();
+ const sources=[episodeSceneId(mapSceneStage(s))];
+ for(let row=0;row<4;row++){moveTo(s.journey,`e${row}_0`);sources.push(episodeSceneId(mapSceneStage(s)));}
+ expect(new Set(sources).size).toBe(5);
+ moveTo(s.journey,'e2_0');s.phase='combat';
+ expect(episodeSceneId(battleSceneStage(s))).toBe(sources[2]);
+ expect(episodeSceneId(battleSceneStage(s))).not.toBe(episodeSceneId(mapSceneStage(s)));
+});

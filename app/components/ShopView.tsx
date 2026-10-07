@@ -11,16 +11,27 @@
 // พฤติกรรมทุกอย่างเหมือนเดิมเป๊ะ — คำสั่งที่ dispatch, เงื่อนไขที่กดได้/ไม่ได้,
 // จำนวนครั้งที่ใช้ได้ ยกมาครบ เปลี่ยนแค่หน้าตากับภาษา
 
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
+import {palette,surface,paper} from '../theme';
+import RitualSurface from './RitualSurface';
+import SceneArrival from './SceneArrival';
+import UpgradeCardPicker,{upgradeSummary} from './UpgradeCardPicker';
+import {upgradeCard} from '../../src/core/engine/shared';
 import React from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
 import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import FusionAltarView from './FusionAltarView';
-import Panel, { GameButton } from './Panel';
+import { GameButton } from './Panel';
 import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
+
+function Panel({title,children}:{title:string;children:React.ReactNode}) {
+  return <RitualSurface kind="darkCloth" style={{padding:22,gap:10,width:'100%',minWidth:0}}>
+    <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:23,lineHeight:32}}>{title}</Text>
+    {children}
+  </RitualSurface>;
+}
 
 interface ShopViewProps {
   state: GameState;
@@ -83,22 +94,8 @@ function ItemChip({
 }
 
 /** บรรทัดบอกว่าทำไมตอนนี้ยังใช้ไม่ได้ */
-function Unavailable({ text }: { text: string }) {
-  return (
-    <View style={{
-      paddingHorizontal: space.lg, paddingVertical: space.md,
-      borderRadius: radius.md,
-      backgroundColor: surface.panelDim,
-      borderWidth: 1, borderColor: palette.line,
-    }}>
-      <Text style={{
-        color: palette.textFaint, textAlign: 'center',
-        fontSize: size.ui, fontFamily: font.ui,
-      }}>
-        {text}
-      </Text>
-    </View>
-  );
+function Unavailable({text}:{text:string}) {
+ return <RitualSurface kind="wood" style={{padding:20,minHeight:70,justifyContent:'center'}}><Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,lineHeight:24,textAlign:'center'}}>{text}</Text></RitualSurface>;
 }
 
 function Money({ state }: { state: GameState }) {
@@ -115,8 +112,8 @@ function Money({ state }: { state: GameState }) {
 function Lead({ children }: { children: React.ReactNode }) {
   return (
     <Text style={{
-      color: palette.textDim, fontSize: size.bodyLg,
-      fontFamily: font.body, lineHeight: 26, marginBottom: space.md,
+      color: palette.textDim, fontSize: 14,
+      fontFamily: font.ui, lineHeight: 25, marginBottom: space.md,
     }}>
       {children}
     </Text>
@@ -125,6 +122,9 @@ function Lead({ children }: { children: React.ReactNode }) {
 
 export default function ShopView({ state, dispatch }: ShopViewProps) {
   const pad = useScreenPadding();
+  const [selected,setSelected]=React.useState<number|null>(null);
+  const [notice,setNotice]=React.useState('');
+  React.useEffect(()=>{setSelected(null);setNotice('');},[state.phase,state.shopKind,state.currentShopId]);
   if (state.phase !== 'shop') return null;
   const kind = state.shopKind;
 
@@ -198,35 +198,22 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   };
 
   const upgradeShop = () => {
-    const count = state.runCounters?.upgradeShopCount ?? 0;
-    const cost = upgradeCostForCount(count);
-    return (
-      <Panel title="ปลุกเสกการ์ด">
-        <Lead>โต๊ะพิธีตั้งอยู่กลางลาน ธูปยังไหม้ค้าง เจ้าพิธีรอเราอยู่แล้ว</Lead>
-        <Money state={state} />
-        <Text style={{ color: palette.moonDim, fontSize: size.label, marginBottom: space.md, fontFamily: font.ui }}>
-          ปลุกเสกไปแล้ว {count} ครั้ง · ใบหนึ่งปลุกได้ถึงขั้น {MAX_UPGRADE_LEVEL} · ราคาขึ้นตามขั้นของใบ
-        </Text>
-        <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-          {deck.map((card, i) => (
-            <ItemChip
-              key={i}
-              title={card.name || card.id}
-              line={cardLine(card)}
-              // ใบที่ปลุกไปแล้วยังโชว์อยู่แต่กดไม่ได้ — ซ่อนทิ้งจะทำให้ลำดับ index
-              // ที่ส่งเข้า dispatch เพี้ยนจากสำรับจริง
-              note={
-                canUpgrade(card)
-                  ? `ขั้น ${upgradeLevelOf(card)} → ${upgradeLevelOf(card) + 1} · ${upgradeCostForCount(count + upgradeLevelOf(card))} เบี้ย`
-                  : 'สุดขั้นแล้ว'
-              }
-              disabled={!canUpgrade(card)}
-              onPress={() => dispatch({ type: 'ShopUpgradeBuy', index: i })}
-            />
-          ))}
-        </View>
-      </Panel>
-    );
+    const count=state.runCounters?.upgradeShopCount??0;
+    const card=selected===null?undefined:deck[selected];
+    const price=card?upgradeCostForCount(count+upgradeLevelOf(card)):0;
+    const available=!!card&&canUpgrade(card)&&(state.player.gold??0)>=price;
+    return <Panel title="ปลุกเสกการ์ด">
+      <Lead>เลือกหนึ่งใบ ดูผลหลังปลุกเสก แล้วกดยืนยัน</Lead>
+      <Money state={state}/>
+      {!!notice&&<Text accessibilityLiveRegion="polite" style={{fontFamily:font.ui,color:palette.moon,fontSize:14,lineHeight:24}}>{notice}</Text>}
+      <UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} price={c=>upgradeCostForCount(count+upgradeLevelOf(c))} disabledConfirm={!available} onConfirm={index=>{
+        const target=deck[index];const cost=upgradeCostForCount(count+upgradeLevelOf(target));
+        if(!canUpgrade(target)||(state.player.gold??0)<cost)return;
+        const next=upgradeCard(target);dispatch({type:'ShopUpgradeBuy',index});
+        setNotice(`ปลุกเสกสำเร็จ · ${next.name}\n${upgradeSummary(next)}`);setSelected(null);
+      }}/>
+      {card&&!available&&<Text style={{fontFamily:font.ui,color:palette.bloodLit,fontSize:13}}>เบี้ยไม่พอ หรือการ์ดสุดขั้นแล้ว</Text>}
+    </Panel>;
   };
 
   const healingShrine = () => {
@@ -239,6 +226,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
 
     return (
       <Panel title="ศาลพักใจ">
+        {!!notice&&<Text accessibilityLiveRegion="polite" style={{fontFamily:font.ui,color:palette.moon,fontSize:14,lineHeight:24}}>{notice}</Text>}
         <Lead>ศาลไม้เล็กๆ ใต้ต้นโพธิ์ ผ้าแพรสีซีดพลิ้วอยู่ทั้งที่ไม่มีลม</Lead>
         <Text style={{ color: palette.textDim, fontSize: size.label, marginBottom: space.md, fontFamily: font.ui }}>
           เบี้ย {state.player.gold ?? 0} · เลือด {state.player.hp}/{state.player.maxHp} · ใช้ได้อีก {Math.max(0, maxUses - used)} ครั้ง
@@ -248,7 +236,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           <GameButton
             label={`ขอพร ${cost} เบี้ย (ฟื้น ${missing})`}
             tone="primary"
-            onPress={() => dispatch({ type: 'UseHealingShrine' })}
+            onPress={() => {dispatch({ type: 'UseHealingShrine' });setNotice(`พักฟื้นแล้ว · ชีวิต ${state.player.maxHp}/${state.player.maxHp}`);}}
           />
         ) : (
           <Unavailable
@@ -343,43 +331,27 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     );
   };
 
-  return (
-    <View style={{
-      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: palette.scrimHeavy,
-      zIndex: layer.overlay,
-    }}>
-      <PaperTexture />
-      <ScrollView contentContainerStyle={{ padding: space.lg, paddingTop: pad.top, paddingBottom: pad.bottom + space.xl }}>
-        {kind === 'card'            && cardShop()}
-        {kind === 'equipment'       && equipmentShop()}
-        {kind === 'remove'          && removeShop()}
-        {kind === 'upgrade'         && upgradeShop()}
-        {kind === 'healing'         && healingShrine()}
-        {kind === 'well'            && well()}
-        {kind === 'treasure'        && treasure()}
-        {kind === 'treasure_single' && singleTreasure()}
-        {kind === 'fusion'          && <FusionAltarView state={state} dispatch={dispatch} />}
-
-        <View style={{
-          marginTop: space.xl, flexDirection: 'row',
-          justifyContent: 'center', gap: space.md,
-        }}>
-          <GameButton
-            label="เดินทางต่อ ▸"
-            tone="primary"
-            onPress={() => dispatch({ type: 'CompleteNode' })}
-          />
-          {/* แท่นผสานกับเหตุการณ์ไม่ใช่ร้าน ไม่มีอะไรให้ "ลบทิ้ง" */}
-          {kind !== 'fusion' && (
-            <GameButton
-              label="ทำลายทิ้ง"
-              tone="danger"
-              onPress={() => dispatch({ type: 'DeleteShop' })}
-            />
-          )}
+  const background=kind==='healing'||kind==='well'?require('../../assets/scence/rest.jpg'):require('../../assets/ui/deck-mat.jpg');
+  const object=kind==='healing'||kind==='well'?require('../../assets/ui/blessing-shrine-object.png'):kind==='upgrade'||kind==='remove'?require('../../assets/ui/ritual-knife.png'):require('../../assets/ui/ritual-jar.png');
+  return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
+    <SceneArrival sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
+      <View style={{flex:1,backgroundColor:surface.glassDim}}>
+        <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+20,paddingBottom:24,gap:12}}>
+          <Image accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?180:95}}/>
+          {kind === 'card'            && cardShop()}
+          {kind === 'equipment'       && equipmentShop()}
+          {kind === 'remove'          && removeShop()}
+          {kind === 'upgrade'         && upgradeShop()}
+          {kind === 'healing'         && healingShrine()}
+          {kind === 'well'            && well()}
+          {kind === 'treasure'        && treasure()}
+          {kind === 'treasure_single' && singleTreasure()}
+          {kind === 'fusion'          && <FusionAltarView state={state} dispatch={dispatch} />}
+        </ScrollView>
+        <View style={{paddingHorizontal:16,paddingTop:8,paddingBottom:pad.bottom+12}}>
+          <GameButton label="เดินทางต่อ" tone="primary" onPress={()=>dispatch({type:'CompleteNode'})}/>
         </View>
-      </ScrollView>
-    </View>
-  );
+      </View>
+    </SceneArrival>
+  </View>;
 }

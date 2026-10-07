@@ -1,3 +1,4 @@
+import {battleScene} from './scenePresentation';
 import React from 'react';
 import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
@@ -308,7 +309,7 @@ export default function BattlePage() {
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={require('../assets/scence/episode-village.jpg')}
+        source={battleScene(gameState).source}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
@@ -495,6 +496,7 @@ export default function BattlePage() {
         {/* หลังรับทราบชัยชนะและเลือกอัปเกรด จึงแสดงการ์ดรางวัล */}
         {!victoryIntro && !timeline.isPlaying && gameState.phase === 'reward' && gameState.cardReward && (
           <CardRewardOverlay
+            notice={gameState.levelUp?.result?.fight===(gameState.fightCount??0)?gameState.levelUp.result.text:undefined}
             choices={gameState.cardReward.choices}
             deck={gameState.masterDeck ?? []}
             onChoose={(index) => dispatch({ type: 'ChooseCardReward', index })}
