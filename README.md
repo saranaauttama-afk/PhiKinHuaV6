@@ -4,7 +4,7 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest gameplay pass
 
-`work/occupation-table`: **v1.0.15/code 16** pilots warrior block/counter and strength/multiple-hit builds, medium spirit/poison builds, six new class cards, five real ghost signatures and 16 original card illustrations. Chapter rewards offer distinct attack/setup/engine options. The 160-run pilot uses real cards without hidden enemy-intent knowledge; 563 tests pass. Start a new run for the complete starter balance. APK/native build pending. See `docs/HANDOFF-chapter-builds.md` and `docs/card-art-prompts-v15.json`.
+`work/occupation-table`: **v1.0.15/code 16** pilots warrior block/counter and strength/multiple-hit builds, medium spirit/poison builds, six new class cards, five real ghost signatures and 16 original card illustrations. Chapter rewards offer distinct attack/setup/engine options. The 160-run pilot uses real cards without hidden enemy-intent knowledge; 563 tests pass. Start a new run for the complete starter balance. [APK/native build in progress](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37658871240). See `docs/HANDOFF-chapter-builds.md` and `docs/card-art-prompts-v15.json`.
 
 ## Latest UI follow-up
 

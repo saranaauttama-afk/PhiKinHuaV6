@@ -43,9 +43,9 @@ v1.0.14 APK/audit succeeded, but native smoke run 37652373221 failed when compar
 
 ## Validation
 
-563 tests passed; TypeScript and clean web export passed with the temporary QA route removed. Mobile web at 393×852 and 360×640 verified all five dealt cards, illustrated preview/play callbacks and reward selection with readable conditional details. All 16 art assets were visually inspected and alpha/512px bounds checked (1,535,074 bytes total). Enemy reveal art and actual effect description were inspected. Post-battle viewport now clips its background to avoid the source image extending the web document to 900px.
+563 tests passed; TypeScript and clean web export passed with the temporary QA route removed. Mobile web at 393×852 and 360×640 verified all five dealt cards, illustrated preview/play callbacks and reward selection with readable conditional details. All 16 art assets were visually inspected and alpha/512px bounds checked (1,535,074 bytes total). Enemy reveal art and actual effect description were inspected. Production web flow also verified medium selection, prologue/blessing, live 42-HP encounter, all five initial cards and exact saved hand after restarting from the app root. Reloading an existing `/battle?monsterId=...` developer URL uses its existing direct-combat fallback rather than the app-root resume flow; the cold-root test mirrors native launcher behavior. Post-battle viewport now clips its background to avoid the source image extending the web document to 900px.
 
-Final APK/native run will be recorded after push.
+Source commit `4ce638941e80f6d4ffd0199e4fcebbca64ecdd5e`. APK/audit/API 36 smoke: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37658871240 . Build in progress; no native pass claimed yet.
 
 Seeded pilot: 40 seeds × two classes × two policies = 160 real-card chapter runs, no synthetic damage/HP or hidden enemy-intent knowledge. Both policies take reward index 0, skip level-ups, take the rest/event recovery and choose alternating routes. The board policy evaluates conditions, helper setup, status/energy/draw and a bounded defense budget. It is a heuristic, not an optimal player or human win-rate estimate.
 
