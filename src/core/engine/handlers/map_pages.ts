@@ -213,13 +213,13 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.enemy.hp = s.enemy.maxHp = hp;
         const energy = (s.fightCount ?? 0) === 0 ? EPISODE.firstEnergy : EPISODE.secondEnergy;
         s.enemy.maxEnergy = deck.maxEnergy = energy;
-        s.enemy.handSize = deck.handSize = energy;
+        s.enemy.handSize = deck.handSize = energy+1;
       }
       if (s.runMode === 'episode' && offer.enemyId === 'phi-pong-kang') {
         s.enemy.hp = s.enemy.maxHp = EPISODE.finaleHp;
         s.enemy.maxEnergy = EPISODE.finaleEnergy;
-        s.enemy.handSize = 3;
-        deck.handSize = 3;
+        s.enemy.handSize = 5;
+        deck.handSize = 5;
         deck.maxEnergy = EPISODE.finaleEnergy;
         s.enemy.name = 'โป่งค่างเฝ้าบ้านร้าง';
       }

@@ -275,7 +275,9 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   // ★ AI learning from player card usage
   onPlayerCardPlayed(state, modifiedCard);
   
+  if(modifiedCard.cleanseDebuffs)require('./statusEffectsRuntime').clearAllStatusEffects('player',state,'debuff');
   // draw will be handled by reducer after moving the card
+  return modifiedCard;
 }
 
 export function isVictory(state: GameState): boolean {

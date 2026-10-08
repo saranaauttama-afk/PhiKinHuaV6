@@ -271,7 +271,7 @@ function reduceStatusEffectDurations(
   const effectsToRemove: string[] = [];
 
   for (const effect of targetState.statusEffects) {
-    if (effect.duration > 0) {
+    if (effect.duration > 0 && effect.duration < 99) {
       effect.duration -= 1;
       
       if (effect.duration <= 0) {

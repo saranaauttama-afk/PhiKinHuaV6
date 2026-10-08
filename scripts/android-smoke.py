@@ -89,9 +89,9 @@ if '--helpers-only' not in sys.argv:
     assert any(t.startswith('EXP ') for t in labels(root)), 'EXP missing from player details'
     tap('ปิดข้อมูลผู้เดินทาง');wait_for('ผีปอบ')
     tap('สำรับ ',contains=True);wait_for('สำรับของเรา');shot('04-deck')
-    tap('ดูการ์ด ฟันดาบวัด จำนวน 4 ใบ',contains=True);wait_for('รายละเอียดการ์ด');root=shot('04-deck-detail')
+    tap('ดูการ์ด ฟันดาบวัด จำนวน 3 ใบ',contains=True);wait_for('รายละเอียดการ์ด');root=shot('04-deck-detail')
     assert has(root,'ฟันดาบวัด'), 'Wrong card detail opened'
-    assert any('×4' in t for t in labels(root)), 'Grouped count missing in card detail'
+    assert any('×3' in t for t in labels(root)), 'Grouped count missing in card detail'
     tap('กลับไปดูสำรับ');wait_for('สำรับของเรา');tap('ปิด');wait_for('ผีปอบ')
     root=dump();assert any('เบี้ย 25' in t for t in labels(root)), 'Currency label missing'
     tap('พร ',contains=True);wait_for('พรติดตัว');shot('04-blessings')

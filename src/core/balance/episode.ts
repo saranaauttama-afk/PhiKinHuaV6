@@ -5,7 +5,7 @@ export const EPISODE = {
   firstHp: 42,
   secondHp: 50,
   finaleHp: 68,
-  firstEnergy: 2,
+  firstEnergy: 3,
   secondEnergy: 3,
   finaleEnergy: 4,
   startingGold: 25,

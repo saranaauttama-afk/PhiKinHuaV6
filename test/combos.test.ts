@@ -137,7 +137,7 @@ describe('การนับคอมโบ', () => {
     state.turn = 1;
 
     play(state, 'muay_stance', 'warrior');
-    expect(state.combo!.progress).toHaveLength(1);
+    expect(state.combo!.progress.map(p=>p.comboId)).toEqual(['muay_combination','ward_counter_chain']);
 
     state.turn = 1 + COMBO_BY_ID['muay_combination'].maxTurns;
     expireCombos(state);
@@ -314,7 +314,7 @@ describe('คอมโบไม่ค้างข้ามไฟต์', () => {
 
     play(a, 'muay_stance', 'warrior');
 
-    expect(a.combo!.progress).toHaveLength(1);
+    expect(a.combo!.progress.map(p=>p.comboId)).toEqual(['muay_combination','ward_counter_chain']);
     expect(b.combo!.progress, 'คอมโบข้ามไปโผล่ใน state อื่น').toHaveLength(0);
   });
 });

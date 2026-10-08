@@ -156,7 +156,7 @@
     "name": "น้ำมนต์",
     "type": "skill",
     "cost": 1,
-    "heal": 7,
+    "heal": 5,
     "rarity": "Common",
     "inShop": true,
     "tags": [
@@ -164,7 +164,7 @@
       "thai",
       "nun"
     ],
-    "desc": "พรมน้ำมนต์ ฟื้นพลังชีวิต 7"
+    "desc": "พรมน้ำมนต์ ฟื้นพลังชีวิต 5"
   },
   {
     "id": "loving_kindness",
@@ -212,15 +212,16 @@
       "thai",
       "nun"
     ],
-    "desc": "ปัดเป่าสิ่งไม่ดี จั่ว 1 ใบ"
+    "desc": "ปัดเป่าสถานะลบทั้งหมดออกจากตัวเอง",
+    "cleanseDebuffs": true
   },
   {
     "id": "alms_offering",
     "name": "สังฆทาน",
     "type": "skill",
-    "cost": 0,
+    "cost": 1,
     "energyGain": 1,
-    "heal": 2,
+    "heal": 4,
     "rarity": "Common",
     "inShop": true,
     "tags": [
@@ -229,7 +230,7 @@
       "thai",
       "nun"
     ],
-    "desc": "ถวายสังฆทาน ได้พลังงาน 1 และฟื้น 2"
+    "desc": "รับบิณฑบาต ฟื้นพลังชีวิต 4 ต้องเลือกระหว่างรักษากับโจมตี"
   },
   {
     "id": "dharma_wheel",
@@ -244,7 +245,16 @@
       "thai",
       "nun"
     ],
-    "desc": "หมุนธรรมจักรใส่อธรรม สร้างความเสียหาย 7"
+    "desc": "โจมตี 7 ถ้ามีป้องกันอย่างน้อย 7 โจมตีเพิ่ม 5",
+    "conditional": {
+      "when": {
+        "kind": "player_block_at_least",
+        "value": 7
+      },
+      "bonus": {
+        "dmg": 5
+      }
+    }
   },
   {
     "id": "five_precepts",
@@ -256,8 +266,8 @@
     "statusEffect": {
       "target": "player",
       "effect": "regeneration",
-      "duration": 5,
-      "value": 3
+      "duration": 3,
+      "value": 2
     },
     "tags": [
       "status",
@@ -265,7 +275,8 @@
       "thai",
       "nun"
     ],
-    "desc": "ถือศีลห้า ฟื้นพลังชีวิต 3 ต่อเทิร์น นาน 5 เทิร์น"
+    "desc": "ฟื้นพลังชีวิต 2 ต่อเทิร์น นาน 3 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)",
+    "exhaust": true
   },
   {
     "id": "invite_spirit",
@@ -329,7 +340,8 @@
       "thai",
       "medium"
     ],
-    "desc": "ตั้งหิ้งบูชา ได้พลังงาน 1"
+    "desc": "ได้พลังงาน 1 ใช้ได้ครั้งเดียวต่อไฟต์ (ใช้แล้วหายไปจากไฟต์นี้)",
+    "exhaust": true
   },
   {
     "id": "yantra_cloth",
@@ -1503,12 +1515,12 @@
       "warrior",
       "build"
     ],
-    "desc": "โจมตี 5 ถ้ามีป้องกันอย่างน้อย 10 โจมตี 14 ต้องตั้งรับก่อน",
+    "desc": "โจมตี 5 ถ้ามีป้องกันอย่างน้อย 8 โจมตี 14 ต้องตั้งรับก่อน",
     "dmg": 5,
     "conditional": {
       "when": {
         "kind": "player_block_at_least",
-        "value": 10
+        "value": 8
       },
       "bonus": {
         "dmg": 9

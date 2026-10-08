@@ -71,6 +71,17 @@ export default function BattlePage() {
   const [presentation, setPresentation] = React.useState<CombatFrame | null>(null);
   const player = presentation?.player ?? gameState.player;
   const enemy = presentation?.enemy ?? gameState.enemy;
+  const [comboNotice,setComboNotice]=React.useState('');
+  const seenCombos=React.useRef(gameState.combo?.done??[]);
+  React.useEffect(()=>{
+    const done=gameState.combo?.done??[];
+    const fresh=done.filter(id=>!seenCombos.current.includes(id));
+    seenCombos.current=done;
+    if(!fresh.length){if(!done.length)setComboNotice('');return;}
+    setComboNotice(fresh.map(id=>COMBO_BY_ID[id]?.name??id).join(' · '));
+    const timer=setTimeout(()=>setComboNotice(''),2400);
+    return ()=>clearTimeout(timer);
+  },[gameState.combo?.done.join('|')]);
   const bootstrapped = React.useRef(false);
   const turnLocked = React.useRef(false);
 
@@ -299,7 +310,7 @@ export default function BattlePage() {
 
   const badges:BattleBadge[]=[
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${t.effects.map(e=>e.desc).join(' · ')}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
-    ...(gameState.combo?.progress??[]).flatMap(p=>{const c=COMBO_BY_ID[p.comboId];return c?[{id:`combo:${p.comboId}`,name:c.name,symbol:'ชุด',neutral:true,count:`${p.cardsPlayed.length}/${comboTarget(c)}`,detail:`${c.desc}\nเล่นแล้ว ${p.cardsPlayed.length}/${comboTarget(c)} ใบ`}]:[]}),
+    ...(gameState.combo?.progress??[]).flatMap(p=>{const c=COMBO_BY_ID[p.comboId];return c?[{id:`combo:${p.comboId}`,name:c.name,symbol:'ชุด',neutral:true,count:`${p.cardsPlayed.length}/${comboTarget(c)}`,detail:`${c.desc}\nเล่นแล้ว ${p.cardsPlayed.length}/${comboTarget(c)} ใบ${c.ordered?' · ต้องเล่นตามลำดับ':''}`}]:[]}),
     ...(gameState.combo?.done??[]).flatMap(id=>{const c=COMBO_BY_ID[id];return c?[{id:`done:${id}`,name:c.name,symbol:'✓',detail:`${c.desc}\nคอมโบทำงานแล้วในไฟต์นี้`}]:[]}),
   ];
   const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
@@ -327,6 +338,8 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
+        {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',top:safe.top+190,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="wood" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:18,textAlign:'center'}}>คอมโบ! {comboNotice}</Text></RitualSurface></View>}
+
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
             ก่อนอนิเมชั่นเริ่มเล่น สิ่งเดียวที่ถูกข้ามคือภาพ */}
         {timeline.isPlaying && (
@@ -349,7 +362,7 @@ export default function BattlePage() {
           </Pressable>
         )}
 
-        <MonsterArea
+        <MonsterArea escalating={gameState.runMode==='episode'}
           ref={monsterRef}
           monsterId={monsterId}
           monsterName={monsterName}
@@ -414,6 +427,7 @@ export default function BattlePage() {
         ))}
 
         <PlayerHand
+          state={gameState}
           enabled={!paused && phase === 'player' && gameState.phase === 'combat'}
           cards={playerHand}
           playedCardIds={playedCardIds}

@@ -36,6 +36,7 @@ export type CardData = {
   statusEffect?: { target: 'player' | 'enemy'; effect: import('./combat/status-effects/types').StatusEffectType; duration: number; value: number };
   /** ฟื้นพลังชีวิตให้ผู้เล่น */
   heal?: number;
+  cleanseDebuffs?: boolean;
   /**
    * เล่นแล้วออกจากไฟต์ไปเลย (เข้ากองเผา ไม่กลับมาในกองจั่วอีก)
    *

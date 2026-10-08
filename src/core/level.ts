@@ -80,7 +80,7 @@ export function rollLevelUpBucket(rng: RNG, s: GameState): { rng: RNG; bucket: L
 export function rollLevelUpChoice(rng: RNG, s: GameState): { rng: RNG; choice: LevelChoice } {
   // Filter choice pairs based on game state and level for more contextual choices
   const level = s.player?.level ?? 1;
-  const viablePairs = getViableChoicePairs(s, level).filter(pair => s.runMode !== 'episode' || !pair.includes('equipment_slot'));
+  const viablePairs = getViableChoicePairs(s, level).filter(pair => s.runMode !== 'episode' || (!pair.includes('equipment_slot') && (s.player.maxEnergy < 4 || !pair.includes('max_energy'))));
   
   // Select a weighted random choice pair
   const pairRoll = int(rng, 0, viablePairs.length - 1);

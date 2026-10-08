@@ -12,6 +12,7 @@ import { toSave, fromSave, isPlayableSave } from '../src/core/save';
 import { EPISODE } from '../src/core/balance/episode';
 import { restBudgetLeft } from '../src/core/map/restPage';
 import { enemyCardById } from '../src/core/pack_enemy_cards';
+import {choosePilotCard} from '../scripts/gameplay-pilot';
 import { readFileSync } from 'node:fs';
 
 function driver(seed = 'episode-test', classId: ClassId = 'shaman') {
@@ -30,21 +31,9 @@ function playFight(d: ReturnType<typeof driver>): number {
     let plays = 0;
     while (d.state.phase === 'combat' && plays++ < 30) {
       const s = d.state;
-      const choices = s.piles.hand.map((card, index) => {
-        if (effectiveCost(s, card) > s.player.energy) return { index, score: -Infinity };
-        const needBlock = Math.max(0, (s.enemyIntent?.damage ?? 0) - s.player.block);
-        const c = withConditional(s, card);
-        const score = (c.dmg ?? 0) * (c.hits ?? 1)
-          + Math.min(c.block ?? 0, needBlock) * (s.classId === 'warrior' ? 0.8 : 1.3)
-          + (c.heal ?? 0) * (s.player.hp < s.player.maxHp ? 1 : 0)
-          + (c.energyGain ?? 0) * 9 + (c.draw ?? 0) * 3
-          + (c.summonMinion ? 8 : 0)
-          + (c.statusEffect?.effect === 'poison' ? 8 : 0)
-          + (c.statusEffect?.effect === 'strength' ? 6 : 0);
-        return { index, score };
-      }).sort((a, b) => b.score - a.score);
-      if (!choices.length || !Number.isFinite(choices[0].score)) break;
-      d.go({ type: 'PlayCard', index: choices[0].index });
+      const index=choosePilotCard(s,true,`episode-test:${turns}:${plays}`);
+      if(index<0)break;
+      d.go({type:'PlayCard',index});
     }
     if (d.state.phase !== 'combat') break;
     // Mirror the UI's mandatory discard before ending an oversized hand.
@@ -85,11 +74,11 @@ describe('first chapter', () => {
     d.go({type:'CompleteNode'});expect(d.state.journey!.currentId).toBe('e2_0');
     d.go({type:'Proceed'});expect(d.state.pages!.current!.offers[0].kind).toBe('monster');
   });
-  it('fight budgets grow 2/3/4 and planned cards fit the energy',()=>{
-    for(const [previous,id,energy,hand]of [['e0_0','e0_0',2,2],['e1_0','e2_0',3,3],['e3_0','e4_0',4,3]] as const){
+  it('fight budgets grow 3/3/4 and planned cards fit the energy',()=>{
+    for(const [fight,previous,energy,hand]of [[0,'e0_0',3,4],[1,'e1_0',3,4],[2,'e3_0',4,5]] as const){
       const d=driver('energy-'+energy,'warrior');
-      if(energy>2){moveTo(d.state.journey!,previous);syncOffersFromJourney(d.state);}
-      d.state.fightCount=energy-2;
+      if(fight>0){moveTo(d.state.journey!,previous);syncOffersFromJourney(d.state);}
+      d.state.fightCount=fight;
       d.go({type:'ChooseOffer',index:0});expect(d.state.enemy!.maxEnergy).toBe(energy);
       expect((d.state as any).enemyHandSize).toBe(hand);
       const ids=d.state.enemyIntent!.cardIds;

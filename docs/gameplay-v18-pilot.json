@@ -1,0 +1,166 @@
+{
+  "developmentSeeds": [
+    {
+      "class": "warrior",
+      "policy": "random-affordable",
+      "wins": 22,
+      "runs": 40,
+      "meanHp": 22.1,
+      "meanTurns": 11.3,
+      "cardsPerEnemyTurn": 2.9,
+      "meanCombos": 0.95
+    },
+    {
+      "class": "warrior",
+      "policy": "public-board",
+      "wins": 39,
+      "runs": 40,
+      "meanHp": 48.7,
+      "meanTurns": 9.3,
+      "cardsPerEnemyTurn": 2.89,
+      "meanCombos": 2.9
+    },
+    {
+      "class": "shaman",
+      "policy": "random-affordable",
+      "wins": 18,
+      "runs": 40,
+      "meanHp": 12.8,
+      "meanTurns": 7.1,
+      "cardsPerEnemyTurn": 2.83,
+      "meanCombos": 3.58
+    },
+    {
+      "class": "shaman",
+      "policy": "public-board",
+      "wins": 30,
+      "runs": 40,
+      "meanHp": 17.1,
+      "meanTurns": 5.6,
+      "cardsPerEnemyTurn": 2.81,
+      "meanCombos": 4.25
+    },
+    {
+      "class": "nun",
+      "policy": "random-affordable",
+      "wins": 12,
+      "runs": 40,
+      "meanHp": 9.8,
+      "meanTurns": 12.6,
+      "cardsPerEnemyTurn": 2.9,
+      "meanCombos": 2.9
+    },
+    {
+      "class": "nun",
+      "policy": "public-board",
+      "wins": 39,
+      "runs": 40,
+      "meanHp": 31.9,
+      "meanTurns": 6.5,
+      "cardsPerEnemyTurn": 2.94,
+      "meanCombos": 3.95
+    },
+    {
+      "class": "medium",
+      "policy": "random-affordable",
+      "wins": 27,
+      "runs": 40,
+      "meanHp": 17.6,
+      "meanTurns": 9.8,
+      "cardsPerEnemyTurn": 2.82,
+      "meanCombos": 4.55
+    },
+    {
+      "class": "medium",
+      "policy": "public-board",
+      "wins": 40,
+      "runs": 40,
+      "meanHp": 33.2,
+      "meanTurns": 5.4,
+      "cardsPerEnemyTurn": 2.83,
+      "meanCombos": 3.52
+    }
+  ],
+  "heldOutSeeds": [
+    {
+      "class": "warrior",
+      "policy": "random-affordable",
+      "wins": 19,
+      "runs": 40,
+      "meanHp": 16.1,
+      "meanTurns": 11.3,
+      "cardsPerEnemyTurn": 2.89,
+      "meanCombos": 0.97
+    },
+    {
+      "class": "warrior",
+      "policy": "public-board",
+      "wins": 38,
+      "runs": 40,
+      "meanHp": 45.2,
+      "meanTurns": 10.6,
+      "cardsPerEnemyTurn": 2.92,
+      "meanCombos": 2.85
+    },
+    {
+      "class": "shaman",
+      "policy": "random-affordable",
+      "wins": 23,
+      "runs": 40,
+      "meanHp": 21.7,
+      "meanTurns": 7.1,
+      "cardsPerEnemyTurn": 2.8,
+      "meanCombos": 4.22
+    },
+    {
+      "class": "shaman",
+      "policy": "public-board",
+      "wins": 31,
+      "runs": 40,
+      "meanHp": 17.7,
+      "meanTurns": 5.7,
+      "cardsPerEnemyTurn": 2.85,
+      "meanCombos": 4.2
+    },
+    {
+      "class": "nun",
+      "policy": "random-affordable",
+      "wins": 8,
+      "runs": 40,
+      "meanHp": 5.3,
+      "meanTurns": 12.8,
+      "cardsPerEnemyTurn": 2.9,
+      "meanCombos": 2.35
+    },
+    {
+      "class": "nun",
+      "policy": "public-board",
+      "wins": 40,
+      "runs": 40,
+      "meanHp": 29.1,
+      "meanTurns": 6.8,
+      "cardsPerEnemyTurn": 2.88,
+      "meanCombos": 3.85
+    },
+    {
+      "class": "medium",
+      "policy": "random-affordable",
+      "wins": 27,
+      "runs": 40,
+      "meanHp": 20.9,
+      "meanTurns": 10.1,
+      "cardsPerEnemyTurn": 2.83,
+      "meanCombos": 4.28
+    },
+    {
+      "class": "medium",
+      "policy": "public-board",
+      "wins": 39,
+      "runs": 40,
+      "meanHp": 28.8,
+      "meanTurns": 5.5,
+      "cardsPerEnemyTurn": 2.84,
+      "meanCombos": 3.77
+    }
+  ]
+}

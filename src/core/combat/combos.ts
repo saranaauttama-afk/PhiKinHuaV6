@@ -27,6 +27,7 @@ export type ComboEffect = {
   value: number;
   target: 'player' | 'enemy';
   statusId?: string;
+  duration?: number;
   minionId?: string;
   desc: string;
 };
@@ -45,6 +46,8 @@ export type CardCombo = {
   /** ติดค้างได้กี่เทิร์นก่อนหลุด */
   maxTurns: number;
   oncePerCombat?: boolean;
+  /** Exact listed order, within maxTurns; wrong followup clears this chain. */
+  ordered?: boolean;
   effects: ComboEffect[];
 };
 
@@ -121,6 +124,10 @@ export function onCardPlayed(s: GameState, card: CardData, classTag: string): vo
       p = { comboId: combo.id, cardsPlayed: [], turnStarted: s.turn };
       cs.progress.push(p);
     }
+    if(combo.ordered&&combo.requiredCards){
+      if(card.id===combo.requiredCards[0]){p.cardsPlayed=[];p.turnStarted=s.turn;}
+      if(card.id!==combo.requiredCards[p.cardsPlayed.length]){cs.progress=cs.progress.filter(x=>x.comboId!==combo.id);continue;}
+    }
     if (p.cardsPlayed.includes(card.id)) continue;
 
     p.cardsPlayed.push(card.id);
@@ -172,7 +179,7 @@ function applyCombo(s: GameState, combo: CardCombo): void {
 
       case 'status':
         if (e.statusId) {
-          applyStatusEffect(e.target, s, e.statusId as StatusEffectType, undefined, e.value);
+          applyStatusEffect(e.target, s, e.statusId as StatusEffectType, e.duration, e.value);
         }
         break;
 

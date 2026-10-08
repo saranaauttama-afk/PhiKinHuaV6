@@ -55,8 +55,8 @@ function simulate(seed: string, cls: ClassId, tactical: boolean) {
 describe('chapter class builds and ghost signatures',()=>{
   it('counterattack depends on setup order and leaves the base card unchanged',()=>{
     const s=run('counter','warrior').state; const card=cardById('ward_riposte')!;
-    s.player.block=9; expect(withConditional(s,card).dmg).toBe(5);
-    s.player.block=10; expect(withConditional(s,card).dmg).toBe(14); expect(card.dmg).toBe(5);
+    s.player.block=7; expect(withConditional(s,card).dmg).toBe(5);
+    s.player.block=8; expect(withConditional(s,card).dmg).toBe(14); expect(card.dmg).toBe(5);
   });
   it('new build cards resolve through the real play command, with costs and exhaust',()=>{
     const d=run('real-build','medium');d.go({type:'ChooseOffer',index:0});
@@ -78,7 +78,7 @@ describe('chapter class builds and ghost signatures',()=>{
     expect(conditionMet(s,cond)).toBe(false);
   });
   it('reward lanes are deterministic, distinct, class restricted and independently cloned',()=>{
-    for(const cls of ['warrior','medium'] as const) for(let n=0;n<40;n++){
+    for(const cls of ['warrior','medium','nun','shaman'] as const) for(let n=0;n<40;n++){
       const a=rollChapterCards(cls,makeRng(String(n)))!, b=rollChapterCards(cls,makeRng(String(n)))!;
       expect(a).toEqual(b);expect(new Set(a.list.map(c=>c.id)).size).toBe(3);
       a.list.forEach((c,i)=>{expect(c.tags).toContain(cls);expect(CHAPTER_REWARD_LANES[cls]![i]).toContain(c.id);});

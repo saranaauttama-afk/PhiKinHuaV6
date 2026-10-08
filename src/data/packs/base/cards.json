@@ -3,8 +3,8 @@
     "id": "bamboo_dart",
     "name": "ปาไผ่เผา",
     "type": "attack",
-    "cost": 0,
-    "dmg": 5,
+    "cost": 1,
+    "dmg": 6,
     "rarity": "Common",
     "starter": 4,
     "inShop": true,
@@ -14,7 +14,7 @@
       "shaman",
       "burn"
     ],
-    "desc": "ปาไผ่เผาใส่ศัตรู สร้างความเสียหาย 5 และเผาไหม้ 2 ดาเมจต่อเทิร์น เป็นเวลา 2 เทิร์น"
+    "desc": "ปาไผ่เผา โจมตี 6"
   },
   {
     "id": "holy_powder",
@@ -36,8 +36,8 @@
     "id": "cooling_cloth",
     "name": "ผ้าเย็น",
     "type": "skill",
-    "cost": 0,
-    "block": 5,
+    "cost": 1,
+    "block": 7,
     "rarity": "Common",
     "starter": 4,
     "inShop": true,
@@ -47,7 +47,7 @@
       "shaman",
       "cleanse"
     ],
-    "desc": "ใช้ผ้าเย็นปิดหน้า Block 5 และล้างสถานะลบทั้งหมด"
+    "desc": "ตั้งรับด้วยผ้าเย็น ป้องกัน 7"
   },
   {
     "id": "bell_sound",
@@ -79,7 +79,16 @@
       "shaman",
       "conditional"
     ],
-    "desc": "เสกเข็มปักผี 7 ดาเมจ หากศัตรูมีสถานะลบ +4 ดาเมจ"
+    "desc": "โจมตี 7 ถ้าผีติดคำสาป โจมตีเพิ่ม 5",
+    "conditional": {
+      "when": {
+        "kind": "enemy_has_status",
+        "statusId": "curse"
+      },
+      "bonus": {
+        "dmg": 5
+      }
+    }
   },
   {
     "id": "meditation",
@@ -97,7 +106,8 @@
       "draw",
       "energy"
     ],
-    "desc": "นั่งสมาธิสงบจิต จั่วการ์ด 1 ใบ และได้ Energy +1"
+    "desc": "จั่ว 1 และได้พลังงาน 1 ใช้ได้ครั้งเดียวต่อไฟต์ (ใช้แล้วหายไปจากไฟต์นี้)",
+    "exhaust": true
   },
   {
     "id": "call_old_ghost",
@@ -224,7 +234,13 @@
       "shaman",
       "curse"
     ],
-    "desc": "เสกคาถาสาปส่ง 4 ดาเมจ ศัตรูได้รับ Cursed (รับดาเมจเพิ่ม +1 จากทุกแหล่ง) 3 เทิร์น"
+    "desc": "โจมตี 4 และใส่คำสาป 1 ชั้น นาน 2 เทิร์น ใช้ก่อนเสกเข็มปัก",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "curse",
+      "duration": 2,
+      "value": 1
+    }
   },
   {
     "id": "sacred_ritual",

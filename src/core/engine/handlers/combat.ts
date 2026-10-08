@@ -36,6 +36,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   const idx = cmd.index;
   if (idx < 0 || idx >= s.piles.hand.length) return { state: s, rng: r };
   const played = s.piles.hand[idx];
+  if(played.type==='attack'&&!require('../../statusEffectsRuntime').canPlayAttackCards(s))return {state:s,rng:r};
 
   // การ์ดคำสาปเล่นไม่ได้ — มันมีไว้ถ่วงมือ ทิ้งเองท้ายเทิร์น
   if (isCurseCard(played)) {
@@ -52,6 +53,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     }
     s.player.energy -= cost;
     countCardPlayed(s);
+    require('../../combat/combos').applyComboCardModifiers(s,played);
     armTrap(s, played);
     const [tc] = s.piles.hand.splice(idx, 1);
     // การ์ดดักที่ตั้งไปแล้วไม่กลับเข้ากองจั่วในไฟต์นี้ — ไม่งั้นตั้งซ้ำได้ไม่จำกัด
@@ -100,7 +102,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   // นับหลังจ่ายเรียบร้อย — ไม่งั้นการ์ดใบนี้จะลดค่าร่ายให้ตัวเอง
   countCardPlayed(s);
 
-  applyCardEffect(s, idx);
+  const resolved=applyCardEffect(s, idx);
   runEquipmentCardPlayed(s, played, 'player');
 
   try {
@@ -122,8 +124,8 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     s.log.push(`Played ${played.name}`);
   }
 
-  if ((played as any).draw && (played as any).draw > 0) {
-    const target = s.piles.hand.length + (played as any).draw;
+  if (resolved?.draw && resolved.draw > 0) {
+    const target = s.piles.hand.length + resolved.draw;
     ({ state: s, rng: r } = drawUpTo(s, r, target));
   }
 
@@ -155,6 +157,8 @@ export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }
 
 export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { type: 'StartPlayerTurn' }>, r: RNG) {
   if (s.phase !== 'combat') return { state: s, rng: r };
+  s.turn=(s.turn??1)+1;
+  require('../../combat/combos').expireCombos(s);
   ({ state: s, rng: r } = startPlayerTurn(s, r));
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
@@ -213,7 +217,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   resetBlessingTurnFlags(s);
   expireCombos(s);
   onPlayerTurnEnd(s, { energyUsed: 0, blockGained: s.player.block });
-  s.turn = 1;
+
 
   emit(s, { t: 'TurnEnded', who: 'player' });
   r = settleCombat(s, r);
@@ -223,6 +227,9 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   if (s.enemy && (s as any).enemyPiles) {
     (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
     s.enemy.block = 0;
+    require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
+    r=settleCombat(s,r);
+    if(s.phase!=='combat')return {state:s,rng:r};
 
     require('../../minionRuntime').processEnemyTurnMinions(s);
     r = settleCombat(s, r);
@@ -237,7 +244,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     if (s.runMode !== 'episode' || !s.enemyIntent) planEnemyIntent(s);
     const toPlay: string[] = [...(s.enemyIntent?.cardIds ?? [])];
 
-    s.enemyLastPlayed = toPlay;
+    s.enemyLastPlayed = [];
     enemyDiscardHand(s);
 
     const { enemyCardById } = require('../../pack_enemy_cards');
@@ -249,6 +256,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       const def = enemyCardById(cardId);
       if (!def) continue;
 
+      const cost=def.energyCost??1;
+      if(cost>(s as any).enemyEnergy)continue;
+      (s as any).enemyEnergy-=cost;
+      s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',
         cardId,
@@ -276,6 +287,12 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     }
   }
 
+  if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
+  // Visible escalation rewards closing the fight rather than healing indefinitely.
+  if(s.phase==='combat' && s.runMode==='episode' && s.turn%3===0){
+    require('../../statusEffectsRuntime').applyStatusEffect('enemy',s,'strength',99,2);
+    s.log.push('ผีคลุ้มคลั่ง: แข็งแกร่งเพิ่ม 2 จนจบไฟต์');
+  }
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 
   // ไม่ประกาศแผนล่วงหน้าอีกแล้ว — ล้างทิ้งเพื่อไม่ให้ค้างเป็นข้อมูลเก่า

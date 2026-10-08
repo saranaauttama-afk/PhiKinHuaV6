@@ -135,7 +135,8 @@ export function cardsPlayedThisTurn(s: GameState): number {
  * ตัวเลขที่หักจริงมาคนละที่ ผู้เล่นจะวางแผนจากเลขที่โกหก
  */
 export function effectiveCost(s: GameState, card: CardData): number {
-  return costWithRule(card, cardsPlayedThisTurn(s));
+  if((s.combo?.freeCards??0)>0)return 0;
+  return require('../statusEffectsRuntime').modifyCardCostForStatusEffects(s,costWithRule(card, cardsPlayedThisTurn(s)));
 }
 
 /**

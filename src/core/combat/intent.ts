@@ -10,6 +10,7 @@
 import type { EnemyIntent, GameState } from '../types';
 import { enemyCardById } from '../pack_enemy_cards';
 import { computeModifiedDamage } from './damage';
+import {chooseEnemyCards} from './enemyPlan';
 
 /**
  * เลือกไพ่ที่ศัตรูจะเล่นเทิร์นหน้า จากมือที่จั่วไว้แล้ว โดยดูพลังงานที่มี
@@ -34,7 +35,8 @@ export function planEnemyIntent(s: GameState): void {
   let damage = 0;
   let block = 0;
 
-  for (const id of piles.hand) {
+  const chosen=s.runMode==='episode'?chooseEnemyCards(s,piles.hand,energy):piles.hand;
+  for (const id of chosen) {
     const def = enemyCardById(id);
     if (!def) continue;
 
