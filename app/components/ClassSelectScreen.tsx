@@ -3,6 +3,7 @@ import { View, Text, Pressable, ScrollView, Image, Modal, StyleSheet, useWindowD
 import { CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
 import Art, { artSource } from './Art';
 import RitualSurface from './RitualSurface';
+import {QuietButton} from './QuietChrome';
 import { font, layer, occupationColors as sceneColors, notebookColors as colors } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 const scene = require('../../assets/ui/occupation-table-tall.jpg');
@@ -28,7 +29,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
     <View collapsable={false} style={{ width: sceneWidth, height: sceneHeight }}>
       <Image accessible={false} source={scene} resizeMode="stretch" style={{ position: 'absolute', width: sceneWidth, height: sceneHeight }} />
       <View pointerEvents="box-none" style={[styles.heading, { top: pad.top + 12 }]}>
-        <RitualSurface kind="notice" style={styles.titlePaper}><Text accessibilityRole="header" style={styles.title}>เลือกอาชีพ</Text></RitualSurface>
+        <Text accessibilityRole="header" style={[styles.title,{color:sceneColors.cream}]}>เลือกอาชีพ</Text>
         <Text style={styles.subtitle}>คืนมืดกำลังรอ… คุณจะเป็นใคร</Text>
       </View>
       {onBack && <Pressable accessibilityRole="button" accessibilityLabel="ย้อนกลับ" onPress={onBack} style={[styles.back, { top: pad.top + 12 }]}><Text style={styles.backLabel}>‹</Text></Pressable>}
@@ -65,12 +66,8 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
             <Text style={styles.passive}>{picked.passiveName}</Text><Text style={styles.copy}>{picked.passiveDesc}</Text>
           </ScrollView>
           <View style={styles.actions}>
-            <Pressable accessibilityRole="button" onPress={() => { const id = picked.id; setSelected(null); onPick(id); }} style={styles.depart} android_ripple={{ color: sceneColors.pressWash }}>
-              <Image accessible={false} source={require('../../assets/ui/paper-button.png')} resizeMode="stretch" tintColor={colors.red}
-                style={{ position: 'absolute', width: detailWidth - 48, height: 56 }} />
-              <Text style={styles.departLabel}>เลือก{picked.name} · ออกเดินทาง →</Text>
-            </Pressable>
-            <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={styles.close}><Text style={styles.closeLabel}>กลับไปเลือกอาชีพ</Text></Pressable>
+            <QuietButton primary label={`เลือก${picked.name} · ออกเดินทาง →`} onPress={()=>{const id=picked.id;setSelected(null);onPick(id);}}/>
+            <QuietButton label="กลับไปเลือกอาชีพ" onPress={()=>setSelected(null)} style={{marginTop:6}}/>
           </View>
         </RitualSurface>}
       </View>

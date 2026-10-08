@@ -29,9 +29,9 @@ export default function RestDestinations({offers,resolved,onEnter,children}:{
           :require('../../assets/ui/ritual-jar.png');
         return <Pressable key={d.id} disabled={done} accessibilityRole="button" accessibilityLabel={d.name} accessibilityState={{disabled:done}} accessibilityHint={done?undefined:'เข้าสถานที่นี้ทันที'}
           onPress={()=>onEnter(offer,index)} style={({pressed})=>({width:destinationWidth,opacity:done?.45:pressed?.85:1})}>
-          <RitualSurface kind="occupationPage" style={{paddingHorizontal:8,paddingVertical:12,minHeight:112,justifyContent:'center'}}>
-            <Image accessible={false} source={image} resizeMode="contain" style={{height:total>2?90:120,width:'100%',marginBottom:8}}/><Text style={{fontFamily:font.heading,fontSize:total>2?14:17,color:paper.ink,textAlign:'center'}}>{d.name}</Text>
-            <Text style={{fontFamily:font.ui,fontSize:13,lineHeight:21,color:paper.ink,textAlign:'center',marginTop:4}}>{done?'แวะแล้ว':d.description}</Text>
+          <RitualSurface kind="quietSlate" style={{paddingHorizontal:8,paddingVertical:12,minHeight:112,justifyContent:'center'}}>
+            <Image accessible={false} source={image} resizeMode="contain" style={{height:total>2?90:120,width:'100%',marginBottom:8}}/><Text style={{fontFamily:font.heading,fontSize:total>2?14:17,color:palette.moon,textAlign:'center'}}>{d.name}</Text>
+            <Text style={{fontFamily:font.ui,fontSize:13,lineHeight:21,color:palette.moon,textAlign:'center',marginTop:4}}>{done?'แวะแล้ว':d.description}</Text>
           </RitualSurface>
         </Pressable>;
       })}

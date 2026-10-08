@@ -1,16 +1,26 @@
-import {pulpColors} from '../theme';
 import React from 'react';
-import {View,Text,Image,ImageBackground,Animated} from 'react-native';
+import {View,Text,Image,ImageBackground,ScrollView} from 'react-native';
 import {loadAutoSaveSummary} from '../../src/core/storage';
 import type {SaveSummary} from '../../src/core/save';
-import {GameButton} from './Panel';
-import Settings,{useGameSettings} from './Settings';
-import {font,palette} from '../theme';
+import {QuietButton} from './QuietChrome';
+import Settings from './Settings';
+import {font,palette,pulpColors} from '../theme';
 import {useScreenPadding} from '../useScreenPadding';
 type Props={onStartGame:()=>void;onContinue?:()=>void;onJournal?:()=>void};
 export default function StartPage({onStartGame,onContinue,onJournal}:Props){
- const pad=useScreenPadding();const [saved,setSaved]=React.useState<SaveSummary|null>(null);const [settings,setSettings]=React.useState(false);const glow=React.useRef(new Animated.Value(.1)).current;const reduced=useGameSettings(s=>s.reducedMotion);
+ const pad=useScreenPadding();const [saved,setSaved]=React.useState<SaveSummary|null>(null),[settings,setSettings]=React.useState(false);
  React.useEffect(()=>{let alive=true;loadAutoSaveSummary().then(s=>{if(alive)setSaved(s)}).catch(()=>{});return()=>{alive=false}},[]);
- React.useEffect(()=>{if(reduced)return;const a=Animated.loop(Animated.sequence([Animated.timing(glow,{toValue:.25,duration:1700,useNativeDriver:true}),Animated.timing(glow,{toValue:.08,duration:2100,useNativeDriver:true})]));a.start();return()=>a.stop()},[reduced]);
- return <ImageBackground source={require('../../assets/scence/menu-haunted.jpg')} style={{flex:1}}><View style={{flex:1,paddingTop:pad.top+20,paddingBottom:pad.bottom+20,paddingHorizontal:28,justifyContent:'space-between',backgroundColor:pulpColors.menuShade}}><View><Text style={{fontFamily:font.ui,color:palette.moonDim,fontSize:12,letterSpacing:3}}>การ์ตูนผี • ห้าคืนอาถรรพ์</Text><Image accessible accessibilityLabel="ผีกินหัว" source={require('../../assets/ui/title-pulp.png')} resizeMode="contain" style={{width:'100%',maxWidth:340,height:144,marginTop:8,marginBottom:8}}/><Text style={{fontFamily:font.heading,color:palette.text,fontSize:19}}>ผ่านห้าคืนให้ถึงเช้า</Text></View><Animated.View pointerEvents="none" style={{position:'absolute',top:'38%',left:'20%',width:120,height:140,backgroundColor:pulpColors.lanternGlow,borderRadius:100,opacity:glow}}/><View style={{gap:12}}><Text style={{fontFamily:font.body,color:palette.text,fontSize:25,lineHeight:29,marginBottom:10,textShadowColor:pulpColors.black,textShadowRadius:5,textShadowOffset:{width:0,height:1}}}>เสียงหัวเราะดังจากบ้านร้าง…{ '\n' }คืนนี้ คุณจะพาเด็กที่หายไปกลับมาได้ไหม?</Text><GameButton label="เริ่มเกม" tone="primary" onPress={onStartGame}/>{saved&&onContinue&&<GameButton label={`เล่นต่อ • ${saved.night?`คืน ${saved.night} · `:''}ศึก ${saved.fight}/${saved.totalFights}`} onPress={onContinue}/>}{onJournal&&<GameButton label="สมุดผ่านคืน" onPress={onJournal}/>}<GameButton label="ตั้งค่า" onPress={()=>setSettings(true)}/>{saved&&<Text style={{fontFamily:font.ui,color:palette.textDim,fontSize:10,textAlign:'center'}}>เริ่มเกมใหม่จะแทนการเดินทางที่ค้างไว้</Text>}</View></View>{settings&&<Settings onClose={()=>setSettings(false)}/>}</ImageBackground>;
+ return <ImageBackground source={require('../../assets/scence/menu-haunted.jpg')} style={{flex:1}}>
+  <ScrollView contentContainerStyle={{flexGrow:1,paddingTop:pad.top+24,paddingBottom:pad.bottom+24,paddingHorizontal:28,justifyContent:'space-between',backgroundColor:pulpColors.menuShade}}>
+   <View style={{alignItems:'center'}}><Text style={{fontFamily:font.ui,color:palette.moonDim,fontSize:12,letterSpacing:3}}>การ์ตูนผี • ห้าคืนอาถรรพ์</Text><Image accessible accessibilityLabel="ผีกินหัว" source={require('../../assets/ui/title-pulp.png')} resizeMode="contain" style={{width:'100%',maxWidth:340,height:150,marginTop:14}}/></View>
+   <View style={{gap:12,paddingTop:100,maxWidth:480,width:'100%',alignSelf:'center'}}>
+    <Text style={{fontFamily:font.body,color:palette.text,fontSize:25,lineHeight:30,textAlign:'center',marginBottom:20}}>เสียงหัวเราะดังจากบ้านร้าง…{'\n'}ผ่านห้าคืน พาเด็กที่หายไปกลับมา</Text>
+    {saved&&onContinue&&<QuietButton primary label={'เล่นต่อ • '+(saved.night?'คืน '+saved.night+' · ':'')+'ศึก '+saved.fight+'/'+saved.totalFights} onPress={onContinue}/>}
+    <QuietButton primary={!saved} label="เริ่มเกม" onPress={onStartGame}/>
+    <View style={{flexDirection:'row',gap:10}}>{onJournal&&<QuietButton label="สมุดผ่านคืน" onPress={onJournal} style={{flex:1}}/>}<QuietButton label="ตั้งค่า" onPress={()=>setSettings(true)} style={{flex:1}}/></View>
+    {saved&&<Text style={{fontFamily:font.ui,color:palette.textDim,fontSize:10,textAlign:'center'}}>เริ่มเกมใหม่จะแทนการเดินทางที่ค้างไว้</Text>}
+   </View>
+  </ScrollView>
+  {settings&&<Settings onClose={()=>setSettings(false)}/>}
+ </ImageBackground>;
 }

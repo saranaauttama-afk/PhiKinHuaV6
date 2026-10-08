@@ -1,16 +1,16 @@
 import {baseNewState} from '../src/core/commands';
 import {applyCommand} from '../src/core/reducer';
-import {makeRng,int} from '../src/core/rng';
+import {makeRng,int,type RNG} from '../src/core/rng';
 import {cardsPlayedThisTurn,effectiveCost} from '../src/core/cards/mechanics';
 import {choosePilotCard} from './gameplay-pilot';
 import {onRestRow} from '../src/core/map/restPage';
 import type {ClassId} from '../src/core/classes';
 import type {Night} from '../src/core/campaign/nights';
-import type {Command,CardData} from '../src/core/types';
+import type {Command,CardData,GameState} from '../src/core/types';
 /** Public-board combat policy, real preparation and identical choices for both policies. */
-export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boolean){
+export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boolean,observe?:(state:GameState,rng:RNG)=>void){
  let s=baseNewState(seed),r=makeRng(seed),steps=0,enemyCards=0,enemyTurns=0,stalled=false;
- const go=(cmd:Command)=>{const out=applyCommand(s,cmd,r);s=out.state;r=out.rng;steps++;};
+ const go=(cmd:Command)=>{const out=applyCommand(s,cmd,r);s=out.state;r=out.rng;steps++;observe?.(s,r);};
  const cardValue=(c:CardData)=>((c.dmg??0)*(c.hits??1)+(c.block??0)*.6+(c.draw??0)*4+(c.energyGain??0)*5+(c.heal??0)*.6+(c.summonMinion?9:0)+(c.statusEffect?6:0)+(c.conditional?7:0))/Math.max(1,c.cost);
  go({type:'NewRun',seed,classId:cls,runMode:'full',night});
  while(!s.runSummary&&steps<2200){

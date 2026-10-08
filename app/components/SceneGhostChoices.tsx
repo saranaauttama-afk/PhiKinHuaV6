@@ -3,7 +3,8 @@ import { Image, Pressable, Text, View, StyleSheet } from 'react-native';
 import type { OfferDisplay } from './offerDisplay';
 import { artSource } from './Art';
 import RitualSurface from './RitualSurface';
-import { font, palette, paper } from '../theme';
+import { font, palette } from '../theme';
+import {QuietButton} from './QuietChrome';
 
 const sceneArt: Record<string, number> = {
   'phi-pop': require('../../assets/ui/map-pop.png'),
@@ -17,7 +18,7 @@ export default function SceneGhostChoices({ choices, selected, onSelect, onEnter
   selected: number | null; onSelect: (index: number | null) => void; onEnter: (index: number) => void;
 }) {
   const [height, setHeight] = React.useState(382);
-  const spriteHeight = Math.max(100, Math.min(240, height * .36));
+  const spriteHeight = Math.max(120, Math.min(330, height - 190));
   const picked = choices.find(c => c.index === selected && !c.resolved);
   // Keep native parents stable while selection changes opacity and transforms.
   // Fabric must not reparent the image layers when a layout-only view unflattens.
@@ -30,20 +31,16 @@ export default function SceneGhostChoices({ choices, selected, onSelect, onEnter
         return <Pressable collapsable={false} key={`${d.id}-${index}`} accessibilityRole="button" accessibilityLabel={d.name}
           accessibilityState={{ selected: active, disabled: resolved }} disabled={resolved}
           onPress={() => onSelect(active ? null : index)} style={[styles.figure, { opacity: resolved ? .25 : dim ? .35 : 1 }]}>
-          <RitualSurface kind="occupationPage" style={{width:'100%',padding:12,borderWidth:active?2:0,borderColor:palette.moon}}>
-            <View collapsable={false} style={[styles.art,{height:spriteHeight}]}><Image accessible={false} source={source??require('../../assets/ui/trail-ghost.png')} resizeMode="contain" style={styles.sprite}/></View>
-            <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:15,color:paper.ink,textAlign:'center',minHeight:44}}>{d.name}</Text>
-            <Text style={{fontFamily:font.ui,fontSize:11,color:paper.red,textAlign:'center'}}>{resolved?'ผ่านแล้ว':active?'เลือกแล้ว':'ต่อสู้'}</Text>
-          </RitualSurface>
+          <View collapsable={false} style={[styles.art,{height:spriteHeight,transform:[{translateY:active?-6:0}]}]}><Image accessible={false} source={source??require('../../assets/ui/trail-ghost.png')} resizeMode="contain" style={styles.sprite}/></View>
+          <Text numberOfLines={2} style={[styles.name,{color:active?palette.moon:palette.text}]}>{d.name}</Text>
+          <Text style={styles.hint}>{resolved?'ผ่านแล้ว':active?'เลือกแล้ว':'ต่อสู้'}</Text>
         </Pressable>;
       })}
     </View>
     <View collapsable={false} style={styles.decision}>
       {picked ? <>
         <Text style={styles.description}>{picked.display.description}</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="เผชิญหน้า →" onPress={() => onEnter(picked.index)} style={styles.enter}>
-          <RitualSurface kind="wood" style={styles.enterWood}><Text style={styles.enterText}>เผชิญหน้า →</Text></RitualSurface>
-        </Pressable>
+        <QuietButton label="เผชิญหน้า →" primary onPress={()=>onEnter(picked.index)} style={{minWidth:190}}/>
       </> : <Text style={styles.prompt}>เลือกผีที่คุณจะเผชิญหน้า</Text>}
     </View>
   </View>;

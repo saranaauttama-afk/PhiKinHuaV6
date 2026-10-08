@@ -5,7 +5,9 @@ import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withDelay, withSequence, Easing,
 } from 'react-native-reanimated';
-import { tint, layer } from '../../theme';
+import { tint, layer,font } from '../../theme';
+import RitualSurface from '../RitualSurface';
+import {QuietButton} from '../QuietChrome';
 
 type Props = {
   onHome: () => void;
@@ -42,13 +44,13 @@ export default function DefeatOverlay({ onHome }: Props) {
       backgroundColor: palette.scrimHeavy,
       justifyContent: 'center', alignItems: 'center', zIndex: layer.overlay,
     }, bgStyle]}>
-      <PaperTexture />
-      <Animated.View style={[{ alignItems: 'center' }, cardStyle]}>
+
+      <Animated.View style={[{width:'90%',maxWidth:480},cardStyle]}><RitualSurface kind="occupationPage" style={{alignItems:'center',padding:28}}>
 
         {/* Title */}
         <Text style={{
-          color: palette.blood, fontSize: 48,
-          fontFamily: 'Prompt_700Bold',
+          color: palette.blood, fontSize: 34,
+          fontFamily: font.display,
           textShadowColor: palette.bloodDeep,
           textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16,
           marginBottom: 12,
@@ -58,30 +60,15 @@ export default function DefeatOverlay({ onHome }: Props) {
 
         <Text style={{
           color: palette.textFaint, fontSize: 14,
-          fontFamily: 'Prompt_400Regular',
-          textAlign: 'center', marginBottom: 52,
+          fontFamily: font.ui,
+          textAlign: 'center', marginBottom: 24,
           lineHeight: 22,
         }}>
           เจ้าถูกปีศาจปราบ...{'\n'}ลองใหม่อีกครั้ง
         </Text>
 
-        <Pressable
-          onPress={onHome}
-          style={({ pressed }) => ({
-            // ต้องต่างกันจริงตอนกด ไม่งั้นปุ่มไม่มีฟีดแบ็กว่าโดนแตะแล้ว
-            backgroundColor: pressed ? tint.bloodSoft : palette.bloodDeep,
-            paddingHorizontal: 44, paddingVertical: 13,
-            borderRadius: 22, borderWidth: 1.5,
-            borderColor: tint.bloodLine,
-          })}
-        >
-          <Text style={{
-            color: palette.text, fontSize: 15,
-            fontFamily: 'Prompt_600SemiBold',
-          }}>
-            กลับหน้าหลัก
-          </Text>
-        </Pressable>
+        <QuietButton primary label="กลับหน้าหลัก" onPress={onHome} style={{alignSelf:'stretch'}}/>
+      </RitualSurface>
       </Animated.View>
     </Animated.View>
   );

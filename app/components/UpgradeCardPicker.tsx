@@ -4,7 +4,7 @@ import type {CardData} from '../../src/core/types';
 import {canUpgrade,upgradeCard,upgradeLevelOf} from '../../src/core/engine/shared';
 import {CardGlyphArt} from './DeckCard';
 import RitualSurface from './RitualSurface';
-import {GameButton} from './Panel';
+import {QuietButton} from './QuietChrome';
 import {cardSummary} from '../cardPresentation';
 import {font,paper} from '../theme';
 
@@ -29,7 +29,7 @@ export default function UpgradeCardPicker({cards,selected,onSelect,price,remove=
         <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:11,lineHeight:19,marginTop:6}}>{remove?'ถอดออกจากสำรับ':available?`ขั้น ${upgradeLevelOf(card)} → ${upgradeLevelOf(card)+1}${price?` · ${price(card)} เบี้ย`:' · ฟรี'}`:'สุดขั้นแล้ว'}</Text>
         <Text style={{fontFamily:font.heading,color:paper.red,fontSize:12,lineHeight:20,marginTop:6}}>{picked?'✓ เลือกไว้แล้ว':' '}</Text>
       </Pressable>
-        {picked&&onConfirm&&<GameButton label={remove?'สละใบนี้':'ปลุกเสกใบนี้'} tone="primary" disabled={disabledConfirm} onPress={()=>onConfirm(i)} style={{marginTop:6}}/>}
+        {picked&&onConfirm&&<QuietButton label={remove?'สละใบนี้':'ปลุกเสกใบนี้'} primary disabled={disabledConfirm} onPress={()=>onConfirm(i)} style={{marginTop:6}}/>}
       </RitualSurface>
     </View>;})}
   </View>;

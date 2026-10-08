@@ -4,7 +4,7 @@ import type {CardData} from '../../../src/core/types';
 import {CardGlyphArt} from '../DeckCard';
 import {cardSummary} from '../../cardPresentation';
 import RitualSurface from '../RitualSurface';
-import {GameButton} from '../Panel';
+import {QuietButton} from '../QuietChrome';
 import {font,palette,paper,layer} from '../../theme';
 interface CardItem {instanceId?:string;id?:string;name:string;cost?:number;damage?:number;block?:number;effects?:{damage?:number;block?:number};[key:string]:unknown}
 interface Props {cards:CardItem[];maxHandSize:number;onConfirm:(indices:number[])=>void;onCancel:()=>void}
@@ -14,7 +14,7 @@ export default function DiscardOverlay({cards,maxHandSize,onConfirm,onCancel}:Pr
  const toggle=(i:number)=>setSelected(prev=>prev.includes(i)?prev.filter(x=>x!==i):prev.length<mustDiscard?[...prev,i]:prev);
  return <View accessibilityViewIsModal style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
   <ImageBackground source={require('../../../assets/ui/deck-mat.jpg')} resizeMode="cover" style={{flex:1,justifyContent:'center',paddingVertical:28,backgroundColor:palette.scrimFull}}>
-   <RitualSurface kind="wood" style={{marginHorizontal:16,padding:18}}>
+   <RitualSurface kind="quietSlate" style={{marginHorizontal:16,padding:18}}>
     <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:21,textAlign:'center'}}>เลือกการ์ดที่จะทิ้ง</Text>
     <Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,textAlign:'center',marginTop:8}}>มือเต็ม · เลือก {mustDiscard} ใบ ({selected.length}/{mustDiscard})</Text>
    </RitualSurface>
@@ -30,8 +30,8 @@ export default function DiscardOverlay({cards,maxHandSize,onConfirm,onCancel}:Pr
     </Pressable>})}
    </ScrollView>
    <View style={{flexDirection:'row',gap:12,paddingHorizontal:16,justifyContent:'center'}}>
-    <GameButton label="ยกเลิก" onPress={onCancel}/>
-    <GameButton label={`ทิ้ง ${selected.length}/${mustDiscard} ใบ`} disabled={selected.length!==mustDiscard} tone="primary" onPress={()=>onConfirm(selected)}/>
+    <QuietButton label="ยกเลิก" onPress={onCancel}/>
+    <QuietButton label={`ทิ้ง ${selected.length}/${mustDiscard} ใบ`} disabled={selected.length!==mustDiscard} primary onPress={()=>onConfirm(selected)}/>
    </View>
   </ImageBackground>
  </View>;

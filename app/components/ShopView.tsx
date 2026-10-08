@@ -22,12 +22,13 @@ import type { CardData, Command, GameState, ShopItem } from '../../src/core/type
 import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import FusionAltarView from './FusionAltarView';
-import { GameButton } from './Panel';
+import {QuietButton} from './QuietChrome';
+import {CardGlyphArt} from './DeckCard';
 import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
 function Panel({title,children}:{title:string;children:React.ReactNode}) {
-  return <RitualSurface kind="darkCloth" style={{padding:22,gap:10,width:'100%',minWidth:0}}>
+  return <RitualSurface kind="quietSlate" style={{padding:22,gap:10,width:'100%',minWidth:0}}>
     <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:23,lineHeight:32}}>{title}</Text>
     {children}
   </RitualSurface>;
@@ -57,45 +58,25 @@ function cardLine(c?: CardData): string {
 }
 
 function ItemChip({
-  title, line, note, onPress, wide = false, disabled = false,
+  title, line, note, onPress, card, wide = false, disabled = false,
 }: {
   title: string; line?: string; note?: string; onPress: () => void;
-  wide?: boolean; disabled?: boolean;
+  wide?: boolean; disabled?: boolean; card?:CardData;
 }) {
-  return (
-    <Pressable
-      onPress={disabled ? undefined : onPress}
-      disabled={disabled}
-      style={{
-        paddingHorizontal: space.md, paddingVertical: space.sm,
-        borderRadius: radius.md,
-        backgroundColor: surface.panelWell,
-        borderWidth: 1, borderColor: palette.line,
-        minWidth: wide ? '46%' : 110,
-        flexGrow: wide ? 1 : 0,
-        opacity: disabled ? 0.4 : 1,
-      }}
-    >
-      <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.heading }}>
-        {title}
-      </Text>
-      {!!line && (
-        <Text style={{ color: palette.textDim, fontSize: size.label, marginTop: 2, fontFamily: font.ui }}>
-          {line}
-        </Text>
-      )}
-      {!!note && (
-        <Text style={{ color: palette.moonDim, fontSize: size.label, marginTop: 2, fontFamily: font.uiMed }}>
-          {note}
-        </Text>
-      )}
-    </Pressable>
-  );
+  return <Pressable accessibilityRole="button" accessibilityLabel={title+(note?' · '+note:'')} onPress={onPress} disabled={disabled} accessibilityState={{disabled}} style={{width:'48%',minHeight:164}}>
+    <RitualSurface kind="quietSlate" style={{flex:1,padding:14,gap:5,alignItems:'center'}}>
+      {card?<CardGlyphArt card={card} size={72} muted={disabled}/>:<Image accessible={false} source={require('../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:72,height:72,opacity:disabled?.55:1}}/>}
+      <Text style={{color:palette.moon,fontSize:14,fontFamily:font.heading,textAlign:'center'}}>{title}</Text>
+      {!!line&&<Text style={{color:palette.text,fontSize:12,lineHeight:20,fontFamily:font.ui,textAlign:'center'}}>{line}</Text>}
+      {!!note&&<Text style={{color:palette.moonDim,fontSize:12,fontFamily:font.ui,textAlign:'center'}}>{note}</Text>}
+      {disabled&&<Text style={{color:palette.textDim,fontSize:11,fontFamily:font.ui}}>เบี้ยไม่พอ</Text>}
+    </RitualSurface>
+  </Pressable>;
 }
 
 /** บรรทัดบอกว่าทำไมตอนนี้ยังใช้ไม่ได้ */
 function Unavailable({text}:{text:string}) {
- return <RitualSurface kind="wood" style={{padding:20,minHeight:70,justifyContent:'center'}}><Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,lineHeight:24,textAlign:'center'}}>{text}</Text></RitualSurface>;
+ return <RitualSurface kind="quietSlate" style={{padding:20,minHeight:70,justifyContent:'center'}}><Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,lineHeight:24,textAlign:'center'}}>{text}</Text></RitualSurface>;
 }
 
 function Money({ state }: { state: GameState }) {
@@ -139,6 +120,8 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         {stock.map((item, i) => (
           <ItemChip
             key={i}
+            card={cardOf(item)}
+            disabled={(state.player.gold??0)<item.price}
             title={cardOf(item)?.name ?? 'ของไม่ทราบชนิด'}
             line={cardLine(cardOf(item))}
             note={`${item.price} เบี้ย`}
@@ -146,7 +129,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           />
         ))}
       </View>
-      <GameButton
+      <QuietButton
         label="ขอดูของชุดใหม่ (50 เบี้ย)"
         onPress={() => dispatch({ type: 'ShopReroll' })}
         style={{ marginTop: space.lg, alignSelf: 'flex-start' }}
@@ -162,6 +145,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         {stock.map((item, i) => (
           <ItemChip
             key={i}
+            disabled={(state.player.gold??0)<item.price}
             title={equipOf(item)?.name ?? 'ของไม่ทราบชนิด'}
             line={equipOf(item)?.desc}
             note={`${item.price} เบี้ย · ${equipOf(item)?.rarity ?? ''}`}
@@ -187,6 +171,8 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {deck.map((card, i) => (
             <ItemChip
               key={i}
+              card={card}
+              disabled={(state.player.gold??0)<cost}
               title={card.name || card.id}
               line={cardLine(card)}
               onPress={() => dispatch({ type: 'ShopRemoveBuy', index: i })}
@@ -233,9 +219,9 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         </Text>
 
         {canUse ? (
-          <GameButton
+          <QuietButton
             label={`ขอพร ${cost} เบี้ย (ฟื้น ${missing})`}
-            tone="primary"
+            primary
             onPress={() => {dispatch({ type: 'UseHealingShrine' });setNotice(`พักฟื้นแล้ว · ชีวิต ${state.player.maxHp}/${state.player.maxHp}`);}}
           />
         ) : (
@@ -264,9 +250,9 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         </Text>
 
         {canUse ? (
-          <GameButton
+          <QuietButton
             label="ตักขึ้นมาดื่ม (ฟื้น 10 · ไม่เสียเบี้ย)"
-            tone="primary"
+            primary
             onPress={() => dispatch({ type: 'UseWell' })}
           />
         ) : (
@@ -284,6 +270,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {stock.map((item, i) => (
             <ItemChip
               key={i}
+              card={cardOf(item)}
               title={cardOf(item)?.name ?? 'ของไม่ทราบชนิด'}
               line={cardLine(cardOf(item))}
               note="หยิบฟรี"
@@ -309,6 +296,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
               {stock.map((item, i) => (
                 <ItemChip
                   key={i}
+                  card={cardOf(item)}
                   title={cardOf(item)?.name ?? 'ของไม่ทราบชนิด'}
                   line={cardLine(cardOf(item))}
                   note="หยิบฟรี"
@@ -317,7 +305,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
                 />
               ))}
             </View>
-            <GameButton
+            <QuietButton
               label={randomized ? 'เปลี่ยนไปแล้ว' : 'ขอเปลี่ยนของ (ได้ครั้งเดียว)'}
               disabled={randomized}
               onPress={() => dispatch({ type: 'RandomizeSingleTreasure' })}
@@ -331,13 +319,13 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     );
   };
 
-  const background=kind==='healing'||kind==='well'?require('../../assets/scence/rest.jpg'):require('../../assets/ui/deck-mat.jpg');
+  const background=kind==='healing'||kind==='well'?require('../../assets/scence/rest.jpg'):require('../../assets/scence/quiet-village.png');
   const object=kind==='healing'||kind==='well'?require('../../assets/ui/blessing-shrine-object.png'):kind==='upgrade'||kind==='remove'?require('../../assets/ui/ritual-knife.png'):require('../../assets/ui/ritual-jar.png');
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
     <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
         <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+20,paddingBottom:24,gap:12}}>
-          <Image accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?180:95}}/>
+          <Image accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>
           {kind === 'card'            && cardShop()}
           {kind === 'equipment'       && equipmentShop()}
           {kind === 'remove'          && removeShop()}
@@ -349,7 +337,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {kind === 'fusion'          && <FusionAltarView state={state} dispatch={dispatch} />}
         </ScrollView>
         <View style={{paddingHorizontal:16,paddingTop:8,paddingBottom:pad.bottom+12}}>
-          <GameButton label="กลับจุดพัก" tone="primary" onPress={()=>dispatch({type:'CompleteNode'})}/>
+          <QuietButton label="กลับจุดพัก" primary onPress={()=>dispatch({type:'CompleteNode'})}/>
         </View>
       </View>
     </SceneArrival>

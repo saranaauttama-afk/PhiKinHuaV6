@@ -10,7 +10,9 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState } from '../../src/core/types';
 import { canFuse, fuseCards, isFused, FUSION_MAX_TOTAL_COST } from '../../src/core/cards/fusion';
 import { FUSIONS_PER_ALTAR } from '../../src/core/engine/handlers/fusion';
-import Panel, { GameButton } from './Panel';
+import RitualSurface from './RitualSurface';
+import {QuietButton} from './QuietChrome';
+import {CardGlyphArt} from './DeckCard';
 import { font, radius, size, space, tint } from '../theme';
 
 type Props = {
@@ -33,10 +35,11 @@ function CardChip({
 
   return (
     <Pressable
+      accessibilityRole="button" accessibilityLabel={`ผสาน ${card.name}`} accessibilityState={{selected,disabled}}
       onPress={onPress}
       disabled={disabled}
       style={{
-        paddingHorizontal: 10, paddingVertical: 8, borderRadius: 12,
+        paddingHorizontal: 10, paddingVertical: 8, borderRadius: 0,
         backgroundColor: selected ? tint.moonPick : surface.panelWell,
         borderWidth: selected ? 2 : 1,
         borderColor: selected ? palette.lineStrong : palette.line,
@@ -44,6 +47,7 @@ function CardChip({
         minWidth: 96,
       }}
     >
+      <View style={{alignItems:'center'}}><CardGlyphArt card={card} size={48}/></View>
       <Text style={{ color: palette.text, fontSize: size.label, fontFamily: font.heading }}>
         {card.name}
       </Text>
@@ -80,7 +84,8 @@ export default function FusionAltarView({ state, dispatch }: Props) {
   const preview = check?.ok ? fuseCards(a, b) : null;
 
   return (
-    <Panel title="แท่นผสาน" style={{ marginTop: space.xl }}>
+    <RitualSurface kind="occupationPage" style={{marginTop:16,padding:24}}>
+      <Text style={{fontFamily:font.heading,fontSize:24,color:palette.text}}>แท่นผสาน</Text>
       <Text style={{
         color: palette.textDim, fontSize: size.bodyLg,
         fontFamily: font.body, lineHeight: 26,
@@ -128,7 +133,7 @@ export default function FusionAltarView({ state, dispatch }: Props) {
 
       {preview && (
         <View style={{
-          marginTop: 12, padding: 12, borderRadius: 12,
+          marginTop: 12, padding: 12, borderRadius: 0,
           backgroundColor: tint.moonFaint,
           borderWidth: 1, borderColor: palette.lineStrong,
         }}>
@@ -152,9 +157,9 @@ export default function FusionAltarView({ state, dispatch }: Props) {
             สำรับ {deck.length} → {deck.length - 1} ใบ
           </Text>
 
-          <GameButton
+          <QuietButton
             label="ผสาน"
-            tone="primary"
+            primary
             onPress={() => {
               dispatch({ type: 'FuseCards', indexA: picked[0], indexB: picked[1] });
               setPicked([]);
@@ -163,6 +168,6 @@ export default function FusionAltarView({ state, dispatch }: Props) {
           />
         </View>
       )}
-    </Panel>
+    </RitualSurface>
   );
 }

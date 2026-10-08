@@ -32,7 +32,7 @@ import { palette, surface, tint, layer, font } from './theme';
 import Settings from './components/Settings';
 import StartPage from './components/StartPage';
 import RitualSurface from './components/RitualSurface';
-import {GameButton} from './components/Panel';
+import {QuietButton} from './components/QuietChrome';
 import {baseNewState} from '../src/core/commands';
 
 type Phase = 'player' | 'discard' | 'enemy';
@@ -339,7 +339,7 @@ export default function BattlePage() {
         </View>
 
         <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.runMode==='episode'?3:15}</Text>
-        {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',top:safe.top+190,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="wood" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:18,textAlign:'center'}}>คอมโบ! {comboNotice}</Text></RitualSurface></View>}
+        {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',top:safe.top+190,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:18,textAlign:'center'}}>คอมโบ! {comboNotice}</Text></RitualSurface></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
             ก่อนอนิเมชั่นเริ่มเล่น สิ่งเดียวที่ถูกข้ามคือภาพ */}
@@ -544,11 +544,11 @@ export default function BattlePage() {
         )}
         <Modal visible={paused} transparent animationType="fade" onRequestClose={()=>settingsOpen?setSettingsOpen(false):setPaused(false)}>
           <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:24,justifyContent:'center'}}>
-            <RitualSurface kind="wood" style={{padding:24,gap:14}}>
+            <RitualSurface kind="quietSlate" style={{padding:24,gap:14}}>
               <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:22,textAlign:'center'}}>พักการต่อสู้</Text>
-              <GameButton label="สู้ต่อ" onPress={()=>setPaused(false)}/>
-              <GameButton label="ตั้งค่า" onPress={()=>setSettingsOpen(true)}/>
-              {gameState.phase==='combat'&&<GameButton label={saving?'กำลังบันทึก…':'กลับเมนูหลัก'} onPress={()=>{void goToMenu();}}/>}
+              <QuietButton label="สู้ต่อ" onPress={()=>setPaused(false)}/>
+              <QuietButton label="ตั้งค่า" onPress={()=>setSettingsOpen(true)}/>
+              {gameState.phase==='combat'&&<QuietButton label={saving?'กำลังบันทึก…':'กลับเมนูหลัก'} onPress={()=>{void goToMenu();}}/>}
               {!!saveError&&<Text style={{fontFamily:font.ui,color:palette.moon}}>{saveError}</Text>}
             </RitualSurface>
             {settingsOpen&&<Settings onClose={()=>setSettingsOpen(false)}/>}

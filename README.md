@@ -2,7 +2,7 @@
 
 ## Current visual preview branch
 
-`art/quiet-comic-ui` starts the approved spacious comic UI: ghost HUD below the sprite, a shared compact bottom player HUD, readable scrolling cards, path choices, confirmed starter blessings and an illustrated victory sheet. This branch uses mobile **web previews before APK builds**. Screenshots: `docs/previews/quiet-comic/`. See `docs/HANDOFF-quiet-comic-ui.md`. The five-night gameplay baseline is v1.0.19 from `work/occupation-table`; the older notes below are historical.
+`art/quiet-comic-ui` starts the approved spacious comic UI: ghost HUD below the sprite, a shared compact bottom player HUD, readable scrolling cards, ghosts standing directly in the path scene, confirmed starter blessings and an illustrated victory sheet. The remaining screens now share quiet controls, night selectors, illustrated inventory, a tabbed journal and a real run report. This branch uses mobile **web previews before APK builds**. Screenshots: `docs/previews/quiet-comic/`. See `docs/HANDOFF-quiet-comic-ui.md` and `docs/HANDOFF-quiet-comic-rest.md`. The five-night gameplay baseline is v1.0.19 from `work/occupation-table`; the older notes below are historical.
 
 Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current deliverable is a short, complete first chapter, targeting 5–10 minutes of human play before expanding the game. Duration and enjoyment are playtest goals, not measured device results.
 

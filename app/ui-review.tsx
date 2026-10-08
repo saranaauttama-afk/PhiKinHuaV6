@@ -1,0 +1,40 @@
+// Web-only visual review harness. Normal exports show no fixtures or review controls.
+import React from 'react';
+import {Platform,Text,View} from 'react-native';
+import {useLocalSearchParams} from 'expo-router';
+import type {Command,GameState} from '../src/core/types';
+import type {RNG} from '../src/core/rng';
+import {applyCommand} from '../src/core/reducer';
+import DefeatOverlay from './components/battle/DefeatOverlay';
+import ShopView from './components/ShopView';
+import StoryEventView from './components/StoryEventView';
+import ChapterView from './components/ChapterView';
+import RunCompleteScreen from './components/RunCompleteScreen';
+import LevelUpOverlay from './components/battle/LevelUpOverlay';
+import CardRewardOverlay from './components/battle/CardRewardOverlay';
+import DeckView from './components/DeckView';
+import BlessingView from './components/BlessingView';
+import {QuietButton,QuietPage} from './components/QuietChrome';
+import {useAppFonts} from './useAppFonts';
+import {palette,font} from './theme';
+export default function UiReview(){
+ const {screen}=useLocalSearchParams<{screen:string}>();const [loaded]=useAppFonts();
+ const [state,setState]=React.useState<GameState|null>(null),[error,setError]=React.useState(''),[done,setDone]=React.useState(false);
+ const rng=React.useRef<RNG>({s:0});
+ const enabled=Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1';
+ React.useEffect(()=>{if(!enabled)return;let alive=true;fetch('/ui-review-fixtures.json').then(r=>{if(!r.ok)throw Error('Review fixtures unavailable');return r.json();}).then(data=>{const f=data.fixtures[screen];if(!f)throw Error('Unknown review screen');if(alive){rng.current=f.rng;setState(f.state);}}).catch(e=>{if(alive)setError(String(e));});return()=>{alive=false};},[screen,enabled]);
+ const dispatch=(cmd:Command)=>{if(!state)return;const out=applyCommand(state,cmd,rng.current);rng.current=out.rng;setState(out.state);};
+ if(!enabled)return <QuietPage title="หน้าตรวจภาพ" subtitle="เปิดเฉพาะชุดตรวจภาพเวอร์ชันเว็บ"><Text style={{color:palette.text}}>กลับไปเล่นเกมจากหน้าแรก</Text></QuietPage>;
+ if(error)return <Text accessibilityRole="alert">{error}</Text>;
+ if(!loaded||!state)return <Text>กำลังเปิดภาพจากเกม…</Text>;
+ if(done)return <QuietPage title="ดำเนินการแล้ว"><Text style={{color:palette.text}}>ปุ่มตอบสนองแล้ว</Text></QuietPage>;
+ if(screen==='defeat')return <DefeatOverlay onHome={()=>setDone(true)}/>;
+ if(screen==='summary'||screen==='summary-defeat')return <RunCompleteScreen state={state} onNewRun={()=>setDone(true)} onJournal={()=>setDone(true)}/>;
+ if(screen==='chapter')return <ChapterView state={state} dispatch={dispatch}/>;
+ if(screen==='event'||screen==='event-result')return state.phase==='event'?<StoryEventView state={state} dispatch={dispatch}/>:<QuietPage title="กลับจุดพักแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>;
+ if(screen==='levelup')return state.phase==='levelup'?<LevelUpOverlay state={state} playerLevel={state.player.level} onChoose={(option,index)=>dispatch({type:'ChooseLevelUpOption',option,index})} onSkip={()=>dispatch({type:'SkipLevelUp'})}/>:<QuietPage title="รับวิชาแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>;
+ if(screen==='reward')return state.phase==='reward'?<CardRewardOverlay choices={state.cardReward?.choices??[]} deck={state.masterDeck} onChoose={index=>dispatch({type:'ChooseCardReward',index})} onSkip={()=>dispatch({type:'SkipCardReward'})}/>:<QuietPage title="เลือกรางวัลแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>;
+ if(screen==='deck')return <DeckView state={{...state,deckOpen:true}} dispatch={cmd=>cmd.type==='CloseDeck'?setDone(true):dispatch(cmd)}/>;
+ if(screen==='blessings')return <BlessingView blessings={state.blessings} onClose={()=>setDone(true)}/>;
+ return <View style={{flex:1,backgroundColor:palette.ink}}>{state.phase==='shop'?<ShopView state={state} dispatch={dispatch}/>:<QuietPage title="กลับจุดพักแล้ว"><QuietButton label="ดำเนินการแล้ว"/></QuietPage>}</View>;
+}

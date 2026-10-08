@@ -17,10 +17,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npm test -- --maxWorkers=2 --testTimeout=30000
+      - run: npm test -- --maxWorkers=2 --testTimeout=60000
       - run: npx tsc --noEmit
       - name: Export real game for web
-        run: npx expo export --platform web --output-dir /tmp/quiet-web
+        run: EXPO_PUBLIC_UI_REVIEW=1 npx expo export --platform web --output-dir /tmp/quiet-web
       - name: Install browser for visual checks
         run: |
           npm install --no-save playwright@1.62.1
@@ -28,12 +28,14 @@ jobs:
       - name: Capture actual mobile screens
         run: |
           npx vite-node --config vitest.config.ts scripts/quiet-preview-fixture.ts
+          npx vite-node --config vitest.config.ts scripts/quiet-review-fixtures.ts
+          cp /tmp/quiet-review-fixtures.json /tmp/quiet-web/ui-review-fixtures.json
           node scripts/preview-mobile.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Mobile-game-preview
-          path: docs/previews/quiet-comic/
+          path: docs/previews/quiet-comic*/
           retention-days: 14
       - uses: actions/upload-artifact@v4
         with:

@@ -7,6 +7,7 @@ import { groupCards } from '../../src/core/cards/group';
 import CardRow from './CardRow';
 import DeckCard, { CardGlyphArt } from './DeckCard';
 import RitualSurface from './RitualSurface';
+import {QuietHeader,QuietButton} from './QuietChrome';
 import { font, radius, size, space, layer, palette, surface } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
@@ -48,20 +49,7 @@ export default function DeckView({ state, dispatch }: Props) {
       zIndex: layer.overlay,
     }}>
 
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        paddingHorizontal: space.xl, paddingTop: pad.top, paddingBottom: space.md,
-      }}>
-        <View>
-          <Text style={{ color: palette.moon, fontSize: size.title, fontFamily: font.display }}>
-            สำรับของเรา
-          </Text>
-          <Text style={{ color: palette.textDim, fontSize: size.ui, fontFamily: font.ui }}>
-            ทั้งหมด {deck.length} ใบ
-          </Text>
-        </View>
-        <SmallButton label="ปิด" onPress={() => dispatch({ type: 'CloseDeck' })} />
-      </View>
+      <View style={{paddingTop:pad.top}}><QuietHeader title="สำรับของเรา" subtitle={`ทั้งหมด ${deck.length} ใบ · แตะการ์ดเพื่ออ่านรายละเอียด`} onClose={()=>dispatch({type:'CloseDeck'})}/></View>
 
       <ScrollView
         contentContainerStyle={{
@@ -84,9 +72,9 @@ export default function DeckView({ state, dispatch }: Props) {
                 key={eq.id ?? i}
                 style={{
                   flexDirection: 'row', alignItems: 'center', gap: space.md,
-                  padding: space.md, borderRadius: radius.md,
-                  backgroundColor: surface.panelRaise,
-                  borderWidth: 1, borderColor: palette.lineStrong,
+                  padding: space.md, borderRadius: 0,
+                  backgroundColor: surface.glassDim,
+                  borderWidth: 1, borderColor: palette.line,
                 }}
               >
                 <View style={{ flex: 1 }}>
@@ -130,8 +118,8 @@ export default function DeckView({ state, dispatch }: Props) {
                   key={`${card.id}-${i}`}
                   style={{
                     flexDirection: 'row', alignItems: 'center', gap: space.md,
-                    padding: space.md, borderRadius: radius.md,
-                    backgroundColor: surface.panelSunk,
+                    padding: space.md, borderRadius: 0,
+                    backgroundColor: surface.glassDim,
                     borderWidth: 1, borderColor: surface.panelWell,
                   }}
                 >
@@ -208,21 +196,4 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function SmallButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={{
-        paddingHorizontal: 0, paddingVertical: 0,
-        minHeight: 44, justifyContent: 'center',
-        borderWidth: 0,
-      }}
-    >
-      <RitualSurface kind="wood" style={{ minHeight: 44, paddingHorizontal: 16, paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: palette.moon, fontSize: size.label, fontFamily: font.uiMed }}>{label}</Text>
-      </RitualSurface>
-    </Pressable>
-  );
-}
+function SmallButton({label,onPress}:{label:string;onPress:()=>void}) {return <QuietButton label={label} onPress={onPress}/>;}

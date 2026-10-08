@@ -18,7 +18,7 @@ import { ImageBackground, Modal, Pressable, ScrollView, Text, View } from 'react
 import type { CardData, DeckPiles } from '../../../src/core/types';
 import { groupCards } from '../../../src/core/cards/group';
 import CardRow from '../CardRow';
-import { GameButton } from '../Panel';
+import {QuietButton} from '../QuietChrome';
 import { font, radius, size, space, tint, layer } from '../../theme';
 import { useScreenPadding } from '../../useScreenPadding';
 
@@ -75,7 +75,7 @@ export default function PileView({ piles, deck, open, onChangePile, onClose }: P
         <Text style={{ color: palette.moon, fontSize: size.title, fontFamily: font.display }}>
           กองการ์ด
         </Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="ปิดกองการ์ด" onPress={onClose}><RitualSurface kind="wood" style={{minHeight:44,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.heading}}>ปิด</Text></RitualSurface></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="ปิดกองการ์ด" onPress={onClose}><RitualSurface kind="quietSlate" style={{minHeight:44,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.heading}}>ปิด</Text></RitualSurface></Pressable>
       </View>
 
       {/* สลับกองได้ในจอเดียว — ปิดแล้วเปิดใหม่ทุกครั้งที่อยากเทียบคือความรำคาญ */}

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import {font} from '../app/theme';
 
 /**
  * ตาข่ายกันสีหลุดพาเลตต์
@@ -105,7 +106,7 @@ describe('ระบบสี', () => {
 describe('การโหลดตัวอักษร', () => {
   it('ทุกหน้าที่เป็นจุดเข้าโหลดฟอนต์เอง', () => {
     // เดิม battle.tsx ใช้ฟอนต์แต่ไม่เคยโหลด — รอดเพราะปกติเข้าหน้าแผนที่ก่อน
-    for (const entry of ['index.tsx', 'battle.tsx']) {
+    for (const entry of ['index.tsx', 'battle.tsx', 'ui-review.tsx']) {
       const src = fs.readFileSync(path.join(APP, entry), 'utf8');
       expect(src, `${entry} ต้องเรียก useAppFonts`).toContain('useAppFonts');
     }
@@ -113,7 +114,7 @@ describe('การโหลดตัวอักษร', () => {
 
   it('ตัวอักษรที่ใช้ต้องเป็นตัวที่โหลดไว้จริง', () => {
     const loader = fs.readFileSync(path.join(APP, 'useAppFonts.ts'), 'utf8');
-    const used = new Set<string>();
+    const used = new Set<string>(Object.values(font));
 
     for (const f of tsxFiles(APP)) {
       const src = fs.readFileSync(path.join(APP, f), 'utf8');

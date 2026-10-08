@@ -1,7 +1,7 @@
 import {palette,surface} from '../../theme';
 import PostBattleSurface from './PostBattleSurface';
 import RitualSurface from '../RitualSurface';
-import {GameButton} from '../Panel';
+import {QuietButton} from '../QuietChrome';
 import {Image} from 'react-native';
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
@@ -90,7 +90,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
 
   return (
     <PostBattleSurface mat>
-      <RitualSurface kind="wood" style={{paddingVertical:18,marginBottom:10}}>
+      <RitualSurface kind="quietSlate" style={{paddingVertical:18,marginBottom:10}}>
         <Text style={{color:palette.moon,fontSize:24,textAlign:'center',fontFamily:font.heading}}>เลเวล {playerLevel}</Text>
       </RitualSurface>
       <Text style={{color:palette.text,fontSize:14,fontFamily:font.ui,textAlign:'center',marginBottom:20}}>
@@ -106,12 +106,12 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
               :bucket==='max_hp'?require('../../../assets/ui/blessing-herb-object.png')
               :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
               :bucket==='upgrade'||bucket==='remove'?require('../../../assets/ui/ritual-knife.png')
-              :require('../../../assets/ui/card-breath.png');
+              :bucket==='max_hand'?require('../../../assets/ui/ritual-palm.png'):require('../../../assets/ui/card-breath.png');
             const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.length:false;
             return <Pressable disabled={unavailable} key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked,disabled:unavailable}}
               onPress={()=>setSelected(opt)} style={{flex:1}}>
-              <Image accessible={false} source={image} resizeMode="contain" style={{width:'100%',height:140,marginBottom:12}}/>
-              <RitualSurface kind="darkCloth" style={{flex:1,minHeight:180,paddingHorizontal:17,paddingVertical:20}}>
+              <Image accessible={false} source={image} resizeMode="contain" style={{width:'100%',height:100,marginBottom:8}}/>
+              <RitualSurface kind="quietSlate" style={{flex:1,minHeight:145,paddingHorizontal:17,paddingVertical:20}}>
                 <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:17,textAlign:'center'}}>{l.title}</Text>
                 <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:22,textAlign:'center',marginTop:8}}>{unavailable?'ไม่มีการ์ดที่เลือกได้':l.detail}</Text>
                 <View style={{minHeight:28,marginTop:10,justifyContent:'center'}}>
@@ -121,7 +121,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
             </Pressable>;
           })}
           </View>
-          <GameButton label="ยืนยันวิชา" tone="primary" disabled={!selected} onPress={()=>selected&&press(selected)}/>
+          <QuietButton label="ยืนยันวิชา" primary disabled={!selected} onPress={()=>selected&&press(selected)}/>
         </View>
       ) : (
         <View>
@@ -133,7 +133,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                 key={sc.key}
                 onPress={() => onChoose(pending, i)}
                 style={{
-                  padding: sc.card ? 0 : 16, borderRadius: 14,
+                  padding: sc.card ? 0 : 16, borderRadius: 0,
                   backgroundColor: surface.panel,
                   borderWidth: sc.card ? 0 : 1, borderColor: palette.line,
                 }}
@@ -168,15 +168,11 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
             ))}
           </ScrollView>}
 
-          <Pressable onPress={() => {setPending(null);setCardIndex(null);}} style={{ marginTop: 14, alignSelf: 'center' }}>
-            <Text style={{ color: palette.textDim, fontFamily:font.ui,fontSize: 14 }}>◂ ย้อนกลับ</Text>
-          </Pressable>
+          <QuietButton label="ย้อนกลับ" onPress={()=>{setPending(null);setCardIndex(null);}} style={{marginTop:14}}/>
         </View>
       )}
 
-      <Pressable onPress={onSkip} style={{ marginTop: 22, alignSelf: 'center' }}>
-        <Text style={{ color: palette.text, fontSize: 13, fontFamily:font.ui }}>ข้ามไปก่อน</Text>
-      </Pressable>
+      <QuietButton label="ข้ามไปก่อน" onPress={onSkip} style={{marginTop:18}}/>
     </PostBattleSurface>
   );
 }
