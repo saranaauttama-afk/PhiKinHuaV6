@@ -212,8 +212,9 @@
       "thai",
       "nun"
     ],
-    "desc": "ปัดเป่าสถานะลบทั้งหมดออกจากตัวเอง",
-    "cleanseDebuffs": true
+    "desc": "ปัดเป่าสถานะลบทั้งหมดออกจากตัวเอง · ใช้แล้วหายไปจากไฟต์นี้",
+    "cleanseDebuffs": true,
+    "exhaust": true
   },
   {
     "id": "alms_offering",
@@ -1648,5 +1649,117 @@
         "draw": 2
       }
     }
+  },
+  {
+    "id": "night_guardian_cut",
+    "name": "มีดครูห้าคืน",
+    "type": "attack",
+    "cost": 2,
+    "dmg": 7,
+    "hits": 2,
+    "conditional": {
+      "when": {
+        "kind": "player_block_at_least",
+        "value": 8
+      },
+      "bonus": {
+        "dmg": 3
+      }
+    },
+    "desc": "โจมตี 7 สองครั้ง ถ้ามีป้องกัน 8 ขึ้นไป โจมตีครั้งละ 10",
+    "tags": [
+      "warrior",
+      "thai",
+      "attack"
+    ],
+    "rarity": "Rare",
+    "inRewards": false,
+    "inShop": false
+  },
+  {
+    "id": "night_hex_knot",
+    "name": "เงื่อนคาถาห้าคืน",
+    "type": "attack",
+    "cost": 1,
+    "dmg": 5,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "poison",
+      "duration": 3,
+      "value": 2
+    },
+    "conditional": {
+      "when": {
+        "kind": "enemy_has_status",
+        "statusId": "poison"
+      },
+      "bonus": {
+        "dmg": 7
+      }
+    },
+    "desc": "โจมตี 5 ใส่พิษ 2 นาน 3 เทิร์น ถ้ามีพิษอยู่ก่อน โจมตี 12",
+    "tags": [
+      "shaman",
+      "thai",
+      "attack",
+      "poison"
+    ],
+    "rarity": "Rare",
+    "inRewards": false,
+    "inShop": false
+  },
+  {
+    "id": "night_lotus_wheel",
+    "name": "จักรบัวห้าคืน",
+    "type": "attack",
+    "cost": 1,
+    "dmg": 6,
+    "block": 5,
+    "conditional": {
+      "when": {
+        "kind": "player_hp_below",
+        "value": 50
+      },
+      "bonus": {
+        "heal": 4
+      }
+    },
+    "desc": "โจมตี 6 ป้องกัน 5 ถ้าเลือดต่ำกว่าครึ่ง ฟื้น 4",
+    "tags": [
+      "nun",
+      "thai",
+      "attack",
+      "block"
+    ],
+    "rarity": "Rare",
+    "inRewards": false,
+    "inShop": false
+  },
+  {
+    "id": "night_ancestor_pact",
+    "name": "สัญญาห้าคืน",
+    "type": "attack",
+    "cost": 1,
+    "dmg": 4,
+    "conditional": {
+      "when": {
+        "kind": "player_minions_at_least",
+        "value": 2
+      },
+      "bonus": {
+        "dmg": 8,
+        "draw": 1
+      }
+    },
+    "desc": "โจมตี 4 ถ้ามีวิญญาณคู่กายอย่างน้อย 2 ตน โจมตี 12 และจั่ว 1",
+    "tags": [
+      "medium",
+      "thai",
+      "attack",
+      "spirit"
+    ],
+    "rarity": "Rare",
+    "inRewards": false,
+    "inShop": false
   }
 ]

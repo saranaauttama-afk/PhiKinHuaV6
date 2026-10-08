@@ -362,7 +362,7 @@ export default function BattlePage() {
           </Pressable>
         )}
 
-        <MonsterArea escalating={gameState.runMode==='episode'}
+        <MonsterArea escalating={gameState.campaign?{every:gameState.campaign.night>=3?3:4,strength:1}:gameState.runMode==='episode'?{every:3,strength:2}:undefined}
           ref={monsterRef}
           monsterId={monsterId}
           monsterName={monsterName}

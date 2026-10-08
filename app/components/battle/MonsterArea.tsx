@@ -24,7 +24,7 @@ type Props = {
   monsterName?: string | string[];
   turnLabel?: string;
   helpers?:React.ReactNode;
-  escalating?:boolean;
+  escalating?:{every:number;strength:number};
   enemy?: {
     hp: number; maxHp: number; name: string;
     block?: number; maxEnergy?: number; handSize?: number;
@@ -98,7 +98,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   return (
     <View pointerEvents="box-none" style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
-      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+52,left:12,right:12,zIndex:layer.decor,paddingHorizontal:12,paddingVertical:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>พลัง {enemy?.maxEnergy ?? 2} · เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} extra={escalating?[{id:"rage-rule",name:"ผีคลุ้มคลั่ง",symbol:"เดือด",bad:true,detail:"ทุก 3 เทิร์น ผีได้ความแข็งแกร่งเพิ่ม 2 จนจบไฟต์ เริ่มมีผลกับการโจมตีรอบถัดไป"}]:[]} compact align="flex-start" /></RitualSurface>
+      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+52,left:12,right:12,zIndex:layer.decor,paddingHorizontal:12,paddingVertical:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>พลัง {enemy?.maxEnergy ?? 2} · เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} extra={escalating?[{id:"rage-rule",name:"ผีคลุ้มคลั่ง",symbol:"เดือด",bad:true,detail:`ทุก ${escalating.every} เทิร์น ผีได้ความแข็งแกร่งเพิ่ม ${escalating.strength} จนจบไฟต์ เริ่มมีผลกับการโจมตีรอบถัดไป`}]:[]} compact align="flex-start" /></RitualSurface>
       <View style={{position:"absolute",top:safe.top+2,left:12,right:112}}>{helpers}</View>
       <Animated.View style={floatStyle}>
         {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}

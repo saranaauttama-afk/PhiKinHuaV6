@@ -10,8 +10,10 @@ export function chooseEnemyCards(s:GameState,hand:string[],budget:number):string
  const value=(ids:string[])=>{
   let attack=0,defense=0,special=0;
   for(const id of ids){const c=enemyCardById(id)!;
-   attack+=(c.hits??1)*computeModifiedDamage(s,{from:'enemy',to:'player',raw:c.dmg??0,source:{kind:'card',cardId:id}});
+   if(c.dmg)attack+=(c.hits??1)*computeModifiedDamage(s,{from:'enemy',to:'player',raw:c.dmg??0,source:{kind:'card',cardId:id}});
    defense+=c.block??0;
+   if(c.summonMinion)special+=(s.minions??[]).filter(m=>m.owner==='enemy').length>=3?1:6;
+   if(c.curseCard)special+=4;
    special+=Math.min(c.heal??0,enemy.maxHp-enemy.hp)*.8;
    if(c.statusEffect){const e=c.statusEffect,who=e.target==='enemy'?enemy:s.player;
     const existing=who.statusEffects?.find(x=>x.id===e.effect);

@@ -98,40 +98,7 @@ function autoEquipStartingCards(s: GameState) {
   }
 }
 
-// export function newRun(
-//   s: GameState,
-//   cmd: Extract<Command, { type: 'NewRun' }>,
-//   r: RNG
-// ) {
-//   // สร้าง state ใหม่ตามปกติ
-//   s = baseNewState(cmd.seed);
-//   s.blessings = s.blessings ?? [];
-//   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
-//   // นับรอบร้านลบ/อัปเกรดไว้ที่นี่ตั้งแต่ต้น run
-//   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };
 
-//   // เด็คตั้งต้น → masterDeck
-//   const { START_DECK } = require('../../balance/core');
-//   s.masterDeck = JSON.parse(JSON.stringify(START_DECK));
-
-//   // ✅ Equipment defaults
-//   s.equipmentSlotsMax = s.equipmentSlotsMax ?? 1;
-//   s.equipped = s.equipped ?? [];
-//   s.backpack = s.backpack ?? [];
-
-//   // ✅ ใช้ PAGES MODE เสมอ (ตัดระบบ Map เดิมทิ้ง)
-//   s.mapMode = 'pages';
-//   //s.map = undefined; // กันหลงเหลือค่าเก่า
-//   const init = initPageMap(r); r = init.rng;
-//   s.pages = init.map;
-
-//   // Starter blessing (เลือกก่อนเข้าเพจแรก)
-//   s.levelUp = null;
-//   const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id)); r = bb.rng;
-//   s.starter = { choices: bb.list, consumed: false };
-//   s.phase = 'starter';
-//   return { state: s, rng: r };
-// }
 export function newRun(
   s: GameState,
   cmd: Extract<Command, { type: 'NewRun' }>,
@@ -139,6 +106,7 @@ export function newRun(
 ) {
   s = baseNewState(cmd.seed);
   s.runMode = cmd.runMode ?? 'full';
+  if(cmd.night&&Number.isInteger(cmd.night)&&cmd.night>=1&&cmd.night<=5){s.runMode='full';s.campaign={night:cmd.night,unlocks:[...new Set(cmd.unlocks??[])]};}
   if (s.runMode === 'episode') s.player.gold = EPISODE.startingGold;
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
@@ -182,6 +150,7 @@ export function newRun(
   // Starter blessing
   s.levelUp = null;
   const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id)); r = bb.rng;
+  if(s.campaign?.unlocks.includes('blessing'))bb.list.push(require('../../campaign/nights').SPECIAL_BLESSINGS[cls.id]);
   s.starter = { choices: bb.list, consumed: false };
   s.phase = 'starter';
 

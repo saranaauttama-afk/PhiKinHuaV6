@@ -146,6 +146,7 @@ describe('พรติดตัวของคลาส', () => {
 
   it('คลาสอื่นไม่ได้ฟื้นเลือดตอนชนะ', () => {
     let s: any = enterFight('warrior');
+    s.blessings = []; // Isolate the class passive from attack-healing blessings.
     s.player.hp = Math.max(1, s.player.maxHp - 20);
     const before = s.player.hp;
 

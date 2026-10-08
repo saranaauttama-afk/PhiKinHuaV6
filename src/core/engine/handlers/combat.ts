@@ -18,6 +18,7 @@ import { isCurseCard, discardCurses } from '../../cards/curse';
 /** Resolve deaths from helper/status/trap effects as well as direct played cards. */
 function settleCombat(s: GameState, r: RNG): RNG {
   if (s.phase !== 'combat') return r;
+  require('../../campaign/nights').awakenNightBoss(s);
   if (isDefeat(s)) {
     loseRun(s);
     require('../../minionRuntime').clearAllMinions(s);
@@ -63,6 +64,9 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
 
   // Equipment cards
   if (played.type === 'equipment' && played.equipmentId) {
+    const cost=effectiveCost(s,played);if(cost>s.player.energy)return {state:s,rng:r};
+    s.player.energy-=cost;countCardPlayed(s);
+    require('../../combat/combos').applyComboCardModifiers(s,played);
     const equipmentData = getEquipmentById(played.equipmentId);
     let equipmentInstalled = false;
 
@@ -129,16 +133,11 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     ({ state: s, rng: r } = drawUpTo(s, r, target));
   }
 
-  if (s.runMode === 'episode' && s.enemyIntent) {
+  require('../../campaign/nights').awakenNightBoss(s);
+  if ((s.runMode === 'episode'||s.campaign) && s.enemyIntent) {
     require('../../combat/intent').refreshIntentEstimate(s);
   }
-  if (isVictory(s)) {
-    r = grantExpAndQueueLevelUp(s, r);
-    s.combatVictoryLock = true;
-    const { clearAllMinions } = require('../../minionRuntime');
-    clearAllMinions(s);
-    advanceAfterVictory(s);
-  }
+  r = settleCombat(s,r);
   return { state: s, rng: r };
 }
 
@@ -163,7 +162,7 @@ export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { ty
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
   r = settleCombat(s, r);
-  if (s.phase === 'combat' && s.runMode === 'episode') planEnemyIntent(s);
+  if (s.phase === 'combat' && (s.runMode === 'episode'||s.campaign)) planEnemyIntent(s);
   return { state: s, rng: r };
 }
 
@@ -241,7 +240,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     // การเลื่อนมาตัดสินใจตรงนี้ดีกว่าในเชิงกฎเกม — ศัตรูเห็นกระดานจริงตอนนั้น
     // ทั้งการ์ดที่ผู้เล่นเพิ่งตั้งและเลือดที่เพิ่งเสีย ไม่ใช่ภาพเมื่อเทิร์นที่แล้ว
     // The episode commits to the displayed cards. Full runs retain existing AI.
-    if (s.runMode !== 'episode' || !s.enemyIntent) planEnemyIntent(s);
+    if ((s.runMode !== 'episode'&&!s.campaign) || !s.enemyIntent) planEnemyIntent(s);
     const toPlay: string[] = [...(s.enemyIntent?.cardIds ?? [])];
 
     s.enemyLastPlayed = [];
@@ -289,9 +288,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
 
   if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
   // Visible escalation rewards closing the fight rather than healing indefinitely.
-  if(s.phase==='combat' && s.runMode==='episode' && s.turn%3===0){
-    require('../../statusEffectsRuntime').applyStatusEffect('enemy',s,'strength',99,2);
-    s.log.push('ผีคลุ้มคลั่ง: แข็งแกร่งเพิ่ม 2 จนจบไฟต์');
+  const escalation=require('../../campaign/nights').nightEscalation(s)??(s.runMode==='episode'?{every:3,strength:2}:undefined);
+  if(s.phase==='combat' && escalation && s.turn%escalation.every===0){
+    require('../../statusEffectsRuntime').applyStatusEffect('enemy',s,'strength',99,escalation.strength);
+    s.log.push(`ผีคลุ้มคลั่ง: แข็งแกร่งเพิ่ม ${escalation.strength} จนจบไฟต์`);
   }
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 

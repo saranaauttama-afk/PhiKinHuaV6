@@ -68,6 +68,7 @@ export type SaveV2 = {
 
 /** ข้อมูลย่อสำหรับโชว์บนปุ่ม "เดินทางต่อ" โดยไม่ต้องโหลดทั้งเซฟ */
 export type SaveSummary = {
+  night?: number;
   classId?: string;
   fight: number;
   totalFights: number;
@@ -161,6 +162,7 @@ export function summarize(data: SaveV2): SaveSummary {
   const plans = s.journey?.plans ?? [];
   return {
     classId: s.classId,
+    night:s.campaign?.night,
     fight: Math.min((s.fightCount ?? 0) + 1, plans.filter(p => p.kind !== 'rest').length || 15),
     totalFights: plans.filter(p => p.kind !== 'rest').length || 15,
     hp: s.player?.hp ?? 0,

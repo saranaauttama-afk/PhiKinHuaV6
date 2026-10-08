@@ -4,6 +4,8 @@ import type { CardData, GameState } from '../types';
 type When = {
   hasTag?: string;
   type?: CardData['type'];
+  cost?: number;
+  status?: boolean;
 };
 
 type OnPlaySpec = {
@@ -19,6 +21,15 @@ export type BlessingBehavior = {
 };
 
 const behaviors: Record<string, BlessingBehavior> = {
+  free_card_energy: {on_card_played:[{when:{cost:0},oncePerTurnKey:'free',effect:s=>{s.player.energy+=1;}}]},
+  naga_blessing: {on_turn_start:s=>{
+    s.player.energy+=1;
+    require('../commands').drawUpTo(s,require('../rngState').nextStateRng(s),s.piles.hand.length+1);
+  }},
+  night_warrior_blessing: {on_card_played:[{when:{type:'skill'},oncePerTurnKey:'skill',effect:s=>{s.player.block+=3;}}]},
+  night_shaman_blessing: {on_card_played:[{when:{status:true},oncePerTurnKey:'status',effect:s=>{s.player.block+=3;}}]},
+  night_nun_blessing: {on_turn_start:s=>{if(s.player.hp<s.player.maxHp*.5)s.player.hp=Math.min(s.player.maxHp,s.player.hp+2);else s.player.block+=2;}},
+  night_medium_blessing: {on_turn_start:s=>{s.player.block+=Math.min(4,(s.minions??[]).filter(m=>m.owner==='player'&&m.duration>0).length*2);}},
   regen_1: {
     on_turn_end: (s) => {
       s.player.hp = Math.min(s.player.maxHp, s.player.hp + 1);
@@ -126,5 +137,10 @@ const behaviors: Record<string, BlessingBehavior> = {
 };
 
 export function getBlessingBehavior(id: string): BlessingBehavior | undefined {
-  return behaviors[id];
+  const aliases: Record<string,string> = {
+    ancestral_blessing:'regen_1', spirit_energy:'bl_energy_first', ghost_protection:'block_on_attack_2',
+    meditation_peace:'start_block_3', herbal_wisdom:'energy_on_skill_first', sacred_cloth:'steel_skin_1',
+    life_steal_spirit:'blood_thirst_1', bamboo_dart_power:'attack_first_energy', ritual_shield:'skill_shield_1',
+  };
+  return behaviors[aliases[id] ?? id];
 }

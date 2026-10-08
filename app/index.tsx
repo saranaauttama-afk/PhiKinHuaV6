@@ -17,6 +17,9 @@ import RestDestinations from './components/RestDestinations';
 import SceneGhostChoices from './components/SceneGhostChoices';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
+import NightSelectScreen from './components/NightSelectScreen';
+import JournalView from './components/JournalView';
+import type {ClassId} from '../src/core/classes';
 import JourneyTrail from './components/JourneyTrail';
 import StarterBlessingScreen from './components/StarterBlessingScreen';
 import StoryEventView from './components/StoryEventView';
@@ -37,7 +40,7 @@ import { palette, font, size, space, surface } from './theme';
 
 
 export default function Home() {
-  const { state, dispatch, newRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
+  const { state, dispatch, newRun, newNightRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
   const router = useRouter();
   const {chooseClass}=useLocalSearchParams();
   const [seed, setSeed] = useState('demo-001');
@@ -46,6 +49,8 @@ export default function Home() {
   const [saveLoadError, setSaveLoadError] = useState<string>('');
   const [showDebugTools, setShowDebugTools] = useState(false);
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const [nightClass,setNightClass]=useState<ClassId|null>(null);
+  const [journalOpen,setJournalOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
   const [blessingsOpen, setBlessingsOpen] = useState(false);
   const enteredRest = React.useRef<string | null>(null);
@@ -82,10 +87,13 @@ export default function Home() {
   // เดิมเป็น if-chain อยู่ตรงนี้ แล้วพลาดจนเปิดแอปมาค้างที่แผนที่เปล่า
   const screen = screenForState(state, { pickingClass });
 
+  if(journalOpen)return <JournalView onClose={()=>setJournalOpen(false)}/>;
+  if(nightClass)return <NightSelectScreen classId={nightClass} onBack={()=>setNightClass(null)} onStart={async night=>{const ok=await newNightRun(`night-${Date.now()}`,nightClass,night);if(ok){enteredRest.current=null;setNightClass(null);setPickingClass(false);}return ok;}}/>;
   if (screen === 'start') {
     return (
       <StartPage
         onStartGame={() => setPickingClass(true)}
+        onJournal={()=>setJournalOpen(true)}
         onContinue={() => { void continueRun(); }}
       />
     );
@@ -95,7 +103,7 @@ export default function Home() {
   if (screen === 'class-select') {
     return (
       <ClassSelectScreen
-        onPick={(classId) => { enteredRest.current = null; setPickingClass(false); newRun(`episode-${Date.now()}`, classId, 'episode'); }}
+        onPick={(classId) => setNightClass(classId)}
         onBack={() => setPickingClass(false)}
       />
     );
@@ -108,7 +116,7 @@ export default function Home() {
 
   // จบรันแล้ว — แสดงจอสรุปแทนการเด้งกลับแผนที่ที่ไม่มีอะไรเหลือ
   if (screen === 'run-complete') {
-    return <RunCompleteScreen state={state} onNewRun={() => setPickingClass(true)} />;
+    return <RunCompleteScreen state={state} onJournal={()=>setJournalOpen(true)} onNewRun={() => setPickingClass(true)} />;
   }
 
   // เลือกพรตั้งต้นก่อนเข้าหน้าแรก
@@ -169,6 +177,7 @@ export default function Home() {
               <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
+          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:18,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · ปราบผี {state.fightCount??0}/15</Text>}
           <JourneyTrail state={state} compact={restRow} />
 
           {offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (

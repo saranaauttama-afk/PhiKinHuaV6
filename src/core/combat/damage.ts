@@ -100,6 +100,7 @@ export function computeModifiedDamage(
 ): number {
   const { from, to, raw } = args;
   const rules = rulesFor(args.source);
+  if(rules.attackerMods&&from==='enemy'&&hasStatusEffect('enemy',state,'entangle'))return 0;
   let dmg = raw;
 
   // 1) ฝั่งผู้ตี — ฟังก์ชันนี้อ่าน status ของ "ผู้ตี" จาก flag ตัวที่สอง
@@ -116,11 +117,16 @@ export function computeModifiedDamage(
     }
   }
 
+  // Curse adds a flat point per stack for every damage source.
+  const curse=(to==='player'?state.player:state.enemy)?.statusEffects?.find(e=>e.id==='curse');
+  dmg+=(curse?.stacks??0);
+
   // 3) ฝั่งผู้รับ — vulnerable
   if (rules.defenderMods && hasStatusEffect(to, state, 'vulnerable' as any)) {
     dmg = dmg * VULNERABLE_MULTIPLIER;
   }
 
+  if (rules.defenderMods && to === 'player' && state.blessings?.some(b=>b.id==='luang_pu_protection')) dmg-=1;
   return Math.max(0, Math.round(dmg));
 }
 

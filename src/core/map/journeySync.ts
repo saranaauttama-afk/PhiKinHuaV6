@@ -10,6 +10,7 @@ import {
   buildJourney, reachableNodes, moveTo, isJourneyComplete,
   appendRows, planSecretRows, rowIsRest,
 } from './journey';
+import type {PageOffer} from './pages';
 import type { JourneyNode } from './journey';
 import { buildEpisode } from './episode';
 import { initPageMap } from './pages';
@@ -30,6 +31,17 @@ export function startJourney(s: GameState, r: RNG): RNG {
   }
   const out = s.runMode === 'episode' ? { journey: buildEpisode(), rng: r } : buildJourney(r);
   s.journey = out.journey;
+  if(s.campaign){
+    const restKinds=[['healing_shrine','shop_card','shop_remove'],['story_event','shop_upgrade','shop_equipment'],['healing_shrine','shop_remove','shop_upgrade'],['treasure_single','shop_card','story_event'],['healing_shrine','shop_upgrade','fusion_altar'],['shop_remove','shop_card','story_event'],['healing_shrine','shop_upgrade','shop_equipment']] as const;
+    let restIndex=0;
+    for(let row=0;row<s.journey.rows.length;row++)if(s.journey.plans[row].kind==='rest'){
+      const kinds=restKinds[restIndex++];
+      s.journey.rows[row].forEach((id,i)=>{const kind=kinds[i%kinds.length];
+        const previous=s.journey!.nodes[id].offer;
+        s.journey!.nodes[id].offer=kind==='story_event'&&previous.kind==='story_event'?previous:{kind,shopId:`night-${row}-${i}`,phase:1,...(kind==='story_event'?{eventId:'episode_blessing'}:{})} as PageOffer;
+      });
+    }
+  }
   syncOffersFromJourney(s);
   return out.rng;
 }

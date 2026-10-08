@@ -176,8 +176,8 @@
     "id": "spirit_whisper",
     "name": "กระซิบผี",
     "type": "attack",
-    "cost": 0,
-    "dmg": 3,
+    "cost": 1,
+    "dmg": 4,
     "draw": 1,
     "rarity": "Common",
     "inShop": true,
@@ -187,7 +187,7 @@
       "shaman",
       "draw"
     ],
-    "desc": "ผีกระซิบข้อมูลให้ 3 ดาเมจ และจั่วการ์ด 1 ใบ"
+    "desc": "โจมตี 4 จั่ว 1"
   },
   {
     "id": "ghost_dodge",
@@ -204,7 +204,8 @@
       "shaman",
       "draw"
     ],
-    "desc": "ให้ผีช่วยหลบ Block 2 และจั่วการ์ด 1 ใบ"
+    "desc": "ให้ผีช่วยหลบ Block 2 และจั่วการ์ด 1 ใบ · ใช้แล้วหายไปจากไฟต์นี้",
+    "exhaust": true
   },
   {
     "id": "herbal_potion",

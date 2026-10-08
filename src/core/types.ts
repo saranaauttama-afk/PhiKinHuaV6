@@ -264,6 +264,8 @@ export type GameState = {
   /** คลาสที่ผู้เล่นเลือกไว้ตอนเริ่มรัน — กำหนดเด็ค ค่าสถานะ และพรติดตัว */
   classId?: import('./classes').ClassId;
   runMode?: 'episode' | 'full';
+  campaign?: import('./campaign/nights').CampaignRun;
+  runMetrics?: import('./campaign/metrics').RunMetrics;
 
   /** ศัตรูจะทำอะไรเทิร์นหน้า — UI แสดงระหว่างเทิร์นผู้เล่น */
   enemyIntent?: EnemyIntent;
@@ -307,6 +309,7 @@ export type GameState = {
     level: number;
     gold: number;
     beatSecretBoss: boolean;
+    metrics?: import('./campaign/metrics').RunMetrics;
   };
   enemyPiles?: {
     draw: string[];
@@ -442,7 +445,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; classId?: import('./classes').ClassId; runMode?: 'episode' | 'full' }
+  | { type: 'NewRun'; seed: string; classId?: import('./classes').ClassId; runMode?: 'episode' | 'full'; night?: import('./campaign/nights').Night; unlocks?: Array<'card'|'blessing'> }
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }
 

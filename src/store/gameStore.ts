@@ -1,5 +1,8 @@
 // app/store/gameStore.ts - Shared game store
 import { create } from 'zustand';
+import {useJournal} from './journalStore';
+import {unlockedNight} from '../core/campaign/journal';
+import type {Night} from '../core/campaign/nights';
 import type { Command, GameState } from '../../src/core/types';
 import type { ClassId } from '../core/classes';
 import { applyCommand } from '../../src/core/reducer';
@@ -22,6 +25,7 @@ function shouldAutoSave(cmdType: Command['type']): boolean {
 }
 
 let autoSaveTimer: ReturnType<typeof setTimeout> | undefined;
+let terminalSavePending:Promise<void>=Promise.resolve();
 let autoSavePending:Promise<void>=Promise.resolve();
 
 type Store = {
@@ -29,6 +33,7 @@ type Store = {
   rng: RNG;
   dispatch: (cmd: Command) => void;
   newRun: (seed: string, classId?: ClassId, runMode?: 'episode' | 'full') => void;
+  newNightRun:(seed:string,classId:ClassId,night:Night)=>Promise<boolean>;
   saveToSlot: (slot: number) => Promise<void>;
   loadFromSlot: (slot: number) => Promise<void>;
   continueRun: () => Promise<boolean>;
@@ -59,6 +64,12 @@ export const useGame = create<Store>((set, get) => ({
     const result = applyCommand(state, cmd, rng);
     set({ state: result.state, rng: result.rng });
 
+    if(result.state.runSummary&&result.state.campaign){
+      clearTimeout(autoSaveTimer);
+      terminalSavePending=autoSavePending.then(()=>useJournal.getState().addRun(result.state)).then(()=>clearAutoSave());
+      void terminalSavePending.catch(()=>{});
+      return;
+    }
     if (!get().autoSaveEnabled) return;
 
     // รันจบแล้ว (ชนะหรือแพ้) — ลบเซฟค้างทิ้ง
@@ -87,6 +98,16 @@ export const useGame = create<Store>((set, get) => ({
     const newRng = makeRng(seed);
     const result = applyCommand(makeEmptyState(), { type: 'NewRun', seed, classId, runMode }, newRng);
     set({ state: result.state, rng: result.rng });
+  },
+
+  newNightRun:async(seed,classId,night)=>{
+    await terminalSavePending.catch(()=>{});
+    const journal=useJournal.getState();await journal.hydrate();
+    const progress=useJournal.getState();if(progress.error||progress.saving||night>unlockedNight(progress.journal,classId))return false;
+    if(!Number.isInteger(night)||night<1||night>5)return false;
+    clearTimeout(autoSaveTimer);await autoSavePending;await clearAutoSave();
+    const result=applyCommand(makeEmptyState(),{type:'NewRun',seed,classId,runMode:'full',night,unlocks:progress.journal.classes[classId].unlocks},makeRng(seed));
+    set({state:result.state,rng:result.rng});return true;
   },
 
   saveToSlot: async (slot: number) => {

@@ -59,7 +59,7 @@ export const THAI_GHOST_POOLS = {
       name: 'งูผีสาง',
       tier: 'T2' as const,
       hp: 30,
-      description: 'งูยักษ์ที่กลายเป็นผี มีพิษร้ายที่สามารถฆ่าคนได้'
+      description: 'โจมตี 5 · พิษ 2 นาน 2 เทิร์น'
     }
   ],
 
@@ -70,35 +70,35 @@ export const THAI_GHOST_POOLS = {
       name: 'ผีเปรต',
       tier: 'T3' as const,
       hp: 35,
-      description: 'ผีที่มีปากเล็กท้องใหญ่ อดอยากตลอดกาล'
+      description: 'โจมตี 6 ฟื้น 4'
     },
     {
       id: 'krahang',
       name: 'กะหัง',
       tier: 'T3' as const,
       hp: 38,
-      description: 'ผีชายที่บินได้ มักลักพาตัวสาวๆ ในยามค่ำคืน'
+      description: 'โจมตี 4 ×2'
     },
     {
       id: 'kuman-thong',
       name: 'กุมารทอง',
       tier: 'T3' as const,
       hp: 40,
-      description: 'วิญญาณเด็กที่ถูกเสกให้กลายเป็นเทพารักษ์'
+      description: 'โจมตี 3 · ลดจั่ว 1 นาน 2 เทิร์น'
     },
     {
       id: 'phi-tai-hong',
       name: 'ผีตายทั้งกลม',
       tier: 'T3' as const,
       hp: 42,
-      description: 'ผีของผู้ที่เสียชีวิตอย่างอนาถ มีความแค้นฝังลึก'
+      description: 'โจมตี 5 · เปราะบาง 1 นาน 2 เทิร์น'
     },
     {
       id: 'phi-pa',
       name: 'ผีป่า',
       tier: 'T3' as const,
       hp: 45,
-      description: 'ผีที่อาศัยอยู่ในป่าลึก พ่อมดแม่มดของธรรมชาติ'
+      description: 'โจมตี 4 เรียกปีศาจป่าทำให้อ่อนแอ'
     }
   ],
 
@@ -109,21 +109,21 @@ export const THAI_GHOST_POOLS = {
       name: 'แม่นาค',
       tier: 'T4' as const,
       hp: 50,
-      description: 'ผีหญิงในตำนานที่รักสามีจนไม่ยอมไปเกิด'
+      description: 'โจมตี 4 ×3'
     },
     {
       id: 'pop-yai',
       name: 'ปอบใหญ่',
       tier: 'T4' as const,
       hp: 55,
-      description: 'ปอบที่มีพลังมากกว่าปกติ กินได้ทั้งของเน่าและเลือดสด'
+      description: 'โจมตี 8 ฟื้น 4'
     },
     {
       id: 'phi-ha-ratri',
       name: 'ผีห่าราตรี',
       tier: 'T4' as const,
       hp: 60,
-      description: 'ผีที่ปรากฏในเวลาบ่ายโมง นำความตายมาสู่ผู้พบเห็น'
+      description: 'โจมตี 5 · พิษ 3 นาน 2 เทิร์น'
     }
   ],
 
@@ -134,21 +134,21 @@ export const THAI_GHOST_POOLS = {
       name: 'อสุรกาย',
       tier: 'T5' as const,
       hp: 70,
-      description: 'ปีศาจร้ายที่มีพลังแห่งความมืด ศัตรูของสวรรค์'
+      description: 'โจมตี 6 ×2'
     },
     {
       id: 'yak-wat-jaeng',
       name: 'ยักษ์วัดแจ้ง',
       tier: 'T5' as const,
       hp: 75,
-      description: 'ยักษ์ผู้พิทักษ์วัด แต่กลายเป็นปีศาจเมื่อโกรธ'
+      description: 'โจมตี 10 ป้องกัน 8'
     },
     {
       id: 'phi-phrai',
       name: 'ผีพราย',
       tier: 'T5' as const,
       hp: 80,
-      description: 'ผีที่ถูกสร้างด้วยเวทมนตร์ร้าย มีพลังที่น่ากลัว'
+      description: 'โจมตี 6 · อ่อนแอ 1 นาน 2 เทิร์น'
     }
   ],
 
@@ -159,42 +159,42 @@ export const THAI_GHOST_POOLS = {
       name: 'วิญญาณเร่ร่อน',
       tier: 'Elite' as const,
       hp: 85,
-      description: 'วิญญาณที่หลงทางไม่สามารถไปสุคติได้'
+      description: 'โจมตี 7 ใส่เสียงในหู 1 ใบในกองทิ้ง เฉพาะไฟต์นี้'
     },
     {
       id: 'pisaj-fai',
       name: 'ปีศาจไฟ',
       tier: 'Elite' as const,
       hp: 90,
-      description: 'ปีศาจที่ควบคุมไฟได้ เผาผลาญทุกสิ่งในทางของมัน'
+      description: 'โจมตี 7 · พิษ 3 นาน 2 เทิร์น'
     },
     {
       id: 'jao-por-pa',
       name: 'เจ้าพ่อป่า',
       tier: 'Elite' as const,
       hp: 95,
-      description: 'เทพารักษ์ป่าที่กลายเป็นปีศาจเมื่อป่าถูกทำลาย'
+      description: 'โจมตี 6 เรียกปีศาจป่าทำให้อ่อนแอ'
     },
     {
       id: 'phi-nang-yai',
       name: 'ผีนางใหญ่',
       tier: 'Elite' as const,
       hp: 100,
-      description: 'ผีหญิงที่มีอำนาจเหนือผีอื่นๆ นางผีแห่งความมืด'
+      description: 'โจมตี 7 · เพิ่มค่าร่าย 1 นาน 2 เทิร์น'
     },
     {
       id: 'winyan-dek',
       name: 'วิญญาณเด็ก',
       tier: 'Elite' as const,
       hp: 105,
-      description: 'วิญญาณเด็กที่เสียชีวิตอย่างน่าสงสาร มีความแค้นฝังลึก'
+      description: 'โจมตี 4 ×3'
     },
     {
       id: 'yak-dam',
       name: 'ยักษ์ดำ',
       tier: 'Elite' as const,
       hp: 110,
-      description: 'ยักษ์ที่มีผิวดำสนิท มีกำลังมหาศาลและความโกรธเกรี้ยว'
+      description: 'โจมตี 13 · เปราะบาง 1 นาน 2 เทิร์น'
     }
   ],
 
@@ -205,14 +205,14 @@ export const THAI_GHOST_POOLS = {
       name: 'ผีแม่ม่าย',
       tier: 'BossMid' as const,
       hp: 120,
-      description: 'ผีหญิงที่เสียสามีไป เต็มไปด้วยความเศร้าโศกและความแค้น'
+      description: 'โจมตี 8 · อ่อนแอ 1 นาน 2 เทิร์น'
     },
     {
       id: 'phra-upakut',
       name: 'พระอุปคุต',
       tier: 'BossMid' as const,
       hp: 130,
-      description: 'เณรที่กลายเป็นปีศาจ ทรงพลังแห่งเวทมนตร์โบราณ'
+      description: 'โจมตี 7 ฟื้น 6'
     }
   ],
 
@@ -223,14 +223,14 @@ export const THAI_GHOST_POOLS = {
       name: 'พญานาค',
       tier: 'BossFinal' as const,
       hp: 180,
-      description: 'ราชาแห่งงูทั้งหลาย ผู้ครองน้ำและสายฟ้า'
+      description: 'โจมตี 6 ×3'
     },
     {
       id: 'thep-aksorn',
       name: 'เทพอักษร',
       tier: 'BossFinal' as const,
       hp: 200,
-      description: 'เทพแห่งภาษาและคำสาป ผู้ควบคุมพลังแห่งคำ'
+      description: 'โจมตี 9 ใส่เสียงในหู 1 ใบในกองทิ้ง เฉพาะไฟต์นี้'
     }
   ],
 
@@ -241,7 +241,7 @@ export const THAI_GHOST_POOLS = {
       name: 'พระยามัจจุราช',
       tier: 'SecretBoss' as const,
       hp: 250,
-      description: 'เทพแห่งความตาย ผู้ปกครองอำนาจแห่งความมืดมิด'
+      description: 'โจมตี 7 ×3'
     }
   ]
 };

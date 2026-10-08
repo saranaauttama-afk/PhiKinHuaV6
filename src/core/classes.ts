@@ -82,7 +82,7 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
     title: 'ผู้ถือศีล',
     desc: 'สวดมนต์ตั้งเกราะก่อนหมุนธรรมจักรให้แรงขึ้น เลือกจังหวะรักษาและล้างพิษ ศีลห้าใช้ได้ครั้งเดียวต่อไฟต์',
     cardTag: 'nun',
-    startHp: 44,
+    startHp: 50,
     startEnergy: 3,
     startHandSize: 6,
     starterDeck: {
@@ -96,7 +96,7 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
       dispel_ill: 1,
     },
     passiveName: 'อานิสงส์',
-    passiveDesc: 'ฟื้นพลังชีวิต 4 ทุกครั้งที่ชนะไฟต์',
+    passiveDesc: 'ฟื้นพลังชีวิต 6 ทุกครั้งที่ชนะไฟต์',
   },
 
   medium: {
@@ -175,7 +175,7 @@ export function applyClassVictoryPassive(s: GameState): void {
   if (cls.id !== 'nun') return;
 
   const before = s.player.hp;
-  s.player.hp = Math.min(s.player.maxHp, before + 4);
+  s.player.hp = Math.min(s.player.maxHp, before + 6);
   const healed = s.player.hp - before;
   if (healed > 0) s.log.push(`อานิสงส์: ฟื้นพลังชีวิต ${healed}`);
 }

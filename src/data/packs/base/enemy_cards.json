@@ -378,5 +378,1039 @@
       "value": 1
     },
     "desc": "ป้องกัน 6 · เพิ่มพลังโจมตี 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "ngu_phi_sang_strike",
+    "owner": "ngu-phi-sang",
+    "name": "โจมตีของฉกพิษ",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "ngu_phi_sang_ward",
+    "owner": "ngu-phi-sang",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "ngu_phi_sang_signature",
+    "owner": "ngu-phi-sang",
+    "name": "ฉกพิษ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "value": 2,
+      "duration": 2
+    },
+    "desc": "โจมตี 5 · พิษ 2 นาน 2 เทิร์น"
+  },
+  {
+    "id": "ngu_phi_sang_ritual",
+    "owner": "ngu-phi-sang",
+    "name": "อาคมฉกพิษ",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_pret_strike",
+    "owner": "phi-pret",
+    "name": "โจมตีของท้องหิว",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "phi_pret_ward",
+    "owner": "phi-pret",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "phi_pret_signature",
+    "owner": "phi-pret",
+    "name": "ท้องหิว",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 6,
+    "heal": 4,
+    "desc": "โจมตี 6 ฟื้น 4"
+  },
+  {
+    "id": "phi_pret_ritual",
+    "owner": "phi-pret",
+    "name": "อาคมท้องหิว",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "krahang_strike",
+    "owner": "krahang",
+    "name": "โจมตีของปีกกระด้ง",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "krahang_ward",
+    "owner": "krahang",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "krahang_signature",
+    "owner": "krahang",
+    "name": "ปีกกระด้ง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "hits": 2,
+    "desc": "โจมตี 4 ×2"
+  },
+  {
+    "id": "krahang_ritual",
+    "owner": "krahang",
+    "name": "อาคมปีกกระด้ง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "kuman_thong_strike",
+    "owner": "kuman-thong",
+    "name": "โจมตีของหัวเราะหลอก",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "kuman_thong_ward",
+    "owner": "kuman-thong",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "kuman_thong_signature",
+    "owner": "kuman-thong",
+    "name": "หัวเราะหลอก",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "value": 1,
+      "duration": 2
+    },
+    "desc": "โจมตี 3 · ลดจั่ว 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "kuman_thong_ritual",
+    "owner": "kuman-thong",
+    "name": "อาคมหัวเราะหลอก",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_tai_hong_strike",
+    "owner": "phi-tai-hong",
+    "name": "โจมตีของลางมรณะ",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "phi_tai_hong_ward",
+    "owner": "phi-tai-hong",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "phi_tai_hong_signature",
+    "owner": "phi-tai-hong",
+    "name": "ลางมรณะ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "value": 1,
+      "duration": 2
+    },
+    "desc": "โจมตี 5 · เปราะบาง 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "phi_tai_hong_ritual",
+    "owner": "phi-tai-hong",
+    "name": "อาคมลางมรณะ",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_pa_strike",
+    "owner": "phi-pa",
+    "name": "โจมตีของเรียกป่ามืด",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "phi_pa_ward",
+    "owner": "phi-pa",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "phi_pa_signature",
+    "owner": "phi-pa",
+    "name": "เรียกป่ามืด",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "summonMinion": "forest_demon",
+    "desc": "โจมตี 4 เรียกปีศาจป่าทำให้อ่อนแอ"
+  },
+  {
+    "id": "phi_pa_ritual",
+    "owner": "phi-pa",
+    "name": "อาคมเรียกป่ามืด",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "mae_nak_strike",
+    "owner": "mae-nak",
+    "name": "โจมตีของมือยาวนาก",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "mae_nak_ward",
+    "owner": "mae-nak",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "mae_nak_signature",
+    "owner": "mae-nak",
+    "name": "มือยาวนาก",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "hits": 3,
+    "desc": "โจมตี 4 ×3"
+  },
+  {
+    "id": "mae_nak_ritual",
+    "owner": "mae-nak",
+    "name": "อาคมมือยาวนาก",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "pop_yai_strike",
+    "owner": "pop-yai",
+    "name": "โจมตีของกัดกินใหญ่",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "pop_yai_ward",
+    "owner": "pop-yai",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "pop_yai_signature",
+    "owner": "pop-yai",
+    "name": "กัดกินใหญ่",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 8,
+    "heal": 4,
+    "desc": "โจมตี 8 ฟื้น 4"
+  },
+  {
+    "id": "pop_yai_ritual",
+    "owner": "pop-yai",
+    "name": "อาคมกัดกินใหญ่",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_ha_ratri_strike",
+    "owner": "phi-ha-ratri",
+    "name": "โจมตีของไอโรคห่า",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "phi_ha_ratri_ward",
+    "owner": "phi-ha-ratri",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "phi_ha_ratri_signature",
+    "owner": "phi-ha-ratri",
+    "name": "ไอโรคห่า",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "value": 3,
+      "duration": 2
+    },
+    "desc": "โจมตี 5 · พิษ 3 นาน 2 เทิร์น"
+  },
+  {
+    "id": "phi_ha_ratri_ritual",
+    "owner": "phi-ha-ratri",
+    "name": "อาคมไอโรคห่า",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "asuragaya_strike",
+    "owner": "asuragaya",
+    "name": "โจมตีของตบสองมือ",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "asuragaya_ward",
+    "owner": "asuragaya",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "asuragaya_signature",
+    "owner": "asuragaya",
+    "name": "ตบสองมือ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 6,
+    "hits": 2,
+    "desc": "โจมตี 6 ×2"
+  },
+  {
+    "id": "asuragaya_ritual",
+    "owner": "asuragaya",
+    "name": "อาคมตบสองมือ",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "yak_wat_jaeng_strike",
+    "owner": "yak-wat-jaeng",
+    "name": "โจมตีของไม้พลองยักษ์",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "yak_wat_jaeng_ward",
+    "owner": "yak-wat-jaeng",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "yak_wat_jaeng_signature",
+    "owner": "yak-wat-jaeng",
+    "name": "ไม้พลองยักษ์",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 10,
+    "block": 8,
+    "desc": "โจมตี 10 ป้องกัน 8"
+  },
+  {
+    "id": "yak_wat_jaeng_ritual",
+    "owner": "yak-wat-jaeng",
+    "name": "อาคมไม้พลองยักษ์",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_phrai_strike",
+    "owner": "phi-phrai",
+    "name": "โจมตีของน้ำมันพราย",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 5,
+    "desc": "โจมตี 5"
+  },
+  {
+    "id": "phi_phrai_ward",
+    "owner": "phi-phrai",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "phi_phrai_signature",
+    "owner": "phi-phrai",
+    "name": "น้ำมันพราย",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "value": 1,
+      "duration": 2
+    },
+    "desc": "โจมตี 6 · อ่อนแอ 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "phi_phrai_ritual",
+    "owner": "phi-phrai",
+    "name": "อาคมน้ำมันพราย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "winyan_rerorn_strike",
+    "owner": "winyan-rerorn",
+    "name": "โจมตีของเสียงเรียกทางหลง",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "โจมตี 6"
+  },
+  {
+    "id": "winyan_rerorn_ward",
+    "owner": "winyan-rerorn",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "winyan_rerorn_signature",
+    "owner": "winyan-rerorn",
+    "name": "เสียงเรียกทางหลง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 7,
+    "curseCard": "curse_whisper",
+    "desc": "โจมตี 7 ใส่เสียงในหู 1 ใบในกองทิ้ง เฉพาะไฟต์นี้"
+  },
+  {
+    "id": "winyan_rerorn_ritual",
+    "owner": "winyan-rerorn",
+    "name": "อาคมเสียงเรียกทางหลง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "pisaj_fai_strike",
+    "owner": "pisaj-fai",
+    "name": "โจมตีของเถ้าถ่านร้อน",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "โจมตี 6"
+  },
+  {
+    "id": "pisaj_fai_ward",
+    "owner": "pisaj-fai",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "pisaj_fai_signature",
+    "owner": "pisaj-fai",
+    "name": "เถ้าถ่านร้อน",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 7,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "value": 3,
+      "duration": 2
+    },
+    "desc": "โจมตี 7 · พิษ 3 นาน 2 เทิร์น"
+  },
+  {
+    "id": "pisaj_fai_ritual",
+    "owner": "pisaj-fai",
+    "name": "อาคมเถ้าถ่านร้อน",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "jao_por_pa_strike",
+    "owner": "jao-por-pa",
+    "name": "โจมตีของรากคุ้มป่า",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "โจมตี 6"
+  },
+  {
+    "id": "jao_por_pa_ward",
+    "owner": "jao-por-pa",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "jao_por_pa_signature",
+    "owner": "jao-por-pa",
+    "name": "รากคุ้มป่า",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 6,
+    "summonMinion": "forest_demon",
+    "desc": "โจมตี 6 เรียกปีศาจป่าทำให้อ่อนแอ"
+  },
+  {
+    "id": "jao_por_pa_ritual",
+    "owner": "jao-por-pa",
+    "name": "อาคมรากคุ้มป่า",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_nang_yai_strike",
+    "owner": "phi-nang-yai",
+    "name": "โจมตีของเงาทับร่าง",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "โจมตี 6"
+  },
+  {
+    "id": "phi_nang_yai_ward",
+    "owner": "phi-nang-yai",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "phi_nang_yai_signature",
+    "owner": "phi-nang-yai",
+    "name": "เงาทับร่าง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 7,
+    "statusEffect": {
+      "target": "player",
+      "effect": "corruption",
+      "value": 1,
+      "duration": 2
+    },
+    "desc": "โจมตี 7 · เพิ่มค่าร่าย 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "phi_nang_yai_ritual",
+    "owner": "phi-nang-yai",
+    "name": "อาคมเงาทับร่าง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "winyan_dek_strike",
+    "owner": "winyan-dek",
+    "name": "โจมตีของของเล่นหลอน",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "โจมตี 6"
+  },
+  {
+    "id": "winyan_dek_ward",
+    "owner": "winyan-dek",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "winyan_dek_signature",
+    "owner": "winyan-dek",
+    "name": "ของเล่นหลอน",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "hits": 3,
+    "desc": "โจมตี 4 ×3"
+  },
+  {
+    "id": "winyan_dek_ritual",
+    "owner": "winyan-dek",
+    "name": "อาคมของเล่นหลอน",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "yak_dam_strike",
+    "owner": "yak-dam",
+    "name": "โจมตีของทุบสนั่น",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "โจมตี 6"
+  },
+  {
+    "id": "yak_dam_ward",
+    "owner": "yak-dam",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "yak_dam_signature",
+    "owner": "yak-dam",
+    "name": "ทุบสนั่น",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 13,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "value": 1,
+      "duration": 2
+    },
+    "desc": "โจมตี 13 · เปราะบาง 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "yak_dam_ritual",
+    "owner": "yak-dam",
+    "name": "อาคมทุบสนั่น",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_mae_mai_strike",
+    "owner": "phi-mae-mai",
+    "name": "โจมตีของเสียงคร่ำครวญ",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "phi_mae_mai_ward",
+    "owner": "phi-mae-mai",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "phi_mae_mai_signature",
+    "owner": "phi-mae-mai",
+    "name": "เสียงคร่ำครวญ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 8,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "value": 1,
+      "duration": 2
+    },
+    "desc": "โจมตี 8 · อ่อนแอ 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "phi_mae_mai_ritual",
+    "owner": "phi-mae-mai",
+    "name": "อาคมเสียงคร่ำครวญ",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phra_upakut_strike",
+    "owner": "phra-upakut",
+    "name": "โจมตีของบาตรอาคม",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "phra_upakut_ward",
+    "owner": "phra-upakut",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "phra_upakut_signature",
+    "owner": "phra-upakut",
+    "name": "บาตรอาคม",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 7,
+    "heal": 6,
+    "desc": "โจมตี 7 ฟื้น 6"
+  },
+  {
+    "id": "phra_upakut_ritual",
+    "owner": "phra-upakut",
+    "name": "อาคมบาตรอาคม",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phaya_nak_strike",
+    "owner": "phaya-nak",
+    "name": "โจมตีของเขี้ยวนาค",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "phaya_nak_ward",
+    "owner": "phaya-nak",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "phaya_nak_signature",
+    "owner": "phaya-nak",
+    "name": "เขี้ยวนาค",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 6,
+    "hits": 3,
+    "desc": "โจมตี 6 ×3"
+  },
+  {
+    "id": "phaya_nak_ritual",
+    "owner": "phaya-nak",
+    "name": "อาคมเขี้ยวนาค",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "thep_aksorn_strike",
+    "owner": "thep-aksorn",
+    "name": "โจมตีของอักษรสาป",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "thep_aksorn_ward",
+    "owner": "thep-aksorn",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "thep_aksorn_signature",
+    "owner": "thep-aksorn",
+    "name": "อักษรสาป",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 9,
+    "curseCard": "curse_whisper",
+    "desc": "โจมตี 9 ใส่เสียงในหู 1 ใบในกองทิ้ง เฉพาะไฟต์นี้"
+  },
+  {
+    "id": "thep_aksorn_ritual",
+    "owner": "thep-aksorn",
+    "name": "อาคมอักษรสาป",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phraya_maccurat_strike",
+    "owner": "phraya-maccurat",
+    "name": "โจมตีของบัญชีมรณะ",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "phraya_maccurat_ward",
+    "owner": "phraya-maccurat",
+    "name": "คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "phraya_maccurat_signature",
+    "owner": "phraya-maccurat",
+    "name": "บัญชีมรณะ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 7,
+    "hits": 3,
+    "desc": "โจมตี 7 ×3"
+  },
+  {
+    "id": "phraya_maccurat_ritual",
+    "owner": "phraya-maccurat",
+    "name": "อาคมบัญชีมรณะ",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
   }
 ]

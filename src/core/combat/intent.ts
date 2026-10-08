@@ -35,7 +35,7 @@ export function planEnemyIntent(s: GameState): void {
   let damage = 0;
   let block = 0;
 
-  const chosen=s.runMode==='episode'?chooseEnemyCards(s,piles.hand,energy):piles.hand;
+  const chosen=(s.runMode==='episode'||s.campaign)?chooseEnemyCards(s,piles.hand,energy):piles.hand;
   for (const id of chosen) {
     const def = enemyCardById(id);
     if (!def) continue;

@@ -60,7 +60,7 @@ describe('chapter class builds and ghost signatures',()=>{
   });
   it('new build cards resolve through the real play command, with costs and exhaust',()=>{
     const d=run('real-build','medium');d.go({type:'ChooseOffer',index:0});
-    const s=d.state;s.player.energy=3;s.piles.hand=[JSON.parse(JSON.stringify(cardById('spirit_pact')))];
+    const s=d.state;s.blessings=[];s.player.energy=3;s.piles.hand=[JSON.parse(JSON.stringify(cardById('spirit_pact')))];
     d.go({type:'PlayCard',index:0});
     expect(d.state.player.energy).toBe(4);
     expect(d.state.piles.exhaust.some(c=>c.id==='spirit_pact')).toBe(true);

@@ -72,37 +72,59 @@ if '--helpers-only' not in sys.argv:
     adb('logcat','-c');adb('shell','am','start','-W','-n',package+'/.MainActivity')
     wait_for('เริ่มเกม');shot('01-cover')
     tap('เริ่มเกม');shot('02-class-table')
-    for class_name, hp in [('หมอผี', '50'), ('นักรบวัด', '66'), ('แม่ชี', '44'), ('คนทรง', '46')]:
+    for class_name, hp in [('หมอผี', '50'), ('นักรบวัด', '66'), ('แม่ชี', '50'), ('คนทรง', '46')]:
         tap('เลือก'+class_name)
         wait_for('เลือก'+class_name+' · ออกเดินทาง →')
-        root=shot('02-class-'+str(hp))
+        root=shot('02-class-'+class_name)
         assert has(root,hp), 'Class stats not visible: '+class_name
         tap('กลับไปเลือกอาชีพ')
         wait_for('เลือก'+class_name)
     tap('เลือกนักรบวัด');shot('02-class');tap('เลือกนักรบวัด · ออกเดินทาง →')
-    wait_for('คืนแรกที่บ้านร้าง');shot('03-prologue')
+    wait_for('เล่นคืนที่ 1');root=shot('03-night-select')
+    locked=find(root,'ผ่านคืนที่ 1 ก่อน');assert locked is not None and locked.get('enabled')=='false', 'Second night was not locked'
+    # Scroll to the journal without bypassing normal UI.
+    for _ in range(6):
+        root=dump()
+        if has(root,'สมุดบันทึกและของปลดล็อก'):break
+        adb('shell','input','swipe','540','1900','540','600','400');time.sleep(.3)
+    tap('สมุดบันทึกและของปลดล็อก');wait_for('สมุดผ่านคืน');root=shot('03-journal')
+    assert has(root,'ผ่านแล้ว 0/5 คืน'), 'Fresh class journal is not empty'
+    for _ in range(8):
+        root=dump()
+        if has(root,'กลับ'):break
+        adb('shell','input','swipe','540','1900','540','600','400');time.sleep(.3)
+    tap('กลับ')
+    for _ in range(7):
+        root=dump()
+        if has(root,'เล่นคืนที่ 1'):break
+        adb('shell','input','swipe','540','600','540','1900','400');time.sleep(.3)
+    tap('เล่นคืนที่ 1');wait_for('ข้ามบทนี้');shot('03-prologue')
     tap('ข้ามบทนี้');wait_for('พรติดตัว 1:',contains=True);shot('03-starter-blessing')
     tap('พรติดตัว 1:',contains=True)
-    wait_for('ผีปอบ');shot('04-map')
+    wait_for('เลือกผีที่คุณจะเผชิญหน้า');root=shot('04-map')
+    ghosts=[name for name in ['ผีกระสือ','ผีปอบ','นางตานี','ผีนางรำ','ผีโป่งค่าง','งูผีสาง'] if has(root,name)]
+    assert len(ghosts)==2, 'Expected two real ghost choices'
+    assert any('/15' in t for t in labels(root)), 'Full 15-fight route missing'
     tap('ข้อมูลผู้เดินทาง');wait_for('ปิดข้อมูลผู้เดินทาง');root=shot('04-player-details')
     assert any(t.startswith('พลังงาน ') for t in labels(root)), 'Energy missing from player details'
     assert any(t.startswith('EXP ') for t in labels(root)), 'EXP missing from player details'
-    tap('ปิดข้อมูลผู้เดินทาง');wait_for('ผีปอบ')
+    tap('ปิดข้อมูลผู้เดินทาง');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
     tap('สำรับ ',contains=True);wait_for('สำรับของเรา');shot('04-deck')
     tap('ดูการ์ด ฟันดาบวัด จำนวน 3 ใบ',contains=True);wait_for('รายละเอียดการ์ด');root=shot('04-deck-detail')
     assert has(root,'ฟันดาบวัด'), 'Wrong card detail opened'
     assert any('×3' in t for t in labels(root)), 'Grouped count missing in card detail'
-    tap('กลับไปดูสำรับ');wait_for('สำรับของเรา');tap('ปิด');wait_for('ผีปอบ')
-    root=dump();assert any('เบี้ย 25' in t for t in labels(root)), 'Currency label missing'
+    tap('กลับไปดูสำรับ');wait_for('สำรับของเรา');tap('ปิด');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
+    root=dump();assert any(re.search(r'เบี้ย \d+',t) for t in labels(root)), 'Currency label missing'
     tap('พร ',contains=True);wait_for('พรติดตัว');shot('04-blessings')
     tap('ดูพร ',contains=True);wait_for('รายละเอียดพร');shot('04-blessing-detail')
-    tap('กลับไปดูพร');wait_for('พรติดตัว');tap('ปิด');wait_for('ผีปอบ')
-    tap('ผีปอบ');wait_for('เผชิญหน้า →');shot('04-ghost-selected')
+    tap('กลับไปดูพร');wait_for('พรติดตัว');tap('ปิด');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
+    tap(ghosts[0]);wait_for('เผชิญหน้า →');shot('04-ghost-selected')
     # Switching and clearing selection must not enter battle.
-    tap('นางตานี');wait_for('เผชิญหน้า →');tap('นางตานี');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
+    tap(ghosts[1]);wait_for('เผชิญหน้า →');tap(ghosts[1]);wait_for('เลือกผีที่คุณจะเผชิญหน้า')
     assert find(dump(),'เผชิญหน้า →') is None, 'Confirm action remained after deselection'
-    tap('ผีปอบ');tap('เผชิญหน้า →')
+    tap(ghosts[0]);tap('เผชิญหน้า →')
     wait_for('จบเทิร์น');shot('05-battle')
+    enemy_hp=next(t for t in labels(dump()) if re.match(r'^\d+/\d+$',t) and t!='66/66')
     # Closing a fight must pause, never return to the next map node.
     hand_before=[]
     for _ in range(12):
@@ -113,7 +135,7 @@ if '--helpers-only' not in sys.argv:
     tap('พักการต่อสู้');wait_for('สู้ต่อ');shot('05-pause')
     assert find(dump(),'เดินทางต่อ') is None, 'Pause exposed a map progression control'
     tap('ตั้งค่า');wait_for('ลดการเคลื่อนไหวของฉาก');tap('กลับ');tap('สู้ต่อ')
-    wait_for('จบเทิร์น');assert has(dump(),'42/42'), 'Pause changed enemy HP'
+    wait_for('จบเทิร์น');assert has(dump(),enemy_hp), 'Pause changed enemy HP'
     tap('ดูกองการ์ด');wait_for('ปิดกองการ์ด');root=shot('05-piles')
     pile_cards=[n for n in root.iter('node') if n.get('content-desc','').startswith('ดูการ์ด ')]
     assert pile_cards, 'Battle piles do not contain illustrated tappable cards'
@@ -121,7 +143,7 @@ if '--helpers-only' not in sys.argv:
     tap('พักการต่อสู้');tap('กลับเมนูหลัก');wait_for('เล่นต่อ',contains=True);shot('05-suspended-menu')
     adb('shell','am','force-stop',package);adb('shell','am','start','-W','-n',package+'/.MainActivity')
     wait_for('เล่นต่อ',contains=True);tap('เล่นต่อ',contains=True);wait_for('จบเทิร์น');root=shot('05-restored-battle')
-    assert has(root,'42/42'), 'Restored battle changed enemy HP'
+    assert has(root,enemy_hp), 'Restored battle changed enemy HP'
     assert sorted(t for t in labels(root) if t.startswith('การ์ด ') and ' พลัง ' in t)==hand_before, 'Restored battle changed the hand'
     adb('shell','input','keyevent','4');wait_for('สู้ต่อ');tap('สู้ต่อ');wait_for('จบเทิร์น')
 
@@ -199,38 +221,19 @@ if '--helpers-only' not in sys.argv:
             touch(cards[0]);wait_for('รับ ',contains=True);shot('10-card-reward-preview')
             touch(wait_for('ไม่เอาสักใบ'))
         else:break
-    wait_for('ตะเกียงใต้ถุน');root=shot('11-rest-arrival')
-    assert not has(root,'แวะที่นี่'), 'Rest still requires an intermediate enter button'
-    assert has(root,'เดินผ่าน'), 'Rest lacks its single proceed action'
-    # Record the actual native arrival, including the image before choices appear.
-    recording = subprocess.Popen(['adb','shell','screenrecord','--time-limit','25','/sdcard/arrival.mp4'])
-    tap('ตะเกียงใต้ถุน')
-    for frame, delay in [('arrival-step-1', .1), ('arrival-step-2', .8), ('arrival-settled', 2.5)]:
-        time.sleep(delay)
-        with open(out/(frame+'.png'),'wb') as f:
-            subprocess.run(['adb','exec-out','screencap','-p'],stdout=f,check=True,timeout=20)
-    # The two pre-choice frames must differ in the scene, not just the clock.
-    from PIL import Image, ImageChops, ImageStat
-    a=Image.open(out/'arrival-step-1.png').convert('RGB')
-    b=Image.open(out/'arrival-step-2.png').convert('RGB')
-    roi=(0,round(a.height*.1),a.width,round(a.height*.45))
-    motion=sum(ImageStat.Stat(ImageChops.difference(a.crop(roi),b.crop(roi))).mean)
-    assert motion>3, 'Scene stayed static during arrival: '+str(motion)
-    (out/'camera-motion.txt').write_text('Pre-choice image difference: '+str(motion)+'\n')
-    adb('shell','pkill','-2','screenrecord')
-    recording.wait(timeout=15)
-    adb('pull','/sdcard/arrival.mp4',str(out/'arrival.mp4'))
-    wait_for('นั่งพักข้างตะเกียง',contains=True);shot('12-event-choices');tap('นั่งพักข้างตะเกียง',contains=True)
-    wait_for('เดินทางต่อ');root=shot('13-event-result')
-    assert not has(root,'นั่งพักข้างตะเกียง',contains=True), 'Event choices remain under the result'
-    tap('เดินทางต่อ')
-    wait_for('กระสือ',contains=True);shot('14-next-location')
+    wait_for('เลือกผีที่คุณจะเผชิญหน้า');root=shot('11-next-map')
+    assert any('1/15' in t for t in labels(root)), 'Victory did not advance the full route by one fight'
 # Fresh real medium run validates summon art and an actual helper attack.
 adb('shell','am','force-stop',package);adb('shell','pm','clear',package)
 adb('shell','am','start','-W','-n',package+'/.MainActivity')
 wait_for('เริ่มเกม');tap('เริ่มเกม');tap('เลือกคนทรง');tap('เลือกคนทรง · ออกเดินทาง →')
-wait_for('ข้ามบทนี้');tap('ข้ามบทนี้');wait_for('พรติดตัว 1:',contains=True);tap('พรติดตัว 1:',contains=True)
-wait_for('ผีปอบ');tap('ผีปอบ');tap('เผชิญหน้า →');wait_for('จบเทิร์น')
+wait_for('เล่นคืนที่ 1');tap('เล่นคืนที่ 1');wait_for('ข้ามบทนี้');tap('ข้ามบทนี้');wait_for('พรติดตัว 1:',contains=True);tap('พรติดตัว 1:',contains=True)
+wait_for('เลือกผีที่คุณจะเผชิญหน้า');root=dump()
+choices=[name for name in ['ผีกระสือ','นางตานี','ผีนางรำ','ผีโป่งค่าง','งูผีสาง','ผีปอบ'] if has(root,name)]
+assert choices, 'No medium encounter available'
+tap(choices[0]);tap('เผชิญหน้า →');wait_for('จบเทิร์น')
+root=dump();enemy_hp=next(t for t in labels(root) if re.match(r'^\d+/\d+$',t) and t!='46/46');old,max_hp=map(int,enemy_hp.split('/'))
+expected_hp=str(old-4)+'/'+str(max_hp)
 root=wait_for('วิญญาณเพื่อน เหลือ 3 เทิร์น');shot('15-helper-summoned')
 tap('วิญญาณเพื่อน เหลือ 3 เทิร์น');root=shot('16-helper-details')
 assert find(root,'โจมตีด้วยพลังวิญญาณทะลุการป้องกัน',contains=True) is not None, 'Helper real effect missing'
@@ -239,17 +242,17 @@ helper_hit_seen=False
 for _ in range(40):
     root=dump()
     # The enemy can heal after the helper hits; inspect the actual damage frame.
-    if has(root,'38/42'):
+    if has(root,expected_hp):
         helper_hit_seen=True
         shot('17-helper-hit-before-enemy')
     if has(root,'จบเทิร์น'):break
     time.sleep(.5)
 wait_for('วิญญาณเพื่อน เหลือ 2 เทิร์น');root=shot('17-helper-after-action')
-assert helper_hit_seen, 'Helper attack did not show actual enemy HP 42 to 38 before enemy actions'
+assert helper_hit_seen or has(root,expected_hp), 'Helper did not deal its real 4 damage: '+enemy_hp+' -> '+expected_hp
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'
 assert adb('shell','pidof',package).strip(),'App exited'
-(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, in-scene ghost selection/switch/deselect, map route, player details, mat deck/card details and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, rest and event, medium summon/details/real helper attack. Physical device not tested.\n')
+(out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': launch, class, prologue, compact blessing, in-scene ghost selection/switch/deselect, map route, player details, mat deck/card details and blessings links, card preview with valid touch bounds, play, enemy turn, victory before upgrades/card reward, five-night lock/journal, full-route advancement, medium summon/details/real helper attack. Physical device not tested.\n')
 if '--helpers-only' in sys.argv:
-    (out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': real medium summon, readable live helper details, duration 3 to 2 and actual enemy HP 42 to 38. Physical device not tested.\n')
+    (out/'result.txt').write_text('PASS: Android API '+adb('shell','getprop','ro.build.version.sdk').strip()+': real medium summon, readable live helper details, duration 3 to 2 and actual helper damage of 4. Physical device not tested.\n')
 print((out/'result.txt').read_text(),flush=True)

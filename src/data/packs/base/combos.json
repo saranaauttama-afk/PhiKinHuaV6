@@ -564,7 +564,7 @@
     "id": "dharma_chain",
     "classTag": "nun",
     "name": "ตั้งจิตหมุนธรรม",
-    "desc": "สวดมนต์ → ธรรมจักร ในเทิร์นเดียว ได้ป้องกัน 5 และจั่ว 1",
+    "desc": "สวดมนต์ → ธรรมจักร ในเทิร์นเดียว ได้ป้องกัน 5 และจั่ว 1 และคืนพลังงาน 1",
     "requiredCards": [
       "chant_sutra",
       "dharma_wheel"
@@ -584,6 +584,12 @@
         "value": 1,
         "target": "player",
         "desc": "จั่ว 1"
+      },
+      {
+        "type": "energy",
+        "value": 1,
+        "target": "player",
+        "desc": "คืนพลังงาน 1"
       }
     ]
   },

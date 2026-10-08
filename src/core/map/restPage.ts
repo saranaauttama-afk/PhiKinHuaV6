@@ -75,7 +75,7 @@ export function spendRestToken(s: GameState, offer: PageOffer): void {
 
 /** ยังมีของเหลือให้เติมช่องอีกไหม */
 export function restBudgetLeft(s: GameState): number {
-  if (s.runMode === 'episode') return 0;
+  if (s.runMode === 'episode'||s.campaign) return 0;
   const pools = s.pages?.pools;
   if (!pools) return 0;
   const act = actOf(s);
@@ -103,7 +103,7 @@ const ALL_REST_KINDS: PageOffer['kind'][] = [
  * ดีกว่าเอา "เดินต่อ" มาใส่ให้เต็มช่อง เพราะปุ่มเดินต่อมีอยู่ตลอดเวลาอยู่แล้ว
  */
 export function refillRestSlot(s: GameState, ix: number, r: RNG): RNG {
-  if (s.runMode === 'episode') return r;
+  if (s.runMode === 'episode'||s.campaign) return r;
   const page = s.pages?.current;
   if (!s.journey || !page) return r;
 

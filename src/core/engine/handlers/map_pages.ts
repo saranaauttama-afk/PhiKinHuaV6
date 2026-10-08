@@ -94,6 +94,7 @@ function clearCombatState(s: GameState) {
   (s as any).playerPiles = undefined;
   (s as any).enemyIntentCardId = null;
   s.player.block = 0;
+  s.player.statusEffects = [];
   s.player.energy = s.player.maxEnergy ?? START_ENERGY;
 }
 
@@ -223,6 +224,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         deck.maxEnergy = EPISODE.finaleEnergy;
         s.enemy.name = 'โป่งค่างเฝ้าบ้านร้าง';
       }
+      require('../../campaign/nights').configureNightEnemy(s);
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
       // ไม่ประกาศท่าล่วงหน้าแล้ว — ศัตรูเลือกไพ่ตอนถึงตาของตัวเอง
       // พรติดตัวของคลาสที่ทำงานตอนเริ่มไฟต์
@@ -252,7 +254,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       resetBlessingTurnFlags(s);
       runBlessingsTurnHook(s, 'on_turn_start');
 
-      if (s.runMode === 'episode') planEnemyIntent(s);
+      if (s.runMode === 'episode'||s.campaign) planEnemyIntent(s);
       mp._activeOfferIndex = ix;
       mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
@@ -297,6 +299,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         handSize: bossDeck.handSize,
         intentCardId: null,
       };
+      require('../../campaign/nights').configureNightEnemy(s);
       ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
       // ไม่ประกาศท่าล่วงหน้าแล้ว — ศัตรูเลือกไพ่ตอนถึงตาของตัวเอง
       // พรติดตัวของคลาสที่ทำงานตอนเริ่มไฟต์
@@ -323,7 +326,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       resetBlessingTurnFlags(s);
       runBlessingsTurnHook(s, 'on_turn_start');
 
-      if (s.runMode === 'episode') planEnemyIntent(s);
+      if (s.runMode === 'episode'||s.campaign) planEnemyIntent(s);
       mp._activeOfferIndex = ix;
       mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
@@ -735,7 +738,7 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
         // บอสสุดท้าย — ถ้าเลือดเหลือมากพอ ปลดล็อคศึกลับต่อท้าย
         if (offer.bossType === 'final') {
           const hpRatio = s.player.hp / Math.max(1, s.player.maxHp);
-          if (hpRatio >= SECRET_BOSS_HP_RATIO) {
+          if (!s.campaign && hpRatio >= SECRET_BOSS_HP_RATIO) {
             s.secretBossUnlocked = true;
             s.log.push('เลือดยังเหลือเฟือ… มีบางอย่างรออยู่ข้างหน้า');
             // จุดพลิกที่สำคัญที่สุดของรัน แต่เดิมสื่อสารผ่าน log บรรทัดเดียว
