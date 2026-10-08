@@ -72,7 +72,7 @@ export function chapterIdFor(t: ChapterTrigger): string | undefined {
 export function fireChapter(s: GameState, t: ChapterTrigger): boolean {
   if (s.chapter) return false;
 
-  const id = chapterIdFor(t);
+  const id = s.campaign&&t.kind==='prologue'?`night_${s.campaign.night}_open`:s.campaign&&t.kind==='final_boss'?`night_${s.campaign.night}_gate`:s.campaign&&t.kind==='ending'&&t.won?`night_${s.campaign.night}_ending`:chapterIdFor(t);
   if (!id) return false;
 
   const ch = getChapter(id);

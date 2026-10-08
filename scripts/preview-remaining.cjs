@@ -5,7 +5,7 @@ module.exports=async function({browser,base,errors}){
  const ctx=await browser.newContext({viewport:{width:393,height:852},deviceScaleFactor:Number(process.env.PHIKINHUA_PREVIEW_SCALE??2)});
  await ctx.addInitScript(({journal})=>{localStorage.clear();localStorage.setItem('phikinhua_journal_v1',JSON.stringify(journal));localStorage.setItem('phi-ui-settings',JSON.stringify({reducedMotion:true}));},{journal:data.journal});
  const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));
- const shot=async name=>{console.log('Capture',name);await p.waitForTimeout(250);await p.screenshot({type:'jpeg',quality:88,animations:'disabled',timeout:60000,path:out+'/'+name+'.jpg'});};
+ const shot=async name=>{console.log('Capture',name);await p.waitForFunction(()=>Array.from(document.images).every(i=>i.complete&&i.naturalWidth>0));await p.waitForTimeout(250);await p.screenshot({type:'jpeg',quality:88,animations:'disabled',timeout:60000,path:out+'/'+name+'.jpg'});};
  await p.goto(base);await p.getByRole('button',{name:'เริ่มเกม',exact:true}).waitFor();await shot('01-menu');
  await p.getByRole('button',{name:'ตั้งค่า',exact:true}).click();await shot('02-settings');
  await p.getByRole('switch',{name:'ลดการเคลื่อนไหวของฉาก'}).click();await p.getByRole('button',{name:'กลับ',exact:true}).click();

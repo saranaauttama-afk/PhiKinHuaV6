@@ -14,7 +14,7 @@ export default function StartPage({onStartGame,onContinue,onJournal}:Props){
   <ScrollView contentContainerStyle={{flexGrow:1,paddingTop:pad.top+24,paddingBottom:pad.bottom+24,paddingHorizontal:28,justifyContent:'space-between',backgroundColor:pulpColors.menuShade}}>
    <View style={{alignItems:'center'}}><Text style={{fontFamily:font.ui,color:palette.moonDim,fontSize:12,letterSpacing:3}}>การ์ตูนผี • ห้าคืนอาถรรพ์</Text><Image accessible accessibilityLabel="ผีกินหัว" source={require('../../assets/ui/title-pulp.png')} resizeMode="contain" style={{width:'100%',maxWidth:340,height:150,marginTop:14}}/></View>
    <View style={{gap:12,paddingTop:100,maxWidth:480,width:'100%',alignSelf:'center'}}>
-    <Text style={{fontFamily:font.body,color:palette.text,fontSize:25,lineHeight:30,textAlign:'center',marginBottom:20}}>เสียงหัวเราะดังจากบ้านร้าง…{'\n'}ผ่านห้าคืน พาเด็กที่หายไปกลับมา</Text>
+    <Text style={{fontFamily:font.body,color:palette.text,fontSize:25,lineHeight:30,textAlign:'center',marginBottom:20}}>ชาวบ้านยังหลับ… แต่หัวหายไป{'\n'}ตามหัวกลับมา ก่อนฟ้าสาง</Text>
     {saved&&onContinue&&<QuietButton primary label={'เล่นต่อ • '+(saved.night?'คืน '+saved.night+' · ':'')+'ศึก '+saved.fight+'/'+saved.totalFights} onPress={onContinue}/>}
     <QuietButton primary={!saved} label="เริ่มเกม" onPress={onStartGame}/>
     <View style={{flexDirection:'row',gap:10}}>{onJournal&&<QuietButton label="สมุดผ่านคืน" onPress={onJournal} style={{flex:1}}/>}<QuietButton label="ตั้งค่า" onPress={()=>setSettings(true)} style={{flex:1}}/></View>

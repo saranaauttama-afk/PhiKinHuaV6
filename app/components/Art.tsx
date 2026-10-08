@@ -19,6 +19,13 @@ import { font, palette, radius, surface } from '../theme';
  * key ต้องตรงกับ `id` ใน `src/art/catalog.ts` เป๊ะ (มีเทสต์คุมให้)
  */
 export const ART_SOURCES: Record<string, any> = {
+  'monster/night-head-collector':require('../../assets/monsters/night-head-collector.png'),
+  'monster/night-bell-keeper':require('../../assets/monsters/night-bell-keeper.png'),
+  'monster/night-root-lord':require('../../assets/monsters/night-root-lord.png'),
+  'monster/night-cave-mother':require('../../assets/monsters/night-cave-mother.png'),
+  'monster/night-headless-king':require('../../assets/monsters/night-headless-king.png'),
+  'monster/phi-kin-hua':require('../../assets/monsters/phi-kin-hua.png'),
+
   'event/episode_blessing': require('../../assets/scence/lantern-hut.jpg'),
   'event/spirit_medium_trance': require('../../assets/scence/lantern-hut.jpg'),
   'event/boatman': require('../../assets/scence/lantern-hut.jpg'),

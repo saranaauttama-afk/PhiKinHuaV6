@@ -98,7 +98,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
       </Text>
 
       {pending === null ? (
-        <View style={{gap:20}}>
+        <View style={{gap:16}}>
           <View style={{flexDirection:'row',gap:12,alignItems:'stretch'}}>
           {(['A','B'] as const).map(opt=>{
             const bucket=bucketOf(opt);const l=labelOf(bucket);const picked=selected===opt;
@@ -106,12 +106,12 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
               :bucket==='max_hp'?require('../../../assets/ui/blessing-herb-object.png')
               :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
               :bucket==='upgrade'||bucket==='remove'?require('../../../assets/ui/ritual-knife.png')
-              :bucket==='max_hand'?require('../../../assets/ui/ritual-palm.png'):require('../../../assets/ui/card-breath.png');
+              :bucket==='max_hand'?require('../../../assets/images/players/iMaxHand.png'):require('../../../assets/ui/ritual-jar.png');
             const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.length:false;
             return <Pressable disabled={unavailable} key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked,disabled:unavailable}}
               onPress={()=>setSelected(opt)} style={{flex:1}}>
-              <Image accessible={false} source={image} resizeMode="contain" style={{width:'100%',height:100,marginBottom:8}}/>
-              <RitualSurface kind="quietSlate" style={{flex:1,minHeight:145,paddingHorizontal:17,paddingVertical:20}}>
+              <RitualSurface kind="quietSlate" style={{flex:1,minHeight:235,paddingHorizontal:14,paddingVertical:18,borderWidth:picked?2:0,borderColor:palette.moon}}>
+                <Image accessible={false} source={image} resizeMode="contain" style={{width:72,height:72,alignSelf:'center',marginBottom:12}}/>
                 <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:17,textAlign:'center'}}>{l.title}</Text>
                 <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:22,textAlign:'center',marginTop:8}}>{unavailable?'ไม่มีการ์ดที่เลือกได้':l.detail}</Text>
                 <View style={{minHeight:28,marginTop:10,justifyContent:'center'}}>

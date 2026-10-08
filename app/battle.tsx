@@ -1,3 +1,4 @@
+import {nightFightTotal} from '../src/core/campaign/bosses';
 import {battleScene} from './scenePresentation';
 import React from 'react';
 import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler } from 'react-native';
@@ -338,7 +339,7 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
-        <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.runMode==='episode'?3:15}</Text>
+        <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.runMode==='episode'?3:nightFightTotal(gameState.campaign?.night)}</Text>
         {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',top:safe.top+190,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:18,textAlign:'center'}}>คอมโบ! {comboNotice}</Text></RitualSurface></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว

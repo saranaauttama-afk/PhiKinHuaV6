@@ -1,3 +1,4 @@
+import {nightFightTotal} from '../src/core/campaign/bosses';
 // app/index.tsx — Clean version for redesign
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -178,9 +179,10 @@ export default function Home() {
               <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
-          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:18,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · ปราบผี {state.fightCount??0}/15</Text>}
+          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:18,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · ปราบผี {state.fightCount??0}/{nightFightTotal(state.campaign?.night)}</Text>}
           <Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>
           {trailOpen&&<JourneyTrail state={state} compact/>}
+          <Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>
           <Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>
 
           {offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (

@@ -25,6 +25,13 @@ export type EnemyDeckConfig = {
  * naga_minor    งู/พิษ                global        พื้นฐาน
  */
 const OWNERS_BY_MONSTER: Record<string, string[]> = {
+  'night-head-collector':['night-head-collector'],
+  'night-bell-keeper':['night-bell-keeper'],
+  'night-root-lord':['night-root-lord'],
+  'night-cave-mother':['night-cave-mother'],
+  'night-headless-king':['night-headless-king'],
+  'phi-kin-hua':['phi-kin-hua'],
+
   // ── T1
   'phi-krasue':    ['krasue', 'phi-krasue'],
   'phi-pop':       ['phi_pop'],

@@ -1412,5 +1412,268 @@
       "duration": 99
     },
     "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "night_head_collector_strike",
+    "owner": "night-head-collector",
+    "name": "คนแบกหัว · จู่โจม",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "night_head_collector_ward",
+    "owner": "night-head-collector",
+    "name": "คนแบกหัว · คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "night_head_collector_signature",
+    "owner": "night-head-collector",
+    "name": "คนแบกหัว · อาถรรพ์",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 8,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "value": 1,
+      "duration": 2
+    },
+    "desc": "โจมตี 8 · อ่อนแอ 1 นาน 2 เทิร์น"
+  },
+  {
+    "id": "night_head_collector_ritual",
+    "owner": "night-head-collector",
+    "name": "คนแบกหัว · ปลุกพลัง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "night_bell_keeper_strike",
+    "owner": "night-bell-keeper",
+    "name": "เงาระฆังร้าง · จู่โจม",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "night_bell_keeper_ward",
+    "owner": "night-bell-keeper",
+    "name": "เงาระฆังร้าง · คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "night_bell_keeper_signature",
+    "owner": "night-bell-keeper",
+    "name": "เงาระฆังร้าง · อาถรรพ์",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 9,
+    "curseCard": "curse_whisper",
+    "desc": "โจมตี 9 ใส่เสียงในหู 1 ใบในกองทิ้ง เฉพาะไฟต์นี้"
+  },
+  {
+    "id": "night_bell_keeper_ritual",
+    "owner": "night-bell-keeper",
+    "name": "เงาระฆังร้าง · ปลุกพลัง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "night_root_lord_strike",
+    "owner": "night-root-lord",
+    "name": "เจ้าดงรากผี · จู่โจม",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 6,
+    "desc": "โจมตี 6"
+  },
+  {
+    "id": "night_root_lord_ward",
+    "owner": "night-root-lord",
+    "name": "เจ้าดงรากผี · คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 5,
+    "desc": "ป้องกัน 5"
+  },
+  {
+    "id": "night_root_lord_signature",
+    "owner": "night-root-lord",
+    "name": "เจ้าดงรากผี · อาถรรพ์",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 6,
+    "summonMinion": "forest_demon",
+    "desc": "โจมตี 6 เรียกปีศาจป่าทำให้อ่อนแอ"
+  },
+  {
+    "id": "night_root_lord_ritual",
+    "owner": "night-root-lord",
+    "name": "เจ้าดงรากผี · ปลุกพลัง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "night_cave_mother_strike",
+    "owner": "night-cave-mother",
+    "name": "นางเฝ้าถ้ำ · จู่โจม",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "night_cave_mother_ward",
+    "owner": "night-cave-mother",
+    "name": "นางเฝ้าถ้ำ · คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "night_cave_mother_signature",
+    "owner": "night-cave-mother",
+    "name": "นางเฝ้าถ้ำ · อาถรรพ์",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 7,
+    "heal": 6,
+    "desc": "โจมตี 7 ฟื้น 6"
+  },
+  {
+    "id": "night_cave_mother_ritual",
+    "owner": "night-cave-mother",
+    "name": "นางเฝ้าถ้ำ · ปลุกพลัง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "night_headless_king_strike",
+    "owner": "night-headless-king",
+    "name": "เจ้าไร้เศียร · จู่โจม",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "night_headless_king_ward",
+    "owner": "night-headless-king",
+    "name": "เจ้าไร้เศียร · คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "night_headless_king_signature",
+    "owner": "night-headless-king",
+    "name": "เจ้าไร้เศียร · อาถรรพ์",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 6,
+    "hits": 3,
+    "desc": "โจมตี 6 ×3"
+  },
+  {
+    "id": "night_headless_king_ritual",
+    "owner": "night-headless-king",
+    "name": "เจ้าไร้เศียร · ปลุกพลัง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_kin_hua_strike",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · จู่โจม",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 7,
+    "desc": "โจมตี 7"
+  },
+  {
+    "id": "phi_kin_hua_ward",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · คุ้มกาย",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 7,
+    "desc": "ป้องกัน 7"
+  },
+  {
+    "id": "phi_kin_hua_signature",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · อาถรรพ์",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 7,
+    "hits": 3,
+    "desc": "โจมตี 7 ×3"
+  },
+  {
+    "id": "phi_kin_hua_ritual",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · ปลุกพลัง",
+    "type": "skill",
+    "energyCost": 1,
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "value": 1,
+      "duration": 99
+    },
+    "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
   }
 ]

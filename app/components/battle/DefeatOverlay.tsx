@@ -1,6 +1,6 @@
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from '../Paper';
+import {palette,paper,quietUiColors} from '../../theme';
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Image, ImageBackground } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle,
   withTiming, withDelay, withSequence, Easing,
@@ -45,21 +45,23 @@ export default function DefeatOverlay({ onHome }: Props) {
       justifyContent: 'center', alignItems: 'center', zIndex: layer.overlay,
     }, bgStyle]}>
 
+      <ImageBackground source={require('../../../assets/scence/menu-haunted.jpg')} resizeMode="cover" style={{position:'absolute',top:0,left:0,right:0,bottom:0}}><View style={{flex:1,backgroundColor:quietUiColors.defeatShade}}/></ImageBackground>
       <Animated.View style={[{width:'90%',maxWidth:480},cardStyle]}><RitualSurface kind="occupationPage" style={{alignItems:'center',padding:28}}>
 
+        <Image accessible={false} source={require('../../../assets/ui/trail-ghost.png')} resizeMode="contain" style={{width:100,height:100,marginBottom:12}}/>
         {/* Title */}
         <Text style={{
           color: palette.blood, fontSize: 34,
           fontFamily: font.display,
           textShadowColor: palette.bloodDeep,
-          textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16,
+          textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 0,
           marginBottom: 12,
         }}>
           พ่ายแพ้
         </Text>
 
         <Text style={{
-          color: palette.textFaint, fontSize: 14,
+          color: paper.ink, fontSize: 15,
           fontFamily: font.ui,
           textAlign: 'center', marginBottom: 24,
           lineHeight: 22,

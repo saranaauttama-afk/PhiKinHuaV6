@@ -202,4 +202,4 @@ export const occupationColors = {"night": "#100d09", "cream": "#f4dfb7", "subtit
 
 export const badgeColors={neutral:"#4b4432",negative:"#682c2b",positive:"#304d37",neutralLine:"#a59972",negativeLine:"#bc6660",positiveLine:"#79a37c",ink:"#f1e5c9",counter:"#24231c",disabledInk:"#454545"} as const;
 
-export const quietUiColors={hudShade:'rgba(17,17,13,.82)',optionLine:'rgba(225,207,153,.2)'};
+export const quietUiColors={hudShade:'rgba(17,17,13,.82)',optionLine:'rgba(225,207,153,.2)',eventPanel:'rgba(18,15,10,.92)',defeatShade:'rgba(12,9,5,.55)'};

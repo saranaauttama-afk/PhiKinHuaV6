@@ -1,6 +1,7 @@
 // src/core/monsters/thai-ghosts.ts - ระบบผีไทยแบบใหม่ตาม Game Spec
 
 import { int, next, type RNG } from '../rng';
+import {NIGHT_BOSSES,ULTIMATE_BOSS} from '../campaign/bosses';
 
 export interface ThaiGhostData {
   id: string;
@@ -218,6 +219,7 @@ export const THAI_GHOST_POOLS = {
 
   // Boss Final - Fight 15
   BossFinal: [
+    ...NIGHT_BOSSES,
     {
       id: 'phaya-nak',
       name: 'พญานาค',
@@ -236,6 +238,7 @@ export const THAI_GHOST_POOLS = {
 
   // Secret Boss - Fight 16 (optional)
   SecretBoss: [
+    ULTIMATE_BOSS,
     {
       id: 'phraya-maccurat',
       name: 'พระยามัจจุราช',

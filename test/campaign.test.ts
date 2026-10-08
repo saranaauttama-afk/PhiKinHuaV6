@@ -11,6 +11,7 @@ import {SPECIAL_CARD_IDS,SPECIAL_BLESSINGS,type Night} from '../src/core/campaig
 import {rollNightCards} from '../src/core/campaign/rewards';
 import {cardById,BY_RARITY} from '../src/core/pack';
 import {enemyCardById} from '../src/core/pack_enemy_cards';
+import {NIGHT_BOSSES,nightFightTotal,ULTIMATE_BOSS} from '../src/core/campaign/bosses';
 import {awakenNightBoss} from '../src/core/campaign/nights';
 import {resolveEnemyCard} from '../src/core/combat/enemyCardEffects';
 import {applyStatusEffect} from '../src/core/statusEffectsRuntime';
@@ -29,6 +30,8 @@ function finish(d:ReturnType<typeof driver>){
    if(onRestRow(d.state)){expect(restBudgetLeft(d.state)).toBe(0);d.go({type:'Proceed'});}
    else d.go({type:'ChooseOffer',index:0});
   }else if(d.state.phase==='combat'){
+   if(d.state.campaign?.night===5&&d.state.fightCount===14)d.state.player.hp=1;
+   if(d.state.campaign?.night===5&&d.state.fightCount===15){expect(d.state.runSummary).toBeUndefined();expect(d.state.enemy?.id).toBe(ULTIMATE_BOSS.id);}
    d.state.piles.hand=[{id:'structural-test',name:'test',type:'attack',cost:0,dmg:9999}];d.go({type:'PlayCard',index:0});
   }else if(d.state.phase==='levelup')d.go({type:'SkipLevelUp'});
   else if(d.state.phase==='reward')d.go({type:'SkipCardReward'});
@@ -38,9 +41,13 @@ function finish(d:ReturnType<typeof driver>){
  return d.state;
 }
 describe('five-night campaign',()=>{
- for(const cls of ALL_CLASS_IDS)for(const night of [1,2,3,4,5] as const)it(`${cls} night ${night}: exactly 15 fights, 7 bounded rests and a credited ending`,()=>{
+ for(const cls of ALL_CLASS_IDS)for(const night of [1,2,3,4,5] as const)it(`${cls} night ${night}: the full route, 7 bounded rests and a credited ending`,()=>{
   const d=driver(cls,night);expect(d.state.journey!.plans.filter(p=>p.kind!=='rest')).toHaveLength(15);expect(d.state.journey!.plans.filter(p=>p.kind==='rest')).toHaveLength(7);
-  const s=finish(d);expect(s.runSummary?.won).toBe(true);expect(s.runSummary?.fights).toBe(15);expect(s.secretBossUnlocked).toBeFalsy();expect(s.runSummary?.metrics?.cardsPlayed).toBe(15);expect(s.runMetrics?.turns).toBe(15);
+  const s=finish(d);expect(s.runSummary?.won).toBe(true);expect(s.runSummary?.fights).toBe(nightFightTotal(night));expect(!!s.secretBossUnlocked).toBe(night===5);expect(s.runSummary?.metrics?.cardsPlayed).toBe(nightFightTotal(night));expect(s.runMetrics?.turns).toBe(nightFightTotal(night));if(night===5)expect(s.runSummary?.beatSecretBoss).toBe(true);
+ });
+ it('each night fixes a distinct final boss and night five ends only after the ultimate boss',()=>{
+  expect(new Set(NIGHT_BOSSES.map(b=>b.id)).size).toBe(5);
+  for(const night of [1,2,3,4,5] as const){const d=driver('warrior',night);const boss=Object.values(d.state.journey!.nodes).find(n=>n.offer.kind==='boss'&&n.offer.bossType==='final');expect((boss!.offer as any).enemyId).toBe(NIGHT_BOSSES[night-1].id);const s=finish(d);if(night===5){expect(s.defeatedEnemyIds).toContain(ULTIMATE_BOSS.id);expect(s.journey!.plans.filter(p=>p.kind!=='rest')).toHaveLength(16);}}
  });
  it('higher nights increase health/strength without shortening the route',()=>{
   const values=[1,2,3,4,5].map(n=>{const d=driver('warrior',n as Night);d.state.pages!.current!.offers[0]={kind:'monster',enemyId:'phi-pop'} as any;d.go({type:'ChooseOffer',index:0});return {hp:d.state.enemy!.maxHp,strength:d.state.enemy!.statusEffects?.find(e=>e.id==='strength')?.stacks??0};});

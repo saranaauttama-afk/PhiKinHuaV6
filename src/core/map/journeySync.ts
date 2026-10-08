@@ -17,6 +17,7 @@ import { initPageMap } from './pages';
 import { THAI_GHOST_POOLS, getMonsterById } from '../monsters/thai-ghosts';
 import { pickFrom } from '../rngState';
 import { fireChapter } from '../story/chapters';
+import {nightFinalBoss,ULTIMATE_BOSS} from '../campaign/bosses';
 
 /** รันนี้ใช้แผนที่แบบเดินทางอยู่หรือเปล่า */
 export function usesJourney(s: GameState): boolean {
@@ -32,6 +33,7 @@ export function startJourney(s: GameState, r: RNG): RNG {
   const out = s.runMode === 'episode' ? { journey: buildEpisode(), rng: r } : buildJourney(r);
   s.journey = out.journey;
   if(s.campaign){
+    for(const node of Object.values(s.journey.nodes))if(node.offer.kind==='boss'&&node.offer.bossType==='final')node.offer={...node.offer,enemyId:nightFinalBoss(s.campaign.night).id};
     const restKinds=[['healing_shrine','shop_card','shop_remove'],['story_event','shop_upgrade','shop_equipment'],['healing_shrine','shop_remove','shop_upgrade'],['treasure_single','shop_card','story_event'],['healing_shrine','shop_upgrade','fusion_altar'],['shop_remove','shop_card','story_event'],['healing_shrine','shop_upgrade','shop_equipment']] as const;
     let restIndex=0;
     for(let row=0;row<s.journey.rows.length;row++)if(s.journey.plans[row].kind==='rest'){
@@ -54,6 +56,7 @@ export function syncOffersFromJourney(s: GameState): void {
   if (!s.journey || !s.pages) return;
 
   const nodes = reachableNodes(s.journey);
+  if(s.campaign)for(const node of nodes)if(node.offer.kind==='boss'&&node.offer.bossType==='final'&&!node.visited)node.offer={...node.offer,enemyId:nightFinalBoss(s.campaign.night).id};
   replaceDefeatedMonsters(s, nodes);
   const offers = nodes.map(n => n.offer);
 
@@ -207,7 +210,10 @@ export function journeyFinished(s: GameState): boolean {
 /** ต่อศึกลับท้ายเส้นทาง — เรียกตอนชนะบอสสุดท้ายด้วยเลือดที่ถึงเกณฑ์ */
 export function unlockSecretBossRows(s: GameState, r: RNG): RNG {
   if (!s.journey) return r;
-  return appendRows(s.journey, planSecretRows(), r);
+  const plans=s.campaign?.night===5?planSecretRows().filter(p=>p.kind==='boss'):planSecretRows();
+  const out=appendRows(s.journey,plans,r);
+  if(s.campaign?.night===5)for(const node of Object.values(s.journey.nodes))if(node.offer.kind==='boss'&&node.offer.bossType==='secret')node.offer={...node.offer,enemyId:ULTIMATE_BOSS.id};
+  return out;
 }
 
 /**

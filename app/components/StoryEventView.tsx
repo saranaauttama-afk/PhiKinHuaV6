@@ -2,22 +2,22 @@ import React from 'react';
 import {View,Text,ScrollView,Pressable,Image} from 'react-native';
 import type {Command,GameState} from '../../src/core/types';
 import {getStoryEvent,choiceLocked} from '../../src/core/events/story';
-import {artSource} from './Art';
+import {visitedScene} from '../scenePresentation';
 import SceneArrival from './SceneArrival';
 import RitualSurface from './RitualSurface';
 import {QuietButton} from './QuietChrome';
-import {font,palette} from '../theme';
+import {font,palette,quietUiColors} from '../theme';
 import {useScreenPadding} from '../useScreenPadding';
 
 export default function StoryEventView({state,dispatch}:{state:GameState;dispatch:(c:Command)=>void}) {
   const pad=useScreenPadding();const story=state.story;
   if(state.phase!=='event'||!story)return null;
   const ev=getStoryEvent(story.eventId);if(!ev)return null;
-  const decided=story.result!=null;
+  const decided=story.result!=null;const location=visitedScene(state);
   return <View style={{flex:1}}>
-    <SceneArrival instant source={artSource(`event/${ev.id}`)??require('../../assets/scence/lantern-hut.jpg')} sceneKey={ev.id}>
-      <ScrollView contentContainerStyle={{flexGrow:1,justifyContent:'flex-end',paddingHorizontal:16,paddingTop:pad.top+140,paddingBottom:pad.bottom+20}}>
-        <RitualSurface kind="quietSlate" style={{paddingHorizontal:22,paddingVertical:24,gap:14}}>
+    <SceneArrival instant source={location.source} sceneKey={location.key}>
+      <ScrollView contentContainerStyle={{flexGrow:1,justifyContent:'flex-end',paddingHorizontal:16,paddingTop:pad.top+240,paddingBottom:pad.bottom+20}}>
+        <RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:20,gap:14,backgroundColor:quietUiColors.eventPanel}}>
           <Text accessibilityRole="header" style={{fontFamily:font.heading,color:palette.moon,fontSize:24}}>{ev.title}</Text>
           <Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,lineHeight:24}}>{decided?story.result:ev.text}</Text>
           {decided?<QuietButton label="กลับจุดพัก" primary onPress={()=>dispatch({type:'CompleteNode'})}/>

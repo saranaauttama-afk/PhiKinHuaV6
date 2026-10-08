@@ -1,3 +1,4 @@
+import {visitedScene} from '../scenePresentation';
 // app/components/ShopView.tsx — โหนดพักทุกชนิดที่ไม่ใช่เหตุการณ์เล่าเรื่อง
 //
 // เขียนใหม่ทั้งไฟล์ ของเดิมมีปัญหาสามอย่างพร้อมกัน:
@@ -319,7 +320,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     );
   };
 
-  const background=kind==='healing'||kind==='well'?require('../../assets/scence/rest.jpg'):require('../../assets/scence/quiet-village.png');
+  const background=visitedScene(state).source;
   const object=kind==='healing'||kind==='well'?require('../../assets/ui/blessing-shrine-object.png'):kind==='upgrade'||kind==='remove'?require('../../assets/ui/ritual-knife.png'):require('../../assets/ui/ritual-jar.png');
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
     <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>

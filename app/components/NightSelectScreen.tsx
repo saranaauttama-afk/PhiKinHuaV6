@@ -1,3 +1,4 @@
+import {nightFinalBoss} from '../../src/core/campaign/bosses';
 import React from 'react';
 import {View,Text,Pressable,Image} from 'react-native';
 import type {ClassId} from '../../src/core/classes';
@@ -24,7 +25,7 @@ export default function NightSelectScreen({classId,onStart,onBack}:{classId:Clas
   </Pressable>)}</View>
   <QuietSection title={'คืนที่ '+selected+' · '+rule.name}>
    <Text style={{fontFamily:font.body,fontSize:22,lineHeight:28,color:palette.text}}>{rule.desc}</Text>
-   <Text style={{fontFamily:font.ui,fontSize:12,color:palette.textDim}}>15 ศึก · มีจุดพักระหว่างทาง · บอสกลางทางและท้ายคืน</Text>
+   <Text style={{fontFamily:font.ui,fontSize:12,color:palette.textDim}}>{selected===5?'15 ศึก + ผีกินหัวตัวจริง':'15 ศึก'} · มีจุดพักระหว่างทาง · {nightFinalBoss(selected).name}</Text>
    {b&&<Text style={{fontFamily:font.ui,fontSize:12,lineHeight:22,color:palette.moon}}>สำรับเล็กสุด {b.smallestDeck} ใบ · ใช้การ์ดน้อยสุด {b.fewestCards} ครั้ง · ชนะ {b.wins} ครั้ง</Text>}
    <QuietButton primary label={locked?'ผ่านคืนที่ '+(selected-1)+' ก่อน':busy?'กำลังออกเดินทาง…':'เล่นคืนที่ '+selected} disabled={locked||!ready||saving||busy||!!error} onPress={()=>{setBusy(true);setError('');void onStart(selected).then(ok=>{if(!ok)setError('ยังเริ่มคืนไม่ได้ กรุณาลองอีกครั้ง');}).catch(()=>setError('เปิดสมุดบันทึกไม่สำเร็จ')).finally(()=>setBusy(false));}}/>
   </QuietSection>

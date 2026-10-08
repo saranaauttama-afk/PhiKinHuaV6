@@ -738,9 +738,9 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
         // บอสสุดท้าย — ถ้าเลือดเหลือมากพอ ปลดล็อคศึกลับต่อท้าย
         if (offer.bossType === 'final') {
           const hpRatio = s.player.hp / Math.max(1, s.player.maxHp);
-          if (!s.campaign && hpRatio >= SECRET_BOSS_HP_RATIO) {
+          if (s.campaign?.night===5 || (!s.campaign && hpRatio >= SECRET_BOSS_HP_RATIO)) {
             s.secretBossUnlocked = true;
-            s.log.push('เลือดยังเหลือเฟือ… มีบางอย่างรออยู่ข้างหน้า');
+            s.log.push(s.campaign?.night===5?'เจ้าไร้เศียรล้มแล้ว แต่ผีกินหัวตัวจริงยังรออยู่':'เลือดยังเหลือเฟือ… มีบางอย่างรออยู่ข้างหน้า');
             // จุดพลิกที่สำคัญที่สุดของรัน แต่เดิมสื่อสารผ่าน log บรรทัดเดียว
             fireChapter(s, { kind: 'secret' });
             // เส้นทางถูกวางไว้ล่วงหน้าถึงบอสสุดท้ายเท่านั้น — ต่อชั้นศึกลับตอนนี้

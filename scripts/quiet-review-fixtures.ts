@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {mapSceneStage} from '../app/scenePresentation';
 import {simulateNight} from './night-pilot';
 import {applyCommand} from '../src/core/reducer';
 import {onRestRow} from '../src/core/map/restPage';
@@ -13,6 +14,7 @@ const originalLog=console.log;console.log=()=>{};
 for(let n=0;n<20;n++){
  const result=simulateNight('night-balance-warrior-'+n,'warrior',1,true,(s,r)=>{
   if(s.chapter)keep('chapter',s,r);
+  if(s.phase==='map'&&!s.chapter){const plan=s.journey?.plans[mapSceneStage(s)];if(plan&&plan.kind!=='rest')keep('route-'+plan.fightIndex,s,r);}
   if(s.phase==='defeat')keep('defeat',s,r);
   if(s.runSummary&&!s.runSummary.won)keep('summary-defeat',s,r);
   if(s.phase==='levelup')keep('levelup',s,r);
@@ -35,5 +37,5 @@ for(let n=0;n<8&&!fixtures['summary-defeat'];n++){const result=simulateNight('qu
 console.log=originalLog;
 if(!fixtures.summary||!fixtures.rest)throw Error('Missing real campaign fixtures');
 fixtures.deck=fixtures.rest;fixtures.blessings=fixtures.rest;fixtures.defeat=fixtures['summary-defeat'];
-fs.writeFileSync('/tmp/quiet-review-fixtures.json',JSON.stringify({fixtures,journal,restSave:toSave(fixtures.rest.state)}));
+fs.writeFileSync('/tmp/quiet-review-fixtures.json',JSON.stringify({fixtures,journal,restSave:toSave(fixtures.rest.state),routeSaves:Object.fromEntries(Object.entries(fixtures).filter(([id])=>id.startsWith('route-')).map(([id,f])=>[id,toSave(f.state)]))}));
 console.log('Legal review fixtures:',Object.keys(fixtures).join(', '));

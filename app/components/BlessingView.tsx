@@ -42,12 +42,13 @@ export default function BlessingView({ blessings, onClose }: { blessings?: Bless
             accessibilityLabel={`ดูพร ${row.blessing.name} จำนวน ${row.count} อย่าง`}
             accessibilityHint="เปิดอ่านผลของพร" onPress={() => setSelected(row)} style={[styles.item, single && styles.singleItem]}>
             <View style={styles.object}>
-              <Image accessible={false} source={objectSource(row.blessing)} resizeMode="contain" style={{ width: single ? 180 : 112, height: single ? 180 : 112 }} />
+              <Image accessible={false} source={objectSource(row.blessing)} resizeMode="contain" style={{ width: 96, height: 96 }} />
               {row.count > 1 && <Text style={styles.count}>×{row.count}</Text>}
             </View>
-            <RitualSurface kind="quietSlate" style={styles.ledge} />
-            <Text style={[styles.name, single && { fontSize: 20 }]}>{row.blessing.name ?? row.blessing.id}</Text>
+            <View style={styles.ledge} />
+            <Text style={[styles.name, single && { fontSize: 17 }]}>{row.blessing.name ?? row.blessing.id}</Text>
             <Text style={styles.hint}>แตะดูรายละเอียด ›</Text>
+            {single && !!row.blessing.desc && <Text style={[styles.desc,{fontFamily:font.ui,fontSize:14,lineHeight:23,marginTop:12}]}>{row.blessing.desc}</Text>}
           </Pressable>)}
         </View>}
     </ScrollView>
@@ -73,17 +74,17 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 24, paddingBottom: 20 },
   title: { color: palette.moon, fontSize: 24, fontFamily: font.display },
   subtitle: { color: palette.textDim, fontSize: 13, fontFamily: font.ui, marginTop: 4 },
-  content: { paddingHorizontal: 24, paddingTop: 24 },
+  content: { paddingHorizontal: 24, paddingTop: 16, flexGrow:1 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 24 },
-  singleGrid: { justifyContent: 'center', paddingTop: 20 },
-  item: { width: '48%', alignItems: 'center', paddingHorizontal: 4 },
-  singleItem: { width: '100%', maxWidth: 300 },
+  singleGrid: { justifyContent: 'flex-start', paddingTop: 12 },
+  item: { width: '48%', alignItems: 'center', paddingHorizontal: 12, paddingVertical:18, backgroundColor:palette.scrim, borderBottomWidth:2, borderBottomColor:palette.paperDeep },
+  singleItem: { width: '100%', maxWidth: 420, alignSelf:'center' },
   object: { alignItems: 'center', justifyContent: 'center', width: '100%' },
   count: { position: 'absolute', right: 4, bottom: 4, color: palette.moon, fontFamily: font.heading, fontSize: 16, backgroundColor: palette.scrim, paddingHorizontal: 6 },
-  ledge: { width: '100%', height: 8, padding: 0, marginTop: -4 },
+  ledge: { width: '75%', height: 3, backgroundColor:palette.paperDeep, marginTop:8 },
   name: { color: palette.moon, fontFamily: font.heading, fontSize: 14, textAlign: 'center', marginTop: 8 },
   desc: { color: palette.text, fontFamily: font.body, fontSize: 21, lineHeight: 25, textAlign: 'center', marginTop: 6 },
-  hint: { color: palette.textFaint, fontFamily: font.ui, fontSize: 10, marginTop: 8 },
+  hint: { color: palette.textFaint, fontFamily: font.ui, fontSize: 12, marginTop: 8 },
   button: { color: palette.text, fontFamily: font.heading, fontSize: 14 },
   empty: { color: palette.textDim, fontFamily: font.body, fontSize: 24, lineHeight: 30, textAlign: 'center', paddingVertical: 48 },
   scrim: { flex: 1, backgroundColor: palette.scrimHeavy, paddingHorizontal: 20, justifyContent: 'center' },

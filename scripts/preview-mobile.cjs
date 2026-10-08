@@ -6,7 +6,8 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
  const server=http.createServer((req,res)=>{let p=path.join(root,decodeURIComponent(req.url.split('?')[0]));if(!fs.existsSync(p)||fs.statSync(p).isDirectory())p=path.join(root,'index.html');const ext=path.extname(p);res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.ttf':'font/ttf'})[ext]||'application/octet-stream');fs.createReadStream(p).pipe(res);});await new Promise(r=>server.listen(8129,'127.0.0.1',r));
  const browser=await chromium.launch({executablePath:process.env.PHIKINHUA_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage','--disable-gpu'],headless:true});const ctx=await browser.newContext({viewport:{width:393,height:852},deviceScaleFactor:Number(process.env.PHIKINHUA_PREVIEW_SCALE??2)});await ctx.addInitScript(()=>localStorage.setItem('phi-ui-settings',JSON.stringify({reducedMotion:true})));const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));
  try{
- if(process.env.PHIKINHUA_REVIEW_ONLY==='1'){await require('./preview-remaining.cjs')({browser,base:'http://127.0.0.1:8129',errors});if(errors.length)throw Error(errors.join('\n'));return;}
+ if(process.env.PHIKINHUA_REVIEW_ONLY==='1'){await require('./preview-remaining.cjs')({browser,base:'http://127.0.0.1:8129',errors});if(fs.existsSync('/tmp/quiet-review-fixtures.json'))await require('./preview-journey.cjs')({browser,base:'http://127.0.0.1:8129',errors});
+ if(errors.length)throw Error(errors.join('\n'));return;}
  await p.goto('http://127.0.0.1:8129');await p.getByRole('button',{name:'เริ่มเกม',exact:true}).click();
  await p.getByRole('button',{name:'เลือกนักรบวัด',exact:true}).click();
  await p.getByRole('button',{name:'เลือกนักรบวัด · ออกเดินทาง →',exact:true}).click();
@@ -36,6 +37,7 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
  await win.getByRole('button',{name:'รับรางวัล',exact:true}).click();
  await ctx.close();
  if(fs.existsSync('/tmp/quiet-review-fixtures.json'))await require('./preview-remaining.cjs')({browser,base:'http://127.0.0.1:8129',errors});
+ if(fs.existsSync('/tmp/quiet-review-fixtures.json'))await require('./preview-journey.cjs')({browser,base:'http://127.0.0.1:8129',errors});
  if(errors.length)throw Error(errors.join('\n'));
  console.log('PASS live menu, class, night, blessing confirmation, map, battle, card detail; two mobile sizes; legal checkpoint card win and reward continuation');
 

@@ -4,7 +4,7 @@
 // ผลลัพธ์คำนวณด้วย `fuseCards` ตัวเดียวกับที่ engine ใช้จริง — ตัวเลขที่เห็น
 // ก่อนกดจึงตรงกับการ์ดที่ได้เสมอ ไม่ใช่ตัวอย่างที่คำนวณคนละทาง
 
-import {paperPalette as palette,paperSurface as surface,PaperTexture} from './Paper';
+import {palette,surface} from '../theme';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState } from '../../src/core/types';
@@ -40,15 +40,15 @@ function CardChip({
       disabled={disabled}
       style={{
         paddingHorizontal: 10, paddingVertical: 8, borderRadius: 0,
-        backgroundColor: selected ? tint.moonPick : surface.panelWell,
+        backgroundColor: selected ? surface.panelActive : surface.panelWell,
         borderWidth: selected ? 2 : 1,
         borderColor: selected ? palette.lineStrong : palette.line,
         opacity: disabled ? 0.35 : 1,
-        minWidth: 96,
+        width: '48%', minHeight:135,
       }}
     >
       <View style={{alignItems:'center'}}><CardGlyphArt card={card} size={48}/></View>
-      <Text style={{ color: palette.text, fontSize: size.label, fontFamily: font.heading }}>
+      <Text style={{ color: palette.text, fontSize: 13, fontFamily: font.heading }}>
         {card.name}
       </Text>
       <Text style={{ color: palette.textDim, fontSize: 11, marginTop: 2, fontFamily: font.ui }}>
@@ -84,11 +84,11 @@ export default function FusionAltarView({ state, dispatch }: Props) {
   const preview = check?.ok ? fuseCards(a, b) : null;
 
   return (
-    <RitualSurface kind="occupationPage" style={{marginTop:16,padding:24}}>
+    <RitualSurface kind="quietSlate" style={{marginTop:8,padding:20}}>
       <Text style={{fontFamily:font.heading,fontSize:24,color:palette.text}}>แท่นผสาน</Text>
       <Text style={{
-        color: palette.textDim, fontSize: size.bodyLg,
-        fontFamily: font.body, lineHeight: 26,
+        color: palette.textDim, fontSize: 14,
+        fontFamily: font.ui, lineHeight: 23,
       }}>
         รวมการ์ดสองใบเป็นใบเดียว จ่ายพลังงานครั้งเดียวได้ผลของทั้งสองใบ
         แลกกับการเลือกเล่นทีละใบไม่ได้อีก
@@ -107,7 +107,7 @@ export default function FusionAltarView({ state, dispatch }: Props) {
             เลือกการ์ดสองใบ ({picked.length}/2)
           </Text>
 
-          <ScrollView style={{ maxHeight: 220 }}>
+          <View>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {deck.map((card, i) => (
                 <CardChip
@@ -120,7 +120,7 @@ export default function FusionAltarView({ state, dispatch }: Props) {
                 />
               ))}
             </View>
-          </ScrollView>
+          </View>
         </>
       )}
 
@@ -149,7 +149,7 @@ export default function FusionAltarView({ state, dispatch }: Props) {
             {preview.energyGain ? ` · พลังงาน +${preview.energyGain}` : ''}
           </Text>
           {!!preview.desc && (
-            <Text style={{ color: palette.textDim, fontSize: size.body, marginTop: 4, fontFamily: font.body }}>
+            <Text style={{ color: palette.textDim, fontSize: 14, lineHeight:23, marginTop: 4, fontFamily: font.ui }}>
               {preview.desc}
             </Text>
           )}

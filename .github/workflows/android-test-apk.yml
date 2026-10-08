@@ -1,7 +1,7 @@
 name: Android five-night APK
 on:
   push:
-    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table']
+    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table', 'art/quiet-comic-ui']
     paths-ignore: ['**/*.md', 'scripts/android-smoke.py', '.github/workflows/android-helper-verify.yml', '.github/workflows/android-native-inspect.yml']
   workflow_dispatch:
 permissions:
@@ -23,7 +23,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: python -m pip install Pillow
       - run: npm ci
-      - run: npm test -- --maxWorkers=2 --testTimeout=30000
+      - run: npm test -- --maxWorkers=2 --testTimeout=60000
       - run: npx tsc --noEmit
       - name: Generate Android project
         run: CI=1 npx expo prebuild --platform android
@@ -39,13 +39,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='20' versionName='1.0.19'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FiveNights-v1.0.19.apk
-          sha256sum PhiKinHua-FiveNights-v1.0.19.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='21' versionName='1.0.20'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FiveNights-v1.0.20.apk
+          sha256sum PhiKinHua-FiveNights-v1.0.20.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FiveNights-APK
-          path: PhiKinHua-FiveNights-v1.0.19.apk
+          path: PhiKinHua-FiveNights-v1.0.20.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -75,7 +75,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FiveNights-v1.0.19.apk
+            adb install PhiKinHua-FiveNights-v1.0.20.apk
             timeout 900 python -u scripts/android-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()

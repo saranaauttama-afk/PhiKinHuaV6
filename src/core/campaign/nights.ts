@@ -10,7 +10,7 @@ export const NIGHT_RULES=[
  {night:2,name:'คืนเสียงเรียก',desc:'ผีเลือดเพิ่ม 10% · การโจมตีแต่ละหมัดแรงขึ้น 1'},
  {night:3,name:'คืนอาถรรพ์',desc:'ผีเลือดเพิ่ม 20% · แรงขึ้น 1 · สะสมแรงทุก 3 เทิร์น'},
  {night:4,name:'คืนล้อมบ้าน',desc:'ผีเลือดเพิ่ม 30% · ผีชั้นสูงและบอสเริ่มด้วยเกราะ 6 · บอสตื่นเมื่อเลือดครึ่งหนึ่ง'},
- {night:5,name:'คืนผีตื่น',desc:'ผีเลือดเพิ่ม 40% · แรงขึ้น 2 · บอสตื่นแล้วเล่นได้เพิ่ม 1 พลังงาน'},
+ {night:5,name:'คืนผีกินหัว',desc:'ผีเลือดเพิ่ม 40% · แรงขึ้น 2 · บอสตื่นแล้วเล่นได้เพิ่ม 1 พลังงาน · หลังศึกที่ 15 ต้องปราบผีกินหัวตัวจริง'},
 ] as const;
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};
 export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>={
