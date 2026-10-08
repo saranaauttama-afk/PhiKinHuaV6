@@ -1,5 +1,6 @@
 /** Distinct art for the chapter pilot cards; upgrades keep their original identity. */
 export const CARD_ART_SOURCES: Record<string, import('react-native').ImageSourcePropType> = {
+ 'qa_phra_prathan': require('../assets/ui/blessing-shrine-object.png'),
  'night_head_collector_strike':require('../assets/monsters/night-head-collector.png'),
  'night_head_collector_ward':require('../assets/monsters/night-head-collector.png'),
  'night_head_collector_signature':require('../assets/monsters/night-head-collector.png'),

@@ -13,6 +13,7 @@ export function cardGlyph(card: CardData): CardGlyph {
   return 'breath';
 }
 export function cardSummary(card: CardData): string {
+  if (card.id === 'qa_phra_prathan') return 'ทดสอบ · ชนะผีทันที';
   const parts: string[] = [];
   if (card.dmg) parts.push(`โจมตี ${card.dmg}${card.hits && card.hits > 1 ? ` ×${card.hits}` : ''}`);
   if (card.block) parts.push(`กัน ${card.block}`);

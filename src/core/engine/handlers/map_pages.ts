@@ -259,6 +259,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → combat (${offer.tier}) vs ${s.enemy?.id ?? s.enemy?.name ?? 'Enemy'}`);
+      require('../../cards/testWin').dealTestWinCard(s);
       return { state: s, rng };
     }
 
@@ -331,6 +332,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       mp._shopUsed = false;
   (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push('ChooseOffer → combat (boss)');
+      require('../../cards/testWin').dealTestWinCard(s);
       return { state: s, rng };
     }
 

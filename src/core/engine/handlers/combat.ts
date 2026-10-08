@@ -14,6 +14,7 @@ import { loseRun } from './runEnd';
 import { isTrapCard, armTrap, springTraps, tickTraps } from '../../combat/traps';
 import { effectiveCost, countCardPlayed, applyHeldEffects } from '../../cards/mechanics';
 import { isCurseCard, discardCurses } from '../../cards/curse';
+import { TEST_WIN_CARD_ID, testWinCardEnabled } from '../../cards/testWin';
 
 /** Resolve deaths from helper/status/trap effects as well as direct played cards. */
 function settleCombat(s: GameState, r: RNG): RNG {
@@ -37,6 +38,15 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   const idx = cmd.index;
   if (idx < 0 || idx >= s.piles.hand.length) return { state: s, rng: r };
   const played = s.piles.hand[idx];
+  if (played.id === TEST_WIN_CARD_ID) {
+    if (!testWinCardEnabled() || !s.enemy) return { state: s, rng: r };
+    countCardPlayed(s);
+    s.piles.exhaust.push(s.piles.hand.splice(idx, 1)[0]);
+    s.enemy.hp = 0;
+    s.log.push('พระประธาน: ชนะการต่อสู้ทันที (ทดสอบ)');
+    r = settleCombat(s, r);
+    return { state: s, rng: r };
+  }
   if(played.type==='attack'&&!require('../../statusEffectsRuntime').canPlayAttackCards(s))return {state:s,rng:r};
 
   // การ์ดคำสาปเล่นไม่ได้ — มันมีไว้ถ่วงมือ ทิ้งเองท้ายเทิร์น
@@ -168,6 +178,7 @@ export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { ty
 
 export function start(s: GameState, cmd: Extract<Command, { type: 'StartCombat' }>, r: RNG) {
   startCombat(s, cmd.monsterId, r);
+  s.turn = 1;
 
   ({ state: s, rng: r } = startPlayerTurn(s, r));
 

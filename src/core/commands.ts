@@ -144,6 +144,7 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   // เดิม: ให้พร reset ที่อื่นด้วย แต่ถ้าจะคงไว้ตรงนี้ก็ได้
   resetBlessingTurnFlags(state);
 
+  require('./cards/testWin').dealTestWinCard(state);
   return { state, rng };  
 }
 
