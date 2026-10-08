@@ -201,3 +201,5 @@ export const notebookColors = { paper: '#fff7e5', ink: '#171410', red: '#751c28'
 export const occupationColors = {"night": "#100d09", "cream": "#f4dfb7", "subtitleShade": "#17110bd9", "backShade": "#261b12e8", "backEdge": "#a37c4c", "backInk": "#f2dfb7", "pressWash": "#ffe5a533", "pressEdge": "#efc979", "labelInk": "#21180f", "hintShade": "#17110be6", "scrim": "#080603e8", "detailEdge": "#6b452b", "mutedInk": "#674331", "rule": "#bc9b72"} as const;
 
 export const badgeColors={neutral:"#4b4432",negative:"#682c2b",positive:"#304d37",neutralLine:"#a59972",negativeLine:"#bc6660",positiveLine:"#79a37c",ink:"#f1e5c9",counter:"#24231c",disabledInk:"#454545"} as const;
+
+export const quietUiColors={hudShade:'rgba(17,17,13,.82)',optionLine:'rgba(225,207,153,.2)'};

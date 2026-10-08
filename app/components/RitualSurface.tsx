@@ -3,6 +3,7 @@ import React from 'react';
 import {Image,View,StyleProp,ViewStyle} from 'react-native';
 
 const surfaces={
+ quietSlate:require('../../assets/ui/quiet-slate.png'),
  darkCloth:require('../../assets/ui/ritual-dark-cloth.webp'),
  slate:require('../../assets/ui/ritual-slate.png'),
  palm:require('../../assets/ui/ritual-palm.png'),

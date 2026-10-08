@@ -15,7 +15,9 @@ const objects = {
   ritual: require('../../assets/ui/ritual-jar.png'),
   attack: require('../../assets/ui/ritual-knife.png'),
 };
-function objectSource(b: BlessingDef) {
+export function objectSource(b: BlessingDef) {
+  if (b.id === 'free_card_energy') return require('../../assets/ui/card-parry.png');
+  if (b.id === 'spirit_energy') return objects.ritual;
   if (b.id === 'herbal_wisdom') return objects.herbs;
   if (b.id === 'ancestral_blessing') return objects.ancestor;
   if (b.id === 'meditation_peace') return objects.meditation;

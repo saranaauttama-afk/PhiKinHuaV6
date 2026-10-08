@@ -52,6 +52,7 @@ export default function Home() {
   const [nightClass,setNightClass]=useState<ClassId|null>(null);
   const [journalOpen,setJournalOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
+  const [trailOpen,setTrailOpen]=useState(false);
   const [blessingsOpen, setBlessingsOpen] = useState(false);
   const enteredRest = React.useRef<string | null>(null);
 
@@ -121,7 +122,7 @@ export default function Home() {
 
   // เลือกพรตั้งต้นก่อนเข้าหน้าแรก
   if (screen === 'starter-blessing') {
-    return <StarterBlessingScreen choices={state.starter?.choices ?? []} onPick={index => dispatch({ type: 'ChooseStarterBlessing', index })} />;
+    return <StarterBlessingScreen state={state} choices={state.starter?.choices ?? []} onPick={index => dispatch({ type: 'ChooseStarterBlessing', index })} />;
   }
 
   // มาถึงหน้าแผนที่โดยไม่มีเส้นทาง = หลุดมาผิดทาง (เช่นเซฟเก่าก่อนมีระบบเส้นทาง)
@@ -178,7 +179,9 @@ export default function Home() {
             </View>
           )}
           {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:18,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · ปราบผี {state.fightCount??0}/15</Text>}
-          <JourneyTrail state={state} compact={restRow} />
+          <Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>
+          {trailOpen&&<JourneyTrail state={state} compact/>}
+          <Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>
 
           {offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
             <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>

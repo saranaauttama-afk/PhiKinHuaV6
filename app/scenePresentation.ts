@@ -20,7 +20,7 @@ export function battleSceneStage(state:GameState) {
 }
 export function battleScene(state:GameState) {
   const row=battleSceneStage(state);
-  return {key:`battle-location-${row}`,source:state.runMode==='episode'?episodeSource(row):require('../assets/scence/episode-village.jpg')};
+  return {key:`battle-location-${row}`,source:state.journey?.plans[row]?.kind==='boss'?require('../assets/scence/boss.jpg'):require('../assets/scence/quiet-village.png')};
 }
 
 /** Map offers describe the destination, while currentId is the previous visit. */
@@ -36,6 +36,6 @@ export function mapScene(state: GameState) {
     ? episodeSource(row)
     : state.journey?.plans[row]?.kind === 'rest'
       ? require('../assets/scence/lantern-hut.jpg')
-      : require('../assets/scence/menu-haunted.jpg');
+      : require('../assets/scence/quiet-village.png');
   return { key: `${state.runMode ?? 'full'}-location-${row}`, source };
 }

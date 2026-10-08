@@ -17,7 +17,7 @@ import InkIcon,{type InkSymbol} from '../InkIcon';
 import HealthBar from '../HealthBar';
 import StatusStrip from './StatusStrip';
 import type { StatusEffect } from '../../../src/core/types_extended';
-import { palette, space, surface, tint, layer } from '../../theme';
+import { palette, space, surface, tint, layer, quietUiColors } from '../../theme';
 
 type Props = {
   monsterId: string | string[];
@@ -98,12 +98,22 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   return (
     <View pointerEvents="box-none" style={{ flex: 1, paddingTop: layout.monsterTop, alignItems: 'center' }}>
-      <RitualSurface kind="wood" style={{position:'absolute',top:safe.top+52,left:12,right:12,zIndex:layer.decor,paddingHorizontal:12,paddingVertical:6}}><HealthBar hp={hp} maxHp={maxHp} label={displayName} dark/><View style={{flexDirection:'row',justifyContent:'space-between',gap:6,marginTop:5}}><Text style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11}}>พลัง {enemy?.maxEnergy ?? 2} · เกราะ {enemy?.block ?? 0}</Text><Text numberOfLines={1} style={{color:chalk,fontFamily:'Prompt_600SemiBold',fontSize:11,flexShrink:1}}>{turnLabel}</Text></View><StatusStrip effects={enemy?.statusEffects} extra={escalating?[{id:"rage-rule",name:"ผีคลุ้มคลั่ง",symbol:"เดือด",bad:true,detail:`ทุก ${escalating.every} เทิร์น ผีได้ความแข็งแกร่งเพิ่ม ${escalating.strength} จนจบไฟต์ เริ่มมีผลกับการโจมตีรอบถัดไป`}]:[]} compact align="flex-start" /></RitualSurface>
-      <View style={{position:"absolute",top:safe.top+2,left:12,right:112}}>{helpers}</View>
       <Animated.View style={floatStyle}>
         {/* ผีตัวไหนยังไม่มีรูป จะได้กรอบ placeholder ที่บอกชื่อและโจทย์ภาพแทน */}
         <Art slot={`monster/${id}`} width={layout.monsterSize} height={layout.monsterSize} />
       </Animated.View>
+      <View style={{position:'absolute',top:layout.monsterTop+layout.monsterSize+8,left:32,right:32,paddingHorizontal:12,paddingVertical:7,backgroundColor:quietUiColors.hudShade}}>
+        <Text numberOfLines={1} style={{fontFamily:'Prompt_600SemiBold',fontSize:14,color:chalk,marginBottom:4}}>{displayName}</Text>
+        <View style={{flexDirection:'row',gap:10,alignItems:'center'}}>
+          <View style={{flex:1}}><HealthBar hp={hp} maxHp={maxHp} compact label={displayName}/></View>
+          <EnemyStatItem icon="block" label="" value={`${enemy?.block??0}`}/>
+          <Text style={{fontFamily:'Prompt_600SemiBold',color:chalk,fontSize:10}}>{turnLabel}</Text>
+        </View>
+        <View style={{flexDirection:'row',gap:8,alignItems:'center'}}>
+          <View style={{flex:2}}><StatusStrip effects={enemy?.statusEffects} extra={escalating?[{id:'rage-rule',name:'ผีคลุ้มคลั่ง',symbol:'เดือด',bad:true,detail:`ทุก ${escalating.every} เทิร์น ผีได้ความแข็งแกร่งเพิ่ม ${escalating.strength} จนจบไฟต์ เริ่มมีผลกับการโจมตีรอบถัดไป`}]:[]} compact/></View>
+          <View style={{flex:1}}>{helpers}</View>
+        </View>
+      </View>
 
 
     </View>

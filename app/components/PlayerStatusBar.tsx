@@ -5,10 +5,11 @@ import type { GameState } from '../../src/core/types';
 import { CHARACTER_CLASSES } from '../../src/core/classes';
 import { artSource } from './Art';
 import RitualSurface from './RitualSurface';
+import QuietPlayerHud,{HudStat} from './QuietPlayerHud';
 import InkIcon from './InkIcon';
 import { font, layer, paper, pulpColors, palette } from '../theme';
 
-export const STATUS_BAR_SPACE = 124;
+export const STATUS_BAR_SPACE = 100;
 export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: {
   state: GameState; onOpenDeck?: () => void; onOpenBlessings?: () => void;
 }) {
@@ -18,23 +19,8 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: 
   const [detailsOpen, setDetailsOpen] = React.useState(false);
   const health = Math.max(0, Math.min(1, p.hp / Math.max(1, p.maxHp)));
   return <>
-    <RitualSurface kind="hudPaper" style={[styles.hud, { bottom: pad.bottom + 8 }]}>
-      <Pressable accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={() => setDetailsOpen(true)} style={styles.portrait}>
-        <Image accessible={false} source={artSource(`class/${character.id}`)} resizeMode="contain" style={styles.portraitImage} />
-      </Pressable>
-      <View style={styles.content}>
-        <View style={styles.nameRow}><Text style={styles.name}>{character.name}</Text><Text style={styles.hp}>{p.hp}/{p.maxHp}</Text></View>
-        <View accessible accessibilityRole="progressbar" accessibilityLabel="พลังชีวิต" accessibilityValue={{ min: 0, max: p.maxHp, now: p.hp }}
-          style={styles.healthRow}><Text style={styles.healthLabel}>พลังชีวิต</Text><View style={styles.track}><View style={[styles.fill, { width: `${health * 100}%` }]} /></View></View>
-        <View style={styles.links}>
-          <View style={[styles.link, { flexDirection: 'row', gap: 3 }]}><InkIcon name="gold" size={14} /><Text style={styles.linkText}>เบี้ย {p.gold ?? 0}</Text></View>
-          <Pressable accessibilityRole="button" accessibilityLabel={`สำรับ ${state.masterDeck?.length ?? 0}`} disabled={!onOpenDeck}
-            onPress={onOpenDeck} android_ripple={{ color: pulpColors.pressedPaper }} style={styles.link}><Text style={styles.linkText}>สำรับ {state.masterDeck?.length ?? 0} ›</Text></Pressable>
-          <Pressable accessibilityRole="button" accessibilityLabel={`พร ${state.blessings?.length ?? 0}`} disabled={!onOpenBlessings}
-            onPress={onOpenBlessings} android_ripple={{ color: pulpColors.pressedPaper }} style={styles.link}><Text style={styles.linkText}>พร {state.blessings?.length ?? 0} ›</Text></Pressable>
-        </View>
-      </View>
-    </RitualSurface>
+    <QuietPlayerHud classId={state.classId} hp={p.hp} maxHp={p.maxHp} onPortrait={()=>setDetailsOpen(true)}
+     stats={<><HudStat icon="gold" text={`${p.gold??0}`} label="เบี้ย"/><HudStat icon="deck" text={`${state.masterDeck?.length??0}`} onPress={onOpenDeck} label={`สำรับ ${state.masterDeck?.length??0}`}/><HudStat icon="blessing" text={`${state.blessings?.length??0}`} onPress={onOpenBlessings} label={`พร ${state.blessings?.length??0}`}/></>}/>
     <Modal visible={detailsOpen} transparent animationType="fade" onRequestClose={() => setDetailsOpen(false)}>
       <View style={[styles.scrim, { paddingTop: pad.top + 16, paddingBottom: pad.bottom + 16 }]}>
         <RitualSurface kind="occupationPage" accessibilityViewIsModal style={styles.details}>

@@ -1,4 +1,8 @@
-# ผีกินหัว — คืนแรกที่บ้านร้าง
+# ผีกินหัว — ห้าคืนอาถรรพ์
+
+## Current visual preview branch
+
+`art/quiet-comic-ui` starts the approved spacious comic UI: ghost HUD below the sprite, a shared compact bottom player HUD, readable scrolling cards, path choices, confirmed starter blessings and an illustrated victory sheet. This branch uses mobile **web previews before APK builds**. Screenshots: `docs/previews/quiet-comic/`. See `docs/HANDOFF-quiet-comic-ui.md`. The five-night gameplay baseline is v1.0.19 from `work/occupation-table`; the older notes below are historical.
 
 Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current deliverable is a short, complete first chapter, targeting 5–10 minutes of human play before expanding the game. Duration and enjoyment are playtest goals, not measured device results.
 

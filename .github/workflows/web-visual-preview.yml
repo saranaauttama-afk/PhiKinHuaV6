@@ -1,0 +1,42 @@
+name: Mobile web visual preview
+on:
+  push:
+    branches: ['art/quiet-comic-ui']
+    paths-ignore: ['docs/previews/**', '**/*.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --maxWorkers=2 --testTimeout=30000
+      - run: npx tsc --noEmit
+      - name: Export real game for web
+        run: npx expo export --platform web --output-dir /tmp/quiet-web
+      - name: Install browser for visual checks
+        run: |
+          npm install --no-save playwright@1.62.1
+          npx playwright install --with-deps chromium
+      - name: Capture actual mobile screens
+        run: |
+          npx vite-node --config vitest.config.ts scripts/quiet-preview-fixture.ts
+          node scripts/preview-mobile.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Mobile-game-preview
+          path: docs/previews/quiet-comic/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Web-game-export
+          path: /tmp/quiet-web/
+          retention-days: 14

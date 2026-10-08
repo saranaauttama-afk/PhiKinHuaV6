@@ -167,7 +167,7 @@ export default function Card({
       <RitualSurface kind={disabled?"grayCard":"occupationPage"} style={{width:'100%',height:'100%',padding:9,paddingTop:28}}>
         <View style={{position:'absolute',top:5,left:6,width:25,height:25,borderRadius:13,backgroundColor:paper.ink,alignItems:'center',justifyContent:'center',zIndex:layer.badge}}><Text style={{color:paper.light,fontFamily:font.heading,fontSize:14}}>{costNow??card.cost}</Text></View>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
-        <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={height*.4} muted={disabled}/></View>
+        <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={Math.max(18,Math.min(height*.4,height-108))} muted={disabled}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:10,lineHeight:14,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>
         {card.exhaust&&<Text style={{position:'absolute',bottom:5,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:8}}>ใช้แล้วหาย</Text>}
       </RitualSurface>

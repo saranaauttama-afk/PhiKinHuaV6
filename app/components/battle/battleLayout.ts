@@ -33,10 +33,10 @@ export function useBattleLayout(): BattleLayout {
   const { width: screenW, height: screenH } = useWindowDimensions();
 
   const safe=useSafeAreaInsets();
-  const monsterTop = safe.top + 168;
+  const monsterTop = safe.top + (screenH<700?52:66);
   const monsterSize = Math.min(
     MONSTER_SIZE_MAX,
-    Math.max(80, Math.min(screenW-24, screenH * MONSTER_SIZE_RATIO, screenH-safe.bottom-380-monsterTop))
+    Math.max(120, Math.min(screenW-32, screenH * MONSTER_SIZE_RATIO, screenH-safe.bottom-430-monsterTop))
   );
 
   return {
@@ -45,7 +45,7 @@ export function useBattleLayout(): BattleLayout {
     monsterTop,
     monsterSize,
     // ใต้ภาพผีลงมานิดหน่อย เพื่อให้การ์ดคว่ำนั่งเหนือ badge
-    enemyHandCenterY: monsterTop + monsterSize - 30,
+    enemyHandCenterY: monsterTop + monsterSize * .58,
     centerX: screenW / 2,
     centerY: screenH * .45,
   };
