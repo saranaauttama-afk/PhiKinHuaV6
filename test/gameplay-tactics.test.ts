@@ -56,6 +56,21 @@ describe('live tactical rules',()=>{
   const out=applyCommand(state,{type:'PlayCard',index:0},rng).state;
   expect(out.player.energy).toBe(state.player.energy);expect(out.piles.hand).toHaveLength(1);
  });
+ it('corruption raises the charged cost as well as the displayed cost',()=>{
+  const {state,rng}=makeCombatState({hand:[attackCard(3,{cost:1})],playerEnergy:3});
+  applyStatusEffect('player',state,'corruption',2,1);
+  expect(effectiveCost(state,state.piles.hand[0])).toBe(2);
+  const out=applyCommand(state,{type:'PlayCard',index:0},rng).state;
+  expect(out.player.energy).toBe(1);
+ });
+ it('dispel cleanses debuffs while retaining a positive strength effect',()=>{
+  const {state,rng}=makeCombatState({hand:[cardById('dispel_ill')!]});
+  applyStatusEffect('player',state,'poison',2,2);
+  applyStatusEffect('player',state,'weakness',2);
+  applyStatusEffect('player',state,'strength',2,2);
+  const out=applyCommand(state,{type:'PlayCard',index:0},rng).state;
+  expect(out.player.statusEffects?.map(e=>e.id)).toEqual(['strength']);
+ });
  it('conditional draw really draws through the live play handler',()=>{
   const card=attackCard(1,{cost:1,conditional:{when:{kind:'player_block_at_least',value:5},bonus:{draw:2}}});
   const {state,rng}=makeCombatState({hand:[card],playerBlock:5});

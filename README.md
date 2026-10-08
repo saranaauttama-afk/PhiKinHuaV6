@@ -4,7 +4,7 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Latest battle UI follow-up
 
-`work/occupation-table`: **v1.0.18/code 19** adds ordered starter combos to all four classes, real card-reading decisions, enemy budget search and visible escalation every third round. Starting decks and three reward lanes now support four distinct builds. Fixes live turn counting, enemy poison/status expiry, conditional draw and free-card cost. TypeScript, 574 tests and production web export passed; 640 seeded chapter simulations distinguish random play from public-board tactics. APK/native CI is pending. See `docs/HANDOFF-gameplay-v18.md`.
+`work/occupation-table`: **v1.0.18/code 19** adds ordered starter combos to all four classes, real card-reading decisions, enemy budget search and visible escalation every third round. Starting decks and three reward lanes now support four distinct builds. Fixes live turn counting, enemy poison/status expiry, conditional draw and free-card cost. TypeScript, 576 tests and production web export passed; 640 seeded chapter simulations distinguish random play from public-board tactics. APK/native CI is pending. See `docs/HANDOFF-gameplay-v18.md`.
 
 `work/occupation-table`: **v1.0.17/code 18** uses compact green/red status seals with tap-to-read details, a separate ghost HUD/art layout, opaque grayscale unplayable cards and faded selected discard cards. TypeScript, 566 tests and mobile web inspection passed. APK/native CI is pending. See `docs/HANDOFF-battle-status-v17.md`.
 

@@ -449,7 +449,7 @@ export function modifyCardCostForStatusEffects(state: GameState, cardCost: numbe
   
   // ตรวจสอบ corruption - เพิ่มต้นทุนการ์ด
   if (hasStatusEffect('player', state, 'corruption')) {
-    const stacks = getStatusEffectStacks('player', state, 'corruption');
+    const stacks = getStatusEffectStacks('player', state, 'corruption') || 1;
     modifiedCost += stacks;
   }
   

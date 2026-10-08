@@ -235,12 +235,17 @@ root=wait_for('วิญญาณเพื่อน เหลือ 3 เทิ�
 tap('วิญญาณเพื่อน เหลือ 3 เทิร์น');root=shot('16-helper-details')
 assert find(root,'โจมตีด้วยพลังวิญญาณทะลุการป้องกัน',contains=True) is not None, 'Helper real effect missing'
 tap('ปิดรายละเอียดมินเนี่ยน');tap('จบเทิร์น')
+helper_hit_seen=False
 for _ in range(40):
     root=dump()
+    # The enemy can heal after the helper hits; inspect the actual damage frame.
+    if has(root,'38/42'):
+        helper_hit_seen=True
+        shot('17-helper-hit-before-enemy')
     if has(root,'จบเทิร์น'):break
     time.sleep(.5)
 wait_for('วิญญาณเพื่อน เหลือ 2 เทิร์น');root=shot('17-helper-after-action')
-assert has(root,'38/42'), 'Helper attack did not remove real enemy HP'
+assert helper_hit_seen, 'Helper attack did not show actual enemy HP 42 to 38 before enemy actions'
 logs=adb('logcat','-d');(out/'logcat.txt').write_text(logs)
 assert not re.search(r'FATAL EXCEPTION|Unable to load script|ANR in '+re.escape(package),logs),'Native runtime failure'
 assert adb('shell','pidof',package).strip(),'App exited'
