@@ -1,8 +1,10 @@
 # ผีกินหัว — ห้าคืนอาถรรพ์
 
-## Current visual preview branch
+## Current release: v1.0.20 / Android code 21
 
-`art/quiet-comic-ui` starts the approved spacious comic UI: ghost HUD below the sprite, a shared compact bottom player HUD, readable scrolling cards, ghosts standing directly in the path scene, confirmed starter blessings and an illustrated victory sheet. The remaining screens now share quiet controls, night selectors, illustrated inventory, a tabbed journal and a real run report. This branch uses mobile **web previews before APK builds**. Screenshots: `docs/previews/quiet-comic/`. See `docs/HANDOFF-quiet-comic-ui.md` and `docs/HANDOFF-quiet-comic-rest.md`. The five-night gameplay baseline is v1.0.19 from `work/occupation-table`; the older notes below are historical.
+`art/quiet-comic-ui` now follows sleeping villagers whose heads vanish while their bodies remain alive. Return the heads before dawn to wake them. Each of the five nights has its own fixed boss; night five adds the mandatory ultimate ผีกินหัว after เจ้าไร้เศียร, for 16 fights. The fifteen regular journey scenes are all distinct, moving from village to temple, forest, stream, mountains, caves and an uncanny realm. Rest shops and events use their actual destination scene. Repairs cover blessing scale/details, illustrated defeat, event backgrounds, level-up symbols and readable fusion cards.
+
+629 tests and TypeScript passed on GitHub Actions. Mobile visual checks restored all fifteen legal route checkpoints and exercised the five reported screens. Android APK/audit and native verification are tracked in `docs/HANDOFF-head-stealing-v20.md`. Earlier notes below are historical.
 
 Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current deliverable is a short, complete first chapter, targeting 5–10 minutes of human play before expanding the game. Duration and enjoyment are playtest goals, not measured device results.
 

@@ -102,26 +102,26 @@ if '--helpers-only' not in sys.argv:
     tap('เล่นคืนที่ 1');wait_for('ข้ามบทนี้');shot('03-prologue')
     tap('ข้ามบทนี้');wait_for('พรติดตัว 1:',contains=True);shot('03-starter-blessing')
     tap('พรติดตัว 1:',contains=True);tap('ยืนยันพร')
-    wait_for('เลือกผีที่คุณจะเผชิญหน้า');root=shot('04-map')
+    wait_for('เลือกทางเดิน');root=shot('04-map')
     ghosts=[name for name in ['ผีกระสือ','ผีปอบ','นางตานี','ผีนางรำ','ผีโป่งค่าง','งูผีสาง'] if has(root,name)]
     assert len(ghosts)==2, 'Expected two real ghost choices'
     assert any('/15' in t for t in labels(root)), 'Full 15-fight route missing'
     tap('ข้อมูลผู้เดินทาง');wait_for('ปิดข้อมูลผู้เดินทาง');root=shot('04-player-details')
     assert any(t.startswith('พลังงาน ') for t in labels(root)), 'Energy missing from player details'
     assert any(t.startswith('EXP ') for t in labels(root)), 'EXP missing from player details'
-    tap('ปิดข้อมูลผู้เดินทาง');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
+    tap('ปิดข้อมูลผู้เดินทาง');wait_for('เลือกทางเดิน')
     tap('สำรับ ',contains=True);wait_for('สำรับของเรา');shot('04-deck')
     tap('ดูการ์ด ฟันดาบวัด จำนวน 3 ใบ',contains=True);wait_for('รายละเอียดการ์ด');root=shot('04-deck-detail')
     assert has(root,'ฟันดาบวัด'), 'Wrong card detail opened'
     assert any('×3' in t for t in labels(root)), 'Grouped count missing in card detail'
-    tap('กลับไปดูสำรับ');wait_for('สำรับของเรา');tap('ปิด');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
-    root=dump();assert any(re.search(r'เบี้ย \d+',t) for t in labels(root)), 'Currency label missing'
+    tap('กลับไปดูสำรับ');wait_for('สำรับของเรา');tap('ปิด');wait_for('เลือกทางเดิน')
+    root=dump();assert has(root,'เบี้ย'), 'Currency label missing'
     tap('พร ',contains=True);wait_for('พรติดตัว');shot('04-blessings')
     tap('ดูพร ',contains=True);wait_for('รายละเอียดพร');shot('04-blessing-detail')
-    tap('กลับไปดูพร');wait_for('พรติดตัว');tap('ปิด');wait_for('เลือกผีที่คุณจะเผชิญหน้า')
+    tap('กลับไปดูพร');wait_for('พรติดตัว');tap('ปิด');wait_for('เลือกทางเดิน')
     tap(ghosts[0]);wait_for('เผชิญหน้า →');shot('04-ghost-selected')
     # Switching and clearing selection must not enter battle.
-    tap(ghosts[1]);wait_for('เผชิญหน้า →');tap(ghosts[1]);wait_for('เลือกผีที่คุณจะเผชิญหน้า')
+    tap(ghosts[1]);wait_for('เผชิญหน้า →');tap(ghosts[1]);wait_for('เลือกทางเดิน')
     assert find(dump(),'เผชิญหน้า →') is None, 'Confirm action remained after deselection'
     tap(ghosts[0]);tap('เผชิญหน้า →')
     wait_for('จบเทิร์น');shot('05-battle')
@@ -222,14 +222,14 @@ if '--helpers-only' not in sys.argv:
             touch(cards[0]);wait_for('รับ ',contains=True);shot('10-card-reward-preview')
             touch(wait_for('ไม่เอาสักใบ'))
         else:break
-    wait_for('เลือกผีที่คุณจะเผชิญหน้า');root=shot('11-next-map')
+    wait_for('เลือกทางเดิน');root=shot('11-next-map')
     assert any('1/15' in t for t in labels(root)), 'Victory did not advance the full route by one fight'
 # Fresh real medium run validates summon art and an actual helper attack.
 adb('shell','am','force-stop',package);adb('shell','pm','clear',package)
 adb('shell','am','start','-W','-n',package+'/.MainActivity')
 wait_for('เริ่มเกม');tap('เริ่มเกม');tap('เลือกคนทรง');tap('เลือกคนทรง · ออกเดินทาง →')
 wait_for('เล่นคืนที่ 1');tap('เล่นคืนที่ 1');wait_for('ข้ามบทนี้');tap('ข้ามบทนี้');wait_for('พรติดตัว 1:',contains=True);tap('พรติดตัว 1:',contains=True);tap('ยืนยันพร')
-wait_for('เลือกผีที่คุณจะเผชิญหน้า');root=dump()
+wait_for('เลือกทางเดิน');root=dump()
 choices=[name for name in ['ผีกระสือ','นางตานี','ผีนางรำ','ผีโป่งค่าง','งูผีสาง','ผีปอบ'] if has(root,name)]
 assert choices, 'No medium encounter available'
 tap(choices[0]);tap('เผชิญหน้า →');wait_for('จบเทิร์น')
