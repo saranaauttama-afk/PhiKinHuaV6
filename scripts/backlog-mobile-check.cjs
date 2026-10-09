@@ -7,7 +7,7 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
  try{
  for(const viewport of [{width:360,height:640},{width:393,height:852}]){
   const ctx=await browser.newContext({viewport});const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));
-  const load=async screen=>{await p.goto('http://127.0.0.1:8130/ui-review?screen='+screen);await p.getByText('กำลังเปิดภาพจากเกม…',{exact:true}).waitFor({state:'hidden'});};
+  const load=async screen=>{await p.goto('http://127.0.0.1:8130/ui-review?screen='+screen);await p.getByTestId('qa-state').waitFor({state:'attached'});await p.getByText('กำลังเปิดภาพจากเกม…',{exact:true}).waitFor({state:'hidden'});};
   const metrics=async()=>JSON.parse(await p.getByTestId('qa-state').textContent());
   // Real shop components, selection/cancel/confirmation through reducer, no capture.
   for(const kind of ['card','remove','upgrade']){

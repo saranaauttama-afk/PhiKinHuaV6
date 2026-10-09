@@ -12,6 +12,18 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Verify UI-only follow-up changes no application code
+        if: contains(github.event.head_commit.message, '[ui-only]')
+        run: |
+          python - <<'PY'
+          import subprocess
+          changed=subprocess.check_output(['git','diff','--name-only','HEAD~1','HEAD'],text=True).splitlines()
+          allowed={'scripts/backlog-mobile-check.cjs','scripts/adventure-mobile-check.cjs','.github/workflows/android-test-apk.yml'}
+          assert all(p in allowed or p.endswith('.md') for p in changed), changed
+          print('Only UI verification scripts/workflow/docs changed; parent application is the APK source.')
+          PY
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -29,6 +41,7 @@ jobs:
           name: UI-backlog-audit
           path: backlog-audit/
   android:
+    if: ${{ !contains(github.event.head_commit.message, '[ui-only]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
