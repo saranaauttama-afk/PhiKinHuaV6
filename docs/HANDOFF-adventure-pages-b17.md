@@ -45,7 +45,19 @@ Implementation commit: `cdf70d4`; status-popup/RNG correction: `b259e49`. Initia
 - Mobile browser checks: 60 checks passed (44 existing regression checks + 16 B17 checks), at 360×640 and 393×852, in Actions run `37961855214`. Both audit JSON files have zero browser errors and no screenshots. Local Chromium download was incomplete; browser success is CI evidence.
 - APK build: passed in Actions run `37961855214` (Gradle 19m 6s). Package `com.phikinhua.episode`, v1.0.26 / code 27; offline Hermes bundle included; arm64-v8a and x86_64. APK v2 signature verifies, ZIP alignment passes, and all 42 native libraries meet 16 KB ELF/ZIP alignment checks.
 - APK: 121,316,211 bytes; SHA-256 `14892dce7dd322845258749e0a2569b7be6902314988b2901044ad066d577ac0`. Downloaded APK checksum matches the CI audit.
-- API 36 native five-night run: pending Actions run `37965979015`. The first native attempt installed/launched successfully but stopped at an anchored departure-button test selector: the real button includes the class name. The harness now matches the complete action. This rerun reuses the exact APK above, verifies its checksum, and checks that application code/dependencies/assets match built commit `b259e49`; no application change is hidden behind APK reuse.
+- API 36 native five-night run: **passed**, [Actions run `37965979015`](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37965979015), tested commit `b018af9`. Downloaded XML/JSON/log evidence confirms all five mandatory stories, 31 battles, all six bosses, progression into each unlocked night, cold combat resume, cancelled drag, portrait layout and a living process without `FATAL EXCEPTION` / `JavascriptException` in the captured logcat. The report records 286 successful action/assertion steps; these are not 286 independent test cases. No game captures were taken.
+
+The first native attempt installed/launched successfully but stopped at an anchored departure-button test selector: the real button includes the class name. Consequently build run `37961855214` has an overall failed conclusion, although its mobile and Android build/audit jobs passed. The corrected native harness matches the complete action. The successful rerun reuses the exact APK above, verifies its checksum, and checks that application code/dependencies/assets match built commit `b259e49`; no application change is hidden behind APK reuse.
+
+Native evidence: [artifact `11634398881`](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/37965979015/artifacts/11634398881), `B17-native-verification.zip`, SHA-256 `04e3c92d0a696d2dd5e27dc26e48722d1ce2b1b77903c744c176b7947b96af36`. Downloaded ZIP checksum matches the uploaded artifact digest. Its files are five completion XML dumps, latest XML, `results.json` and `logcat.txt`.
+
+| Night | Battles | Mandatory story | Native boss names |
+| --- | ---: | --- | --- |
+| 1 | 6 | Passed | กระหังหนองร้าง |
+| 2 | 6 | Passed | เปรตวัดร้าง |
+| 3 | 6 | Passed | ผีป่าไทรพันราก |
+| 4 | 6 | Passed | พรายแอ่งถ้ำ |
+| 5 | 7 | Passed | ปอบครูอาคม → ผีกินหัว |
 
 The native run installs/clears app data and follows the warrior class through all five nights. It checks mixed-shop routing and preserved pages, mandatory stories and 31 battles including all six bosses, next-night unlocks, cold combat resume and cancelled drag. It uses the existing test-only พระประธาน card to verify structure. Mobile browser fixtures independently verify card drag play, cancel, blessing confirmation, upgrade cancel/scroll, geometry and actual shop dispatch at 360×640 and 393×852. Both write XML/JSON/log evidence without game screenshots. The test APK retains พระประธาน; it is not a production-balanced release build.
 
