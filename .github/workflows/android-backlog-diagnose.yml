@@ -1,0 +1,39 @@
+name: Backlog native diagnostics
+on:
+  push:
+    branches: ['work/battle-ui-backlog-v22']
+    paths: ['scripts/android-backlog-smoke.py', '.github/workflows/android-backlog-diagnose.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-FiveNights-APK
+          run-id: 37937815937
+          github-token: ${{ github.token }}
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-FiveNights-v1.0.25.apk
+            python scripts/android-backlog-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Native-backlog-diagnostics
+          path: backlog-native-audit/
