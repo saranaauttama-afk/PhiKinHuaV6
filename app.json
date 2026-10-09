@@ -3,7 +3,7 @@
     "name": "PhiKinHua",
     "slug": "PhiKinHua",
     "scheme": "phikinhua",
-    "version": "1.0.25",
+    "version": "1.0.26",
     "userInterfaceStyle": "dark",
     "orientation": "portrait",
     "plugins": [
@@ -23,7 +23,7 @@
     ],
     "android": {
       "package": "com.phikinhua.episode",
-      "versionCode": 26,
+      "versionCode": 27,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-pulp.png",
         "backgroundColor": "#1a0a00"

@@ -24,6 +24,10 @@ import MonsterArea from './components/battle/MonsterArea';
 import EnemyHandCard from './components/battle/EnemyHandCard';
 import RestDestinations from './components/RestDestinations';
 import SceneGhostChoices from './components/SceneGhostChoices';
+import AdventureChoices from './components/AdventureChoices';
+import PlayerHand from './components/battle/PlayerHand';
+import PlayerHUD from './components/battle/PlayerHUD';
+import {skippableSlots} from '../src/core/map/adventure';
 import {describeOffer} from './components/offerDisplay';
 import {palette,font} from './theme';
 export default function UiReview(){
@@ -38,11 +42,13 @@ export default function UiReview(){
  if(error)return <Text accessibilityRole="alert">{error}</Text>;
  if(!loaded||!state)return <Text>กำลังเปิดภาพจากเกม…</Text>;
  if(done)return <QuietPage title="ดำเนินการแล้ว"><Text style={{color:palette.text}}>ปุ่มตอบสนองแล้ว</Text></QuietPage>;
- const telemetry=<Text pointerEvents="none" testID="qa-state" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({gold:state.player.gold,deck:state.masterDeck.map(c=>[c.id,c.upgradeLevel??0]),stock:state.shopStock?.length,phase:state.phase,hp:state.player.maxHp})}</Text>;
+ const telemetry=<Text pointerEvents="none" testID="qa-state" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({gold:state.player.gold,deck:state.masterDeck.map(c=>[c.id,c.upgradeLevel??0]),stock:state.shopStock?.length,phase:state.phase,hp:state.player.maxHp,enemyHp:state.enemy?.hp,hand:state.piles.hand.map(c=>c.id),plays:state.runMetrics?.cardsPlayed,adventure:state.pages?.adventure})}</Text>;
  const wrap=(child:React.ReactNode)=><View style={{flex:1}}>{child}{telemetry}</View>;
+ if(screen?.startsWith('adventure-'))return wrap(state.phase==='map'?<AdventureChoices offers={state.pages!.current!.offers} resolved={state.pages!.current!.resolved} slotIds={state.pages!.adventure!.slotIds} onEnter={(_,index)=>dispatch({type:'ChooseOffer',index})} onSkip={()=>dispatch({type:'Proceed'})} skipCount={skippableSlots(state).length}/>:<ShopView state={state} dispatch={dispatch}/>);
+ if(screen==='hand')return wrap(<View style={{flex:1}}><MonsterArea monsterId={state.enemy!.id} enemy={state.enemy}/><PlayerHand state={state} cards={state.piles.hand} energy={state.player.energy} playedCardIds={[]} hoveredCardId={null} onHoverChange={()=>{}} onPlayCard={(_,index)=>dispatch({type:'PlayCard',index})}/><PlayerHUD classId={state.classId} hp={state.player.hp} maxHp={state.player.maxHp} energy={state.player.energy} maxEnergy={state.player.maxEnergy} block={state.player.block} maxHandSize={state.player.maxHandSize} drawCount={state.piles.draw.length} onEndTurn={()=>dispatch({type:'EndTurn'})} blessings={<BlessingSeals blessings={state.blessings}/>} statuses={<StatusStrip effects={state.player.statusEffects}/>} helpers={<MinionRow compact minions={state.minions} owner="player"/>}/></View>);
  if(screen==='rest-cards')return wrap(<RestDestinations offers={[{kind:'shop_card'},{kind:'shop_remove'},{kind:'shop_upgrade'}] as any} resolved={[]} onEnter={()=>setDone(true)}/>);
  if(screen?.startsWith('rest-'))return wrap(state.phase==='map'?<SceneGhostChoices choices={[{display:describeOffer(state.pages!.current!.offers[0],0),resolved:!!state.pages!.current!.resolved[0],index:0}]} selected={routeSelected} onSelect={setRouteSelected} onEnter={index=>dispatch({type:'ChooseOffer',index})}/>:state.phase==='event'?<StoryEventView state={state} dispatch={dispatch}/>:<ShopView state={state} dispatch={dispatch}/>);
- if(screen==='status')return wrap(<QuietPage title="สถานะ"><StatusStrip effects={state.player.statusEffects}/><MinionRow owner="player" minions={state.minions}/></QuietPage>);
+ if(screen==='status')return wrap(<QuietPage title="สถานะ"><StatusStrip effects={state.player.statusEffects}/><MinionRow compact owner="player" minions={state.minions}/></QuietPage>);
  if(screen==='blessing-seals')return wrap(<QuietPage title="พร"><BlessingSeals blessings={state.blessings}/></QuietPage>);
  if(screen==='combo-book')return wrap(<ComboBook state={state} visible={!done} onClose={()=>setDone(true)}/>);
  if(screen==='enemy-card'||screen==='enemy-card-multi')return wrap(<View style={{flex:1}}><MonsterArea monsterId={state.enemy?.id??'phi-pop'} enemy={state.enemy} enemies={screen==='enemy-card-multi'?[{...state.enemy!,id:'phi-pop'},{...state.enemy!,id:'phi-krasue'}]:undefined}/><EnemyHandCard card={{id:'pop_strike',name:'ข่วนกรงเล็บ',damage:8,block:0,cost:1}} playing ownerIndex={screen==='enemy-card-multi'?1:0} ownerCount={screen==='enemy-card-multi'?2:1} delay={0} cardIndex={0} totalCards={1}/></View>);
@@ -50,7 +56,7 @@ export default function UiReview(){
  if(screen==='summary'||screen==='summary-defeat')return <RunCompleteScreen state={state} onNewRun={()=>setDone(true)} onMainMenu={()=>setDone(true)} onJournal={()=>setDone(true)}/>;
  if(screen==='chapter')return <ChapterView state={state} dispatch={dispatch}/>;
  if(screen==='event'||screen==='event-result')return wrap(state.phase==='event'?<StoryEventView state={state} dispatch={dispatch}/>:<QuietPage title="กลับจุดพักแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>);
- if(screen==='levelup')return state.phase==='levelup'?<LevelUpOverlay state={state} playerLevel={state.player.level} onChoose={(option,index)=>dispatch({type:'ChooseLevelUpOption',option,index})} onSkip={()=>dispatch({type:'SkipLevelUp'})}/>:<QuietPage title="รับวิชาแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>;
+ if(screen==='levelup'||screen==='levelup-blessing')return wrap(state.phase==='levelup'?<LevelUpOverlay state={state} playerLevel={state.player.level} onChoose={(option,index)=>dispatch({type:'ChooseLevelUpOption',option,index})} onSkip={()=>dispatch({type:'SkipLevelUp'})}/>:<QuietPage title="รับวิชาแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>);
  if(screen==='reward')return state.phase==='reward'?<CardRewardOverlay choices={state.cardReward?.choices??[]} deck={state.masterDeck} onChoose={index=>dispatch({type:'ChooseCardReward',index})} onSkip={()=>dispatch({type:'SkipCardReward'})}/>:<QuietPage title="เลือกรางวัลแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>;
  if(screen==='deck')return <DeckView state={{...state,deckOpen:true}} dispatch={cmd=>cmd.type==='CloseDeck'?setDone(true):dispatch(cmd)}/>;
  if(screen==='blessings')return <BlessingView blessings={state.blessings} onClose={()=>setDone(true)}/>;

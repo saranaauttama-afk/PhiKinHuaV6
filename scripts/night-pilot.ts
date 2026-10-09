@@ -3,6 +3,8 @@ import {applyCommand} from '../src/core/reducer';
 import {makeRng,int,type RNG} from '../src/core/rng';
 import {cardsPlayedThisTurn,effectiveCost} from '../src/core/cards/mechanics';
 import {choosePilotCard} from './gameplay-pilot';
+import {skippableSlots,isCriticalOffer} from '../src/core/map/adventure';
+import {upgradeCostForCount} from '../src/core/balance/economy';
 import {onRestRow} from '../src/core/map/restPage';
 import type {ClassId} from '../src/core/classes';
 import type {Night} from '../src/core/campaign/nights';
@@ -45,6 +47,21 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
    go(pick?{type:'ChooseCardReward',index:best.i}:{type:'SkipCardReward'});continue;
   }
   if(s.phase==='victory'){go({type:'CompleteNode'});continue;}
+  if(s.pages?.adventure&&s.phase==='map'){
+   const offers=s.pages.current!.offers;
+   const prep=offers.findIndex(o=>o&&(o.kind==='treasure'||o.kind==='story_event'||o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75&&s.player.gold>=25+((s as any).healingShrine?.timesUsed??0)*10||o.kind==='shop_upgrade'&&s.player.gold>=upgradeCostForCount(s.runCounters?.upgradeShopCount??0)||o.kind==='shop_card'&&s.player.gold>=80&&s.masterDeck.length<14));
+   const ix=prep>=0?prep:offers.findIndex(o=>o&&isCriticalOffer(o));
+   go(ix>=0?{type:'ChooseOffer',index:ix}:{type:'Proceed'});continue;
+  }
+  if(s.pages?.adventure&&s.phase==='shop'){
+   if(s.shopKind==='well')go({type:'UseWell'});
+   if(s.shopKind==='healing')go({type:'UseHealingShrine'});
+   if(s.shopKind==='treasure'){go({type:'TakeTreasureCard',index:0});continue;}
+   if(s.shopKind==='upgrade'){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),u:c.upgradeLevel??0})).filter(x=>x.u<3).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'ShopUpgradeBuy',index:rank[0].i});}
+   if(s.shopKind==='card'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&it.price<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
+   const used=s.pages._shopUsed;go({type:'CompleteNode'});if(!used&&!s.runSummary)go({type:'Proceed'});continue;
+  }
+  if(s.pages?.adventure&&s.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});continue;}
   if(s.phase==='map'){
    if(onRestRow(s)){
     const offers=s.pages!.current!.offers;
@@ -68,7 +85,7 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
 }
 if(process.argv.includes('--night-report')){
  const log=console.log;console.log=()=>{};const rows=[];
- for(const cls of ['warrior','shaman','nun','medium'] as const)for(const night of [1,2,3,4,5] as const)for(const tactical of [false,true]){
+ for(const cls of ['warrior','shaman','nun','medium'] as const)for(const night of ([1,2,3,4,5] as const).filter(n=>!process.env.NIGHT_PILOT_NIGHTS||process.env.NIGHT_PILOT_NIGHTS.split(',').includes(String(n))))for(const tactical of [false,true]){
   const runs=Array.from({length:Number(process.env.NIGHT_PILOT_RUNS??8)},(_,i)=>simulateNight(`night-balance-${cls}-${i}`,cls,night,tactical));
   rows.push({class:cls,night,policy:tactical?'public-board':'random-affordable',runs:runs.length,wins:runs.filter(r=>r.won).length,meanFights:+(runs.reduce((n,r)=>n+r.fights,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((n,r)=>n+r.turns,0)/runs.length).toFixed(1),meanCombos:+(runs.reduce((n,r)=>n+r.combos,0)/runs.length).toFixed(1),cardsPerEnemyTurn:+(runs.reduce((n,r)=>n+r.enemyCards,0)/Math.max(1,runs.reduce((n,r)=>n+r.enemyTurns,0))).toFixed(2),stalled:runs.filter(r=>r.stalled).length});
  }

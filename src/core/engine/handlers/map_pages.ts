@@ -32,10 +32,12 @@ import { planEnemyIntent } from '../../combat/intent';
 import { winRun } from './runEnd';
 import { resetCombos } from '../../combat/combos';
 import { resetTraps } from '../../combat/traps';
+import {settleAdventureSlot,nextIntersection,revealUltimate,isCriticalOffer} from '../../map/adventure';
 
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
 export function replaceSingleOffer(mp: MapStatePages, rng: RNG, s: GameState, slotIndex: number) {
+  if(mp.adventure)return {rng};
   const ro = rollPageOffers(mp, rng, s); rng = ro.rng;
   const current = (mp.current?.offers ?? []) as PageOffer[];
   const otherKinds = current.map((o, i) => i !== slotIndex ? (o && (o as any).kind) : undefined);
@@ -98,6 +100,35 @@ function clearCombatState(s: GameState) {
   s.player.energy = s.player.maxEnergy ?? START_ENERGY;
 }
 
+function completeAdventure(s:GameState,r:RNG){
+ const mp=s.pages!,a=mp.adventure!,ix=mp._activeOfferIndex;
+ if(ix==null||!mp.current||mp.current.resolved[ix]||s.chapter)return {state:s,rng:r};
+ const offer=mp.current.offers[ix];if(!offer)return {state:s,rng:r};
+ if(s.phase==='victory'&&(offer.kind==='monster'||offer.kind==='boss')){
+  s.defeatedEnemyIds=[...(s.defeatedEnemyIds??[]),offer.enemyId];
+  removeTemporaryEquipment(s);s.equipmentTempSlots=0;clearCombatState(s);
+  if(offer.kind==='boss'){
+   if(offer.bossType==='final'&&s.campaign!.night===5){revealUltimate(s);fireChapter(s,{kind:'secret'});}
+   else {a.boss='done';mp.current.resolved[ix]=true;mp._activeOfferIndex=undefined;winRun(s,offer.bossType==='secret');}
+   return {state:s,rng:r};
+  }
+  s.phase='map';settleAdventureSlot(s,ix);return {state:s,rng:r};
+ }
+ if(s.phase==='shop'){
+  const used=mp._shopUsed||!!s.shopBoughtItems?.length||(s.shopKind==='fusion'&&(s.fusionAltar?.timesUsed??0)>0);
+  if(s.currentShopId&&s.shopKind){
+   const {addShopToRegistry,updateShopInRegistry}=require('../../shopRegistry');
+   if(s.shopRegistry?.some(sh=>sh.id===s.currentShopId))updateShopInRegistry(s,s.currentShopId,s.shopStock??[],s.shopBoughtItems??[]);
+   else addShopToRegistry(s,s.shopKind,s.shopStock??[],s.shopBoughtItems??[],s.currentShopId);
+  }
+  s.shopKind=undefined;s.shopStock=undefined;s.currentShopId=undefined;s.shopBoughtItems=undefined;s.phase='map';
+  if(used)settleAdventureSlot(s,ix);else mp._activeOfferIndex=undefined;
+  return {state:s,rng:r};
+ }
+ if(s.phase==='event'&&s.story?.result!=null){s.story=undefined;s.event=undefined;s.phase='map';settleAdventureSlot(s,ix);}
+ return {state:s,rng:r};
+}
+
 function formatOffer(o: PageOffer): string {
   return o.kind === 'monster' ? `monster:${o.tier}` : o.kind;
 }
@@ -124,6 +155,7 @@ function openPageInternal(s: GameState, mp: MapStatePages, r: RNG) {
 // Commands
 // -------------------------------------------------
 export function qaInitPages(s: GameState, _cmd: Extract<Command, { type: 'QA_InitPages' }>, r: RNG) {
+  if(s.pages?.adventure)return {state:s,rng:r};
   const got = ensurePages(s, r);
   let { rng, mp } = got;
   mp.pageIndex = 0;
@@ -131,6 +163,7 @@ export function qaInitPages(s: GameState, _cmd: Extract<Command, { type: 'QA_Ini
 }
 
 export function open(s: GameState, _cmd: Extract<Command, { type: 'OpenPage' }>, r: RNG) {
+  if(s.pages?.adventure)return {state:s,rng:r};
   const got = ensurePages(s, r);
   let { rng, mp } = got;
   // ถ้ายังเคลียร์หน้าเดิมไม่ครบ อย่า roll ใหม่
@@ -155,6 +188,7 @@ export function qaPrintPage(s: GameState, _cmd: Extract<Command, { type: 'QA_Pri
 }
 
 export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer' }>, r: RNG) {
+  if(s.pages?.adventure&&(s.phase!=='map'||s.chapter))return {state:s,rng:r};
   const got = ensurePages(s, r);
   let { rng, mp } = got;
 
@@ -650,6 +684,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
 }
 
 export function dismiss(s: GameState, cmd: Extract<Command, { type: 'DismissOffer' }>, r: RNG) {
+  if(s.pages?.adventure){if(s.phase==='map'&&!s.chapter)settleAdventureSlot(s,cmd.index,true);return {state:s,rng:r};}
   const got = ensurePages(s, r);
   const { rng, mp } = got;
   if (!mp.current) return { state: s, rng };
@@ -668,6 +703,7 @@ export function dismiss(s: GameState, cmd: Extract<Command, { type: 'DismissOffe
 }
 
 export function proceed(s: GameState, _cmd: Extract<Command, { type: 'Proceed' }>, r: RNG) {
+  if(s.pages?.adventure){nextIntersection(s);return {state:s,rng:r};}
   if (['combat','levelup','reward','defeat'].includes(s.phase)) return {state:s,rng:r};
   const got = ensurePages(s, r);
   let { rng, mp } = got;
@@ -691,6 +727,7 @@ export function proceed(s: GameState, _cmd: Extract<Command, { type: 'Proceed' }
 }
 
 export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'CompleteNode' }>, r: RNG) {
+  if(s.pages?.adventure)return completeAdventure(s,r);
   if (['combat','levelup','reward','defeat'].includes(s.phase)) return {state:s,rng:r};
   const got = ensurePages(s, r);
   let { rng, mp } = got;
@@ -939,6 +976,7 @@ export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'Compl
 }
 
 export function deleteShopFromMap(s: GameState, cmd: Extract<Command, { type: 'DeleteShopFromMap' }>, rng: RNG) {
+  if(s.pages?.adventure){if(s.phase==='map'&&!s.chapter&&cmd.index!=null)settleAdventureSlot(s,cmd.index,true);return {state:s,rng};}
   if (s.mapMode !== 'pages' || !s.pages) {
     return { state: s, rng };
   }
@@ -1003,6 +1041,11 @@ export function deleteShopFromMap(s: GameState, cmd: Extract<Command, { type: 'D
 }
 
 export function deleteShop(s: GameState, _cmd: Extract<Command, { type: 'DeleteShop' }>, rng: RNG) {
+  if(s.pages?.adventure){
+    const ix=s.pages._activeOfferIndex;
+    if(s.phase==='shop'&&ix!=null){s.shopStock=undefined;s.shopKind=undefined;s.currentShopId=undefined;s.shopBoughtItems=undefined;s.phase='map';settleAdventureSlot(s,ix,true);}
+    return {state:s,rng};
+  }
   if (s.phase !== 'shop' || s.mapMode !== 'pages' || !s.pages) {
     return { state: s, rng };
   }

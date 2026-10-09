@@ -7,6 +7,7 @@ import { EPISODE } from '../../balance/episode';
 import { START_ENERGY } from '../../balance/core';
 import { initPageMap } from '../../map/pages';
 import { startJourney } from '../../map/journeySync';
+import {startAdventure} from '../../map/adventure';
 import { getClass, buildStarterDeck } from '../../classes';
 import { grantBlessing } from '../shared';
 import { fireChapter } from '../../story/chapters';
@@ -186,7 +187,7 @@ export function chooseStarter(
 
   // ✅ วางเส้นทางทั้งรันไว้ล่วงหน้า แล้วเปิดตัวเลือกของชั้นแรก
   // (เดิม roll ถาด 3 ช่องที่สุ่มตัวเองใหม่เรื่อยๆ ผู้เล่นจึงไม่เคยเห็นทางข้างหน้า)
-  r = startJourney(s, r);
+  r = s.campaign ? startAdventure(s, r) : startJourney(s, r);
 
   s.phase = 'map'; // UI ของคุณใช้ phase 'map' เพื่อโชว์ pages อยู่แล้ว
   s.enemy = undefined;

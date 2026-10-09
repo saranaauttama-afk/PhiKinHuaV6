@@ -14,7 +14,7 @@ export default function GhostLoreButton({id,compact=false}:{id:string;compact?:b
  const copy={fontFamily:font.ui,fontSize:14,lineHeight:24,color:palette.text};
  return <>
   <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={`อ่านที่มาของ ${lore.name}`} onPress={e=>{e.stopPropagation();setOpen(true);}} style={{paddingHorizontal:compact?2:10,paddingVertical:compact?2:6,minWidth:compact?24:undefined,minHeight:compact?24:undefined}}>
-   {compact?<InkIcon name="blessing" size={18} color={palette.moon}/>:<Text style={{fontFamily:font.ui,fontSize:12,color:palette.moon,textDecorationLine:'underline'}}>ที่มาของผี</Text>}
+   {compact?<Text style={{fontFamily:font.ui,fontSize:10,color:palette.text}}>ที่มา</Text>:<Text style={{fontFamily:font.ui,fontSize:12,color:palette.moon,textDecorationLine:'underline'}}>ที่มาของผี</Text>}
   </Pressable>
   <Modal visible={open} transparent animationType="fade" onRequestClose={()=>setOpen(false)}>
    <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>

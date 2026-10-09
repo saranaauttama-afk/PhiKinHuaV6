@@ -55,5 +55,5 @@ export function screenForState(
  * (เช่นเซฟเก่าที่บันทึกไว้ก่อนมีระบบเส้นทาง) — ไม่ควรโชว์จอเปล่าให้ผู้เล่นงง
  */
 export function mapIsReady(state: GameState): boolean {
-  return !!state.journey && (state.pages?.current?.offers?.length ?? 0) > 0;
+  return (!!state.journey||!!state.pages?.adventure) && (state.pages?.current?.offers?.length ?? 0) > 0;
 }

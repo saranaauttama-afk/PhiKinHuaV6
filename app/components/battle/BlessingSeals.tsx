@@ -10,10 +10,10 @@ export default function BlessingSeals({blessings}:{blessings?:BlessingDef[]}) {
  const scroll=React.useRef<ScrollView>(null);
  const [open,setOpen]=React.useState<string|null>(null);const rows=groupBlessings(blessings??[]);const selected=rows.find(r=>r.blessing.id===open);
  if(!rows.length)return null;
- return <View testID="player-blessing-seals" style={{height:44,width:'100%'}}>
+ return <View testID="player-blessing-seals" style={{height:36,width:'100%'}}>
   <ScrollView ref={scroll} onContentSizeChange={()=>scroll.current?.scrollToEnd({animated:false})} horizontal showsHorizontalScrollIndicator={rows.length>6} contentContainerStyle={{flexDirection:'row-reverse',flexGrow:1,justifyContent:'flex-start',gap:3}}>
-   {rows.map(({blessing:b,count})=><Pressable key={b.id} accessibilityRole="button" accessibilityLabel={`ดูพร ${b.name}`} onPress={()=>setOpen(b.id)} style={{width:44,height:44,alignItems:'center',justifyContent:'center'}}>
-    <View style={{width:34,height:34,borderRadius:17,backgroundColor:blessingSealColors.backing,borderColor:blessingSealColors.line,borderWidth:1,overflow:'hidden',alignItems:'center',justifyContent:'center'}}><Image source={objectSource(b)} resizeMode="contain" style={{width:29,height:29}}/></View>
+   {rows.map(({blessing:b,count})=><Pressable key={b.id} accessibilityRole="button" accessibilityLabel={`ดูพร ${b.name}`} onPress={()=>setOpen(b.id)} style={{width:36,height:36,alignItems:'center',justifyContent:'center'}}>
+    <View style={{width:30,height:30,borderRadius:17,backgroundColor:blessingSealColors.backing,borderColor:blessingSealColors.line,borderWidth:1,overflow:'hidden',alignItems:'center',justifyContent:'center'}}><Image source={objectSource(b)} resizeMode="contain" style={{width:26,height:26}}/></View>
     {count>1&&<Text style={{position:'absolute',right:1,bottom:0,color:palette.moon,fontFamily:font.ui,fontSize:10}}>×{count}</Text>}
    </Pressable>)}
   </ScrollView>

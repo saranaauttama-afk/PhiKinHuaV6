@@ -367,6 +367,7 @@ export function useHealingShrine(s: GameState, _cmd: Extract<Command, { type: 'U
     (s as any).healingShrine = { timesUsed: 0 };
   }
   (s as any).healingShrine.timesUsed += 1;
+  if(s.pages)s.pages._shopUsed=true;
   
   // Track as bought item for registry
   if (!s.shopBoughtItems) s.shopBoughtItems = [];
@@ -403,6 +404,7 @@ export function useWell(s: GameState, _cmd: Extract<Command, { type: 'UseWell' }
     (s as any).mysticalWell = { timesUsed: 0 };
   }
   (s as any).mysticalWell.timesUsed += 1;
+  if(s.pages)s.pages._shopUsed=true;
   
   // Track as bought item for registry (price = 0 for free)
   if (!s.shopBoughtItems) s.shopBoughtItems = [];
@@ -495,6 +497,7 @@ export function takeTreasureCard(s: GameState, cmd: Extract<Command, { type: 'Ta
     s.shopRegistry = s.shopRegistry.filter(shop => shop.id !== treasureId);
   }
   
+  if(s.pages?.adventure&&s.pages._activeOfferIndex!=null){require('../../map/adventure').settleAdventureSlot(s,s.pages._activeOfferIndex);return {state:s,rng:r};}
   // Mark treasure as used and trigger map refresh
   if (s.pages && s.pages.current && s.pages._activeOfferIndex !== undefined) {
     const mp = s.pages;
@@ -563,6 +566,7 @@ export function takeSingleTreasureCard(s: GameState, cmd: Extract<Command, { typ
     s.shopRegistry = s.shopRegistry.filter(shop => shop.id !== treasureId);
   }
   
+  if(s.pages?.adventure&&s.pages._activeOfferIndex!=null){require('../../map/adventure').settleAdventureSlot(s,s.pages._activeOfferIndex);return {state:s,rng:r};}
   // Mark treasure as used and trigger map refresh
   if (s.pages && s.pages.current && s.pages._activeOfferIndex !== undefined) {
     const mp = s.pages;

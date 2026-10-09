@@ -3,6 +3,8 @@ import PostBattleSurface from './PostBattleSurface';
 import RitualSurface from '../RitualSurface';
 import {QuietButton} from '../QuietChrome';
 import {Image} from 'react-native';
+import {objectSource} from '../BlessingView';
+import {RITUAL_OBJECTS} from '../RitualObject';
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { CardData, GameState } from '../../../src/core/types';
@@ -107,7 +109,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
             const image=bucket==='equipment_slot'||bucket==='blessing'?require('../../../assets/ui/blessing-amulet.png')
               :bucket==='max_hp'?require('../../../assets/ui/blessing-herb-object.png')
               :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
-              :bucket==='upgrade'||bucket==='remove'?require('../../../assets/ui/ritual-knife.png')
+              :bucket==='upgrade'?RITUAL_OBJECTS.upgrade:bucket==='remove'?RITUAL_OBJECTS.remove
               :bucket==='max_hand'?require('../../../assets/images/players/iMaxHand.png'):require('../../../assets/ui/ritual-jar.png');
             const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.some(c=>canRemoveCard(c,deck.length)):false;
             return <Pressable disabled={unavailable} key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked,disabled:unavailable}}
@@ -129,45 +131,18 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         <View>
           {(bucketOf(pending)==='upgrade'||bucketOf(pending)==='remove')?<View style={{gap:16}}>
             <UpgradeCardPicker cards={deck} selected={cardIndex} onSelect={setCardIndex} remove={bucketOf(pending)==='remove'} onConfirm={i=>onChoose(pending,i)}/>
-          </View>:<ScrollView style={{ maxHeight: 340 }} contentContainerStyle={{ gap: 12 }}>
-            {subChoices(pending).map((sc, i) => (
-              <Pressable
-                key={sc.key}
-                onPress={() => setCardIndex(i)}
-                style={{
-                  padding: sc.card ? 0 : 16, borderRadius: 0,
-                  backgroundColor:'transparent',opacity:cardIndex!==null&&cardIndex!==i?.68:1,
-                }}
-              >
-                <CandleSelection selected={cardIndex===i}>{sc.card ? (
-                  <View>
-                    <CardRow card={sc.card} />
-                    {/* ซ้ำใบเดิมไม่ได้แปลว่าแย่ — บางทีเราตั้งใจถือใบเดิมหลายใบ
-                        แต่ต้องรู้ตัวว่ากำลังทำอยู่ */}
-                    {ownedCount(sc.card.id) > 0 && (
-                      <Text style={{
-                        color: palette.moonDim, fontSize: size.tiny,
-                        fontFamily: font.ui, marginTop: 2, marginLeft: space.md,
-                      }}>
-                        มีอยู่แล้ว {ownedCount(sc.card.id)} ใบ
-                      </Text>
-                    )}
-                  </View>
-                ) : (
-                  <>
-                    <Text style={{ color: palette.text, fontSize: 16, fontFamily: 'Prompt_600SemiBold' }}>
-                      {sc.title}
-                    </Text>
-                    {!!sc.detail && (
-                      <Text style={{ color: palette.textDim, fontFamily:font.ui,fontSize: 13, marginTop: 4 }}>
-                        {sc.detail}
-                      </Text>
-                    )}
-                  </>
-                )}</CandleSelection>
-              </Pressable>
-            ))}
-          <QuietButton label="ยืนยันรับพร" primary disabled={cardIndex===null} onPress={()=>cardIndex!==null&&onChoose(pending,cardIndex)}/></ScrollView>}
+          </View>:<View style={{gap:14}}>
+            <View style={{flexDirection:'row',gap:10,alignItems:'stretch'}}>
+             {(state.levelUp?.blessingChoices??[]).map((b,i)=><Pressable key={b.id} testID={`level-blessing-${i}`} accessibilityRole="button" accessibilityLabel={`เลือกพร ${b.name}`} onPress={()=>setCardIndex(i)} style={{flex:1}}>
+              <CandleSelection selected={cardIndex===i} dim={cardIndex!==null&&cardIndex!==i}><RitualSurface kind="quietSlate" style={{height:278,padding:12,gap:8}}>
+               <Image source={objectSource(b)} resizeMode="contain" style={{width:76,height:76,alignSelf:'center'}}/>
+               <Text style={{height:48,color:palette.moon,fontFamily:font.heading,fontSize:16,lineHeight:24,textAlign:'center'}}>{b.name}</Text>
+               <ScrollView><Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,lineHeight:22,textAlign:'center'}}>{b.desc}</Text></ScrollView>
+              </RitualSurface></CandleSelection>
+             </Pressable>)}
+            </View>
+            <QuietButton label="ยืนยันรับพร" primary disabled={cardIndex===null} onPress={()=>cardIndex!==null&&onChoose(pending,cardIndex)}/>
+          </View>}
 
           <QuietButton label="ย้อนกลับ" onPress={()=>{setPending(null);setCardIndex(null);}} style={{marginTop:14}}/>
         </View>

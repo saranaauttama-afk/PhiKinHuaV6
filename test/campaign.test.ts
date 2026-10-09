@@ -17,6 +17,7 @@ import {resolveEnemyCard} from '../src/core/combat/enemyCardEffects';
 import {applyStatusEffect} from '../src/core/statusEffectsRuntime';
 import {toBattleSave,fromSave} from '../src/core/save';
 import type {GameState,Command} from '../src/core/types';
+import {isCriticalOffer,skippableSlots} from '../src/core/map/adventure';
 import {screenForState} from '../app/screenRouter';
 function driver(cls:ClassId='warrior',night:Night=1,unlocks:Array<'card'|'blessing'>=[]){
  const seed=`campaign-${cls}-${night}`;let state=baseNewState(seed),rng=makeRng(seed);
@@ -28,13 +29,15 @@ function finish(d:ReturnType<typeof driver>){
  for(let guard=0;guard<250&&!d.state.runSummary;guard++){
   if(d.state.chapter){d.go({type:'SkipChapter'});continue;}
   if(d.state.phase==='map'){
-   if(onRestRow(d.state)){expect(restBudgetLeft(d.state)).toBe(0);d.go({type:'Proceed'});}
-   else d.go({type:'ChooseOffer',index:0});
+   const offers=d.state.pages!.current!.offers;
+   const critical=offers.findIndex(o=>o&&isCriticalOffer(o));
+   if(critical>=0)d.go({type:'ChooseOffer',index:critical});else d.go({type:'Proceed'});
   }else if(d.state.phase==='combat'){
-   if(d.state.campaign?.night===5&&d.state.fightCount===14)d.state.player.hp=1;
-   if(d.state.campaign?.night===5&&d.state.fightCount===15){expect(d.state.runSummary).toBeUndefined();expect(d.state.enemy?.id).toBe(ULTIMATE_BOSS.id);}
+   if(d.state.campaign?.night===5&&d.state.fightCount===5)d.state.player.hp=1;
+   if(d.state.campaign?.night===5&&d.state.fightCount===6){expect(d.state.runSummary).toBeUndefined();expect(d.state.enemy?.id).toBe(ULTIMATE_BOSS.id);}
    d.state.piles.hand=[{id:'structural-test',name:'test',type:'attack',cost:0,dmg:9999}];d.go({type:'PlayCard',index:0});
-  }else if(d.state.phase==='levelup')d.go({type:'SkipLevelUp'});
+  }else if(d.state.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}
+  else if(d.state.phase==='levelup')d.go({type:'SkipLevelUp'});
   else if(d.state.phase==='reward')d.go({type:'SkipCardReward'});
   else if(d.state.phase==='victory')d.go({type:'CompleteNode'});
   else throw Error(d.state.phase);
@@ -54,17 +57,18 @@ describe('five-night campaign',()=>{
   expect(recordRun(journal,makeRunRecord(out.state,'2026-10-09')!)).toEqual(journal);
   expect(screenForState(out.state,{pickingClass:true})).toBe('class-select');
  });
- for(const cls of ALL_CLASS_IDS)for(const night of [1,2,3,4,5] as const)it(`${cls} night ${night}: the full route, 7 bounded rests and a credited ending`,()=>{
-  const d=driver(cls,night);expect(d.state.journey!.plans.filter(p=>p.kind!=='rest')).toHaveLength(15);expect(d.state.journey!.plans.filter(p=>p.kind==='rest')).toHaveLength(7);
-  const s=finish(d);expect(s.runSummary?.won).toBe(true);expect(s.runSummary?.fights).toBe(nightFightTotal(night));expect(!!s.secretBossUnlocked).toBe(night===5);expect(s.runSummary?.metrics?.cardsPlayed).toBe(nightFightTotal(night));expect(s.runMetrics?.turns).toBe(nightFightTotal(night));if(night===5)expect(s.runSummary?.beatSecretBoss).toBe(true);
+ for(const cls of ALL_CLASS_IDS)for(const night of [1,2,3,4,5] as const)it(`${cls} night ${night}: 12 finite encounters and a credited ending`,()=>{
+  const d=driver(cls,night);expect(d.state.pages!.adventure!.deck).toHaveLength(12);expect(d.state.journey).toBeUndefined();
+  const s=finish(d);expect(s.runSummary?.won).toBe(true);expect(s.runSummary?.fights).toBe((night===5?7:6));expect(!!s.secretBossUnlocked).toBe(night===5);expect(s.runSummary?.metrics?.cardsPlayed).toBe((night===5?7:6));expect(s.runMetrics?.turns).toBe((night===5?7:6));if(night===5)expect(s.runSummary?.beatSecretBoss).toBe(true);
  });
  it('each night fixes a distinct final boss and night five ends only after the ultimate boss',()=>{
   expect(new Set(NIGHT_BOSSES.map(b=>b.id)).size).toBe(5);
-  for(const night of [1,2,3,4,5] as const){const d=driver('warrior',night);const boss=Object.values(d.state.journey!.nodes).find(n=>n.offer.kind==='boss'&&n.offer.bossType==='final');expect((boss!.offer as any).enemyId).toBe(NIGHT_BOSSES[night-1].id);const s=finish(d);if(night===5){expect(s.defeatedEnemyIds).toContain(ULTIMATE_BOSS.id);expect(s.journey!.plans.filter(p=>p.kind!=='rest')).toHaveLength(16);}}
+  for(const night of [1,2,3,4,5] as const){const d=driver('warrior',night);const s=finish(d);expect(s.defeatedEnemyIds).toContain(NIGHT_BOSSES[night-1].id);if(night===5){expect(s.defeatedEnemyIds).toContain(ULTIMATE_BOSS.id);expect(s.fightCount).toBe(7);}}
+
  });
  it('higher nights increase health/strength without shortening the route',()=>{
   const values=[1,2,3,4,5].map(n=>{const d=driver('warrior',n as Night);d.state.pages!.current!.offers[0]={kind:'monster',enemyId:'phi-pop'} as any;d.go({type:'ChooseOffer',index:0});return {hp:d.state.enemy!.maxHp,strength:d.state.enemy!.statusEffects?.find(e=>e.id==='strength')?.stacks??0};});
-  expect(values.map(v=>v.hp)).toEqual([34,37,41,44,48]);expect(values.map(v=>v.strength)).toEqual([0,1,1,2,2]);
+  expect(values.map(v=>v.hp)).toEqual([28,31,34,36,39]);expect(values.map(v=>v.strength)).toEqual([0,1,1,1,1]);
  });
  it('boss awakening triggers once and new energy starts on the next hand',()=>{
   const d=driver('warrior',5);d.state.pages!.current!.offers[0]={kind:'boss',bossType:'final',enemyId:'phaya-nak'} as any;d.go({type:'ChooseOffer',index:0});const s=d.state;s.enemy!.hp=Math.floor(s.enemy!.maxHp/2);
@@ -91,7 +95,7 @@ describe('five-night campaign',()=>{
  });
 });
 function record(night:number,id:string,over:Partial<RunRecord>={}):RunRecord{
- const s=finish(driver());return {...makeRunRecord(s,'2026-10-08')!,night,id,...over};
+ const s=finish(driver());return {...makeRunRecord(s,'2026-10-08')!,night,id,fights:night===5?7:6,...over};
 }
 describe('persistent class journal',()=>{
  it('unlocks sequentially, records defeats without promotion, and is idempotent',()=>{

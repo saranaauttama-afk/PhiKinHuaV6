@@ -21,6 +21,7 @@ export type PageOffer =
   | { kind: 'boss', bossType: 'mid' | 'final' | 'secret', enemyId: string };
 
 export type MapStatePages = {
+  adventure?: import('./adventure').Adventure;
   totalPages: number;
   pageIndex: number; // 0-based
   pools: {

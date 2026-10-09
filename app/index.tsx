@@ -15,6 +15,8 @@ import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
 import RestDestinations from './components/RestDestinations';
+import AdventureChoices from './components/AdventureChoices';
+import {skippableSlots} from '../src/core/map/adventure';
 import SceneGhostChoices from './components/SceneGhostChoices';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
@@ -75,8 +77,8 @@ export default function Home() {
   }, [state.phase,state.chapter,state.runSummary,journalOpen,nightClass,pickingClass,returnToMainMenu]);
 
   useEffect(() => {
-    if (state.phase === 'combat' && state.enemy) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
-  },[state.phase,state.enemy?.id]);
+    if (['combat','victory','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
+  },[state.phase,state.enemy?.id,state.chapter]);
 
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
@@ -193,13 +195,13 @@ export default function Home() {
               <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
-          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:18,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · ปราบผี {state.fightCount??0}/{nightFightTotal(state.campaign?.night)}</Text>}
-          <Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>
-          {trailOpen&&<JourneyTrail state={state} compact/>}
+          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:16,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · {state.pages?.adventure?`คลี่คลาย ${state.pages.adventure.resolvedIds.length}/12 · เดินผ่าน ${state.pages.adventure.skippedIds.length}`:`ปราบผี ${state.fightCount??0}/${nightFightTotal(state.campaign?.night)}`}</Text>}
+          {!state.pages?.adventure&&<Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>}
+          {!state.pages?.adventure&&trailOpen&&<JourneyTrail state={state} compact/>}
           <Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>
-          <Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>
+          <Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{state.pages?.adventure?'สามหน้าระหว่างทาง':restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>
 
-          {offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
+          {state.pages?.adventure || (offers.some(o=>o?.kind==='monster'||o?.kind==='boss')&&offers.some(o=>o&&o.kind!=='monster'&&o.kind!=='boss')) ? <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} skipCount={skippableSlots(state).length} onSkip={state.pages?.adventure?()=>dispatch({type:'Proceed'}):undefined}/></View> : offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
             <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>
               <SceneGhostChoices choices={offers.flatMap((offer, index) => offer ? [{ display: describeOffer(offer, index), resolved: page?.resolved[index] ?? false, index }] : [])}
                 selected={selectedCard} onSelect={setSelectedCard}

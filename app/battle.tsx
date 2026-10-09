@@ -345,7 +345,7 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
-        <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.runMode==='episode'?3:nightFightTotal(gameState.campaign?.night)}</Text>
+        <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.pages?.adventure?(gameState.campaign?.night===5?7:6):gameState.runMode==='episode'?3:nightFightTotal(gameState.campaign?.night)}</Text>
         {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',bottom:safe.bottom+340,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:13,lineHeight:21,textAlign:'center'}}>{comboNotice}</Text></RitualSurface></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
@@ -449,7 +449,7 @@ export default function BattlePage() {
         <ComboBook state={gameState} visible={comboOpen} onClose={()=>setComboOpen(false)}/>
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
-          helpers={!victoryIntro&&<MinionRow owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
+          helpers={!victoryIntro&&<MinionRow compact owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
           statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges}/>:null}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}

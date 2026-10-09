@@ -1,4 +1,5 @@
 import React from 'react';
+import {RITUAL_OBJECTS} from './RitualObject';
 import {Image, Pressable, ScrollView, Text, View, useWindowDimensions} from 'react-native';
 import type {PageOffer} from '../../src/core/map/pages';
 import {describeOffer} from './offerDisplay';
@@ -22,12 +23,13 @@ export default function RestDestinations({offers,resolved,onEnter,children}:{
         const done=resolved[index]??false;
         const image=offer.kind==='healing_shrine'||offer.kind==='well'
           ?require('../../assets/ui/blessing-shrine-object.png')
-          :offer.kind==='shop_upgrade'||offer.kind==='shop_remove'||offer.kind==='fusion_altar'
-          ?require('../../assets/ui/ritual-knife.png')
+          :offer.kind==='shop_upgrade'?RITUAL_OBJECTS.upgrade
+          :offer.kind==='shop_remove'?RITUAL_OBJECTS.remove
+          :offer.kind==='fusion_altar'?require('../../assets/ui/ritual-knife.png')
           :offer.kind==='story_event'&&offer.eventId==='episode_blessing'?require('../../assets/ui/ritual-jar.png')
           :offer.kind==='story_event'?require('../../assets/ui/trail-rest.png')
           :offer.kind==='shop_equipment'?require('../../assets/ui/blessing-amulet.png')
-          :require('../../assets/ui/ritual-jar.png');
+          :offer.kind==='shop_card'?RITUAL_OBJECTS.shop:require('../../assets/ui/ritual-jar.png');
         return <Pressable key={d.id} testID={`rest-choice-${index}`} disabled={done} accessibilityRole="button" accessibilityLabel={d.name} accessibilityState={{disabled:done}} accessibilityHint={done?undefined:'เข้าสถานที่นี้ทันที'}
           onPress={()=>onEnter(offer,index)} style={({pressed})=>({width:destinationWidth,opacity:done?.45:pressed?.85:1})}>
           {({pressed})=><CandleSelection selected={pressed}><RitualSurface kind="quietSlate" style={{paddingHorizontal:8,paddingVertical:12,height:total>2?336:310}}>

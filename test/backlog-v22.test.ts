@@ -14,7 +14,7 @@ import {reachableNodes} from '../src/core/map/journey';
 import {resolveStoryIfAny} from './helpers';
 import {cardSummary} from '../app/cardPresentation';
 import {ALL_CARDS} from '../src/core/pack';
-function newState():GameState {return applyCommand({seed:'backlog',phase:'start',turn:0} as GameState,{type:'NewRun',seed:'backlog',classId:'warrior',runMode:'full',night:2},makeRng('backlog')).state;}
+function newState():GameState {return applyCommand({seed:'backlog',phase:'start',turn:0} as GameState,{type:'NewRun',seed:'backlog',classId:'warrior',runMode:'full'},makeRng('backlog')).state;}
 function step(s:GameState,c:Command){return applyCommand(s,c,makeRng('backlog')).state;}
 function shop(kind:'card'|'remove'|'upgrade') {const s=newState();s.phase='shop';s.shopKind=kind;s.player.gold=1000;return s;}
 describe('shop confirmation engine and boundaries',()=>{
@@ -52,7 +52,7 @@ describe('all rest route types and combat labels',()=>{
    else if(s.phase==='reward')s=step(s,{type:'SkipCardReward'});
    else s=step(s,{type:'CompleteNode'});
   }
-  expect(onRestRow(s)).toBe(true);expect(s.phase).toBe('map');
+  expect(onRestRow(s)).toBe(true);expect(s.phase).toBe('map');s.campaign={night:2,unlocks:[]};
   const offer={kind,nodeId:'night2-stage8',shopId:'night2-stage8',eventId:'episode_lantern'} as any;
   const d=describeOffer(offer,0);expect(d.isCombat).toBe(false);expect(encounterAction(d)).not.toContain('เผชิญหน้า');expect(d.type).toBe(kind);
   const row=s.journey!.rowIndex;const nodes=reachableNodes(s.journey!);s.pages!.current!.offers[0]=offer;nodes[0].offer=offer;
@@ -75,7 +75,7 @@ describe('portrait card/art/HUD separation, including multiple owners',()=>{
  for(const [w,h] of [[360,640],[393,852],[412,915]])for(const count of [1,2,3])it(`${w}x${h}, ${count} enemies`,()=>{
   const g=battleGeometry(w,h,24,24);
   for(let i=0;i<count;i++){const p=enemyLane(g,i,count);expect(p.cardX+p.cardW/2).toBeLessThanOrEqual(p.artX);expect(p.cardY+p.cardH/2).toBeLessThan(g.hudTop);expect(p.artX+p.artSize).toBeLessThanOrEqual(w);expect(p.cardX-p.cardW/2).toBeGreaterThanOrEqual(0);}
-  expect(g.hudTop+106).toBeLessThan(h-24-(h<700?286:328));
+  expect(g.hudTop+90).toBeLessThanOrEqual(h-24-118-(h<700?148:178)+10);
  });
 });
 

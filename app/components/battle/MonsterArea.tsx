@@ -104,16 +104,16 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
      <Art slot={`monster/${actor.id}`} width={lane.artSize} height={lane.artSize}/>
     </Animated.View>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
-     <RitualSurface kind="quietSlate" style={{paddingHorizontal:actors.length>1?6:14,paddingVertical:8,gap:2}}>
+     <RitualSurface kind="quietSlate" style={{paddingHorizontal:actors.length>1?6:14,paddingVertical:4,gap:2}}>
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>
        <Text numberOfLines={1} style={{flex:1,fontFamily:'Prompt_600SemiBold',fontSize:actors.length>1?11:13,color:chalk}}>{ghostLore(actor.id)?.name??actor.name}</Text>
        <View style={{flex:1.2}}><HealthBar hp={actor.hp} maxHp={actor.maxHp} compact label={actor.name}/></View>
        {actors.length===1&&<GhostLoreButton compact id={actor.id}/>}
       </View>
       <View style={{flexDirection:'row',gap:actors.length>1?4:12,alignItems:'center',minHeight:24}}>
-       <EnemyStatItem icon="block" label={actors.length>1?'':'เกราะ'} value={`${actor.block??0}`}/>
-       <EnemyStatItem icon="energy" label={actors.length>1?'':'พลัง'} value={`${actor.energy??actor.maxEnergy??0}`}/>
-       <EnemyStatItem icon="deck" label={actors.length>1?'':'การ์ด'} value={`${actor.handCount??actor.handSize??0}`}/>
+       <EnemyStatItem icon="block" label="" value={`${actor.block??0}`}/>
+       <EnemyStatItem icon="energy" label="" value={`${actor.energy??actor.maxEnergy??0}`}/>
+       <EnemyStatItem icon="deck" label="" value={`${actor.handCount??actor.handSize??0}`}/>
       </View>
       <View style={{flexDirection:'row',gap:6,alignItems:'center'}}>
        <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={escalating?[{id:'rage-rule',name:'ผีคลุ้มคลั่ง',symbol:'strength',bad:true,detail:`ทุก ${escalating.every} เทิร์น ผีได้ความแข็งแกร่งเพิ่ม ${escalating.strength} จนจบไฟต์`}]:[]} compact/></View>
@@ -126,7 +126,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 });
 
 function EnemyStatItem({ icon, label, value }: { icon: InkSymbol; label: string; value: string }) {
-  return <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+  return <View accessible accessibilityLabel={`${icon==='block'?'เกราะ':icon==='energy'?'พลัง':'การ์ด'} ${value}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
     <InkIcon name={icon} size={20} color={chalk} />
     <Text style={{ color: chalk, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>{label} {value}</Text>
   </View>;

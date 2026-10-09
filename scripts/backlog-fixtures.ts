@@ -9,7 +9,7 @@ import {toBattleSave} from '../src/core/save';
 import {onRestRow} from '../src/core/map/restPage';
 import {reachableNodes} from '../src/core/map/journey';
 import type {GameState} from '../src/core/types';
-const rng=makeRng('backlog-qa');let s=applyCommand({seed:'backlog-qa',turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'backlog-qa',classId:'warrior',night:2},rng).state;
+const rng=makeRng('backlog-qa');let s=applyCommand({seed:'backlog-qa',turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'backlog-qa',classId:'warrior'},rng).state;
 s.chapter=undefined;s=applyCommand(s,{type:'ChooseStarterBlessing',index:0},rng).state;s=applyCommand(s,{type:'ChooseOffer',index:0},rng).state;
 s.player.gold=1000;s.masterDeck[0]={...s.masterDeck[0],unremovable:true};s.masterDeck[2]={...s.masterDeck[2],upgradeLevel:3,upgraded:true};
 s.blessings=Object.values(BLESSINGS_BY_RARITY).flat().slice(0,8);applyStatusEffect('player',s,'poison',3,2);applyStatusEffect('player',s,'strength',3,2);applyStatusEffect('enemy',s,'weakness',3,2);
@@ -20,7 +20,7 @@ keep('status',s);keep('blessing-seals',s);keep('combo-book',s);keep('enemy-card'
 for(const kind of ['card','remove','upgrade'] as const){const a=structuredClone(s);a.phase='shop';a.shopKind=kind;a.currentShopId='qa-'+kind;a.shopStock=[{card:ALL_CARDS[0],price:70},{card:ALL_CARDS[1],price:90}];a.runCounters={removed:0,removeShopCount:1,upgradeShopCount:1};keep('shop-'+kind,a);a.player.gold=0;keep('shop-'+kind+'-poor',a);}
 const level=structuredClone(s);level.phase='levelup';level.levelUp={choice:{optionA:'max_hp',optionB:'max_energy',gold:30},consumed:false} as any;keep('levelup',level);
 // Navigate the real reducer to a rest row; route QA never fabricates its return state.
-let rest=applyCommand({seed:'backlog-route',turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'backlog-route',classId:'warrior',night:2},rng).state;
+let rest=applyCommand({seed:'backlog-route',turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'backlog-route',classId:'warrior'},rng).state;
 const step=(cmd:any)=>{rest=applyCommand(rest,cmd,rng).state;};rest.chapter=undefined;step({type:'ChooseStarterBlessing',index:0});
 for(let guard=0;guard<60&&!(rest.phase==='map'&&onRestRow(rest));guard++){
  if(rest.chapter)step({type:'SkipChapter'});
@@ -31,12 +31,17 @@ for(let guard=0;guard<60&&!(rest.phase==='map'&&onRestRow(rest));guard++){
  else step({type:'CompleteNode'});
 }
 if(rest.phase!=='map'||!onRestRow(rest))throw Error('QA failed to reach a real rest row');
+rest.campaign={night:2,unlocks:[]};
 for(const kind of ['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event']){
  const a=structuredClone(rest);const offer={kind,nodeId:'qa-rest',shopId:'qa-rest',eventId:'episode_lantern'} as any;
  a.pages!.current!.offers[0]=offer;reachableNodes(a.journey!)[0].offer=offer;keep('rest-'+kind,a);
  if(kind==='story_event')keep('event',applyCommand(a,{type:'ChooseOffer',index:0},rng).state);
 }
 keep('rest-cards',rest);
+const bless=structuredClone(level);bless.levelUp={choice:{optionA:'blessing',optionB:'max_hp',gold:30},blessingChoices:Object.values(BLESSINGS_BY_RARITY).flat().slice(0,2),consumed:false} as any;keep('levelup-blessing',bless);
+keep('hand',s);
+for(const night of [1,2,3,4,5] as const){let a=applyCommand({seed:'adventure-ui-'+night,turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'adventure-ui-'+night,classId:'warrior',night},rng).state;a.chapter=undefined;a=applyCommand(a,{type:'ChooseStarterBlessing',index:0},rng).state;keep('adventure-'+night,a);}
+
 fs.mkdirSync('/tmp/phikinhua-backlog-web',{recursive:true});fs.writeFileSync('/tmp/phikinhua-backlog-web/ui-review-fixtures.json',JSON.stringify({fixtures}));
 fs.writeFileSync('/tmp/phikinhua-backlog-battle.json',JSON.stringify(toBattleSave(s,rng)));
 console.log('Backlog QA fixtures generated:',Object.keys(fixtures).join(', '));

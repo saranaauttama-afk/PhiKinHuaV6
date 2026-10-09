@@ -20,12 +20,12 @@ function Head({m,size=42}:{m:MinionData;size?:number}){
  const id=minionTemplateId(m.id),crop=heads[id]??{x:64,y:0,w:128,h:128};const scale=size/crop.w;
  return <View pointerEvents="none" style={{width:size,height:size,overflow:'hidden'}}><Image accessible={false} source={artSource(`minion/${id}`)} resizeMode="stretch" style={{position:'absolute',width:256*scale,height:256*scale,left:-crop.x*scale,top:-crop.y*scale}}/></View>;
 }
-type Props={minions?:MinionData[];activeId?:string;owner:'player'|'enemy'};
-export default function MinionRow({minions,activeId,owner}:Props){
+type Props={minions?:MinionData[];activeId?:string;owner:'player'|'enemy';compact?:boolean};
+export default function MinionRow({minions,activeId,owner,compact=false}:Props){
  const [open,setOpen]=React.useState<string|null>(null);const all=visibleMinions(minions).filter(m=>m.owner===owner);const selected=all.find(m=>m.id===open);
  if(!all.length)return null;
  return <View style={{paddingHorizontal:4}}>
- <ScrollView horizontal showsHorizontalScrollIndicator={all.length>5} contentContainerStyle={{gap:10,paddingVertical:3}}>{all.map(m=><View key={m.id} style={{width:m.statusEffects?.length?100:52,flexDirection:'row',alignItems:'center'}}><Spirit m={m} active={m.id===activeId} selected={m.id===open} onPress={()=>setOpen(m.id)}/>{!!m.statusEffects?.length&&<View style={{width:44}}><StatusStrip effects={m.statusEffects} compact/></View>}</View>)}</ScrollView>
+ <ScrollView horizontal showsHorizontalScrollIndicator={all.length>5} contentContainerStyle={{gap:10,paddingVertical:compact?0:3}}>{all.map(m=><View key={m.id} style={{width:m.statusEffects?.length?(compact?80:100):(compact?36:52),flexDirection:'row',alignItems:'center'}}><Spirit compact={compact} m={m} active={m.id===activeId} selected={m.id===open} onPress={()=>setOpen(m.id)}/>{!!m.statusEffects?.length&&<View style={{width:44}}><StatusStrip effects={m.statusEffects} compact/></View>}</View>)}</ScrollView>
  <Modal visible={!!selected} transparent animationType="fade" onRequestClose={()=>setOpen(null)}>
   <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>
    {selected&&<RitualSurface kind="wood" style={{padding:22,gap:12}}>
@@ -37,7 +37,7 @@ export default function MinionRow({minions,activeId,owner}:Props){
  </Modal>
  </View>;
 }
-function Spirit({m,active,selected,onPress}:{m:MinionData;active:boolean;selected:boolean;onPress:()=>void}){
+function Spirit({m,active,selected,onPress,compact=false}:{compact?:boolean;m:MinionData;active:boolean;selected:boolean;onPress:()=>void}){
  const y=useSharedValue(0);React.useEffect(()=>{if(active)y.value=withSequence(withTiming(-6,{duration:160}),withTiming(0,{duration:280}))},[active]);const anim=useAnimatedStyle(()=>({transform:[{translateY:y.value}]}));
- return <Animated.View entering={FadeInUp.duration(300)} exiting={FadeOutDown.duration(250)} style={anim}><Pressable accessibilityRole="button" accessibilityLabel={`${m.name} เหลือ ${m.duration} เทิร์น`} onPress={onPress} style={{width:52,height:48,alignItems:'center',justifyContent:'flex-end',backgroundColor:active||selected?tint.moonSoft:surface.glassDim,borderRadius:8}}><Head m={m}/><View style={{position:'absolute',right:0,bottom:0,minWidth:18,height:18,borderRadius:9,alignItems:'center',justifyContent:'center',backgroundColor:active?tint.bloodLine:surface.panelDeep}}><Text style={{fontFamily:font.heading,fontSize:11,color:palette.moon}}>{m.duration}</Text></View></Pressable></Animated.View>;
+ return <Animated.View entering={FadeInUp.duration(300)} exiting={FadeOutDown.duration(250)} style={anim}><Pressable accessibilityRole="button" accessibilityLabel={`${m.name} เหลือ ${m.duration} เทิร์น`} onPress={onPress} style={{width:compact?36:52,height:compact?36:48,alignItems:'center',justifyContent:'flex-end',backgroundColor:active||selected?tint.moonSoft:surface.glassDim,borderRadius:8}}><Head m={m} size={compact?30:42}/><View style={{position:'absolute',right:0,bottom:0,minWidth:18,height:18,borderRadius:9,alignItems:'center',justifyContent:'center',backgroundColor:active?tint.bloodLine:surface.panelDeep}}><Text style={{fontFamily:font.heading,fontSize:11,color:palette.moon}}>{m.duration}</Text></View></Pressable></Animated.View>;
 }

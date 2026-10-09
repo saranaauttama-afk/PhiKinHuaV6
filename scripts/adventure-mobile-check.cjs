@@ -1,0 +1,31 @@
+const fs=require('fs'),http=require('http'),path=require('path'),assert=require('node:assert/strict');
+const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES].filter(Boolean)}));
+(async()=>{
+ const root=process.env.PHIKINHUA_WEB_DIR||'/tmp/phikinhua-backlog-web',reports=[],errors=[];
+ const server=http.createServer((req,res)=>{let f=path.join(root,decodeURIComponent(req.url.split('?')[0]));if(!fs.existsSync(f)||fs.statSync(f).isDirectory())f=path.join(root,'index.html');res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.json':'application/json','.webp':'image/webp','.jpg':'image/jpeg','.png':'image/png','.ttf':'font/ttf'})[path.extname(f)]||'application/octet-stream');fs.createReadStream(f).pipe(res);});await new Promise(r=>server.listen(8131,'127.0.0.1',r));
+ const browser=await chromium.launch({args:['--no-sandbox','--disable-dev-shm-usage']});
+ try{
+  for(const viewport of [{width:360,height:640},{width:393,height:852}]){
+   const ctx=await browser.newContext({viewport,hasTouch:true}),p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));
+   const load=async screen=>{await p.goto('http://127.0.0.1:8131/ui-review?screen='+screen);await p.getByText('กำลังเปิดภาพจากเกม…',{exact:true}).waitFor({state:'hidden'});};
+   const state=async()=>JSON.parse(await p.getByTestId('qa-state').textContent());
+   for(let night=1;night<=5;night++){
+    await load('adventure-'+night);const before=await state();
+    const slots=p.locator('[data-testid^="adventure-slot-"]');const bounds=await slots.evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};}));assert.equal(bounds.length,3);assert.ok(bounds.every(b=>b.x>=0&&b.x+b.w<=viewport.width+1&&Math.abs(b.h-bounds[0].h)<1));
+    await p.getByTestId('adventure-slot-1').click();await p.getByRole('button',{name:'แวะ · ร้านค้าการ์ด',exact:true}).click();assert.equal((await state()).phase,'shop');
+    await p.getByRole('button',{name:'กลับจุดพัก',exact:true}).click();assert.deepEqual((await state()).adventure,before.adventure);
+    await p.getByRole('button',{name:'ทางแยกถัดไป',exact:true}).click();assert.deepEqual((await state()).adventure,before.adventure);await p.getByRole('button',{name:'เก็บหน้าเหล่านี้ไว้',exact:true}).click();
+    await p.getByRole('button',{name:'ทางแยกถัดไป',exact:true}).click();await p.getByRole('button',{name:'ยืนยันไปทางแยกถัดไป',exact:true}).click();const after=await state();assert.equal(after.adventure.slotIds[0],before.adventure.slotIds[0]);assert.equal(after.adventure.skippedIds.length,2);assert.equal(after.adventure.cursor,5);
+    reports.push({viewport,night,check:'mixed-pages-shop-postpone-confirm-skip',result:'passed'});
+   }
+   await load('shop-upgrade');const card=p.getByRole('button',{name:/^ดูการ์ด /}).nth(1);await card.scrollIntoViewIfNeeded();const scroll=await card.boundingBox();const before=await state();await card.click();const modal=p.getByRole('button',{name:'ยืนยันปลุกเสกใบนี้',exact:true});await modal.waitFor();assert.deepEqual(await state(),before);await p.getByText('ก่อน',{exact:true}).waitFor();await p.getByText('หลัง',{exact:true}).waitFor();await p.getByRole('button',{name:'ยกเลิกการเลือก',exact:true}).click();assert.ok(Math.abs((await card.boundingBox()).y-scroll.y)<2);assert.deepEqual(await state(),before);reports.push({viewport,check:'centered-upgrade-cancel-preserves-scroll',result:'passed'});
+   await load('levelup-blessing');await p.getByRole('button',{name:'พร',exact:true}).click();await p.getByRole('button',{name:'เลือกพรที่จะรับ',exact:true}).click();const blessing=p.locator('[data-testid^="level-blessing-"]');const shapes=await blessing.evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {w:r.width,h:r.height,images:el.querySelectorAll('img').length};}));assert.equal(shapes.length,2);assert.ok(shapes.every(b=>b.images>0&&Math.abs(b.h-shapes[0].h)<1));await blessing.first().click();assert.equal((await state()).phase,'levelup');await p.getByRole('button',{name:'ยืนยันรับพร',exact:true}).click();assert.notEqual((await state()).phase,'levelup');reports.push({viewport,check:'blessing-existing-art-equal-size-confirmation',result:'passed'});
+   await load('hand');const hand=p.getByRole('button',{name:/^การ์ด /}).first(),hb=await hand.boundingBox(),hud=await p.getByTestId('player-hud').boundingBox(),ghost=await p.getByTestId('enemy-art-0').boundingBox();assert.ok(hb&&hud&&ghost);assert.ok(ghost.height>=140);assert.ok(hb.y+hb.height<=hud.y+4);const initial=await state();
+   await hand.click();assert.deepEqual(await state(),initial);await p.getByRole('button',{name:'ปิด',exact:true}).click();
+   await p.mouse.move(hb.x+hb.width/2,hb.y+hb.height/2);await p.mouse.down();await p.mouse.move(hb.x+hb.width/2,hb.y+hb.height/2-35,{steps:6});await p.mouse.up();await p.waitForTimeout(400);assert.deepEqual(await state(),initial);
+   await p.mouse.move(hb.x+hb.width/2,hb.y+hb.height/2);await p.mouse.down();await p.mouse.move(hb.x+hb.width/2,hb.y+hb.height/2-120,{steps:10});await p.mouse.up();await p.waitForTimeout(500);assert.ok((await state()).hand.length<initial.hand.length);reports.push({viewport,check:'larger-ghost-compact-hud-tap-cancel-drag-play',result:'passed'});
+   await ctx.close();
+  }
+  assert.deepEqual(errors,[]);console.log('PASS',reports.length,'B01–B17 mobile component checks; no captures.');
+ }finally{fs.mkdirSync('backlog-audit',{recursive:true});fs.writeFileSync('backlog-audit/adventure-ui.json',JSON.stringify({reports,errors,screenshots:false},null,2));await browser.close();await new Promise(r=>server.close(r));}
+})().catch(e=>{console.error(e);process.exit(1)});

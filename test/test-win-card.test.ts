@@ -7,6 +7,7 @@ import { TEST_WIN_CARD_ID, dealTestWinCard } from '../src/core/cards/testWin';
 import { onRestRow } from '../src/core/map/restPage';
 import { ULTIMATE_BOSS, nightFightTotal } from '../src/core/campaign/bosses';
 import { toBattleSave, fromSave } from '../src/core/save';
+import {isCriticalOffer} from '../src/core/map/adventure';
 import type { Command } from '../src/core/types';
 afterEach(() => vi.unstubAllEnvs());
 describe('พระประธาน test APK card', () => {
@@ -21,7 +22,8 @@ describe('พระประธาน test APK card', () => {
       let wins = 0;
       for (let guard = 0; guard < 250 && !s.runSummary; guard++) {
         if (s.chapter) go({ type: 'SkipChapter' });
-        else if (s.phase === 'map') go(onRestRow(s) ? { type: 'Proceed' } : { type: 'ChooseOffer', index: 0 });
+        else if (s.phase === 'map') {const ix=s.pages!.current!.offers.findIndex(o=>o&&isCriticalOffer(o));go(ix>=0?{type:'ChooseOffer',index:ix}:{type:'Proceed'});}
+        else if(s.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});}
         else if (s.phase === 'combat') {
           expect(s.piles.hand.filter(c => c.id === TEST_WIN_CARD_ID)).toHaveLength(1);
           expect(s.piles.hand[0].id).toBe(TEST_WIN_CARD_ID);
@@ -40,7 +42,7 @@ describe('พระประธาน test APK card', () => {
         else if (s.phase === 'victory') go({ type: 'CompleteNode' });
         else throw new Error(s.phase);
       }
-      expect(wins).toBe(nightFightTotal(night));
+      expect(wins).toBe((night===5?7:6));
       expect(s.runSummary?.won).toBe(true);
       expect(s.runSummary?.metrics?.cardsPlayed).toBe(wins);
       if (night === 5) expect(s.defeatedEnemyIds).toContain(ULTIMATE_BOSS.id);

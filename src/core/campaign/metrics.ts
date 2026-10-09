@@ -7,7 +7,7 @@ export type RunMetrics={
 };
 export type RunRecord={
  id:string; classId:import('../classes').ClassId; night:number; won:boolean; fights:number;
- level:number; hp:number; savedAt:string; metrics:RunMetrics; deck:CardData[];
+ route?:'adventure'; level:number; hp:number; savedAt:string; metrics:RunMetrics; deck:CardData[];
  blessings:Array<{id:string;name:string;desc?:string}>;
 };
 export function trackRun(before:GameState,after:GameState,cmd:Command):void{
@@ -38,7 +38,7 @@ export function trackRun(before:GameState,after:GameState,cmd:Command):void{
 export function makeRunRecord(s:GameState,savedAt:string):RunRecord|undefined{
  if(!s.campaign||!s.runSummary||!s.runMetrics||!s.classId)return;
  return {id:`${s.classId}:${s.campaign.night}:${s.seed}`,classId:s.classId,night:s.campaign.night,
-  won:s.runSummary.won,fights:s.runSummary.fights,level:s.player.level,hp:s.player.hp,savedAt,
+  won:s.runSummary.won,fights:s.runSummary.fights,route:s.pages?.adventure?'adventure':undefined,level:s.player.level,hp:s.player.hp,savedAt,
   metrics:JSON.parse(JSON.stringify(s.runMetrics)),deck:JSON.parse(JSON.stringify(s.masterDeck)),
   blessings:(s.blessings??[]).map(({id,name,desc})=>({id,name,desc}))};
 }

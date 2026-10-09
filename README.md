@@ -1,10 +1,10 @@
 # ผีกินหัว — ห้าคืนอาถรรพ์
 
-## Current release: v1.0.25 / Android code 26
+## Current release: v1.0.26 / Android code 27
 
-Working branch `work/battle-ui-backlog-v22`, based on freshly fetched `art/quiet-comic-ui` (`752c79c3`). Implements all ten backlogs in Issue #5: status icons, candle selection, enemy card/HUD geometry, separate blessing seals, ordered combo feedback, consistent rest/event cards, confirmed card purchase/removal/upgrades, correct encounter routes and researched Thai ghost art.
+Working branch `work/adventure-pages-b17`, continuing Issue #6 from the committed B17 plan (`586445d`). B01–B17 add compact battle UI and three independent encounter pages. Each night draws a finite 12-encounter deck, requires its story and five ghost fights, then opens the night boss; night five continues to ผีกินหัว. Ordinary combat grants XP/money; optional cards come from preparation and rare rewards. Save/load preserves slots, stock, choices and RNG.
 
-Local TypeScript, 684 automated tests and web production export pass. The Android workflow checks real mobile UI interactions at 360×640 and 393×852, builds/audits a bundled APK and installs it in an API 36 portrait emulator. No screenshots are captured. Final Actions/APK results are recorded on Issue #5. Read `docs/HANDOFF-battle-ui-backlog-v22.md` and `docs/THAI-FOLKLORE-ART-AUDIT.md`.
+Local TypeScript, 694 automated tests and production web export pass. Mobile browser and native Android results are tracked in `docs/HANDOFF-adventure-pages-b17.md`; the workflow verifies mobile interactions before building/auditing the APK and testing all five nights on API 36. No game screenshots are captured. Begin a new run for B17; old saves are not required by the user.
 
 Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. Five nights have distinct bosses; night five adds the mandatory game-original ผีกินหัว. All 34 ghosts, 134 newly illustrated card assets, 16 blessings and 24 rural Thai journey environments share vintage Thai horror comic art. Player-card and blessing hashes detect accidental duplicates; enemy move cards intentionally reuse their owner's portrait.
 
@@ -48,7 +48,7 @@ The following notes describe earlier implementations and validation, not the cur
 
 ## Current source
 
-Current work branch: `work/battle-ui-backlog-v22`, based on `art/quiet-comic-ui`. `main` is older. Read `docs/HANDOFF-battle-ui-backlog-v22.md` first; older references include `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
+Current work branch: `work/adventure-pages-b17`, continuing Issue #6 and `docs/B17-three-page-adventure-plan.md`. `main` is older. Read `docs/HANDOFF-adventure-pages-b17.md` first; older references include `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
 
 ## First chapter
 

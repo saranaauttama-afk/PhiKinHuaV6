@@ -101,7 +101,7 @@ export default function Card({
   const panGesture = Gesture.Pan()
     .activeOffsetY([-10, 10])
     .failOffsetX([-20, 20])
-    .onBegin(() => {
+    .onStart(() => {
       'worklet';
       // Lift the card — dragOffsetY handles finger follow independently
       translateY.value = withTiming(-20, { duration: 150 });
@@ -115,7 +115,7 @@ export default function Card({
     })
     .onEnd((event) => {
       'worklet';
-      if (event.translationY < -50) {
+      if (event.translationY < -90 && Math.abs(event.translationX) < 55) {
         if (isDisabledShared.value) {
           shakeX.value = withSequence(
             withTiming(15, { duration: 60 }),
@@ -132,6 +132,7 @@ export default function Card({
     })
     .onFinalize(() => {
       'worklet';
+      runOnJS(updateHoverState)(false);
       // Skip reset if card was already played (avoid racing with fade-out)
       if (isPlayedShared.value) return;
       translateY.value = withTiming(0, { duration: 300 });
@@ -165,10 +166,11 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <CandleSelection selected={selected}><RitualSurface kind={disabled?"grayCard":"occupationPage"} style={{width:'100%',height:'100%',padding:9,paddingTop:28}}>
+      <CandleSelection selected={selected}><RitualSurface kind={disabled?"grayCard":"occupationPage"} style={{width:'100%',height:'100%',padding:9,paddingTop:28,paddingBottom:4}}>
         <View style={{position:'absolute',top:5,left:6,width:25,height:25,borderRadius:13,backgroundColor:paper.ink,alignItems:'center',justifyContent:'center',zIndex:layer.badge}}><Text style={{color:paper.light,fontFamily:font.heading,fontSize:14}}>{costNow??card.cost}</Text></View>
+        <Text style={{position:'absolute',top:6,right:7,fontFamily:font.ui,fontSize:10,color:paper.ink}}>ขั้น {card.upgradeLevel??0}</Text>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
-        <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={Math.max(18,Math.min(height*.4,height-108))} muted={disabled}/></View>
+        <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={Math.max(18,Math.min(height*.38,height-94))} muted={disabled}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:10,lineHeight:14,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>
         {card.exhaust&&<Text style={{position:'absolute',bottom:5,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:8}}>ใช้แล้วหาย</Text>}
       </RitualSurface></CandleSelection>

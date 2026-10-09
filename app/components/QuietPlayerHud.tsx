@@ -12,12 +12,14 @@ export function HudStat({icon,text,onPress,label}:{icon:InkSymbol;text:string;on
 }
 export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,blessings}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;blessings?:React.ReactNode}){
  const pad=useSafeAreaInsets();
- return <View pointerEvents="box-none" style={{position:'absolute',bottom:pad.bottom+4,left:8,right:8,zIndex:layer.statusBar}}>
-  {(extras||blessings)&&<View style={{height:54,flexDirection:'row',alignItems:'center',paddingHorizontal:8,gap:6}}><View style={{flex:2,flexDirection:'row',gap:4,alignItems:'center'}}>{extras}</View>{blessings&&<View style={{flex:1}}>{blessings}</View>}</View>}
-  <RitualSurface kind="quietSlate" style={{height:88,paddingHorizontal:8,paddingVertical:8,flexDirection:'row',alignItems:'center',gap:8}}>
-   <Pressable disabled={!onPortrait} accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={onPortrait} style={{width:48,height:70}}><Image accessible={false} source={playerPortraits[classId??'shaman']} resizeMode="contain" style={{width:48,height:70}}/></Pressable>
-   <View style={{flex:1}}><HealthBar hp={hp} maxHp={maxHp} compact/><View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:4}}>{stats}</View></View>
-   {action}
+ return <View testID="player-hud" pointerEvents="box-none" style={{position:'absolute',bottom:pad.bottom+4,left:8,right:8,zIndex:layer.statusBar}}>
+  <RitualSurface kind="quietSlate" style={{height:extras||blessings?114:88,paddingHorizontal:8,paddingVertical:6,gap:2}}>
+   <View style={{flexDirection:'row',alignItems:'center',gap:8,flex:1}}>
+    <Pressable disabled={!onPortrait} accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={onPortrait} style={{width:40,height:64}}><Image accessible={false} source={playerPortraits[classId??'shaman']} resizeMode="contain" style={{width:40,height:64}}/></Pressable>
+    <View style={{flex:1,gap:2}}><HealthBar hp={hp} maxHp={maxHp} compact/><View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:4}}>{stats}</View></View>
+    {action}
+   </View>
+   {(extras||blessings)&&<View style={{height:36,flexDirection:'row',alignItems:'center',gap:4}}><View style={{flex:2,flexDirection:'row',gap:2,alignItems:'center',minWidth:0}}>{extras}</View>{blessings&&<View style={{flex:1,minWidth:0}}>{blessings}</View>}</View>}
   </RitualSurface>
  </View>;
 }

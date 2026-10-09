@@ -43,9 +43,9 @@ export const DEFAULT_SETTINGS: GameSettings = {
 
 // === Save/Load Functions ===
 
-export async function saveGame(state: GameState, slot: number = 0): Promise<void> {
+export async function saveGame(state: GameState, slot: number = 0,rng?:RNG): Promise<void> {
   try {
-    const saveData = toSave(state);
+    const saveData = toSave(state,rng);
     const key = slot === -1 ? AUTO_SAVE_KEY : `${SAVE_SLOT_PREFIX}${slot}`;
     
     // Add metadata
@@ -86,7 +86,7 @@ export async function loadGameSnapshot(slot: number = 0): Promise<{state:GameSta
     }
 
     const saveData = JSON.parse(saved) as SaveV2 & { savedAt?: string; slot?: string | number };
-    return {state:fromSave(saveData),rng:saveData.battleRng};
+    return {state:fromSave(saveData),rng:saveData.battleRng??saveData.mapRng};
   } catch (error) {
     console.error('Failed to load game:', error);
     throw new Error(`Failed to load game: ${error}`);
@@ -214,10 +214,10 @@ export async function markChapterSeen(id: string): Promise<void> {
 
 // === Auto Save ===
 
-export async function autoSave(state: GameState): Promise<void> {
+export async function autoSave(state: GameState,rng?:RNG): Promise<void> {
   const settings = await loadSettings();
   if (settings.autoSaveEnabled) {
-    await saveGame(state, -1); // -1 = auto save slot
+    await saveGame(state, -1,rng); // -1 = auto save slot
   }
 }
 

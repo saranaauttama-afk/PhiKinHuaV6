@@ -1,5 +1,6 @@
 import type { GameState } from '../src/core/types';
 import { reachableNodes } from '../src/core/map/journey';
+import {adventureStage} from '../src/core/map/adventure';
 import {JOURNEY_LOCATIONS} from './journeyLocations';
 
 export function episodeSceneId(row:number) {
@@ -16,6 +17,7 @@ const episodeScenes=[
 return episodeScenes[Math.max(0,Math.min(row,4))];
 }
 export function battleSceneStage(state:GameState) {
+ if(state.pages?.adventure)return adventureStage(state);
  const j=state.journey;
  return j?.currentId?j.nodes[j.currentId]?.row??0:0;
 }
@@ -59,7 +61,20 @@ function journeySource(id:string){
  };
  return sources[id]??sources['01-village'];
 }
+export const ADVENTURE_GEOGRAPHY=[
+ ['01-village','02-village-edge','06-bamboo-forest','08-stream'],
+ ['03-temple-gate','04-temple-court','05-cremation-ground'],
+ ['06-bamboo-forest','07-banyan','08-stream','09-waterfall'],
+ ['10-mountain-trail','11-mountain-shrine','12-cave-mouth','13-cave-river'],
+ ['12-cave-mouth','13-cave-river','14-buried-sanctuary','15-otherworld-gate'],
+] as const;
+export function adventureSceneId(state:GameState):string {
+ if(state.pages?.adventure?.boss==='ultimate')return '16-secret-throne';
+ const route=ADVENTURE_GEOGRAPHY[(state.campaign?.night??1)-1];
+ return route[Math.min(route.length-1,Math.floor(adventureStage(state)*route.length/15))];
+}
 function sceneForRow(state:GameState,row:number){
+ if(state.pages?.adventure){const id=adventureSceneId(state);return {key:`night-${state.campaign?.night}-${id}`,name:JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??'แดนผีกินหัว',source:journeySource(id)};}
  const id=state.runMode==='episode'?episodeSceneId(row):journeySceneId(state,row);
  const name=JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??(id.startsWith('rest-')?'ที่พักระหว่างทาง':'แดนผีกินหัว');
  return {key:`${state.runMode??'full'}-location-${row}-${id}`,name,source:state.runMode==='episode'?episodeSource(row):journeySource(id)};
@@ -70,6 +85,7 @@ export function visitedScene(state:GameState){return sceneForRow(state,state.pha
 
 /** Map offers describe the destination, while currentId is the previous visit. */
 export function mapSceneStage(state: GameState): number {
+  if(state.pages?.adventure)return adventureStage(state);
   const journey = state.journey;
   if (!journey) return 0;
   return reachableNodes(journey)[0]?.row ?? journey.rowIndex;

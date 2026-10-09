@@ -17,6 +17,7 @@
 
 import type { GameState } from './types';
 import type { RNG } from './rng';
+import {validAdventure} from './map/adventure';
 
 export const SAVE_VERSION = 2;
 
@@ -62,6 +63,7 @@ export type SaveV2 = {
   version: 2;
   /** Explicit settled player-turn snapshot; legacy map checkpoints remain unchanged. */
   battleRng?: RNG;
+  mapRng?: RNG;
   /** สถานะทั้งก้อนที่ตัดสเตตคอมแบตออกแล้ว */
   state: Partial<GameState> & { seed: string };
 };
@@ -78,7 +80,12 @@ export type SaveSummary = {
   level: number;
 };
 
-export function toSave(s: GameState): SaveV2 {
+export function toSave(s: GameState,rng?:RNG): SaveV2 {
+  if(s.pages?.adventure){
+    if(s.phase==='combat'){if(!rng)throw Error('Combat RNG required');return toBattleSave(s,rng);}
+    const copy:GameState=JSON.parse(JSON.stringify(s));copy.pendingEvents=[];copy.deckOpen=false;
+    return {version:SAVE_VERSION,state:copy,mapRng:rng?{...rng}:undefined};
+  }
   const copy: any = JSON.parse(JSON.stringify(s));
   for (const k of DROP_ON_SAVE) delete copy[k];
 
@@ -103,6 +110,11 @@ export function fromSave(data: SaveV2): GameState {
   }
 
   const s = data.state as GameState;
+  if(s.pages?.adventure){
+    if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บบันทึกห้าคืนไว้');
+    if(data.battleRng&&(s.phase!=='combat'||!s.enemy||!s.piles||!Number.isInteger(data.battleRng.s)))throw Error('Invalid battle snapshot');
+    return {...JSON.parse(JSON.stringify(s)),pendingEvents:[],deckOpen:false};
+  }
   if (data.battleRng) {
     if (s.phase !== 'combat' || !s.enemy || !s.piles || !Number.isInteger(data.battleRng.s)) throw new Error('Invalid battle snapshot');
     return {...JSON.parse(JSON.stringify(s)), pendingEvents: [], deckOpen: false};
@@ -148,7 +160,8 @@ export function isPlayableSave(data: unknown): data is SaveV2 {
   const d = data as any;
   if (d.version !== SAVE_VERSION) return false;
   if (!d.state || typeof d.state !== 'object') return false;
-  if (!d.state.journey || !d.state.journey.rows?.length) return false;
+  if(d.state.pages?.adventure){if(!validAdventure(d.state))return false;}
+  else if (!d.state.journey || !d.state.journey.rows?.length) return false;
   if (d.state.phase === 'run_complete') return false;   // รันนี้จบไปแล้ว
   // `toSave` บังคับ phase เป็น 'map' เสมอ เช็ค phase อย่างเดียวจึงไม่พอ:
   // เซฟที่เขียนตอนจบรัน (ชนะหรือแพ้) จะดูเหมือนเซฟกลางทาง แล้วปุ่ม "เดินทางต่อ"
@@ -163,8 +176,8 @@ export function summarize(data: SaveV2): SaveSummary {
   return {
     classId: s.classId,
     night:s.campaign?.night,
-    fight: Math.min((s.fightCount ?? 0) + 1, plans.filter(p => p.kind !== 'rest').length || 15),
-    totalFights: plans.filter(p => p.kind !== 'rest').length || 15,
+    fight: Math.min((s.fightCount ?? 0) + 1,s.pages?.adventure?(s.campaign?.night===5?7:6):plans.filter(p => p.kind !== 'rest').length || 15),
+    totalFights: s.pages?.adventure?(s.campaign?.night===5?7:6):plans.filter(p => p.kind !== 'rest').length || 15,
     hp: s.player?.hp ?? 0,
     maxHp: s.player?.maxHp ?? 0,
     gold: s.player?.gold ?? 0,

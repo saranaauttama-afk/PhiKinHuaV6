@@ -184,7 +184,10 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   }
 
   // การ์ดรางวัลเป็นของ "ชนะไฟต์" ไม่ใช่ของ "เลเวลอัป" — ทุกไฟต์ที่ชนะได้เลือก
-  r = rollCardReward(s, r);
+  const offer=s.pages?.current?.offers[s.pages._activeOfferIndex??-1];
+  // The finite adventure gives cards for elites/bosses; ordinary fights give XP/money.
+  if(!s.pages?.adventure||offer?.kind==='boss'||(offer?.kind==='monster'&&offer.tier==='elite'))r=rollCardReward(s,r);
+  else s.cardReward=undefined;
 
   return r;
 }

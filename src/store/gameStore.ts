@@ -81,12 +81,13 @@ export const useGame = create<Store>((set, get) => ({
       return;
     }
 
-    if (shouldAutoSave(cmd.type)) {
+    if (shouldAutoSave(cmd.type)||(result.state.pages?.adventure&&['ChooseCardReward','SkipCardReward','ChooseLevelUpOption','SkipLevelUp','ChooseLevelUp','AdvanceChapter','SkipChapter'].includes(cmd.type))) {
       // Combat saves resume at the last map decision, before entering the node.
       // Saving the entered node with dropped combat state could skip/mismatch a fight.
       const checkpoint = cmd.type === 'ChooseOffer' && result.state.phase === 'combat' ? state : result.state;
+      const checkpointRng=checkpoint===state?rng:result.rng;
       clearTimeout(autoSaveTimer);
-      autoSaveTimer = setTimeout(() => { autoSavePending=autoSave(checkpoint).catch(()=>{}); }, 100);
+      autoSaveTimer = setTimeout(() => { autoSavePending=autoSave(checkpoint,checkpointRng).catch(()=>{}); }, 100);
     }
   },
 
@@ -111,15 +112,14 @@ export const useGame = create<Store>((set, get) => ({
   },
 
   saveToSlot: async (slot: number) => {
-    const { state } = get();
-    await saveGame(state, slot);
+    const { state,rng } = get();
+    await saveGame(state, slot,rng);
   },
 
   loadFromSlot: async (slot: number) => {
-    const loaded = await loadGame(slot);
-    if (loaded) {
-      const newRng = makeRng(loaded.seed || 'demo-fallback');
-      set({ state: loaded, rng: newRng });
+    const loaded = await loadGameSnapshot(slot);
+    if (loaded.state) {
+      set({ state: loaded.state, rng:loaded.rng??makeRng(loaded.state.seed || 'demo-fallback') });
     }
   },
 
@@ -134,7 +134,7 @@ export const useGame = create<Store>((set, get) => ({
   continueRun: async () => {
     try {
       const loaded = await loadGameSnapshot(-1);
-      if (!loaded.state?.journey) return false;
+      if (!loaded.state?.journey&&!loaded.state?.pages?.adventure) return false;
       set({ state: loaded.state, rng: loaded.rng ?? makeRng(loaded.state.seed || 'demo-fallback') });
       return true;
     } catch {

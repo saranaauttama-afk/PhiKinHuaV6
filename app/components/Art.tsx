@@ -119,7 +119,7 @@ export const ART_SOURCES: Record<string, any> = {
   'monster/phi-nang-ram': require('../../assets/monsters/thai-v24/phi-nang-ram.webp'),
   'monster/phi-pong-kang': require('../../assets/monsters/thai-v24/phi-pong-kang.webp'),
 
-  'encounter/shop_card': require('../../assets/encounters/enShopCardMini.png'),
+  'encounter/shop_card': require('../../assets/cards/thai-v24/offering_tray.webp'),
   'encounter/treasure':  require('../../assets/encounters/enTreasureOpenMini.png'),
 
   // ไฟล์สองอันนี้ตั้งชื่อตาม id ปลอมของ BlessingDialog ที่เป็น mock (ถูกลบไปแล้ว)

@@ -1,7 +1,7 @@
 name: Android five-night APK
 on:
   push:
-    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table', 'art/quiet-comic-ui', 'work/battle-ui-backlog-v22']
+    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table', 'art/quiet-comic-ui', 'work/battle-ui-backlog-v22', 'work/adventure-pages-b17']
     paths-ignore: ['**/*.md', 'scripts/android-smoke.py', '.github/workflows/android-helper-verify.yml', '.github/workflows/android-native-inspect.yml']
   workflow_dispatch:
 permissions:
@@ -22,6 +22,7 @@ jobs:
       - run: EXPO_PUBLIC_UI_REVIEW=1 EXPO_PUBLIC_TEST_WIN_CARD=1 npx expo export --platform web --output-dir /tmp/phikinhua-backlog-web
       - run: npx vite-node --config vitest.config.ts scripts/backlog-fixtures.ts
       - run: node scripts/backlog-mobile-check.cjs
+      - run: node scripts/adventure-mobile-check.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -62,13 +63,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='26' versionName='1.0.25'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FiveNights-v1.0.25.apk
-          sha256sum PhiKinHua-FiveNights-v1.0.25.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='27' versionName='1.0.26'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FiveNights-v1.0.26.apk
+          sha256sum PhiKinHua-FiveNights-v1.0.26.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FiveNights-APK
-          path: PhiKinHua-FiveNights-v1.0.25.apk
+          path: PhiKinHua-FiveNights-v1.0.26.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -78,7 +79,7 @@ jobs:
   emulator:
     needs: android
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - run: python -m pip install Pillow
       - uses: actions/checkout@v4
@@ -98,7 +99,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FiveNights-v1.0.25.apk
+            adb install PhiKinHua-FiveNights-v1.0.26.apk
             adb shell am start -W -n com.phikinhua.episode/.MainActivity
             adb shell pidof com.phikinhua.episode
             python scripts/android-backlog-smoke.py
