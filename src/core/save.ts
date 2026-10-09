@@ -1,3 +1,4 @@
+import {adventureFightTotal} from './map/adventure';
 // src/core/save.ts — เซฟ/โหลดแบบไม่ทำ IO (ชั้นนอกค่อยเขียนลง storage)
 //
 // **เขียนใหม่ทั้งไฟล์ — ของเดิมทำข้อมูลหายเงียบๆ**
@@ -179,8 +180,8 @@ export function summarize(data: SaveV2): SaveSummary {
   return {
     classId: s.classId,
     night:s.campaign?.night,
-    fight: Math.min((s.fightCount ?? 0) + 1,s.pages?.adventure?(s.campaign?.night===5?7:6):plans.filter(p => p.kind !== 'rest').length || 15),
-    totalFights: s.pages?.adventure?(s.campaign?.night===5?7:6):plans.filter(p => p.kind !== 'rest').length || 15,
+    fight: Math.min((s.fightCount ?? 0) + 1,s.pages?.adventure?adventureFightTotal(s.campaign?.night):plans.filter(p => p.kind !== 'rest').length || 15),
+    totalFights: s.pages?.adventure?adventureFightTotal(s.campaign?.night):plans.filter(p => p.kind !== 'rest').length || 15,
     hp: s.player?.hp ?? 0,
     maxHp: s.player?.maxHp ?? 0,
     gold: s.player?.gold ?? 0,

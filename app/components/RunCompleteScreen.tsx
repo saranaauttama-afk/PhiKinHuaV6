@@ -1,3 +1,4 @@
+import {adventureFightTotal} from '../../src/core/map/adventure';
 import {nightFightTotal} from '../../src/core/campaign/bosses';
 import React from 'react';
 import {View,Text,Image} from 'react-native';
@@ -15,7 +16,7 @@ export default function RunCompleteScreen({state,onNewRun,onMainMenu,onJournal}:
    <View style={{height:180,alignItems:'center'}}><Art slot={'class/'+(state.classId??'shaman')} width={120} height={180}/></View>
    <Text style={{fontFamily:font.body,fontSize:22,lineHeight:28,color:paper.ink,textAlign:'center'}}>{s.won?'เสียงนกเริ่มดัง… คุณผ่านค่ำคืนนี้มาได้':'เรื่องราวจบลงกลางทาง แต่ยังมีคืนถัดไปให้ลองอีกครั้ง'}</Text>
    <View style={{gap:10,paddingTop:12,borderTopWidth:1,borderColor:paper.muted}}>
-    <Row label="ศึกที่ผ่าน" value={s.fights+' / '+(state.pages?.adventure?(state.campaign?.night===5?7:6):state.campaign?nightFightTotal(state.campaign.night):state.runMode==='episode'?3:15)}/>
+    <Row label="ศึกที่ผ่าน" value={s.fights+' / '+(state.pages?.adventure?adventureFightTotal(state.campaign?.night):state.campaign?nightFightTotal(state.campaign.night):state.runMode==='episode'?3:15)}/>
     <Row label="เลเวล · เบี้ยที่เหลือ" value={s.level+' · '+s.gold}/>
     <Row label="สำรับตอนจบ" value={state.masterDeck.length+' ใบ'}/>
     {s.metrics&&<><Row label="ใช้การ์ดทั้งหมด" value={s.metrics.cardsPlayed+' ครั้ง'}/><Row label="เทิร์น · คอมโบ" value={s.metrics.turns+' · '+s.metrics.combos}/><Row label="เพิ่ม · สละ · ปลุกเสก" value={s.metrics.added+' · '+s.metrics.removed+' · '+s.metrics.upgraded}/></>}

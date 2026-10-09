@@ -11,7 +11,7 @@ import Animated, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {enemyLane} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
-import Art from '../Art';
+import GhostArt from '../GhostArt';
 import GhostLoreButton from '../GhostLoreButton';
 import {ghostLore} from '../../../src/core/monsters/folklore';
 import {paper} from '../Paper';
@@ -101,7 +101,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   return <View pointerEvents="box-none" style={{flex:1}}>
    {actors.map((actor,index)=>{const lane=enemyLane(layout,index,actors.length);return <View key={actor.id} pointerEvents="box-none" style={{position:'absolute',top:0,left:0,right:0,bottom:0}}>
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
-     <Art slot={`monster/${actor.id}`} width={lane.artSize} height={lane.artSize}/>
+     <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize} halfBody/>
     </Animated.View>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
      <RitualSurface kind="quietSlate" style={{paddingHorizontal:actors.length>1?6:14,paddingVertical:4,gap:2}}>

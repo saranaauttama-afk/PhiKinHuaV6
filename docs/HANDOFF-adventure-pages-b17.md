@@ -1,3 +1,20 @@
+# Issue #6 corrections · v1.0.27 / code 28
+
+Authorized after the user reviewed v1.0.26. This section supersedes the short-route delivery below.
+
+- Every selected night starts a complete independent run: the same 28 ghosts, once each, plus its distinct final boss. Night five adds ผีกินหัว, for 29/30 battles. All 34 existing ghost identities remain represented across the five difficulty nights. Normal/elite/legacy guardian art and decks are reused.
+- Finite deck: 28 fights, 12 optional services and one mandatory story. Resolving replaces only its own page. Leaving an unused shop retains its page and stock.
+- Confirmed Next Intersection postpones visible ghosts in a saved FIFO queue, discards visible optional services, and preserves the story. Replacements cannot be skipped in that same action. Queued ghosts return once undiscovered pages run out. All 28 fights and the story gate the boss. Once only the last visible fights remain, Next Intersection cannot bypass them.
+- Every difficulty traverses the entire village → temple → forest → mountain/cave route. Geography follows uniquely discovered encounters and never moves backwards when deferred ghosts return.
+- Ghost HP/energy are based on identity and difficulty rather than chosen fight order. Later nights increase HP and strength. Removed the free 75% heal before the ultimate fight.
+- Status detail uses one existing old-paper surface. Battle shows enlarged upper-body art, cropped below; enemy reveal is anchored beside its owner. Map uses full bodies with smaller props on a shared ground line. Transparent padding is normalized through metadata/layout only; no image is rewritten or generated.
+- Treasure/single treasure reuse the actual deck card face, including energy, upgrade and ability; inspect, cancel or confirm รับการ์ด. Equipment inspection works even without money; confirm disabled when poor; currency/stock change only after ยืนยันซื้อ.
+- Adventure save version 2 validates complete roster, exact visible/deferred partition and RNG. Old short-route saves are rejected with the existing recoverable restart message; user authorized new games.
+
+Validation so far: TypeScript passed; 698 tests / 43 files passed; web export and JS/Python harness syntax passed. New mobile checks and fresh APK/native runs are pending CI. Local Chromium installation failed because its downloaded archive was truncated; this is not a successful mobile check. Real-card full-route pilot is still running. No game captures taken, no newly generated art. The test APK retains พระประธาน in each class’s first combat hand.
+
+## Historical delivery: v1.0.26 (superseded route and affected UI)
+
 # Issue #6 · B01–B17 · v1.0.26 / code 27
 
 Branch: `work/adventure-pages-b17`. Implementation began by reading the committed B17 plan at `586445d` and auditing the reducer, journey, store and save flow. The user explicitly permits discarding old saves and starting fresh; no old-save migration is required. New B17 saves preserve in-progress map, shop/event result, rewards, level-up and combat RNG.

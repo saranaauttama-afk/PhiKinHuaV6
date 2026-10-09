@@ -16,7 +16,7 @@ import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
 import RestDestinations from './components/RestDestinations';
 import AdventureChoices from './components/AdventureChoices';
-import {skippableSlots} from '../src/core/map/adventure';
+import {skippableSlots,FIGHTS_PER_NIGHT} from '../src/core/map/adventure';
 import SceneGhostChoices from './components/SceneGhostChoices';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
@@ -195,7 +195,7 @@ export default function Home() {
               <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
-          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:16,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · {state.pages?.adventure?`คลี่คลาย ${state.pages.adventure.resolvedIds.length}/12 · เดินผ่าน ${state.pages.adventure.skippedIds.length}`:`ปราบผี ${state.fightCount??0}/${nightFightTotal(state.campaign?.night)}`}</Text>}
+          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:16,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · {state.pages?.adventure?`ปราบผี ${state.pages.adventure.fightsWon}/${FIGHTS_PER_NIGHT} · ผีรอ ${state.pages.adventure.pendingIds.length}`:`ปราบผี ${state.fightCount??0}/${nightFightTotal(state.campaign?.night)}`}</Text>}
           {!state.pages?.adventure&&<Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>}
           {!state.pages?.adventure&&trailOpen&&<JourneyTrail state={state} compact/>}
           <Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>

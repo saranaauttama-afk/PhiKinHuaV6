@@ -18,11 +18,11 @@ const surfaces={
 };
 export const chalk=ritualColors.chalk;
 /** Numeric measured bounds avoid native Image intrinsic/percentage sizing surprises. */
-export default function RitualSurface({kind,children,style,accessibilityViewIsModal}:{kind:keyof typeof surfaces;children?:React.ReactNode;style?:StyleProp<ViewStyle>;accessibilityViewIsModal?:boolean}){
+export default function RitualSurface({kind,children,style,accessibilityViewIsModal,testID}:{kind:keyof typeof surfaces;children?:React.ReactNode;style?:StyleProp<ViewStyle>;accessibilityViewIsModal?:boolean;testID?:string}){
  const [size,setSize]=React.useState({width:0,height:0});
  // Preserve the native parent when borders/opacity change; avoid Fabric reparenting on exit.
  // Keep the image mounted: measurement changes dimensions, never the child hierarchy.
- return <View collapsable={false} accessibilityViewIsModal={accessibilityViewIsModal} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setSize(s=>s.width===width&&s.height===height?s:{width,height})}} style={[{padding:16,backgroundColor:'transparent'},style]}>
+ return <View testID={testID} collapsable={false} accessibilityViewIsModal={accessibilityViewIsModal} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setSize(s=>s.width===width&&s.height===height?s:{width,height})}} style={[{padding:16,backgroundColor:'transparent'},style]}>
   <Image accessible={false} source={surfaces[kind]} resizeMode="stretch" style={{position:'absolute',left:0,top:0,width:size.width,height:size.height}}/>
   {children}
  </View>;

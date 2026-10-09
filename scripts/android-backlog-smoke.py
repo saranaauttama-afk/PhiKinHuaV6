@@ -44,12 +44,13 @@ try:
         tap(r'^ร้านค้าการ์ด · แวะพัก'); tap(r'^แวะ · ร้านค้าการ์ด$')
         shop=nodes(); assert available(shop,r'^ร้านขายคาถา$') is not None,'Shop must open on mixed map'; assert available(shop,r'^จบเทิร์น$') is None
         tap(r'^กลับจุดพัก$'); assert slots(nodes())==before,'Postponed shop must preserve all pages'; record('night '+str(night)+' native mixed shop and postponed pages')
-        battles=0; story=False; bosses=[]; complete=False
-        for guard in range(160):
+        battles=0; story=False; bosses=[]; ghosts=[]; complete=False
+        for guard in range(650):
             ns=nodes(); text=' '.join(label(n) for n in ns)
             if available(ns,r'^ผ่านคืนที่ '+str(night)+r'!$') is not None:
-                assert story and battles==(7 if night==5 else 6),(night,story,battles)
-                snapshot('night-'+str(night)+'-complete',ns); nights.append({'night':night,'battles':battles,'story':story,'bosses':bosses}); record('night '+str(night)+' complete and next night unlocked'); tap(r'^กลับหน้าแรก$'); complete=True; break
+                assert story and battles==(30 if night==5 else 29),(night,story,battles)
+                assert len(ghosts)==28 and len(set(ghosts))==28,(night,ghosts)
+                snapshot('night-'+str(night)+'-complete',ns); nights.append({'night':night,'battles':battles,'story':story,'bosses':bosses,'ghosts':ghosts}); record('night '+str(night)+' complete and next night unlocked'); tap(r'^กลับหน้าแรก$'); complete=True; break
             if available(ns,r'^ข้ามบทนี้$') is not None: tap(r'^ข้ามบทนี้$'); continue
             if available(ns,r'^รับรางวัล$') is not None: tap(r'^รับรางวัล$'); battles+=1; continue
             if available(ns,r'^ข้ามไปก่อน$') is not None: tap(r'^ข้ามไปก่อน$'); continue
@@ -70,6 +71,7 @@ try:
             critical=next((n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and re.search(r' · (ต่อสู้|ศึกใหญ่|เรื่องสำคัญ)',label(n))),None)
             if critical is not None:
                 if 'ศึกใหญ่' in label(critical): bosses.append(label(critical).split(' · ')[0])
+                elif 'ต่อสู้' in label(critical): ghosts.append(label(critical).split(' · ')[0])
                 story_page='เรื่องสำคัญ' in label(critical); click(critical); tap(r'^สำรวจเรื่องราว$' if story_page else r'^เผชิญหน้า · '); continue
             choice=next((n for n in ns if 'event-choice-0' in n.attrib.get('resource-id','')),None)
             if choice is not None:

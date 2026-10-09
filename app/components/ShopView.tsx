@@ -18,7 +18,7 @@ import SceneArrival from './SceneArrival';
 import UpgradeCardPicker,{upgradeSummary} from './UpgradeCardPicker';
 import {upgradeCard} from '../../src/core/engine/shared';
 import React from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
 import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
@@ -134,25 +134,32 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     </Panel>;
   };
 
-  const equipmentShop = () => (
-    <Panel title="ร้านเครื่องราง">
-      <Lead>ตะกรุด ลูกประคำ ผ้ายันต์ วางเรียงบนผ้าขาว เจ้าของร้านไม่พูดอะไรสักคำ</Lead>
-      <Money state={state} />
-      <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-        {stock.map((item, i) => (
-          <ItemChip
-            key={i}
-            disabled={(state.player.gold??0)<item.price}
-            title={equipOf(item)?.name ?? 'ของไม่ทราบชนิด'}
-            line={equipOf(item)?.desc}
-            note={`${item.price} เบี้ย · ${equipOf(item)?.rarity ?? ''}`}
-            onPress={() => dispatch({ type: 'TakeShopEquipment', index: i })}
-            wide
-          />
-        ))}
+  const equipmentShop = () => {
+    const item=selected===null?undefined:stock[selected],equipment=item?equipOf(item):undefined;
+    return <Panel title="ร้านเครื่องราง">
+      <Lead>แตะเครื่องรางเพื่ออ่านผล แล้วกดยืนยันซื้อ</Lead><Money state={state}/>
+      {!!notice&&<Text accessibilityLiveRegion="polite" style={{color:palette.moon,fontFamily:font.ui}}>{notice}</Text>}
+      <View style={{flexDirection:'row',gap:space.sm,flexWrap:'wrap'}}>
+        {stock.map((it,i)=><ItemChip key={i} title={equipOf(it)?.name??'ของไม่ทราบชนิด'} line={equipOf(it)?.desc} note={`${it.price} เบี้ย · ${equipOf(it)?.rarity??''}${(state.player.gold??0)<it.price?' · เบี้ยไม่พอ':''}`} onPress={()=>setSelected(i)}/>) }
       </View>
-    </Panel>
-  );
+      <Modal visible={!!equipment} transparent animationType="fade" onRequestClose={()=>setSelected(null)}>
+       <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>
+        <Pressable accessibilityLabel="ปิดรายละเอียดเครื่องราง" onPress={()=>setSelected(null)} style={{position:'absolute',top:0,bottom:0,left:0,right:0}}/>
+        <RitualSurface kind="occupationPage" accessibilityViewIsModal style={{padding:24,maxHeight:'85%'}}>
+         <ScrollView contentContainerStyle={{gap:12}}>
+          <Image accessible={false} source={require('../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:'100%',height:132}}/>
+          <Text style={{fontFamily:font.heading,color:paper.ink,fontSize:20}}>{equipment?.name}</Text>
+          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:14,lineHeight:24}}>{equipment?.desc}</Text>
+          <Text style={{fontFamily:font.ui,color:paper.ink}}>ราคา {item?.price} เบี้ย · มี {state.player.gold} เบี้ย</Text>
+          {item&&(state.player.gold??0)<item.price&&<Text style={{fontFamily:font.ui,color:paper.red}}>เบี้ยไม่พอ</Text>}
+          <QuietButton label={`ยืนยันซื้อ ${item?.price??0} เบี้ย`} primary disabled={!item||(state.player.gold??0)<item.price} onPress={()=>{if(selected===null||!item||(state.player.gold??0)<item.price)return;dispatch({type:'TakeShopEquipment',index:selected});setSelected(null);setNotice(`ซื้อ ${equipment.name} แล้ว`);}}/>
+          <QuietButton label="ยกเลิกการเลือก" onPress={()=>setSelected(null)}/>
+         </ScrollView>
+        </RitualSurface>
+       </View>
+      </Modal>
+    </Panel>;
+  };
 
   const removeShop = () => {
     const cost=removeCostForCount(state.runCounters?.removeShopCount??0);
@@ -242,61 +249,26 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     );
   };
 
-  const treasure = () => (
-    <Panel title="หีบสมบัติ">
-      <Lead>หีบไม้เก่าเปิดแง้มอยู่ มีแสงลอดออกมาจากในนั้น — เลือกได้อย่างเดียว</Lead>
-      {stock.length > 0 ? (
-        <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-          {stock.map((item, i) => (
-            <ItemChip
-              key={i}
-              card={cardOf(item)}
-              title={cardOf(item)?.name ?? 'ของไม่ทราบชนิด'}
-              line={cardLine(cardOf(item))}
-              note="หยิบฟรี"
-              onPress={() => dispatch({ type: 'TakeTreasureCard', index: i })}
-              wide
-            />
-          ))}
+  const treasure = (single=false) => {
+    const item=selected===null?undefined:stock[selected],card=item?cardOf(item):undefined;
+    const randomized=(state as any)._singleTreasureRandomized??false;
+    return <Panel title={single?'สมบัติชิ้นเดียว':'หีบสมบัติ'}>
+      <Lead>แตะการ์ดเพื่ออ่าน · เลือกได้หนึ่งใบ แล้วกดยืนยันรับการ์ด</Lead>
+      {stock.length?<View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>
+       {stock.map((it,i)=>{const c=cardOf(it);return c&&<View key={`${c.id}-${i}`} style={{width:'48%',gap:4}}><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/><Text style={{fontFamily:font.ui,color:palette.moon,textAlign:'center'}}>หยิบฟรี</Text></View>;})}
+      </View>:<Unavailable text="หีบว่างเปล่า"/>}
+      <Modal visible={!!card} transparent animationType="fade" onRequestClose={()=>setSelected(null)}>
+       <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>
+        <Pressable accessibilityLabel="ปิดรายละเอียดการ์ดสมบัติ" onPress={()=>setSelected(null)} style={{position:'absolute',top:0,bottom:0,left:0,right:0}}/>
+        <View accessibilityViewIsModal style={{maxHeight:'90%',gap:10}}>
+         <ScrollView>{card&&<CardFace card={card}/>}</ScrollView>
+         <QuietButton label="รับการ์ด" primary onPress={()=>{if(selected===null||!card)return;dispatch({type:single?'TakeSingleTreasureCard':'TakeTreasureCard',index:selected});setSelected(null);}}/>
+         <QuietButton label="ยกเลิกการเลือก" onPress={()=>setSelected(null)}/>
         </View>
-      ) : (
-        <Unavailable text="หีบว่างเปล่า" />
-      )}
-    </Panel>
-  );
-
-  const singleTreasure = () => {
-    const randomized = (state as any)._singleTreasureRandomized ?? false;
-    return (
-      <Panel title="สมบัติชิ้นเดียว">
-        <Lead>ห่อผ้าเล็กๆ วางบนตอไม้ ข้างในมีของอยู่ชิ้นเดียว</Lead>
-        {stock.length > 0 ? (
-          <>
-            <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-              {stock.map((item, i) => (
-                <ItemChip
-                  key={i}
-                  card={cardOf(item)}
-                  title={cardOf(item)?.name ?? 'ของไม่ทราบชนิด'}
-                  line={cardLine(cardOf(item))}
-                  note="หยิบฟรี"
-                  onPress={() => dispatch({ type: 'TakeSingleTreasureCard', index: i })}
-                  wide
-                />
-              ))}
-            </View>
-            <QuietButton
-              label={randomized ? 'เปลี่ยนไปแล้ว' : 'ขอเปลี่ยนของ (ได้ครั้งเดียว)'}
-              disabled={randomized}
-              onPress={() => dispatch({ type: 'RandomizeSingleTreasure' })}
-              style={{ marginTop: space.lg, alignSelf: 'flex-start' }}
-            />
-          </>
-        ) : (
-          <Unavailable text="ห่อผ้าว่างเปล่า" />
-        )}
-      </Panel>
-    );
+       </View>
+      </Modal>
+      {single&&stock.length>0&&<QuietButton label={randomized?'เปลี่ยนไปแล้ว':'ขอเปลี่ยนของ (ได้ครั้งเดียว)'} disabled={randomized} onPress={()=>{setSelected(null);dispatch({type:'RandomizeSingleTreasure'});}}/>}
+    </Panel>;
   };
 
   const background=visitedScene(state).source;
@@ -313,7 +285,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {kind === 'healing'         && healingShrine()}
           {kind === 'well'            && well()}
           {kind === 'treasure'        && treasure()}
-          {kind === 'treasure_single' && singleTreasure()}
+          {kind === 'treasure_single' && treasure(true)}
           {kind === 'fusion'          && <FusionAltarView state={state} dispatch={dispatch} />}
         </ScrollView>
         <View style={{paddingHorizontal:16,paddingTop:8,paddingBottom:pad.bottom+12}}>

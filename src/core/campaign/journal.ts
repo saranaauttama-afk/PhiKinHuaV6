@@ -1,3 +1,4 @@
+import {adventureFightTotal} from '../map/adventure';
 import {ALL_CLASS_IDS,type ClassId} from '../classes';
 import type {RunRecord} from './metrics';
 
@@ -20,7 +21,7 @@ export function recordRun(j:Journal,r:RunRecord):Journal{
  if(j.recordedIds.includes(r.id))return j;
  const out=JSON.parse(JSON.stringify(j)) as Journal;
  out.recordedIds.push(r.id);out.history=[r,...out.history].slice(0,60);
- if(!r.won||r.fights<(r.route==='adventure'?(r.night===5?7:6):15))return out;
+ if(!r.won||r.fights<(r.route==='adventure'?adventureFightTotal(r.night):15))return out;
  const p=out.classes[r.classId];
  // A skipped/locked tier never grants progression.
  if(r.night<1||r.night>unlockedNight(j,r.classId))return out;

@@ -7,7 +7,7 @@ import { TEST_WIN_CARD_ID, dealTestWinCard } from '../src/core/cards/testWin';
 import { onRestRow } from '../src/core/map/restPage';
 import { ULTIMATE_BOSS, nightFightTotal } from '../src/core/campaign/bosses';
 import { toBattleSave, fromSave } from '../src/core/save';
-import {isCriticalOffer} from '../src/core/map/adventure';
+import {isCriticalOffer,adventureFightTotal} from '../src/core/map/adventure';
 import type { Command } from '../src/core/types';
 afterEach(() => vi.unstubAllEnvs());
 describe('พระประธาน test APK card', () => {
@@ -42,7 +42,7 @@ describe('พระประธาน test APK card', () => {
         else if (s.phase === 'victory') go({ type: 'CompleteNode' });
         else throw new Error(s.phase);
       }
-      expect(wins).toBe((night===5?7:6));
+      expect(wins).toBe(adventureFightTotal(night));
       expect(s.runSummary?.won).toBe(true);
       expect(s.runSummary?.metrics?.cardsPlayed).toBe(wins);
       if (night === 5) expect(s.defeatedEnemyIds).toContain(ULTIMATE_BOSS.id);

@@ -61,17 +61,10 @@ function journeySource(id:string){
  };
  return sources[id]??sources['01-village'];
 }
-export const ADVENTURE_GEOGRAPHY=[
- ['01-village','02-village-edge','06-bamboo-forest','08-stream'],
- ['03-temple-gate','04-temple-court','05-cremation-ground'],
- ['06-bamboo-forest','07-banyan','08-stream','09-waterfall'],
- ['10-mountain-trail','11-mountain-shrine','12-cave-mouth','13-cave-river'],
- ['12-cave-mouth','13-cave-river','14-buried-sanctuary','15-otherworld-gate'],
-] as const;
+export const ADVENTURE_GEOGRAPHY=JOURNEY_LOCATIONS.map(l=>l.id);
 export function adventureSceneId(state:GameState):string {
  if(state.pages?.adventure?.boss==='ultimate')return '16-secret-throne';
- const route=ADVENTURE_GEOGRAPHY[(state.campaign?.night??1)-1];
- return route[Math.min(route.length-1,Math.floor(adventureStage(state)*route.length/15))];
+ return ADVENTURE_GEOGRAPHY[Math.min(14,adventureStage(state))];
 }
 function sceneForRow(state:GameState,row:number){
  if(state.pages?.adventure){const id=adventureSceneId(state);return {key:`night-${state.campaign?.night}-${id}`,name:JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??'แดนผีกินหัว',source:journeySource(id)};}

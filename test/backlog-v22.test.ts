@@ -74,7 +74,7 @@ describe('actual combo feedback and payoff',()=>{
 describe('portrait card/art/HUD separation, including multiple owners',()=>{
  for(const [w,h] of [[360,640],[393,852],[412,915]])for(const count of [1,2,3])it(`${w}x${h}, ${count} enemies`,()=>{
   const g=battleGeometry(w,h,24,24);
-  for(let i=0;i<count;i++){const p=enemyLane(g,i,count);expect(p.cardX+p.cardW/2).toBeLessThanOrEqual(p.artX);expect(p.cardY+p.cardH/2).toBeLessThan(g.hudTop);expect(p.artX+p.artSize).toBeLessThanOrEqual(w);expect(p.cardX-p.cardW/2).toBeGreaterThanOrEqual(0);}
+  for(let i=0;i<count;i++){const p=enemyLane(g,i,count);expect(Math.abs(p.cardX-(i+.5)*w/count)).toBeLessThan(w/count*.3);expect(p.cardY+p.cardH/2).toBeLessThan(g.hudTop);expect(p.artX+p.artWidth).toBeLessThanOrEqual(w);expect(p.cardX-p.cardW/2).toBeGreaterThanOrEqual(0);}
   expect(g.hudTop+90).toBeLessThanOrEqual(h-24-118-(h<700?148:178)+10);
  });
 });

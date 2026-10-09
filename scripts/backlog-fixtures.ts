@@ -37,6 +37,10 @@ for(const kind of ['shop_card','shop_equipment','shop_remove','shop_upgrade','we
  a.pages!.current!.offers[0]=offer;reachableNodes(a.journey!)[0].offer=offer;keep('rest-'+kind,a);
  if(kind==='story_event')keep('event',applyCommand(a,{type:'ChooseOffer',index:0},rng).state);
 }
+for(const kind of ['shop_equipment','treasure','treasure_single'] as const){
+ const a=structuredClone(fixtures['rest-'+kind].state);const result=applyCommand(a,{type:'ChooseOffer',index:0},rng);result.state.player.gold=1000;keep('confirm-'+kind,result.state);
+ const poor=structuredClone(result.state);poor.player.gold=0;keep('confirm-'+kind+'-poor',poor);
+}
 keep('rest-cards',rest);
 const bless=structuredClone(level);bless.levelUp={choice:{optionA:'blessing',optionB:'max_hp',gold:30},blessingChoices:Object.values(BLESSINGS_BY_RARITY).flat().slice(0,2),consumed:false} as any;keep('levelup-blessing',bless);
 keep('hand',s);
