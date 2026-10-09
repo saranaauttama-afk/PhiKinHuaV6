@@ -2,7 +2,7 @@ name: Android five-night APK
 on:
   push:
     branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table', 'art/quiet-comic-ui', 'work/battle-ui-backlog-v22', 'work/adventure-pages-b17']
-    paths-ignore: ['**/*.md', 'scripts/android-smoke.py', '.github/workflows/android-helper-verify.yml', '.github/workflows/android-native-inspect.yml']
+    paths-ignore: ['**/*.md', 'scripts/android-smoke.py', 'scripts/android-backlog-smoke.py', '.github/workflows/android-b17-verify.yml', '.github/workflows/android-helper-verify.yml', '.github/workflows/android-native-inspect.yml']
   workflow_dispatch:
 permissions:
   contents: read

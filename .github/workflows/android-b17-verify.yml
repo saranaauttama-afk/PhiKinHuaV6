@@ -1,0 +1,53 @@
+name: B17 native verification of built APK
+on:
+  push:
+    branches: ['work/adventure-pages-b17']
+    paths: ['scripts/android-backlog-smoke.py', '.github/workflows/android-b17-verify.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify application source matches built APK
+        run: |
+          python - <<'PY'
+          import subprocess
+          built='b259e49fe3b1850e715b165e37f5cf7ee8b9ca90'
+          changed=subprocess.check_output(['git','diff','--name-only',built,'HEAD'],text=True).splitlines()
+          assert all(p.endswith('.md') or p.startswith('.github/') or p=='scripts/android-backlog-smoke.py' for p in changed), changed
+          print('Only documentation/workflows/native test harness changed. Application code, dependencies and assets match built APK.')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-FiveNights-APK
+          run-id: 37961855214
+          github-token: ${{ github.token }}
+      - name: Verify APK checksum
+        run: echo '14892dce7dd322845258749e0a2569b7be6902314988b2901044ad066d577ac0  PhiKinHua-FiveNights-v1.0.26.apk' | sha256sum -c -
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-FiveNights-v1.0.26.apk
+            python scripts/android-backlog-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: B17-native-verification
+          path: backlog-native-audit/
