@@ -37,7 +37,7 @@ Prompt: a single aged ochre parchment playing-card object, ripped diagonally int
 ## Validation and limits
 
 - Local TypeScript check: passed.
-- Local unit/integration suite: 694 tests / 43 files passed, including real reducer checks for all four classes × five nights, independent replacement, no refill farming, optional card rewards, mandatory stories/bosses, journal unlocks and exact save/RNG at every phase.
+- Local unit/integration suite: 695 tests / 43 files passed, including real reducer checks for all four classes × five nights, independent replacement, no refill farming, optional card rewards, mandatory stories/bosses, journal unlocks and exact save/RNG at every phase.
 - Local production web export: passed. Python and browser-check script syntax: passed.
 - Real-card balance pilot: 320 deterministic runs, four classes × five nights × two policies × eight seeds; no immediate-win card and no stalled runs. Raw results are in `docs/b17-balance-pilot.json`. This is automated policy evidence, not human playtesting or proof that all classes are equally balanced.
 - Mobile browser checks: pending Actions. Local browser installation failed because the Chromium download was incomplete; browser checks are not claimed as passed locally.

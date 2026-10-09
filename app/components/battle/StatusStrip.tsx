@@ -28,7 +28,7 @@ export default function StatusStrip({effects,extra=[],compact=false,align='cente
     <RitualSurface kind="wood" style={{padding:24,gap:14,maxHeight:'75%'}}>
      <View style={{flexDirection:"row",alignItems:"center",gap:12}}><StatusArt name={selected?badgeSymbol(selected):"curse"} size={52}/><Text style={{flex:1,fontFamily:font.heading,fontSize:20,color:palette.moon}}>{selected?.name}</Text></View>
      <ScrollView><Text style={{fontFamily:font.body,fontSize:21,lineHeight:29,color:palette.text}}>{selected?.detail}</Text></ScrollView>
-     <Pressable accessibilityRole="button" onPress={()=>setOpen(null)} style={{minHeight:44,alignItems:'center',justifyContent:'center'}}><Text style={{fontFamily:font.heading,color:palette.moon}}>ปิด</Text></Pressable>
+     <Pressable testID="status-detail-close" accessibilityRole="button" accessibilityLabel="ปิดสถานะ" onPress={()=>setOpen(null)} style={{minHeight:44,alignItems:'center',justifyContent:'center'}}><Text style={{fontFamily:font.heading,color:palette.moon}}>ปิด</Text></Pressable>
     </RitualSurface>
    </View>
   </Modal>

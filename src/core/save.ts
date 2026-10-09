@@ -82,6 +82,7 @@ export type SaveSummary = {
 
 export function toSave(s: GameState,rng?:RNG): SaveV2 {
   if(s.pages?.adventure){
+    if(!rng||!Number.isInteger(rng.s))throw Error('ต้องมี RNG เพื่อบันทึกการเดินทาง B17');
     if(s.phase==='combat'){if(!rng)throw Error('Combat RNG required');return toBattleSave(s,rng);}
     const copy:GameState=JSON.parse(JSON.stringify(s));copy.pendingEvents=[];copy.deckOpen=false;
     return {version:SAVE_VERSION,state:copy,mapRng:rng?{...rng}:undefined};
@@ -112,6 +113,8 @@ export function fromSave(data: SaveV2): GameState {
   const s = data.state as GameState;
   if(s.pages?.adventure){
     if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บบันทึกห้าคืนไว้');
+    const rng=s.phase==='combat'?data.battleRng:data.mapRng;
+    if(!rng||!Number.isInteger(rng.s))throw Error('ข้อมูล RNG ของการเดินทางหายไป เริ่มเกมใหม่ได้');
     if(data.battleRng&&(s.phase!=='combat'||!s.enemy||!s.piles||!Number.isInteger(data.battleRng.s)))throw Error('Invalid battle snapshot');
     return {...JSON.parse(JSON.stringify(s)),pendingEvents:[],deckOpen:false};
   }
@@ -160,7 +163,7 @@ export function isPlayableSave(data: unknown): data is SaveV2 {
   const d = data as any;
   if (d.version !== SAVE_VERSION) return false;
   if (!d.state || typeof d.state !== 'object') return false;
-  if(d.state.pages?.adventure){if(!validAdventure(d.state))return false;}
+  if(d.state.pages?.adventure){if(!validAdventure(d.state))return false;const rng=d.state.phase==='combat'?d.battleRng:d.mapRng;if(!rng||!Number.isInteger(rng.s))return false;}
   else if (!d.state.journey || !d.state.journey.rows?.length) return false;
   if (d.state.phase === 'run_complete') return false;   // รันนี้จบไปแล้ว
   // `toSave` บังคับ phase เป็น 'map' เสมอ เช็ค phase อย่างเดียวจึงไม่พอ:

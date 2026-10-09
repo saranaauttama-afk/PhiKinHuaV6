@@ -18,6 +18,13 @@ function win(d:ReturnType<typeof driver>,ix:number){
  if(d.s.phase==='levelup')d.go({type:'SkipLevelUp'});if(d.s.phase==='reward')d.go({type:'SkipCardReward'});d.go({type:'CompleteNode'});
 }
 describe('B17 independent pages and bounded resources',()=>{
+ it('rejects missing/corrupt B17 RNG instead of silently reseeding the restored adventure',()=>{
+  const d=driver();expect(()=>toSave(d.s)).toThrow(/RNG/);
+  for(const rng of [undefined,{s:NaN},{s:1.5}]){
+   const data=toSave(d.s,d.r);data.mapRng=rng;expect(isPlayableSave(data)).toBe(false);expect(()=>fromSave(data)).toThrow(/RNG/);
+  }
+  d.go({type:'ChooseOffer',index:0});const data=toSave(d.s,d.r);data.battleRng=undefined;expect(isPlayableSave(data)).toBe(false);expect(()=>fromSave(data)).toThrow(/RNG/);
+ });
  it('replaces only the defeated page; preserves postponed shop/well IDs and never rerolls them',()=>{
   const d=driver(),before=structuredClone(d.s.pages!.current!),ids=[...d.s.pages!.adventure!.slotIds];
   d.go({type:'ChooseOffer',index:1});expect(d.s.phase).toBe('shop');const stock=structuredClone(d.s.shopStock);
