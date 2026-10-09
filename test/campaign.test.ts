@@ -70,6 +70,10 @@ describe('five-night campaign',()=>{
   const values=[1,2,3,4,5].map(n=>{const d=driver('warrior',n as Night);d.state.pages!.current!.offers[0]={kind:'monster',enemyId:'phi-pop'} as any;d.go({type:'ChooseOffer',index:0});return {hp:d.state.enemy!.maxHp,strength:d.state.enemy!.statusEffects?.find(e=>e.id==='strength')?.stacks??0};});
   expect(values.map(v=>v.hp)).toEqual([28,31,34,36,39]);expect(values.map(v=>v.strength)).toEqual([0,1,1,1,1]);
  });
+ it('higher difficulty never reduces an existing guardian’s energy, and postponement does not change its base stats',()=>{
+  const stats=(night:Night,fights:number)=>{const d=driver('warrior',night);d.state.fightCount=fights;d.state.pages!.current!.offers[0]={kind:'monster',tier:'elite',enemyId:'phaya-nak'};d.go({type:'ChooseOffer',index:0});return {hp:d.state.enemy!.maxHp,energy:d.state.enemy!.maxEnergy};};
+  for(const n of [1,2,3,4,5] as const){expect(stats(n,0)).toEqual(stats(n,20));expect(stats(n,0).energy).toBe(4);if(n>1)expect(stats(n,0).hp).toBeGreaterThan(stats((n-1) as Night,0).hp);}
+ });
  it('boss awakening triggers once and new energy starts on the next hand',()=>{
   const d=driver('warrior',5);d.state.pages!.current!.offers[0]={kind:'boss',bossType:'final',enemyId:'phaya-nak'} as any;d.go({type:'ChooseOffer',index:0});const s=d.state;s.enemy!.hp=Math.floor(s.enemy!.maxHp/2);
   const budget=s.enemy!.maxEnergy!;awakenNightBoss(s);const strength=s.enemy!.statusEffects!.find(e=>e.id==='strength')!.stacks;expect(s.enemy!.block).toBe(14);expect(s.enemy!.maxEnergy).toBe(budget+1);awakenNightBoss(s);expect(s.enemy!.statusEffects!.find(e=>e.id==='strength')!.stacks).toBe(strength);

@@ -96,30 +96,6 @@
     "stalled": 0
   },
   {
-    "class": "warrior",
-    "night": 5,
-    "policy": "random-affordable",
-    "runs": 8,
-    "wins": 1,
-    "meanFights": 25,
-    "meanTurns": 86.3,
-    "meanCombos": 18.6,
-    "cardsPerEnemyTurn": 2.43,
-    "stalled": 0
-  },
-  {
-    "class": "warrior",
-    "night": 5,
-    "policy": "public-board",
-    "runs": 8,
-    "wins": 4,
-    "meanFights": 27.6,
-    "meanTurns": 91.5,
-    "meanCombos": 16.6,
-    "cardsPerEnemyTurn": 2.44,
-    "stalled": 0
-  },
-  {
     "class": "shaman",
     "night": 1,
     "policy": "random-affordable",
@@ -213,30 +189,6 @@
     "meanTurns": 52.1,
     "meanCombos": 48.1,
     "cardsPerEnemyTurn": 2.57,
-    "stalled": 0
-  },
-  {
-    "class": "shaman",
-    "night": 5,
-    "policy": "random-affordable",
-    "runs": 8,
-    "wins": 1,
-    "meanFights": 26.1,
-    "meanTurns": 67.1,
-    "meanCombos": 51,
-    "cardsPerEnemyTurn": 2.49,
-    "stalled": 0
-  },
-  {
-    "class": "shaman",
-    "night": 5,
-    "policy": "public-board",
-    "runs": 8,
-    "wins": 1,
-    "meanFights": 26.3,
-    "meanTurns": 57.8,
-    "meanCombos": 49.9,
-    "cardsPerEnemyTurn": 2.46,
     "stalled": 0
   },
   {
@@ -336,30 +288,6 @@
     "stalled": 0
   },
   {
-    "class": "nun",
-    "night": 5,
-    "policy": "random-affordable",
-    "runs": 8,
-    "wins": 3,
-    "meanFights": 25.6,
-    "meanTurns": 136,
-    "meanCombos": 40.1,
-    "cardsPerEnemyTurn": 2.41,
-    "stalled": 0
-  },
-  {
-    "class": "nun",
-    "night": 5,
-    "policy": "public-board",
-    "runs": 8,
-    "wins": 4,
-    "meanFights": 27.9,
-    "meanTurns": 109.4,
-    "meanCombos": 47.1,
-    "cardsPerEnemyTurn": 2.52,
-    "stalled": 0
-  },
-  {
     "class": "medium",
     "night": 1,
     "policy": "random-affordable",
@@ -456,15 +384,87 @@
     "stalled": 0
   },
   {
+    "class": "warrior",
+    "night": 5,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 0,
+    "meanFights": 23.1,
+    "meanTurns": 76.8,
+    "meanCombos": 16.5,
+    "cardsPerEnemyTurn": 2.48,
+    "stalled": 0
+  },
+  {
+    "class": "warrior",
+    "night": 5,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 1,
+    "meanFights": 24.9,
+    "meanTurns": 77.5,
+    "meanCombos": 15.1,
+    "cardsPerEnemyTurn": 2.58,
+    "stalled": 0
+  },
+  {
+    "class": "shaman",
+    "night": 5,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 1,
+    "meanFights": 25.9,
+    "meanTurns": 64.8,
+    "meanCombos": 50.5,
+    "cardsPerEnemyTurn": 2.66,
+    "stalled": 0
+  },
+  {
+    "class": "shaman",
+    "night": 5,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 0,
+    "meanFights": 25.1,
+    "meanTurns": 54.4,
+    "meanCombos": 47.1,
+    "cardsPerEnemyTurn": 2.63,
+    "stalled": 0
+  },
+  {
+    "class": "nun",
+    "night": 5,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 0,
+    "meanFights": 23.4,
+    "meanTurns": 120.1,
+    "meanCombos": 36.9,
+    "cardsPerEnemyTurn": 2.46,
+    "stalled": 0
+  },
+  {
+    "class": "nun",
+    "night": 5,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 2,
+    "meanFights": 25.3,
+    "meanTurns": 88.8,
+    "meanCombos": 42.1,
+    "cardsPerEnemyTurn": 2.68,
+    "stalled": 0
+  },
+  {
     "class": "medium",
     "night": 5,
     "policy": "random-affordable",
     "runs": 8,
     "wins": 0,
-    "meanFights": 20.1,
-    "meanTurns": 76.3,
-    "meanCombos": 34,
-    "cardsPerEnemyTurn": 2.41,
+    "meanFights": 20.3,
+    "meanTurns": 76.8,
+    "meanCombos": 34.5,
+    "cardsPerEnemyTurn": 2.45,
     "stalled": 0
   },
   {
@@ -472,11 +472,11 @@
     "night": 5,
     "policy": "public-board",
     "runs": 8,
-    "wins": 5,
-    "meanFights": 28.4,
-    "meanTurns": 76.3,
-    "meanCombos": 35.5,
-    "cardsPerEnemyTurn": 2.49,
+    "wins": 3,
+    "meanFights": 27.5,
+    "meanTurns": 72.4,
+    "meanCombos": 35.1,
+    "cardsPerEnemyTurn": 2.67,
     "stalled": 0
   }
 ]
