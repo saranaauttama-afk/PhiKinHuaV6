@@ -39,7 +39,7 @@ try:
     resumed=False; cancel_checked=False
     for night in range(1,6):
         tap(r'^เริ่มเกม$'); root=nodes()[0]; x1,y1,x2,y2=bounds(root); assert y2-y1>x2-x1,'Android must be portrait'
-        tap(r'^เลือกนักรบวัด'); tap(r'^ออกเดินทาง$'); tap('ดูคืนที่ '+str(night)); tap('เล่นคืนที่ '+str(night)); tap(r'^ข้ามบทนี้$'); tap(r'^พรติดตัว 1:'); tap(r'^ยืนยันพร$')
+        tap(r'^เลือกนักรบวัด'); tap(r'ออกเดินทาง'); tap('ดูคืนที่ '+str(night)); tap('เล่นคืนที่ '+str(night)); tap(r'^ข้ามบทนี้$'); tap(r'^พรติดตัว 1:'); tap(r'^ยืนยันพร$')
         before=slots(nodes()); assert len(before)==3,('three pages',before)
         tap(r'^ร้านค้าการ์ด · แวะพัก'); tap(r'^แวะ · ร้านค้าการ์ด$')
         shop=nodes(); assert available(shop,r'^ร้านขายคาถา$') is not None,'Shop must open on mixed map'; assert available(shop,r'^จบเทิร์น$') is None
