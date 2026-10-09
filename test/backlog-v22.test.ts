@@ -44,7 +44,7 @@ describe('all rest route types and combat labels',()=>{
  const kinds=['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event'] as const;
  for(const kind of kinds)it(`${kind} enters correct phase and returns to identical rest row`,()=>{
   let s=newState();s.chapter=undefined;s=step(s,{type:'ChooseStarterBlessing',index:0});
-  for(let guard=0;guard<60&&!onRestRow(s);guard++){
+  for(let guard=0;guard<60&&!(s.phase==='map'&&onRestRow(s));guard++){
    if(s.chapter){s=step(s,{type:'SkipChapter'});continue;}
    if(s.phase==='map'){const ix=s.pages!.current!.offers.findIndex(o=>o.kind==='monster'||o.kind==='boss');s=step(s,{type:'ChooseOffer',index:ix});}
    else if(s.phase==='combat'){s.piles.hand=[{id:'test',name:'test',type:'attack',cost:0,dmg:9999}];s=step(s,{type:'PlayCard',index:0});}
@@ -52,7 +52,7 @@ describe('all rest route types and combat labels',()=>{
    else if(s.phase==='reward')s=step(s,{type:'SkipCardReward'});
    else s=step(s,{type:'CompleteNode'});
   }
-  expect(onRestRow(s)).toBe(true);
+  expect(onRestRow(s)).toBe(true);expect(s.phase).toBe('map');
   const offer={kind,nodeId:'night2-stage8',shopId:'night2-stage8',eventId:'episode_lantern'} as any;
   const d=describeOffer(offer,0);expect(d.isCombat).toBe(false);expect(encounterAction(d)).not.toContain('เผชิญหน้า');expect(d.type).toBe(kind);
   const row=s.journey!.rowIndex;const nodes=reachableNodes(s.journey!);s.pages!.current!.offers[0]=offer;nodes[0].offer=offer;

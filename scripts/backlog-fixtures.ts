@@ -22,7 +22,7 @@ const level=structuredClone(s);level.phase='levelup';level.levelUp={choice:{opti
 // Navigate the real reducer to a rest row; route QA never fabricates its return state.
 let rest=applyCommand({seed:'backlog-route',turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'backlog-route',classId:'warrior',night:2},rng).state;
 const step=(cmd:any)=>{rest=applyCommand(rest,cmd,rng).state;};rest.chapter=undefined;step({type:'ChooseStarterBlessing',index:0});
-for(let guard=0;guard<60&&!onRestRow(rest);guard++){
+for(let guard=0;guard<60&&!(rest.phase==='map'&&onRestRow(rest));guard++){
  if(rest.chapter)step({type:'SkipChapter'});
  else if(rest.phase==='map')step({type:'ChooseOffer',index:rest.pages!.current!.offers.findIndex(o=>o.kind==='monster'||o.kind==='boss')});
  else if(rest.phase==='combat'){rest.piles.hand=[{id:'test',name:'test',type:'attack',cost:0,dmg:9999}];step({type:'PlayCard',index:0});}
@@ -30,7 +30,7 @@ for(let guard=0;guard<60&&!onRestRow(rest);guard++){
  else if(rest.phase==='reward')step({type:'SkipCardReward'});
  else step({type:'CompleteNode'});
 }
-if(!onRestRow(rest))throw Error('QA failed to reach a real rest row');
+if(rest.phase!=='map'||!onRestRow(rest))throw Error('QA failed to reach a real rest row');
 for(const kind of ['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event']){
  const a=structuredClone(rest);const offer={kind,nodeId:'qa-rest',shopId:'qa-rest',eventId:'episode_lantern'} as any;
  a.pages!.current!.offers[0]=offer;reachableNodes(a.journey!)[0].offer=offer;keep('rest-'+kind,a);
