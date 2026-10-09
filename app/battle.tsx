@@ -1,3 +1,4 @@
+import {adventureFightTotal} from '../src/core/map/adventure';
 import {ghostLore} from '../src/core/monsters/folklore';
 import {nightFightTotal} from '../src/core/campaign/bosses';
 import {battleScene} from './scenePresentation';
@@ -48,7 +49,7 @@ const eventKey = (_ev: CombatEvent) => `${++_popupSeq}`;
 
 type EnemyHandCardData = {
   key: string;
-  card: { id?: string; name: string; damage: number; block: number; cost?: number; hits?: number; desc?: string };
+  card: { id?: string; ownerId?:string; name: string; damage: number; block: number; cost?: number; hits?: number; desc?: string };
   cardIndex: number;
   totalCards: number;
   delay: number;
@@ -256,7 +257,7 @@ export default function BattlePage() {
     setEnemyHandCards(
       revealOrder.map((e, i) => ({
         key: `${i}-${e.cardId}`,
-        card: { id: e.cardId, name: e.name, damage: e.dmg, block: e.block, cost: e.cost, hits: e.hits, desc: e.desc },
+        card: { id: e.cardId, ownerId:e.ownerId??after.enemy?.id, name: e.name, damage: e.dmg, block: e.block, cost: e.cost, hits: e.hits, desc: e.desc },
         cardIndex: i,
         totalCards: revealOrder.length,
         delay: i * 100,
@@ -345,7 +346,7 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
-        <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.pages?.adventure?(gameState.campaign?.night===5?7:6):gameState.runMode==='episode'?3:nightFightTotal(gameState.campaign?.night)}</Text>
+        <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.pages?.adventure?adventureFightTotal(gameState.campaign?.night):gameState.runMode==='episode'?3:nightFightTotal(gameState.campaign?.night)}</Text>
         {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',bottom:safe.bottom+340,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:13,lineHeight:21,textAlign:'center'}}>{comboNotice}</Text></RitualSurface></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
@@ -389,6 +390,7 @@ export default function BattlePage() {
             key={c.key}
             onAttackPeak={() => flashRef.current?.flash()}
             card={c.card}
+            ownerId={c.card.ownerId}
             cardIndex={c.cardIndex}
             totalCards={c.totalCards}
             delay={c.delay}

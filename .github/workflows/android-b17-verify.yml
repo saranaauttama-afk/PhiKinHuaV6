@@ -1,8 +1,5 @@
 name: B17 native verification of built APK
 on:
-  push:
-    branches: ['work/adventure-pages-b17']
-    paths: ['scripts/android-backlog-smoke.py', '.github/workflows/android-b17-verify.yml']
   workflow_dispatch:
 permissions:
   contents: read

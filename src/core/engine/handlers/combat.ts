@@ -275,6 +275,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',
+        ownerId:s.enemy.id,
         cardId,
         name: def.name ?? def.id,
         dmg: def.dmg ?? 0,

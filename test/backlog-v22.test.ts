@@ -83,7 +83,7 @@ describe('live enemy HUD and upgrade ability text',()=>{
  it('enemy reveal frames report actual energy spent and queued cards left',()=>{
   let s=newState();s.chapter=undefined;s=step(s,{type:'ChooseStarterBlessing',index:0});s=step(s,{type:'ChooseOffer',index:0});s.player.hp=s.player.maxHp=999;
   s=step(s,{type:'EndTurn'});const reveals=(s.pendingEvents??[]).filter(e=>e.t==='EnemyCardRevealed');expect(reveals.length).toBeGreaterThan(0);
-  let energy=s.enemy!.maxEnergy||2;for(const event of reveals){if(event.t!=='EnemyCardRevealed')continue;energy-=event.cost??1;expect(event.frame!.enemy!.energy).toBe(energy);expect(event.frame!.enemy!.handCount).toBeGreaterThanOrEqual(0);}
+  let energy=s.enemy!.maxEnergy||2;for(const event of reveals){if(event.t!=='EnemyCardRevealed')continue;expect(event.ownerId).toBe(s.enemy!.id);energy-=event.cost??1;expect(event.frame!.enemy!.energy).toBe(energy);expect(event.frame!.enemy!.handCount).toBeGreaterThanOrEqual(0);}
   expect(s.enemy?.handCount).toBe(0);
  });
  it('trap upgrade preview prints upgraded effect values instead of stale descriptions',()=>{

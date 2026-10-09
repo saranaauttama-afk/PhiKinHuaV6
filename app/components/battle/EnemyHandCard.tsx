@@ -14,6 +14,7 @@ import {font} from '../../theme';
 import {paper} from '../Paper';
 import RitualSurface from '../RitualSurface';
 import InkIcon from '../InkIcon';
+import {artSource} from '../Art';
 import {CardGlyphArt} from '../DeckCard';
 
 const CARD_W      = 200;
@@ -36,6 +37,7 @@ const easeIn   = Easing.in(Easing.quad);
 
 interface Props {
   card: { id?: string; name: string; damage: number; block: number; cost?: number; hits?: number; desc?: string };
+  ownerId?:string;
   ownerIndex?:number;
   ownerCount?:number;
   cardIndex: number;
@@ -47,7 +49,7 @@ interface Props {
 }
 
 export default function EnemyHandCard({
-  card, cardIndex, totalCards, delay, playing, onAttackPeak, ownerIndex=0,ownerCount=1,
+  card, cardIndex, totalCards, delay, playing, onAttackPeak, ownerId, ownerIndex=0,ownerCount=1,
 }: Props) {
   const layout = useBattleLayout();
 
@@ -147,7 +149,7 @@ export default function EnemyHandCard({
       <Animated.View style={frontStyle}>
         {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:4}}>
           <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:18}}>พลัง {card.cost??1}</Text>
-          <CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'skill',cost:card.cost??1}} size={68}/>
+          {ownerId?<Image testID="enemy-card-owner-art" accessible={false} source={artSource(`monster/${ownerId}`)} resizeMode="contain" style={{width:68,height:68}}/>:<CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'skill',cost:card.cost??1}} size={68}/>}
           <Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.heading,fontSize:22,textAlign:'center'}}>{card.name}</Text>
           {card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:22}}>โจมตี {card.damage}{(card.hits??1)>1?` ×${card.hits}`:''}</Text>}
           {card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:21}}>ป้องกัน {card.block}</Text>}

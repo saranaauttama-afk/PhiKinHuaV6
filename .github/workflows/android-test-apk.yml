@@ -29,7 +29,6 @@ jobs:
           name: UI-backlog-audit
           path: backlog-audit/
   android:
-    needs: mobile-ui
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:

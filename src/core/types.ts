@@ -220,7 +220,7 @@ export type CombatFrame = {
 
 export type CombatEvent = (
   /** ศัตรูเปิดการ์ดใบหนึ่ง — view ใช้จังหวะนี้พลิกการ์ด */
-  | { t: 'EnemyCardRevealed'; cardId: string; name: string; dmg: number; block: number; cost?: number; hits?: number; desc?: string }
+  | { t: 'EnemyCardRevealed'; ownerId?:string; cardId: string; name: string; dmg: number; block: number; cost?: number; hits?: number; desc?: string }
   | {
       t: 'Damage';
       target: CombatEventTarget;
