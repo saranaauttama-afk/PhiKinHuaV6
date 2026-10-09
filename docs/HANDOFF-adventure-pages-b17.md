@@ -36,11 +36,24 @@ Prompt: a single aged ochre parchment playing-card object, ripped diagonally int
 
 ## Validation and limits
 
+Implementation commit: `cdf70d4`; status-popup/RNG correction: `b259e49`. Initial CI `37961367892` stopped at an ambiguous close-control selector; the corrected run `37961855214` passed the complete mobile checks.
+
 - Local TypeScript check: passed.
 - Local unit/integration suite: 695 tests / 43 files passed, including real reducer checks for all four classes × five nights, independent replacement, no refill farming, optional card rewards, mandatory stories/bosses, journal unlocks and exact save/RNG at every phase.
 - Local production web export: passed. Python and browser-check script syntax: passed.
 - Real-card balance pilot: 320 deterministic runs, four classes × five nights × two policies × eight seeds; no immediate-win card and no stalled runs. Raw results are in `docs/b17-balance-pilot.json`. This is automated policy evidence, not human playtesting or proof that all classes are equally balanced.
-- Mobile browser checks: pending Actions. Local browser installation failed because the Chromium download was incomplete; browser checks are not claimed as passed locally.
-- APK package/signature/16 KB audit and API 36 native five-night run: pending Actions.
+- Mobile browser checks: 60 checks passed (44 existing regression checks + 16 B17 checks), at 360×640 and 393×852, in Actions run `37961855214`. Both audit JSON files have zero browser errors and no screenshots. Local Chromium download was incomplete; browser success is CI evidence.
+- APK build: passed in Actions run `37961855214` (Gradle 19m 6s). Package `com.phikinhua.episode`, v1.0.26 / code 27; offline Hermes bundle included; arm64-v8a and x86_64. APK v2 signature verifies, ZIP alignment passes, and all 42 native libraries meet 16 KB ELF/ZIP alignment checks.
+- APK: 121,316,211 bytes; SHA-256 `14892dce7dd322845258749e0a2569b7be6902314988b2901044ad066d577ac0`. Downloaded APK checksum matches the CI audit.
+- API 36 native five-night run: pending Actions run `37965979015`. The first native attempt installed/launched successfully but stopped at an anchored departure-button test selector: the real button includes the class name. The harness now matches the complete action. This rerun reuses the exact APK above, verifies its checksum, and checks that application code/dependencies/assets match built commit `b259e49`; no application change is hidden behind APK reuse.
 
-The native run installs/clears app data, checks mixed-shop routing and preserved pages in all five nights, mandatory stories and 31 battles including all six bosses, next-night unlocks, cold combat resume and cancelled drag. It uses the existing test-only พระประธาน card to verify structure. Mobile browser fixtures independently verify card drag play, cancel, blessing confirmation, upgrade cancel/scroll, geometry and actual shop dispatch at 360×640 and 393×852. Both write XML/JSON/log evidence without game screenshots. The test APK retains พระประธาน; it is not a production-balanced release build.
+The native run installs/clears app data and follows the warrior class through all five nights. It checks mixed-shop routing and preserved pages, mandatory stories and 31 battles including all six bosses, next-night unlocks, cold combat resume and cancelled drag. It uses the existing test-only พระประธาน card to verify structure. Mobile browser fixtures independently verify card drag play, cancel, blessing confirmation, upgrade cancel/scroll, geometry and actual shop dispatch at 360×640 and 393×852. Both write XML/JSON/log evidence without game screenshots. The test APK retains พระประธาน; it is not a production-balanced release build.
+
+Night-five pilot wins (eight seeds per policy) show a remaining class gap, especially for warrior. These figures use normal cards and the same preparation policy; they are distinct from the native structural test.
+
+| Class | Random affordable | Public-board policy |
+| --- | ---: | ---: |
+| Warrior | 1/8 | 2/8 |
+| Shaman | 6/8 | 8/8 |
+| Nun | 3/8 | 6/8 |
+| Medium | 3/8 | 7/8 |

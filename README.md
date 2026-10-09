@@ -50,11 +50,11 @@ The following notes describe earlier implementations and validation, not the cur
 
 Current work branch: `work/adventure-pages-b17`, continuing Issue #6 and `docs/B17-three-page-adventure-plan.md`. `main` is older. Read `docs/HANDOFF-adventure-pages-b17.md` first; older references include `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
 
-## First chapter
+## Historical first chapter
 
 Cover → character → short story → starter blessing → choose Pop/Tanee → lantern decision (heal, risky card, or pass) and equipment shop → choose Krasue/dancer → choose healing, card upgrade and blessing activities → Pong Kang finale → card reward and ending. Three real battles, with the existing reducer/command, equipment, class, card-reward and status systems. Rest nodes do not refill in this mode. Enemy cards stay face down until played; no enemy intent is displayed. The current chapter has dedicated enemy pressure and class-card balance.
 
-Tap a hand card to read it and press **ใช้การ์ด**, or drag upward. End turn with **จบเทิร์น**. Choose card rewards after winning. Old full-run engine mode remains available through `NewRun` without `runMode`; the current main menu starts the short chapter.
+Tap a hand card to read it and press **ใช้การ์ด**, or drag upward. End turn with **จบเทิร์น**. The old episode and full-run modes remain in the engine for legacy tests. The current main menu selects a class and one of five nights, using B17's finite adventure pages and optional card rewards.
 
 ## Run and check
 
@@ -71,9 +71,9 @@ npx expo export --platform web
 
 ## Android deliverable
 
-GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.25`, versionCode `26`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
+GitHub Actions **Android five-night APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.26`, versionCode `27`, minSDK 24. ABI targets: ARM64 and x86_64. The APK retains the existing test-only พระประธาน card. See the current handoff for verified APK results and normal-card balance-pilot limits.
 
-Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. A dependent Android API 36 x86_64 emulator job installs and launches the APK, navigates into a fight, previews/plays a real card and ends a turn. The current branch uploads interaction reports, package audits and logcat without screenshots. See the handoff for actual run results; successful build alone does not prove installation or launch.
+Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. The Android API 36 x86_64 emulator test follows warrior through five nights, checks mixed shops and mandatory stories, 31 battles and six bosses, next-night unlocks, cold battle resume and cancelled drag. It uses พระประธาน to verify route structure; browser checks and the 320-run pilot independently exercise normal-card mechanics. The current branch uploads XML/JSON interaction reports, package audits and logcat without screenshots. The separate native verification workflow reuses an APK only after verifying its checksum and matching application source. See the handoff for actual run results; successful build alone does not prove installation or launch.
 
 ## Visual direction
 
