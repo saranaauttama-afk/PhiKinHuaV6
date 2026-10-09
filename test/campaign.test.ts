@@ -17,6 +17,7 @@ import {resolveEnemyCard} from '../src/core/combat/enemyCardEffects';
 import {applyStatusEffect} from '../src/core/statusEffectsRuntime';
 import {toBattleSave,fromSave} from '../src/core/save';
 import type {GameState,Command} from '../src/core/types';
+import {screenForState} from '../app/screenRouter';
 function driver(cls:ClassId='warrior',night:Night=1,unlocks:Array<'card'|'blessing'>=[]){
  const seed=`campaign-${cls}-${night}`;let state=baseNewState(seed),rng=makeRng(seed);
  const go=(cmd:Command)=>{const o=applyCommand(state,cmd,rng);state=o.state;rng=o.rng;return state;};
@@ -41,6 +42,18 @@ function finish(d:ReturnType<typeof driver>){
  return d.state;
 }
 describe('five-night campaign',()=>{
+ it('a completed first night can return to the cover without losing credited progress',()=>{
+  const d=driver();const finished=finish(d);
+  const record=makeRunRecord(finished,'2026-10-09')!;
+  const journal=recordRun(emptyJournal(),record);
+  const out=applyCommand(finished,{type:'EnterMenu'},d.rng);
+  expect(screenForState(out.state,{pickingClass:false})).toBe('start');
+  expect(out.state.runSummary).toEqual(finished.runSummary);
+  expect(out.rng).toEqual(d.rng);
+  expect(unlockedNight(journal,'warrior')).toBe(2);
+  expect(recordRun(journal,makeRunRecord(out.state,'2026-10-09')!)).toEqual(journal);
+  expect(screenForState(out.state,{pickingClass:true})).toBe('class-select');
+ });
  for(const cls of ALL_CLASS_IDS)for(const night of [1,2,3,4,5] as const)it(`${cls} night ${night}: the full route, 7 bounded rests and a credited ending`,()=>{
   const d=driver(cls,night);expect(d.state.journey!.plans.filter(p=>p.kind!=='rest')).toHaveLength(15);expect(d.state.journey!.plans.filter(p=>p.kind==='rest')).toHaveLength(7);
   const s=finish(d);expect(s.runSummary?.won).toBe(true);expect(s.runSummary?.fights).toBe(nightFightTotal(night));expect(!!s.secretBossUnlocked).toBe(night===5);expect(s.runSummary?.metrics?.cardsPlayed).toBe(nightFightTotal(night));expect(s.runMetrics?.turns).toBe(nightFightTotal(night));if(night===5)expect(s.runSummary?.beatSecretBoss).toBe(true);

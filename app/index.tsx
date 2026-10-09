@@ -3,7 +3,7 @@ import {nightFightTotal} from '../src/core/campaign/bosses';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import React, { useMemo, useState, useEffect } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View, ImageBackground, Image } from 'react-native';
+import { BackHandler, Pressable, ScrollView, Text, TextInput, View, ImageBackground, Image } from 'react-native';
 import { useAppFonts } from './useAppFonts';
 import type { SaveSlotInfo } from '../src/core/storage';
 import type { PageOffer } from '../src/core/map/pages';
@@ -60,6 +60,20 @@ export default function Home() {
   const [fontsLoaded] = useAppFonts();
   const pad = useScreenPadding();
 
+  const returnToMainMenu = React.useCallback(() => {
+    setPickingClass(false);
+    setNightClass(null);
+    setJournalOpen(false);
+    dispatch({type:'EnterMenu'});
+  }, [dispatch]);
+
+  useEffect(() => {
+    const atEnding=state.phase==='run_complete'||(state.phase==='defeat'&&!!state.runSummary);
+    if (!atEnding||state.chapter||journalOpen||nightClass||pickingClass) return;
+    const back=BackHandler.addEventListener('hardwareBackPress',()=>{returnToMainMenu();return true;});
+    return ()=>back.remove();
+  }, [state.phase,state.chapter,state.runSummary,journalOpen,nightClass,pickingClass,returnToMainMenu]);
+
   useEffect(() => {
     if (state.phase === 'combat' && state.enemy) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
   },[state.phase,state.enemy?.id]);
@@ -106,7 +120,7 @@ export default function Home() {
     return (
       <ClassSelectScreen
         onPick={(classId) => setNightClass(classId)}
-        onBack={() => setPickingClass(false)}
+        onBack={() => state.runSummary?returnToMainMenu():setPickingClass(false)}
       />
     );
   }
@@ -118,7 +132,7 @@ export default function Home() {
 
   // จบรันแล้ว — แสดงจอสรุปแทนการเด้งกลับแผนที่ที่ไม่มีอะไรเหลือ
   if (screen === 'run-complete') {
-    return <RunCompleteScreen state={state} onJournal={()=>setJournalOpen(true)} onNewRun={() => setPickingClass(true)} />;
+    return <RunCompleteScreen state={state} onMainMenu={returnToMainMenu} onJournal={()=>setJournalOpen(true)} onNewRun={() => setPickingClass(true)} />;
   }
 
   // เลือกพรตั้งต้นก่อนเข้าหน้าแรก

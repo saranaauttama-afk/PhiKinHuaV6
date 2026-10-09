@@ -29,7 +29,7 @@ export default function UiReview(){
  if(!loaded||!state)return <Text>กำลังเปิดภาพจากเกม…</Text>;
  if(done)return <QuietPage title="ดำเนินการแล้ว"><Text style={{color:palette.text}}>ปุ่มตอบสนองแล้ว</Text></QuietPage>;
  if(screen==='defeat')return <DefeatOverlay onHome={()=>setDone(true)}/>;
- if(screen==='summary'||screen==='summary-defeat')return <RunCompleteScreen state={state} onNewRun={()=>setDone(true)} onJournal={()=>setDone(true)}/>;
+ if(screen==='summary'||screen==='summary-defeat')return <RunCompleteScreen state={state} onNewRun={()=>setDone(true)} onMainMenu={()=>setDone(true)} onJournal={()=>setDone(true)}/>;
  if(screen==='chapter')return <ChapterView state={state} dispatch={dispatch}/>;
  if(screen==='event'||screen==='event-result')return state.phase==='event'?<StoryEventView state={state} dispatch={dispatch}/>:<QuietPage title="กลับจุดพักแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>;
  if(screen==='levelup')return state.phase==='levelup'?<LevelUpOverlay state={state} playerLevel={state.player.level} onChoose={(option,index)=>dispatch({type:'ChooseLevelUpOption',option,index})} onSkip={()=>dispatch({type:'SkipLevelUp'})}/>:<QuietPage title="รับวิชาแล้ว"><Text style={{color:palette.text}}>ดำเนินการแล้ว</Text></QuietPage>;

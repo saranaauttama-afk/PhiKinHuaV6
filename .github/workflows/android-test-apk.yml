@@ -41,13 +41,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='23' versionName='1.0.22'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FiveNights-v1.0.22.apk
-          sha256sum PhiKinHua-FiveNights-v1.0.22.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='24' versionName='1.0.23'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FiveNights-v1.0.23.apk
+          sha256sum PhiKinHua-FiveNights-v1.0.23.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FiveNights-APK
-          path: PhiKinHua-FiveNights-v1.0.22.apk
+          path: PhiKinHua-FiveNights-v1.0.23.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -77,6 +77,6 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FiveNights-v1.0.22.apk
+            adb install PhiKinHua-FiveNights-v1.0.23.apk
             adb shell am start -W -n com.phikinhua.episode/.MainActivity
             adb shell pidof com.phikinhua.episode

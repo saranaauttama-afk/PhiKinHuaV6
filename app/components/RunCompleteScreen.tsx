@@ -6,10 +6,10 @@ import {QuietButton,QuietPage} from './QuietChrome';
 import RitualSurface from './RitualSurface';
 import Art from './Art';
 import {font,paper,palette} from '../theme';
-export default function RunCompleteScreen({state,onNewRun,onJournal}:{state:GameState;onNewRun:()=>void;onJournal?:()=>void}){
+export default function RunCompleteScreen({state,onNewRun,onMainMenu,onJournal}:{state:GameState;onNewRun:()=>void;onMainMenu:()=>void;onJournal?:()=>void}){
  const s=state.runSummary;if(!s)return null;
  const headline=!s.won?'ไปไม่ถึงเช้า':state.campaign?'ผ่านคืนที่ '+state.campaign.night+'!':state.runMode==='episode'?'รอดคืนแรก!':s.beatSecretBoss?'ท้ามัจจุราชสำเร็จ':'จบการเดินทาง';
- return <QuietPage title="บันทึกเมื่อฟ้าสาง" subtitle={state.campaign?'ห้าคืนอาถรรพ์ · คืนที่ '+state.campaign.night:undefined} source={require('../../assets/scence/quiet-village.png')} footer={<QuietButton primary label="ออกเดินทางอีกครั้ง" onPress={onNewRun}/>}>
+ return <QuietPage title="บันทึกเมื่อฟ้าสาง" subtitle={state.campaign?'ห้าคืนอาถรรพ์ · คืนที่ '+state.campaign.night:undefined} source={require('../../assets/scence/quiet-village.png')} footer={<View style={{gap:8}}><QuietButton primary label="เลือกอาชีพและคืน" onPress={onNewRun}/><QuietButton label="กลับหน้าแรก" onPress={onMainMenu}/></View>}>
   <RitualSurface kind="occupationPage" style={{paddingHorizontal:26,paddingVertical:28,gap:12}}>
    <Text accessibilityRole="header" style={{fontFamily:font.display,fontSize:32,color:paper.red,textAlign:'center'}}>{headline}</Text>
    <View style={{height:180,alignItems:'center'}}><Art slot={'class/'+(state.classId??'shaman')} width={120} height={180}/></View>
