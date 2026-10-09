@@ -1,4 +1,4 @@
-import {ritualColors,paper,palette} from '../theme';
+import {ritualColors,palette} from '../theme';
 import React from 'react';
 import {Image,View,StyleProp,ViewStyle} from 'react-native';
 
@@ -22,7 +22,7 @@ export default function RitualSurface({kind,children,style,accessibilityViewIsMo
  const [size,setSize]=React.useState({width:0,height:0});
  // Preserve the native parent when borders/opacity change; avoid Fabric reparenting on exit.
  // Keep the image mounted: measurement changes dimensions, never the child hierarchy.
- return <View collapsable={false} accessibilityViewIsModal={accessibilityViewIsModal} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setSize(s=>s.width===width&&s.height===height?s:{width,height})}} style={[{padding:16,backgroundColor:kind==='occupationPage'||kind==='hudPaper'||kind==='grayCard'?paper.bg:palette.inkSoft},style]}>
+ return <View collapsable={false} accessibilityViewIsModal={accessibilityViewIsModal} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setSize(s=>s.width===width&&s.height===height?s:{width,height})}} style={[{padding:16,backgroundColor:kind==='occupationPage'||kind==='hudPaper'||kind==='grayCard'?'transparent':palette.inkSoft},style]}>
   <Image accessible={false} source={surfaces[kind]} resizeMode="stretch" style={{position:'absolute',left:0,top:0,width:size.width,height:size.height}}/>
   {children}
  </View>;

@@ -10,6 +10,7 @@ import CardRow from '../CardRow';
 import UpgradeCardPicker from '../UpgradeCardPicker';
 import {canUpgrade} from '../../../src/core/engine/shared';
 import { font, size, space } from '../../theme';
+import {levelUpConfirmLabel} from '../../levelUpPresentation';
 
 /**
  * หน้าเลือกรางวัลตอนเลเวลอัป
@@ -94,7 +95,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         <Text style={{color:palette.moon,fontSize:24,textAlign:'center',fontFamily:font.heading}}>เลเวล {playerLevel}</Text>
       </RitualSurface>
       <Text style={{color:palette.text,fontSize:14,fontFamily:font.ui,textAlign:'center',marginBottom:20}}>
-        {pending ? bucketOf(pending)==='upgrade'?'เลือกการ์ดที่จะปลุกเสกฟรี 1 ใบ':bucketOf(pending)==='remove'?'เลือกการ์ดที่จะสละ 1 ใบ':'เลือกพรหนึ่งอย่าง' : 'เลือกวิชาที่จะพัฒนา'}
+        {pending ? bucketOf(pending)==='upgrade'?'เลือกการ์ดที่จะปลุกเสกฟรี 1 ใบ':bucketOf(pending)==='remove'?'เลือกการ์ดที่จะสละ 1 ใบ':'เลือกพรหนึ่งอย่าง' : 'เลือกสิ่งที่จะรับเมื่อเลเวลเพิ่ม'}
       </Text>
 
       {pending === null ? (
@@ -121,7 +122,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
             </Pressable>;
           })}
           </View>
-          <QuietButton label="ยืนยันวิชา" primary disabled={!selected} onPress={()=>selected&&press(selected)}/>
+          <QuietButton label={levelUpConfirmLabel(selected?bucketOf(selected):undefined)} primary disabled={!selected} onPress={()=>selected&&press(selected)}/>
         </View>
       ) : (
         <View>
