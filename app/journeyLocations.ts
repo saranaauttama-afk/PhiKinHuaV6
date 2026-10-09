@@ -10,10 +10,10 @@ export const JOURNEY_LOCATIONS = [
   {id:'08-stream',name:'ลำธารเงาดำ'},
   {id:'09-waterfall',name:'น้ำตกหุบลับ'},
   {id:'10-mountain-trail',name:'ทางเขาหมอก'},
-  {id:'11-mountain-shrine',name:'ศาลบนยอดเขา'},
+  {id:'11-mountain-shrine',name:'ศาลข้างทางเขา'},
   {id:'12-cave-mouth',name:'ปากถ้ำฟันหิน'},
   {id:'13-cave-river',name:'แม่น้ำใต้พิภพ'},
-  {id:'14-buried-sanctuary',name:'วิหารใต้ภูเขา'},
+  {id:'14-buried-sanctuary',name:'สำนักร้างในถ้ำ'},
   {id:'15-otherworld-gate',name:'ประตูแดนอาถรรพ์'},
 ] as const;
 export const REST_LOCATION_IDS = ["rest-02", "rest-04", "rest-06", "rest-08", "rest-10", "rest-12", "rest-14"] as const;

@@ -7,11 +7,11 @@ export function episodeSceneId(row:number) {
 }
 function episodeSource(row:number) {
 const episodeScenes=[
-  require('../assets/ui/map-crossroads.jpg'),
-  require('../assets/scence/lantern-hut.jpg'),
-  require('../assets/scence/episode-village.jpg'),
-  require('../assets/scence/rest.jpg'),
-  require('../assets/scence/menu-haunted.jpg'),
+  require('../assets/scence/journey/thai-v24/01-village.jpg'),
+  require('../assets/scence/journey/thai-v24/rest-02.jpg'),
+  require('../assets/scence/journey/thai-v24/02-village-edge.jpg'),
+  require('../assets/scence/journey/thai-v24/rest-04.jpg'),
+  require('../assets/scence/journey/thai-v24/05-cremation-ground.jpg'),
 ];
 return episodeScenes[Math.max(0,Math.min(row,4))];
 }
@@ -32,36 +32,36 @@ export function journeySceneId(state:GameState,row:number):string {
 }
 function journeySource(id:string){
  const sources:Record<string,any>={
-  '01-village':require('../assets/scence/journey/01-village.jpg'),
-  '02-village-edge':require('../assets/scence/journey/02-village-edge.jpg'),
-  '03-temple-gate':require('../assets/scence/journey/03-temple-gate.jpg'),
-  '04-temple-court':require('../assets/scence/journey/04-temple-court.jpg'),
-  '05-cremation-ground':require('../assets/scence/journey/05-cremation-ground.jpg'),
-  '06-bamboo-forest':require('../assets/scence/journey/06-bamboo-forest.jpg'),
-  '07-banyan':require('../assets/scence/journey/07-banyan.jpg'),
-  '08-stream':require('../assets/scence/journey/08-stream.jpg'),
-  '09-waterfall':require('../assets/scence/journey/09-waterfall.jpg'),
-  '10-mountain-trail':require('../assets/scence/journey/10-mountain-trail.jpg'),
-  '11-mountain-shrine':require('../assets/scence/journey/11-mountain-shrine.jpg'),
-  '12-cave-mouth':require('../assets/scence/journey/12-cave-mouth.jpg'),
-  '13-cave-river':require('../assets/scence/journey/13-cave-river.jpg'),
-  '14-buried-sanctuary':require('../assets/scence/journey/14-buried-sanctuary.jpg'),
-  '15-otherworld-gate':require('../assets/scence/journey/15-otherworld-gate.jpg'),
-  'rest-02':require('../assets/scence/journey/rest-02.jpg'),
-  'rest-04':require('../assets/scence/journey/rest-04.jpg'),
-  'rest-06':require('../assets/scence/journey/rest-06.jpg'),
-  'rest-08':require('../assets/scence/journey/rest-08.jpg'),
-  'rest-10':require('../assets/scence/journey/rest-10.jpg'),
-  'rest-12':require('../assets/scence/journey/rest-12.jpg'),
-  'rest-14':require('../assets/scence/journey/rest-14.jpg'),
-  'rest-15':require('../assets/scence/boss.jpg'),
-  '16-secret-throne':require('../assets/scence/journey/16-secret-throne.jpg'),
+  '01-village':require('../assets/scence/journey/thai-v24/01-village.jpg'),
+  '02-village-edge':require('../assets/scence/journey/thai-v24/02-village-edge.jpg'),
+  '03-temple-gate':require('../assets/scence/journey/thai-v24/03-temple-gate.jpg'),
+  '04-temple-court':require('../assets/scence/journey/thai-v24/04-temple-court.jpg'),
+  '05-cremation-ground':require('../assets/scence/journey/thai-v24/05-cremation-ground.jpg'),
+  '06-bamboo-forest':require('../assets/scence/journey/thai-v24/06-bamboo-forest.jpg'),
+  '07-banyan':require('../assets/scence/journey/thai-v24/07-banyan.jpg'),
+  '08-stream':require('../assets/scence/journey/thai-v24/08-stream.jpg'),
+  '09-waterfall':require('../assets/scence/journey/thai-v24/09-waterfall.jpg'),
+  '10-mountain-trail':require('../assets/scence/journey/thai-v24/10-mountain-trail.jpg'),
+  '11-mountain-shrine':require('../assets/scence/journey/thai-v24/11-mountain-shrine.jpg'),
+  '12-cave-mouth':require('../assets/scence/journey/thai-v24/12-cave-mouth.jpg'),
+  '13-cave-river':require('../assets/scence/journey/thai-v24/13-cave-river.jpg'),
+  '14-buried-sanctuary':require('../assets/scence/journey/thai-v24/14-buried-sanctuary.jpg'),
+  '15-otherworld-gate':require('../assets/scence/journey/thai-v24/15-otherworld-gate.jpg'),
+  'rest-02':require('../assets/scence/journey/thai-v24/rest-02.jpg'),
+  'rest-04':require('../assets/scence/journey/thai-v24/rest-04.jpg'),
+  'rest-06':require('../assets/scence/journey/thai-v24/rest-06.jpg'),
+  'rest-08':require('../assets/scence/journey/thai-v24/rest-08.jpg'),
+  'rest-10':require('../assets/scence/journey/thai-v24/rest-10.jpg'),
+  'rest-12':require('../assets/scence/journey/thai-v24/rest-12.jpg'),
+  'rest-14':require('../assets/scence/journey/thai-v24/rest-14.jpg'),
+  'rest-15':require('../assets/scence/journey/thai-v24/rest-15.jpg'),
+  '16-secret-throne':require('../assets/scence/journey/thai-v24/16-secret-throne.jpg'),
  };
  return sources[id]??sources['01-village'];
 }
 function sceneForRow(state:GameState,row:number){
  const id=state.runMode==='episode'?episodeSceneId(row):journeySceneId(state,row);
- const name=JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??(id.startsWith('rest-')?'ที่พักระหว่างทาง':'แดนมัจจุราช');
+ const name=JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??(id.startsWith('rest-')?'ที่พักระหว่างทาง':'แดนผีกินหัว');
  return {key:`${state.runMode??'full'}-location-${row}-${id}`,name,source:state.runMode==='episode'?episodeSource(row):journeySource(id)};
 }
 export function battleScene(state:GameState){return sceneForRow(state,battleSceneStage(state));}

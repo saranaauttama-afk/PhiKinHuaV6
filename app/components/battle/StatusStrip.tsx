@@ -3,19 +3,20 @@ import {Modal,Pressable,Text,View,ScrollView} from 'react-native';
 import type {StatusEffect} from '../../../src/core/types_extended';
 import {sortForDisplay,isDebuff} from '../../../src/core/combat/statusDisplay';
 import RitualSurface from '../RitualSurface';
+import InkIcon,{type InkSymbol} from '../InkIcon';
 import {font,palette,badgeColors} from '../../theme';
-export type BattleBadge={id:string;name:string;symbol:string;detail:string;count?:string;bad?:boolean;neutral?:boolean};
-const symbols:Record<string,string>={fear:'กล',poison:'พิ',curse:'สาป',corruption:'เส',entangle:'พัน',weak:'อ่อ',weakness:'อ่อ',vulnerable:'เป',strength:'แรง',regeneration:'ฟื้น',regen:'ฟื้น',protection:'กัน',haste:'ไว',draw_reduction:'จั่ว',block_next:'กัน',energy_boost:'พลัง',spell_charging:'มนต์',burn:'ไฟ',bleed:'ช้ำ'};
+export type BattleBadge={id:string;name:string;symbol:string;detail:string;count?:string;bad?:boolean;neutral?:boolean;onPress?:()=>void};
+const symbols:Record<string,InkSymbol>={fear:'fear',poison:'poison',curse:'curse',corruption:'corruption',entangle:'entangle',weak:'weakness',weakness:'weakness',vulnerable:'vulnerable',strength:'strength',regeneration:'regeneration',regen:'regeneration',protection:'block',haste:'energy',draw_reduction:'draw_reduction',block_next:'block_next',energy_boost:'energy_boost',spell_charging:'spell_charging',burn:'rest',bleed:'hp'};
 /** One bounded row; details open above combat without changing HUD height. */
 export default function StatusStrip({effects,extra=[],compact=false,align='center'}:{effects?:StatusEffect[];extra?:BattleBadge[];compact?:boolean;align?:'center'|'flex-start'}){
  const [open,setOpen]=React.useState<string|null>(null);
- const list:BattleBadge[]=[...extra,...sortForDisplay(effects??[]).map(e=>({id:`status:${e.id}`,name:e.name,symbol:symbols[e.id]??e.name.slice(0,2),bad:isDebuff(e),count:(e.stacks??1)>1?`${e.stacks}`:undefined,detail:`${e.description}\n${(e.stacks??1)>1?`${e.stacks} ชั้น · `:''}${e.duration>=99?'ตลอดการต่อสู้':`เหลือ ${e.duration} เทิร์น`}`}))];
+ const list:BattleBadge[]=[...extra,...sortForDisplay(effects??[]).map(e=>({id:`status:${e.id}`,name:e.name,symbol:symbols[e.id]??'curse',bad:isDebuff(e),count:(e.stacks??1)>1?`${e.stacks}`:undefined,detail:`${e.description}\n${(e.stacks??1)>1?`${e.stacks} ชั้น · `:''}${e.duration>=99?'ตลอดการต่อสู้':`เหลือ ${e.duration} เทิร์น`}`}))];
  const selected=list.find(e=>e.id===open);
  if(!list.length)return null;
  return <View style={{width:'100%'}}>
   <ScrollView horizontal showsHorizontalScrollIndicator={list.length>7} style={{height:44}} contentContainerStyle={{gap:4,alignItems:'center',flexGrow:1,justifyContent:'flex-start',paddingHorizontal:2}}>
-   {list.map(e=><Pressable key={e.id} accessibilityRole="button" accessibilityLabel={`ดู${e.name}`} accessibilityHint={e.detail} onPress={()=>setOpen(e.id)} style={{width:40,height:44,alignItems:'center',justifyContent:'center'}}>
-    <View style={{width:compact?30:32,height:compact?30:32,borderRadius:18,backgroundColor:e.neutral?badgeColors.neutral:e.bad?badgeColors.negative:badgeColors.positive,borderWidth:1,borderColor:e.neutral?badgeColors.neutralLine:e.bad?badgeColors.negativeLine:badgeColors.positiveLine,alignItems:'center',justifyContent:'center'}}><Text numberOfLines={1} style={{fontFamily:font.heading,fontSize:10,color:badgeColors.ink}}>{e.symbol}</Text></View>
+   {list.map(e=><Pressable key={e.id} accessibilityRole="button" accessibilityLabel={`ดู${e.name}`} accessibilityHint={e.detail} onPress={()=>e.onPress?e.onPress():setOpen(e.id)} style={{width:40,height:44,alignItems:'center',justifyContent:'center'}}>
+    <View style={{width:compact?30:32,height:compact?30:32,borderRadius:18,backgroundColor:e.neutral?badgeColors.neutral:e.bad?badgeColors.negative:badgeColors.positive,borderWidth:1,borderColor:e.neutral?badgeColors.neutralLine:e.bad?badgeColors.negativeLine:badgeColors.positiveLine,alignItems:'center',justifyContent:'center'}}><InkIcon name={(e.symbol in symbols?symbols[e.symbol]:e.id.startsWith('trap:')?'trap':e.id==='rage-rule'?'strength':e.id.startsWith('combo:')||e.id.startsWith('done:')?'combo':e.symbol==='✓'?'check':e.symbol) as InkSymbol} size={18} color={badgeColors.ink}/></View>
     {!!e.count&&<View style={{position:'absolute',right:0,bottom:0,backgroundColor:badgeColors.counter,borderRadius:8,paddingHorizontal:3}}><Text style={{fontFamily:font.ui,fontSize:9,color:palette.moon}}>{e.count}</Text></View>}
    </Pressable>)}
   </ScrollView>

@@ -82,7 +82,7 @@ export function buildAndShuffleEnemyDeck(s: GameState, r: RNG) {
   // สุ่มลำดับเด็คหนึ่งครั้งให้ deterministic
   const sh = shuffleIds(ids, r);
   (s as any).enemyPiles = { draw: sh.arr, hand: [], discard: [] };
-  (s as any).enemyEnergy = 0;
+  (s as any).enemyEnergy = 0;s.enemy.energy=0;s.enemy.handCount=0;
 
   // ใช้ค่าจาก deck config ถ้ามี ไม่งั้น default ตาม tier
   (s as any).enemyHandSize = handSizeCfg ?? (s as any).enemyHandSize ?? ENEMY_HAND_SIZE;
@@ -173,6 +173,7 @@ export function enemyDrawUpToHand(s: GameState) {
     const ok = enemyDrawOne(s);
     if (!ok) break;
   }
+  if(s.enemy)s.enemy.handCount=piles.hand.length;
 }
 
 export function enemyPlayCardId(s: GameState, idx: number): boolean {
@@ -205,6 +206,7 @@ s.log.push(`Enemy discards unknown card ${id}.`);
 
   // หักค่า energy
   (s as any).enemyEnergy = ((s as any).enemyEnergy ?? 0) - cost;
+  if(s.enemy){s.enemy.energy=(s as any).enemyEnergy;s.enemy.handCount=Math.max(0,piles.hand.length-1);}
 
   // เล่นเอฟเฟ็กต์
   require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
@@ -217,6 +219,7 @@ s.log.push(`Enemy discards unknown card ${id}.`);
 }
 
 export function enemyDiscardHand(s: GameState) {
+  if(s.enemy)s.enemy.handCount=0;
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] } | undefined;
   if (!piles) return;
   if (piles.hand.length > 0) {
@@ -255,8 +258,10 @@ export function runEnemyTurn(s: GameState) {
     console.log(`🔋 runEnemyTurn: Keeping existing energy ${(s as any).enemyEnergy}`);
   }
 
+  s.enemy.energy=(s as any).enemyEnergy;
   // จั่วถึงขนาดมือ
   enemyDrawUpToHand(s);
+  s.enemy.handCount=(s as any).enemyPiles?.hand?.length??0;
 
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] };
   const startHand = piles?.hand?.length ?? 0;

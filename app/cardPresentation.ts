@@ -26,8 +26,17 @@ export function cardSummary(card: CardData): string {
   }
   if (card.statusEffect) {
     const e = card.statusEffect;
-    parts.push(`${STATUS_EFFECTS_REGISTRY[e.effect]?.name ?? e.effect} ${e.value}${e.duration < 99 ? ` · ${e.duration} เทิร์น` : ''}`);
+    parts.push(`${e.target==='player'?'ตนเอง':'ผี'}: ${STATUS_EFFECTS_REGISTRY[e.effect]?.name ?? e.effect} ${e.value}${e.duration < 99 ? ` · ${e.duration} เทิร์น` : ''}`);
   }
-  if (card.conditional) parts.push('มีเงื่อนไข');
+  if(card.trap){parts.push(card.trap.trigger==='enemy_attack'?'เมื่อผีโจมตี':card.trap.trigger==='enemy_skill'?'เมื่อผีใช้วิชา':'เมื่อผีเล่นการ์ด');parts.push(card.trap.effects.map(e=>e.type==='negate'?'ยกเลิกการ์ดผี':e.type==='status'?`${STATUS_EFFECTS_REGISTRY[e.statusId as keyof typeof STATUS_EFFECTS_REGISTRY]?.name??e.statusId} ${e.value}`:`${e.type==='damage'?'โจมตีกลับ':e.type==='block'?'ป้องกัน':'พลังงาน'} ${e.value}`).join(' · '));}
+  if(card.cleanseDebuffs)parts.push('ล้างสถานะลบ');
+  if(card.whileHeld){if(card.whileHeld.block)parts.push(`ค้างมือ: ป้องกัน ${card.whileHeld.block}`);if(card.whileHeld.heal)parts.push(`ค้างมือ: ฟื้น ${card.whileHeld.heal}`);}
+  if(card.whileHeld?.status){const e=card.whileHeld.status;parts.push(`ค้างมือ: ${STATUS_EFFECTS_REGISTRY[e.effect as keyof typeof STATUS_EFFECTS_REGISTRY]?.name??e.effect} ${e.value} · ${e.duration} เทิร์น`);}
+  if(card.costRule)parts.push(`ลดค่าร่าย ${card.costRule.step} ต่อการ์ดที่เล่นแล้ว · ต่ำสุด ${card.costRule.min}`);
+  if(card.conditional){const c=card.conditional,w=c.when;
+   const when=w.kind==='player_hp_below'?`เมื่อชีวิตต่ำกว่า ${w.value}%`:w.kind==='player_block_at_least'?`เมื่อมีเกราะ ${w.value} ขึ้นไป`:w.kind==='enemy_has_status'?`เมื่อผีมี ${STATUS_EFFECTS_REGISTRY[w.statusId as keyof typeof STATUS_EFFECTS_REGISTRY]?.name??w.statusId}`:w.kind==='hand_empty'?'เมื่อมือไม่เหลือใบอื่น':w.kind==='player_minions_at_least'?`เมื่อมีวิญญาณช่วย ${w.value} ตนขึ้นไป`:`เมื่อสำรับไม่เกิน ${w.value} ใบ`;
+   const names={dmg:'โจมตี',block:'ป้องกัน',heal:'ฟื้น',draw:'จั่ว',energyGain:'พลังงาน',hits:'จำนวนครั้งโจมตี'};
+   parts.push(`${when}: ${Object.entries(c.bonus).map(([k,v])=>`${names[k as keyof typeof names]} +${v}`).join(' · ')}`);
+  }
   return parts.join(' · ') || (card.type === 'curse' ? 'คำสาป · เล่นไม่ได้' : card.type === 'trap' ? 'ตั้งดัก' : card.type === 'equipment' ? 'เครื่องรางติดตัว' : 'วิชาและผลพิเศษ');
 }

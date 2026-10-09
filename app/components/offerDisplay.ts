@@ -67,13 +67,13 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
       return { ...base, type: 'shop_equipment', name: 'ร้านเครื่องราง', description: 'ซื้อเครื่องรางติดตัว' };
 
     case 'shop_remove':
-      return { ...base, type: 'shop_card', name: 'สละการ์ด', description: 'ถอดการ์ดที่ไม่ต้องการออกจากสำรับ' };
+      return { ...base, type: 'shop_remove', name: 'สละการ์ด', description: 'ถอดการ์ดที่ไม่ต้องการออกจากสำรับ' };
 
     case 'shop_upgrade':
-      return { ...base, type: 'shop_equipment', name: 'ปลุกเสกการ์ด', description: 'อัปเกรดการ์ดที่มีอยู่ให้แรงขึ้น' };
+      return { ...base, type: 'shop_upgrade', name: 'ปลุกเสกการ์ด', description: 'อัปเกรดการ์ดที่มีอยู่ให้แรงขึ้น' };
 
     case 'well':
-      return { ...base, type: 'healing_shrine', name: 'บ่อน้ำลึกลับ', description: 'ดื่มน้ำจากบ่อ ฟื้นพลังชีวิต' };
+      return { ...base, type: 'well', name: 'บ่อน้ำลึกลับ', description: 'ดื่มน้ำจากบ่อ ฟื้นพลังชีวิต' };
 
     case 'healing_shrine':
       return { ...base, type: 'healing_shrine', name: 'ศาลพักใจ', description: 'พักฟื้น เรียกพลังชีวิตกลับคืน' };

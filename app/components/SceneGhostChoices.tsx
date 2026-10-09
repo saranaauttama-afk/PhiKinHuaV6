@@ -1,17 +1,14 @@
 import React from 'react';
 import { Image, Pressable, Text, View, StyleSheet } from 'react-native';
 import type { OfferDisplay } from './offerDisplay';
+import {encounterAction} from '../encounterPresentation';
+import CandleSelection from './CandleSelection';
+import GhostLoreButton from './GhostLoreButton';
 import { artSource } from './Art';
 import RitualSurface from './RitualSurface';
 import { font, palette } from '../theme';
 import {QuietButton} from './QuietChrome';
 
-const sceneArt: Record<string, number> = {
-  'phi-pop': require('../../assets/ui/map-pop.png'),
-  'nang-tanee': require('../../assets/ui/map-tanee.png'),
-  'phi-nang-ram': require('../../assets/ui/map-dancer.png'),
-  'phi-pong-kang': require('../../assets/ui/map-pongkang.png'),
-};
 
 export default function SceneGhostChoices({ choices, selected, onSelect, onEnter }: {
   choices: { display: OfferDisplay; resolved: boolean; index: number }[];
@@ -27,21 +24,21 @@ export default function SceneGhostChoices({ choices, selected, onSelect, onEnter
       {choices.map(({ display: d, resolved, index }) => {
         const active = selected === index && !resolved;
         const dim = !!picked && !active;
-        const source = sceneArt[d.id] ?? artSource(d.artSlot);
+        const source = artSource(d.artSlot);
         return <Pressable collapsable={false} key={`${d.id}-${index}`} accessibilityRole="button" accessibilityLabel={d.name}
           accessibilityState={{ selected: active, disabled: resolved }} disabled={resolved}
           onPress={() => onSelect(active ? null : index)} style={[styles.figure, { opacity: resolved ? .25 : dim ? .35 : 1 }]}>
           <View collapsable={false} style={[styles.art,{height:spriteHeight,transform:[{translateY:active?-6:0}]}]}><Image accessible={false} source={source??require('../../assets/ui/trail-ghost.png')} resizeMode="contain" style={styles.sprite}/></View>
           <Text numberOfLines={2} style={[styles.name,{color:active?palette.moon:palette.text}]}>{d.name}</Text>
-          <Text style={styles.hint}>{resolved?'ผ่านแล้ว':active?'เลือกแล้ว':'ต่อสู้'}</Text>
+          {d.isCombat&&<GhostLoreButton id={d.id}/>}<Text style={styles.hint}>{resolved?'ผ่านแล้ว':active?'เลือกแล้ว':d.isCombat?'ต่อสู้':d.type.startsWith('shop_')?'ร้านค้า':'จุดพัก'}</Text>
         </Pressable>;
       })}
     </View>
     <View collapsable={false} style={styles.decision}>
       {picked ? <>
         <Text style={styles.description}>{picked.display.description}</Text>
-        <QuietButton label="เผชิญหน้า →" primary onPress={()=>onEnter(picked.index)} style={{minWidth:190}}/>
-      </> : <Text style={styles.prompt}>เลือกผีที่คุณจะเผชิญหน้า</Text>}
+        <QuietButton label={encounterAction(picked.display)} primary onPress={()=>onEnter(picked.index)} style={{minWidth:190}}/>
+      </> : <Text style={styles.prompt}>เลือกทางที่จะไปต่อ</Text>}
     </View>
   </View>;
 }

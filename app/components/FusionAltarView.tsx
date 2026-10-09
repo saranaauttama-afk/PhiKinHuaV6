@@ -12,7 +12,8 @@ import { canFuse, fuseCards, isFused, FUSION_MAX_TOTAL_COST } from '../../src/co
 import { FUSIONS_PER_ALTAR } from '../../src/core/engine/handlers/fusion';
 import RitualSurface from './RitualSurface';
 import {QuietButton} from './QuietChrome';
-import {CardGlyphArt} from './DeckCard';
+import {CardGlyphArt,CardFace} from './DeckCard';
+import CandleSelection from './CandleSelection';
 import { font, radius, size, space, tint } from '../theme';
 
 type Props = {
@@ -20,42 +21,8 @@ type Props = {
   dispatch: (cmd: Command) => void;
 };
 
-function CardChip({
-  card, selected, disabled, onPress,
-}: {
-  card: CardData; selected: boolean; disabled: boolean; onPress: () => void;
-}) {
-  const bits = [
-    card.dmg   ? `⚔${card.dmg}`   : '',
-    card.block ? `🛡${card.block}` : '',
-    card.heal  ? `♥${card.heal}`   : '',
-    card.draw  ? `+${card.draw}ใบ` : '',
-    card.energyGain ? `⚡${card.energyGain}` : '',
-  ].filter(Boolean).join(' ');
-
-  return (
-    <Pressable
-      accessibilityRole="button" accessibilityLabel={`ผสาน ${card.name}`} accessibilityState={{selected,disabled}}
-      onPress={onPress}
-      disabled={disabled}
-      style={{
-        paddingHorizontal: 10, paddingVertical: 8, borderRadius: 0,
-        backgroundColor: selected ? surface.panelActive : surface.panelWell,
-        borderWidth: selected ? 2 : 1,
-        borderColor: selected ? palette.lineStrong : palette.line,
-        opacity: disabled ? 0.35 : 1,
-        width: '48%', minHeight:135,
-      }}
-    >
-      <View style={{alignItems:'center'}}><CardGlyphArt card={card} size={48}/></View>
-      <Text style={{ color: palette.text, fontSize: 13, fontFamily: font.heading }}>
-        {card.name}
-      </Text>
-      <Text style={{ color: palette.textDim, fontSize: 11, marginTop: 2, fontFamily: font.ui }}>
-        ร่าย {card.cost}{bits ? ` · ${bits}` : ''}
-      </Text>
-    </Pressable>
-  );
+function CardChip({card,selected,disabled,onPress}:{card:CardData;selected:boolean;disabled:boolean;onPress:()=>void}) {
+ return <Pressable accessibilityRole="button" accessibilityLabel={`ผสาน ${card.name}`} accessibilityState={{selected,disabled}} onPress={onPress} disabled={disabled} style={{width:'48%',opacity:disabled?.35:1}}><CandleSelection selected={selected}><CardFace card={card}/></CandleSelection></Pressable>;
 }
 
 export default function FusionAltarView({ state, dispatch }: Props) {

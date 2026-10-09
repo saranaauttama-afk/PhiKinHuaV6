@@ -9,6 +9,7 @@ import {useJournal} from '../../src/store/journalStore';
 import {QuietButton,QuietPage,QuietSection} from './QuietChrome';
 import {playerPortraits} from './QuietPlayerHud';
 import {font,palette,quietUiColors} from '../theme';
+import CandleSelection from './CandleSelection';
 import JournalView from './JournalView';
 export default function NightSelectScreen({classId,onStart,onBack}:{classId:ClassId;onStart:(n:Night)=>Promise<boolean>;onBack:()=>void}){
  const {journal,ready,saving,error,hydrate,retry}=useJournal();
@@ -20,9 +21,9 @@ export default function NightSelectScreen({classId,onStart,onBack}:{classId:Clas
  const rule=NIGHT_RULES.find(r=>r.night===selected)!,b=p.best[selected],locked=selected>top;
  return <QuietPage title="ห้าคืนอาถรรพ์" subtitle={CHARACTER_CLASSES[classId].name+' · ผ่านคืนก่อนเพื่อเปิดคืนถัดไป'} onClose={onBack} closeLabel="กลับ">
   <Image accessible={false} source={playerPortraits[classId]} resizeMode="contain" style={{height:170,width:'100%'}}/>
-  <View style={{flexDirection:'row',gap:8,justifyContent:'center'}}>{NIGHT_RULES.map(r=><Pressable key={r.night} accessibilityRole="button" accessibilityLabel={'ดูคืนที่ '+r.night} accessibilityState={{selected:selected===r.night}} onPress={()=>setSelected(r.night)} style={{flex:1,minHeight:66,alignItems:'center',justifyContent:'center',borderBottomWidth:selected===r.night?2:0,borderColor:palette.moon,backgroundColor:quietUiColors.hudShade}}>
+  <View style={{flexDirection:'row',gap:8,justifyContent:'center'}}>{NIGHT_RULES.map(r=><Pressable key={r.night} accessibilityRole="button" accessibilityLabel={'ดูคืนที่ '+r.night} accessibilityState={{selected:selected===r.night}} onPress={()=>setSelected(r.night)} style={{flex:1}}><CandleSelection selected={selected===r.night} dim={selected!==r.night}><View style={{minHeight:66,alignItems:'center',justifyContent:'center'}}>
    <Text style={{fontFamily:font.display,fontSize:26,color:r.night>top?palette.textDim:palette.moon}}>{r.night}</Text><Text style={{fontFamily:font.ui,fontSize:10,color:palette.textDim}}>{r.night<=p.highestCleared?'ผ่านแล้ว':r.night>top?'ยังไม่เปิด':'เล่นได้'}</Text>
-  </Pressable>)}</View>
+  </View></CandleSelection></Pressable>)}</View>
   <QuietSection title={'คืนที่ '+selected+' · '+rule.name}>
    <Text style={{fontFamily:font.body,fontSize:22,lineHeight:28,color:palette.text}}>{rule.desc}</Text>
    <Text style={{fontFamily:font.ui,fontSize:12,color:palette.textDim}}>{selected===5?'15 ศึก + ผีกินหัวตัวจริง':'15 ศึก'} · มีจุดพักระหว่างทาง · {nightFinalBoss(selected).name}</Text>

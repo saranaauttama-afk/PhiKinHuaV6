@@ -8,6 +8,7 @@
 // เพราะ React Native บังคับว่า `require()` ต้องเป็น path คงที่ตอน build
 // สแกนโฟลเดอร์อัตโนมัติไม่ได้ → เพิ่มรูปใหม่ = เพิ่มหนึ่งบรรทัดที่ไฟล์นั้น
 
+import {SPECIAL_BLESSINGS} from '../core/campaign/nights';
 import { THAI_GHOST_POOLS } from '../core/monsters/thai-ghosts';
 import { CHARACTER_CLASSES, ALL_CLASS_IDS } from '../core/classes';
 import { STORY_EVENTS } from '../core/events/story';
@@ -90,7 +91,7 @@ function monsterSlots(): ArtSlot[] {
       out.push({
         id: `monster/${m.id}`,
         label: m.name,
-        file: m.id === 'phi-krasue' ? 'monsters/phi-krasue-pulp.png' : `monsters/${m.id}.png`,
+        file: `monsters/thai-v24/${m.id}.webp`,
         // บอสวาดใหญ่กว่า เพราะกินพื้นที่กลางจอตอนสู้
         size: isBoss ? [768, 768] : [512, 512],
         brief: (m.description ? `${m.description} — ` : '')
@@ -120,10 +121,10 @@ function classSlots(): ArtSlot[] {
 }
 
 function blessingSlots(): ArtSlot[] {
-  return blessings.map(b => ({
+  return [...blessings,...Object.values(SPECIAL_BLESSINGS)].map(b => ({
     id: `blessing/${b.id}`,
     label: b.name,
-    file: `imgBlessing/${b.id}.png`,
+    file: `blessings/thai-v24/${b.id}.webp`,
     size: [256, 256] as [number, number],
     brief: `${b.desc ?? b.name} — ไอคอนวัตถุมงคลชิ้นเดียว พื้นหลังโปร่ง`,
     group: 'blessing' as const,

@@ -1,12 +1,16 @@
 # ผีกินหัว — ห้าคืนอาถรรพ์
 
-## Current release: v1.0.20 / Android code 21
+## Current release: v1.0.25 / Android code 26
 
-`art/quiet-comic-ui` now follows sleeping villagers whose heads vanish while their bodies remain alive. Return the heads before dawn to wake them. Each of the five nights has its own fixed boss; night five adds the mandatory ultimate ผีกินหัว after เจ้าไร้เศียร, for 16 fights. The fifteen regular journey scenes are all distinct, moving from village to temple, forest, stream, mountains, caves and an uncanny realm. Rest shops and events use their actual destination scene. Repairs cover blessing scale/details, illustrated defeat, event backgrounds, level-up symbols and readable fusion cards.
+Working branch `work/battle-ui-backlog-v22`, based on freshly fetched `art/quiet-comic-ui` (`752c79c3`). Implements all ten backlogs in Issue #5: status icons, candle selection, enemy card/HUD geometry, separate blessing seals, ordered combo feedback, consistent rest/event cards, confirmed card purchase/removal/upgrades, correct encounter routes and researched Thai ghost art.
 
-629 tests and TypeScript passed on GitHub Actions. Mobile visual checks restored all fifteen legal route checkpoints and exercised the five reported screens. Android APK/audit and native verification are tracked in `docs/HANDOFF-head-stealing-v20.md`. Earlier notes below are historical.
+Local TypeScript, 684 automated tests and web production export pass. The Android workflow checks real mobile UI interactions at 360×640 and 393×852, builds/audits a bundled APK and installs it in an API 36 portrait emulator. No screenshots are captured. Final Actions/APK results are recorded on Issue #5. Read `docs/HANDOFF-battle-ui-backlog-v22.md` and `docs/THAI-FOLKLORE-ART-AUDIT.md`.
 
-Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current deliverable is a short, complete first chapter, targeting 5–10 minutes of human play before expanding the game. Duration and enjoyment are playtest goals, not measured device results.
+Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. Five nights have distinct bosses; night five adds the mandatory game-original ผีกินหัว. All 34 ghosts, 134 newly illustrated card assets, 16 blessings and 24 rural Thai journey environments share vintage Thai horror comic art. Player-card and blessing hashes detect accidental duplicates; enemy move cards intentionally reuse their owner's portrait.
+
+## Historical releases
+
+The following notes describe earlier implementations and validation, not the current branch state.
 
 ## Latest battle UI follow-up
 
@@ -44,7 +48,7 @@ Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. The current 
 
 ## Current source
 
-Current work branch: `work/occupation-table`, extending the character and ritual UI branches and `work/first-chapter-apk`. `main` is older. Read `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
+Current work branch: `work/battle-ui-backlog-v22`, based on `art/quiet-comic-ui`. `main` is older. Read `docs/HANDOFF-battle-ui-backlog-v22.md` first; older references include `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
 
 ## First chapter
 
@@ -67,9 +71,9 @@ npx expo export --platform web
 
 ## Android deliverable
 
-GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.18`, versionCode `19`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
+GitHub Actions **Android first chapter APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.25`, versionCode `26`, minSDK 24. ABI targets: ARM64 and x86_64. Package and signing configuration remain unchanged; see the current handoff for verified APK results.
 
-Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. A dependent Android API 36 x86_64 emulator job installs and launches the APK, navigates into a fight, previews/plays a real card and ends a turn. Screenshots, UI XML and logcat are uploaded as separate evidence. See the handoff for actual run results; successful build alone does not prove installation or launch.
+Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. A dependent Android API 36 x86_64 emulator job installs and launches the APK, navigates into a fight, previews/plays a real card and ends a turn. The current branch uploads interaction reports, package audits and logcat without screenshots. See the handoff for actual run results; successful build alone does not prove installation or launch.
 
 ## Visual direction
 

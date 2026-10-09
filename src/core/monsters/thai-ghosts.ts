@@ -43,21 +43,21 @@ export const THAI_GHOST_POOLS = {
   T2: [
     {
       id: 'phi-nang-ram',
-      name: 'ผีนางรำ',
+      name: 'ผีตายโหงนางรำ',
       tier: 'T2' as const,
       hp: 28,
       description: 'รำสองจังหวะ โจมตีครั้งละ 4 สองครั้ง — อย่าคิดว่าจบในหมัดเดียว'
     },
     {
       id: 'phi-pong-kang',
-      name: 'ผีโป่งค่าง',
+      name: 'ผีป่าโป่งร้าง',
       tier: 'T2' as const,
       hp: 32,
       description: 'ยิ่งต่อสู้นานยิ่งสะสมแรงโจมตี — ต้องตั้งสำรับให้ปิดไฟต์ได้'
     },
     {
       id: 'ngu-phi-sang',
-      name: 'งูผีสาง',
+      name: 'ผีโพงท้ายทุ่ง',
       tier: 'T2' as const,
       hp: 30,
       description: 'โจมตี 5 · พิษ 2 นาน 2 เทิร์น'
@@ -75,21 +75,21 @@ export const THAI_GHOST_POOLS = {
     },
     {
       id: 'krahang',
-      name: 'กะหัง',
+      name: 'กระหัง',
       tier: 'T3' as const,
       hp: 38,
       description: 'โจมตี 4 ×2'
     },
     {
       id: 'kuman-thong',
-      name: 'กุมารทอง',
+      name: 'ผีตายโหงชายทุ่ง',
       tier: 'T3' as const,
       hp: 40,
       description: 'โจมตี 3 · ลดจั่ว 1 นาน 2 เทิร์น'
     },
     {
       id: 'phi-tai-hong',
-      name: 'ผีตายทั้งกลม',
+      name: 'ผีตายโหง',
       tier: 'T3' as const,
       hp: 42,
       description: 'โจมตี 5 · เปราะบาง 1 นาน 2 เทิร์น'
@@ -121,7 +121,7 @@ export const THAI_GHOST_POOLS = {
     },
     {
       id: 'phi-ha-ratri',
-      name: 'ผีห่าราตรี',
+      name: 'ผีโขมด',
       tier: 'T4' as const,
       hp: 60,
       description: 'โจมตี 5 · พิษ 3 นาน 2 เทิร์น'
@@ -132,14 +132,14 @@ export const THAI_GHOST_POOLS = {
   T5: [
     {
       id: 'asuragaya',
-      name: 'อสุรกาย',
+      name: 'ผีกองกอย',
       tier: 'T5' as const,
       hp: 70,
       description: 'โจมตี 6 ×2'
     },
     {
       id: 'yak-wat-jaeng',
-      name: 'ยักษ์วัดแจ้ง',
+      name: 'เปรตลานวัด',
       tier: 'T5' as const,
       hp: 75,
       description: 'โจมตี 10 ป้องกัน 8'
@@ -157,42 +157,42 @@ export const THAI_GHOST_POOLS = {
   Elite: [
     {
       id: 'winyan-rerorn',
-      name: 'วิญญาณเร่ร่อน',
+      name: 'ผีตายโหงเร่ร่อน',
       tier: 'Elite' as const,
       hp: 85,
       description: 'โจมตี 7 ใส่เสียงในหู 1 ใบในกองทิ้ง เฉพาะไฟต์นี้'
     },
     {
       id: 'pisaj-fai',
-      name: 'ปีศาจไฟ',
+      name: 'โขมดดง',
       tier: 'Elite' as const,
       hp: 90,
       description: 'โจมตี 7 · พิษ 3 นาน 2 เทิร์น'
     },
     {
       id: 'jao-por-pa',
-      name: 'เจ้าพ่อป่า',
+      name: 'ผีป่าดงลึก',
       tier: 'Elite' as const,
       hp: 95,
       description: 'โจมตี 6 เรียกปีศาจป่าทำให้อ่อนแอ'
     },
     {
       id: 'phi-nang-yai',
-      name: 'ผีนางใหญ่',
+      name: 'ผีตายโหงเรือนร้าง',
       tier: 'Elite' as const,
       hp: 100,
       description: 'โจมตี 7 · เพิ่มค่าร่าย 1 นาน 2 เทิร์น'
     },
     {
       id: 'winyan-dek',
-      name: 'วิญญาณเด็ก',
+      name: 'ผีตายโหงริมคลอง',
       tier: 'Elite' as const,
       hp: 105,
       description: 'โจมตี 4 ×3'
     },
     {
       id: 'yak-dam',
-      name: 'ยักษ์ดำ',
+      name: 'กระหังครูอาคม',
       tier: 'Elite' as const,
       hp: 110,
       description: 'โจมตี 13 · เปราะบาง 1 นาน 2 เทิร์น'
@@ -210,7 +210,7 @@ export const THAI_GHOST_POOLS = {
     },
     {
       id: 'phra-upakut',
-      name: 'พระอุปคุต',
+      name: 'เปรตหิวโหย',
       tier: 'BossMid' as const,
       hp: 130,
       description: 'โจมตี 7 ฟื้น 6'
@@ -222,14 +222,14 @@ export const THAI_GHOST_POOLS = {
     ...NIGHT_BOSSES,
     {
       id: 'phaya-nak',
-      name: 'พญานาค',
+      name: 'พรายวังน้ำ',
       tier: 'BossFinal' as const,
       hp: 180,
       description: 'โจมตี 6 ×3'
     },
     {
       id: 'thep-aksorn',
-      name: 'เทพอักษร',
+      name: 'ปอบผู้เฒ่า',
       tier: 'BossFinal' as const,
       hp: 200,
       description: 'โจมตี 9 ใส่เสียงในหู 1 ใบในกองทิ้ง เฉพาะไฟต์นี้'
@@ -241,7 +241,7 @@ export const THAI_GHOST_POOLS = {
     ULTIMATE_BOSS,
     {
       id: 'phraya-maccurat',
-      name: 'พระยามัจจุราช',
+      name: 'ปอบดงร้าง',
       tier: 'SecretBoss' as const,
       hp: 250,
       description: 'โจมตี 7 ×3'

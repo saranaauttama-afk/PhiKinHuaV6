@@ -5,6 +5,7 @@ import type {MinionData} from '../../../src/core/types_extended';
 import {visibleMinions,minionSummary,minionTemplateId} from '../../../src/core/combat/minions/display';
 import {artSource} from '../Art';
 import RitualSurface from '../RitualSurface';
+import StatusStrip from './StatusStrip';
 import {font,palette,surface,tint} from '../../theme';
 // Source-space head windows: clip the existing transparent illustrations in the view.
 // The source files stay intact and are still available for full-body presentations.
@@ -24,12 +25,12 @@ export default function MinionRow({minions,activeId,owner}:Props){
  const [open,setOpen]=React.useState<string|null>(null);const all=visibleMinions(minions).filter(m=>m.owner===owner);const selected=all.find(m=>m.id===open);
  if(!all.length)return null;
  return <View style={{paddingHorizontal:4}}>
- <ScrollView horizontal showsHorizontalScrollIndicator={all.length>5} contentContainerStyle={{gap:10,paddingVertical:3}}>{all.map(m=><Spirit key={m.id} m={m} active={m.id===activeId} selected={m.id===open} onPress={()=>setOpen(m.id)}/>)}</ScrollView>
+ <ScrollView horizontal showsHorizontalScrollIndicator={all.length>5} contentContainerStyle={{gap:10,paddingVertical:3}}>{all.map(m=><View key={m.id} style={{width:m.statusEffects?.length?100:52,flexDirection:'row',alignItems:'center'}}><Spirit m={m} active={m.id===activeId} selected={m.id===open} onPress={()=>setOpen(m.id)}/>{!!m.statusEffects?.length&&<View style={{width:44}}><StatusStrip effects={m.statusEffects} compact/></View>}</View>)}</ScrollView>
  <Modal visible={!!selected} transparent animationType="fade" onRequestClose={()=>setOpen(null)}>
   <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>
    {selected&&<RitualSurface kind="wood" style={{padding:22,gap:12}}>
     <View style={{flexDirection:'row',alignItems:'center',gap:12}}><Head m={selected} size={64}/><View style={{flex:1}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:18}}>{selected.name}</Text><Text style={{fontFamily:font.ui,color:palette.text,fontSize:13}}>เหลือ {selected.duration} เทิร์น</Text></View></View>
-    <Text style={{fontFamily:font.body,color:palette.text,fontSize:21}}>{minionSummary(selected)}</Text>
+    <Text style={{fontFamily:font.body,color:palette.text,fontSize:21}}>{minionSummary(selected)}</Text><StatusStrip effects={selected.statusEffects} compact/>
     <Pressable accessibilityRole="button" accessibilityLabel="ปิดรายละเอียดมินเนี่ยน" onPress={()=>setOpen(null)} style={{minHeight:48,justifyContent:'center',alignItems:'center'}}><Text style={{fontFamily:font.heading,color:palette.moon}}>ปิด</Text></Pressable>
    </RitualSurface>}
   </View>

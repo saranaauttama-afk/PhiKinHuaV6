@@ -7,8 +7,9 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import type { CardData, GameState } from '../../../src/core/types';
 import CardRow from '../CardRow';
+import CandleSelection from '../CandleSelection';
 import UpgradeCardPicker from '../UpgradeCardPicker';
-import {canUpgrade} from '../../../src/core/engine/shared';
+import {canUpgrade,canRemoveCard} from '../../../src/core/engine/shared';
 import { font, size, space } from '../../theme';
 import {levelUpConfirmLabel} from '../../levelUpPresentation';
 
@@ -108,17 +109,17 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
               :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
               :bucket==='upgrade'||bucket==='remove'?require('../../../assets/ui/ritual-knife.png')
               :bucket==='max_hand'?require('../../../assets/images/players/iMaxHand.png'):require('../../../assets/ui/ritual-jar.png');
-            const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.length:false;
+            const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.some(c=>canRemoveCard(c,deck.length)):false;
             return <Pressable disabled={unavailable} key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked,disabled:unavailable}}
               onPress={()=>setSelected(opt)} style={{flex:1}}>
-              <RitualSurface kind="quietSlate" style={{flex:1,minHeight:235,paddingHorizontal:14,paddingVertical:18,borderWidth:picked?2:0,borderColor:palette.moon}}>
+              <CandleSelection selected={picked} dim={!!selected&&!picked}><RitualSurface kind="quietSlate" style={{flex:1,minHeight:235,paddingHorizontal:14,paddingVertical:18}}>
                 <Image accessible={false} source={image} resizeMode="contain" style={{width:72,height:72,alignSelf:'center',marginBottom:12}}/>
                 <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:17,textAlign:'center'}}>{l.title}</Text>
                 <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:22,textAlign:'center',marginTop:8}}>{unavailable?'ไม่มีการ์ดที่เลือกได้':l.detail}</Text>
                 <View style={{minHeight:28,marginTop:10,justifyContent:'center'}}>
                   {picked&&<Text style={{fontFamily:font.heading,color:palette.bloodLit,fontSize:12,textAlign:'center'}}>✓ เลือกไว้แล้ว</Text>}
                 </View>
-              </RitualSurface>
+              </RitualSurface></CandleSelection>
             </Pressable>;
           })}
           </View>
@@ -132,14 +133,13 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
             {subChoices(pending).map((sc, i) => (
               <Pressable
                 key={sc.key}
-                onPress={() => onChoose(pending, i)}
+                onPress={() => setCardIndex(i)}
                 style={{
                   padding: sc.card ? 0 : 16, borderRadius: 0,
-                  backgroundColor: surface.panel,
-                  borderWidth: sc.card ? 0 : 1, borderColor: palette.line,
+                  backgroundColor:'transparent',opacity:cardIndex!==null&&cardIndex!==i?.68:1,
                 }}
               >
-                {sc.card ? (
+                <CandleSelection selected={cardIndex===i}>{sc.card ? (
                   <View>
                     <CardRow card={sc.card} />
                     {/* ซ้ำใบเดิมไม่ได้แปลว่าแย่ — บางทีเราตั้งใจถือใบเดิมหลายใบ
@@ -164,10 +164,10 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
                       </Text>
                     )}
                   </>
-                )}
+                )}</CandleSelection>
               </Pressable>
             ))}
-          </ScrollView>}
+          <QuietButton label="ยืนยันรับพร" primary disabled={cardIndex===null} onPress={()=>cardIndex!==null&&onChoose(pending,cardIndex)}/></ScrollView>}
 
           <QuietButton label="ย้อนกลับ" onPress={()=>{setPending(null);setCardIndex(null);}} style={{marginTop:14}}/>
         </View>

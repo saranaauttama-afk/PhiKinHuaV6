@@ -1,8 +1,23 @@
 import React from 'react';
 import {paper} from '../theme';
 import Svg, { Path, Circle } from 'react-native-svg';
-export type InkSymbol = 'hp'|'energy'|'block'|'gold'|'deck'|'blessing'|'hand'|'attack'|'rest'|'house'|'lantern'|'walk'|'check'|'settings';
+export type InkSymbol = 'hp'|'energy'|'block'|'gold'|'deck'|'blessing'|'hand'|'attack'|'rest'|'house'|'lantern'|'walk'|'check'|'settings'|'fear'|'poison'|'curse'|'corruption'|'entangle'|'weakness'|'vulnerable'|'draw_reduction'|'regeneration'|'strength'|'block_next'|'energy_boost'|'spell_charging'|'combo'|'trap';
 const paths: Record<InkSymbol,string> = {
+ fear:'M5 19Q1 8 8 3Q19 0 21 10Q23 18 17 21L14 18L11 22L8 19Z M7 9L10 10 M17 9L14 10 M9 15Q12 11 15 15',
+ poison:'M12 2Q4 12 4 16Q4 23 12 23Q20 23 20 16Q20 12 12 2Z M8 14L16 20 M16 14L8 20',
+ curse:'M3 3L21 21 M21 3L3 21 M5 8L12 2L19 8L17 19L7 19Z',
+ corruption:'M5 3H19V21H5Z M8 7L14 10L9 13L16 17 M2 12H6 M18 12H22',
+ entangle:'M5 4Q20 0 18 8Q0 14 7 20Q20 26 20 16Q5 6 4 14 M8 1L16 23',
+ weakness:'M3 6L12 15L21 6 M3 14L12 23L21 14',
+ vulnerable:'M12 2L21 6V15L16 21L13 14L16 10L10 7L12 2 M9 3L3 6V15L8 21L9 14L6 10',
+ draw_reduction:'M4 3H16V19H4Z M19 6H22V22H8 M7 9L13 15 M13 9L7 15',
+ regeneration:'M2 12H7L10 5L14 20L17 12H22 M12 2V6 M10 4H14',
+ strength:'M3 16L7 9L11 11L12 4L18 3L20 9L17 13L22 17Q14 25 3 16Z',
+ block_next:'M12 2L21 6V12Q20 19 12 23Q4 19 3 12V6Z M7 12H17 M12 7V17',
+ energy_boost:'M14 2L4 14H11L9 23L21 10H14Z M3 3V8 M1 5H6',
+ spell_charging:'M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z M12 7V17',
+ combo:'M3 8Q6 2 10 7L16 13Q21 18 17 21Q14 24 10 19L4 13Q0 9 3 8 M8 14L16 6 M13 4L20 11',
+ trap:'M3 21L8 4L12 17L16 4L21 21 M4 17H20',
  hp:'M12 21C8 17 2 13 2 7C2 1 10 1 12 6C14 1 22 1 22 7C22 13 16 17 12 21Z',
  energy:'M14 2L4 14H11L9 23L21 10H14Z',
  block:'M12 2L21 6V12Q20 19 12 23Q4 19 3 12V6Z M8 12L11 15L17 8',

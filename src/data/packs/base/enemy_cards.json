@@ -382,7 +382,7 @@
   {
     "id": "ngu_phi_sang_strike",
     "owner": "ngu-phi-sang",
-    "name": "โจมตีของฉกพิษ",
+    "name": "โพงตะปบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 5,
@@ -391,7 +391,7 @@
   {
     "id": "ngu_phi_sang_ward",
     "owner": "ngu-phi-sang",
-    "name": "คุ้มกาย",
+    "name": "แสงตาพร่า",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -400,7 +400,7 @@
   {
     "id": "ngu_phi_sang_signature",
     "owner": "ngu-phi-sang",
-    "name": "ฉกพิษ",
+    "name": "ลมหายใจโพง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 5,
@@ -415,7 +415,7 @@
   {
     "id": "ngu_phi_sang_ritual",
     "owner": "ngu-phi-sang",
-    "name": "อาคมฉกพิษ",
+    "name": "โพงหาของคาว",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -516,7 +516,7 @@
   {
     "id": "kuman_thong_strike",
     "owner": "kuman-thong",
-    "name": "โจมตีของหัวเราะหลอก",
+    "name": "เงาคนตะปบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 5,
@@ -525,7 +525,7 @@
   {
     "id": "kuman_thong_ward",
     "owner": "kuman-thong",
-    "name": "คุ้มกาย",
+    "name": "เงาเรือนบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -534,7 +534,7 @@
   {
     "id": "kuman_thong_signature",
     "owner": "kuman-thong",
-    "name": "หัวเราะหลอก",
+    "name": "เสียงหลงทาง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 3,
@@ -549,7 +549,7 @@
   {
     "id": "kuman_thong_ritual",
     "owner": "kuman-thong",
-    "name": "อาคมหัวเราะหลอก",
+    "name": "อาฆาตคันนา",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -741,7 +741,7 @@
   {
     "id": "phi_ha_ratri_strike",
     "owner": "phi-ha-ratri",
-    "name": "โจมตีของไอโรคห่า",
+    "name": "ไฟโขมดซัด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 5,
@@ -750,7 +750,7 @@
   {
     "id": "phi_ha_ratri_ward",
     "owner": "phi-ha-ratri",
-    "name": "คุ้มกาย",
+    "name": "หมอกบึงบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -759,7 +759,7 @@
   {
     "id": "phi_ha_ratri_signature",
     "owner": "phi-ha-ratri",
-    "name": "ไอโรคห่า",
+    "name": "แสงลวงทาง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 5,
@@ -774,7 +774,7 @@
   {
     "id": "phi_ha_ratri_ritual",
     "owner": "phi-ha-ratri",
-    "name": "อาคมไอโรคห่า",
+    "name": "ไฟเหนือบึง",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -789,7 +789,7 @@
   {
     "id": "asuragaya_strike",
     "owner": "asuragaya",
-    "name": "โจมตีของตบสองมือ",
+    "name": "กองกอยตะปบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 5,
@@ -798,7 +798,7 @@
   {
     "id": "asuragaya_ward",
     "owner": "asuragaya",
-    "name": "คุ้มกาย",
+    "name": "ขาเดียวตั้งรับ",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -807,7 +807,7 @@
   {
     "id": "asuragaya_signature",
     "owner": "asuragaya",
-    "name": "ตบสองมือ",
+    "name": "ดูดแรงปลายเท้า",
     "type": "attack",
     "energyCost": 2,
     "dmg": 6,
@@ -817,7 +817,7 @@
   {
     "id": "asuragaya_ritual",
     "owner": "asuragaya",
-    "name": "อาคมตบสองมือ",
+    "name": "เสียงกองกอย",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -832,7 +832,7 @@
   {
     "id": "yak_wat_jaeng_strike",
     "owner": "yak-wat-jaeng",
-    "name": "โจมตีของไม้พลองยักษ์",
+    "name": "มือเปรตซัด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 5,
@@ -841,7 +841,7 @@
   {
     "id": "yak_wat_jaeng_ward",
     "owner": "yak-wat-jaeng",
-    "name": "คุ้มกาย",
+    "name": "ร่างสูงบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -850,7 +850,7 @@
   {
     "id": "yak_wat_jaeng_signature",
     "owner": "yak-wat-jaeng",
-    "name": "ไม้พลองยักษ์",
+    "name": "เสียงเปรตร้อง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 10,
@@ -860,7 +860,7 @@
   {
     "id": "yak_wat_jaeng_ritual",
     "owner": "yak-wat-jaeng",
-    "name": "อาคมไม้พลองยักษ์",
+    "name": "หิวไม่สิ้นสุด",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -966,7 +966,7 @@
   {
     "id": "pisaj_fai_strike",
     "owner": "pisaj-fai",
-    "name": "โจมตีของเถ้าถ่านร้อน",
+    "name": "ไฟโขมดวูบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 6,
@@ -975,7 +975,7 @@
   {
     "id": "pisaj_fai_ward",
     "owner": "pisaj-fai",
-    "name": "คุ้มกาย",
+    "name": "ควันบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -984,7 +984,7 @@
   {
     "id": "pisaj_fai_signature",
     "owner": "pisaj-fai",
-    "name": "เถ้าถ่านร้อน",
+    "name": "ไฟลวงทาง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 7,
@@ -999,7 +999,7 @@
   {
     "id": "pisaj_fai_ritual",
     "owner": "pisaj-fai",
-    "name": "อาคมเถ้าถ่านร้อน",
+    "name": "แสงแยกดวง",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1014,7 +1014,7 @@
   {
     "id": "jao_por_pa_strike",
     "owner": "jao-por-pa",
-    "name": "โจมตีของรากคุ้มป่า",
+    "name": "มือดงซัด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 6,
@@ -1023,7 +1023,7 @@
   {
     "id": "jao_por_pa_ward",
     "owner": "jao-por-pa",
-    "name": "คุ้มกาย",
+    "name": "เงาดงบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -1032,7 +1032,7 @@
   {
     "id": "jao_por_pa_signature",
     "owner": "jao-por-pa",
-    "name": "รากคุ้มป่า",
+    "name": "เรียกเงาป่า",
     "type": "attack",
     "energyCost": 2,
     "dmg": 6,
@@ -1042,7 +1042,7 @@
   {
     "id": "jao_por_pa_ritual",
     "owner": "jao-por-pa",
-    "name": "อาคมรากคุ้มป่า",
+    "name": "ดงคลุ้มคลั่ง",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1057,7 +1057,7 @@
   {
     "id": "phi_nang_yai_strike",
     "owner": "phi-nang-yai",
-    "name": "โจมตีของเงาทับร่าง",
+    "name": "เงาเรือนตบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 6,
@@ -1066,7 +1066,7 @@
   {
     "id": "phi_nang_yai_ward",
     "owner": "phi-nang-yai",
-    "name": "คุ้มกาย",
+    "name": "ม่านร้างบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -1075,7 +1075,7 @@
   {
     "id": "phi_nang_yai_signature",
     "owner": "phi-nang-yai",
-    "name": "เงาทับร่าง",
+    "name": "เสียงหลังหน้าต่าง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 7,
@@ -1090,7 +1090,7 @@
   {
     "id": "phi_nang_yai_ritual",
     "owner": "phi-nang-yai",
-    "name": "อาคมเงาทับร่าง",
+    "name": "อาฆาตเรือนร้าง",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1105,7 +1105,7 @@
   {
     "id": "winyan_dek_strike",
     "owner": "winyan-dek",
-    "name": "โจมตีของของเล่นหลอน",
+    "name": "มือริมคลอง",
     "type": "attack",
     "energyCost": 1,
     "dmg": 6,
@@ -1114,7 +1114,7 @@
   {
     "id": "winyan_dek_ward",
     "owner": "winyan-dek",
-    "name": "คุ้มกาย",
+    "name": "น้ำดำบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -1123,7 +1123,7 @@
   {
     "id": "winyan_dek_signature",
     "owner": "winyan-dek",
-    "name": "ของเล่นหลอน",
+    "name": "เสียงพายลวง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 4,
@@ -1133,7 +1133,7 @@
   {
     "id": "winyan_dek_ritual",
     "owner": "winyan-dek",
-    "name": "อาคมของเล่นหลอน",
+    "name": "อาฆาตริมคลอง",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1148,7 +1148,7 @@
   {
     "id": "yak_dam_strike",
     "owner": "yak-dam",
-    "name": "โจมตีของทุบสนั่น",
+    "name": "กระด้งซัด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 6,
@@ -1157,7 +1157,7 @@
   {
     "id": "yak_dam_ward",
     "owner": "yak-dam",
-    "name": "คุ้มกาย",
+    "name": "สากตั้งรับ",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -1166,7 +1166,7 @@
   {
     "id": "yak_dam_signature",
     "owner": "yak-dam",
-    "name": "ทุบสนั่น",
+    "name": "กระหังพุ่ง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 13,
@@ -1181,7 +1181,7 @@
   {
     "id": "yak_dam_ritual",
     "owner": "yak-dam",
-    "name": "อาคมทุบสนั่น",
+    "name": "ครูอาคมเดือด",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1244,7 +1244,7 @@
   {
     "id": "phra_upakut_strike",
     "owner": "phra-upakut",
-    "name": "โจมตีของบาตรอาคม",
+    "name": "ฝ่ามือตะปบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1253,7 +1253,7 @@
   {
     "id": "phra_upakut_ward",
     "owner": "phra-upakut",
-    "name": "คุ้มกาย",
+    "name": "ร่างเปรตบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1262,7 +1262,7 @@
   {
     "id": "phra_upakut_signature",
     "owner": "phra-upakut",
-    "name": "บาตรอาคม",
+    "name": "หิวโหยดูดแรง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 7,
@@ -1272,7 +1272,7 @@
   {
     "id": "phra_upakut_ritual",
     "owner": "phra-upakut",
-    "name": "อาคมบาตรอาคม",
+    "name": "เสียงร้องหิว",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1287,7 +1287,7 @@
   {
     "id": "phaya_nak_strike",
     "owner": "phaya-nak",
-    "name": "โจมตีของเขี้ยวนาค",
+    "name": "พรายฉุด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1296,7 +1296,7 @@
   {
     "id": "phaya_nak_ward",
     "owner": "phaya-nak",
-    "name": "คุ้มกาย",
+    "name": "ม่านน้ำ",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1305,7 +1305,7 @@
   {
     "id": "phaya_nak_signature",
     "owner": "phaya-nak",
-    "name": "เขี้ยวนาค",
+    "name": "มือลากใต้น้ำ",
     "type": "attack",
     "energyCost": 2,
     "dmg": 6,
@@ -1315,7 +1315,7 @@
   {
     "id": "phaya_nak_ritual",
     "owner": "phaya-nak",
-    "name": "อาคมเขี้ยวนาค",
+    "name": "วังน้ำเชี่ยว",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1330,7 +1330,7 @@
   {
     "id": "thep_aksorn_strike",
     "owner": "thep-aksorn",
-    "name": "โจมตีของอักษรสาป",
+    "name": "ปอบตะปบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1339,7 +1339,7 @@
   {
     "id": "thep_aksorn_ward",
     "owner": "thep-aksorn",
-    "name": "คุ้มกาย",
+    "name": "อาคมปอบ",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1348,7 +1348,7 @@
   {
     "id": "thep_aksorn_signature",
     "owner": "thep-aksorn",
-    "name": "อักษรสาป",
+    "name": "เสียงเรียกชื่อ",
     "type": "attack",
     "energyCost": 2,
     "dmg": 9,
@@ -1358,7 +1358,7 @@
   {
     "id": "thep_aksorn_ritual",
     "owner": "thep-aksorn",
-    "name": "อาคมอักษรสาป",
+    "name": "วิชาปอบ",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1373,7 +1373,7 @@
   {
     "id": "phraya_maccurat_strike",
     "owner": "phraya-maccurat",
-    "name": "โจมตีของบัญชีมรณะ",
+    "name": "ปอบซัด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1382,7 +1382,7 @@
   {
     "id": "phraya_maccurat_ward",
     "owner": "phraya-maccurat",
-    "name": "คุ้มกาย",
+    "name": "เงาปอบบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1391,7 +1391,7 @@
   {
     "id": "phraya_maccurat_signature",
     "owner": "phraya-maccurat",
-    "name": "บัญชีมรณะ",
+    "name": "กัดกินแรงชีวิต",
     "type": "attack",
     "energyCost": 2,
     "dmg": 7,
@@ -1401,7 +1401,7 @@
   {
     "id": "phraya_maccurat_ritual",
     "owner": "phraya-maccurat",
-    "name": "อาคมบัญชีมรณะ",
+    "name": "อาฆาตปอบ",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1416,7 +1416,7 @@
   {
     "id": "night_head_collector_strike",
     "owner": "night-head-collector",
-    "name": "คนแบกหัว · จู่โจม",
+    "name": "กระด้งซัด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1425,7 +1425,7 @@
   {
     "id": "night_head_collector_ward",
     "owner": "night-head-collector",
-    "name": "คนแบกหัว · คุ้มกาย",
+    "name": "สากคุ้มกาย",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1434,7 +1434,7 @@
   {
     "id": "night_head_collector_signature",
     "owner": "night-head-collector",
-    "name": "คนแบกหัว · อาถรรพ์",
+    "name": "บินฉวย",
     "type": "attack",
     "energyCost": 2,
     "dmg": 8,
@@ -1449,7 +1449,7 @@
   {
     "id": "night_head_collector_ritual",
     "owner": "night-head-collector",
-    "name": "คนแบกหัว · ปลุกพลัง",
+    "name": "ครูอาคมคลุ้มคลั่ง",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1464,7 +1464,7 @@
   {
     "id": "night_bell_keeper_strike",
     "owner": "night-bell-keeper",
-    "name": "เงาระฆังร้าง · จู่โจม",
+    "name": "มือเปรตตบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1473,7 +1473,7 @@
   {
     "id": "night_bell_keeper_ward",
     "owner": "night-bell-keeper",
-    "name": "เงาระฆังร้าง · คุ้มกาย",
+    "name": "ร่างสูงบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1482,7 +1482,7 @@
   {
     "id": "night_bell_keeper_signature",
     "owner": "night-bell-keeper",
-    "name": "เงาระฆังร้าง · อาถรรพ์",
+    "name": "เสียงเปรตร้อง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 9,
@@ -1492,7 +1492,7 @@
   {
     "id": "night_bell_keeper_ritual",
     "owner": "night-bell-keeper",
-    "name": "เงาระฆังร้าง · ปลุกพลัง",
+    "name": "หิวไม่สิ้นสุด",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1507,7 +1507,7 @@
   {
     "id": "night_root_lord_strike",
     "owner": "night-root-lord",
-    "name": "เจ้าดงรากผี · จู่โจม",
+    "name": "รากผีซัด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 6,
@@ -1516,7 +1516,7 @@
   {
     "id": "night_root_lord_ward",
     "owner": "night-root-lord",
-    "name": "เจ้าดงรากผี · คุ้มกาย",
+    "name": "เงาไทรบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 5,
@@ -1525,7 +1525,7 @@
   {
     "id": "night_root_lord_signature",
     "owner": "night-root-lord",
-    "name": "เจ้าดงรากผี · อาถรรพ์",
+    "name": "เรียกเงาดง",
     "type": "attack",
     "energyCost": 2,
     "dmg": 6,
@@ -1535,7 +1535,7 @@
   {
     "id": "night_root_lord_ritual",
     "owner": "night-root-lord",
-    "name": "เจ้าดงรากผี · ปลุกพลัง",
+    "name": "แรงอาฆาต",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1550,7 +1550,7 @@
   {
     "id": "night_cave_mother_strike",
     "owner": "night-cave-mother",
-    "name": "นางเฝ้าถ้ำ · จู่โจม",
+    "name": "มือพรายฉุด",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1559,7 +1559,7 @@
   {
     "id": "night_cave_mother_ward",
     "owner": "night-cave-mother",
-    "name": "นางเฝ้าถ้ำ · คุ้มกาย",
+    "name": "ม่านน้ำ",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1568,7 +1568,7 @@
   {
     "id": "night_cave_mother_signature",
     "owner": "night-cave-mother",
-    "name": "นางเฝ้าถ้ำ · อาถรรพ์",
+    "name": "เสียงใต้น้ำ",
     "type": "attack",
     "energyCost": 2,
     "dmg": 7,
@@ -1578,7 +1578,7 @@
   {
     "id": "night_cave_mother_ritual",
     "owner": "night-cave-mother",
-    "name": "นางเฝ้าถ้ำ · ปลุกพลัง",
+    "name": "ดูดแรงชีวิต",
     "type": "skill",
     "energyCost": 1,
     "block": 3,
@@ -1593,7 +1593,7 @@
   {
     "id": "night_headless_king_strike",
     "owner": "night-headless-king",
-    "name": "เจ้าไร้เศียร · จู่โจม",
+    "name": "ปอบตะปบ",
     "type": "attack",
     "energyCost": 1,
     "dmg": 7,
@@ -1602,7 +1602,7 @@
   {
     "id": "night_headless_king_ward",
     "owner": "night-headless-king",
-    "name": "เจ้าไร้เศียร · คุ้มกาย",
+    "name": "อาคมบัง",
     "type": "skill",
     "energyCost": 1,
     "block": 7,
@@ -1611,7 +1611,7 @@
   {
     "id": "night_headless_king_signature",
     "owner": "night-headless-king",
-    "name": "เจ้าไร้เศียร · อาถรรพ์",
+    "name": "ปอบกัดกิน",
     "type": "attack",
     "energyCost": 2,
     "dmg": 6,
@@ -1621,7 +1621,7 @@
   {
     "id": "night_headless_king_ritual",
     "owner": "night-headless-king",
-    "name": "เจ้าไร้เศียร · ปลุกพลัง",
+    "name": "ครูอาคมตื่น",
     "type": "skill",
     "energyCost": 1,
     "block": 3,

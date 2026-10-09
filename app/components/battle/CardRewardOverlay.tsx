@@ -20,7 +20,7 @@ export default function CardRewardOverlay({choices,deck,onChoose,onSkip,notice}:
    <Text style={{fontFamily:font.ui,fontSize:12,color:palette.text,marginTop:8}}>แตะการ์ดเพื่ออ่านก่อนเลือก</Text>
   </RitualSurface>
   <View style={{flexDirection:'row',flexWrap:'wrap',justifyContent:'center',gap:8,paddingTop:12}}>
-   {choices.map((c,i)=><View key={c.instanceId??`${c.id}-${i}`} style={{width:cardWidth,transform:[{translateY:selected===i?-8:0}]}}>
+   {choices.map((c,i)=><View key={c.instanceId??`${c.id}-${i}`} style={{width:cardWidth,opacity:selected!==null&&selected!==i?.68:1,transform:[{translateY:selected===i?-8:0}]}}>
     <Card card={c} width={cardWidth} height={174} selected={selected===i} onPress={()=>setSelected(selected===i?null:i)}/>
     <Text style={{fontFamily:font.ui,fontSize:11,textAlign:'center',color:palette.text,backgroundColor:palette.scrim,marginTop:4,padding:4}}>มีอยู่แล้ว {owned(c.id)} ใบ</Text>
    </View>)}

@@ -1,5 +1,6 @@
 // src/core/engine/handlers/shops_events.ts
 import type { Command, GameState } from '../../types';
+import {canRemoveCard} from '../shared';
 import type { RNG } from '../../rng';
 import { rollShopStock } from '../../shop';
 import { getClass } from '../../classes';
@@ -89,7 +90,7 @@ export function qaOpenShopHere(s: GameState, _cmd: Extract<Command, { type: 'QA_
 // }
 
 export function takeShop(s: GameState, cmd: Extract<Command, { type: 'TakeShop' }>, r: RNG) {
-  if (s.phase !== 'shop' || !s.shopStock) return { state: s, rng: r };
+  if (s.phase !== 'shop' || s.shopKind!=='card' || !s.shopStock) return { state: s, rng: r };
   const i = cmd.index;
   const item = s.shopStock[i];
   if (!item) return { state: s, rng: r };
@@ -123,7 +124,8 @@ export function shopRemoveBuy(s: GameState, cmd: Extract<Command, { type: 'ShopR
     return { state: s, rng: r };
   }
   const i = cmd.index;
-  if (i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
+  if (!Number.isInteger(i) || i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
+  if (!Number.isInteger(i)||!canRemoveCard(s.masterDeck[i],s.masterDeck.length)) return {state:s,rng:r};
   s.player.gold -= price;
   s.masterDeck.splice(i, 1);
   s.runCounters = s.runCounters || ({} as any);
@@ -155,7 +157,7 @@ export function doWellDismiss(s: GameState, _cmd: Extract<Command, { type: 'DoWe
 export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'ShopUpgradeBuy' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'upgrade') return { state: s, rng: r };
   const i = cmd.index;
-  if (i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
+  if (!Number.isInteger(i) || i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
 
   // ใบที่เต็มขั้นแล้วปลุกต่อไม่ได้ — กันไว้ที่นี่ด้วย ไม่ใช่แค่ซ่อนปุ่มใน UI
   // ไม่งั้นเสียเบี้ยฟรีโดยไม่มีอะไรเปลี่ยน

@@ -1,5 +1,6 @@
 // src/core/engine/handlers/level.ts
 import type { Command, GameState } from '../../types';
+import {canRemoveCard} from '../shared';
 import type { RNG } from '../../rng';
 import { upgradeCard, canUpgrade, grantBlessing, advanceAfterVictory } from '../shared';
 
@@ -27,7 +28,7 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
   const idx = cmd.index ?? 0;
   
   if ((selectedBucket==='upgrade'||selectedBucket==='remove') &&
-      (idx<0||idx>=s.masterDeck.length||(selectedBucket==='upgrade'&&!canUpgrade(s.masterDeck[idx])))) return {state:s,rng:r};
+      (idx<0||idx>=s.masterDeck.length||(selectedBucket==='upgrade'&&!canUpgrade(s.masterDeck[idx]))||(selectedBucket==='remove'&&!canRemoveCard(s.masterDeck[idx],s.masterDeck.length)))) return {state:s,rng:r};
   const before={hp:s.player.hp,maxHp:s.player.maxHp,energy:s.player.maxEnergy,hand:s.player.maxHandSize,slots:s.equipmentSlotsMax??2,card:s.masterDeck[idx]?.name};
   // Store the selected option for UI display
   choice.selectedOption = cmd.option;
@@ -68,7 +69,7 @@ function applyBucketChoice(s: GameState, bucket: string, idx: number) {
     }
     case 'remove': {
       const i = idx;
-      if (i >= 0 && i < s.masterDeck.length) {
+      if (canRemoveCard(s.masterDeck[i],s.masterDeck.length)) {
         s.masterDeck.splice(i, 1);
         s.runCounters = s.runCounters || { removed: 0 } as any;
         (s.runCounters as any).removed += 1;

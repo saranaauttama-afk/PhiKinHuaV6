@@ -236,6 +236,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   // ── เทิร์นศัตรู
   if (s.enemy && (s as any).enemyPiles) {
     (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
+    s.enemy.energy=(s as any).enemyEnergy;
     s.enemy.block = 0;
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
@@ -256,10 +257,11 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
 
     s.enemyLastPlayed = [];
     enemyDiscardHand(s);
+    s.enemy.handCount=toPlay.length;
 
     const { enemyCardById } = require('../../pack_enemy_cards');
 
-    for (const cardId of toPlay) {
+    for (const [playIndex,cardId] of toPlay.entries()) {
       // ผู้เล่นตายกลางคัน → หยุดทันที ใบที่เหลือไม่ถูกเล่น
       if (s.phase !== 'combat') break;
 
@@ -269,6 +271,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       const cost=def.energyCost??1;
       if(cost>(s as any).enemyEnergy)continue;
       (s as any).enemyEnergy-=cost;
+      s.enemy.energy=(s as any).enemyEnergy;s.enemy.handCount=toPlay.length-playIndex-1;
       s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',
@@ -304,6 +307,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     require('../../statusEffectsRuntime').applyStatusEffect('enemy',s,'strength',99,escalation.strength);
     s.log.push(`ผีคลุ้มคลั่ง: แข็งแกร่งเพิ่ม ${escalation.strength} จนจบไฟต์`);
   }
+  if(s.enemy)s.enemy.handCount=0;
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 
   // ไม่ประกาศแผนล่วงหน้าอีกแล้ว — ล้างทิ้งเพื่อไม่ให้ค้างเป็นข้อมูลเก่า

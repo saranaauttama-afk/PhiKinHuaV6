@@ -22,6 +22,7 @@ export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Legendary';
 export type CardType = 'attack' | 'skill' | 'equipment' | 'trap' | 'curse';
 
 export type CardData = {
+  unremovable?: boolean;
   id: string;
   instanceId?: string;  // unique per card instance in play — assigned on deck build
   name: string;
@@ -79,6 +80,8 @@ export type EnemyCard = {
 };
 
 export type EnemyState = {
+  energy?:number;
+  handCount?:number;
   id: string;
   name: string;
   hp: number;

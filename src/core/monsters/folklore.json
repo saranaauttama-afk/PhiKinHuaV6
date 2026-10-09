@@ -1,0 +1,274 @@
+{
+  "phi-krasue": {
+    "name": "ผีกระสือ",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "แสงลอยผ่านคอกควายทุกคืน ก่อนหายไปหลังบ้านร้าง",
+    "visual": "floating Thai female head, tangled black hair, dangling stylized non-graphic viscera silhouette, no body",
+    "original": false,
+    "speciesKey": "กระสือ"
+  },
+  "phi-pop": {
+    "name": "ผีปอบ",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "คนเฝ้ายุ้งไม่กลับบ้าน หลังคืนที่มีเสียงเคี้ยวดังจากกองข้าว",
+    "visual": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+    "original": false,
+    "speciesKey": "ปอบ"
+  },
+  "nang-tanee": {
+    "name": "นางตานี",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "กอกล้วยท้ายเรือนมีเสียงเรียกชื่อคนเดินผ่าน",
+    "visual": "Thai woman in green sabai and green pha nung, banana leaves curling beside her feet, long black hair, distinctly rural Thai dress",
+    "original": false,
+    "speciesKey": "นางตานี"
+  },
+  "phi-nang-ram": {
+    "name": "ผีตายโหงนางรำ",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "นางรำคณะเร่หายไปในคืนฝนหนัก เหลือชุดเก็บอยู่หลังศาลา",
+    "visual": "adult Thai dancer revenant in simple worn Thai dance outfit, Thai chada small headdress, bent Thai dance fingers, no Chinese opera face makeup",
+    "original": false,
+    "speciesKey": "ผีตายโหงนางรำ"
+  },
+  "phi-pong-kang": {
+    "name": "ผีป่าโป่งร้าง",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "พรานไม่กลับจากโป่งเก่า ชาวบ้านจึงเลี่ยงทางนั้นยามค่ำ",
+    "visual": "gaunt dark Thai forest revenant, tangled hair, ragged rural cloth, rootlike fingers and branch shadows, human spirit not fantasy monster",
+    "original": false,
+    "speciesKey": "ผีป่า"
+  },
+  "ngu-phi-sang": {
+    "name": "ผีโพงท้ายทุ่ง",
+    "region": "ภาคเหนือ; ประวัติตัวละครในเกมแต่งเพิ่ม",
+    "story": "ชาวบ้านเห็นแสงเหนือคันนา แล้วพบรอยเท้าหยุดกลางทุ่ง",
+    "visual": "Thai northern rural adult revenant, worn simple cotton clothes, nose and mouth casting pale eerie glow, bent stalking posture, no snake",
+    "original": false,
+    "speciesKey": "ผีโพง"
+  },
+  "phi-pret": {
+    "name": "ผีเปรต",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "เสียงร้องหิวดังจากกำแพงวัด ทั้งที่ไม่มีใครอยู่",
+    "visual": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+    "original": false,
+    "speciesKey": "เปรต"
+  },
+  "krahang": {
+    "name": "กระหัง",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "กระด้งของชาวบ้านหายไปทีละคู่ และมีเงาบินเหนือยุ้งข้าว",
+    "visual": "Thai male ghost with two round woven bamboo winnowing baskets strapped to arms as wings and a wooden rice pestle between legs, short jongkraben, clearly show baskets and pestle, no bat wings",
+    "original": false,
+    "speciesKey": "กระหัง"
+  },
+  "kuman-thong": {
+    "name": "ผีตายโหงชายทุ่ง",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "ชายเฝ้านาถูกพบหายไป เหลือเพียงหมวกอยู่บนคันนา",
+    "visual": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+    "original": false,
+    "speciesKey": "ผีตายโหง"
+  },
+  "phi-tai-hong": {
+    "name": "ผีตายโหง",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "คนเดินทางไม่ถึงบ้านหลังพายุ เสียงฝีเท้ายังวนอยู่บนทางเก่า",
+    "visual": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+    "original": false,
+    "speciesKey": "ผีตายโหง"
+  },
+  "phi-pa": {
+    "name": "ผีป่า",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "ทุกครั้งที่มีคนตัดทางใหม่ จะได้ยินเสียงเดินตามออกจากดง",
+    "visual": "gaunt dark Thai forest revenant, tangled hair, ragged rural cloth, rootlike fingers and branch shadows, human spirit not fantasy monster",
+    "original": false,
+    "speciesKey": "ผีป่า"
+  },
+  "mae-nak": {
+    "name": "แม่นาค",
+    "region": "ตำนานพระโขนง กรุงเทพฯ; การพบในเกมแต่งเพิ่ม",
+    "story": "เงาจากตำนานพระโขนงปรากฏในคืนอาถรรพ์ของเรื่องแต่งนี้",
+    "visual": "Thai woman revenant in old brown sabai and sarong, one unnaturally extended arm reaching low, cloth cradle bundle held gently, no injured baby",
+    "original": false,
+    "speciesKey": "แม่นาค"
+  },
+  "pop-yai": {
+    "name": "ปอบใหญ่",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "ปอบที่สิงผู้เฒ่ามาหลายปี เฝ้าบ้านซึ่งไม่มีใครกล้าขอพัก",
+    "visual": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+    "original": false,
+    "speciesKey": "ปอบ"
+  },
+  "phi-ha-ratri": {
+    "name": "ผีโขมด",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "ดวงไฟชวนให้เดินออกจากทาง ก่อนดับลงเหนือบึง",
+    "visual": "eerie glowing ochre floating marsh light containing a barely visible Thai human face, thin black curling smoke silhouette, no demon body or fire armor",
+    "original": false,
+    "speciesKey": "ผีโขมด"
+  },
+  "asuragaya": {
+    "name": "ผีกองกอย",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "เสียงกองกอยดังจากเนินดิน แต่มีรอยเท้าเพียงข้างเดียว",
+    "visual": "small hairy Thai forest ghost with exactly one leg centered beneath hunched body, wide eyes, long arms, no goblin armor, unmistakable single leg",
+    "original": false,
+    "speciesKey": "ผีกองกอย"
+  },
+  "yak-wat-jaeng": {
+    "name": "เปรตลานวัด",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "เงาสูงพ้นหลังคาเดินวนลานวัดทุกคืนเดือนมืด",
+    "visual": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+    "original": false,
+    "speciesKey": "เปรต"
+  },
+  "phi-phrai": {
+    "name": "ผีพราย",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "ลำธารนิ่งสนิท แต่มีมือเอื้อมขึ้นจากใต้ผิวน้ำ",
+    "visual": "drowned Thai adult woman, soaked old cotton blouse and sarong, waterweed entangled around wrists and ankles, wet hanging black hair, streams of water dripping, no Chinese floating silk",
+    "original": false,
+    "speciesKey": "ผีพรายน้ำ"
+  },
+  "winyan-rerorn": {
+    "name": "ผีตายโหงเร่ร่อน",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "ไม่มีใครจำชื่อคนที่เฝ้ารอหน้าศาลาริมทางได้",
+    "visual": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+    "original": false,
+    "speciesKey": "ผีตายโหง"
+  },
+  "pisaj-fai": {
+    "name": "โขมดดง",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "แสงกลางดงแตกเป็นหลายดวง ทำให้คนหลงทางกลับที่เดิม",
+    "visual": "eerie glowing ochre floating marsh light containing a barely visible Thai human face, thin black curling smoke silhouette, no demon body or fire armor",
+    "original": false,
+    "speciesKey": "ผีโขมด"
+  },
+  "jao-por-pa": {
+    "name": "ผีป่าดงลึก",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "เจ้าของเสียงในดงตามพรานออกมาถึงชายหมู่บ้าน",
+    "visual": "gaunt dark Thai forest revenant, tangled hair, ragged rural cloth, rootlike fingers and branch shadows, human spirit not fantasy monster",
+    "original": false,
+    "speciesKey": "ผีป่า"
+  },
+  "phi-nang-yai": {
+    "name": "ผีตายโหงเรือนร้าง",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "เรือนว่างมาหลายปี แต่ยังมีคนเปิดหน้าต่างตอนเที่ยงคืน",
+    "visual": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+    "original": false,
+    "speciesKey": "ผีตายโหง"
+  },
+  "winyan-dek": {
+    "name": "ผีตายโหงริมคลอง",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "คนพายเรือหายไปในฝนหนัก เสียงพายยังดังริมคลอง",
+    "visual": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+    "original": false,
+    "speciesKey": "ผีตายโหง"
+  },
+  "yak-dam": {
+    "name": "กระหังครูอาคม",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "ครูอาคมเก่าซ่อนกระด้งไว้ใต้เรือน และไม่เคยออกมาในตอนกลางวัน",
+    "visual": "Thai male ghost with two round woven bamboo winnowing baskets strapped to arms as wings and a wooden rice pestle between legs, short jongkraben, clearly show baskets and pestle, no bat wings",
+    "original": false,
+    "speciesKey": "กระหัง"
+  },
+  "phi-mae-mai": {
+    "name": "ผีแม่ม่าย",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "เสียงเรียกยามดึกมาจากบ้านที่ผูกผ้าแดงไว้ทุกหน้าต่าง",
+    "visual": "Thai adult female revenant in dark rural blouse and faded red sarong, long hair, beckoning hand, red cloth wrapped at wrist, no Chinese robes",
+    "original": false,
+    "speciesKey": "ผีแม่ม่าย"
+  },
+  "phra-upakut": {
+    "name": "เปรตหิวโหย",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "เสียงหิวลอดจากต้นไทรกลางวัด แม้มีคนวางอาหารไว้แล้ว",
+    "visual": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+    "original": false,
+    "speciesKey": "เปรต"
+  },
+  "phaya-nak": {
+    "name": "พรายวังน้ำ",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "วังน้ำที่ห้ามลงเล่นสะท้อนเงาคนเพิ่มขึ้นหนึ่งคนเสมอ",
+    "visual": "drowned Thai adult woman, soaked old cotton blouse and sarong, waterweed entangled around wrists and ankles, wet hanging black hair, streams of water dripping, no Chinese floating silk",
+    "original": false,
+    "speciesKey": "ผีพรายน้ำ"
+  },
+  "thep-aksorn": {
+    "name": "ปอบผู้เฒ่า",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "ผู้เฒ่าเก็บชื่อคนในหมู่บ้านไว้ในสมุด ไม่ยอมให้ใครเปิดอ่าน",
+    "visual": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+    "original": false,
+    "speciesKey": "ปอบ"
+  },
+  "phraya-maccurat": {
+    "name": "ปอบดงร้าง",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "คนสุดท้ายของหมู่บ้านร้างยังรอรับแขกอยู่ในป่า",
+    "visual": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+    "original": false,
+    "speciesKey": "ปอบ"
+  },
+  "night-head-collector": {
+    "name": "กระหังหนองร้าง",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "ครูอาคมจากเรือนข้างหนองออกบินตามหัวที่หายไป คืนนี้ต้องหยุดเขาก่อนฟ้าสาง",
+    "visual": "Thai male ghost with two round woven bamboo winnowing baskets strapped to arms as wings and a wooden rice pestle between legs, short jongkraben, clearly show baskets and pestle, no bat wings",
+    "original": false,
+    "speciesKey": "กระหัง"
+  },
+  "night-bell-keeper": {
+    "name": "เปรตวัดร้าง",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "ระฆังวัดดังเองเมื่อเงาสูงก้มหน้าหาศีรษะชาวบ้านที่ซ่อนใต้ลาน",
+    "visual": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+    "original": false,
+    "speciesKey": "เปรต"
+  },
+  "night-root-lord": {
+    "name": "ผีป่าไทรพันราก",
+    "region": "ความเชื่อและเรื่องเล่าไทย; บุคคลและสถานที่ในเกมแต่งเพิ่ม",
+    "story": "เงาคนหายในป่ารวมกันใต้ไทร ไม่ยอมคืนหัวให้ผู้ที่ตัดทางผ่านดง",
+    "visual": "gaunt dark Thai forest revenant, tangled hair, ragged rural cloth, rootlike fingers and branch shadows, human spirit not fantasy monster",
+    "original": false,
+    "speciesKey": "ผีป่า"
+  },
+  "night-cave-mother": {
+    "name": "พรายแอ่งถ้ำ",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "แอ่งน้ำในถ้ำเก็บเงาของคนทั้งหมู่บ้านไว้ ใครเรียกชื่อจะได้ยินเสียงตอบใต้น้ำ",
+    "visual": "drowned Thai adult woman, soaked old cotton blouse and sarong, waterweed entangled around wrists and ankles, wet hanging black hair, streams of water dripping, no Chinese floating silk",
+    "original": false,
+    "speciesKey": "ผีพรายน้ำ"
+  },
+  "night-headless-king": {
+    "name": "ปอบครูอาคม",
+    "region": "อ้างอิงความเชื่อไทเบิ้ง โคกสลุง จ.ลพบุรี; เรื่องในเกมแต่งเพิ่ม",
+    "story": "ครูอาคมที่หายจากหมู่บ้านซ่อนศีรษะไว้เป็นเครื่องต่อรองกับผีกินหัว",
+    "visual": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+    "original": false,
+    "speciesKey": "ปอบ"
+  },
+  "phi-kin-hua": {
+    "name": "ผีกินหัว",
+    "region": "เรื่องแต่งต้นฉบับของเกม",
+    "story": "ชาวบ้านหลับอยู่แต่ศีรษะหายไป ต้องนำกลับก่อนเช้าเพื่อถอนคำสาป",
+    "visual": "original Thai game ghost, towering shadowy elderly villager wrapped in torn burial cloth, looming dark face and many floating faceless head-shaped shadows, no crown, no palace armor, no gore",
+    "original": true,
+    "speciesKey": "ผีกินหัว"
+  }
+}

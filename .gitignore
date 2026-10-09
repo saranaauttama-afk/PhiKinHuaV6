@@ -58,3 +58,11 @@ android/
 
 # --- Metro
 .metro-health-check*
+
+# Backlog validation artifacts are uploaded by Actions
+backlog-audit/
+backlog-native-audit/
+apk-audit/
+*.apk
+
+__pycache__/

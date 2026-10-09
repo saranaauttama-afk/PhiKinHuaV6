@@ -1,3 +1,4 @@
+import {ghostLore} from '../src/core/monsters/folklore';
 import {nightFightTotal} from '../src/core/campaign/bosses';
 import {battleScene} from './scenePresentation';
 import React from 'react';
@@ -10,6 +11,9 @@ import { combatFrame } from '../src/core/combat/damage';
 import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
 import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
+import BlessingSeals from './components/battle/BlessingSeals';
+import ComboBook from './components/battle/ComboBook';
+import {comboFeedbackText} from './comboPresentation';
 import EnemyHandCard from './components/battle/EnemyHandCard';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
@@ -73,16 +77,18 @@ export default function BattlePage() {
   const player = presentation?.player ?? gameState.player;
   const enemy = presentation?.enemy ?? gameState.enemy;
   const [comboNotice,setComboNotice]=React.useState('');
-  const seenCombos=React.useRef(gameState.combo?.done??[]);
+  const [comboOpen,setComboOpen]=React.useState(false);
+  const comboFight=React.useRef(gameState.fightCount??0);
+  const seenFeedback=React.useRef(gameState.combo?.feedbackSeq??0);
   React.useEffect(()=>{
-    const done=gameState.combo?.done??[];
-    const fresh=done.filter(id=>!seenCombos.current.includes(id));
-    seenCombos.current=done;
-    if(!fresh.length){if(!done.length)setComboNotice('');return;}
-    setComboNotice(fresh.map(id=>COMBO_BY_ID[id]?.name??id).join(' · '));
-    const timer=setTimeout(()=>setComboNotice(''),2400);
-    return ()=>clearTimeout(timer);
-  },[gameState.combo?.done.join('|')]);
+    if(comboFight.current!==(gameState.fightCount??0)){comboFight.current=gameState.fightCount??0;seenFeedback.current=0;setComboNotice('');}
+    const feedback=gameState.combo?.feedback??[];const seq=gameState.combo?.feedbackSeq??0;
+    if(seq<seenFeedback.current)seenFeedback.current=0;
+    const fresh=feedback.filter(f=>f.seq>seenFeedback.current);seenFeedback.current=seq;
+    if(!fresh.length)return;
+    setComboNotice(fresh.map(comboFeedbackText).join('\n'));
+    const timer=setTimeout(()=>setComboNotice(''),3200);return()=>clearTimeout(timer);
+  },[gameState.combo?.feedbackSeq,gameState.fightCount]);
   const bootstrapped = React.useRef(false);
   const turnLocked = React.useRef(false);
 
@@ -147,12 +153,13 @@ export default function BattlePage() {
       if(mainMenu)return false;
       if(settingsOpen){setSettingsOpen(false);return true;}
       if(openPile){setOpenPile(null);return true;}
+      if(comboOpen){setComboOpen(false);return true;}
       if(blessingsOpen){setBlessingsOpen(false);return true;}
       if(paused){setPaused(false);return true;}
       openPause();return true;
     });
     return ()=>back.remove();
-  },[mainMenu,settingsOpen,openPile,blessingsOpen,paused]);
+  },[mainMenu,settingsOpen,openPile,blessingsOpen,paused,comboOpen]);
   React.useEffect(()=>navigation.addListener('beforeRemove',(e)=>{
     if(allowLeave.current || useGame.getState().state.phase!=='combat')return;
     e.preventDefault();openPause();
@@ -311,8 +318,7 @@ export default function BattlePage() {
 
   const badges:BattleBadge[]=[
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${t.effects.map(e=>e.desc).join(' · ')}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
-    ...(gameState.combo?.progress??[]).flatMap(p=>{const c=COMBO_BY_ID[p.comboId];return c?[{id:`combo:${p.comboId}`,name:c.name,symbol:'ชุด',neutral:true,count:`${p.cardsPlayed.length}/${comboTarget(c)}`,detail:`${c.desc}\nเล่นแล้ว ${p.cardsPlayed.length}/${comboTarget(c)} ใบ${c.ordered?' · ต้องเล่นตามลำดับ':''}`}]:[]}),
-    ...(gameState.combo?.done??[]).flatMap(id=>{const c=COMBO_BY_ID[id];return c?[{id:`done:${id}`,name:c.name,symbol:'✓',detail:`${c.desc}\nคอมโบทำงานแล้วในไฟต์นี้`}]:[]}),
+    {id:'combo:book',name:'ตำราคอมโบ',symbol:'combo',neutral:true,detail:'ดูลำดับการ์ดและผลคอมโบ',onPress:()=>setComboOpen(true)},
   ];
   const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
@@ -340,7 +346,7 @@ export default function BattlePage() {
         </View>
 
         <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.runMode==='episode'?3:nightFightTotal(gameState.campaign?.night)}</Text>
-        {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',top:safe.top+190,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:18,textAlign:'center'}}>คอมโบ! {comboNotice}</Text></RitualSurface></View>}
+        {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',bottom:safe.bottom+340,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:13,lineHeight:21,textAlign:'center'}}>{comboNotice}</Text></RitualSurface></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
             ก่อนอนิเมชั่นเริ่มเล่น สิ่งเดียวที่ถูกข้ามคือภาพ */}
@@ -440,7 +446,9 @@ export default function BattlePage() {
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />}
 
+        <ComboBook state={gameState} visible={comboOpen} onClose={()=>setComboOpen(false)}/>
         <PlayerHUD
+          blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
           helpers={!victoryIntro&&<MinionRow owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
           statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges}/>:null}
           classId={gameState.classId}
@@ -456,25 +464,6 @@ export default function BattlePage() {
           onOpenPiles={() => setOpenPile('draw')}
           isEnemyTurn={phase === 'enemy'}
         />
-
-        {/* พรติดตัว — กดดูได้ระหว่างสู้ เพราะพรทุกอย่างกำลังทำงานอยู่ตอนนี้ */}
-        {(gameState.blessings?.length ?? 0) > 0 && (
-          <Pressable
-            onPress={() => setBlessingsOpen(true)}
-            hitSlop={8}
-            style={{
-              position: 'absolute', top: safe.top + 8, right: 60, zIndex: layer.control,
-              paddingHorizontal: 10, paddingVertical: 4,
-              borderRadius: 999,
-              backgroundColor: tint.moonSoft,
-              borderWidth: 1, borderColor: palette.lineStrong,
-            }}
-          >
-            <Text style={{ color: palette.moon, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>
-              พร {gameState.blessings.length}
-            </Text>
-          </Pressable>
-        )}
 
         {blessingsOpen && (
           <BlessingView
@@ -526,7 +515,7 @@ export default function BattlePage() {
 
         {victoryIntro && (
           <VictoryOverlay
-            enemyName={enemy?.name ?? (Array.isArray(monsterName) ? monsterName[0] : monsterName) ?? 'ศัตรู'}
+            enemyName={ghostLore(enemy?.id??'')?.name??enemy?.name ?? (Array.isArray(monsterName) ? monsterName[0] : monsterName) ?? 'ศัตรู'}
             expGained={reward.exp}
             goldGained={reward.gold}
             playerLevel={player.level}

@@ -4,6 +4,7 @@ import { Image, ImageBackground, Modal, Pressable, ScrollView, StyleSheet, Text,
 import type { BlessingDef } from '../../src/core/types';
 import { groupBlessings } from '../../src/core/blessing/group';
 import RitualSurface from './RitualSurface';
+import {BLESSING_ART_SOURCES} from '../blessingArt';
 import {QuietHeader,QuietButton} from './QuietChrome';
 import { font, palette, space, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
@@ -17,6 +18,7 @@ const objects = {
   attack: require('../../assets/ui/ritual-knife.png'),
 };
 export function objectSource(b: BlessingDef) {
+  if(BLESSING_ART_SOURCES[b.id])return BLESSING_ART_SOURCES[b.id];
   if (b.id === 'free_card_energy') return require('../../assets/ui/card-parry.png');
   if (b.id === 'spirit_energy') return objects.ritual;
   if (b.id === 'herbal_wisdom') return objects.herbs;

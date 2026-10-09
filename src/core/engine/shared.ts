@@ -39,6 +39,9 @@ export function grantBlessing(s: GameState, b: BlessingDef): boolean {
 
 /** ปลุกเสกได้สูงสุดกี่ขั้นต่อใบ */
 export const MAX_UPGRADE_LEVEL = 3;
+export function canRemoveCard(card:CardData|undefined,deckSize:number):boolean {
+ return !!card&&deckSize>1&&!card.unremovable&&card.id!=='qa_phra_prathan';
+}
 
 /** ปลุกเสกไปแล้วกี่ขั้น */
 export function upgradeLevelOf(c: CardData): number {

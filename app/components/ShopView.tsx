@@ -24,7 +24,8 @@ import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import FusionAltarView from './FusionAltarView';
 import {QuietButton} from './QuietChrome';
-import {CardGlyphArt} from './DeckCard';
+import DeckCard,{CardGlyphArt,CardFace} from './DeckCard';
+import {canRemoveCard} from '../../src/core/engine/shared';
 import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
@@ -113,30 +114,25 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   const deck = state.masterDeck ?? [];
   const stock = state.shopStock ?? [];
 
-  const cardShop = () => (
-    <Panel title="ร้านขายคาถา">
-      <Lead>พ่อค้าเร่กางผ้าขายม้วนคาถาอยู่ริมทาง ของทุกชิ้นเก่าแต่ยังใช้ได้</Lead>
-      <Money state={state} />
-      <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-        {stock.map((item, i) => (
-          <ItemChip
-            key={i}
-            card={cardOf(item)}
-            disabled={(state.player.gold??0)<item.price}
-            title={cardOf(item)?.name ?? 'ของไม่ทราบชนิด'}
-            line={cardLine(cardOf(item))}
-            note={`${item.price} เบี้ย`}
-            onPress={() => dispatch({ type: 'TakeShop', index: i })}
-          />
-        ))}
-      </View>
-      <QuietButton
-        label="ขอดูของชุดใหม่ (50 เบี้ย)"
-        onPress={() => dispatch({ type: 'ShopReroll' })}
-        style={{ marginTop: space.lg, alignSelf: 'flex-start' }}
-      />
-    </Panel>
-  );
+  const cardShop = () => {
+    const item=selected===null?undefined:stock[selected];const card=item?cardOf(item):undefined;
+    return <Panel title="ร้านขายคาถา">
+      <Lead>แตะการ์ดเพื่ออ่าน แล้วกดยืนยันซื้อ · ยังไม่เสียเบี้ยจนกว่าจะยืนยัน</Lead><Money state={state}/>
+      {!!notice&&<Text accessibilityLiveRegion="polite" style={{color:palette.moon,fontFamily:font.ui}}>{notice}</Text>}
+      <View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>{stock.map((it,i)=>{const c=cardOf(it);return c&&<View key={`${c.id}-${i}`} style={{width:'48%',gap:4}}>
+        <View><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/></View>
+        <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {it.price} เบี้ย</Text>
+      </View>;})}</View>
+      {card&&item&&<RitualSurface kind="occupationPage" style={{padding:22,gap:10}}>
+        <Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>ยืนยันซื้อ {card.name}</Text>
+        <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:14,lineHeight:24}}>{card.desc}\n{cardLine(card)}\nราคา {item.price} เบี้ย · มี {state.player.gold} เบี้ย</Text>
+        {(state.player.gold??0)<item.price&&<Text style={{color:paper.red,fontFamily:font.ui}}>เบี้ยไม่พอ</Text>}
+        <QuietButton label={`ยืนยันซื้อ ${item.price} เบี้ย`} primary disabled={(state.player.gold??0)<item.price} onPress={()=>{if(selected===null||(state.player.gold??0)<item.price)return;dispatch({type:'TakeShop',index:selected});setSelected(null);setNotice(`ซื้อ ${card.name} แล้ว`);}}/>
+        <QuietButton label="ยกเลิกการเลือก" onPress={()=>setSelected(null)}/>
+      </RitualSurface>}
+      <QuietButton label="ขอดูของชุดใหม่ (50 เบี้ย)" disabled={(state.player.gold??0)<50} onPress={()=>{setSelected(null);dispatch({type:'ShopReroll'});}}/>
+    </Panel>;
+  };
 
   const equipmentShop = () => (
     <Panel title="ร้านเครื่องราง">
@@ -159,29 +155,12 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   );
 
   const removeShop = () => {
-    const count = state.runCounters?.removeShopCount ?? 0;
-    const cost = removeCostForCount(count);
-    return (
-      <Panel title="สละการ์ด">
-        <Lead>กองไฟเล็กๆ ริมทาง เผาสิ่งที่ไม่อยากแบกต่อได้ที่นี่</Lead>
-        <Money state={state} />
-        <Text style={{ color: palette.moonDim, fontSize: size.label, marginBottom: space.md, fontFamily: font.ui }}>
-          ค่าเผา {cost} เบี้ย · สละไปแล้ว {count} ใบ
-        </Text>
-        <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-          {deck.map((card, i) => (
-            <ItemChip
-              key={i}
-              card={card}
-              disabled={(state.player.gold??0)<cost}
-              title={card.name || card.id}
-              line={cardLine(card)}
-              onPress={() => dispatch({ type: 'ShopRemoveBuy', index: i })}
-            />
-          ))}
-        </View>
-      </Panel>
-    );
+    const cost=removeCostForCount(state.runCounters?.removeShopCount??0);
+    const card=selected===null?undefined:deck[selected];
+    return <Panel title="สละการ์ด"><Lead>เลือกและอ่านการ์ดก่อนยืนยันสละ</Lead><Money state={state}/>
+      {!!notice&&<Text accessibilityLiveRegion="polite" style={{fontFamily:font.ui,color:palette.moon}}>{notice}</Text>}
+      <UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} remove price={()=>cost} disabledConfirm={(state.player.gold??0)<cost} onConfirm={index=>{if(!canRemoveCard(deck[index],deck.length)||(state.player.gold??0)<cost)return;const name=deck[index].name;dispatch({type:'ShopRemoveBuy',index});setSelected(null);setNotice(`สละ ${name} แล้ว`);}}/>
+    </Panel>;
   };
 
   const upgradeShop = () => {

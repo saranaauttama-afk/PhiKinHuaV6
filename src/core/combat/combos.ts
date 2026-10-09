@@ -69,7 +69,10 @@ export function comboTarget(combo: CardCombo): number {
 }
 
 /** สถานะคอมโบของไฟต์ปัจจุบัน */
+export type ComboFeedback={seq:number;comboId:string;kind:'progress'|'success'|'reset';played:string[];reason?:'order'|'restart'|'expired'};
 export type ComboState = {
+  feedback?:ComboFeedback[];
+  feedbackSeq?:number;
   /** คอมโบที่กำลังนับอยู่ */
   progress: Array<{ comboId: string; cardsPlayed: string[]; turnStarted: number }>;
   /** คอมโบที่ติดไปแล้วในไฟต์นี้ */
@@ -84,6 +87,10 @@ function comboState(s: GameState): ComboState {
   return (s.combo ??= { progress: [], done: [], freeCards: 0, debuffImmunity: false });
 }
 
+function reportCombo(s:GameState,combo:CardCombo,kind:ComboFeedback['kind'],played:string[],reason?:ComboFeedback['reason']) {
+ const cs=comboState(s);cs.feedbackSeq=(cs.feedbackSeq??0)+1;
+ cs.feedback=[...(cs.feedback??[]),{seq:cs.feedbackSeq,comboId:combo.id,kind,played:[...played],reason}].slice(-24);
+}
 /** เริ่มไฟต์ใหม่ = คอมโบเริ่มนับใหม่หมด */
 export function resetCombos(s: GameState): void {
   s.combo = { progress: [], done: [], freeCards: 0, debuffImmunity: false };
@@ -125,8 +132,8 @@ export function onCardPlayed(s: GameState, card: CardData, classTag: string): vo
       cs.progress.push(p);
     }
     if(combo.ordered&&combo.requiredCards){
-      if(card.id===combo.requiredCards[0]){p.cardsPlayed=[];p.turnStarted=s.turn;}
-      if(card.id!==combo.requiredCards[p.cardsPlayed.length]){cs.progress=cs.progress.filter(x=>x.comboId!==combo.id);continue;}
+      if(card.id===combo.requiredCards[0]){if(p.cardsPlayed.length)reportCombo(s,combo,'reset',p.cardsPlayed,'restart');p.cardsPlayed=[];p.turnStarted=s.turn;}
+      if(card.id!==combo.requiredCards[p.cardsPlayed.length]){if(p.cardsPlayed.length)reportCombo(s,combo,'reset',p.cardsPlayed,'order');cs.progress=cs.progress.filter(x=>x.comboId!==combo.id);continue;}
     }
     if (p.cardsPlayed.includes(card.id)) continue;
 
@@ -137,8 +144,10 @@ export function onCardPlayed(s: GameState, card: CardData, classTag: string): vo
       cs.done.push(combo.id);
       s.log.push(`คอมโบ ${combo.name}!`);
       applyCombo(s, combo);
+      reportCombo(s,combo,'success',p.cardsPlayed);
     } else {
       s.log.push(`${combo.name} ${p.cardsPlayed.length}/${comboTarget(combo)}`);
+      reportCombo(s,combo,'progress',p.cardsPlayed);
     }
   }
 }
@@ -151,6 +160,7 @@ export function expireCombos(s: GameState): void {
     if (!combo) return false;
     if (s.turn - p.turnStarted < combo.maxTurns) return true;
     s.log.push(`${combo.name} หลุดคอมโบ`);
+    reportCombo(s,combo,'reset',p.cardsPlayed,'expired');
     return false;
   });
 }
