@@ -1675,5 +1675,4057 @@
       "duration": 99
     },
     "desc": "ป้องกัน 3 แข็งแกร่ง +1 จนจบไฟต์"
+  },
+  {
+    "id": "phi_krasue_v29_strike",
+    "owner": "phi-krasue",
+    "name": "ผีกระสือ · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_krasue_v29_double",
+    "owner": "phi-krasue",
+    "name": "ผีกระสือ · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_krasue_v29_pierce",
+    "owner": "phi-krasue",
+    "name": "ผีกระสือ · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_krasue_v29_ward",
+    "owner": "phi-krasue",
+    "name": "ผีกระสือ · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_krasue_v29_defense",
+    "owner": "phi-krasue",
+    "name": "ลอยหลบ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_krasue_v29_signature",
+    "owner": "phi-krasue",
+    "name": "น้ำลายพิษ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 1 · พิษ 2 · 2 เทิร์น",
+    "dmg": 1,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_krasue_v29_signature_support",
+    "owner": "phi-krasue",
+    "name": "ผีกระสือ · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · พิษ 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_krasue_v29_setup",
+    "owner": "phi-krasue",
+    "name": "ผีกระสือ · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pop_v29_strike",
+    "owner": "phi-pop",
+    "name": "ผีปอบ · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_pop_v29_double",
+    "owner": "phi-pop",
+    "name": "ผีปอบ · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_pop_v29_pierce",
+    "owner": "phi-pop",
+    "name": "ผีปอบ · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pop_v29_ward",
+    "owner": "phi-pop",
+    "name": "ผีปอบ · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_pop_v29_defense",
+    "owner": "phi-pop",
+    "name": "ซ่อนเขี้ยว",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ฟื้น 3",
+    "block": 2,
+    "heal": 3
+  },
+  {
+    "id": "phi_pop_v29_signature",
+    "owner": "phi-pop",
+    "name": "กินของคาว",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · ฟื้น 4",
+    "dmg": 2,
+    "heal": 4
+  },
+  {
+    "id": "phi_pop_v29_signature_support",
+    "owner": "phi-pop",
+    "name": "ผีปอบ · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ฟื้น 6 · ตนเอง แข็งแกร่ง 1 · 3 เทิร์น",
+    "heal": 6,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pop_v29_setup",
+    "owner": "phi-pop",
+    "name": "ผีปอบ · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "nang_tanee_v29_strike",
+    "owner": "nang-tanee",
+    "name": "นางตานี · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "nang_tanee_v29_double",
+    "owner": "nang-tanee",
+    "name": "นางตานี · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "nang_tanee_v29_pierce",
+    "owner": "nang-tanee",
+    "name": "นางตานี · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "nang_tanee_v29_ward",
+    "owner": "nang-tanee",
+    "name": "นางตานี · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "nang_tanee_v29_defense",
+    "owner": "nang-tanee",
+    "name": "โอบรัดกล้วย",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ตนเอง หนาม 2 · 2 เทิร์น",
+    "block": 2,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "nang_tanee_v29_signature",
+    "owner": "nang-tanee",
+    "name": "ใบตานีบัง",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 3 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "nang_tanee_v29_signature_support",
+    "owner": "nang-tanee",
+    "name": "นางตานี · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง หนาม 3 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 3
+    },
+    "block": 3
+  },
+  {
+    "id": "nang_tanee_v29_setup",
+    "owner": "nang-tanee",
+    "name": "นางตานี · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_ram_v29_strike",
+    "owner": "phi-nang-ram",
+    "name": "ผีตายโหงนางรำ · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_nang_ram_v29_double",
+    "owner": "phi-nang-ram",
+    "name": "ผีตายโหงนางรำ · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_nang_ram_v29_pierce",
+    "owner": "phi-nang-ram",
+    "name": "ผีตายโหงนางรำ · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_ram_v29_ward",
+    "owner": "phi-nang-ram",
+    "name": "ผีตายโหงนางรำ · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_nang_ram_v29_defense",
+    "owner": "phi-nang-ram",
+    "name": "ตั้งท่ารำ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 2,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_nang_ram_v29_signature",
+    "owner": "phi-nang-ram",
+    "name": "เสียงฉิ่ง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · กลัว 1 · 1 เทิร์น",
+    "dmg": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "fear",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_ram_v29_signature_support",
+    "owner": "phi-nang-ram",
+    "name": "ผีตายโหงนางรำ · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_ram_v29_setup",
+    "owner": "phi-nang-ram",
+    "name": "ผีตายโหงนางรำ · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pong_kang_v29_strike",
+    "owner": "phi-pong-kang",
+    "name": "ผีป่าโป่งร้าง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_pong_kang_v29_double",
+    "owner": "phi-pong-kang",
+    "name": "ผีป่าโป่งร้าง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_pong_kang_v29_pierce",
+    "owner": "phi-pong-kang",
+    "name": "ผีป่าโป่งร้าง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pong_kang_v29_ward",
+    "owner": "phi-pong-kang",
+    "name": "ผีป่าโป่งร้าง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_pong_kang_v29_defense",
+    "owner": "phi-pong-kang",
+    "name": "ปีนทางมืด",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pong_kang_v29_signature",
+    "owner": "phi-pong-kang",
+    "name": "วิ่งเข้าหา",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×3",
+    "dmg": 2,
+    "hits": 3
+  },
+  {
+    "id": "phi_pong_kang_v29_signature_support",
+    "owner": "phi-pong-kang",
+    "name": "ผีป่าโป่งร้าง · อาถรรพ์ประจำตน",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 2 ×2 · อ่อนแอ 1 · 1 เทิร์น",
+    "dmg": 2,
+    "hits": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pong_kang_v29_setup",
+    "owner": "phi-pong-kang",
+    "name": "ผีป่าโป่งร้าง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "ngu_phi_sang_v29_strike",
+    "owner": "ngu-phi-sang",
+    "name": "ผีโพงท้ายทุ่ง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "ngu_phi_sang_v29_double",
+    "owner": "ngu-phi-sang",
+    "name": "ผีโพงท้ายทุ่ง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "ngu_phi_sang_v29_pierce",
+    "owner": "ngu-phi-sang",
+    "name": "ผีโพงท้ายทุ่ง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "ngu_phi_sang_v29_ward",
+    "owner": "ngu-phi-sang",
+    "name": "ผีโพงท้ายทุ่ง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "ngu_phi_sang_v29_defense",
+    "owner": "ngu-phi-sang",
+    "name": "ตาพร่า",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "ngu_phi_sang_v29_signature",
+    "owner": "ngu-phi-sang",
+    "name": "ไอของคาว",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 1 · พิษ 2 · 2 เทิร์น",
+    "dmg": 1,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "ngu_phi_sang_v29_signature_support",
+    "owner": "ngu-phi-sang",
+    "name": "ผีโพงท้ายทุ่ง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · พิษ 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "ngu_phi_sang_v29_setup",
+    "owner": "ngu-phi-sang",
+    "name": "ผีโพงท้ายทุ่ง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pret_v29_strike",
+    "owner": "phi-pret",
+    "name": "ผีเปรต · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_pret_v29_double",
+    "owner": "phi-pret",
+    "name": "ผีเปรต · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_pret_v29_pierce",
+    "owner": "phi-pret",
+    "name": "ผีเปรต · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pret_v29_ward",
+    "owner": "phi-pret",
+    "name": "ผีเปรต · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_pret_v29_defense",
+    "owner": "phi-pret",
+    "name": "ยืดแขนเปรต",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 2,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_pret_v29_signature",
+    "owner": "phi-pret",
+    "name": "ปากเล็กหิวโหย",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · ลดการจั่ว 1 · 1 เทิร์น",
+    "dmg": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pret_v29_signature_support",
+    "owner": "phi-pret",
+    "name": "ผีเปรต · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ฟื้น 4 · ลดการจั่ว 1 · 1 เทิร์น",
+    "heal": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pret_v29_setup",
+    "owner": "phi-pret",
+    "name": "ผีเปรต · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "krahang_v29_strike",
+    "owner": "krahang",
+    "name": "กระหัง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "krahang_v29_double",
+    "owner": "krahang",
+    "name": "กระหัง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "krahang_v29_pierce",
+    "owner": "krahang",
+    "name": "กระหัง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "krahang_v29_ward",
+    "owner": "krahang",
+    "name": "กระหัง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "krahang_v29_defense",
+    "owner": "krahang",
+    "name": "สากฟาด",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "krahang_v29_signature",
+    "owner": "krahang",
+    "name": "กระด้งโฉบ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×3",
+    "dmg": 2,
+    "hits": 3
+  },
+  {
+    "id": "krahang_v29_signature_support",
+    "owner": "krahang",
+    "name": "กระหัง · อาถรรพ์ประจำตน",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 2 ×2 · อ่อนแอ 1 · 1 เทิร์น",
+    "dmg": 2,
+    "hits": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "krahang_v29_setup",
+    "owner": "krahang",
+    "name": "กระหัง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "kuman_thong_v29_strike",
+    "owner": "kuman-thong",
+    "name": "ผีตายโหงชายทุ่ง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "kuman_thong_v29_double",
+    "owner": "kuman-thong",
+    "name": "ผีตายโหงชายทุ่ง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "kuman_thong_v29_pierce",
+    "owner": "kuman-thong",
+    "name": "ผีตายโหงชายทุ่ง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "kuman_thong_v29_ward",
+    "owner": "kuman-thong",
+    "name": "ผีตายโหงชายทุ่ง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "kuman_thong_v29_defense",
+    "owner": "kuman-thong",
+    "name": "ซ่อนในหุ่น",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 2,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "kuman_thong_v29_signature",
+    "owner": "kuman-thong",
+    "name": "ซุกเถ้ากระดูก",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · ใส่การ์ดคำสาปในกองทิ้ง",
+    "dmg": 2,
+    "curseCard": "curse_burden"
+  },
+  {
+    "id": "kuman_thong_v29_signature_support",
+    "owner": "kuman-thong",
+    "name": "ผีตายโหงชายทุ่ง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "kuman_thong_v29_setup",
+    "owner": "kuman-thong",
+    "name": "ผีตายโหงชายทุ่ง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_tai_hong_v29_strike",
+    "owner": "phi-tai-hong",
+    "name": "ผีตายโหง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_tai_hong_v29_double",
+    "owner": "phi-tai-hong",
+    "name": "ผีตายโหง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_tai_hong_v29_pierce",
+    "owner": "phi-tai-hong",
+    "name": "ผีตายโหง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_tai_hong_v29_ward",
+    "owner": "phi-tai-hong",
+    "name": "ผีตายโหง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_tai_hong_v29_defense",
+    "owner": "phi-tai-hong",
+    "name": "เรียกแรงอาฆาต",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 2,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_tai_hong_v29_signature",
+    "owner": "phi-tai-hong",
+    "name": "รอยแค้น",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5",
+    "dmg": 5
+  },
+  {
+    "id": "phi_tai_hong_v29_signature_support",
+    "owner": "phi-tai-hong",
+    "name": "ผีตายโหง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง แข็งแกร่ง 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_tai_hong_v29_setup",
+    "owner": "phi-tai-hong",
+    "name": "ผีตายโหง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pa_v29_strike",
+    "owner": "phi-pa",
+    "name": "ผีป่า · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_pa_v29_double",
+    "owner": "phi-pa",
+    "name": "ผีป่า · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_pa_v29_pierce",
+    "owner": "phi-pa",
+    "name": "ผีป่า · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pa_v29_ward",
+    "owner": "phi-pa",
+    "name": "ผีป่า · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_pa_v29_defense",
+    "owner": "phi-pa",
+    "name": "หักกิ่งบัง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pa_v29_signature",
+    "owner": "phi-pa",
+    "name": "พุ่งจากพง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×3",
+    "dmg": 2,
+    "hits": 3
+  },
+  {
+    "id": "phi_pa_v29_signature_support",
+    "owner": "phi-pa",
+    "name": "ผีป่า · อาถรรพ์ประจำตน",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 2 ×2 · อ่อนแอ 1 · 1 เทิร์น",
+    "dmg": 2,
+    "hits": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_pa_v29_setup",
+    "owner": "phi-pa",
+    "name": "ผีป่า · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "mae_nak_v29_strike",
+    "owner": "mae-nak",
+    "name": "แม่นาค · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "mae_nak_v29_double",
+    "owner": "mae-nak",
+    "name": "แม่นาค · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "mae_nak_v29_pierce",
+    "owner": "mae-nak",
+    "name": "แม่นาค · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "mae_nak_v29_ward",
+    "owner": "mae-nak",
+    "name": "แม่นาค · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "mae_nak_v29_defense",
+    "owner": "mae-nak",
+    "name": "กอดหวง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ตนเอง หนาม 2 · 2 เทิร์น",
+    "block": 2,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "mae_nak_v29_signature",
+    "owner": "mae-nak",
+    "name": "มือยาวรั้ง",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 3 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "mae_nak_v29_signature_support",
+    "owner": "mae-nak",
+    "name": "แม่นาค · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง หนาม 3 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 3
+    },
+    "block": 3
+  },
+  {
+    "id": "mae_nak_v29_setup",
+    "owner": "mae-nak",
+    "name": "แม่นาค · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "pop_yai_v29_strike",
+    "owner": "pop-yai",
+    "name": "ปอบใหญ่ · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "pop_yai_v29_double",
+    "owner": "pop-yai",
+    "name": "ปอบใหญ่ · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "pop_yai_v29_pierce",
+    "owner": "pop-yai",
+    "name": "ปอบใหญ่ · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "pop_yai_v29_ward",
+    "owner": "pop-yai",
+    "name": "ปอบใหญ่ · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "pop_yai_v29_defense",
+    "owner": "pop-yai",
+    "name": "สะสมความหิว",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ฟื้น 3",
+    "block": 2,
+    "heal": 3
+  },
+  {
+    "id": "pop_yai_v29_signature",
+    "owner": "pop-yai",
+    "name": "กลืนเลือด",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · ฟื้น 4",
+    "dmg": 2,
+    "heal": 4
+  },
+  {
+    "id": "pop_yai_v29_signature_support",
+    "owner": "pop-yai",
+    "name": "ปอบใหญ่ · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ฟื้น 6 · ตนเอง แข็งแกร่ง 1 · 3 เทิร์น",
+    "heal": 6,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "pop_yai_v29_setup",
+    "owner": "pop-yai",
+    "name": "ปอบใหญ่ · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_ha_ratri_v29_strike",
+    "owner": "phi-ha-ratri",
+    "name": "ผีโขมด · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_ha_ratri_v29_double",
+    "owner": "phi-ha-ratri",
+    "name": "ผีโขมด · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_ha_ratri_v29_pierce",
+    "owner": "phi-ha-ratri",
+    "name": "ผีโขมด · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_ha_ratri_v29_ward",
+    "owner": "phi-ha-ratri",
+    "name": "ผีโขมด · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_ha_ratri_v29_defense",
+    "owner": "phi-ha-ratri",
+    "name": "เงาราตรี",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 2 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 2,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_ha_ratri_v29_signature",
+    "owner": "phi-ha-ratri",
+    "name": "เสียงร้องห้าคืน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · กลัว 1 · 1 เทิร์น",
+    "dmg": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "fear",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_ha_ratri_v29_signature_support",
+    "owner": "phi-ha-ratri",
+    "name": "ผีโขมด · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_ha_ratri_v29_setup",
+    "owner": "phi-ha-ratri",
+    "name": "ผีโขมด · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "asuragaya_v29_strike",
+    "owner": "asuragaya",
+    "name": "ผีกองกอย · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "asuragaya_v29_double",
+    "owner": "asuragaya",
+    "name": "ผีกองกอย · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "asuragaya_v29_pierce",
+    "owner": "asuragaya",
+    "name": "ผีกองกอย · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "asuragaya_v29_ward",
+    "owner": "asuragaya",
+    "name": "ผีกองกอย · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "asuragaya_v29_defense",
+    "owner": "asuragaya",
+    "name": "หมัดหนัก",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6 · อ่อนแอ 1 · 1 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "asuragaya_v29_signature",
+    "owner": "asuragaya",
+    "name": "เกราะอสุรกาย",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · กัน 2",
+    "dmg": 2,
+    "block": 2
+  },
+  {
+    "id": "asuragaya_v29_signature_support",
+    "owner": "asuragaya",
+    "name": "ผีกองกอย · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 7",
+    "block": 7
+  },
+  {
+    "id": "asuragaya_v29_setup",
+    "owner": "asuragaya",
+    "name": "ผีกองกอย · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "yak_wat_jaeng_v29_strike",
+    "owner": "yak-wat-jaeng",
+    "name": "เปรตลานวัด · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "yak_wat_jaeng_v29_double",
+    "owner": "yak-wat-jaeng",
+    "name": "เปรตลานวัด · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "yak_wat_jaeng_v29_pierce",
+    "owner": "yak-wat-jaeng",
+    "name": "เปรตลานวัด · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "yak_wat_jaeng_v29_ward",
+    "owner": "yak-wat-jaeng",
+    "name": "เปรตลานวัด · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "yak_wat_jaeng_v29_defense",
+    "owner": "yak-wat-jaeng",
+    "name": "กระบองยักษ์",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6 · อ่อนแอ 1 · 1 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "yak_wat_jaeng_v29_signature",
+    "owner": "yak-wat-jaeng",
+    "name": "ยืนเฝ้าประตู",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · กัน 2",
+    "dmg": 2,
+    "block": 2
+  },
+  {
+    "id": "yak_wat_jaeng_v29_signature_support",
+    "owner": "yak-wat-jaeng",
+    "name": "เปรตลานวัด · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 7",
+    "block": 7
+  },
+  {
+    "id": "yak_wat_jaeng_v29_setup",
+    "owner": "yak-wat-jaeng",
+    "name": "เปรตลานวัด · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_phrai_v29_strike",
+    "owner": "phi-phrai",
+    "name": "ผีพราย · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 3",
+    "dmg": 3
+  },
+  {
+    "id": "phi_phrai_v29_double",
+    "owner": "phi-phrai",
+    "name": "ผีพราย · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 ×2",
+    "dmg": 2,
+    "hits": 2
+  },
+  {
+    "id": "phi_phrai_v29_pierce",
+    "owner": "phi-phrai",
+    "name": "ผีพราย · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_phrai_v29_ward",
+    "owner": "phi-phrai",
+    "name": "ผีพราย · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4",
+    "block": 4
+  },
+  {
+    "id": "phi_phrai_v29_defense",
+    "owner": "phi-phrai",
+    "name": "ดำลงน้ำ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_phrai_v29_signature",
+    "owner": "phi-phrai",
+    "name": "พรายน้ำเน่า",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 1 · พิษ 2 · 2 เทิร์น",
+    "dmg": 1,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_phrai_v29_signature_support",
+    "owner": "phi-phrai",
+    "name": "ผีพราย · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · พิษ 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_phrai_v29_setup",
+    "owner": "phi-phrai",
+    "name": "ผีพราย · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_rerorn_v29_strike",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "winyan_rerorn_v29_double",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "winyan_rerorn_v29_pierce",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_rerorn_v29_ward",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "winyan_rerorn_v29_defense",
+    "owner": "winyan-rerorn",
+    "name": "ผ้าห่อเงา",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "winyan_rerorn_v29_signature",
+    "owner": "winyan-rerorn",
+    "name": "เสียงเร่ร่อน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 · ใส่การ์ดคำสาปในกองทิ้ง",
+    "dmg": 3,
+    "curseCard": "curse_burden"
+  },
+  {
+    "id": "winyan_rerorn_v29_signature_support",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_rerorn_v29_setup",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_rerorn_v29_pressure",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_rerorn_v29_recover",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "pisaj_fai_v29_strike",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "pisaj_fai_v29_double",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "pisaj_fai_v29_pierce",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "pisaj_fai_v29_ward",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "pisaj_fai_v29_defense",
+    "owner": "pisaj-fai",
+    "name": "คุไฟใต้เถ้า",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "pisaj_fai_v29_signature",
+    "owner": "pisaj-fai",
+    "name": "สะเก็ดไฟ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6",
+    "dmg": 6
+  },
+  {
+    "id": "pisaj_fai_v29_signature_support",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง แข็งแกร่ง 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "pisaj_fai_v29_setup",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "pisaj_fai_v29_pressure",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "pisaj_fai_v29_recover",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "jao_por_pa_v29_strike",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "jao_por_pa_v29_double",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "jao_por_pa_v29_pierce",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "jao_por_pa_v29_ward",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "jao_por_pa_v29_defense",
+    "owner": "jao-por-pa",
+    "name": "เปลือกไม้คุ้ม",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง หนาม 2 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "jao_por_pa_v29_signature",
+    "owner": "jao-por-pa",
+    "name": "รากไม้พัน",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "jao_por_pa_v29_signature_support",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง หนาม 3 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 3
+    },
+    "block": 3
+  },
+  {
+    "id": "jao_por_pa_v29_setup",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "jao_por_pa_v29_pressure",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "jao_por_pa_v29_recover",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "phi_nang_yai_v29_strike",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "phi_nang_yai_v29_double",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "phi_nang_yai_v29_pierce",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_yai_v29_ward",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "phi_nang_yai_v29_defense",
+    "owner": "phi-nang-yai",
+    "name": "ขึงจอผี",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_nang_yai_v29_signature",
+    "owner": "phi-nang-yai",
+    "name": "เงาหนังใหญ่",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 · ใส่การ์ดคำสาปในกองทิ้ง",
+    "dmg": 3,
+    "curseCard": "curse_burden"
+  },
+  {
+    "id": "phi_nang_yai_v29_signature_support",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_yai_v29_setup",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_yai_v29_pressure",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_nang_yai_v29_recover",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "winyan_dek_v29_strike",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "winyan_dek_v29_double",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "winyan_dek_v29_pierce",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_dek_v29_ward",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "winyan_dek_v29_defense",
+    "owner": "winyan-dek",
+    "name": "เล่นซ่อนเงา",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "winyan_dek_v29_signature",
+    "owner": "winyan-dek",
+    "name": "เสียงร้องเด็ก",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 · กลัว 1 · 1 เทิร์น",
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "fear",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_dek_v29_signature_support",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_dek_v29_setup",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_dek_v29_pressure",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "winyan_dek_v29_recover",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "yak_dam_v29_strike",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "yak_dam_v29_double",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "yak_dam_v29_pierce",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "yak_dam_v29_ward",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "yak_dam_v29_defense",
+    "owner": "yak-dam",
+    "name": "เกร็งกายดำ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "yak_dam_v29_signature",
+    "owner": "yak-dam",
+    "name": "หมัดยักษ์ดำ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6",
+    "dmg": 6
+  },
+  {
+    "id": "yak_dam_v29_signature_support",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง แข็งแกร่ง 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "yak_dam_v29_setup",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "yak_dam_v29_pressure",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "yak_dam_v29_recover",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "phi_mae_mai_v29_strike",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "phi_mae_mai_v29_double",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "phi_mae_mai_v29_pierce",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_mae_mai_v29_ward",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "phi_mae_mai_v29_defense",
+    "owner": "phi-mae-mai",
+    "name": "กอดเงามืด",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "phi_mae_mai_v29_signature",
+    "owner": "phi-mae-mai",
+    "name": "เสียงเรียกชื่อ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 · ลดการจั่ว 1 · 1 เทิร์น",
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_mae_mai_v29_signature_support",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ฟื้น 4 · ลดการจั่ว 1 · 1 เทิร์น",
+    "heal": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_mae_mai_v29_setup",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_mae_mai_v29_pressure",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_mae_mai_v29_recover",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "phra_upakut_v29_strike",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "phra_upakut_v29_double",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "phra_upakut_v29_pierce",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phra_upakut_v29_ward",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "phra_upakut_v29_defense",
+    "owner": "phra-upakut",
+    "name": "บ่วงทะเล",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 7 · อ่อนแอ 1 · 1 เทิร์น",
+    "block": 7,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phra_upakut_v29_signature",
+    "owner": "phra-upakut",
+    "name": "ม่านคลื่น",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 · กัน 3",
+    "dmg": 3,
+    "block": 3
+  },
+  {
+    "id": "phra_upakut_v29_signature_support",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 8",
+    "block": 8
+  },
+  {
+    "id": "phra_upakut_v29_setup",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phra_upakut_v29_pressure",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phra_upakut_v29_recover",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "phaya_nak_v29_strike",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "phaya_nak_v29_double",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "phaya_nak_v29_pierce",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phaya_nak_v29_ward",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "phaya_nak_v29_defense",
+    "owner": "phaya-nak",
+    "name": "เกล็ดนาค",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phaya_nak_v29_signature",
+    "owner": "phaya-nak",
+    "name": "ลมหายใจนาค",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 2 · พิษ 2 · 2 เทิร์น",
+    "dmg": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "phaya_nak_v29_signature_support",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · พิษ 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "poison",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "phaya_nak_v29_setup",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phaya_nak_v29_pressure",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phaya_nak_v29_recover",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "thep_aksorn_v29_strike",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "thep_aksorn_v29_double",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "thep_aksorn_v29_pierce",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "thep_aksorn_v29_ward",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "thep_aksorn_v29_defense",
+    "owner": "thep-aksorn",
+    "name": "ปิดคัมภีร์",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "thep_aksorn_v29_signature",
+    "owner": "thep-aksorn",
+    "name": "อักษรต้องห้าม",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 · ใส่การ์ดคำสาปในกองทิ้ง",
+    "dmg": 3,
+    "curseCard": "curse_burden"
+  },
+  {
+    "id": "thep_aksorn_v29_signature_support",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "thep_aksorn_v29_setup",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "thep_aksorn_v29_pressure",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "thep_aksorn_v29_recover",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "phraya_maccurat_v29_strike",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 4",
+    "dmg": 4
+  },
+  {
+    "id": "phraya_maccurat_v29_double",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×2",
+    "dmg": 3,
+    "hits": 2
+  },
+  {
+    "id": "phraya_maccurat_v29_pierce",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phraya_maccurat_v29_ward",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 5",
+    "block": 5
+  },
+  {
+    "id": "phraya_maccurat_v29_defense",
+    "owner": "phraya-maccurat",
+    "name": "บัญชีวิญญาณ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "phraya_maccurat_v29_signature",
+    "owner": "phraya-maccurat",
+    "name": "ตรายมทูต",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 · ลดการจั่ว 1 · 1 เทิร์น",
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phraya_maccurat_v29_signature_support",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ฟื้น 4 · ลดการจั่ว 1 · 1 เทิร์น",
+    "heal": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phraya_maccurat_v29_setup",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phraya_maccurat_v29_pressure",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phraya_maccurat_v29_recover",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 4 · ฟื้น 5",
+    "block": 4,
+    "heal": 5
+  },
+  {
+    "id": "night_head_collector_v29_strike",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 5",
+    "dmg": 5
+  },
+  {
+    "id": "night_head_collector_v29_double",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 ×2",
+    "dmg": 4,
+    "hits": 2
+  },
+  {
+    "id": "night_head_collector_v29_pierce",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_head_collector_v29_ward",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6",
+    "block": 6
+  },
+  {
+    "id": "night_head_collector_v29_defense",
+    "owner": "night-head-collector",
+    "name": "กระด้งบัง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "dodge",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_head_collector_v29_signature",
+    "owner": "night-head-collector",
+    "name": "ฉวยศีรษะ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 3 ×3",
+    "dmg": 3,
+    "hits": 3
+  },
+  {
+    "id": "night_head_collector_v29_signature_support",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · อาถรรพ์ประจำตน",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 2 ×2 · อ่อนแอ 1 · 1 เทิร์น",
+    "dmg": 2,
+    "hits": 2,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_head_collector_v29_setup",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_head_collector_v29_pressure",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_head_collector_v29_recover",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ฟื้น 5",
+    "block": 5,
+    "heal": 5
+  },
+  {
+    "id": "night_head_collector_v29_boundary",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · เขตต้องห้าม",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 6 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_head_collector_v29_execution",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · จู่โจมใหญ่",
+    "type": "attack",
+    "energyCost": 3,
+    "desc": "โจมตี 6 ×2",
+    "dmg": 6,
+    "hits": 2
+  },
+  {
+    "id": "night_head_collector_v29_awakened_strike",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · ตื่นอาฆาต",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 ×2",
+    "dmg": 5,
+    "hits": 2
+  },
+  {
+    "id": "night_head_collector_v29_awakened_ritual",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · พิธีครึ่งชีวิต",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_strike",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 5",
+    "dmg": 5
+  },
+  {
+    "id": "night_bell_keeper_v29_double",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 ×2",
+    "dmg": 4,
+    "hits": 2
+  },
+  {
+    "id": "night_bell_keeper_v29_pierce",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_ward",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6",
+    "block": 6
+  },
+  {
+    "id": "night_bell_keeper_v29_defense",
+    "owner": "night-bell-keeper",
+    "name": "ปิดเสียง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 4,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_signature",
+    "owner": "night-bell-keeper",
+    "name": "ระฆังปลุกผี",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · กลัว 1 · 1 เทิร์น",
+    "dmg": 4,
+    "statusEffect": {
+      "target": "player",
+      "effect": "fear",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_signature_support",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_setup",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_pressure",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_recover",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ฟื้น 5",
+    "block": 5,
+    "heal": 5
+  },
+  {
+    "id": "night_bell_keeper_v29_boundary",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · เขตต้องห้าม",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 6 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_bell_keeper_v29_execution",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · จู่โจมใหญ่",
+    "type": "attack",
+    "energyCost": 3,
+    "desc": "โจมตี 6 ×2",
+    "dmg": 6,
+    "hits": 2
+  },
+  {
+    "id": "night_bell_keeper_v29_awakened_strike",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · ตื่นอาฆาต",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 ×2",
+    "dmg": 5,
+    "hits": 2
+  },
+  {
+    "id": "night_bell_keeper_v29_awakened_ritual",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · พิธีครึ่งชีวิต",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ลดการจั่ว 1 · 1 เทิร์น",
+    "block": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "draw_reduction",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_root_lord_v29_strike",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 5",
+    "dmg": 5
+  },
+  {
+    "id": "night_root_lord_v29_double",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 ×2",
+    "dmg": 4,
+    "hits": 2
+  },
+  {
+    "id": "night_root_lord_v29_pierce",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_root_lord_v29_ward",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6",
+    "block": 6
+  },
+  {
+    "id": "night_root_lord_v29_defense",
+    "owner": "night-root-lord",
+    "name": "เปลือกอาถรรพ์",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4 · ตนเอง หนาม 2 · 2 เทิร์น",
+    "block": 4,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 2
+    }
+  },
+  {
+    "id": "night_root_lord_v29_signature",
+    "owner": "night-root-lord",
+    "name": "รากกลืนกาย",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · อ่อนแอ 1 · 2 เทิร์น",
+    "block": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_root_lord_v29_signature_support",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง หนาม 3 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 3
+    },
+    "block": 3
+  },
+  {
+    "id": "night_root_lord_v29_setup",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_root_lord_v29_pressure",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_root_lord_v29_recover",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ฟื้น 5",
+    "block": 5,
+    "heal": 5
+  },
+  {
+    "id": "night_root_lord_v29_boundary",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · เขตต้องห้าม",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 6 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_root_lord_v29_execution",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · จู่โจมใหญ่",
+    "type": "attack",
+    "energyCost": 3,
+    "desc": "โจมตี 6 ×2",
+    "dmg": 6,
+    "hits": 2
+  },
+  {
+    "id": "night_root_lord_v29_awakened_strike",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · ตื่นอาฆาต",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 ×2",
+    "dmg": 5,
+    "hits": 2
+  },
+  {
+    "id": "night_root_lord_v29_awakened_ritual",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · พิธีครึ่งชีวิต",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ตนเอง หนาม 3 · 2 เทิร์น",
+    "block": 5,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "thorns",
+      "duration": 2,
+      "value": 3
+    }
+  },
+  {
+    "id": "night_cave_mother_v29_strike",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 5",
+    "dmg": 5
+  },
+  {
+    "id": "night_cave_mother_v29_double",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 ×2",
+    "dmg": 4,
+    "hits": 2
+  },
+  {
+    "id": "night_cave_mother_v29_pierce",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_cave_mother_v29_ward",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6",
+    "block": 6
+  },
+  {
+    "id": "night_cave_mother_v29_defense",
+    "owner": "night-cave-mother",
+    "name": "ม่านถ้ำ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 4,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "night_cave_mother_v29_signature",
+    "owner": "night-cave-mother",
+    "name": "เถ้าลูกผี",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · ใส่การ์ดคำสาปในกองทิ้ง",
+    "dmg": 4,
+    "curseCard": "curse_burden"
+  },
+  {
+    "id": "night_cave_mother_v29_signature_support",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_cave_mother_v29_setup",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_cave_mother_v29_pressure",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_cave_mother_v29_recover",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ฟื้น 5",
+    "block": 5,
+    "heal": 5
+  },
+  {
+    "id": "night_cave_mother_v29_boundary",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · เขตต้องห้าม",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 6 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_cave_mother_v29_execution",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · จู่โจมใหญ่",
+    "type": "attack",
+    "energyCost": 3,
+    "desc": "โจมตี 6 ×2",
+    "dmg": 6,
+    "hits": 2
+  },
+  {
+    "id": "night_cave_mother_v29_awakened_strike",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · ตื่นอาฆาต",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 ×2",
+    "dmg": 5,
+    "hits": 2
+  },
+  {
+    "id": "night_cave_mother_v29_awakened_ritual",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · พิธีครึ่งชีวิต",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_headless_king_v29_strike",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 5",
+    "dmg": 5
+  },
+  {
+    "id": "night_headless_king_v29_double",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 ×2",
+    "dmg": 4,
+    "hits": 2
+  },
+  {
+    "id": "night_headless_king_v29_pierce",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_headless_king_v29_ward",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6",
+    "block": 6
+  },
+  {
+    "id": "night_headless_king_v29_defense",
+    "owner": "night-headless-king",
+    "name": "เกราะราชาผี",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4 · ตนเอง ฟื้นฟู 2 · 3 เทิร์น",
+    "block": 4,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "regeneration",
+      "duration": 3,
+      "value": 2
+    }
+  },
+  {
+    "id": "night_headless_king_v29_signature",
+    "owner": "night-headless-king",
+    "name": "คมตัดคอ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 7",
+    "dmg": 7
+  },
+  {
+    "id": "night_headless_king_v29_signature_support",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 3 · ตนเอง แข็งแกร่ง 1 · 3 เทิร์น",
+    "block": 3,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_headless_king_v29_setup",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_headless_king_v29_pressure",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_headless_king_v29_recover",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ฟื้น 5",
+    "block": 5,
+    "heal": 5
+  },
+  {
+    "id": "night_headless_king_v29_boundary",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · เขตต้องห้าม",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 6 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "night_headless_king_v29_execution",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · จู่โจมใหญ่",
+    "type": "attack",
+    "energyCost": 3,
+    "desc": "โจมตี 6 ×2",
+    "dmg": 6,
+    "hits": 2
+  },
+  {
+    "id": "night_headless_king_v29_awakened_strike",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · ตื่นอาฆาต",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 ×2",
+    "dmg": 5,
+    "hits": 2
+  },
+  {
+    "id": "night_headless_king_v29_awakened_ritual",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · พิธีครึ่งชีวิต",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_kin_hua_v29_strike",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · ตะปบ",
+    "type": "attack",
+    "energyCost": 1,
+    "desc": "โจมตี 5",
+    "dmg": 5
+  },
+  {
+    "id": "phi_kin_hua_v29_double",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · ฟาดต่อเนื่อง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 ×2",
+    "dmg": 4,
+    "hits": 2
+  },
+  {
+    "id": "phi_kin_hua_v29_pierce",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · ทะลวง",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 6 · เปราะบาง 1 · 1 เทิร์น",
+    "dmg": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 1,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_kin_hua_v29_ward",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · ตั้งรับ",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 6",
+    "block": 6
+  },
+  {
+    "id": "phi_kin_hua_v29_defense",
+    "owner": "phi-kin-hua",
+    "name": "อิ่มเลือด",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "กัน 4 · ฟื้น 3",
+    "block": 4,
+    "heal": 3
+  },
+  {
+    "id": "phi_kin_hua_v29_signature",
+    "owner": "phi-kin-hua",
+    "name": "กลืนศีรษะ",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 4 · ฟื้น 4",
+    "dmg": 4,
+    "heal": 4
+  },
+  {
+    "id": "phi_kin_hua_v29_signature_support",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · อาถรรพ์ประจำตน",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ฟื้น 6 · ตนเอง แข็งแกร่ง 1 · 3 เทิร์น",
+    "heal": 6,
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 3,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_kin_hua_v29_setup",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · รวบรวมแรง",
+    "type": "skill",
+    "energyCost": 1,
+    "desc": "ตนเอง แข็งแกร่ง 1 · 2 เทิร์น",
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "strength",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_kin_hua_v29_pressure",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · กดดัน",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 · อ่อนแอ 1 · 2 เทิร์น",
+    "dmg": 5,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_kin_hua_v29_recover",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · ถอยฟื้น",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ฟื้น 5",
+    "block": 5,
+    "heal": 5
+  },
+  {
+    "id": "phi_kin_hua_v29_boundary",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · เขตต้องห้าม",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 6 · เปราะบาง 1 · 2 เทิร์น",
+    "block": 6,
+    "statusEffect": {
+      "target": "player",
+      "effect": "vulnerable",
+      "duration": 2,
+      "value": 1
+    }
+  },
+  {
+    "id": "phi_kin_hua_v29_execution",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · จู่โจมใหญ่",
+    "type": "attack",
+    "energyCost": 3,
+    "desc": "โจมตี 6 ×2",
+    "dmg": 6,
+    "hits": 2
+  },
+  {
+    "id": "phi_kin_hua_v29_awakened_strike",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · ตื่นอาฆาต",
+    "type": "attack",
+    "energyCost": 2,
+    "desc": "โจมตี 5 ×2",
+    "dmg": 5,
+    "hits": 2
+  },
+  {
+    "id": "phi_kin_hua_v29_awakened_ritual",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · พิธีครึ่งชีวิต",
+    "type": "skill",
+    "energyCost": 2,
+    "desc": "กัน 5 · ฟื้น 6",
+    "block": 5,
+    "heal": 6
   }
 ]

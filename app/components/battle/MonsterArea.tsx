@@ -12,7 +12,6 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {enemyLane} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
 import GhostArt from '../GhostArt';
-import GhostLoreButton from '../GhostLoreButton';
 import {ghostLore} from '../../../src/core/monsters/folklore';
 import {paper} from '../Paper';
 import RitualSurface,{chalk} from '../RitualSurface';
@@ -108,11 +107,10 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>
        <Text numberOfLines={1} style={{flex:1,fontFamily:'Prompt_600SemiBold',fontSize:actors.length>1?11:13,color:chalk}}>{ghostLore(actor.id)?.name??actor.name}</Text>
        <View style={{flex:1.2}}><HealthBar hp={actor.hp} maxHp={actor.maxHp} compact label={actor.name}/></View>
-       {actors.length===1&&<GhostLoreButton compact id={actor.id}/>}
       </View>
       <View style={{flexDirection:'row',gap:actors.length>1?4:12,alignItems:'center',minHeight:24}}>
-       <EnemyStatItem icon="block" label="" value={`${actor.block??0}`}/>
        <EnemyStatItem icon="energy" label="" value={`${actor.energy??actor.maxEnergy??0}`}/>
+       <EnemyStatItem icon="block" label="" value={`${actor.block??0}`}/>
        <EnemyStatItem icon="deck" label="" value={`${actor.handCount??actor.handSize??0}`}/>
       </View>
       <View style={{flexDirection:'row',gap:6,alignItems:'center'}}>
@@ -126,7 +124,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 });
 
 function EnemyStatItem({ icon, label, value }: { icon: InkSymbol; label: string; value: string }) {
-  return <View accessible accessibilityLabel={`${icon==='block'?'เกราะ':icon==='energy'?'พลัง':'การ์ด'} ${value}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+  return <View accessible accessibilityLabel={`${icon==='block'?'เกราะ':icon==='energy'?'พลัง':'การ์ดในมือ'} ${value}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
     <InkIcon name={icon} size={20} color={chalk} />
     <Text style={{ color: chalk, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>{label} {value}</Text>
   </View>;

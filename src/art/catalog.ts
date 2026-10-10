@@ -64,16 +64,16 @@ const SCENES: ArtSlot[] = [
 
 /** ภาพกลางการ์ด encounter บนหน้าแผนที่ (โหนดที่ไม่ใช่การต่อสู้) */
 const ENCOUNTERS: ArtSlot[] = [
-  { id: 'encounter/shop_card',       label: 'ร้านค้าการ์ด',   file: 'encounters/enShopCardMini.png',     size: [200, 200], brief: 'แผงขายของริมทาง มีม้วนคาถา/ยันต์วางขาย', group: 'encounter' },
-  { id: 'encounter/shop_equipment',  label: 'ร้านเครื่องราง', file: 'encounters/enShopEquipMini.png',    size: [200, 200], brief: 'แผงขายเครื่องราง ตะกรุด ลูกประคำ', group: 'encounter' },
-  { id: 'encounter/shop_remove',     label: 'สละการ์ด',       file: 'encounters/enRemoveMini.png',       size: [200, 200], brief: 'กองไฟเผากระดาษยันต์ สื่อถึงการทิ้งการ์ด', group: 'encounter' },
-  { id: 'encounter/shop_upgrade',    label: 'ปลุกเสกการ์ด',   file: 'encounters/enUpgradeMini.png',      size: [200, 200], brief: 'โต๊ะพิธี ธูปเทียน สื่อถึงการปลุกเสก', group: 'encounter' },
-  { id: 'encounter/well',            label: 'บ่อน้ำลึกลับ',   file: 'encounters/enWellMini.png',         size: [200, 200], brief: 'บ่อน้ำหินเก่า มีแสงเรืองจากก้นบ่อ', group: 'encounter' },
-  { id: 'encounter/healing_shrine',  label: 'ศาลพักใจ',       file: 'encounters/enShrineMini.png',       size: [200, 200], brief: 'ศาลพระภูมิเล็กๆ มีผ้าแพรและธูปจุดค้างอยู่', group: 'encounter' },
+  { id: 'encounter/shop_card',       label: 'ร้านค้าการ์ด',   file: 'encounters/thai-v29/shop-card.webp',     size: [200, 200], brief: 'แผงขายของริมทาง มีม้วนคาถา/ยันต์วางขาย', group: 'encounter' },
+  { id: 'encounter/shop_equipment',  label: 'ร้านเครื่องราง', file: 'encounters/thai-v29/shop-equipment.webp',    size: [200, 200], brief: 'แผงขายเครื่องราง ตะกรุด ลูกประคำ', group: 'encounter' },
+  { id: 'encounter/shop_remove',     label: 'สละการ์ด',       file: 'ui/remove-torn-card-b17.webp',       size: [200, 200], brief: 'กองไฟเผากระดาษยันต์ สื่อถึงการทิ้งการ์ด', group: 'encounter' },
+  { id: 'encounter/shop_upgrade',    label: 'ปลุกเสกการ์ด',   file: 'encounters/thai-v29/upgrade-altar.webp',      size: [200, 200], brief: 'โต๊ะพิธี ธูปเทียน สื่อถึงการปลุกเสก', group: 'encounter' },
+  { id: 'encounter/well',            label: 'บ่อน้ำลึกลับ',   file: 'encounters/enWell.png',         size: [200, 200], brief: 'บ่อน้ำหินเก่า มีแสงเรืองจากก้นบ่อ', group: 'encounter' },
+  { id: 'encounter/healing_shrine',  label: 'ศาลพักใจ',       file: 'ui/blessing-shrine-object.png',       size: [200, 200], brief: 'ศาลพระภูมิเล็กๆ มีผ้าแพรและธูปจุดค้างอยู่', group: 'encounter' },
   { id: 'encounter/treasure',        label: 'หีบสมบัติ',      file: 'encounters/enTreasureOpenMini.png', size: [200, 200], brief: 'หีบไม้เก่าเปิดอยู่ มีแสงลอดออกมา', group: 'encounter' },
-  { id: 'encounter/treasure_single', label: 'สมบัติชิ้นเดียว', file: 'encounters/enTreasure1Mini.png',    size: [200, 200], brief: 'ห่อผ้าเล็กๆ วางบนตอไม้ มีของชิ้นเดียวข้างใน', group: 'encounter' },
-  { id: 'encounter/next_event',      label: 'ทางไปต่อ',       file: 'encounters/enNextMini.png',         size: [200, 200], brief: 'ทางเดินลึกเข้าไปในความมืด มีรอยเท้าบนดินเปียก', group: 'encounter' },
-  { id: 'encounter/fusion_altar',    label: 'แท่นผสาน',       file: 'encounters/enFusionMini.png',       size: [200, 200], brief: 'แท่นหินกลางป่า มีรอยยันต์เรืองแสง ใช้รวมการ์ดสองใบเป็นใบเดียว', group: 'encounter' },
+  { id: 'encounter/treasure_single', label: 'สมบัติชิ้นเดียว', file: 'encounters/thai-v29/treasure-single.webp',    size: [200, 200], brief: 'ห่อผ้าเล็กๆ วางบนตอไม้ มีของชิ้นเดียวข้างใน', group: 'encounter' },
+  { id: 'encounter/next_event',      label: 'ทางไปต่อ',       file: 'encounters/thai-v29/next-path.webp',         size: [200, 200], brief: 'ทางเดินลึกเข้าไปในความมืด มีรอยเท้าบนดินเปียก', group: 'encounter' },
+  { id: 'encounter/fusion_altar',    label: 'แท่นผสาน',       file: 'encounters/thai-v29/fusion-altar.webp',       size: [200, 200], brief: 'แท่นหินกลางป่า มีรอยยันต์เรืองแสง ใช้รวมการ์ดสองใบเป็นใบเดียว', group: 'encounter' },
 ];
 
 /** ไอคอนบนแถบเส้นทาง — ตอนนี้ยังเป็น emoji อยู่ */

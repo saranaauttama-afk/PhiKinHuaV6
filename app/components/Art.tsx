@@ -1,3 +1,4 @@
+import {ENCOUNTER_OBJECTS} from './EncounterArt';
 // app/components/Art.tsx — จุดเดียวที่ผูกไฟล์รูปจริงเข้ากับช่องรูปของเกม
 //
 // **วิธีเพิ่มรูปใหม่: วางไฟล์ตาม path ที่ `docs/art-checklist.md` บอก แล้วเพิ่ม
@@ -19,6 +20,16 @@ import { font, palette, radius, surface } from '../theme';
  * key ต้องตรงกับ `id` ใน `src/art/catalog.ts` เป๊ะ (มีเทสต์คุมให้)
  */
 export const ART_SOURCES: Record<string, any> = {
+ 'encounter/shop_card':ENCOUNTER_OBJECTS.shop_card,
+ 'encounter/shop_equipment':ENCOUNTER_OBJECTS.shop_equipment,
+ 'encounter/shop_upgrade':ENCOUNTER_OBJECTS.shop_upgrade,
+ 'encounter/shop_remove':ENCOUNTER_OBJECTS.shop_remove,
+ 'encounter/well':ENCOUNTER_OBJECTS.well,
+ 'encounter/healing_shrine':ENCOUNTER_OBJECTS.healing_shrine,
+ 'encounter/treasure':ENCOUNTER_OBJECTS.treasure,
+ 'encounter/treasure_single':ENCOUNTER_OBJECTS.treasure_single,
+ 'encounter/fusion_altar':ENCOUNTER_OBJECTS.fusion_altar,
+ 'encounter/next_event':ENCOUNTER_OBJECTS.next_event,
  'blessing/night_medium_blessing': require('../../assets/blessings/thai-v24/night_medium_blessing.webp'),
  'blessing/night_nun_blessing': require('../../assets/blessings/thai-v24/night_nun_blessing.webp'),
  'blessing/night_shaman_blessing': require('../../assets/blessings/thai-v24/night_shaman_blessing.webp'),
@@ -99,8 +110,6 @@ export const ART_SOURCES: Record<string, any> = {
   'event/episode_lantern': require('../../assets/scence/lantern-hut.jpg'),
   'chapter/episode_open': require('../../assets/scence/episode-village.jpg'),
   'chapter/episode_end': require('../../assets/scence/menu-haunted.jpg'),
-  'encounter/healing_shrine': require('../../assets/scence/rest.jpg'),
-  'encounter/shop_upgrade': require('../../assets/scence/rest.jpg'),
   'scene/start':  require('../../assets/scence/startPage.png'),
   'scene/swamp':  require('../../assets/scence/swamp.png'),
   'scene/hut':    require('../../assets/scence/abandonedHut.png'),
@@ -118,9 +127,6 @@ export const ART_SOURCES: Record<string, any> = {
   'monster/nang-tanee': require('../../assets/monsters/thai-v24/nang-tanee.webp'),
   'monster/phi-nang-ram': require('../../assets/monsters/thai-v24/phi-nang-ram.webp'),
   'monster/phi-pong-kang': require('../../assets/monsters/thai-v24/phi-pong-kang.webp'),
-
-  'encounter/shop_card': require('../../assets/cards/thai-v24/offering_tray.webp'),
-  'encounter/treasure':  require('../../assets/encounters/enTreasureOpenMini.png'),
 
   // ไฟล์สองอันนี้ตั้งชื่อตาม id ปลอมของ BlessingDialog ที่เป็น mock (ถูกลบไปแล้ว)
   // ไม่ตรงกับ id จริงใน blessings.json จึงต้องแม็ปตามความหมายของภาพ

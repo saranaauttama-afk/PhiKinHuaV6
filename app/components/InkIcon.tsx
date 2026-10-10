@@ -1,8 +1,10 @@
 import React from 'react';
 import {paper} from '../theme';
 import Svg, { Path, Circle } from 'react-native-svg';
-export type InkSymbol = 'hp'|'energy'|'block'|'gold'|'deck'|'blessing'|'hand'|'attack'|'rest'|'house'|'lantern'|'walk'|'check'|'settings'|'fear'|'poison'|'curse'|'corruption'|'entangle'|'weakness'|'vulnerable'|'draw_reduction'|'regeneration'|'strength'|'block_next'|'energy_boost'|'spell_charging'|'combo'|'trap';
+export type InkSymbol = 'thorns'|'dodge'|'hp'|'energy'|'block'|'gold'|'deck'|'blessing'|'hand'|'attack'|'rest'|'house'|'lantern'|'walk'|'check'|'settings'|'fear'|'poison'|'curse'|'corruption'|'entangle'|'weakness'|'vulnerable'|'draw_reduction'|'regeneration'|'strength'|'block_next'|'energy_boost'|'spell_charging'|'combo'|'trap';
 const paths: Record<InkSymbol,string> = {
+ thorns:'M3 21L8 12L9 17L14 4L15 11L21 2L18 17L12 15L8 22Z',
+ dodge:'M2 12Q12 1 22 12Q12 23 2 12 M4 22L20 2',
  fear:'M5 19Q1 8 8 3Q19 0 21 10Q23 18 17 21L14 18L11 22L8 19Z M7 9L10 10 M17 9L14 10 M9 15Q12 11 15 15',
  poison:'M12 2Q4 12 4 16Q4 23 12 23Q20 23 20 16Q20 12 12 2Z M8 14L16 20 M16 14L8 20',
  curse:'M3 3L21 21 M21 3L3 21 M5 8L12 2L19 8L17 19L7 19Z',

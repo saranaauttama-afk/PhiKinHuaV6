@@ -17,7 +17,7 @@ export function chooseEnemyCards(s:GameState,hand:string[],budget:number):string
    special+=Math.min(c.heal??0,enemy.maxHp-enemy.hp)*.8;
    if(c.statusEffect){const e=c.statusEffect,who=e.target==='enemy'?enemy:s.player;
     const existing=who.statusEffects?.find(x=>x.id===e.effect);
-    special+=e.effect==='strength'?(preparing?7:3):e.effect==='poison'?4:3;
+    special+=e.effect==='strength'?(preparing?7:3):e.effect==='poison'?4:e.effect==='dodge'?(preparing?6:3):3;
     if(existing&&(existing.stacks??1)>=4)special-=3;
    }
   }

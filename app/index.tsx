@@ -200,11 +200,11 @@ export default function Home() {
               <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
-          {state.campaign&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:16,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · {state.pages?.adventure?`ปราบผี ${state.pages.adventure.fightsWon}/${FIGHTS_PER_NIGHT} · ผีรอ ${state.pages.adventure.pendingIds.length}`:`ปราบผี ${state.fightCount??0}/${nightFightTotal(state.campaign?.night)}`}</Text>}
+          {state.campaign&&!state.pages?.adventure&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:16,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · {state.pages?.adventure?`ปราบผี ${state.pages.adventure.fightsWon}/${FIGHTS_PER_NIGHT} · ผีรอ ${state.pages.adventure.pendingIds.length}`:`ปราบผี ${state.fightCount??0}/${nightFightTotal(state.campaign?.night)}`}</Text>}
           {!state.pages?.adventure&&<Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>}
           {!state.pages?.adventure&&trailOpen&&<JourneyTrail state={state} compact/>}
-          <Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>
-          <Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{state.pages?.adventure?'สามหน้าระหว่างทาง':restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>
+          {!state.pages?.adventure&&<Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>}
+          {!state.pages?.adventure&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>}
 
           {state.pages?.adventure || (offers.some(o=>o?.kind==='monster'||o?.kind==='boss')&&offers.some(o=>o&&o.kind!=='monster'&&o.kind!=='boss')) ? <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} skipCount={skippableSlots(state).length} onSkip={state.pages?.adventure?()=>dispatch({type:'Proceed'}):undefined}/></View> : offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
             <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>

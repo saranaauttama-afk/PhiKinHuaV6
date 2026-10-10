@@ -28,4 +28,4 @@ Current source/APK commit e56d50c9d6697da07ab700d8471c01db838aa5cd, CI run 38017
 
 Android job 114110334806 succeeded: 710 tests / 44 files, TypeScript, Gradle build in 17m52s, APK signing/16KB alignment/package checks. APK is 121,345,359 bytes, package com.phikinhua.episode, v1.0.28 / code29, ARM64 and x86_64, offline Hermes bundle. SHA256 3559efd62dc9046ce457902cef753be3869a3c2ccce4d5f77883f4786b30fbe8. Signature v2 certificate matches v1.0.27, permitting an update install. Downloaded ZIP digests and actual APK checksum/ZIP integrity verified. APK artifact 11656859047 and audit 11656823823. APK delivered to user.
 
-Native job 114113941819 remains in progress. Do not claim five-night Android/archive persistence success until its actual result/evidence is inspected. v1.0.27 validation is historical and cannot substitute for this application's native result.
+Native job 114113941819 completed successfully in CI 38017307432. The five-night structure and archive cold-restart checks passed with the v1.0.28 APK; this was rechecked when starting v1.0.29. The old pending note was stale. v1.0.29 requires its own validation.

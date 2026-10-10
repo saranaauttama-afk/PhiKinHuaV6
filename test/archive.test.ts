@@ -24,8 +24,8 @@ describe('archive catalog and real discoveries',()=>{
   expect(GHOST_CATALOG.at(-1)?.id).toBe('phi-kin-hua');
   expect(CARD_CATALOG.filter(c=>c.group==='สูตรผสาน').every(c=>c.card.tags?.includes('fused'))).toBe(true);
  });
- it('records only map ghosts revealed to the player, not the 28 prebuilt future fights',()=>{
-  const r=run();expect(Object.keys(r.s.discovery!.ghosts)).toHaveLength(1);
+ it('records only map ghosts revealed to the player, not the ten prebuilt future fights',()=>{
+  const r=run();const visible=r.s.pages!.current!.offers.filter(o=>o?.kind==='monster');expect(Object.keys(r.s.discovery!.ghosts)).toHaveLength(visible.length);
   expect(Object.keys(r.s.discovery!.cards).length).toBeGreaterThan(0);
   const id=Object.keys(r.s.discovery!.ghosts)[0],p=mergeDiscovery(emptyArchive(),r.s.discovery!);
   r.step({type:'Proceed'});const next=mergeDiscovery(p,r.s.discovery!);

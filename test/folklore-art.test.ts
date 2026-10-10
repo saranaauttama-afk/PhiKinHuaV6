@@ -32,7 +32,7 @@ describe('complete researched Thai ghost roster',()=>{
   for(const ghost of Object.values(THAI_GHOST_POOLS).flat())expect(art.get('monster/'+ghost.id)).toContain('monsters/thai-v24/'+ghost.id+'.webp');
   expect(read('app/components/SceneGhostChoices.tsx')).not.toContain('map-pop.png');
   expect(read('app/components/SceneGhostChoices.tsx')).toContain('<GhostLoreButton');
-  expect(read('app/components/battle/MonsterArea.tsx')).toContain('<GhostLoreButton');
+  expect(read('app/components/battle/MonsterArea.tsx')).not.toContain('<GhostLoreButton');expect(read('app/components/battle/MonsterArea.tsx')).toContain('<GhostArt');
  });
 });
 

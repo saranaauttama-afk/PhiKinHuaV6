@@ -101,7 +101,7 @@ function buildDeckFromConfig(_enemyId: string, cfg: DeckConfig, r: RNG): { ids: 
     const ro = int(rr, 0, total-1); rr = ro.rng;
     let acc=0, pick = cfg.lists[0];
     for (const opt of cfg.lists) { acc += (opt.weight||0); if (ro.value < acc) { pick = opt; break; } }
-    const ids = pick.cards.slice(0, ENEMY_DECK_SIZE);
+    const ids = pick.cards.slice();
     return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
   }
 

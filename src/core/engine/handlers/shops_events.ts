@@ -50,11 +50,11 @@ export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopRer
     const { rollShopStock } = require('../../shop');
     const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS, getClass(s.classId).cardTag);
     r = out.rng;
-    s.shopStock = out.items;
+    s.shopStock = out.items.map((item:import('../../types').ShopItem)=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
   } catch {
     const fb = fallbackShopStock(r, SHOP_STOCK_SIZE);
     r = fb.rng;
-    s.shopStock = fb.items;
+    s.shopStock = fb.items.map(item=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
     s.log.push('Shop: reroll fallback stock.');
   }
   s.log.push(`Shop: rerolled (-${SHOP_REROLL_COST}g)`);
@@ -66,11 +66,11 @@ export function qaOpenShopHere(s: GameState, _cmd: Extract<Command, { type: 'QA_
     const { rollShopStock } = require('../../shop');
     const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS, getClass(s.classId).cardTag);
     r = out.rng;
-    s.shopStock = out.items;
+    s.shopStock = out.items.map((item:import('../../types').ShopItem)=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
   } catch {
     const fb = fallbackShopStock(r, SHOP_STOCK_SIZE);
     r = fb.rng;
-    s.shopStock = fb.items;
+    s.shopStock = fb.items.map(item=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
     s.log.push('QA: fallback shop stock.');
   }
   s.phase = 'shop';
@@ -249,11 +249,11 @@ export function openShopCard(s: GameState, r: RNG): { state: GameState; rng: RNG
     const { rollShopStock } = require('../../shop');
     const out = rollShopStock(r, 3, SHOP_POWER_BIAS, getClass(s.classId).cardTag); // Limit to 3 cards
     r = out.rng;
-    s.shopStock = out.items;
+    s.shopStock = out.items.map((item:import('../../types').ShopItem)=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
   } catch {
     const fb = fallbackShopStock(r, 3); // Limit to 3 cards
     r = fb.rng;
-    s.shopStock = fb.items;
+    s.shopStock = fb.items.map(item=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
     s.log.push('Shop(card): fallback stock.');
   }
   s.shopKind = 'card';

@@ -1,7 +1,7 @@
 name: Android five-night APK
 on:
   push:
-    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table', 'art/quiet-comic-ui', 'work/battle-ui-backlog-v22', 'work/adventure-pages-b17']
+    branches: [forCodex, 'work/first-chapter-apk', 'work/pulp-ui', 'work/occupation-table', 'art/quiet-comic-ui', 'work/battle-ui-backlog-v22', 'work/adventure-pages-b17', 'work/final-tuning-v29']
     paths-ignore: ['**/*.md', 'scripts/android-smoke.py', 'scripts/android-backlog-smoke.py', '.github/workflows/android-b17-verify.yml', '.github/workflows/android-helper-verify.yml', '.github/workflows/android-native-inspect.yml']
   workflow_dispatch:
 permissions:
@@ -36,6 +36,7 @@ jobs:
       - run: node scripts/backlog-mobile-check.cjs
       - run: node scripts/adventure-mobile-check.cjs
       - run: node scripts/archive-mobile-check.cjs
+      - run: node scripts/final-tuning-mobile-check.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -76,13 +77,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='29' versionName='1.0.28'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FiveNights-v1.0.28.apk
-          sha256sum PhiKinHua-FiveNights-v1.0.28.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='30' versionName='1.0.29'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FiveNights-v1.0.29.apk
+          sha256sum PhiKinHua-FiveNights-v1.0.29.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FiveNights-APK
-          path: PhiKinHua-FiveNights-v1.0.28.apk
+          path: PhiKinHua-FiveNights-v1.0.29.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -112,7 +113,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FiveNights-v1.0.28.apk
+            adb install PhiKinHua-FiveNights-v1.0.29.apk
             adb shell am start -W -n com.phikinhua.episode/.MainActivity
             adb shell pidof com.phikinhua.episode
             python scripts/android-backlog-smoke.py

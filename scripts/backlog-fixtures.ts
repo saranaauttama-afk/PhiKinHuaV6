@@ -45,7 +45,20 @@ keep('rest-cards',rest);
 const bless=structuredClone(level);bless.levelUp={choice:{optionA:'blessing',optionB:'max_hp',gold:30},blessingChoices:Object.values(BLESSINGS_BY_RARITY).flat().slice(0,2),consumed:false} as any;keep('levelup-blessing',bless);
 keep('hand',s);
 keep('archive-populated',s);keep('archive-empty',s);
-for(const night of [1,2,3,4,5] as const){let a=applyCommand({seed:'adventure-ui-'+night,turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'adventure-ui-'+night,classId:'warrior',night},rng).state;a.chapter=undefined;a=applyCommand(a,{type:'ChooseStarterBlessing',index:0},rng).state;keep('adventure-'+night,a);}
+for(const night of [1,2,3,4,5] as const){
+ for(let ix=0;ix<100;ix++){
+  const seed='adventure-ui-'+night+'-'+ix,r=makeRng(seed);let a=applyCommand({seed,turn:0,phase:'start'} as GameState,{type:'NewRun',seed,classId:'warrior',night},r).state;
+  a.chapter=undefined;a=applyCommand(a,{type:'ChooseStarterBlessing',index:0},r).state;
+  if(a.pages!.current!.offers[1]?.kind==='shop_card'){keep('adventure-'+night,a);break;}
+ }
+}
+// All actual destination kinds presented on the route, using the same object mapping.
+for(const kind of ['shop_card','shop_equipment','shop_upgrade','shop_remove','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event','next_event']){
+ const a=structuredClone(fixtures['adventure-1'].state),o=structuredClone(fixtures['rest-'+kind]?.state.pages!.current!.offers[0]??{kind:'next_event'});
+ a.pages!.current!.offers[1]=o;a.pages!.adventure!.deck.find(e=>e.id===a.pages!.adventure!.slotIds[1])!.offer=o;
+ keep('adventure-prop-'+kind,a);
+}
+
 
 fs.mkdirSync('/tmp/phikinhua-backlog-web',{recursive:true});fs.writeFileSync('/tmp/phikinhua-backlog-web/ui-review-fixtures.json',JSON.stringify({fixtures}));
 fs.writeFileSync('/tmp/phikinhua-backlog-battle.json',JSON.stringify(toBattleSave(s,rng)));

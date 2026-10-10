@@ -16,7 +16,7 @@ import { palette, surface, tint, layer, font } from '../theme';
 import {paper} from './Paper';
 import CandleSelection from './CandleSelection';
 import RitualSurface from './RitualSurface';
-import InkIcon from './InkIcon';
+import CardBadges from './CardBadges';
 import { CardGlyphArt } from './DeckCard';
 import { cardSummary } from '../cardPresentation';
 
@@ -167,8 +167,7 @@ export default function Card({
         animatedStyle
       ]}>
       <CandleSelection selected={selected}><RitualSurface kind={disabled?"grayCard":"occupationPage"} style={{width:'100%',height:'100%',padding:9,paddingTop:28,paddingBottom:4}}>
-        <View style={{position:'absolute',top:5,left:6,width:25,height:25,borderRadius:13,backgroundColor:paper.ink,alignItems:'center',justifyContent:'center',zIndex:layer.badge}}><Text style={{color:paper.light,fontFamily:font.heading,fontSize:14}}>{costNow??card.cost}</Text></View>
-        <Text style={{position:'absolute',top:6,right:7,fontFamily:font.ui,fontSize:10,color:paper.ink}}>ขั้น {card.upgradeLevel??0}</Text>
+        <View style={{position:'absolute',top:4,left:6,right:7,zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact/></View>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
         <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={Math.max(18,Math.min(height*.38,height-94))} muted={disabled}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:10,lineHeight:14,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>

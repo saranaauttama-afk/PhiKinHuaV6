@@ -68,18 +68,18 @@ describe('five-night campaign',()=>{
  });
  it('higher nights increase health/strength without shortening the route',()=>{
   const values=[1,2,3,4,5].map(n=>{const d=driver('warrior',n as Night);d.state.pages!.current!.offers[0]={kind:'monster',enemyId:'phi-pop'} as any;d.go({type:'ChooseOffer',index:0});return {hp:d.state.enemy!.maxHp,strength:d.state.enemy!.statusEffects?.find(e=>e.id==='strength')?.stacks??0};});
-  expect(values.map(v=>v.hp)).toEqual([28,31,34,36,39]);expect(values.map(v=>v.strength)).toEqual([0,1,1,1,1]);
+  expect(values.map(v=>v.hp)).toEqual([51,55,58,62,65]);expect(values.map(v=>v.strength)).toEqual([0,1,1,1,1]);
  });
  it('higher difficulty never reduces an existing guardian’s energy, and postponement does not change its base stats',()=>{
   const stats=(night:Night,fights:number)=>{const d=driver('warrior',night);d.state.fightCount=fights;d.state.pages!.current!.offers[0]={kind:'monster',tier:'elite',enemyId:'phaya-nak'};d.go({type:'ChooseOffer',index:0});return {hp:d.state.enemy!.maxHp,energy:d.state.enemy!.maxEnergy};};
-  for(const n of [1,2,3,4,5] as const){expect(stats(n,0)).toEqual(stats(n,20));expect(stats(n,0).energy).toBe(4);if(n>1)expect(stats(n,0).hp).toBeGreaterThan(stats((n-1) as Night,0).hp);}
+  for(const n of [1,2,3,4,5] as const){expect(stats(n,0)).toEqual(stats(n,20));expect(stats(n,0).energy).toBe(3);if(n>1)expect(stats(n,0).hp).toBeGreaterThan(stats((n-1) as Night,0).hp);}
  });
  it('boss awakening triggers once and new energy starts on the next hand',()=>{
   const d=driver('warrior',5);d.state.pages!.current!.offers[0]={kind:'boss',bossType:'final',enemyId:'phaya-nak'} as any;d.go({type:'ChooseOffer',index:0});const s=d.state;s.enemy!.hp=Math.floor(s.enemy!.maxHp/2);
   const budget=s.enemy!.maxEnergy!;awakenNightBoss(s);const strength=s.enemy!.statusEffects!.find(e=>e.id==='strength')!.stacks;expect(s.enemy!.block).toBe(14);expect(s.enemy!.maxEnergy).toBe(budget+1);awakenNightBoss(s);expect(s.enemy!.statusEffects!.find(e=>e.id==='strength')!.stacks).toBe(strength);
  });
  it('all new ghosts have resolvable, distinct, mixed full decks',()=>{
-  for(const [owner,ids] of Object.entries(NIGHT_ENEMY_DECKS)){expect(ids).toHaveLength(15);const cards=ids.map(id=>enemyCardById(id)!);expect(cards.every(c=>c&&c.owner===owner)).toBe(true);expect(cards.some(c=>c.type==='skill')).toBe(true);expect(cards.some(c=>c.id.endsWith('_signature'))).toBe(true);}
+  for(const [owner,ids] of Object.entries(NIGHT_ENEMY_DECKS)){const unique=new Set(ids).size;expect([8,10,12]).toContain(unique);expect(ids.length).toBeGreaterThanOrEqual(18);expect(ids.length).toBeLessThanOrEqual(30);const cards=ids.map(id=>enemyCardById(id)!);expect(cards.every(c=>c&&c.owner===owner)).toBe(true);expect(cards.some(c=>c.type==='skill')).toBe(true);expect(cards.some(c=>c.id.endsWith('_signature'))).toBe(true);}
  });
  it('entangle denies enemy attacks, while curses are fight-only and summons visible',()=>{
   const d=driver();d.go({type:'ChooseOffer',index:0});const s=d.state;const hp=s.player.hp;applyStatusEffect('enemy',s,'entangle',2,1);resolveEnemyCard(s,enemyCardById('thep_aksorn_signature')!);expect(s.player.hp).toBe(hp);expect(s.piles.discard.some(c=>c.type==='curse')).toBe(false);

@@ -146,8 +146,10 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   // เดิมใช้ก้อนเดียวสำหรับทุกตัวที่ไม่ใช่ elite/boss ผีกระสือกับผีพราย
   // จึงให้รางวัลเท่ากันทั้งที่ HP ต่างกัน 4 เท่า
   const tier = defeatedMonsterTier(s);
-  const gained = expForMonster(tier);
-  const gold = goldForMonster(tier);
+  const offer=s.pages?.current?.offers[s.pages._activeOfferIndex??-1];
+  const elite=offer?.kind==='monster'&&offer.tier==='elite';
+  const gained = s.pages?.adventure?(offer?.kind==='boss'?60:elite?32:18):expForMonster(tier);
+  const gold = s.pages?.adventure?(offer?.kind==='boss'?60:elite?28:18):goldForMonster(tier);
 
   s.player.exp += gained;
   s.player.gold = (s.player.gold || 0) + gold;
@@ -184,7 +186,6 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   }
 
   // การ์ดรางวัลเป็นของ "ชนะไฟต์" ไม่ใช่ของ "เลเวลอัป" — ทุกไฟต์ที่ชนะได้เลือก
-  const offer=s.pages?.current?.offers[s.pages._activeOfferIndex??-1];
   // The finite adventure gives cards for elites/bosses; ordinary fights give XP/money.
   if(!s.pages?.adventure||offer?.kind==='boss'||(offer?.kind==='monster'&&offer.tier==='elite'))r=rollCardReward(s,r);
   else s.cardReward=undefined;

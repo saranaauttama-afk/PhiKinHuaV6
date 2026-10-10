@@ -7,7 +7,7 @@ import RitualSurface from '../RitualSurface';
 import InkIcon,{type InkSymbol} from '../InkIcon';
 import {font,palette,badgeColors,paper} from '../../theme';
 export type BattleBadge={id:string;name:string;symbol:string;detail:string;count?:string;bad?:boolean;neutral?:boolean;onPress?:()=>void};
-const symbols:Record<string,InkSymbol>={fear:'fear',poison:'poison',curse:'curse',corruption:'corruption',entangle:'entangle',weak:'weakness',weakness:'weakness',vulnerable:'vulnerable',strength:'strength',regeneration:'regeneration',regen:'regeneration',protection:'block',haste:'energy',draw_reduction:'draw_reduction',block_next:'block_next',energy_boost:'energy_boost',spell_charging:'spell_charging',burn:'rest',bleed:'hp'};
+const symbols:Record<string,InkSymbol>={thorns:'thorns',dodge:'dodge',fear:'fear',poison:'poison',curse:'curse',corruption:'corruption',entangle:'entangle',weak:'weakness',weakness:'weakness',vulnerable:'vulnerable',strength:'strength',regeneration:'regeneration',regen:'regeneration',protection:'block',haste:'energy',draw_reduction:'draw_reduction',block_next:'block_next',energy_boost:'energy_boost',spell_charging:'spell_charging',burn:'rest',bleed:'hp'};
 const badgeSymbol=(e:BattleBadge)=>(e.symbol in symbols?symbols[e.symbol]:e.id.startsWith('trap:')?'trap':e.id==='rage-rule'?'strength':e.id.startsWith('combo:')||e.id.startsWith('done:')?'combo':e.symbol==='✓'?'check':e.symbol) as InkSymbol;
 /** One bounded row; details open above combat without changing HUD height. */
 export default function StatusStrip({effects,extra=[],compact=false,align='center'}:{effects?:StatusEffect[];extra?:BattleBadge[];compact?:boolean;align?:'center'|'flex-start'}){

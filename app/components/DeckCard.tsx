@@ -7,6 +7,7 @@ import RitualSurface from './RitualSurface';
 import { font, paper } from '../theme';
 import {upgradeLevelOf} from '../../src/core/engine/shared';
 import {fusedArtParents} from '../cardArtIdentity';
+import CardBadges from './CardBadges';
 import CandleSelection from './CandleSelection';
 
 const glyphs = {
@@ -29,9 +30,10 @@ export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardDat
 /** Same paper, art, energy, level and complete ability text in deck and all shops. */
 export function CardFace({card,count}:{card:CardData;count?:number}) {
  return <RitualSurface kind="occupationPage" style={styles.card}>
-  <View style={styles.top}><Text style={styles.cost}>พลัง {card.cost??0}</Text><Text style={styles.count}>ขั้น {upgradeLevelOf(card)}</Text></View>
+  <CardBadges card={card}/>
   <View style={styles.symbol}><CardGlyphArt card={card}/></View>
   <Text style={styles.name}>{card.name??card.id}</Text>
+  {upgradeLevelOf(card)>0&&<Text style={styles.note}>ปลุกเสกขั้น {upgradeLevelOf(card)}</Text>}
   <Text style={[styles.summary,{color:card.type==='attack'?paper.red:paper.ink}]}>{cardSummary(card)}</Text>
   {!!card.desc&&!card.upgraded&&<Text style={styles.summary}>{card.desc}</Text>}
   {count!=null&&<Text style={styles.note}>×{count} ใบ</Text>}

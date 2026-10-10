@@ -30,7 +30,7 @@ function wiredSlots(): Set<string> {
 /** path ของรูปที่ Art.tsx require ไว้ (นับจาก assets/) */
 function wiredFiles(): string[] {
   const src = fs.readFileSync(ART_TSX, 'utf8');
-  const body = src.slice(src.indexOf('ART_SOURCES'), src.indexOf('export function hasArt'));
+  const body = src.slice(src.indexOf('ART_SOURCES'), src.indexOf('export function hasArt'))+fs.readFileSync(path.join(ROOT,'app/components/EncounterArt.ts'),'utf8');
   return [...body.matchAll(/require\('\.\.\/\.\.\/assets\/([^']+)'\)/g)].map(m => m[1]);
 }
 

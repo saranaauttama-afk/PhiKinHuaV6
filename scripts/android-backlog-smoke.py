@@ -41,15 +41,18 @@ try:
         tap(r'^เริ่มเกม$'); root=nodes()[0]; x1,y1,x2,y2=bounds(root); assert y2-y1>x2-x1,'Android must be portrait'
         tap(r'^เลือกนักรบวัด'); tap(r'ออกเดินทาง'); tap('ดูคืนที่ '+str(night)); tap('เล่นคืนที่ '+str(night)); tap(r'^ข้ามบทนี้$'); tap(r'^พรติดตัว 1:'); tap(r'^ยืนยันพร$')
         before=slots(nodes()); assert len(before)==3,('three pages',before)
-        tap(r'^ร้านค้าการ์ด · แวะพัก'); tap(r'^แวะ · ร้านค้าการ์ด$')
-        shop=nodes(); assert available(shop,r'^ร้านขายคาถา$') is not None,'Shop must open on mixed map'; assert available(shop,r'^จบเทิร์น$') is None
-        tap(r'^กลับจุดพัก$'); assert slots(nodes())==before,'Postponed shop must preserve all pages'; record('night '+str(night)+' native mixed shop and postponed pages')
+        shop_checked=False
         battles=0; story=False; bosses=[]; ghosts=[]; complete=False
         for guard in range(650):
             ns=nodes(); text=' '.join(label(n) for n in ns)
+            if not shop_checked:
+                shop_page=next((n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and ' · เข้าร้าน' in label(n)),None)
+                if shop_page is not None:
+                    before=slots(ns); click(shop_page); tap(r'^เข้าร้าน · '); assert available(nodes(),r'^จบเทิร์น$') is None
+                    tap(r'^กลับจุดพัก$'); assert slots(nodes())==before,'Postponed shop must preserve all pages'; shop_checked=True; record('native sparse shop preserves pages'); continue
             if available(ns,r'^ผ่านคืนที่ '+str(night)+r'!$') is not None:
-                assert story and battles==(30 if night==5 else 29),(night,story,battles)
-                assert len(ghosts)==28 and len(set(ghosts))==28,(night,ghosts)
+                assert shop_checked and story and battles==(12 if night==5 else 11),(night,story,battles)
+                assert len(ghosts)==10 and len(set(ghosts))==10,(night,ghosts)
                 snapshot('night-'+str(night)+'-complete',ns); nights.append({'night':night,'battles':battles,'story':story,'bosses':bosses,'ghosts':ghosts}); record('night '+str(night)+' complete and next night unlocked'); tap(r'^กลับหน้าแรก$'); complete=True; break
             if available(ns,r'^ข้ามบทนี้$') is not None: tap(r'^ข้ามบทนี้$'); continue
             if available(ns,r'^รับรางวัล$') is not None: tap(r'^รับรางวัล$'); battles+=1; continue
@@ -57,6 +60,7 @@ try:
             if available(ns,r'^ไม่เอาสักใบ$') is not None: tap(r'^ไม่เอาสักใบ$'); continue
             card=available(ns,r'^การ์ด .*พระประธาน')
             if card is not None:
+                assert 'ที่มา' not in text and not re.search(r'คืน \d+ · ศึก ',text),'Battle header/lore must stay removed'
                 if not resumed:
                     initial=hand(ns); tap(r'^พักการต่อสู้$'); tap(r'^กลับเมนูหลัก$'); tap(r'^เล่นต่อ'); tap(r'^พักการต่อสู้$'); tap(r'^กลับเมนูหลัก$')
                     adb('shell','am','force-stop',APP); adb('shell','am','start','-W','-n',APP+'/.MainActivity'); tap(r'^เล่นต่อ'); now=nodes(); assert hand(now)==initial,'Cold resume must preserve visible hand'
@@ -70,6 +74,7 @@ try:
                 tap(r'^การ์ด .*พระประธาน'); tap(r'^ใช้การ์ด$'); continue
             critical=next((n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and re.search(r' · (ต่อสู้|ศึกใหญ่|เรื่องสำคัญ)',label(n))),None)
             if critical is not None:
+                assert 'สามหน้าระหว่างทาง' not in text and 'เลือกหนึ่งหน้า' not in text,'Map copy must stay removed'
                 if 'ศึกใหญ่' in label(critical): bosses.append(label(critical).split(' · ')[0])
                 elif 'ต่อสู้' in label(critical): ghosts.append(label(critical).split(' · ')[0])
                 story_page='เรื่องสำคัญ' in label(critical); click(critical); tap(r'^สำรวจเรื่องราว$' if story_page else r'^เผชิญหน้า · '); continue
@@ -82,12 +87,13 @@ try:
     assert resumed and cancel_checked
     assert nights[-1]['bosses'][-1]=='ผีกินหัว',nights[-1]
     tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$')
-    text=' '.join(label(n) for n in nodes()); assert 'พบแล้ว 34 / 34 ตัว' in text and 'ปราบแล้ว 34 ตัว' in text,text
-    tap(r'^ดูทั้งหมด$'); tap(r'^ดูผี ผีปอบ$'); detail=' '.join(label(n) for n in nodes()); assert 'พบ 5 การเดินทาง' in detail and 'ปราบ 5 การเดินทาง' in detail,detail
+    expected=len(set(name for n in nights for name in n['ghosts']+n['bosses']))
+    text=' '.join(label(n) for n in nodes()); assert f'พบแล้ว {expected} / 34 ตัว' in text and f'ปราบแล้ว {expected} ตัว' in text,text
+    tap(r'^ดูทั้งหมด$'); first=nights[0]['ghosts'][0]; tap(r'^ดูผี '+re.escape(first)+r'$'); detail=' '.join(label(n) for n in nodes()); count=sum(first in n['ghosts']+n['bosses'] for n in nights); assert f'พบ {count} การเดินทาง' in detail and f'ปราบ {count} การเดินทาง' in detail,detail
     tap(r'^ปิดรายละเอียด$'); tap(r'^การ์ด$'); tap(r'^ทุกกลุ่ม$'); tap(r'^นักรบวัด$'); tap(r'^ดูการ์ด ฟันดาบวัด$'); tap(r'^ดูการ์ดปลุกเสกขั้น 1$'); tap(r'^ปิดรายละเอียด$')
     tap(r'^กลับ$'); adb('shell','am','force-stop',APP); adb('shell','am','start','-W','-n',APP+'/.MainActivity')
-    tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$'); text=' '.join(label(n) for n in nodes()); assert 'พบแล้ว 34 / 34 ตัว' in text and 'ปราบแล้ว 34 ตัว' in text,text
-    snapshot('archive-cold-reopen',nodes()); tap(r'^กลับ$'); record('archive full roster and card inspection persist across five runs and cold restart')
+    tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$'); text=' '.join(label(n) for n in nodes()); assert f'พบแล้ว {expected} / 34 ตัว' in text and f'ปราบแล้ว {expected} ตัว' in text,text
+    snapshot('archive-cold-reopen',nodes()); tap(r'^กลับ$'); record('archive sampled roster and card inspection persist across five runs and cold restart')
     assert adb('shell','pidof',APP).strip(); record('Android portrait and process alive after all five nights')
     log_file.flush(); log=(OUT/'logcat.txt').read_text()
     assert 'FATAL EXCEPTION' not in log and 'JavascriptException' not in log,'Native crash in logcat'

@@ -1,7 +1,7 @@
 /** Shared owner coordinates: enlarged upper body and reveal beside its shoulder. */
 export function battleGeometry(screenW:number,screenH:number,top=0,bottom=0) {
- const monsterTop=top+54,handHeight=screenH<700?148:178;
- const monsterSize=Math.max(140,Math.min(350,screenH-bottom-118-handHeight-110-monsterTop));
+ const monsterTop=top+10,handHeight=screenH<700?148:178;
+ const monsterSize=Math.max(140,Math.min(390,screenH-bottom-118-handHeight-110-monsterTop));
  const hudTop=monsterTop+monsterSize+8;
  return {screenW,screenH,monsterTop,monsterSize,hudTop,enemyHandCenterY:monsterTop+monsterSize*.55,centerX:screenW*.34,centerY:monsterTop+monsterSize*.55};
 }

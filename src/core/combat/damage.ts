@@ -159,8 +159,11 @@ export function dealDamage(
   const sourceKind = args.source.kind;
 
   const rules = rulesFor(args.source);
-  const modified = computeModifiedDamage(state, { from, to, raw, source: args.source });
+  let modified = computeModifiedDamage(state, { from, to, raw, source: args.source });
 
+  const isAttack=sourceKind==='card'||sourceKind==='combo'||sourceKind==='minion';
+  const dodge=targetState.statusEffects?.find(e=>e.id==='dodge');
+  if(isAttack&&modified>0&&dodge){modified=0;dodge.stacks=(dodge.stacks??1)-1;if(dodge.stacks<=0)targetState.statusEffects=targetState.statusEffects!.filter(e=>e!==dodge);}
   // 4) block ดูดซับ (ดาเมจบางชนิดทะลุ block — ดู rulesFor)
   const blockBefore = targetState.block ?? 0;
   const blocked = rules.useBlock ? Math.min(blockBefore, modified) : 0;
@@ -195,6 +198,8 @@ export function dealDamage(
     runEquipmentDamageDealt(state, { amount: hpLoss, side: from, target: to });
   }
 
+  const thorns=targetState.statusEffects?.find(e=>e.id==='thorns');
+  if(isAttack&&modified>0&&thorns&&((from==='player'?state.player:state.enemy)?.hp??0)>0)dealDamage(state,{from:to,to:from,raw:thorns.stacks??thorns.value??1,source:{kind:'status',effectId:'thorns'}});
   return { raw, modified, blocked, hpLoss, died };
 }
 

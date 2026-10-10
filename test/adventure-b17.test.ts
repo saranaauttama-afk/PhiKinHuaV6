@@ -7,8 +7,7 @@ import {isCriticalOffer,skippableSlots,validAdventure,ADVENTURE_GHOSTS,FIGHTS_PE
 import {fromSave,toSave,isPlayableSave} from '../src/core/save';
 import {adventureSceneId,ADVENTURE_GEOGRAPHY,battleSceneStage,mapSceneStage} from '../app/scenePresentation';
 import {nightFinalBoss,ULTIMATE_BOSS} from '../src/core/campaign/bosses';
-function driver(night:1|2|3|4|5=1){
- const seed=`adventure-${night}`;let s=baseNewState(seed),r=makeRng(seed);
+function driver(night:1|2|3|4|5=1,seed=`adventure-${night}`){let s=baseNewState(seed),r=makeRng(seed);
  const go=(cmd:Command)=>{({state:s,rng:r}=applyCommand(s,cmd,r));};
  go({type:'NewRun',seed,classId:'warrior',night});go({type:'SkipChapter'});go({type:'ChooseStarterBlessing',index:0});
  return {go,get s(){return s},get r(){return r},restore(){const data=toSave(s,r);s=fromSave(data);r=data.mapRng??data.battleRng!;}};
@@ -40,17 +39,17 @@ describe('B17 independent pages and bounded resources',()=>{
   d.go({type:'CompleteNode'});d.go({type:'OpenPage'});expect(d.s.pages!.current!.offers[1]).toEqual(before.offers[1]);
  });
  it('Next Intersection queues visible ghosts, discards visible services and never skips replacements',()=>{
-  const d=driver(),a=structuredClone(d.s.pages!.adventure!),combat=structuredClone(d.s.pages!.current!.offers[0]);
+  const d=driver(),dBefore=structuredClone(d.s.pages!.current!.offers),a=structuredClone(d.s.pages!.adventure!),combat=structuredClone(d.s.pages!.current!.offers[0]);
   expect(skippableSlots(d.s)).toEqual([0,1,2]);d.go({type:'Proceed'});
-  expect(d.s.pages!.adventure!.skippedIds).toEqual(a.slotIds.slice(1));expect(d.s.pages!.adventure!.pendingIds).toEqual([a.slotIds[0]]);expect(d.s.pages!.adventure!.cursor).toBe(6);
-  expect(d.s.pages!.adventure!.fightsWon).toBe(0);expect(validAdventure(d.s)).toBe(true);d.restore();expect(d.s.pages!.adventure!.pendingIds).toEqual([a.slotIds[0]]);
+  expect(d.s.pages!.adventure!.skippedIds).toEqual(a.slotIds.filter((id,i)=>!isCriticalOffer(dBefore[i])));expect(d.s.pages!.adventure!.pendingIds).toEqual(a.slotIds.filter((id,i)=>dBefore[i].kind==='monster'));expect(d.s.pages!.adventure!.cursor).toBe(6);
+  expect(d.s.pages!.adventure!.fightsWon).toBe(0);expect(validAdventure(d.s)).toBe(true);d.restore();expect(d.s.pages!.adventure!.pendingIds).toEqual(a.slotIds.filter((id,i)=>dBefore[i].kind==='monster'));
   const ix=d.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster'),offer=structuredClone(d.s.pages!.current!.offers[ix]);
   d.go({type:'DismissOffer',index:ix});expect(d.s.pages!.current!.offers[ix]).toEqual(offer);
   d.go({type:'ChooseOffer',index:ix});const page=structuredClone(d.s.pages);d.go({type:'Proceed'});d.go({type:'ChooseOffer',index:1});expect(d.s.phase).toBe('combat');expect(d.s.pages).toEqual(page);
   expect(a.deck[0].offer).toEqual(combat);
  });
- it('every seed/night includes the same complete ghost roster exactly once',()=>{
-  for(const n of [1,2,3,4,5] as const){const d=driver(n),ids=d.s.pages!.adventure!.deck.flatMap(e=>e.offer.kind==='monster'?[e.offer.enemyId]:[]);expect(ids.sort()).toEqual(ADVENTURE_GHOSTS.map(m=>m.id).sort());expect(new Set(ids).size).toBe(FIGHTS_PER_NIGHT);}
+ it('every night samples ten distinct existing ghosts',()=>{
+  for(const n of [1,2,3,4,5] as const){const d=driver(n),ids=d.s.pages!.adventure!.deck.flatMap(e=>e.offer.kind==='monster'?[e.offer.enemyId]:[]);expect(ids.every(id=>ADVENTURE_GHOSTS.some(m=>m.id===id))).toBe(true);expect(new Set(ids).size).toBe(FIGHTS_PER_NIGHT);}
  });
  it('postponing all possible fights accumulates a finite late combat queue without healing or a boss bypass',()=>{
   const d=driver();let stages:number[]=[];
@@ -61,7 +60,7 @@ describe('B17 independent pages and bounded resources',()=>{
    else d.go({type:'Proceed'});
    expect(validAdventure(d.s)).toBe(true);d.restore();
   }
-  expect(d.s.pages!.adventure!.pendingIds.length).toBeGreaterThan(20);expect(d.s.pages!.adventure!.fightsWon).toBe(0);expect(d.s.pages!.adventure!.boss).toBe('locked');
+  expect(d.s.pages!.adventure!.pendingIds.length).toBeGreaterThanOrEqual(7);expect(d.s.pages!.adventure!.fightsWon).toBe(0);expect(d.s.pages!.adventure!.boss).toBe('locked');
   expect(d.s.pages!.current!.offers.filter(Boolean).every(o=>o.kind==='monster')).toBe(true);
   d.s.player.hp=9;const defeated:string[]=[];
   for(let guard=0;guard<100&&d.s.pages!.adventure!.boss==='locked';guard++){
@@ -76,7 +75,7 @@ describe('B17 independent pages and bounded resources',()=>{
   expect(d.s.cardReward).toBeUndefined();expect(d.s.masterDeck).toHaveLength(before);expect(d.s.player.gold).toBeGreaterThan(gold);expect(d.s.lastReward!.exp).toBeGreaterThan(0);
  });
  it('treasure resolves only its own slot and cannot resurrect or grant a second card after save/load',()=>{
-  const d=driver();
+  const d=Array.from({length:30},(_,i)=>driver(1,`treasure-v29-${i}`)).find(d=>d.s.pages!.adventure!.deck.some(e=>e.offer.kind==='treasure'))!;expect(d).toBeDefined();
   for(let guard=0;guard<30&&!d.s.pages!.current!.offers.some(o=>o?.kind==='treasure');guard++){
    const ix=d.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster');
    if(ix>=0)win(d,ix);else d.go({type:'Proceed'});

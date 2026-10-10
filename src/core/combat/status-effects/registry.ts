@@ -151,6 +151,8 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     }
   },
 
+  thorns:{id:'thorns',name:'หนามสะท้อน',description:'เมื่อรับการโจมตี สะท้อนความเสียหายตามจำนวนชั้น',defaultDuration:2,stackable:true,maxStacks:6,tags:['buff','protection']},
+  dodge:{id:'dodge',name:'หลบครั้งถัดไป',description:'หลบการโจมตีถัดไปหนึ่งครั้ง ไม่หลบพิษหรือความเสียหายจากสถานะ',defaultDuration:1,stackable:true,maxStacks:2,tags:['buff','protection']},
   energy_boost: {
     id: 'energy_boost',
     name: 'เพิ่มพลังงาน',

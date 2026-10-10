@@ -1,0 +1,1042 @@
+[
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 80,
+        "mean": 4.05
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 7,
+        "mean": 5.71
+      }
+    },
+    "class": "warrior",
+    "night": 1,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 7,
+    "meanFights": 10.9,
+    "meanTurns": 46.8,
+    "meanCombos": 6.8,
+    "cardsPerEnemyTurn": 2,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 80,
+        "mean": 2.84
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 8,
+        "mean": 4.75
+      }
+    },
+    "class": "warrior",
+    "night": 1,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 33.1,
+    "meanCombos": 9.5,
+    "cardsPerEnemyTurn": 2.05,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 72,
+        "mean": 4.19
+      },
+      "elite": {
+        "count": 8,
+        "mean": 4.13
+      },
+      "boss": {
+        "count": 7,
+        "mean": 7.14
+      }
+    },
+    "class": "warrior",
+    "night": 2,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 7,
+    "meanFights": 10.9,
+    "meanTurns": 49.3,
+    "meanCombos": 5.9,
+    "cardsPerEnemyTurn": 1.96,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 72,
+        "mean": 3.4
+      },
+      "elite": {
+        "count": 8,
+        "mean": 3.75
+      },
+      "boss": {
+        "count": 8,
+        "mean": 6.75
+      }
+    },
+    "class": "warrior",
+    "night": 2,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 41.1,
+    "meanCombos": 10.8,
+    "cardsPerEnemyTurn": 2.1,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 63,
+        "mean": 5.17
+      },
+      "elite": {
+        "count": 16,
+        "mean": 4.69
+      },
+      "boss": {
+        "count": 4,
+        "mean": 6
+      }
+    },
+    "class": "warrior",
+    "night": 3,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 4,
+    "meanFights": 10.4,
+    "meanTurns": 55.4,
+    "meanCombos": 5.4,
+    "cardsPerEnemyTurn": 1.96,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 3.42
+      },
+      "elite": {
+        "count": 16,
+        "mean": 3.56
+      },
+      "boss": {
+        "count": 8,
+        "mean": 5.63
+      }
+    },
+    "class": "warrior",
+    "night": 3,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 40.1,
+    "meanCombos": 10.3,
+    "cardsPerEnemyTurn": 2.06,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 61,
+        "mean": 4.79
+      },
+      "elite": {
+        "count": 11,
+        "mean": 4.91
+      },
+      "boss": {
+        "count": 3,
+        "mean": 7.67
+      }
+    },
+    "class": "warrior",
+    "night": 4,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 3,
+    "meanFights": 9.4,
+    "meanTurns": 49.5,
+    "meanCombos": 6.6,
+    "cardsPerEnemyTurn": 1.93,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 3.44
+      },
+      "elite": {
+        "count": 16,
+        "mean": 3.94
+      },
+      "boss": {
+        "count": 7,
+        "mean": 6.14
+      }
+    },
+    "class": "warrior",
+    "night": 4,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 7,
+    "meanFights": 10.9,
+    "meanTurns": 41.8,
+    "meanCombos": 11.1,
+    "cardsPerEnemyTurn": 2.09,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 54,
+        "mean": 5.46
+      },
+      "elite": {
+        "count": 9,
+        "mean": 5.22
+      },
+      "boss": {
+        "count": 4,
+        "mean": 6.5
+      }
+    },
+    "class": "warrior",
+    "night": 5,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 1,
+    "meanFights": 8.4,
+    "meanTurns": 49.8,
+    "meanCombos": 5.9,
+    "cardsPerEnemyTurn": 1.91,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 3.61
+      },
+      "elite": {
+        "count": 16,
+        "mean": 4.38
+      },
+      "boss": {
+        "count": 9,
+        "mean": 5.33
+      }
+    },
+    "class": "warrior",
+    "night": 5,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 3,
+    "meanFights": 11.1,
+    "meanTurns": 46.5,
+    "meanCombos": 11,
+    "cardsPerEnemyTurn": 2.12,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 80,
+        "mean": 2.76
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 8,
+        "mean": 3.13
+      }
+    },
+    "class": "shaman",
+    "night": 1,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 30.8,
+    "meanCombos": 18.1,
+    "cardsPerEnemyTurn": 1.98,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 80,
+        "mean": 1.81
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 8,
+        "mean": 2.75
+      }
+    },
+    "class": "shaman",
+    "night": 1,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 20.9,
+    "meanCombos": 17.5,
+    "cardsPerEnemyTurn": 2.07,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 72,
+        "mean": 2.93
+      },
+      "elite": {
+        "count": 8,
+        "mean": 3.25
+      },
+      "boss": {
+        "count": 8,
+        "mean": 3.5
+      }
+    },
+    "class": "shaman",
+    "night": 2,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 33.1,
+    "meanCombos": 19.4,
+    "cardsPerEnemyTurn": 1.99,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 72,
+        "mean": 2
+      },
+      "elite": {
+        "count": 8,
+        "mean": 2
+      },
+      "boss": {
+        "count": 8,
+        "mean": 2.13
+      }
+    },
+    "class": "shaman",
+    "night": 2,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 22.1,
+    "meanCombos": 18.1,
+    "cardsPerEnemyTurn": 2.09,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 2.61
+      },
+      "elite": {
+        "count": 16,
+        "mean": 2.31
+      },
+      "boss": {
+        "count": 8,
+        "mean": 3.25
+      }
+    },
+    "class": "shaman",
+    "night": 3,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 28.8,
+    "meanCombos": 22.5,
+    "cardsPerEnemyTurn": 2.05,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 2.27
+      },
+      "elite": {
+        "count": 16,
+        "mean": 2.25
+      },
+      "boss": {
+        "count": 8,
+        "mean": 2.5
+      }
+    },
+    "class": "shaman",
+    "night": 3,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 25,
+    "meanCombos": 20.1,
+    "cardsPerEnemyTurn": 2.08,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 2.72
+      },
+      "elite": {
+        "count": 16,
+        "mean": 2.44
+      },
+      "boss": {
+        "count": 8,
+        "mean": 4
+      }
+    },
+    "class": "shaman",
+    "night": 4,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 30.5,
+    "meanCombos": 21.1,
+    "cardsPerEnemyTurn": 2.1,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 2.2
+      },
+      "elite": {
+        "count": 16,
+        "mean": 2.38
+      },
+      "boss": {
+        "count": 8,
+        "mean": 2.88
+      }
+    },
+    "class": "shaman",
+    "night": 4,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 25.3,
+    "meanCombos": 20.5,
+    "cardsPerEnemyTurn": 2.12,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 3.11
+      },
+      "elite": {
+        "count": 16,
+        "mean": 2.81
+      },
+      "boss": {
+        "count": 10,
+        "mean": 4.5
+      }
+    },
+    "class": "shaman",
+    "night": 5,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 4,
+    "meanFights": 11.3,
+    "meanTurns": 38.8,
+    "meanCombos": 23.4,
+    "cardsPerEnemyTurn": 2.13,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 2.41
+      },
+      "elite": {
+        "count": 16,
+        "mean": 2.25
+      },
+      "boss": {
+        "count": 16,
+        "mean": 3.75
+      }
+    },
+    "class": "shaman",
+    "night": 5,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 12,
+    "meanTurns": 31.1,
+    "meanCombos": 21.8,
+    "cardsPerEnemyTurn": 2.17,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 80,
+        "mean": 5.25
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 7,
+        "mean": 6.86
+      }
+    },
+    "class": "nun",
+    "night": 1,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 7,
+    "meanFights": 10.9,
+    "meanTurns": 59.6,
+    "meanCombos": 16,
+    "cardsPerEnemyTurn": 1.98,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 80,
+        "mean": 2.73
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 8,
+        "mean": 4.75
+      }
+    },
+    "class": "nun",
+    "night": 1,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 32,
+    "meanCombos": 17.3,
+    "cardsPerEnemyTurn": 2.12,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 72,
+        "mean": 5.06
+      },
+      "elite": {
+        "count": 8,
+        "mean": 5
+      },
+      "boss": {
+        "count": 6,
+        "mean": 10.67
+      }
+    },
+    "class": "nun",
+    "night": 2,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 6,
+    "meanFights": 10.8,
+    "meanTurns": 61.6,
+    "meanCombos": 17.1,
+    "cardsPerEnemyTurn": 1.99,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 72,
+        "mean": 2.75
+      },
+      "elite": {
+        "count": 8,
+        "mean": 2.75
+      },
+      "boss": {
+        "count": 8,
+        "mean": 4.25
+      }
+    },
+    "class": "nun",
+    "night": 2,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 8,
+    "meanFights": 11,
+    "meanTurns": 31.8,
+    "meanCombos": 18.3,
+    "cardsPerEnemyTurn": 2.07,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 5.27
+      },
+      "elite": {
+        "count": 16,
+        "mean": 4.69
+      },
+      "boss": {
+        "count": 6,
+        "mean": 8.67
+      }
+    },
+    "class": "nun",
+    "night": 3,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 6,
+    "meanFights": 10.8,
+    "meanTurns": 59.8,
+    "meanCombos": 16.5,
+    "cardsPerEnemyTurn": 1.93,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 3.06
+      },
+      "elite": {
+        "count": 16,
+        "mean": 3.06
+      },
+      "boss": {
+        "count": 6,
+        "mean": 5.17
+      }
+    },
+    "class": "nun",
+    "night": 3,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 6,
+    "meanFights": 10.8,
+    "meanTurns": 35.4,
+    "meanCombos": 18,
+    "cardsPerEnemyTurn": 2.04,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 53,
+        "mean": 6.81
+      },
+      "elite": {
+        "count": 12,
+        "mean": 7.42
+      },
+      "boss": {
+        "count": 4,
+        "mean": 7.75
+      }
+    },
+    "class": "nun",
+    "night": 4,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 4,
+    "meanFights": 8.6,
+    "meanTurns": 66,
+    "meanCombos": 14.6,
+    "cardsPerEnemyTurn": 1.98,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 3.25
+      },
+      "elite": {
+        "count": 16,
+        "mean": 3.69
+      },
+      "boss": {
+        "count": 3,
+        "mean": 5.33
+      }
+    },
+    "class": "nun",
+    "night": 4,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 3,
+    "meanFights": 10.4,
+    "meanTurns": 38.3,
+    "meanCombos": 16.6,
+    "cardsPerEnemyTurn": 2.09,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 6.36
+      },
+      "elite": {
+        "count": 16,
+        "mean": 6.81
+      },
+      "boss": {
+        "count": 4,
+        "mean": 9.25
+      }
+    },
+    "class": "nun",
+    "night": 5,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 1,
+    "meanFights": 10.5,
+    "meanTurns": 76.9,
+    "meanCombos": 17.9,
+    "cardsPerEnemyTurn": 2.01,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 3.58
+      },
+      "elite": {
+        "count": 16,
+        "mean": 4.06
+      },
+      "boss": {
+        "count": 10,
+        "mean": 6.9
+      }
+    },
+    "class": "nun",
+    "night": 5,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 5,
+    "meanFights": 11.3,
+    "meanTurns": 47.5,
+    "meanCombos": 20,
+    "cardsPerEnemyTurn": 2.19,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 80,
+        "mean": 4.03
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 7,
+        "mean": 6.57
+      }
+    },
+    "class": "medium",
+    "night": 1,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 7,
+    "meanFights": 10.9,
+    "meanTurns": 44.3,
+    "meanCombos": 16.4,
+    "cardsPerEnemyTurn": 1.99,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 71,
+        "mean": 2.48
+      },
+      "elite": {
+        "count": 0,
+        "mean": null
+      },
+      "boss": {
+        "count": 7,
+        "mean": 3.43
+      }
+    },
+    "class": "medium",
+    "night": 1,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 7,
+    "meanFights": 9.8,
+    "meanTurns": 24.1,
+    "meanCombos": 11,
+    "cardsPerEnemyTurn": 1.92,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 67,
+        "mean": 4.42
+      },
+      "elite": {
+        "count": 6,
+        "mean": 5
+      },
+      "boss": {
+        "count": 6,
+        "mean": 7.17
+      }
+    },
+    "class": "medium",
+    "night": 2,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 6,
+    "meanFights": 9.9,
+    "meanTurns": 44.6,
+    "meanCombos": 14.6,
+    "cardsPerEnemyTurn": 2,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 64,
+        "mean": 2.67
+      },
+      "elite": {
+        "count": 7,
+        "mean": 2.71
+      },
+      "boss": {
+        "count": 7,
+        "mean": 3.86
+      }
+    },
+    "class": "medium",
+    "night": 2,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 7,
+    "meanFights": 9.8,
+    "meanTurns": 26.3,
+    "meanCombos": 11.1,
+    "cardsPerEnemyTurn": 1.99,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 62,
+        "mean": 4.9
+      },
+      "elite": {
+        "count": 13,
+        "mean": 5.08
+      },
+      "boss": {
+        "count": 1,
+        "mean": 7
+      }
+    },
+    "class": "medium",
+    "night": 3,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 1,
+    "meanFights": 9.5,
+    "meanTurns": 49,
+    "meanCombos": 14.6,
+    "cardsPerEnemyTurn": 2.02,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 60,
+        "mean": 2.97
+      },
+      "elite": {
+        "count": 12,
+        "mean": 3.08
+      },
+      "boss": {
+        "count": 5,
+        "mean": 4
+      }
+    },
+    "class": "medium",
+    "night": 3,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 5,
+    "meanFights": 9.6,
+    "meanTurns": 29.5,
+    "meanCombos": 10.8,
+    "cardsPerEnemyTurn": 2,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 57,
+        "mean": 5.19
+      },
+      "elite": {
+        "count": 11,
+        "mean": 6.64
+      },
+      "boss": {
+        "count": 1,
+        "mean": 6
+      }
+    },
+    "class": "medium",
+    "night": 4,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 1,
+    "meanFights": 8.6,
+    "meanTurns": 48.3,
+    "meanCombos": 13.9,
+    "cardsPerEnemyTurn": 1.95,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 54,
+        "mean": 3.2
+      },
+      "elite": {
+        "count": 9,
+        "mean": 4.11
+      },
+      "boss": {
+        "count": 4,
+        "mean": 4.75
+      }
+    },
+    "class": "medium",
+    "night": 4,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 4,
+    "meanFights": 8.4,
+    "meanTurns": 29.4,
+    "meanCombos": 10.6,
+    "cardsPerEnemyTurn": 2.09,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 50,
+        "mean": 5.2
+      },
+      "elite": {
+        "count": 11,
+        "mean": 5.55
+      },
+      "boss": {
+        "count": 4,
+        "mean": 5.5
+      }
+    },
+    "class": "medium",
+    "night": 5,
+    "policy": "random-affordable",
+    "runs": 8,
+    "wins": 2,
+    "meanFights": 8.1,
+    "meanTurns": 44,
+    "meanCombos": 13,
+    "cardsPerEnemyTurn": 1.94,
+    "stalled": 0
+  },
+  {
+    "fightTurns": {
+      "normal": {
+        "count": 60,
+        "mean": 3.32
+      },
+      "elite": {
+        "count": 13,
+        "mean": 3.92
+      },
+      "boss": {
+        "count": 6,
+        "mean": 5.17
+      }
+    },
+    "class": "medium",
+    "night": 5,
+    "policy": "public-board",
+    "runs": 8,
+    "wins": 2,
+    "meanFights": 9.9,
+    "meanTurns": 37.6,
+    "meanCombos": 12.1,
+    "cardsPerEnemyTurn": 2.1,
+    "stalled": 0
+  }
+]

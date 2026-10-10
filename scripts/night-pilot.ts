@@ -12,7 +12,8 @@ import type {Command,CardData,GameState} from '../src/core/types';
 /** Public-board combat policy, real preparation and identical choices for both policies. */
 export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boolean,observe?:(state:GameState,rng:RNG)=>void){
  let s=baseNewState(seed),r=makeRng(seed),steps=0,enemyCards=0,enemyTurns=0,stalled=false;
- const go=(cmd:Command)=>{const out=applyCommand(s,cmd,r);s=out.state;r=out.rng;steps++;observe?.(s,r);};
+ const fightDetails:Array<{id:string;kind:string;turns:number;won:boolean}>=[];let lastFightRecorded=0;
+ const go=(cmd:Command)=>{const out=applyCommand(s,cmd,r);s=out.state;r=out.rng;steps++;if(s.enemy&&s.phase!=='combat'&&(s.fightCount??0)>lastFightRecorded){const ix=s.pages?._activeOfferIndex;fightDetails.push({id:s.enemy.id,kind:ix!=null?s.pages?.current?.offers[ix]?.kind==='boss'?'boss':(s.pages?.current?.offers[ix] as any)?.tier??'normal':'normal',turns:s.turn,won:true});lastFightRecorded=s.fightCount??0;}observe?.(s,r);};
  const cardValue=(c:CardData)=>((c.dmg??0)*(c.hits??1)+(c.block??0)*.6+(c.draw??0)*4+(c.energyGain??0)*5+(c.heal??0)*.6+(c.summonMinion?9:0)+(c.statusEffect?6:0)+(c.conditional?7:0))/Math.max(1,c.cost);
  go({type:'NewRun',seed,classId:cls,runMode:'full',night});
  while(!s.runSummary&&steps<2200){
@@ -49,14 +50,14 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
   if(s.phase==='victory'){go({type:'CompleteNode'});continue;}
   if(s.pages?.adventure&&s.phase==='map'){
    const offers=s.pages.current!.offers;
-   const prep=offers.findIndex(o=>o&&(o.kind==='treasure'||o.kind==='story_event'||o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75&&s.player.gold>=25+((s as any).healingShrine?.timesUsed??0)*10||o.kind==='shop_upgrade'&&s.player.gold>=upgradeCostForCount(s.runCounters?.upgradeShopCount??0)||o.kind==='shop_card'&&s.player.gold>=80&&s.masterDeck.length<14));
+   const prep=offers.findIndex(o=>o&&(o.kind==='treasure'||o.kind==='treasure_single'||o.kind==='story_event'||o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75&&s.player.gold>=25+((s as any).healingShrine?.timesUsed??0)*10||o.kind==='shop_upgrade'&&s.player.gold>=upgradeCostForCount(s.runCounters?.upgradeShopCount??0)||o.kind==='shop_card'&&s.player.gold>=80&&s.masterDeck.length<14));
    const ix=prep>=0?prep:offers.findIndex(o=>o&&isCriticalOffer(o));
    go(ix>=0?{type:'ChooseOffer',index:ix}:{type:'Proceed'});continue;
   }
   if(s.pages?.adventure&&s.phase==='shop'){
    if(s.shopKind==='well')go({type:'UseWell'});
    if(s.shopKind==='healing')go({type:'UseHealingShrine'});
-   if(s.shopKind==='treasure'){go({type:'TakeTreasureCard',index:0});continue;}
+   if(s.shopKind==='treasure'||s.shopKind==='treasure_single'){go({type:s.shopKind==='treasure'?'TakeTreasureCard':'TakeSingleTreasureCard',index:0});continue;}
    if(s.shopKind==='upgrade'){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),u:c.upgradeLevel??0})).filter(x=>x.u<3).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'ShopUpgradeBuy',index:rank[0].i});}
    if(s.shopKind==='card'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&it.price<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
    const used=s.pages._shopUsed;go({type:'CompleteNode'});if(!used&&!s.runSummary)go({type:'Proceed'});continue;
@@ -81,13 +82,14 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
   }
   stalled=true;break;
  }
- return {won:!!s.runSummary?.won,fights:s.fightCount??0,hp:s.player.hp,turns:s.runMetrics?.turns??0,combos:s.runMetrics?.combos??0,plays:s.runMetrics?.cardsPlayed??0,deck:s.masterDeck.length,enemyCards,enemyTurns,stalled,phase:s.phase,state:s};
+ return {fightDetails,won:!!s.runSummary?.won,fights:s.fightCount??0,hp:s.player.hp,turns:s.runMetrics?.turns??0,combos:s.runMetrics?.combos??0,plays:s.runMetrics?.cardsPlayed??0,deck:s.masterDeck.length,enemyCards,enemyTurns,stalled,phase:s.phase,state:s};
 }
 if(process.argv.includes('--night-report')){
  const log=console.log;console.log=()=>{};const rows=[];
  for(const cls of ['warrior','shaman','nun','medium'] as const)for(const night of ([1,2,3,4,5] as const).filter(n=>!process.env.NIGHT_PILOT_NIGHTS||process.env.NIGHT_PILOT_NIGHTS.split(',').includes(String(n))))for(const tactical of [false,true]){
   const runs=Array.from({length:Number(process.env.NIGHT_PILOT_RUNS??8)},(_,i)=>simulateNight(`night-balance-${cls}-${i}`,cls,night,tactical));
-  rows.push({class:cls,night,policy:tactical?'public-board':'random-affordable',runs:runs.length,wins:runs.filter(r=>r.won).length,meanFights:+(runs.reduce((n,r)=>n+r.fights,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((n,r)=>n+r.turns,0)/runs.length).toFixed(1),meanCombos:+(runs.reduce((n,r)=>n+r.combos,0)/runs.length).toFixed(1),cardsPerEnemyTurn:+(runs.reduce((n,r)=>n+r.enemyCards,0)/Math.max(1,runs.reduce((n,r)=>n+r.enemyTurns,0))).toFixed(2),stalled:runs.filter(r=>r.stalled).length});
+  const fights=runs.flatMap(r=>r.fightDetails);
+  rows.push({fightTurns:Object.fromEntries(['normal','elite','boss'].map(kind=>{const list=fights.filter(f=>f.kind===kind);return [kind,{count:list.length,mean:list.length?+(list.reduce((n,f)=>n+f.turns,0)/list.length).toFixed(2):null}]})),class:cls,night,policy:tactical?'public-board':'random-affordable',runs:runs.length,wins:runs.filter(r=>r.won).length,meanFights:+(runs.reduce((n,r)=>n+r.fights,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((n,r)=>n+r.turns,0)/runs.length).toFixed(1),meanCombos:+(runs.reduce((n,r)=>n+r.combos,0)/runs.length).toFixed(1),cardsPerEnemyTurn:+(runs.reduce((n,r)=>n+r.enemyCards,0)/Math.max(1,runs.reduce((n,r)=>n+r.enemyTurns,0))).toFixed(2),stalled:runs.filter(r=>r.stalled).length});
  }
  log(JSON.stringify(rows,null,2));
 }

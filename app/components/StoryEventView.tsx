@@ -1,3 +1,4 @@
+import {storyObject} from './EncounterArt';
 import React from 'react';
 import {View,Text,ScrollView,Pressable,Image} from 'react-native';
 import type {Command,GameState} from '../../src/core/types';
@@ -20,6 +21,7 @@ export default function StoryEventView({state,dispatch}:{state:GameState;dispatc
     <SceneArrival instant source={location.source} sceneKey={location.key}>
       <ScrollView contentContainerStyle={{flexGrow:1,justifyContent:'flex-end',paddingHorizontal:16,paddingTop:pad.top+240,paddingBottom:pad.bottom+20}}>
         <RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:20,gap:14}}>
+          <Image testID="story-object" accessible={false} source={storyObject(story.eventId)} resizeMode="contain" style={{width:'100%',height:100}}/>
           <Text accessibilityRole="header" style={{fontFamily:font.heading,color:palette.moon,fontSize:24}}>{ev.title}</Text>
           <Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,lineHeight:24}}>{decided?story.result:ev.text}</Text>
           {decided?<QuietButton label="กลับจุดพัก" primary onPress={()=>dispatch({type:'CompleteNode'})}/>

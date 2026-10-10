@@ -203,6 +203,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
 
   switch (offer.kind) {
     case 'monster': {
+      mp._activeOfferIndex=ix;
       // เริ่มคอมแบต (normal/elite)
       s.phase = 'combat';
       (s as any).nodePhase = 'in_combat';
@@ -298,6 +299,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
     }
 
     case 'boss': {
+      mp._activeOfferIndex=ix;
       s.phase = 'combat';
       (s as any).nodePhase = 'in_combat';
       s.turn = 1;
@@ -496,6 +498,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       }
       const out = ShopEv.openShopEquipment(s, rng);
       s = out.state; rng = out.rng;
+      if(s.pages?.adventure)s.shopStock=s.shopStock?.map(item=>({...item,price:Math.max(30,Math.round(item.price*.65))}));
       if (s.runMode === 'episode') s.shopStock = s.shopStock?.map(item => ({...item,price:Math.max(15,Math.round(item.price / 4))}));
       s.currentShopId = offer.shopId; // Track current shop ID
         mp._activeOfferIndex = ix; mp._shopUsed = false;

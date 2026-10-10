@@ -1,3 +1,4 @@
+import {shopObject} from './EncounterArt';
 import {visitedScene} from '../scenePresentation';
 // app/components/ShopView.tsx — โหนดพักทุกชนิดที่ไม่ใช่เหตุการณ์เล่าเรื่อง
 //
@@ -272,12 +273,12 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   };
 
   const background=visitedScene(state).source;
-  const object=kind==='healing'||kind==='well'?require('../../assets/ui/blessing-shrine-object.png'):kind==='upgrade'||kind==='remove'?require('../../assets/ui/ritual-knife.png'):require('../../assets/ui/ritual-jar.png');
+  const object=shopObject(kind);
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
     <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
         <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+20,paddingBottom:24,gap:12}}>
-          <Image accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>
+          <Image testID="destination-object" accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>
           {kind === 'card'            && cardShop()}
           {kind === 'equipment'       && equipmentShop()}
           {kind === 'remove'          && removeShop()}

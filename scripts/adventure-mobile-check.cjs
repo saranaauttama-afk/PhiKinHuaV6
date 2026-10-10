@@ -12,10 +12,10 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
    for(let night=1;night<=5;night++){
     await load('adventure-'+night);const before=await state();
     const slots=p.locator('[data-testid^="adventure-slot-"]');const bounds=await slots.evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};}));assert.equal(bounds.length,3);assert.ok(bounds.every(b=>b.x>=0&&b.x+b.w<=viewport.width+1&&Math.abs(b.h-bounds[0].h)<1));
-    await p.getByTestId('adventure-slot-1').click();await p.getByRole('button',{name:'แวะ · ร้านค้าการ์ด',exact:true}).click();assert.equal((await state()).phase,'shop');
+    await p.getByTestId('adventure-slot-1').click();await p.getByRole('button',{name:'เข้าร้าน · ร้านค้าการ์ด',exact:true}).click();assert.equal((await state()).phase,'shop');
     await p.getByRole('button',{name:'กลับจุดพัก',exact:true}).click();assert.deepEqual((await state()).adventure,before.adventure);
     await p.getByRole('button',{name:'ทางแยกถัดไป',exact:true}).click();assert.deepEqual((await state()).adventure,before.adventure);await p.getByRole('button',{name:'เก็บหน้าเหล่านี้ไว้',exact:true}).click();
-    await p.getByRole('button',{name:'ทางแยกถัดไป',exact:true}).click();await p.getByRole('button',{name:'ยืนยันไปทางแยกถัดไป',exact:true}).click();const after=await state();assert.deepEqual(after.adventure.pendingIds,[before.adventure.slotIds[0]]);assert.equal(after.adventure.skippedIds.length,2);assert.equal(after.adventure.cursor,6);
+    await p.getByRole('button',{name:'ทางแยกถัดไป',exact:true}).click();await p.getByRole('button',{name:'ยืนยันไปทางแยกถัดไป',exact:true}).click();const after=await state();assert.deepEqual(after.adventure.pendingIds,[before.adventure.slotIds[0],before.adventure.slotIds[2]]);assert.equal(after.adventure.skippedIds.length,1);assert.equal(after.adventure.cursor,6);
     reports.push({viewport,night,check:'mixed-pages-shop-postpone-confirm-skip',result:'passed'});
    }
    await load('confirm-shop_equipment');let initialShop=await state();const equipment=p.getByRole('button',{name:/เบี้ย · /}).first();await equipment.click();assert.deepEqual(await state(),initialShop);await p.getByRole('button',{name:'ยกเลิกการเลือก',exact:true}).click();assert.deepEqual(await state(),initialShop);

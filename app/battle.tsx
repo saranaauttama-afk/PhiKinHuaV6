@@ -346,7 +346,6 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
-        <Text style={{position:'absolute',top:safe.top+18,left:18,color:palette.moon,fontFamily:font.heading,fontSize:14}}>คืน {gameState.campaign?.night??1} · ศึก {(gameState.fightCount??0)+(gameState.phase==='combat'?1:0)}/{gameState.pages?.adventure?adventureFightTotal(gameState.campaign?.night):gameState.runMode==='episode'?3:nightFightTotal(gameState.campaign?.night)}</Text>
         {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',bottom:safe.bottom+340,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:13,lineHeight:21,textAlign:'center'}}>{comboNotice}</Text></RitualSurface></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
