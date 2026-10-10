@@ -11,6 +11,7 @@
 // ข้อความเก็บเป็นอาร์เรย์ย่อหน้า เพื่อให้แตะเปิดทีละย่อหน้าแบบ visual novel
 // แทนที่จะเทกำแพงข้อความใส่ผู้เล่นทีเดียว
 
+import {isThreeNight} from '../campaign/threeNight';
 import type { GameState } from '../types';
 import type { ClassId } from '../classes';
 
@@ -72,7 +73,9 @@ export function chapterIdFor(t: ChapterTrigger): string | undefined {
 export function fireChapter(s: GameState, t: ChapterTrigger): boolean {
   if (s.chapter) return false;
 
-  const id = s.campaign&&t.kind==='prologue'?`night_${s.campaign.night}_open`:s.campaign&&t.kind==='final_boss'?`night_${s.campaign.night}_gate`:s.campaign&&t.kind==='ending'&&t.won?`night_${s.campaign.night}_ending`:chapterIdFor(t);
+  const modern=isThreeNight(s);
+  const runChapter=modern?(t.kind==='prologue'?`run_night_${s.campaign!.night}_open`:t.kind==='final_boss'?`run_night_${s.campaign!.night}_gate`:t.kind==='secret'?'run_ultimate_gate':t.kind==='ending'&&t.won?t.beatSecretBoss?'run_true_ending':'run_ending':undefined):undefined;
+  const id = runChapter??(s.campaign&&t.kind==='prologue'?`night_${s.campaign.night}_open`:s.campaign&&t.kind==='final_boss'?`night_${s.campaign.night}_gate`:s.campaign&&t.kind==='ending'&&t.won?`night_${s.campaign.night}_ending`:chapterIdFor(t));
   if (!id) return false;
 
   const ch = getChapter(id);

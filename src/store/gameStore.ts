@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import {useJournal} from './journalStore';
 import {useArchive} from './archiveStore';
 import {trackDiscovery} from '../core/archive/progress';
-import {unlockedNight} from '../core/campaign/journal';
+import {unlockedDifficulty,unlockedNight} from '../core/campaign/journal';
 import type {Night} from '../core/campaign/nights';
 import type { Command, GameState } from '../../src/core/types';
 import type { ClassId } from '../core/classes';
@@ -37,6 +37,7 @@ type Store = {
   rng: RNG;
   dispatch: (cmd: Command) => void;
   newRun: (seed: string, classId?: ClassId, runMode?: 'episode' | 'full') => void;
+  newDifficultyRun:(seed:string,classId:ClassId,difficulty:Night)=>Promise<boolean>;
   newNightRun:(seed:string,classId:ClassId,night:Night)=>Promise<boolean>;
   saveToSlot: (slot: number) => Promise<void>;
   loadFromSlot: (slot: number) => Promise<void>;
@@ -105,6 +106,16 @@ export const useGame = create<Store>((set, get) => ({
     const result = applyCommand(makeEmptyState(), { type: 'NewRun', seed, discoveryId:discoveryId(),classId, runMode }, newRng);
     set({ state: result.state, rng: result.rng });
     void useArchive.getState().observe(result.state).catch(()=>{});
+  },
+
+  newDifficultyRun:async(seed,classId,difficulty)=>{
+    await terminalSavePending.catch(()=>{});
+    await useJournal.getState().hydrate();
+    const progress=useJournal.getState();
+    if(progress.error||progress.saving||!Number.isInteger(difficulty)||difficulty<1||difficulty>unlockedDifficulty(progress.journal,classId))return false;
+    clearTimeout(autoSaveTimer);await autoSavePending;await clearAutoSave();
+    const result=applyCommand(makeEmptyState(),{type:'NewRun',seed,discoveryId:discoveryId(),classId,difficulty,unlocks:progress.journal.classes[classId].unlocks},makeRng(seed));
+    set({state:result.state,rng:result.rng});void useArchive.getState().observe(result.state).catch(()=>{});return true;
   },
 
   newNightRun:async(seed,classId,night)=>{

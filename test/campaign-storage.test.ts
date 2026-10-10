@@ -13,6 +13,10 @@ function ended(seed='storage-result'){
 }
 beforeEach(async()=>{await AsyncStorage.clear();useJournal.setState({journal:emptyJournal(),ready:false,saving:false,error:''});vi.restoreAllMocks();});
 describe('campaign persistence',()=>{
+ it('new difficulty entry starts at night one and requires a complete three-night record to unlock the next tier',async()=>{
+  await useJournal.getState().addRun(ended());expect(await useGame.getState().newDifficultyRun('new-locked','warrior',2)).toBe(false);expect(await useGame.getState().newDifficultyRun('new-run','warrior',1)).toBe(true);expect(useGame.getState().state.campaign).toMatchObject({night:1,difficulty:1,completedNights:0});
+  const complete=structuredClone(useGame.getState().state);complete.campaign!.night=3;complete.campaign!.completedNights=3;complete.fightCount=30;complete.runSummary={won:true,fights:30,level:3,gold:50,beatSecretBoss:false};await useJournal.getState().addRun(complete);expect(await useGame.getState().newDifficultyRun('next-tier','warrior',2)).toBe(true);expect(useGame.getState().state.campaign).toMatchObject({night:1,difficulty:2});expect(await useGame.getState().newDifficultyRun('other-class','shaman',2)).toBe(false);
+ });
  it('retains class progression when an unrelated run save is cleared',async()=>{
   await useJournal.getState().addRun(ended());await AsyncStorage.removeItem('phikinhua_autosave');useJournal.setState({ready:false,journal:emptyJournal()});await useJournal.getState().hydrate();expect(useJournal.getState().journal.classes.warrior.highestCleared).toBe(1);
  });

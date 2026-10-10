@@ -32,7 +32,8 @@ import { planEnemyIntent } from '../../combat/intent';
 import { winRun } from './runEnd';
 import { resetCombos } from '../../combat/combos';
 import { resetTraps } from '../../combat/traps';
-import {settleAdventureSlot,nextIntersection,revealUltimate,isCriticalOffer} from '../../map/adventure';
+import {isThreeNight,ultimateRequired} from '../../campaign/threeNight';
+import {startAdventure,settleAdventureSlot,nextIntersection,revealUltimate,isCriticalOffer} from '../../map/adventure';
 
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
@@ -108,7 +109,19 @@ function completeAdventure(s:GameState,r:RNG){
   s.defeatedEnemyIds=[...(s.defeatedEnemyIds??[]),offer.enemyId];
   removeTemporaryEquipment(s);s.equipmentTempSlots=0;clearCombatState(s);
   if(offer.kind==='boss'){
-   if(offer.bossType==='final'&&s.campaign!.night===5){revealUltimate(s);fireChapter(s,{kind:'secret'});}
+   if(offer.bossType==='final'&&isThreeNight(s)){
+    s.campaign!.completedNights=s.campaign!.night;
+    if(s.campaign!.night<3){
+     s.campaign!.night=(s.campaign!.night+1) as 2|3;
+     const healed=Math.min(s.player.maxHp-s.player.hp,Math.ceil(s.player.maxHp*.12));s.player.hp+=healed;
+     s.log.push(`ฟ้าสาง คืนหัวสำเร็จ · พักฟื้น ${healed} · ออกตามรอยคืนที่ ${s.campaign!.night}`);
+     s.phase='map';s.levelUp=null;s.cardReward=undefined;s.combatVictoryLock=false;
+     s.story=undefined;s.event=undefined;
+     r=startAdventure(s,r);fireChapter(s,{kind:'prologue',classId:s.classId});
+     return {state:s,rng:r};
+    }
+   }
+   if(offer.bossType==='final'&&ultimateRequired(s)){revealUltimate(s);fireChapter(s,{kind:'secret'});}
    else {a.boss='done';mp.current.resolved[ix]=true;mp._activeOfferIndex=undefined;winRun(s,offer.bossType==='secret');}
    return {state:s,rng:r};
   }

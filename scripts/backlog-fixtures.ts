@@ -52,6 +52,24 @@ for(const night of [1,2,3,4,5] as const){
   if(a.pages!.current!.offers[1]?.kind==='shop_card'){keep('adventure-'+night,a);break;}
  }
 }
+// New continuous run snapshots from the live reducer, including every dawn transition.
+for(const difficulty of [1,5] as const){
+ const seed='three-ui-'+difficulty;let state=applyCommand({seed,turn:0,phase:'start'} as GameState,{type:'NewRun',seed,classId:'warrior',difficulty},makeRng(seed)).state,r=makeRng(seed);
+ const go=(cmd:any)=>{const out=applyCommand(state,cmd,r);state=out.state;r=out.rng;};
+ const snapshot=(name:string)=>{fixtures[name]={state:structuredClone(state),rng:{...r}};};
+ go({type:'SkipChapter'});go({type:'ChooseStarterBlessing',index:0});snapshot('three-menu-'+difficulty);let lastNight=0;
+ for(let guard=0;guard<700&&!state.runSummary;guard++){
+  if(lastNight!==state.campaign!.night){lastNight=state.campaign!.night;snapshot('three-map-'+difficulty+'-'+lastNight);if(state.chapter)snapshot('three-dawn-'+difficulty+'-'+lastNight);}
+  if(state.chapter)go({type:'SkipChapter'});
+  else if(state.phase==='map'){const ix=state.pages!.current!.offers.findIndex(o=>o&&(o.kind==='monster'||o.kind==='boss'||o.kind==='story_event'));if(ix<0)go({type:'Proceed'});else {const offer=state.pages!.current!.offers[ix];go({type:'ChooseOffer',index:ix});if(offer.kind==='story_event')snapshot('three-story-'+difficulty+'-'+state.campaign!.night);}}
+  else if(state.phase==='combat'){state.piles.hand=[{id:'qa',name:'qa',type:'attack',cost:0,dmg:99999}];go({type:'PlayCard',index:0});}
+  else if(state.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});}
+  else if(state.phase==='levelup')go({type:'SkipLevelUp'});
+  else if(state.phase==='reward')go({type:'SkipCardReward'});
+  else if(state.phase==='victory')go({type:'CompleteNode'});
+ }
+ if(!state.runSummary)throw Error('Three-night QA did not finish');go({type:'SkipChapter'});snapshot('three-summary-'+difficulty);
+}
 // All actual destination kinds presented on the route, using the same object mapping.
 for(const kind of ['shop_card','shop_equipment','shop_upgrade','shop_remove','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event','next_event']){
  const a=structuredClone(fixtures['adventure-1'].state),o=structuredClone(fixtures['rest-'+kind]?.state.pages!.current!.offers[0]??{kind:'next_event'});

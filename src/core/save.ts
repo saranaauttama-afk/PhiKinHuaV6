@@ -1,4 +1,4 @@
-import {adventureFightTotal} from './map/adventure';
+import {campaignFightTotal} from './campaign/threeNight';
 // src/core/save.ts — เซฟ/โหลดแบบไม่ทำ IO (ชั้นนอกค่อยเขียนลง storage)
 //
 // **เขียนใหม่ทั้งไฟล์ — ของเดิมทำข้อมูลหายเงียบๆ**
@@ -73,6 +73,7 @@ export type SaveV2 = {
 /** ข้อมูลย่อสำหรับโชว์บนปุ่ม "เดินทางต่อ" โดยไม่ต้องโหลดทั้งเซฟ */
 export type SaveSummary = {
   night?: number;
+  difficulty?:number;
   classId?: string;
   fight: number;
   totalFights: number;
@@ -115,7 +116,7 @@ export function fromSave(data: SaveV2): GameState {
   const s = data.state as GameState;
   if(s.discovery)parseArchive(JSON.stringify({version:1,runs:{[s.discovery.id]:s.discovery}}));
   if(s.pages?.adventure){
-    if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บบันทึกห้าคืนไว้');
+    if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บสมุดบันทึกและของปลดล็อกไว้');
     const rng=s.phase==='combat'?data.battleRng:data.mapRng;
     if(!rng||!Number.isInteger(rng.s))throw Error('ข้อมูล RNG ของการเดินทางหายไป เริ่มเกมใหม่ได้');
     if(data.battleRng&&(s.phase!=='combat'||!s.enemy||!s.piles||!Number.isInteger(data.battleRng.s)))throw Error('Invalid battle snapshot');
@@ -182,8 +183,9 @@ export function summarize(data: SaveV2): SaveSummary {
   return {
     classId: s.classId,
     night:s.campaign?.night,
-    fight: Math.min((s.fightCount ?? 0) + 1,s.pages?.adventure?adventureFightTotal(s.campaign?.night):plans.filter(p => p.kind !== 'rest').length || 15),
-    totalFights: s.pages?.adventure?adventureFightTotal(s.campaign?.night):plans.filter(p => p.kind !== 'rest').length || 15,
+    difficulty:s.campaign?.difficulty,
+    fight: Math.min((s.fightCount ?? 0) + 1,s.pages?.adventure?campaignFightTotal(s):plans.filter(p => p.kind !== 'rest').length || 15),
+    totalFights: s.pages?.adventure?campaignFightTotal(s):plans.filter(p => p.kind !== 'rest').length || 15,
     hp: s.player?.hp ?? 0,
     maxHp: s.player?.maxHp ?? 0,
     gold: s.player?.gold ?? 0,

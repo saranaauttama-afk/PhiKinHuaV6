@@ -1,8 +1,12 @@
-# ผีกินหัว — ห้าคืนอาถรรพ์
+# ผีกินหัว — สามคืนตามหัว
 
-## Current branch: v1.0.30 / Android code 31
+## Current branch: v1.0.31 / Android code 32
 
-User-approved framed encounter layout: three matching illustrated dark panels, equal circular ghost/service portraits, short public trait clues and an in-panel confirmation button. The selected frame uses red ink; Next Intersection is compact and still confirms skipped services. Map HUD height is reduced with its deck/blessing actions preserved. Local TypeScript, 753 tests and web export passed; new mobile/Android verification and APK are pending. See `docs/HANDOFF-framed-encounters-v30.md`.
+`work/three-night-runs-v31` continues the approved framed-circle UI with one continuous **three-night run**, 7/10/10 route ghosts and three night guardians (30 fights), plus the real PhiKinHua only at difficulty 5 (31). Deck, equipment, blessings, gold, XP and HP carry across nights; dawn gives only modest healing. Five difficulty tiers unlock per class after a full run. Eight spaced services and three mandatory stories span the run; the first card shop is guaranteed. Legacy saves/history/unlocks are retained separately. TypeScript, 781 tests and web export passed locally. New mobile/Android verification and APK are pending. See `docs/HANDOFF-three-night-runs-v31.md` and the normal-card full-run pilot `docs/three-night-v31-pilot.json`. Human pacing/balance, audio and Closed Beta remain open.
+
+## Previous delivery: v1.0.30 / Android code 31
+
+User-approved framed encounter layout: three matching illustrated dark panels, equal circular ghost/service portraits, short public trait clues and an in-panel confirmation button. The selected frame uses red ink; Next Intersection is compact and still confirms skipped services. Map HUD height is reduced with its deck/blessing actions preserved. Local TypeScript, 753 tests and web export passed; mobile verification and signed APK audit passed in CI 38052942953; native verification was still running at this checkpoint. See `docs/HANDOFF-framed-encounters-v30.md`.
 
 ## Previous delivery: v1.0.29 / Android code 30
 
@@ -18,7 +22,7 @@ Continuing Issue #6 on `work/adventure-pages-b17`, with the user’s corrected f
 
 Corrected paper status details, enlarged upper-body battle ghosts and owner-relative reveals, full-body map ghosts with smaller props, actual treasure cards with confirmation, and equipment inspection/confirm/cancel. No existing artwork regenerated or changed. TypeScript, 699 automated tests, web export, final Android build and package audit passed. The corrected UI harness passed 70 mobile checks on application-identical commit `7e16b2e`; API 36 native verification completed all five nights and 146 battles with all 28 route ghosts each night. The first final-build UI job failed on fixture hydration timing; its corrected rerun passed. Test APK retains พระประธาน for structural testing. Exact current validation is in `docs/HANDOFF-adventure-pages-b17.md`; older APK evidence there is historical.
 
-Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. Five nights have distinct bosses; night five adds the mandatory game-original ผีกินหัว. All 34 ghosts, 134 newly illustrated card assets, 16 blessings and 24 rural Thai journey environments share vintage Thai horror comic art. Player-card and blessing hashes detect accidental duplicates; enemy move cards intentionally reuse their owner's portrait.
+Expo 54 / React Native 0.81 / React 19 / TypeScript card roguelike. Three consecutive nights form a run; difficulty level 5 adds the mandatory game-original ผีกินหัว. All 34 ghosts, 134 newly illustrated card assets, 16 blessings and 24 rural Thai journey environments share vintage Thai horror comic art. Player-card and blessing hashes detect accidental duplicates; enemy move cards intentionally reuse their owner's portrait.
 
 ## Historical releases
 

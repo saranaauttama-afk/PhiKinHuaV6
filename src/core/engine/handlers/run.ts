@@ -108,6 +108,7 @@ export function newRun(
   s = baseNewState(cmd.seed);
   s.runMode = cmd.runMode ?? 'full';
   if(cmd.night&&Number.isInteger(cmd.night)&&cmd.night>=1&&cmd.night<=5){s.runMode='full';s.campaign={night:cmd.night,unlocks:[...new Set(cmd.unlocks??[])]};}
+  if(cmd.difficulty&&Number.isInteger(cmd.difficulty)&&cmd.difficulty>=1&&cmd.difficulty<=5){s.runMode='full';s.campaign={night:1,difficulty:cmd.difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])]};}
   if (s.runMode === 'episode') s.player.gold = EPISODE.startingGold;
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };

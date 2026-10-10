@@ -10,13 +10,13 @@ import type {ClassId} from '../src/core/classes';
 import type {Night} from '../src/core/campaign/nights';
 import type {Command,CardData,GameState} from '../src/core/types';
 /** Public-board combat policy, real preparation and identical choices for both policies. */
-export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boolean,observe?:(state:GameState,rng:RNG)=>void){
+export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boolean,observe?:(state:GameState,rng:RNG)=>void,threeNight=false){
  let s=baseNewState(seed),r=makeRng(seed),steps=0,enemyCards=0,enemyTurns=0,stalled=false;
  const fightDetails:Array<{id:string;kind:string;turns:number;won:boolean}>=[];let lastFightRecorded=0;
  const go=(cmd:Command)=>{const out=applyCommand(s,cmd,r);s=out.state;r=out.rng;steps++;if(s.enemy&&s.phase!=='combat'&&(s.fightCount??0)>lastFightRecorded){const ix=s.pages?._activeOfferIndex;fightDetails.push({id:s.enemy.id,kind:ix!=null?s.pages?.current?.offers[ix]?.kind==='boss'?'boss':(s.pages?.current?.offers[ix] as any)?.tier??'normal':'normal',turns:s.turn,won:true});lastFightRecorded=s.fightCount??0;}observe?.(s,r);};
  const cardValue=(c:CardData)=>((c.dmg??0)*(c.hits??1)+(c.block??0)*.6+(c.draw??0)*4+(c.energyGain??0)*5+(c.heal??0)*.6+(c.summonMinion?9:0)+(c.statusEffect?6:0)+(c.conditional?7:0))/Math.max(1,c.cost);
- go({type:'NewRun',seed,classId:cls,runMode:'full',night});
- while(!s.runSummary&&steps<2200){
+ go({type:'NewRun',seed,classId:cls,runMode:'full',...(threeNight?{difficulty:night}:{night})});
+ while(!s.runSummary&&steps<(threeNight?6500:2200)){
   if(s.chapter){go({type:'SkipChapter'});continue;}
   if(s.phase==='starter'){const i=s.starter!.choices.findIndex(b=>b.id==='spirit_energy'||b.id==='herbal_wisdom'||b.id==='bamboo_dart_power');go({type:'ChooseStarterBlessing',index:Math.max(0,i)});continue;}
   if(s.phase==='combat'){

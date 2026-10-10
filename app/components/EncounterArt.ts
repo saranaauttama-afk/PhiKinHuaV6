@@ -15,9 +15,9 @@ export const ENCOUNTER_OBJECTS={
 };
 export function storyObject(eventId:string){
  if(eventId==='night_story_2'||eventId==='temple_bell')return require('../../assets/cards/thai-v24/bell_sound.webp');
- if(eventId==='night_story_3')return require('../../assets/encounters/thai-v29/story-root.webp');
+ if(eventId==='run_story_2'||eventId==='night_story_3')return require('../../assets/encounters/thai-v29/story-root.webp');
  if(eventId==='night_story_4')return require('../../assets/encounters/thai-v29/story-water.webp');
- if(eventId==='night_story_5')return require('../../assets/encounters/thai-v29/story-manuscript.webp');
+ if(eventId==='run_story_3'||eventId==='night_story_5')return require('../../assets/encounters/thai-v29/story-manuscript.webp');
  if(eventId==='old_well')return ENCOUNTER_OBJECTS.well;
  if(eventId==='roadside_shrine'||eventId==='episode_blessing')return ENCOUNTER_OBJECTS.healing_shrine;
  if(eventId==='silk_on_tree'||eventId==='tanee_grove')return require('../../assets/cards/thai-v24/yantra_cloth.webp');

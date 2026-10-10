@@ -449,7 +449,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; runMode?: 'episode' | 'full'; night?: import('./campaign/nights').Night; unlocks?: Array<'card'|'blessing'> }
+  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; runMode?: 'episode' | 'full'; night?: import('./campaign/nights').Night; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'> }
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }
 

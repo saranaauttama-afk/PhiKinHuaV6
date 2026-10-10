@@ -44,7 +44,7 @@ import { palette, font, size, space, surface } from './theme';
 
 
 export default function Home() {
-  const { state, dispatch, newRun, newNightRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
+  const { state, dispatch, newRun, newDifficultyRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
   const router = useRouter();
   const {chooseClass}=useLocalSearchParams();
   const [seed, setSeed] = useState('demo-001');
@@ -110,7 +110,7 @@ export default function Home() {
 
   if(journalOpen)return <JournalView onClose={()=>setJournalOpen(false)}/>;
   if(archiveOpen)return <ArchiveView onClose={()=>setArchiveOpen(false)}/>;
-  if(nightClass)return <NightSelectScreen classId={nightClass} onBack={()=>setNightClass(null)} onStart={async night=>{const ok=await newNightRun(`night-${Date.now()}`,nightClass,night);if(ok){enteredRest.current=null;setNightClass(null);setPickingClass(false);}return ok;}}/>;
+  if(nightClass)return <NightSelectScreen classId={nightClass} onBack={()=>setNightClass(null)} onStart={async night=>{const ok=await newDifficultyRun(`run-${Date.now()}`,nightClass,night);if(ok){enteredRest.current=null;setNightClass(null);setPickingClass(false);}return ok;}}/>;
   if (screen === 'start') {
     return (
       <StartPage

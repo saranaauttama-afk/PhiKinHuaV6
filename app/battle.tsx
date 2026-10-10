@@ -1,3 +1,4 @@
+import {difficultyOf} from '../src/core/campaign/threeNight';
 import {adventureFightTotal} from '../src/core/map/adventure';
 import {ghostLore} from '../src/core/monsters/folklore';
 import {nightFightTotal} from '../src/core/campaign/bosses';
@@ -370,7 +371,7 @@ export default function BattlePage() {
           </Pressable>
         )}
 
-        <MonsterArea escalating={gameState.campaign?{every:gameState.campaign.night>=3?3:4,strength:1}:gameState.runMode==='episode'?{every:3,strength:2}:undefined}
+        <MonsterArea escalating={gameState.campaign?{every:difficultyOf(gameState)>=3?3:4,strength:1}:gameState.runMode==='episode'?{every:3,strength:2}:undefined}
           ref={monsterRef}
           monsterId={monsterId}
           monsterName={monsterName}

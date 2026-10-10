@@ -1,0 +1,111 @@
+"""Fresh install, five difficulty, three-night native flow and cold resume. XML/logs only."""
+import json, re, subprocess, time, xml.etree.ElementTree as ET
+from pathlib import Path
+OUT=Path('backlog-native-audit'); OUT.mkdir(exist_ok=True)
+checks=[]; runs=[]; nights=[]; APP='com.phikinhua.episode'
+def adb(*args): return subprocess.check_output(['adb',*args],text=True)
+def nodes():
+    adb('shell','uiautomator','dump','/sdcard/backlog-ui.xml')
+    xml=adb('shell','cat','/sdcard/backlog-ui.xml'); (OUT/'latest-ui.xml').write_text(xml)
+    return list(ET.fromstring(xml).iter('node'))
+def label(n): return (n.attrib.get('content-desc','')+' '+n.attrib.get('text','')).strip()
+def bounds(n): return tuple(map(int,re.findall(r'\d+',n.attrib.get('bounds',''))))
+def available(ns,pattern): return next((n for n in ns if re.search(pattern,label(n)) and n.attrib.get('enabled')=='true' and len(bounds(n))==4 and bounds(n)[2]>bounds(n)[0] and bounds(n)[3]>bounds(n)[1]),None)
+def click(n):
+    x1,y1,x2,y2=bounds(n); adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2)); time.sleep(.7)
+def record(s): checks.append(s); print('PASS native:',s,flush=True)
+def tap(pattern,timeout=75):
+    end=time.monotonic()+timeout; last=[]; attempts=0
+    while time.monotonic()<end:
+        try: last=nodes()
+        except (subprocess.CalledProcessError,ET.ParseError): time.sleep(.5); continue
+        n=available(last,pattern)
+        if n is not None: click(n); record(pattern); return n
+        attempts+=1
+        if attempts%4==0 and last:
+            x1,y1,x2,y2=bounds(last[0]); adb('shell','input','swipe',str((x1+x2)//2),str(int(y2*.8)),str((x1+x2)//2),str(int(y2*.35)),'350')
+        time.sleep(.5)
+    print('Native UI at failure:',[(label(n),n.attrib.get('resource-id'),n.attrib.get('bounds')) for n in last],flush=True)
+    raise RuntimeError('Missing native control: '+pattern)
+def slots(ns): return [(n.attrib.get('resource-id'),label(n)) for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','')]
+def hand(ns): return sorted(label(n) for n in ns if re.match(r'^การ์ด ',label(n)))
+def snapshot(name,ns): (OUT/(name+'.xml')).write_text(ET.tostring(ET.fromstring(adb('shell','cat','/sdcard/backlog-ui.xml')),encoding='unicode'))
+adb('shell','am','force-stop',APP); adb('shell','pm','clear',APP); adb('logcat','-c')
+log_file=(OUT/'logcat.txt').open('w')
+logger=subprocess.Popen(['adb','logcat','-v','threadtime','ReactNativeJS:V','ReactNative:V','AndroidRuntime:E','Expo:V','ExpoFont:V','*:S'],stdout=log_file,stderr=subprocess.STDOUT)
+try:
+    adb('shell','input','keyevent','KEYCODE_WAKEUP'); adb('shell','input','keyevent','82')
+    print(adb('shell','am','start','-W','-n',APP+'/.MainActivity'),flush=True)
+    resumed=False; cancel_checked=False
+    for difficulty in range(1,6):
+        night=1
+        tap(r'^เริ่มเกม$'); root=nodes()[0]; x1,y1,x2,y2=bounds(root); assert y2-y1>x2-x1,'Android must be portrait'
+        tap(r'^เลือกนักรบวัด'); tap(r'ออกเดินทาง'); tap('ดูระดับอาถรรพ์ '+str(difficulty)); tap('เริ่มรอบ · ระดับ '+str(difficulty)); tap(r'^(ข้ามบทนี้|เดินทางต่อ)$'); tap(r'^พรติดตัว 1:'); tap(r'^ยืนยันพร$')
+        before=slots(nodes()); assert len(before)==3,('three pages',before)
+        shop_checked=False
+        battles=0; stories=0; bosses=[]; ghosts=[]; complete=False
+        for guard in range(650):
+            ns=nodes(); text=' '.join(label(n) for n in ns)
+            if not shop_checked:
+                shop_page=next((n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and ' · เข้าร้าน' in label(n)),None)
+                if shop_page is not None:
+                    before=slots(ns); click(shop_page); tap(r'^เข้าร้าน · '); assert available(nodes(),r'^จบเทิร์น$') is None
+                    tap(r'^กลับจุดพัก$'); assert slots(nodes())==before,'Postponed shop must preserve all pages'; shop_checked=True; record('native sparse shop preserves pages'); continue
+            if available(ns,r'^ผ่านสามคืน · ระดับ '+str(difficulty)+r'!$') is not None:
+                assert shop_checked and stories==3 and battles==(31 if difficulty==5 else 30),(difficulty,stories,battles)
+                assert len(ghosts)==27,(difficulty,ghosts)
+                snapshot('difficulty-'+str(difficulty)+'-complete',ns); runs.append({'difficulty':difficulty,'battles':battles,'stories':stories,'bosses':bosses,'ghosts':ghosts}); record('difficulty '+str(difficulty)+' completes three nights and unlocks next tier'); tap(r'^กลับหน้าแรก$'); complete=True; break
+            if available(ns,r'^(ข้ามบทนี้|เดินทางต่อ)$') is not None:
+                if 'เสียงเรียกจากป่า' in text:
+                    assert battles==8,(difficulty,battles,'night 2 starts after 8 fights');night=2
+                    adb('shell','am','force-stop',APP);adb('shell','am','start','-W','-n',APP+'/.MainActivity');tap(r'^เล่นต่อ');record('dawn checkpoint restores night 2 without resetting run')
+                elif 'ต้นทางคาถาขโมยหัว' in text:
+                    assert battles==19,(difficulty,battles,'night 3 starts after 19 fights');night=3
+                tap(r'^(ข้ามบทนี้|เดินทางต่อ)$');continue
+            if available(ns,r'^รับรางวัล$') is not None: tap(r'^รับรางวัล$'); battles+=1; continue
+            if available(ns,r'^ข้ามไปก่อน$') is not None: tap(r'^ข้ามไปก่อน$'); continue
+            if available(ns,r'^ไม่เอาสักใบ$') is not None: tap(r'^ไม่เอาสักใบ$'); continue
+            card=available(ns,r'^การ์ด .*พระประธาน')
+            if card is not None:
+                assert 'ที่มา' not in text and not re.search(r'คืน \d+ · ศึก ',text),'Battle header/lore must stay removed'
+                if not resumed:
+                    initial=hand(ns); tap(r'^พักการต่อสู้$'); tap(r'^กลับเมนูหลัก$'); tap(r'^เล่นต่อ'); tap(r'^พักการต่อสู้$'); tap(r'^กลับเมนูหลัก$')
+                    adb('shell','am','force-stop',APP); adb('shell','am','start','-W','-n',APP+'/.MainActivity'); tap(r'^เล่นต่อ'); now=nodes(); assert hand(now)==initial,'Cold resume must preserve visible hand'
+                    record('cold resume keeps battle hand'); resumed=True; ns=now; card=available(ns,r'^การ์ด .*พระประธาน'); assert card is not None
+                if not cancel_checked:
+                    x1,y1,x2,y2=bounds(card); cx=(x1+x2)//2; cy=(y1+y2)//2; initial=hand(ns)
+                    adb('shell','input','swipe',str(cx),str(cy),str(cx),str(cy-60),'350'); time.sleep(.7)
+                    after=nodes()
+                    if available(after,r'^ปิด$') is not None: tap(r'^ปิด$'); after=nodes()
+                    assert hand(after)==initial,'Cancelled drag must preserve hand'; record('native short drag cancels and preserves hand'); cancel_checked=True
+                tap(r'^การ์ด .*พระประธาน'); tap(r'^ใช้การ์ด$'); continue
+            critical=next((n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and re.search(r' · (ต่อสู้|ศึกใหญ่|เรื่องสำคัญ)',label(n))),None)
+            if critical is not None:
+                assert 'สามหน้าระหว่างทาง' not in text and 'เลือกหนึ่งหน้า' not in text,'Map copy must stay removed'
+                if 'ศึกใหญ่' in label(critical): bosses.append(label(critical).split(' · ')[0])
+                elif 'ต่อสู้' in label(critical): ghosts.append(label(critical).split(' · ')[0])
+                story_page='เรื่องสำคัญ' in label(critical); click(critical); tap(r'^สำรวจเรื่องราว$' if story_page else r'^เผชิญหน้า · '); continue
+            choice=next((n for n in ns if 'event-choice-0' in n.attrib.get('resource-id','')),None)
+            if choice is not None:
+                click(choice); tap(r'^ยืนยัน · '); tap(r'^กลับจุดพัก$'); stories+=1; record('difficulty '+str(difficulty)+' night '+str(night)+' mandatory story resolved'); continue
+            if available(ns,r'^ทางแยกถัดไป$') is not None: tap(r'^ทางแยกถัดไป$'); tap(r'^ยืนยันไปทางแยกถัดไป$'); continue
+            time.sleep(1)
+        assert complete,'Difficulty '+str(difficulty)+' stalled'
+    assert resumed and cancel_checked
+    assert runs[-1]['bosses'][-1]=='ผีกินหัว',runs[-1]
+    tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$')
+    expected=len(set(name for n in runs for name in n['ghosts']+n['bosses']))
+    text=' '.join(label(n) for n in nodes()); assert f'พบแล้ว {expected} / 34 ตัว' in text and f'ปราบแล้ว {expected} ตัว' in text,text
+    tap(r'^ดูทั้งหมด$'); first=runs[0]['ghosts'][0]; tap(r'^ดูผี '+re.escape(first)+r'$'); detail=' '.join(label(n) for n in nodes()); count=sum(first in set(n['ghosts']+n['bosses']) for n in runs); assert f'พบ {count} การเดินทาง' in detail and f'ปราบ {count} การเดินทาง' in detail,detail
+    tap(r'^ปิดรายละเอียด$'); tap(r'^การ์ด$'); tap(r'^ทุกกลุ่ม$'); tap(r'^นักรบวัด$'); tap(r'^ดูการ์ด ฟันดาบวัด$'); tap(r'^ดูการ์ดปลุกเสกขั้น 1$'); tap(r'^ปิดรายละเอียด$')
+    tap(r'^กลับ$'); adb('shell','am','force-stop',APP); adb('shell','am','start','-W','-n',APP+'/.MainActivity')
+    tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$'); text=' '.join(label(n) for n in nodes()); assert f'พบแล้ว {expected} / 34 ตัว' in text and f'ปราบแล้ว {expected} ตัว' in text,text
+    snapshot('archive-cold-reopen',nodes()); tap(r'^กลับ$'); record('archive sampled roster and card inspection persist across five three-night runs and cold restart')
+    assert adb('shell','pidof',APP).strip(); record('Android portrait and process alive after all five difficulty levels')
+    log_file.flush(); log=(OUT/'logcat.txt').read_text()
+    assert 'FATAL EXCEPTION' not in log and 'JavascriptException' not in log,'Native crash in logcat'
+finally:
+    logger.terminate(); logger.wait(timeout=10); log_file.close()
+    (OUT/'results.json').write_text(json.dumps({'checks':checks,'runs':runs,'freshInstall':True,'screenshots':False,'usesTestWinCard':True},ensure_ascii=False,indent=2))
+    print((OUT/'logcat.txt').read_text()[-24000:],flush=True)
+print('Native five-tier three-night flow passed; no captures.')
