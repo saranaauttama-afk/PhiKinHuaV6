@@ -19,6 +19,7 @@ import {adventureFightTotal} from './map/adventure';
 import type { GameState } from './types';
 import type { RNG } from './rng';
 import {validAdventure} from './map/adventure';
+import {parseArchive} from './archive/progress';
 
 export const SAVE_VERSION = 2;
 
@@ -112,6 +113,7 @@ export function fromSave(data: SaveV2): GameState {
   }
 
   const s = data.state as GameState;
+  if(s.discovery)parseArchive(JSON.stringify({version:1,runs:{[s.discovery.id]:s.discovery}}));
   if(s.pages?.adventure){
     if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บบันทึกห้าคืนไว้');
     const rng=s.phase==='combat'?data.battleRng:data.mapRng;

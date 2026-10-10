@@ -1,6 +1,10 @@
 # ผีกินหัว — ห้าคืนอาถรรพ์
 
-## Current branch: v1.0.27 / Android code 28
+## Current branch: v1.0.28 / Android code 29
+
+Adds the approved บันทึกอาถรรพ์ archive: all 34 ghosts grouped and numbered, all 126 class cards plus curses/fusion/QA categories, real durable discovery/victory tracking, search/filters, locked and full views, and read-only card upgrade inspection. Local TypeScript and 710 tests passed; current APK/UI/native CI pending. See docs/HANDOFF-archive-v28.md.
+
+## Previous verified delivery: v1.0.27 / Android code 28
 
 Continuing Issue #6 on `work/adventure-pages-b17`, with the user’s corrected full-run design. Every night contains the same complete 28-ghost roster, one mandatory story, 12 finite preparation pages and its own final boss; night five continues to ผีกินหัว (29/30 battles). Next Intersection queues ghosts for later and consumes skipped optional rest opportunities. All queued ghosts must be cleared before the boss. Later nights increase difficulty, and each run traverses the complete geographic route. Old short-route saves may be discarded.
 
@@ -71,7 +75,7 @@ npx expo export --platform web
 
 ## Android deliverable
 
-GitHub Actions **Android five-night APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.27`, versionCode `28`, minSDK 24. ABI targets: ARM64 and x86_64. The APK retains the existing test-only พระประธาน card. See the current handoff for verified APK results and normal-card balance-pilot limits.
+GitHub Actions **Android five-night APK** builds a bundled offline, signed test APK with Expo's stable test/debug signing key. This is a test distribution, not a production signing setup. Application ID `com.phikinhua.episode`, current source version `1.0.28`, versionCode `29`, minSDK 24. ABI targets: ARM64 and x86_64. The APK retains the existing test-only พระประธาน card. See the current handoff for verified APK results and normal-card balance-pilot limits.
 
 Actions verifies package metadata, APK signature, 16 KB native ELF/ZIP alignment and offline JS bundle. The Android API 36 x86_64 emulator test follows warrior through five nights, checks mixed shops and mandatory stories, 146 battles and six final/ultimate bosses, next-night unlocks, cold battle resume and cancelled drag. It uses พระประธาน to verify route structure; browser checks and the 320-run pilot independently exercise normal-card mechanics. The current branch uploads XML/JSON interaction reports, package audits and logcat without screenshots. The separate native verification workflow reuses an APK only after verifying its checksum and matching application source. See the handoff for actual run results; successful build alone does not prove installation or launch.
 

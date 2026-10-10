@@ -81,6 +81,13 @@ try:
         assert complete,'Night '+str(night)+' stalled'
     assert resumed and cancel_checked
     assert nights[-1]['bosses'][-1]=='ผีกินหัว',nights[-1]
+    tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$')
+    text=' '.join(label(n) for n in nodes()); assert 'พบแล้ว 34 / 34 ตัว' in text and 'ปราบแล้ว 34 ตัว' in text,text
+    tap(r'^ดูทั้งหมด$'); tap(r'^ดูผี ผีปอบ$'); detail=' '.join(label(n) for n in nodes()); assert 'พบ 5 การเดินทาง' in detail and 'ปราบ 5 การเดินทาง' in detail,detail
+    tap(r'^ปิดรายละเอียด$'); tap(r'^การ์ด$'); tap(r'^ทุกกลุ่ม$'); tap(r'^นักรบวัด$'); tap(r'^ดูการ์ด ฟันดาบวัด$'); tap(r'^ดูการ์ดปลุกเสกขั้น 1$'); tap(r'^ปิดรายละเอียด$')
+    tap(r'^กลับ$'); adb('shell','am','force-stop',APP); adb('shell','am','start','-W','-n',APP+'/.MainActivity')
+    tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$'); text=' '.join(label(n) for n in nodes()); assert 'พบแล้ว 34 / 34 ตัว' in text and 'ปราบแล้ว 34 ตัว' in text,text
+    snapshot('archive-cold-reopen',nodes()); tap(r'^กลับ$'); record('archive full roster and card inspection persist across five runs and cold restart')
     assert adb('shell','pidof',APP).strip(); record('Android portrait and process alive after all five nights')
     log_file.flush(); log=(OUT/'logcat.txt').read_text()
     assert 'FATAL EXCEPTION' not in log and 'JavascriptException' not in log,'Native crash in logcat'

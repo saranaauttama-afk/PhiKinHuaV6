@@ -2,6 +2,7 @@
 import type { Command, GameState } from '../types';
 import type { RNG } from '../rng';
 import {trackRun} from '../campaign/metrics';
+import {trackDiscovery} from '../archive/progress';
 import { cloneForReducer } from './shared';
 
 import * as run from './handlers/run';
@@ -147,6 +148,6 @@ export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
   s.pendingEvents = [];
 
   const h = H[cmd.type] as Handler<typeof cmd.type> | undefined;
-  if (h) {const out=h(s,cmd as any,rng);trackRun(state,out.state,cmd);return out;}
+  if (h) {const out=h(s,cmd as any,rng);trackRun(state,out.state,cmd);trackDiscovery(state,out.state,cmd);return out;}
   return { state: s, rng };
 }

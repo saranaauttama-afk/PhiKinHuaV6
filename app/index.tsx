@@ -22,6 +22,7 @@ import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
 import NightSelectScreen from './components/NightSelectScreen';
 import JournalView from './components/JournalView';
+import ArchiveView from './components/ArchiveView';
 import type {ClassId} from '../src/core/classes';
 import JourneyTrail from './components/JourneyTrail';
 import StarterBlessingScreen from './components/StarterBlessingScreen';
@@ -54,6 +55,7 @@ export default function Home() {
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [nightClass,setNightClass]=useState<ClassId|null>(null);
   const [journalOpen,setJournalOpen]=useState(false);
+  const [archiveOpen,setArchiveOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
   const [trailOpen,setTrailOpen]=useState(false);
   const [blessingsOpen, setBlessingsOpen] = useState(false);
@@ -66,6 +68,7 @@ export default function Home() {
     setPickingClass(false);
     setNightClass(null);
     setJournalOpen(false);
+    setArchiveOpen(false);
     dispatch({type:'EnterMenu'});
   }, [dispatch]);
 
@@ -106,12 +109,14 @@ export default function Home() {
   const screen = screenForState(state, { pickingClass });
 
   if(journalOpen)return <JournalView onClose={()=>setJournalOpen(false)}/>;
+  if(archiveOpen)return <ArchiveView onClose={()=>setArchiveOpen(false)}/>;
   if(nightClass)return <NightSelectScreen classId={nightClass} onBack={()=>setNightClass(null)} onStart={async night=>{const ok=await newNightRun(`night-${Date.now()}`,nightClass,night);if(ok){enteredRest.current=null;setNightClass(null);setPickingClass(false);}return ok;}}/>;
   if (screen === 'start') {
     return (
       <StartPage
         onStartGame={() => setPickingClass(true)}
         onJournal={()=>setJournalOpen(true)}
+        onArchive={()=>setArchiveOpen(true)}
         onContinue={() => { void continueRun(); }}
       />
     );

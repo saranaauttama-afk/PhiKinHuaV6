@@ -44,6 +44,7 @@ for(const kind of ['shop_equipment','treasure','treasure_single'] as const){
 keep('rest-cards',rest);
 const bless=structuredClone(level);bless.levelUp={choice:{optionA:'blessing',optionB:'max_hp',gold:30},blessingChoices:Object.values(BLESSINGS_BY_RARITY).flat().slice(0,2),consumed:false} as any;keep('levelup-blessing',bless);
 keep('hand',s);
+keep('archive-populated',s);keep('archive-empty',s);
 for(const night of [1,2,3,4,5] as const){let a=applyCommand({seed:'adventure-ui-'+night,turn:0,phase:'start'} as GameState,{type:'NewRun',seed:'adventure-ui-'+night,classId:'warrior',night},rng).state;a.chapter=undefined;a=applyCommand(a,{type:'ChooseStarterBlessing',index:0},rng).state;keep('adventure-'+night,a);}
 
 fs.mkdirSync('/tmp/phikinhua-backlog-web',{recursive:true});fs.writeFileSync('/tmp/phikinhua-backlog-web/ui-review-fixtures.json',JSON.stringify({fixtures}));

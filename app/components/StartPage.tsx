@@ -6,8 +6,8 @@ import {QuietButton} from './QuietChrome';
 import Settings from './Settings';
 import {font,palette,pulpColors} from '../theme';
 import {useScreenPadding} from '../useScreenPadding';
-type Props={onStartGame:()=>void;onContinue?:()=>void;onJournal?:()=>void};
-export default function StartPage({onStartGame,onContinue,onJournal}:Props){
+type Props={onStartGame:()=>void;onContinue?:()=>void;onJournal?:()=>void;onArchive?:()=>void};
+export default function StartPage({onStartGame,onContinue,onJournal,onArchive}:Props){
  const pad=useScreenPadding();const [saved,setSaved]=React.useState<SaveSummary|null>(null),[settings,setSettings]=React.useState(false);
  React.useEffect(()=>{let alive=true;loadAutoSaveSummary().then(s=>{if(alive)setSaved(s)}).catch(()=>{});return()=>{alive=false}},[]);
  return <ImageBackground source={require('../../assets/scence/menu-haunted.jpg')} style={{flex:1}}>
@@ -17,6 +17,7 @@ export default function StartPage({onStartGame,onContinue,onJournal}:Props){
     <Text style={{fontFamily:font.body,color:palette.text,fontSize:25,lineHeight:30,textAlign:'center',marginBottom:20}}>ชาวบ้านยังหลับ… แต่หัวหายไป{'\n'}ตามหัวกลับมา ก่อนฟ้าสาง</Text>
     {saved&&onContinue&&<QuietButton primary label={'เล่นต่อ • '+(saved.night?'คืน '+saved.night+' · ':'')+'ศึก '+saved.fight+'/'+saved.totalFights} onPress={onContinue}/>}
     <QuietButton primary={!saved} label="เริ่มเกม" onPress={onStartGame}/>
+    {onArchive&&<QuietButton label="บันทึกอาถรรพ์ · ผีและการ์ด" onPress={onArchive}/>}
     <View style={{flexDirection:'row',gap:10}}>{onJournal&&<QuietButton label="สมุดผ่านคืน" onPress={onJournal} style={{flex:1}}/>}<QuietButton label="ตั้งค่า" onPress={()=>setSettings(true)} style={{flex:1}}/></View>
     {saved&&<Text style={{fontFamily:font.ui,color:palette.textDim,fontSize:10,textAlign:'center'}}>เริ่มเกมใหม่จะแทนการเดินทางที่ค้างไว้</Text>}
    </View>

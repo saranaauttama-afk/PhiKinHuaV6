@@ -205,3 +205,6 @@ export const badgeColors={neutral:"#4b4432",negative:"#682c2b",positive:"#304d37
 export const quietUiColors={hudShade:'rgba(17,17,13,.82)',optionLine:'rgba(225,207,153,.2)',eventPanel:'rgba(18,15,10,.92)',defeatShade:'rgba(12,9,5,.55)'};
 
 export const blessingSealColors={paperInk:paper.ink,backing:palette.inkSoft,line:palette.moonDim,completed:badgeColors.positiveLine};
+
+/** Pigments for the user's approved archive notebook layout. */
+export const archiveColors={scene:'rgba(12,16,12,.90)',scrim:'rgba(0,0,0,.82)',field:'#25271e',fieldEdge:'#79694b',rule:'#665439',muted:'#6b624e',panel:'#1c2119',edge:'#8b744b',silhouette:'#4b4940'} as const;
