@@ -2,7 +2,7 @@
 
 ## Current branch: v1.0.28 / Android code 29
 
-Adds the approved บันทึกอาถรรพ์ archive: all 34 ghosts grouped and numbered, all 126 class cards plus curses/fusion/QA categories, real durable discovery/victory tracking, search/filters, locked and full views, and read-only card upgrade inspection. Local TypeScript and 710 tests passed; current APK/UI/native CI pending. See docs/HANDOFF-archive-v28.md.
+Adds the approved บันทึกอาถรรพ์ archive: all 34 ghosts grouped and numbered, all 126 class cards plus curses/fusion/QA categories, real durable discovery/victory tracking, search/filters, locked and full views, and read-only card upgrade inspection. TypeScript, 710 tests and 82 mobile UI checks passed. Signed offline APK v1.0.28 / code29 built and verified; five-night native archive validation remains pending. See docs/HANDOFF-archive-v28.md.
 
 ## Previous verified delivery: v1.0.27 / Android code 28
 

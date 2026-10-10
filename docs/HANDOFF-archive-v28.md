@@ -24,4 +24,8 @@ Local: TypeScript passed; 710 tests / 44 files passed (including 11 new catalogu
 
 Local Chromium download returned a truncated archive, so no local browser success is claimed. GitHub mobile workflow now runs the existing 70 checks plus archive inspection, locked/full views, filters, grouping, actual card/upgrade preview and no-credit assertions at 360×640 and 393×852. Native five-night workflow adds a 34/34 seen-and-defeated assertion, five-journey counts for ผีปอบ, card inspection and a cold archive reopen after all 146 battles.
 
-APK/mobile/native CI results are pending until recorded below. v1.0.27 validation is historical and cannot be substituted for this application's APK.
+Current source/APK commit e56d50c9d6697da07ab700d8471c01db838aa5cd, CI run 38017307432: https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38017307432 . Mobile job 114110334696 succeeded with 82 checks (44 regression, 26 adventure, 12 archive). All three downloaded JSON reports have errors=[] and screenshots=false. UI audit artifact 11656109517 ZIP SHA256 8e954e7f9148f4c09724c88fbe0cbbe8fc1849f872b33ab4936d9f8da5b9f409 matched GitHub.
+
+Android job 114110334806 succeeded: 710 tests / 44 files, TypeScript, Gradle build in 17m52s, APK signing/16KB alignment/package checks. APK is 121,345,359 bytes, package com.phikinhua.episode, v1.0.28 / code29, ARM64 and x86_64, offline Hermes bundle. SHA256 3559efd62dc9046ce457902cef753be3869a3c2ccce4d5f77883f4786b30fbe8. Signature v2 certificate matches v1.0.27, permitting an update install. Downloaded ZIP digests and actual APK checksum/ZIP integrity verified. APK artifact 11656859047 and audit 11656823823. APK delivered to user.
+
+Native job 114113941819 remains in progress. Do not claim five-night Android/archive persistence success until its actual result/evidence is inspected. v1.0.27 validation is historical and cannot substitute for this application's native result.
