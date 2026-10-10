@@ -20,7 +20,7 @@ jobs:
           python - <<'PY'
           import subprocess
           changed=subprocess.check_output(['git','diff','--name-only','HEAD~1','HEAD'],text=True).splitlines()
-          allowed={'scripts/backlog-mobile-check.cjs','scripts/adventure-mobile-check.cjs','scripts/final-tuning-mobile-check.cjs','.github/workflows/android-test-apk.yml'}
+          allowed={'scripts/backlog-mobile-check.cjs','scripts/adventure-mobile-check.cjs','scripts/final-tuning-mobile-check.cjs','scripts/three-night-mobile-check.cjs','.github/workflows/android-test-apk.yml'}
           assert all(p in allowed or p.endswith('.md') for p in changed), changed
           print('Only UI verification scripts/workflow/docs changed; parent application is the APK source.')
           PY

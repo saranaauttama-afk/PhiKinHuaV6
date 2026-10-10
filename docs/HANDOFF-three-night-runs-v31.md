@@ -37,7 +37,7 @@ Adventure v4 snapshots validate difficulty, chapter, completed-night counters, q
 - Local TypeScript passed.
 - All 781 tests across 46 files passed: includes 20 class/tier complete-run paths, exact 30/31 fights, save/RNG on every screen, carryover, modest healing, journal migration/idempotence, locked/failed/partial clears, class-specific entry and boss phases.
 - Web export passed; real reducer fixture generation passed.
-- New mobile checks cover difficulty locks, framed routes, all three stories, dawn and final totals at 360×640 and 393×852. CI pending.
+- Existing 108 mobile checks passed in CI 38054952320. New mobile checks cover difficulty locks, framed routes, all three stories, dawn and final totals at 360×640 and 393×852. The first run failed because a previously-read chapter changes its button from ข้ามบทนี้ to เดินทางต่อ; the test selector is corrected to accept both. Product code and APK source remain fdcef6e5. Corrected mobile rerun pending.
 - Native API 36 audit plays all five difficulty levels sequentially: 151 fights, three mandatory stories per run, chapter dawn checkpoints, cold combat restore, cancelled drag and durable archive. XML/logs only. CI pending.
 - Signed offline universal arm64/x86_64 APK, package/code, signing and 16 KB audit: pending CI.
 - Full-run pilot: `docs/three-night-v31-pilot.json`; normal cards, public-board vs random-affordable policies, six matched seeds per class/tier/policy (240 runs). This checks model stalls and relative class behavior, not human fun or actual session duration.
