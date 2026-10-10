@@ -9,7 +9,7 @@ import QuietPlayerHud,{HudStat} from './QuietPlayerHud';
 import InkIcon from './InkIcon';
 import { font, layer, paper, pulpColors, palette } from '../theme';
 
-export const STATUS_BAR_SPACE = 100;
+export const STATUS_BAR_SPACE = 88;
 export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: {
   state: GameState; onOpenDeck?: () => void; onOpenBlessings?: () => void;
 }) {

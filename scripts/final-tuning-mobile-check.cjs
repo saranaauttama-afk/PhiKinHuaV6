@@ -9,9 +9,10 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
   const objectSources=[];
   for(const kind of ['shop_card','shop_equipment','shop_upgrade','shop_remove','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event','next_event']){
    await load('adventure-prop-'+kind);const prop=p.getByTestId('adventure-prop-1').locator('img'),src=await prop.getAttribute('src');assert.ok(src);objectSources.push(src);
-   await p.getByTestId('adventure-slot-1').click();assert.equal(await prop.getAttribute('src'),src);
+   const geometry=await p.locator('[data-testid^="adventure-frame-"]').evaluateAll(els=>els.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};}));assert.equal(geometry.length,3);assert.ok(geometry.every(b=>Math.abs(b.h-geometry[0].h)<1&&b.x>=0&&b.x+b.w<=viewport.width+1));
+   await p.getByTestId('adventure-slot-1').click();assert.equal(await prop.getAttribute('src'),src);const enter=await p.getByTestId('adventure-enter-1').boundingBox(),frame=await p.getByTestId('adventure-frame-1').boundingBox(),mapHud=await p.getByTestId('player-hud').boundingBox();assert.ok(enter&&frame&&mapHud&&enter.height>=44&&enter.x>=frame.x&&enter.x+enter.width<=frame.x+frame.width+1&&enter.y+enter.height<=frame.y+frame.height+1&&frame.y+frame.height<mapHud.y);assert.equal(await p.locator('button button').count(),0);
    if(kind!=='next_event'){
-    await p.getByRole('button',{name:/^(เข้าร้าน|ปลุกเสก|สละการ์ด|ดื่มน้ำ|พักฟื้น|รับสมบัติ|ผสานการ์ด) · |^สำรวจเรื่องราว$/}).click();
+    await p.getByTestId('adventure-enter-1').click();
     const destination=p.getByTestId(kind==='story_event'?'story-object':'destination-object');await destination.waitFor();assert.equal(await destination.locator('img').getAttribute('src'),src,'route/destination artwork mismatch: '+kind);
     if(kind==='story_event'){await p.getByTestId('event-choice-0').click();await p.getByRole('button',{name:/^ยืนยัน · /}).click();}
     await p.getByRole('button',{name:'กลับจุดพัก',exact:true}).click();if(kind!=='story_event')assert.equal(await p.getByTestId('adventure-prop-1').locator('img').getAttribute('src'),src);

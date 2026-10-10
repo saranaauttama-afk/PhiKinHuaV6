@@ -20,7 +20,7 @@ jobs:
           python - <<'PY'
           import subprocess
           changed=subprocess.check_output(['git','diff','--name-only','HEAD~1','HEAD'],text=True).splitlines()
-          allowed={'scripts/backlog-mobile-check.cjs','scripts/adventure-mobile-check.cjs','.github/workflows/android-test-apk.yml'}
+          allowed={'scripts/backlog-mobile-check.cjs','scripts/adventure-mobile-check.cjs','scripts/final-tuning-mobile-check.cjs','.github/workflows/android-test-apk.yml'}
           assert all(p in allowed or p.endswith('.md') for p in changed), changed
           print('Only UI verification scripts/workflow/docs changed; parent application is the APK source.')
           PY
@@ -77,13 +77,13 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
           python scripts/check-apk.py "$APK" > apk-audit/libraries.json
-          grep "package: name='com.phikinhua.episode' versionCode='30' versionName='1.0.29'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-FiveNights-v1.0.29.apk
-          sha256sum PhiKinHua-FiveNights-v1.0.29.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='31' versionName='1.0.30'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-FiveNights-v1.0.30.apk
+          sha256sum PhiKinHua-FiveNights-v1.0.30.apk > apk-audit/sha256.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-FiveNights-APK
-          path: PhiKinHua-FiveNights-v1.0.29.apk
+          path: PhiKinHua-FiveNights-v1.0.30.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -113,7 +113,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-FiveNights-v1.0.29.apk
+            adb install PhiKinHua-FiveNights-v1.0.30.apk
             adb shell am start -W -n com.phikinhua.episode/.MainActivity
             adb shell pidof com.phikinhua.episode
             python scripts/android-backlog-smoke.py

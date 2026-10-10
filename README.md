@@ -1,8 +1,12 @@
 # ผีกินหัว — ห้าคืนอาถรรพ์
 
-## Current branch: v1.0.29 / Android code 30
+## Current branch: v1.0.30 / Android code 31
 
-`work/final-tuning-v29` implements Issue #7: ten distinct route ghosts per night plus the night boss (night five also has the ultimate boss), two new roster ghosts each later night, four spaced service opportunities, richer owner-specific enemy decks, real dodge/thorns mechanics, simpler HUDs and corrected shared encounter illustrations. TypeScript, 753 automated tests and 320 seeded simulations passed locally without stalled runs. The simulation still shows class balance differences, especially faster shaman fights; human pacing/fun is not signed off. Android/mobile verification and the new APK are pending. See `docs/HANDOFF-final-tuning-v29.md`.
+User-approved framed encounter layout: three matching illustrated dark panels, equal circular ghost/service portraits, short public trait clues and an in-panel confirmation button. The selected frame uses red ink; Next Intersection is compact and still confirms skipped services. Map HUD height is reduced with its deck/blessing actions preserved. Local TypeScript, 753 tests and web export passed; new mobile/Android verification and APK are pending. See `docs/HANDOFF-framed-encounters-v30.md`.
+
+## Previous delivery: v1.0.29 / Android code 30
+
+`work/final-tuning-v29` implements Issue #7: ten distinct route ghosts per night plus the night boss (night five also has the ultimate boss), two new roster ghosts each later night, four spaced service opportunities, richer owner-specific enemy decks, real dodge/thorns mechanics, simpler HUDs and corrected shared encounter illustrations. TypeScript, 753 automated tests and 320 seeded simulations passed locally without stalled runs. The simulation still shows class balance differences, especially faster shaman fights; human pacing/fun is not signed off. Signed APK/package audit and native five-night validation passed in CI 38043198980. The existing 82 mobile checks passed; the added final-tuning script failed because its selector matched two same-label controls. v30 corrects that selector and replaces the encounter layout. See `docs/HANDOFF-final-tuning-v29.md`.
 
 ## Previous verified delivery: v1.0.28 / Android code 29
 
@@ -56,7 +60,7 @@ The following notes describe earlier implementations and validation, not the cur
 
 ## Current source
 
-Current work branch: `work/final-tuning-v29`, continuing Issue #7. Read `docs/HANDOFF-final-tuning-v29.md` for current behavior; B17 documents below describe the older complete-roster design. `main` is older. Read `docs/HANDOFF-adventure-pages-b17.md` first; older references include `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
+Current work branch: `work/final-tuning-v29`, continuing Issue #7. Read `docs/HANDOFF-framed-encounters-v30.md` for current UI and `docs/HANDOFF-final-tuning-v29.md` for gameplay; B17 documents below describe the older complete-roster design. `main` is older. Read `docs/HANDOFF-adventure-pages-b17.md` first; older references include `docs/HANDOFF-battle-hud-pause.md`, `docs/HANDOFF-blessing-cowrie.md`, `docs/HANDOFF-scene-deck.md`, `docs/HANDOFF-map-hud.md`, `docs/HANDOFF-occupation-table.md` and `docs/HANDOFF-first-night.md`; `CLAUDE.md` and `context.md` contain historical information and are not a reliable snapshot of current implementation. No AGENTS.md existed in the audited branch.
 
 ## Historical first chapter
 
