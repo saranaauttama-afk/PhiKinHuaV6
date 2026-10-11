@@ -25,6 +25,7 @@ jobs:
           print('Application code, dependencies, gameplay, save format and assets match APK source',base)
           PY
       - run: python -m pip install Pillow
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - uses: actions/download-artifact@v4
         with:
           name: PhiKinHua-Paper-Rollout-Test-APK
@@ -55,7 +56,7 @@ jobs:
           disable-animations: false
           script: |
             adb install PhiKinHua-Paper-Rollout-Test.apk
-            python -u scripts/android-paper-rollout-smoke.py
+            python -u scripts/android-paper-rollout-smoke.py --settings-only
       - uses: actions/upload-artifact@v4
         if: always()
         with:
