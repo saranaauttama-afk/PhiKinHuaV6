@@ -2,6 +2,7 @@ import React from 'react';
 import {Image, ImageSourcePropType, Platform, StyleSheet, View} from 'react-native';
 import Animated, {SharedValue, useAnimatedStyle} from 'react-native-reanimated';
 import {PAPER_GHOST_ID, PAPER_LAYERS, PaperLayerId, paperProjection} from '../../../src/visual/paperDiorama';
+import {paperViewport} from '../../../src/visual/paperViewport';
 import {enemyLane} from '../../battleGeometry';
 import {useBattleLayout} from '../battle/battleLayout';
 import GhostArt from '../GhostArt';
@@ -22,12 +23,23 @@ function useLayer(id: PaperLayerId, motion: Motion) {
     return {...webPlaneStyle,opacity:p.opacity,transform: [{translateX: p.translateX}, {translateY: p.translateY}, {scale: p.scale}]};
   });
 }
-function BackLayer({id, source, motion, baseY=0,onLoad}: {id: Exclude<PaperLayerId, 'ghost'>; source: ImageSourcePropType; motion: Motion; baseY?:number;onLoad?:(key:string)=>void}) {
-  const style = useLayer(id, motion), offset = PAPER_LAYERS[id].shadow;
-  return <Animated.View testID={`paper-layer-${id}`} style={[styles.overscan, {top:-16+baseY,bottom:-16-baseY},style]}>
-    {offset > 0 && <Image accessible={false} source={source} resizeMode="stretch" style={[styles.plane, {tintColor:ink.shadow, opacity:0.55, transform:[{translateX:offset},{translateY:offset*1.3}]}]}/>}
-    <Image accessible={false} source={source} onLoad={()=>onLoad?.(id)} resizeMode="stretch" style={styles.plane}/><Image testID={`paper-ink-${id}`} accessible={false} source={inkSources[id]} onLoad={()=>onLoad?.(id+"-ink")} resizeMode="stretch" style={styles.plane}/>
-  </Animated.View>;
+type Plane={left:number;top:number;width:number;height:number};
+function PaperPrint({id,source,plane,onLoad}: {id:Exclude<PaperLayerId,'ghost'>;source:ImageSourcePropType;plane:Plane;onLoad?:(key:string)=>void}){
+ const offset=PAPER_LAYERS[id].shadow;
+ return <View testID={`paper-print-${id}`} style={{position:'absolute',...plane}}>
+  {offset>0&&<Image accessible={false} source={source} resizeMode="stretch" style={[styles.plane,{tintColor:ink.shadow,opacity:0.55,transform:[{translateX:offset},{translateY:offset*1.3}]}]}/>}
+  <Image accessible={false} source={source} onLoad={()=>onLoad?.(id)} resizeMode="stretch" style={styles.plane}/>
+  <Image testID={`paper-ink-${id}`} accessible={false} source={inkSources[id]} onLoad={()=>onLoad?.(id+'-ink')} resizeMode="stretch" style={styles.plane}/>
+ </View>;
+}
+function BackLayer({id,source,motion,plane,canopy,onLoad}: {id:Exclude<PaperLayerId,'ghost'>;source:ImageSourcePropType;motion:Motion;plane:Plane;canopy?:Plane;onLoad?:(key:string)=>void}){
+ const style=useLayer(id,motion);
+ return <Animated.View testID={`paper-layer-${id}`} style={[StyleSheet.absoluteFill,style]}>
+  {canopy?<>
+   <View testID="paper-canopy-clip" style={{position:'absolute',left:-24,right:-24,top:canopy.top,height:canopy.height*0.42,overflow:'hidden'}}><PaperPrint id={id} source={source} plane={{...canopy,left:canopy.left+24,top:0}} onLoad={onLoad}/></View>
+   <View testID="paper-foliage-clip" style={{position:'absolute',left:-24,right:-24,top:plane.top+plane.height*0.42,bottom:-24,overflow:'hidden'}}><PaperPrint id={id} source={source} plane={{...plane,left:plane.left+24,top:-plane.height*0.42}}/></View>
+  </>:<PaperPrint id={id} source={source} plane={plane} onLoad={onLoad}/>}
+ </Animated.View>;
 }
 /** Each original bitmap moves independently; screen UI is a separate sibling. */
 export default function PaperDiorama(motion: Motion) {
@@ -36,18 +48,18 @@ export default function PaperDiorama(motion: Motion) {
   const layout = useBattleLayout(), lane = enemyLane(layout), ghostStyle = useLayer('ghost', motion);
   // Register the printed lane's horizon to the approved battle foot line on
   // short and tall phones, rather than moving any HUD or stretching the art.
-  const groundShift = layout.hudTop - 12 - layout.screenH * 0.57;
+  const planes=paperViewport(layout);
   return <View pointerEvents="none" testID="paper-world" style={[StyleSheet.absoluteFill, {overflow:'hidden', backgroundColor:ink.backing}]}>
-    <BackLayer id="sky" source={sources.sky} motion={motion} onLoad={onLoad}/>
-    <BackLayer id="forest" source={sources.forest} motion={motion} onLoad={onLoad}/>
+    <BackLayer id="sky" source={sources.sky} motion={motion} plane={planes.sky} onLoad={onLoad}/>
+    <BackLayer id="forest" source={sources.forest} motion={motion} plane={planes.forest} onLoad={onLoad}/>
     <View style={{position:'absolute',top:layout.hudTop-12,left:0,right:0,bottom:0,backgroundColor:ink.floor}}/>
-    <BackLayer id="village" source={sources.village} motion={motion} baseY={groundShift} onLoad={onLoad}/>
+    <BackLayer id="village" source={sources.village} motion={motion} plane={planes.village} onLoad={onLoad}/>
     <Animated.View testID="paper-layer-ghost" style={[{position:'absolute',top:layout.monsterTop,left:lane.artX,width:lane.artWidth,height:lane.artSize},ghostStyle]}>
       <View style={[StyleSheet.absoluteFill,{transform:[{translateX:7},{translateY:9}],opacity:0.65}]}><GhostArt id={PAPER_GHOST_ID} width={lane.artWidth} height={lane.artSize} paperTint={ink.ghostShadow}/></View>
       {[[-1.3,-1.3],[1.3,1.3]].map(([x,y],i)=><View key={i} style={[StyleSheet.absoluteFill,{transform:[{translateX:x},{translateY:y}]}]}><GhostArt id={PAPER_GHOST_ID} width={lane.artWidth} height={lane.artSize} paperTint={ink.edge}/></View>)}
       <GhostArt id={PAPER_GHOST_ID} width={lane.artWidth} height={lane.artSize} onLoad={()=>onLoad("ghost")}/>
     </Animated.View>
-    <BackLayer id="foliage" source={sources.foliage} motion={motion} baseY={-layout.screenH*0.14} onLoad={onLoad}/>
+    <BackLayer id="foliage" source={sources.foliage} motion={motion} plane={planes.foliage} canopy={planes.canopy} onLoad={onLoad}/>
   </View>;
 }
-const styles = StyleSheet.create({overscan:{position:'absolute',top:-16,left:-16,right:-16,bottom:-16},plane:{...StyleSheet.absoluteFillObject,width:'100%',height:'100%'}});
+const styles = StyleSheet.create({plane:{...StyleSheet.absoluteFillObject,width:'100%',height:'100%'}});

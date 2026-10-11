@@ -1,6 +1,8 @@
 import React from 'react';
-import {Platform, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Platform, Pressable, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import Animated, {cancelAnimation, Easing, runOnJS, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming} from 'react-native-reanimated';
+import {battleGeometry} from './battleGeometry';
+import {BattleLayoutContext} from './components/battle/battleLayout';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {applyCommand} from '../src/core/reducer';
 import {makeRng} from '../src/core/rng';
@@ -32,7 +34,9 @@ function previewBattle() {
 
 /** Opt-in, isolated one-route review. Never writes a run, journal or discoveries. */
 export default function PaperDioramaPreview() {
-  const [loaded] = useAppFonts(), safe = useSafeAreaInsets();
+  const [loaded] = useAppFonts(), safe = useSafeAreaInsets(),window=useWindowDimensions();
+  const [viewport,setViewport]=React.useState({width:window.width,height:window.height});
+  const layout=React.useMemo(()=>battleGeometry(viewport.width,viewport.height,safe.top,safe.bottom),[viewport.width,viewport.height,safe.top,safe.bottom]);
   const enabled = process.env.EXPO_PUBLIC_PAPER_DIORAMA === '1';
   const [snapshot, setSnapshot] = React.useState(previewBattle);
   const [phase, setPhase] = React.useState<'route'|'arrival'|'battle'>('route');
@@ -67,7 +71,8 @@ export default function PaperDioramaPreview() {
   if (!enabled) return <QuietPage title="ฉากทดลอง"><Text style={{color:palette.text}}>เปิดเฉพาะ Web Preview ของฉากต้นแบบ</Text></QuietPage>;
   if (!ready) return <View style={{flex:1,backgroundColor:ink.loading}}><Text style={{color:palette.moon}}>กำลังเปิดฉาก…</Text></View>;
   const state = snapshot.state;
-  return <View testID="paper-preview" style={{flex:1,overflow:'hidden',backgroundColor:ink.backing}}>
+  return <View onLayout={event=>{const {width,height}=event.nativeEvent.layout;if(width>0&&height>0)setViewport(current=>current.width===width&&current.height===height?current:{width,height});}} testID="paper-preview" style={{flex:1,overflow:'hidden',backgroundColor:ink.backing}}>
+    <BattleLayoutContext.Provider value={layout}>
     <PaperDiorama assembly={assembly} x={x} y={y} onReady={onReady}/>
     {/* No camera transform is an ancestor of this screen-space HUD. */}
     <View testID="paper-screen-ui" pointerEvents="box-none" style={StyleSheet.absoluteFill}>
@@ -96,6 +101,7 @@ export default function PaperDioramaPreview() {
       {showSettings&&<Settings onClose={()=>setShowSettings(false)}/>}
       {discard&&<DiscardOverlay cards={state.piles.hand} maxHandSize={state.player.maxHandSize!} onCancel={()=>setDiscard(false)} onConfirm={indices=>{for(const index of [...indices].sort((a,b)=>b-a))dispatch({type:'DiscardCard',index});setDiscard(false);dispatch({type:'EndTurn'});}}/>}
     </View>
-    {Platform.OS==='web'&&<Text testID="paper-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({phase,reduced:motion.reduced,active:motion.active,enemy:state.enemy?.id,hand:state.piles.hand.map(c=>c.id),turn:state.turn,eventTypes:state.pendingEvents?.map(e=>e.t)??[],assemblyMs:PAPER_ASSEMBLY_MS,animationOn:settings.dioramaAnimation,assetsReady,progressionWritten:false})}</Text>}
+    {Platform.OS==='web'&&<Text testID="paper-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({phase,reduced:motion.reduced,active:motion.active,enemy:state.enemy?.id,hand:state.piles.hand.map(c=>c.id),turn:state.turn,eventTypes:state.pendingEvents?.map(e=>e.t)??[],assemblyMs:PAPER_ASSEMBLY_MS,animationOn:settings.dioramaAnimation,assetsReady,progressionWritten:false,viewport,safe})}</Text>}
+  </BattleLayoutContext.Provider>
   </View>;
 }

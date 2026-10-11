@@ -1,0 +1,117 @@
+name: Paper diorama mobile test APK
+on:
+  push:
+    branches: ['work/paper-diorama-prototype']
+    paths: ['app/components/paper/**', 'app/paper-diorama.tsx', 'app/components/battle/battleLayout.ts', 'src/visual/paperViewport.ts', 'test/paper-viewport.test.ts', 'scripts/android-paper-smoke.py', '.github/workflows/paper-diorama-test-apk.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test -- --maxWorkers=2 --testTimeout=60000
+      - run: npm install --no-save --package-lock=false playwright@1.62.1
+      - run: npx playwright install --with-deps chromium
+      - run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - run: EXPO_PUBLIC_PAPER_DIORAMA=1 npx expo export --platform web --output-dir /tmp/assembly-web
+      - run: node scripts/paper-diorama-check.cjs
+        env:
+          PAPER_AUDIT_DIR: paper-mobile-web-audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Paper-mobile-web-audit
+          path: paper-mobile-web-audit/
+  android:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Configure isolated one-scene test application
+        run: |
+          node - <<'JS'
+          const fs=require('fs');const pkg=JSON.parse(fs.readFileSync('package.json'));pkg.main='preview/paper-entry.tsx';fs.writeFileSync('package.json',JSON.stringify(pkg,null,2));
+          const config=JSON.parse(fs.readFileSync('app.json'));config.expo.name='PhiKinHua Diorama Test';config.expo.android.package='com.phikinhua.dioramatest';config.expo.android.versionCode=1;fs.writeFileSync('app.json',JSON.stringify(config,null,2));
+          JS
+      - name: Generate Android project from this commit
+        run: CI=1 EXPO_PUBLIC_PAPER_DIORAMA=1 npx expo prebuild --platform android
+      - name: Build signed offline universal test APK
+        env:
+          EXPO_PUBLIC_PAPER_DIORAMA: '1'
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
+      - name: Verify signature, manifest, assets and 16KB alignment
+        run: |
+          mkdir -p paper-apk-audit
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > paper-apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 "$APK" > paper-apk-audit/zipalign.txt
+          "$BT/aapt" dump badging "$APK" > paper-apk-audit/package.txt
+          python scripts/check-apk.py "$APK" > paper-apk-audit/libraries.json
+          grep "package: name='com.phikinhua.dioramatest' versionCode='1' versionName='1.0.33'" paper-apk-audit/package.txt
+          grep 'screenOrientation' android/app/src/main/AndroidManifest.xml | grep portrait
+          cp "$APK" PhiKinHua-Paper-Diorama-Test.apk
+          sha256sum PhiKinHua-Paper-Diorama-Test.apk > paper-apk-audit/sha256.txt
+          echo '${{ github.sha }}' > paper-apk-audit/source-commit.txt
+          echo 'Test signing key; separate application ID; exact prototype entry component.' > paper-apk-audit/build-mode.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhiKinHua-Paper-Diorama-Test-APK
+          path: PhiKinHua-Paper-Diorama-Test.apk
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Paper-APK-signature-audit
+          path: paper-apk-audit/
+  native:
+    needs: android
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m pip install Pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-Paper-Diorama-Test-APK
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: false
+          script: |
+            adb install PhiKinHua-Paper-Diorama-Test.apk
+            python -u scripts/android-paper-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Paper-native-mobile-audit
+          path: paper-native-audit/
+          retention-days: 14
