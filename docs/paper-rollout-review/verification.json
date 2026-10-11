@@ -1,0 +1,957 @@
+{
+  "applicationSource": "9cadcf501c563ec6ceb65c166e74998bcf21a408",
+  "apkBuildSource": "1e786da13fdfaa924c632e0bd485b0e0b6fd9f52",
+  "apkSha256": "1466491cd3f0f183fd2e72645f4784d92f44c2750563ae2efc173310575bff14",
+  "native": [
+    {
+      "check": "production-campaign-route-battle-cold-save-resume-v33-no-combo",
+      "passed": true
+    },
+    {
+      "check": "saved-combat-survives-portrait-window-recreation",
+      "passed": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "01-village",
+      "logicalViewport": [
+        360.0,
+        640.0
+      ],
+      "grounded": false
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "03-temple-gate",
+      "logicalViewport": [
+        360.0,
+        640.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "06-bamboo-forest",
+      "logicalViewport": [
+        360.0,
+        640.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "08-stream",
+      "logicalViewport": [
+        360.0,
+        640.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "10-mountain-trail",
+      "logicalViewport": [
+        360.0,
+        640.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "13-cave-river",
+      "logicalViewport": [
+        360.0,
+        640.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "16-secret-throne",
+      "logicalViewport": [
+        360.0,
+        640.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "01-village",
+      "logicalViewport": [
+        393.0,
+        852.0
+      ],
+      "grounded": false
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "03-temple-gate",
+      "logicalViewport": [
+        393.0,
+        852.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "06-bamboo-forest",
+      "logicalViewport": [
+        393.0,
+        852.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "08-stream",
+      "logicalViewport": [
+        393.0,
+        852.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "10-mountain-trail",
+      "logicalViewport": [
+        393.0,
+        852.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "13-cave-river",
+      "logicalViewport": [
+        393.0,
+        852.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "portrait-environment-route-battle",
+      "passed": true,
+      "scene": "16-secret-throne",
+      "logicalViewport": [
+        393.0,
+        852.0
+      ],
+      "grounded": true
+    },
+    {
+      "check": "normal-speed-three-second-native-recording-late-HUD",
+      "passed": true
+    },
+    {
+      "check": "OFF-persistence-after-cold-restart-and-immediate-HUD",
+      "passed": true
+    },
+    {
+      "check": "game-reduced-motion-overrides-ON-immediate-HUD",
+      "passed": true
+    },
+    {
+      "check": "no-native-crash-or-worklet-errors",
+      "passed": true
+    }
+  ],
+  "nativeRuns": [
+    38173301137,
+    38174850144
+  ],
+  "performance": {
+    "checksPassed": 7,
+    "assemblySamples": [
+      {
+        "scene": "01-village",
+        "totalPssKb": 154708,
+        "frames": {
+          "samples": 29,
+          "meanMs": 284.64089155172417,
+          "p95Ms": 400.125581,
+          "worstMs": 402.661959
+        },
+        "logicalViewport": [
+          393,
+          852
+        ],
+        "emulatorOnly": true
+      },
+      {
+        "scene": "03-temple-gate",
+        "totalPssKb": 168642,
+        "frames": {
+          "samples": 40,
+          "meanMs": 223.10405625,
+          "p95Ms": 266.847143,
+          "worstMs": 302.167334
+        },
+        "logicalViewport": [
+          393,
+          852
+        ],
+        "emulatorOnly": true
+      },
+      {
+        "scene": "06-bamboo-forest",
+        "totalPssKb": 186004,
+        "frames": {
+          "samples": 44,
+          "meanMs": 202.8610398181818,
+          "p95Ms": 250.216369,
+          "worstMs": 351.713329
+        },
+        "logicalViewport": [
+          393,
+          852
+        ],
+        "emulatorOnly": true
+      },
+      {
+        "scene": "08-stream",
+        "totalPssKb": 196562,
+        "frames": {
+          "samples": 46,
+          "meanMs": 191.49508523913045,
+          "p95Ms": 216.945574,
+          "worstMs": 245.073337
+        },
+        "logicalViewport": [
+          393,
+          852
+        ],
+        "emulatorOnly": true
+      },
+      {
+        "scene": "10-mountain-trail",
+        "totalPssKb": 206362,
+        "frames": {
+          "samples": 49,
+          "meanMs": 191.28336181632653,
+          "p95Ms": 225.583354,
+          "worstMs": 233.492764
+        },
+        "logicalViewport": [
+          393,
+          852
+        ],
+        "emulatorOnly": true
+      },
+      {
+        "scene": "13-cave-river",
+        "totalPssKb": 204726,
+        "frames": {
+          "samples": 47,
+          "meanMs": 187.4782540212766,
+          "p95Ms": 216.926445,
+          "worstMs": 233.534398
+        },
+        "logicalViewport": [
+          393,
+          852
+        ],
+        "emulatorOnly": true
+      },
+      {
+        "scene": "16-secret-throne",
+        "totalPssKb": 213450,
+        "frames": {
+          "samples": 48,
+          "meanMs": 184.83154758333333,
+          "p95Ms": 217.030708,
+          "worstMs": 229.641086
+        },
+        "logicalViewport": [
+          393,
+          852
+        ],
+        "emulatorOnly": true
+      }
+    ],
+    "physicalDeviceTested": false
+  },
+  "webPaperReports": {
+    "reports": [
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "01-village",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "02-village-edge",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "03-temple-gate",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "04-temple-court",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "05-cremation-ground",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "06-bamboo-forest",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "07-banyan",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "08-stream",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "09-waterfall",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "10-mountain-trail",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "11-mountain-shrine",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "12-cave-mouth",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "13-cave-river",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "14-buried-sanctuary",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "15-otherworld-gate",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "16-secret-throne",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-02",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-04",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-06",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-08",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-10",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-12",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-14",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "rest-15",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "01-village",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3555,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.55324074074074,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 17.20000000001164
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "03-temple-gate",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3538,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.54768518518513,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 19.79999999998836
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "06-bamboo-forest",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3512,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.55324074074074,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 19
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "08-stream",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3519,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.557407407407513,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 19.20000000001164
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "10-mountain-trail",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3525,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.561111111111163,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 19.29999999998836
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "13-cave-river",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3538,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.562037037036877,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 20
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 360,
+          "height": 640
+        },
+        "scene": "16-secret-throne",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3519,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.562962962962857,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 17.900000000023283
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "01-village",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "02-village-edge",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "03-temple-gate",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "04-temple-court",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "05-cremation-ground",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "06-bamboo-forest",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "07-banyan",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "08-stream",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "09-waterfall",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "10-mountain-trail",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "11-mountain-shrine",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "12-cave-mouth",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "13-cave-river",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "14-buried-sanctuary",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "15-otherworld-gate",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "16-secret-throne",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-02",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-04",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-06",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-08",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-10",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-12",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-14",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "rest-15",
+        "check": "route-battle-OFF-coverage-and-layout",
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "01-village",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3609,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.555555555555557,
+          "p95Ms": 16.800000000046566,
+          "worstMs": 18.900000000023283
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "03-temple-gate",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3611,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.55231481481476,
+          "p95Ms": 17.099999999976717,
+          "worstMs": 21.5
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "06-bamboo-forest",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3623,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.53749999999989,
+          "p95Ms": 17,
+          "worstMs": 20.5
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "08-stream",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3578,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.561111111110897,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 17.70000000001164
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "10-mountain-trail",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3585,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.56435185185169,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 17.900000000023283
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "13-cave-river",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3155,
+        "perf": {
+          "frames": 208,
+          "meanMs": 16.523671497584374,
+          "p95Ms": 17.20000000001164,
+          "worstMs": 23.400000000023283
+        },
+        "passed": true
+      },
+      {
+        "viewport": {
+          "width": 393,
+          "height": 852
+        },
+        "scene": "16-secret-throne",
+        "check": "normal-speed-ON-assembly-no-replay",
+        "elapsed": 3599,
+        "perf": {
+          "frames": 217,
+          "meanMs": 16.563888888888837,
+          "p95Ms": 16.79999999998836,
+          "worstMs": 17.20000000001164
+        },
+        "passed": true
+      },
+      {
+        "check": "OS-reduced-motion-overrides-ON",
+        "passed": true
+      },
+      {
+        "check": "OFF-cold-reload-persistence",
+        "passed": true
+      }
+    ],
+    "errors": [],
+    "physicalAndroidProfiled": false
+  },
+  "physicalDeviceTested": false
+}
