@@ -8,7 +8,7 @@ permissions:
   actions: read
 jobs:
   native:
-    if: ${{ contains(github.event.head_commit.message, '[native-recheck]') }}
+    if: ${{ contains(github.event.head_commit.message, '[native-recheck]') && !contains(github.event.head_commit.message, '[diagnose]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -53,3 +53,14 @@ jobs:
           name: Paper-rollout-native-audit
           path: paper-rollout-native-audit/
           retention-days: 30
+  diagnostics:
+    if: ${{ contains(github.event.head_commit.message, '[diagnose]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-native-audit
+          run-id: 38166885904
+          github-token: ${{ github.token }}
+      - run: cat logcat.txt
+      - run: cat results.json
