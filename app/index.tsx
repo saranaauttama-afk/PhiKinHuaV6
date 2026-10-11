@@ -93,6 +93,8 @@ export default function Home() {
         frame = requestAnimationFrame(restoreBattle);
         return;
       }
+      // A deep link may have focused another screen during the readiness wait.
+      if (navigationRef.getCurrentRoute()?.name !== 'index') return;
       router.replace({pathname:'/battle',params:{monsterId:state.enemy!.id,monsterName:state.enemy!.name}});
     };
     frame = requestAnimationFrame(restoreBattle);
