@@ -1,0 +1,158 @@
+name: Paper rollout final review media and performance
+on:
+  push:
+    branches: ['work/paper-diorama-rollout']
+    paths: ['.github/workflows/paper-rollout-delivery.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  performance:
+    if: ${{ contains(github.event.head_commit.message, '[publish-review]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m pip install Pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-Paper-Rollout-Test-APK
+          run-id: 38172779690
+          github-token: ${{ github.token }}
+      - run: echo "1466491cd3f0f183fd2e72645f4784d92f44c2750563ae2efc173310575bff14  PhiKinHua-Paper-Rollout-Test.apk" | sha256sum -c -
+      - run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: false
+          script: |
+            adb install PhiKinHua-Paper-Rollout-Test.apk
+            python -u - <<'PY'
+            from pathlib import Path
+            import sys,json,re,time,statistics
+            sys.argv=['performance']
+            source=Path('scripts/android-paper-rollout-smoke.py').read_text()
+            source=source[:source.index("adb('shell','pm','clear',APP)")].replace('paper-rollout-native-audit','paper-rollout-performance')
+            exec(compile(source,'native-performance-helpers','exec'),globals())
+            adb('shell','pm','clear',APP);adb('logcat','-c')
+            adb('shell','wm','size','786x1704');adb('shell','wm','density','320')
+            scenes=['01-village','03-temple-gate','06-bamboo-forest','08-stream','10-mountain-trail','13-cave-river','16-secret-throne']
+            samples=[]
+            def frame_stats(raw):
+             values=[]
+             for section in raw.split('---PROFILEDATA---')[1::2]:
+              lines=[l.strip() for l in section.splitlines() if l.strip()]
+              if len(lines)<2:continue
+              header=lines[0].split(',')
+              if 'IntendedVsync' not in header or 'FrameCompleted' not in header:continue
+              for line in lines[1:]:
+               fields=line.split(',')
+               try:
+                if int(fields[header.index('Flags')]):continue
+                ms=(int(fields[header.index('FrameCompleted')])-int(fields[header.index('IntendedVsync')]))/1e6
+                if 0<ms<10000:values.append(ms)
+               except (ValueError,IndexError):pass
+             values.sort()
+             return {'samples':len(values),'meanMs':statistics.mean(values) if values else None,'p95Ms':values[min(len(values)-1,int(len(values)*.95))] if values else None,'worstMs':max(values) if values else None}
+            try:
+             for scene in scenes:
+              ghost='phi-nang-yai' if scene=='01-village' else 'phi-pop'
+              open_review(scene,ghost);tap(r'^'+('ผีตายโหงเรือนร้าง' if ghost=='phi-nang-yai' else 'ผีปอบ')+r'$');button=find(r'^เผชิญหน้า');motion()
+              adb('shell','dumpsys','gfxinfo',APP,'reset');click(button,0);time.sleep(4)
+              gfx=adb('shell','dumpsys','gfxinfo',APP,'framestats');mem=adb('shell','dumpsys','meminfo',APP)
+              (OUT/(scene+'-gfx.txt')).write_text(gfx);(OUT/(scene+'-memory.txt')).write_text(mem)
+              quiet();find(r'^จบเทิร์น$');assert adb('shell','pidof',APP).strip()
+              pss=re.search(r'TOTAL PSS:\s*(\d+)',mem)
+              item={'scene':scene,'totalPssKb':int(pss.group(1)) if pss else None,'frames':frame_stats(gfx),'logicalViewport':[393,852],'emulatorOnly':True}
+              samples.append(item);print('PERFORMANCE',json.dumps(item),flush=True)
+             log=adb('logcat','-d');(OUT/'logcat.txt').write_text(log)
+             assert not re.search(r'FATAL EXCEPTION|WorkletError|TypeError:|ReferenceError:|ReactNativeJS: Error:',log),log[-4000:]
+             assert all(s['frames']['samples']>0 and s['totalPssKb'] for s in samples),samples
+             (OUT/'results.json').write_text(json.dumps({'checksPassed':7,'assemblySamples':samples,'physicalDeviceTested':False},indent=2))
+            finally:
+             adb('shell','wm','size','reset');adb('shell','wm','density','reset');motion()
+            PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Paper-rollout-performance-audit
+          path: paper-rollout-performance/
+          retention-days: 30
+  publish:
+    needs: performance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python -m pip install Pillow
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-native-audit
+          run-id: 38173301137
+          github-token: ${{ github.token }}
+          path: audit/native
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-native-audit
+          run-id: 38174850144
+          github-token: ${{ github.token }}
+          path: audit/settings
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-web-audit
+          run-id: 38171204621
+          github-token: ${{ github.token }}
+          path: audit/web
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-performance-audit
+          path: audit/performance
+      - name: Preserve durable review evidence for the exact signed APK
+        run: |
+          python - <<'PY'
+          import json,subprocess,shutil
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          out=Path('docs/paper-rollout-review');out.mkdir(exist_ok=True)
+          native=Path('audit/native');settings=Path('audit/settings');web=Path('audit/web/paper-rollout')
+          n=json.loads((native/'results.json').read_text());s=json.loads((settings/'results.json').read_text());perf=json.loads(Path('audit/performance/results.json').read_text())
+          assert len(n['checks'])==17 and all(c['passed'] for c in n['checks'])
+          assert len(s['checks'])==3 and all(c['passed'] for c in s['checks'])
+          scenes=['01-village','03-temple-gate','06-bamboo-forest','08-stream','10-mountain-trail','13-cave-river','16-secret-throne']
+          for width in [720,786]:
+           canvas=Image.new('RGB',(240*4,510*2),'#171313')
+           for i,scene in enumerate(scenes):
+            im=Image.open(native/f'battle-{scene}-{width}.png').convert('RGB');im.thumbnail((220,480));tile=Image.new('RGB',(240,510),'#171313');tile.paste(im,((240-im.width)//2,24));ImageDraw.Draw(tile).text((6,4),scene,fill='white');canvas.paste(tile,((i%4)*240,(i//4)*510))
+           canvas.save(out/f'environments-{width}.jpg',quality=90)
+          for name in ['battle-01-village-720','battle-03-temple-gate-786','battle-13-cave-river-786']:
+           Image.open(native/(name+'.png')).convert('RGB').save(out/(name+'.jpg'),quality=90)
+          videos=[native/'native-assembly-temple.mp4',*sorted(web.rglob('*.mp4'))]
+          for i,p in enumerate(videos):
+           target=out/('native-assembly-temple.mp4' if i==0 else 'web-'+p.name)
+           subprocess.run(['ffmpeg','-v','error','-y','-i',str(p),'-vf','scale=-2:720','-c:v','libx264','-preset','medium','-crf','22','-pix_fmt','yuv420p','-an','-movflags','+faststart',str(target)],check=True)
+           print('PUBLISHED_VIDEO',target,subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration:stream=r_frame_rate,width,height','-of','json',str(target)],text=True))
+          w=json.loads((web/'results.json').read_text());traces=[r for r in w['reports'] if 'perf' in r]
+          print('WEB_CHECK_COUNTS',len(w['reports']),w['errors']);print('WEB_FRAME_STATS',json.dumps(traces))
+          aggregate={'applicationSource':'9cadcf501c563ec6ceb65c166e74998bcf21a408','apkBuildSource':'1e786da13fdfaa924c632e0bd485b0e0b6fd9f52','apkSha256':'1466491cd3f0f183fd2e72645f4784d92f44c2750563ae2efc173310575bff14','native':n['checks']+s['checks'],'nativeRuns':[38173301137,38174850144],'performance':perf,'webPaperReports':w,'physicalDeviceTested':False}
+          (out/'verification.json').write_text(json.dumps(aggregate,ensure_ascii=False,indent=2))
+          shutil.copy(web/'results.json',out/'web-paper-results.json')
+          print('DELIVERY_NATIVE_CHECKS',len(aggregate['native']));print('DELIVERY_PERFORMANCE',json.dumps(perf))
+          PY
+      - name: Commit media without altering application or artwork assets
+        env:
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          test "$(git ls-remote origin refs/heads/work/paper-diorama-rollout | cut -f1)" = "$HEAD_SHA"
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add docs/paper-rollout-review
+          git commit -m "docs(paper): retain final APK visual and performance evidence [skip ci]"
+          git push origin HEAD:work/paper-diorama-rollout
