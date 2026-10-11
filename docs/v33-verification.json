@@ -1,0 +1,32 @@
+{
+  "branch": "work/hand-balance-v33",
+  "testedApplicationCommit": "4847f005979a777828e026b76ef2ec788cc66a51",
+  "ciRun": "https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38116466577",
+  "ciConclusion": "success",
+  "artifactId": 11693760776,
+  "typeScript": "passed",
+  "unitTests": {"filesPassed": 48, "testsPassed": 895},
+  "webExport": "passed",
+  "webPreview": {
+    "viewports": [{"width": 360, "height": 640}, {"width": 393, "height": 852}],
+    "checksPassed": 162,
+    "suites": {"v33": 12, "battleBacklog": 42, "adventure": 26, "archive": 12, "finalTuning": 26, "threeNight": 44},
+    "browserErrors": 0
+  },
+  "simulations": {
+    "classes": 4,
+    "difficultyTiers": 5,
+    "policies": 2,
+    "seedsPerCombination": 8,
+    "runs": 320,
+    "wins": 24,
+    "stalled": 0,
+    "ciMatchesLocal": true,
+    "shamanWinsAcross80Runs": 0,
+    "tierFiveWins": 0,
+    "results": "docs/v33-balance-pilot.json",
+    "limitation": "Heuristic policies are not estimates of human win rates; shaman and tier-five balance need real-player testing."
+  },
+  "apkBuilt": false,
+  "mergedToMain": false
+}
