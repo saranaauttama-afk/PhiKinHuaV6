@@ -9,6 +9,7 @@ Work branch: `work/hand-balance-v33`. Base application tree is the audited v32 t
 - After the first guardian and ordinary rewards, a mandatory choice independently raises opening/per-turn draw from two to three **or** retained hand size from two to three. Later level choices can improve the other side, with base values capped at three in this initial balance pilot. Night-one level rewards do not increase either stat.
 - No explicit sequence/progress/completion tracking, extra chain rewards, free-card quota, damage modifier, debuff immunity, HUD/book/notice/overlay or QA commands remain. Run and journal views no longer show combo totals. No replacement meter exists.
 - Normal block/strength/poison/status conditions, minions, card/gear/blessing draw, energy, healing, held effects and per-turn card cost rules remain. Minion draw is additive, like other draw effects, independently of the retention cap.
+- Class selection now displays the actual common v33 starting energy and retention values, using the same constants as the run initializer.
 - All four classes, v32 battle geometry and artwork, the continuous three-night campaign, 30/31 fight gates and five difficulty tiers remain. No asset files were changed.
 
 ## Card and blessing audit
@@ -37,6 +38,8 @@ Save version remains 2. Map/adventure/battle saves and old journals remove obsol
 
 ## Verification
 
-Local TypeScript and unit regressions pass. Web export passes. The web-only workflow `.github/workflows/v33-web-verification.yml` exercises both mobile viewports, all existing mobile interaction suites, cold v32 saves, exact multi-card discard, QA exclusion, no combo UI and both dawn choices. It also runs 320 seeded normal-card simulations (four classes × five tiers × two policies × eight seeds). Final results will be recorded after the workflow completes. It contains no Android build/deploy steps, and the existing APK workflows do not target this branch.
+Local TypeScript, all 895 unit tests across 48 files, and web export pass. The supplemental removal audit contributes 50 independent checks. The 320 seeded normal-card simulations completed with zero stalled runs; full results are in `docs/v33-balance-pilot.json`. The web-only workflow `.github/workflows/v33-web-verification.yml` exercises both mobile viewports, all existing mobile interaction suites, cold v32 saves, exact multi-card discard, QA exclusion, no combo UI and both dawn choices. It also runs 320 seeded normal-card simulations (four classes × five tiers × two policies × eight seeds). Final results will be recorded after the workflow completes. It contains no Android build/deploy steps, and the existing APK workflows do not target this branch.
+
+Simulation policy warning: shaman won 0/80 runs across both policies/tiers; every class had zero tier-five wins in this eight-seed sample. Tier-one tactical wins were warrior 3/8, shaman 0/8, nun 4/8 and medium 1/8. Enemy tuning was deliberately preserved, and the public-board heuristic is limited. These are material balance risks, not human win-rate estimates.
 
 Balance is provisional: removing large sequence bonuses reduces burst power and the new small retained hand reduces options. Converted rare/legendary shaman cards and draw/energy engines warrant real-player pacing checks. Simulated policies do not establish fun or human win rates. No APK or main merge was performed.

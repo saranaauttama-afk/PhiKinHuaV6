@@ -1,3 +1,4 @@
+import {V33_HAND_BALANCE} from '../../balance/core';
 // src/core/engine/handlers/run.ts
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
@@ -124,7 +125,7 @@ export function newRun(
   s.player.maxEnergy   = cls.startEnergy;
   s.player.energy      = cls.startEnergy;
   s.player.maxHandSize = cls.startHandSize;
-  if(cmd.difficulty){s.player.maxEnergy=s.player.energy=2;s.player.openingDraw=2;s.player.drawPerTurn=2;s.player.maxHandSize=2;s.player.handBalanceVersion=33;}
+  if(cmd.difficulty){s.player.maxEnergy=s.player.energy=V33_HAND_BALANCE.energy;s.player.openingDraw=V33_HAND_BALANCE.openingDraw;s.player.drawPerTurn=V33_HAND_BALANCE.drawPerTurn;s.player.maxHandSize=V33_HAND_BALANCE.retainedHand;s.player.handBalanceVersion=33;}
 
   const { ALL_CARDS } = require('../../pack');
   const deck = buildStarterDeck(cmd.difficulty?{...cls,starterDeck:Object.fromEntries(Object.entries(cls.starterDeck).map(([id,count])=>[id,Math.min(2,count)]))}:cls, ALL_CARDS);

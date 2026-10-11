@@ -1,3 +1,4 @@
+import {V33_HAND_BALANCE} from '../../src/core/balance/core';
 import React from 'react';
 import { View, Text, Pressable, ScrollView, Image, Modal, StyleSheet, useWindowDimensions } from 'react-native';
 import { CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
@@ -62,7 +63,7 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
               <Art slot={`class/${picked.id}`} width={portraitHeight * 2 / 3} height={portraitHeight} />
             </View>
             <Text style={styles.copy}>{picked.desc}</Text>
-            <View style={styles.stats}><Stat label="ชีวิต" value={picked.startHp} /><Stat label="พลังงาน" value={picked.startEnergy} /><Stat label="ไพ่ในมือ" value={picked.startHandSize} /></View>
+            <View style={styles.stats}><Stat label="ชีวิต" value={picked.startHp} /><Stat label="พลังงาน" value={V33_HAND_BALANCE.energy} /><Stat label="เก็บข้ามเทิร์น" value={V33_HAND_BALANCE.retainedHand} /></View>
             <Text style={styles.passive}>{picked.passiveName}</Text><Text style={styles.copy}>{picked.passiveDesc}</Text>
           </ScrollView>
           <View style={styles.actions}>

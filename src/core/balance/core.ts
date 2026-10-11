@@ -2,6 +2,8 @@
 import type { CardData } from '../types';
 import { START_DECK as START_DECK_FROM_PACK } from '../pack';
 
+export const V33_HAND_BALANCE = {energy:2,openingDraw:2,drawPerTurn:2,retainedHand:2} as const;
+
 export const START_HP = 50;
 export const START_ENERGY = 3;
 /** Legacy hand default; v33 three-night runs use independent draw and retention rules. */
