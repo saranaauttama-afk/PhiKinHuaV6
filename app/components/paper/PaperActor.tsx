@@ -13,7 +13,7 @@ import type {TheaterMotion} from './SceneTheater';
 function PaperActor({id,motion,onReady}:{id:string;motion:TheaterMotion;onReady:()=>void}){
  const layout=useBattleLayout(),safe=useSafeAreaInsets();
  const placement=paperPlacement(layout.screenW,layout.screenH,safe.top,safe.bottom,characterPlacement(motion.sceneId,id),layout.hudTop-8);
- const style=useAnimatedStyle(()=>{const p=paperProjection('ghost',motion.assembly.value,motion.x.value,motion.y.value);return {opacity:p.opacity,transform:[{translateX:p.translateX},{translateY:p.translateY}]};});
+ const style=useAnimatedStyle(()=>{const p=paperProjection('ghost',motion.assembly.value,motion.x.value,motion.y.value);return {opacity:p.opacity,transform:[{translateX:p.translateX+motion.shake.value},{translateY:p.translateY}]};});
  const props={id,width:placement.actor.width,height:placement.actor.height,fadeDuration:0};
  return <>
   <Animated.View testID="theater-contact-shadow" style={[{position:'absolute',...placement.shadow},style]}><View style={{flex:1,backgroundColor:ink.ghostShadow,borderRadius:100}}/></Animated.View>

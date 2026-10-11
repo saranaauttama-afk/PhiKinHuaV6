@@ -95,7 +95,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   useImperativeHandle(ref, () => ({
     shake() {
-      monsterShakeX.value = withSequence(
+      const shake=theater?.shake??monsterShakeX;
+      shake.value = withSequence(
         withTiming(10,  { duration: 60 }),
         withTiming(-10, { duration: 60 }),
         withTiming(8,   { duration: 60 }),

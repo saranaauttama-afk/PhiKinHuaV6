@@ -12,7 +12,7 @@ import PaperActor from './PaperActor';
 import {PAPER_ASSEMBLY_MS,paperHudOpacity} from '../../../src/visual/paperDiorama';
 import {paperDioramaColors as ink,layer} from '../../theme';
 
-export type TheaterMotion={assembly:SharedValue<number>;x:SharedValue<number>;y:SharedValue<number>;sceneId:string;ready:boolean};
+export type TheaterMotion={assembly:SharedValue<number>;x:SharedValue<number>;y:SharedValue<number>;shake:SharedValue<number>;sceneId:string;ready:boolean};
 export const TheaterContext=React.createContext<TheaterMotion|null>(null);
 /** Presentation lifecycle keyed to entry identity, never combat turns or saves. */
 export default function SceneTheater({sceneId,entryKey,instant=false,ghostId,children}:{sceneId:string;entryKey:string;instant?:boolean;ghostId?:string;children:React.ReactNode}){
@@ -24,7 +24,7 @@ export default function SceneTheater({sceneId,entryKey,instant=false,ghostId,chi
  const onReady=React.useCallback(()=>setEnvironmentReady(true),[]);
  const onActorReady=React.useCallback(()=>setActorReady(true),[]);
  const assetsReady=environmentReady&&actorReady;
- const assembly=useSharedValue(bypass?PAPER_ASSEMBLY_MS:0),x=useSharedValue(0),y=useSharedValue(0),generation=React.useRef(0),started=React.useRef(false);
+ const assembly=useSharedValue(bypass?PAPER_ASSEMBLY_MS:0),x=useSharedValue(0),y=useSharedValue(0),shake=useSharedValue(0),generation=React.useRef(0),started=React.useRef(false);
  const finish=React.useCallback((id:number)=>{if(id===generation.current)setFinished(true);},[]);
  const hydrated=settings.hydrated&&motion.ready;
  React.useEffect(()=>{
@@ -42,7 +42,7 @@ export default function SceneTheater({sceneId,entryKey,instant=false,ghostId,chi
  },[finished,motion.reduced,motion.active,x,y]);
  const uiStyle=useAnimatedStyle(()=>({opacity:paperHudOpacity(assembly.value)}));
  const ready=hydrated&&assetsReady&&(bypass||finished);
- const context=React.useMemo(()=>({assembly,x,y,sceneId,ready}),[assembly,x,y,sceneId,ready]);
+ const context=React.useMemo(()=>({assembly,x,y,shake,sceneId,ready}),[assembly,x,y,shake,sceneId,ready]);
  return <View testID="scene-theater" onLayout={e=>{const {width,height}=e.nativeEvent.layout;if(width>0&&height>0)setSize(s=>s.width===width&&s.height===height?s:{width,height});}} style={{flex:1,overflow:'hidden',backgroundColor:ink.backing}}>
   <BattleLayoutContext.Provider value={layout}><TheaterContext.Provider value={context}>
    {sceneId==='01-village'?<PaperDiorama assembly={assembly} x={x} y={y} onReady={onReady} showGhost={false}/>:<PaperEnvironment motion={context} onReady={onReady}/>}
