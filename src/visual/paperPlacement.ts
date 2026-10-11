@@ -5,7 +5,7 @@ export type PaperCharacterPlacement={
  compactGroundAnchorY:number;compactHeight:number;referenceHeight:number;
 };
 export const VILLAGE_PLACEMENT:PaperCharacterPlacement={
- groundAnchorX:.5,groundAnchorY:410/852,compactGroundAnchorY:200/640,
+ groundAnchorX:.5,groundAnchorY:410/852,compactGroundAnchorY:230/640,
  compactHeight:640,referenceHeight:852,characterScale:1,characterOffsetY:-.012,
  // The dangling, unequal feet in the approved cutout intentionally float.
  placementMode:'floating',shadowOpacity:.22,shadowScale:.42,
@@ -13,7 +13,9 @@ export const VILLAGE_PLACEMENT:PaperCharacterPlacement={
 export function paperPlacement(width:number,height:number,top=0,bottom=0,config=VILLAGE_PLACEMENT){
  const shortY=config.compactGroundAnchorY*config.compactHeight;
  const referenceY=config.groundAnchorY*config.referenceHeight;
- const authoredY=shortY+(height-config.compactHeight)*(referenceY-shortY)/(config.referenceHeight-config.compactHeight);
+ const authoredY=height>config.referenceHeight
+  ?referenceY+(height-config.referenceHeight)*1
+  :shortY+(height-config.compactHeight)*(referenceY-shortY)/(config.referenceHeight-config.compactHeight);
  const groundX=width*config.groundAnchorX;
  const groundY=Math.max(top+90,Math.min(height-bottom-24,authoredY-bottom));
  const offset=config.placementMode==='floating'?config.characterOffsetY*height:0;

@@ -6,12 +6,16 @@ describe('village ground anchors',()=>{
   expect(float.footY).toBeLessThan(float.groundY);expect(ground.footY).toBe(ground.groundY);
   for(const p of [float,ground]){expect(p.actor.top+p.actor.height).toBeCloseTo(p.footY,10);expect(p.shadow.top+3).toBe(p.groundY);expect(p.actor.left+p.actor.width/2).toBe(p.groundX);}
  });
+ it('preserves approved short and reference ghost framing',()=>{
+  expect(paperPlacement(360,640).footY).toBeCloseTo(222.32);expect(paperPlacement(393,852).footY).toBeCloseTo(399.776);
+  expect(paperPlacement(432,960).footY).toBeCloseTo(506.48);
+ });
  it('supports per-character scale, anchor and floating height without HUD data',()=>{
   const a=paperPlacement(393,852),b=paperPlacement(393,852,0,0,{...VILLAGE_PLACEMENT,groundAnchorX:.6,characterScale:.7,characterOffsetY:-.03,shadowScale:.6});
   expect(b.groundX).toBe(393*.6);expect(b.actor.width/a.actor.width).toBeCloseTo(.7);expect(b.footY).toBeCloseTo(b.groundY-852*.03);expect(b.actor.top+b.actor.height).toBeCloseTo(b.footY);
  });
  it('keeps the approved reference framing and avoids a discontinuity at compact height',()=>{
-  expect(paperPlacement(393,852).groundY).toBeCloseTo(410);expect(paperPlacement(360,640).groundY).toBeCloseTo(200);
+  expect(paperPlacement(393,852).groundY).toBeCloseTo(410);expect(paperPlacement(360,640).groundY).toBeCloseTo(230);
   expect(Math.abs(paperPlacement(360,641).footY-paperPlacement(360,640).footY)).toBeLessThan(1);
  });
 });

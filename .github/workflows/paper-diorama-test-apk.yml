@@ -5,7 +5,26 @@ on:
     paths: ['app/components/paper/**', 'app/paper-diorama.tsx', 'app/components/battle/battleLayout.ts', 'src/visual/paperViewport.ts', 'src/visual/paperPlacement.ts', 'src/visual/paperDiorama.ts', 'test/paper-viewport.test.ts', 'scripts/android-paper-smoke.py', '.github/workflows/paper-diorama-test-apk.yml']
 permissions:
   contents: read
+concurrency:
+  group: paper-test-apk-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
+  cancel-superseded:
+    if: ${{ !contains(github.event.head_commit.message, '[qa-only]') }}
+    permissions:
+      actions: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            // Also retire older runs started before this concurrency group existed.
+            const runs=await github.rest.actions.listWorkflowRuns({owner:context.repo.owner,repo:context.repo.repo,workflow_id:"paper-diorama-test-apk.yml",branch:context.ref.replace("refs/heads/",""),per_page:20});
+            for(const run of runs.data.workflow_runs){
+              if(run.id<context.runId && ["queued","in_progress"].includes(run.status)){
+                await github.rest.actions.cancelWorkflowRun({owner:context.repo.owner,repo:context.repo.repo,run_id:run.id});
+              }
+            }
   verify:
     if: ${{ !contains(github.event.head_commit.message, '[qa-only]') }}
     runs-on: ubuntu-latest
