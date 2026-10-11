@@ -16,7 +16,7 @@ import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
 import RestDestinations from './components/RestDestinations';
 import AdventureChoices from './components/AdventureChoices';
-import {skippableSlots,FIGHTS_PER_NIGHT} from '../src/core/map/adventure';
+import {skippableSlots,FIGHTS_PER_NIGHT,usesThreePageBoard} from '../src/core/map/adventure';
 import SceneGhostChoices from './components/SceneGhostChoices';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
@@ -189,7 +189,7 @@ export default function Home() {
   const location = mapScene(state);
   return (
     <View style={{ flex: 1 }}>
-      <SceneArrival instant={restRow && enteredRest.current === location.key} sceneKey={location.key} source={location.source}>
+      <SceneArrival instant={usesThreePageBoard(state)?state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex:restRow && enteredRest.current === location.key} sceneKey={usesThreePageBoard(state)?`${location.key}:board-${state.pages?.adventure?.boardIndex}`:location.key} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
           <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: surface.glassDim, opacity: selectedCard !== null && offers.some((o, i) => o && describeOffer(o, i).isCombat) ? .55 : 0 }} />
 
@@ -206,7 +206,7 @@ export default function Home() {
           {!state.pages?.adventure&&<Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>}
           {!state.pages?.adventure&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>}
 
-          {state.pages?.adventure || (offers.some(o=>o?.kind==='monster'||o?.kind==='boss')&&offers.some(o=>o&&o.kind!=='monster'&&o.kind!=='boss')) ? <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} skipCount={skippableSlots(state).length} onSkip={state.pages?.adventure?()=>dispatch({type:'Proceed'}):undefined}/></View> : offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
+          {state.pages?.adventure || (offers.some(o=>o?.kind==='monster'||o?.kind==='boss')&&offers.some(o=>o&&o.kind!=='monster'&&o.kind!=='boss')) ? <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={usesThreePageBoard(state)?index=>dispatch({type:'DeleteShopFromMap',index}):undefined} skipCount={skippableSlots(state).length} onSkip={state.pages?.adventure&&!usesThreePageBoard(state)?()=>dispatch({type:'Proceed'}):undefined}/></View> : offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
             <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>
               <SceneGhostChoices choices={offers.flatMap((offer, index) => offer ? [{ display: describeOffer(offer, index), resolved: page?.resolved[index] ?? false, index }] : [])}
                 selected={selectedCard} onSelect={setSelectedCard}

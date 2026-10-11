@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {enemyLane} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
-import {font} from '../../theme';
+import {font,layer} from '../../theme';
 import {paper} from '../Paper';
 import RitualSurface from '../RitualSurface';
 import InkIcon from '../InkIcon';
@@ -23,13 +23,13 @@ const IDLE_SCALE  = 0.32;   // เล็กลง — นั่งอยู่�
 const SLOT_W      = 40;
 
 const PHASE_ENTER = 450;
-const PHASE_FLIP  = 300;
-const PHASE_RISE  = 350;
-const PHASE_HOLD  = 1300;
-const PHASE_EXIT  = 200;
+const PHASE_FLIP  = 250;
+const PHASE_RISE  = 250;
+const PHASE_HOLD  = 1100;
+const PHASE_EXIT  = 160;
 
-export const ENEMY_PLAY_TOTAL      = PHASE_FLIP + PHASE_RISE + PHASE_HOLD + PHASE_EXIT; // 1350ms
-export const ENEMY_MAX_SCALE_OFFSET = PHASE_FLIP + PHASE_RISE; // 650ms — จังหวะที่ card ใหญ่สุด
+export const ENEMY_PLAY_TOTAL      = PHASE_FLIP + PHASE_RISE + PHASE_HOLD + PHASE_EXIT;
+export const ENEMY_MAX_SCALE_OFFSET = PHASE_FLIP + PHASE_RISE; // 500ms — จังหวะที่ card ใหญ่สุด
 
 const easeOut  = Easing.out(Easing.cubic);
 const easeBack = Easing.out(Easing.back(1.4));
@@ -62,8 +62,10 @@ export default function EnemyHandCard({
   const centerX=lane.cardX-CARD_W/2;
   const centerY=lane.cardY-CARD_H/2;
 
-  const posX    = useSharedValue(idlePosX);
-  const posY    = useSharedValue(idlePosY - 80); // start above slot
+  // The native owner anchor is always valid, even before a worklet runs or
+  // with reduced motion. Only local offsets animate; never animate top/left.
+  const posX    = useSharedValue(0);
+  const posY    = useSharedValue(-24);
   const scale   = useSharedValue(Math.min(.20,peakScale*.65));
   const opacity = useSharedValue(0);
   const flip    = useSharedValue(0);
@@ -72,11 +74,11 @@ export default function EnemyHandCard({
   React.useEffect(() => {
     if (playing) return;
     const t = setTimeout(() => {
-      posY.value    = withTiming(idlePosY, { duration: PHASE_ENTER, easing: easeOut });
+      posY.value    = withTiming(0, { duration: PHASE_ENTER, easing: easeOut });
       opacity.value = withTiming(1, { duration: 350 });
     }, delay);
     return () => clearTimeout(t);
-  }, [playing]);
+  }, [playing,centerX,centerY,peakScale,idlePosX,idlePosY]);
 
   // Phase 2: when playing=true → flip, rise, hold, exit
   React.useEffect(() => {
@@ -86,13 +88,13 @@ export default function EnemyHandCard({
     flip.value = withTiming(1, { duration: PHASE_FLIP, easing: easeOut });
 
     posX.value = withSequence(
-      withTiming(idlePosX, { duration: PHASE_FLIP }),
-      withTiming(centerX,  { duration: PHASE_RISE, easing: easeBack }),
+      withTiming(idlePosX-centerX, { duration: PHASE_FLIP }),
+      withTiming(0,  { duration: PHASE_RISE, easing: easeBack }),
     );
 
     posY.value = withSequence(
-      withTiming(idlePosY, { duration: PHASE_FLIP }),
-      withTiming(centerY,  { duration: PHASE_RISE, easing: easeBack }),
+      withTiming(idlePosY-centerY, { duration: PHASE_FLIP }),
+      withTiming(0,  { duration: PHASE_RISE, easing: easeBack }),
     );
 
     scale.value = withSequence(
@@ -110,17 +112,14 @@ export default function EnemyHandCard({
     }, PHASE_FLIP + PHASE_RISE + PHASE_HOLD);
     return () => clearTimeout(exitTimer);
 
-  }, [playing]);
+  }, [playing,centerX,centerY,peakScale,idlePosX,idlePosY]);
 
   const containerStyle = useAnimatedStyle(() => ({
-    position: 'absolute',
-    top: posY.value,
-    left: posX.value,
     width: CARD_W,
     height: CARD_H,
-    transform: [{ scale: scale.value }],
+    transform: [{translateX:posX.value},{translateY:posY.value},{ scale: scale.value }],
     opacity: opacity.value,
-    zIndex: playing ? 250 : 10,
+    zIndex: playing ? layer.overlay : layer.control,
   }));
 
   const backStyle = useAnimatedStyle(() => ({
@@ -139,7 +138,8 @@ export default function EnemyHandCard({
 
 
   return (
-    <Animated.View pointerEvents="none" testID={`enemy-played-${ownerIndex}`} accessibilityLabel={playing?`ผีเล่น ${card.name}`:undefined} style={containerStyle}>
+    <View pointerEvents="none" testID={`enemy-played-${ownerIndex}`} accessibilityLabel={playing?`ผีเล่น ${card.name}`:undefined} style={{position:'absolute',left:centerX,top:centerY,width:CARD_W,height:CARD_H,zIndex:playing?layer.overlay:layer.control}}>
+    <Animated.View testID={`enemy-card-face-${ownerIndex}`} style={containerStyle}>
       {/* Back face (face-down) */}
       <Animated.View style={backStyle}>
         <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5}}><Image source={require('../../../assets/ui/trail-ghost.png')} resizeMode="contain" style={{width:100,height:140}}/></RitualSurface>
@@ -157,6 +157,6 @@ export default function EnemyHandCard({
         </RitualSurface>}
       </Animated.View>
 
-    </Animated.View>
+    </Animated.View></View>
   );
 }

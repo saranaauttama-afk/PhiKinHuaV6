@@ -21,8 +21,9 @@ export default function UpgradeCardPicker({cards,selected,onSelect,price,remove=
    {!remove&&available?<View style={{flexDirection:'row',gap:8}}><View style={{flex:1}}><Text style={{color:palette.moon,fontFamily:font.ui}}>ก่อน</Text><CardFace card={card}/></View><View style={{flex:1}}><Text style={{color:palette.moon,fontFamily:font.ui}}>หลัง</Text><CardFace card={upgradeCard(card)}/></View></View>:<CardFace card={card}/>}
    <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:23}}>{!available?(remove?'สละไม่ได้ · การ์ดคุ้มครองหรือใบสุดท้าย':'สุดขั้นแล้ว'):price?`ราคา ${price(card)} เบี้ย`:remove?'ถอดใบนี้จากสำรับ':'ปลุกเสกฟรี 1 ขั้น'}</Text>
    {disabledConfirm&&available&&<Text style={{fontFamily:font.ui,color:palette.bloodLit}}>เบี้ยไม่พอ</Text>}
+  </ScrollView>
    {onConfirm&&<QuietButton label={remove?'ยืนยันสละใบนี้':'ยืนยันปลุกเสกใบนี้'} primary disabled={!available||disabledConfirm} onPress={()=>selected!==null&&onConfirm(selected)}/>}
    <QuietButton label="ยกเลิกการเลือก" onPress={()=>onSelect(null)}/>
-  </ScrollView></RitualSurface>}</View></Modal>
+  </RitualSurface>}</View></Modal>
  </View>;
 }

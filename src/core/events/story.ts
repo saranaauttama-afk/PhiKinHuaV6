@@ -11,6 +11,7 @@ import type { GameState } from '../types';
 import type { RNG } from '../rng';
 import { int } from '../rng';
 import type { ClassId } from '../classes';
+import {buildsForClass,grantBuildKit} from '../campaign/builds';
 
 export type EventEffect =
   /** เลือดตอนนี้ (ติดลบ = เสีย) */
@@ -26,7 +27,8 @@ export type EventEffect =
   | { kind: 'removeRandomCard' }
   /** ยัดการ์ดคำสาปเข้าสำรับ — ราคาที่จ่ายโดยไม่เสียเลือด */
   | { kind: 'curse'; count?: number }
-  | { kind: 'blessing' };
+  | { kind: 'blessing' }
+  | { kind: 'build';buildId:string };
 
 export type EventRequirement =
   | { kind: 'gold'; min: number }
@@ -36,6 +38,7 @@ export type EventRequirement =
 
 export type EventChoice = {
   label: string;
+  preview?: string;
   /** เงื่อนไขที่ต้องผ่านถึงจะเลือกได้ — ไม่ผ่านก็ยังเห็น แต่กดไม่ได้ */
   requires?: EventRequirement[];
   /** ข้อความหลังเลือก (ใช้เมื่อไม่มี branches) */
@@ -59,8 +62,10 @@ export const STORY_EVENT_BY_ID: Record<string, StoryEvent> = Object.fromEntries(
   STORY_EVENTS.map(e => [e.id, e])
 );
 
-export function getStoryEvent(id: string): StoryEvent | undefined {
-  return STORY_EVENT_BY_ID[id];
+export function getStoryEvent(id: string,state?:GameState): StoryEvent | undefined {
+  const base=STORY_EVENT_BY_ID[id];
+  if(!base||state?.pages?.adventure?.version!==5||id!=='run_story_1')return base;
+  return {...base,choices:[...buildsForClass(state.classId).map(k=>({label:`เรียน ${k.name} · รับวิชาและพร${k.risk?` · เสีย ${k.risk} ชีวิต`:''}`,preview:`${k.blessing.desc} · ${k.plan}`,text:`คนเฝ้าเรือนช่วยดูแลร่างไร้หัวถึงเช้า คุณตามรอยคาถาและรับวิชา ${k.name} · ${k.plan}`,effects:[...(k.risk?[{kind:'hp' as const,amount:-k.risk}]:[]),{kind:'build' as const,buildId:k.id}],...(k.risk?{requires:[{kind:'hpRatio' as const,min:.25}]}:{})})),{label:'จดชื่อและตามรอย · รับ 20 เบี้ย',text:base.choices[0].text,effects:[{kind:'gold',amount:20}]}]};
 }
 
 /** เลือกทางนี้ได้ไหม — คืนเหตุผลไว้ให้ UI บอกผู้เล่นว่าทำไมยังกดไม่ได้ */
@@ -86,6 +91,7 @@ export function choiceLocked(s: GameState, choice: EventChoice): string | null {
 /** ใช้ผลหนึ่งอย่าง — คืน rng ตัวใหม่เสมอ เพื่อให้ทั้งรันยังซ้ำได้ตาม seed */
 export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
   switch (eff.kind) {
+    case 'build':grantBuildKit(s,eff.buildId);return r;
     case 'hp': {
       const before = s.player.hp;
       s.player.hp = Math.max(0, Math.min(s.player.maxHp, s.player.hp + eff.amount));

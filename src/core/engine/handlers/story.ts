@@ -14,7 +14,7 @@ export function chooseEventOption(
   // เลือกได้ครั้งเดียวต่อเหตุการณ์ — กดซ้ำแล้วได้ผลอีกรอบคือช่องโหว่ที่หาเจอง่ายมาก
   if (s.story.result != null) return { state: s, rng: r };
 
-  const ev = getStoryEvent(s.story.eventId);
+  const ev = getStoryEvent(s.story.eventId,s);
   if (!ev) {
     s.log.push(`ไม่พบเหตุการณ์ ${s.story.eventId}`);
     return { state: s, rng: r };

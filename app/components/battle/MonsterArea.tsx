@@ -17,6 +17,7 @@ import {paper} from '../Paper';
 import RitualSurface,{chalk} from '../RitualSurface';
 import InkIcon,{type InkSymbol} from '../InkIcon';
 import HealthBar from '../HealthBar';
+import {enemyBattleRule} from '../../../src/core/campaign/enemyRules';
 import StatusStrip from './StatusStrip';
 import type { StatusEffect } from '../../../src/core/types_extended';
 import { palette, space, surface, tint, layer, quietUiColors } from '../../theme';
@@ -26,6 +27,7 @@ type Props = {
   enemies?:Array<{id:string;name:string;hp:number;maxHp:number;block?:number;handCount?:number;energy?:number;maxEnergy?:number;handSize?:number;statusEffects?:StatusEffect[]}>;
   monsterName?: string | string[];
   turnLabel?: string;
+  rules?:boolean;
   helpers?:React.ReactNode;
   escalating?:{every:number;strength:number};
   enemy?: {
@@ -47,6 +49,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   helpers,
   escalating,
   enemies,
+  rules=false,
 }, ref) {
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
@@ -100,10 +103,10 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   return <View pointerEvents="box-none" style={{flex:1}}>
    {actors.map((actor,index)=>{const lane=enemyLane(layout,index,actors.length);return <View key={actor.id} pointerEvents="box-none" style={{position:'absolute',top:0,left:0,right:0,bottom:0}}>
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
-     <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize} halfBody/>
+     <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize}/>
     </Animated.View>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
-     <RitualSurface kind="quietSlate" style={{paddingHorizontal:actors.length>1?6:14,paddingVertical:4,gap:2}}>
+     <RitualSurface kind="quietSlate" style={{height:layout.enemyHudHeight,paddingHorizontal:actors.length>1?6:10,paddingVertical:4,gap:2}}>
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>
        <Text numberOfLines={1} style={{flex:1,fontFamily:'Prompt_600SemiBold',fontSize:actors.length>1?11:13,color:chalk}}>{ghostLore(actor.id)?.name??actor.name}</Text>
        <View style={{flex:1.2}}><HealthBar hp={actor.hp} maxHp={actor.maxHp} compact label={actor.name}/></View>
@@ -113,11 +116,11 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
        <EnemyStatItem icon="block" label="" value={`${actor.block??0}`}/>
        <EnemyStatItem icon="deck" label="" value={`${actor.handCount??actor.handSize??0}`}/>
       </View>
-      <View style={{flexDirection:'row',gap:6,alignItems:'center'}}>
-       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={escalating?[{id:'rage-rule',name:'ผีคลุ้มคลั่ง',symbol:'strength',bad:true,detail:`ทุก ${escalating.every} เทิร์น ผีได้ความแข็งแกร่งเพิ่ม ${escalating.strength} จนจบไฟต์`}]:[]} compact/></View>
-       {index===0&&<View style={{flex:1}}>{helpers}</View>}
-      </View>
      </RitualSurface>
+      <View testID={`enemy-extras-${index}`} style={{height:layout.enemyExtrasHeight,flexDirection:'row',gap:4,alignItems:'center'}}>
+       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={[...(rules&&enemyBattleRule(actor.id)?[{id:'ghost-rule',...enemyBattleRule(actor.id),neutral:true}]:[]),...(escalating?[{id:'rage-rule',name:'ผีคลุ้มคลั่ง',symbol:'strength',bad:true,detail:`ทุก ${escalating.every} เทิร์น ผีได้ความแข็งแกร่งเพิ่ม ${escalating.strength} จนจบไฟต์`}]:[])]} compact/></View>
+       {index===0&&<View style={{flex:1,minWidth:0}}>{helpers}</View>}
+      </View>
     </View>
    </View>;})}
   </View>;

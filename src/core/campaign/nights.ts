@@ -3,6 +3,7 @@ import type {ClassId} from '../classes';
 import type {BlessingDef,GameState} from '../types';
 import {NIGHT_ENEMY_DECKS,NIGHT_AWAKENED_DECKS,ENEMY_ARCHETYPES} from './enemyDecks';
 import {applyStatusEffect} from '../statusEffectsRuntime';
+import {applyEnemyBattleRule} from './enemyRules';
 
 export type Night=1|2|3|4|5;
 export type CampaignRun={night:Night;difficulty?:import('./threeNight').Difficulty;completedNights?:number;unlocks:Array<'card'|'blessing'>;bossAwakened?:boolean};
@@ -26,8 +27,10 @@ export function configureNightEnemy(s:GameState):void{
  const monster=require('../monsters/thai-ghosts').getMonsterById(s.enemy.id);
  const boss=monster?.tier.includes('Boss')&&!(adventureRoute(s));
  const adventure=!!s.pages?.adventure;
- const elite=monster?.tier==='Elite'||adventureRoute(s)&&!monster?.tier.startsWith('T');
- const baseHp=adventure?(boss?(s.enemy.id==='phi-kin-hua'?165:isThreeNight(s)?110:110+(n-1)*8):elite?70:48+Math.max(0,Number(monster?.tier.slice(1))||1)*3):Math.max(s.enemy.maxHp,f<=2?34:0);
+ const routeOffer=s.pages?.current?.offers[s.pages?._activeOfferIndex??-1];
+ const elite=s.pages?.adventure?.version===5&&routeOffer?.kind==='monster'?routeOffer.tier==='elite':monster?.tier==='Elite'||adventureRoute(s)&&!monster?.tier.startsWith('T');
+ const compact=s.pages?.adventure?.version===5;
+ const baseHp=adventure?(boss?(s.enemy.id==='phi-kin-hua'?compact?125:165:isThreeNight(s)?compact?78:110:110+(n-1)*8):elite?compact?48:70:(compact?28:48)+Math.max(0,Math.min(5,Number(monster?.tier.slice(1))||1))*(compact?2:3)):Math.max(s.enemy.maxHp,f<=2?34:0);
  const chapterScale=isThreeNight(s)?[1,1.28,1.58][s.campaign.night-1]:1;
  s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*chapterScale*(1+(n-1)*(isThreeNight(s)?.05:adventure?.07:.1)));
  const archetype=ENEMY_ARCHETYPES[s.enemy.id];
@@ -39,6 +42,7 @@ export function configureNightEnemy(s:GameState):void{
  s.campaign.bossAwakened=false;
  if(n>=2&&(!isThreeNight(s)||n>=3||elite||boss))applyStatusEffect('enemy',s,'strength',99,n>=4&&!adventure?2:1);
  if(n>=4&&(boss||elite))s.enemy.block=6;
+ applyEnemyBattleRule(s);
 }
 export function awakenNightBoss(s:GameState):void{
  if(!s.campaign||s.campaign.bossAwakened||!s.enemy||s.enemy.hp<=0||s.enemy.hp>s.enemy.maxHp*.5)return;

@@ -6,6 +6,7 @@ type When = {
   type?: CardData['type'];
   cost?: number;
   status?: boolean;
+  block?:boolean;heal?:boolean;summon?:boolean;enemyStatus?:boolean;multipleHits?:boolean;
 };
 
 type OnPlaySpec = {
@@ -21,6 +22,14 @@ export type BlessingBehavior = {
 };
 
 const behaviors: Record<string, BlessingBehavior> = {
+  build_guard:{on_card_played:[{when:{block:true},oncePerTurnKey:'guard',effect:s=>{s.player.energy+=1;}}]},
+  build_fury:{on_card_played:[{when:{multipleHits:true},oncePerTurnKey:'fury',effect:s=>require('../statusEffectsRuntime').applyStatusEffect('player',s,'strength',99,1)}]},
+  build_hex:{on_card_played:[{when:{enemyStatus:true},oncePerTurnKey:'hex',effect:s=>require('../combat/damage').dealDamage(s,'enemy',3,{kind:'blessing',blessingId:'build_hex'})}]},
+  build_kuman:{on_card_played:[{when:{summon:true},oncePerTurnKey:'kuman',effect:s=>{for(const m of s.minions??[])if(m.owner==='player'&&m.duration>0)m.duration=Math.min(4,m.duration+1);}}]},
+  build_merit:{on_card_played:[{when:{heal:true},oncePerTurnKey:'merit',effect:s=>{require('../commands').drawUpTo(s,require('../rngState').nextStateRng(s),s.piles.hand.length+1);}}]},
+  build_wheel:{on_card_played:[{when:{block:true},oncePerTurnKey:'wheel',effect:s=>{s.player.block+=3;}}]},
+  build_spirits:{on_card_played:[{when:{summon:true},oncePerTurnKey:'spirits',effect:s=>{s.player.energy+=1;}}]},
+  build_echo:{on_card_played:[{when:{enemyStatus:true},oncePerTurnKey:'echo',effect:s=>require('../statusEffectsRuntime').applyStatusEffect('enemy',s,'weakness',2,1)}]},
   free_card_energy: {on_card_played:[{when:{cost:0},oncePerTurnKey:'free',effect:s=>{s.player.energy+=1;}}]},
   naga_blessing: {on_turn_start:s=>{
     s.player.energy+=1;

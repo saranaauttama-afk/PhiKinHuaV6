@@ -144,6 +144,8 @@ export type PlayerState = {
   hp: number; maxHp: number; block: number; energy: number; gold: number;
   level: number; exp: number; expToNext: number;
   maxEnergy: number; maxHandSize: number;
+  /** New runs separate opening draw, per-turn draw and the retained-hand cap. */
+  openingDraw?:number;drawPerTurn?:number;
   // Status Effects System
   statusEffects?: StatusEffect[];
 };
@@ -231,7 +233,7 @@ export type CombatEvent = (
       blocked: number;
       hpLoss: number;
       died: boolean;
-      sourceKind: 'card' | 'combo' | 'status' | 'minion' | 'equipment' | 'event';
+      sourceKind: 'card' | 'combo' | 'status' | 'minion' | 'equipment' | 'event' | 'blessing';
     }
   | { t: 'BlockGained'; target: CombatEventTarget; amount: number }
   | { t: 'Healed'; target: CombatEventTarget; amount: number }
@@ -401,6 +403,8 @@ export type GameState = {
     chosenIndex?: number;
     result?: string;
   };
+  /** Frozen actual grant, shown on the result screen and preserved on resume. */
+  rewardReceipt?: {cards:CardData[];blessings:BlessingDef[];equipment:EquipmentData[];lostCards:CardData[];hp:number;gold:number};
 
   // flags & counters
   turnFlags: {

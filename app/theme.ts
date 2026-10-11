@@ -208,3 +208,5 @@ export const blessingSealColors={paperInk:paper.ink,backing:palette.inkSoft,line
 
 /** Pigments for the user's approved archive notebook layout. */
 export const archiveColors={scene:'rgba(12,16,12,.90)',scrim:'rgba(0,0,0,.82)',field:'#25271e',fieldEdge:'#79694b',rule:'#665439',muted:'#6b624e',panel:'#1c2119',edge:'#8b744b',silhouette:'#4b4940'} as const;
+
+export const battleSceneColors={base:'#101714',centre:'#131b19',floor:'#0c120f'} as const;

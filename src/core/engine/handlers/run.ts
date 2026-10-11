@@ -124,9 +124,10 @@ export function newRun(
   s.player.maxEnergy   = cls.startEnergy;
   s.player.energy      = cls.startEnergy;
   s.player.maxHandSize = cls.startHandSize;
+  if(cmd.difficulty){s.player.maxEnergy=s.player.energy=2;s.player.openingDraw=2;s.player.drawPerTurn=3;s.player.maxHandSize=6;}
 
   const { ALL_CARDS } = require('../../pack');
-  const deck = buildStarterDeck(cls, ALL_CARDS);
+  const deck = buildStarterDeck(cmd.difficulty?{...cls,starterDeck:Object.fromEntries(Object.entries(cls.starterDeck).map(([id,count])=>[id,Math.min(2,count)]))}:cls, ALL_CARDS);
   if (deck.length > 0) {
     s.masterDeck = deck;
   } else {

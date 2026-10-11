@@ -18,6 +18,10 @@ const objects = {
   attack: require('../../assets/ui/ritual-knife.png'),
 };
 export function objectSource(b: BlessingDef) {
+  if(b.id==='build_guard'||b.id==='build_wheel')return objects.amulet;
+  if(b.id==='build_fury'||b.id==='build_hex'||b.id==='build_echo')return objects.attack;
+  if(b.id==='build_kuman'||b.id==='build_spirits')return objects.ancestor;
+  if(b.id==='build_merit')return objects.meditation;
   if(BLESSING_ART_SOURCES[b.id])return BLESSING_ART_SOURCES[b.id];
   if (b.id === 'free_card_energy') return require('../../assets/ui/card-parry.png');
   if (b.id === 'spirit_energy') return objects.ritual;

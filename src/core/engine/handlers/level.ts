@@ -29,7 +29,7 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
   
   if ((selectedBucket==='upgrade'||selectedBucket==='remove') &&
       (idx<0||idx>=s.masterDeck.length||(selectedBucket==='upgrade'&&!canUpgrade(s.masterDeck[idx]))||(selectedBucket==='remove'&&!canRemoveCard(s.masterDeck[idx],s.masterDeck.length)))) return {state:s,rng:r};
-  const before={hp:s.player.hp,maxHp:s.player.maxHp,energy:s.player.maxEnergy,hand:s.player.maxHandSize,slots:s.equipmentSlotsMax??2,card:s.masterDeck[idx]?.name};
+  const before={hp:s.player.hp,maxHp:s.player.maxHp,energy:s.player.maxEnergy,hand:s.player.drawPerTurn??s.player.maxHandSize,slots:s.equipmentSlotsMax??2,card:s.masterDeck[idx]?.name};
   // Store the selected option for UI display
   choice.selectedOption = cmd.option;
   
@@ -39,7 +39,7 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
     :selectedBucket==='upgrade'?`ปลุกเสกสำเร็จ · ${s.masterDeck[idx]?.name}`
     :selectedBucket==='remove'?`สละ ${before.card} ออกจากสำรับแล้ว`
     :selectedBucket==='max_energy'?`พลังงานต่อเทิร์น ${before.energy} → ${s.player.maxEnergy}`
-    :selectedBucket==='max_hand'?`ขนาดมือ ${before.hand} → ${s.player.maxHandSize}`
+    :selectedBucket==='max_hand'?s.player.drawPerTurn!==undefined?`จั่วต่อเทิร์น ${before.hand} → ${s.player.drawPerTurn}`:`ขนาดมือ ${before.hand} → ${s.player.maxHandSize}`
     :selectedBucket==='equipment_slot'?`ช่องเครื่องราง ${before.slots} → ${s.equipmentSlotsMax}`
     :selectedBucket==='blessing'?`รับพร ${s.levelUp.blessingChoices?.[idx]?.name??''} แล้ว`:'รับเบี้ยเพิ่มแล้ว';
   s.levelUp.result={fight:s.fightCount??0,text};s.log.push(text);
@@ -59,7 +59,7 @@ function applyBucketChoice(s: GameState, bucket: string, idx: number) {
       s.log.push(`Max energy size increased to ${s.player.maxEnergy}`);
       break;
     case 'max_hand':
-      s.player.maxHandSize += 1;
+      if(s.player.drawPerTurn!==undefined){s.player.drawPerTurn+=1;s.player.openingDraw=(s.player.openingDraw??2)+1;s.player.maxHandSize=Math.max(s.player.maxHandSize,s.player.drawPerTurn+2);}else s.player.maxHandSize += 1;
       s.log.push(`Hand size: ${s.player.maxHandSize}`);
       break;
     case 'blessing': {

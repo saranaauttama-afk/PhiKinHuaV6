@@ -39,7 +39,7 @@ export const SAVE_VERSION = 2;
  * ช่วงเวลานั้นพอดี — `CompleteNode` ตามมาติดๆ อยู่แล้ว เสียแค่การกดหนึ่งครั้ง
  */
 export const AUTO_SAVE_COMMANDS = [
-  'CompleteNode', 'ChooseOffer', 'Proceed',
+  'CompleteNode', 'ChooseOffer', 'Proceed', 'DeleteShopFromMap', 'DismissOffer',
   'ChooseStarterBlessing',
   'TakeShop', 'TakeShopEquipment', 'ShopRemoveBuy', 'ShopUpgradeBuy',
   'TakeTreasureCard', 'TakeSingleTreasureCard',

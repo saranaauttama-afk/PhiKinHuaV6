@@ -6,7 +6,7 @@
 
 import {palette,surface} from '../theme';
 import React from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import type { CardData, Command, GameState } from '../../src/core/types';
 import { canFuse, fuseCards, isFused, FUSION_MAX_TOTAL_COST } from '../../src/core/cards/fusion';
 import { FUSIONS_PER_ALTAR } from '../../src/core/engine/handlers/fusion';
@@ -99,7 +99,7 @@ export default function FusionAltarView({ state, dispatch }: Props) {
       )}
 
       {preview && (
-        <View style={{
+        <Modal transparent animationType="fade" onRequestClose={()=>setPicked([])}><View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:20,justifyContent:'center'}}><RitualSurface kind="quietSlate" style={{maxHeight:'85%',padding:16,gap:10}}><ScrollView><View style={{
           marginTop: 12, padding: 12, borderRadius: 0,
           backgroundColor: tint.moonFaint,
           borderWidth: 1, borderColor: palette.lineStrong,
@@ -124,7 +124,7 @@ export default function FusionAltarView({ state, dispatch }: Props) {
             สำรับ {deck.length} → {deck.length - 1} ใบ
           </Text>
 
-          <QuietButton
+          </View></ScrollView><QuietButton
             label="ผสาน"
             primary
             onPress={() => {
@@ -132,8 +132,8 @@ export default function FusionAltarView({ state, dispatch }: Props) {
               setPicked([]);
             }}
             style={{ marginTop: space.md, alignSelf: 'flex-start' }}
-          />
-        </View>
+          /><QuietButton label="ยกเลิกการเลือก" onPress={()=>setPicked([])}/>
+        </RitualSurface></View></Modal>
       )}
     </RitualSurface>
   );

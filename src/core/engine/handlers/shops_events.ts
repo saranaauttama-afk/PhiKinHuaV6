@@ -484,6 +484,7 @@ export function takeTreasureCard(s: GameState, cmd: Extract<Command, { type: 'Ta
   
   // Clear treasure stock (chest is now empty)
   s.shopStock = [];
+  if(s.pages?.adventure?.version===5){s.pages._shopUsed=true;require('../../map/adventure').rememberAdventureService(s);return {state:s,rng:r};}
   
   // Auto-delete treasure from map after taking card
   const treasureId = s.currentShopId; // Save before clearing
@@ -553,6 +554,7 @@ export function takeSingleTreasureCard(s: GameState, cmd: Extract<Command, { typ
   
   // Clear treasure stock (chest is now empty)
   s.shopStock = [];
+  if(s.pages?.adventure?.version===5){s.pages._shopUsed=true;require('../../map/adventure').rememberAdventureService(s);return {state:s,rng:r};}
   
   // Auto-delete treasure from map after taking card
   const treasureId = s.currentShopId; // Save before clearing
@@ -597,6 +599,7 @@ export function takeSingleTreasureCard(s: GameState, cmd: Extract<Command, { typ
 
 export function randomizeSingleTreasure(s: GameState, _cmd: Extract<Command, { type: 'RandomizeSingleTreasure' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'treasure_single' || !s.shopStock) return { state: s, rng: r };
+  if(s.pages?.adventure?.version===5&&!s.shopStock.length)return {state:s,rng:r};
   
   // Check if already used randomize (limit once per treasure)
   if ((s as any)._singleTreasureRandomized) {

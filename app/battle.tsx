@@ -3,6 +3,9 @@ import {adventureFightTotal} from '../src/core/map/adventure';
 import {ghostLore} from '../src/core/monsters/folklore';
 import {nightFightTotal} from '../src/core/campaign/bosses';
 import {battleScene} from './scenePresentation';
+import BattleBackdrop from './components/battle/BattleBackdrop';
+import {useBattleLayout} from './components/battle/battleLayout';
+import {activePendingCombos} from './comboPresentation';
 import React from 'react';
 import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
@@ -60,6 +63,7 @@ type EnemyHandCardData = {
 export default function BattlePage() {
   const router    = useRouter();
   const safe = useSafeAreaInsets();
+  const battleLayout=useBattleLayout();
   const navigation = useNavigation();
   const [paused,setPaused]=React.useState(false);
   const [settingsOpen,setSettingsOpen]=React.useState(false);
@@ -78,19 +82,22 @@ export default function BattlePage() {
   const [presentation, setPresentation] = React.useState<CombatFrame | null>(null);
   const player = presentation?.player ?? gameState.player;
   const enemy = presentation?.enemy ?? gameState.enemy;
-  const [comboNotice,setComboNotice]=React.useState('');
+  const [comboQueue,setComboQueue]=React.useState<string[]>([]);
+  const comboNotice=comboQueue[0]??'';
   const [comboOpen,setComboOpen]=React.useState(false);
   const comboFight=React.useRef(gameState.fightCount??0);
   const seenFeedback=React.useRef(gameState.combo?.feedbackSeq??0);
   React.useEffect(()=>{
-    if(comboFight.current!==(gameState.fightCount??0)){comboFight.current=gameState.fightCount??0;seenFeedback.current=0;setComboNotice('');}
+    if(comboFight.current!==(gameState.fightCount??0)){comboFight.current=gameState.fightCount??0;seenFeedback.current=0;setComboQueue([]);}
     const feedback=gameState.combo?.feedback??[];const seq=gameState.combo?.feedbackSeq??0;
     if(seq<seenFeedback.current)seenFeedback.current=0;
     const fresh=feedback.filter(f=>f.seq>seenFeedback.current);seenFeedback.current=seq;
     if(!fresh.length)return;
-    setComboNotice(fresh.map(comboFeedbackText).join('\n'));
-    const timer=setTimeout(()=>setComboNotice(''),3200);return()=>clearTimeout(timer);
+    const completed=fresh.filter(f=>f.kind==='success');
+    if(!completed.length)return;
+    setComboQueue(q=>[...q,...completed.map(f=>COMBO_BY_ID[f.comboId]?.name??'').filter(Boolean)]);
   },[gameState.combo?.feedbackSeq,gameState.fightCount]);
+  React.useEffect(()=>{if(!comboNotice)return;const timer=setTimeout(()=>setComboQueue(q=>q.slice(1)),2400);return()=>clearTimeout(timer);},[comboQueue]);
   const bootstrapped = React.useRef(false);
   const turnLocked = React.useRef(false);
 
@@ -320,7 +327,7 @@ export default function BattlePage() {
 
   const badges:BattleBadge[]=[
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${t.effects.map(e=>e.desc).join(' · ')}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
-    {id:'combo:book',name:'ตำราคอมโบ',symbol:'combo',neutral:true,detail:'ดูลำดับการ์ดและผลคอมโบ',onPress:()=>setComboOpen(true)},
+    {id:'combo:book',name:'ตำราคอมโบ',symbol:'combo',neutral:true,count:activePendingCombos(gameState).length?String(activePendingCombos(gameState).length):undefined,detail:'ดูลำดับการ์ด ผลคอมโบ และจำนวนตาที่เหลือ',onPress:()=>setComboOpen(true)},
   ];
   const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
@@ -332,11 +339,7 @@ export default function BattlePage() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ImageBackground
-        source={battleScene(gameState).source}
-        style={{ flex: 1 }}
-        resizeMode="cover"
-      >
+      <BattleBackdrop source={battleScene(gameState).source}>
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
           <Pressable accessibilityRole="button" accessibilityLabel="พักการต่อสู้" onPress={openPause} style={{minWidth:44,minHeight:44,alignItems:'center',justifyContent:'center'}}>
             <Image
@@ -347,7 +350,7 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
-        {!!comboNotice&&<View pointerEvents="none" style={{position:'absolute',bottom:safe.bottom+340,left:24,right:24,zIndex:layer.overlay,alignItems:'center'}}><RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:10}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:13,lineHeight:21,textAlign:'center'}}>{comboNotice}</Text></RitualSurface></View>}
+        {!!comboNotice&&<View testID="combo-completed-notice" pointerEvents="none" style={{position:'absolute',top:battleLayout.noticeTop,height:battleLayout.noticeHeight,left:20,right:20,zIndex:layer.overlay,alignItems:'center',justifyContent:'center'}}><Text numberOfLines={1} style={{fontFamily:font.heading,color:palette.moon,fontSize:13,lineHeight:21,textAlign:'center',textShadowColor:'#000',textShadowRadius:4}}>{comboNotice}</Text></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
             ก่อนอนิเมชั่นเริ่มเล่น สิ่งเดียวที่ถูกข้ามคือภาพ */}
@@ -372,12 +375,13 @@ export default function BattlePage() {
         )}
 
         <MonsterArea escalating={gameState.campaign?{every:difficultyOf(gameState)>=3?3:4,strength:1}:gameState.runMode==='episode'?{every:3,strength:2}:undefined}
+          rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
           monsterName={monsterName}
           enemy={enemy ?? null}
           turnLabel={`เทิร์น ${gameState.turn} · ${phase==='enemy'?'ตาผี':'ตาเรา'}`}
-          helpers={<MinionRow owner="enemy" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/> }
+          helpers={<MinionRow compact owner="enemy" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/> }
         />
 
 
@@ -401,7 +405,7 @@ export default function BattlePage() {
         {/* Enemy takes damage — ใกล้ monster */}
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', top: 280, left: 0, right: 0, alignItems: 'center', zIndex: layer.popup }}
+          style={{ position: 'absolute', top: battleLayout.monsterTop+battleLayout.monsterSize*.4, left: 0, right: 0, alignItems: 'center', zIndex: layer.popup }}
         >
           {enemyDamagePopups.map(popup => (
             <DamagePopup
@@ -546,7 +550,7 @@ export default function BattlePage() {
             {settingsOpen&&<Settings onClose={()=>setSettingsOpen(false)}/>}
           </View>
         </Modal>
-      </ImageBackground>
+      </BattleBackdrop>
     </View>
   );
 }

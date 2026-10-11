@@ -31,6 +31,7 @@ export type DamageSource =
   | { kind: 'status'; effectId: string }
   | { kind: 'minion'; minionId: string; ignoresBlock?: boolean }
   | { kind: 'equipment'; equipmentId: string }
+  | { kind: 'blessing'; blessingId:string }
   | { kind: 'event' };
 
 /**
@@ -65,6 +66,7 @@ function rulesFor(source: DamageSource): DamageRules {
     // equipment (หนามสะท้อน ฯลฯ): โดน block ตามปกติ แต่ไม่สืบทอด buff ของผู้สวม
     // ด้วยเหตุผลเดียวกับ minion — แรงมาจากตัวของ ไม่ใช่จากคนถือ
     case 'equipment':
+    case 'blessing':
       return { useBlock: true, attackerMods: false, defenderMods: true };
     case 'status':
     case 'event':

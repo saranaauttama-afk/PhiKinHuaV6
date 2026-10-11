@@ -33,7 +33,7 @@ import { winRun } from './runEnd';
 import { resetCombos } from '../../combat/combos';
 import { resetTraps } from '../../combat/traps';
 import {isThreeNight,ultimateRequired} from '../../campaign/threeNight';
-import {startAdventure,settleAdventureSlot,nextIntersection,revealUltimate,isCriticalOffer} from '../../map/adventure';
+import {startAdventure,settleAdventureSlot,nextIntersection,revealUltimate,isCriticalOffer,usesThreePageBoard,rememberAdventureService,restoreAdventureService,useIntersectionPage} from '../../map/adventure';
 
 
 // Helper: refresh single slot with a new offer (respect pools/duplicates)
@@ -128,6 +128,7 @@ function completeAdventure(s:GameState,r:RNG){
   s.phase='map';settleAdventureSlot(s,ix);return {state:s,rng:r};
  }
  if(s.phase==='shop'){
+  rememberAdventureService(s);
   const used=mp._shopUsed||!!s.shopBoughtItems?.length||(s.shopKind==='fusion'&&(s.fusionAltar?.timesUsed??0)>0);
   if(s.currentShopId&&s.shopKind){
    const {addShopToRegistry,updateShopInRegistry}=require('../../shopRegistry');
@@ -135,7 +136,7 @@ function completeAdventure(s:GameState,r:RNG){
    else addShopToRegistry(s,s.shopKind,s.shopStock??[],s.shopBoughtItems??[],s.currentShopId);
   }
   s.shopKind=undefined;s.shopStock=undefined;s.currentShopId=undefined;s.shopBoughtItems=undefined;s.phase='map';
-  if(used)settleAdventureSlot(s,ix);else mp._activeOfferIndex=undefined;
+  if(used&&!usesThreePageBoard(s))settleAdventureSlot(s,ix);else mp._activeOfferIndex=undefined;
   return {state:s,rng:r};
  }
  if(s.phase==='event'&&s.story?.result!=null){s.story=undefined;s.event=undefined;s.phase='map';settleAdventureSlot(s,ix);}
@@ -210,6 +211,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
   const offers: PageOffer[] = mp.current.offers as PageOffer[];
   const offer: PageOffer | undefined = offers[ix];
   if (!offer || mp.current.resolved[ix]) return { state: s, rng };
+  s.rewardReceipt=undefined;
+  if(usesThreePageBoard(s))mp.adventure!.enteredBoard=mp.adventure!.boardIndex;
+  if(restoreAdventureService(s,offer,ix))return {state:s,rng};
 
   // แผนที่แบบเดินทาง: เลือกช่องไหน = เดินไปยืนที่โหนดนั้น เดินแล้วเดินกลับไม่ได้
   if (usesJourney(s)) enterNode(s, ix);
@@ -292,7 +296,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
 
       // สร้างเด็คผู้เล่น + จั่วมือแรก
       ({ state: s, rng } = buildAndShuffleDeck(s, rng));
-      ({ state: s, rng } = drawUpTo(s, rng, s.player.maxHandSize));
+      ({ state: s, rng } = drawUpTo(s, rng, s.player.openingDraw??s.player.maxHandSize));
 
       // ★ Equipment: battle-start hook (NOTM-style)
       runEquipmentOnEquip(s); // Player equipment
@@ -367,7 +371,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
 
       ({ state: s, rng } = buildAndShuffleDeck(s, rng));
-      ({ state: s, rng } = drawUpTo(s, rng, s.player.maxHandSize));
+      ({ state: s, rng } = drawUpTo(s, rng, s.player.openingDraw??s.player.maxHandSize));
 
       // ★ Equipment: battle-start hook (NOTM-style)
       runEquipmentOnEquip(s); // Player equipment
@@ -687,6 +691,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
     }
 
     case 'next_event': {
+      if(usesThreePageBoard(s)){useIntersectionPage(s,ix);return {state:s,rng};}
       // ใช้ token แล้วข้ามหน้าเลย
       consumeToken(mp, offer);
       mp.current.resolved[ix] = true;

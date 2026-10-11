@@ -118,7 +118,7 @@ function getViableChoicePairs(s: GameState, level: number): Array<[LevelBucket, 
              buckets.includes('max_hand');
     });
     // Include some early game gold for shop opportunities
-    earlyPairs.push(['max_hp', 'gold']);
+    earlyPairs.push(['max_hp', 'gold'],['remove','upgrade'],['blessing','max_hand']);
     return earlyPairs;
   }
   

@@ -1,7 +1,13 @@
 import type {ComboEffect,ComboFeedback} from '../src/core/combat/combos';
+import type {GameState} from '../src/core/types';
 import {COMBO_BY_ID,comboTarget} from '../src/core/combat/combos';
 import {STATUS_EFFECTS_REGISTRY} from '../src/core/combat/status-effects/registry';
 import {THAI_MINIONS} from '../src/core/combat/minions/thai-minions';
+/** Engine turn increases once per player round; expiry runs before next turn. */
+export function comboTurnsRemaining(s:GameState,p:{comboId:string;turnStarted:number}):number {
+ const c=COMBO_BY_ID[p.comboId];return c?Math.max(0,c.maxTurns-(s.turn-p.turnStarted)):0;
+}
+export function activePendingCombos(s:GameState){return (s.combo?.progress??[]).filter(p=>p.cardsPlayed.length>0&&!s.combo?.done.includes(p.comboId)&&comboTurnsRemaining(s,p)>0);}
 export function comboPayoff(e:ComboEffect):string {
  const target=e.target==='enemy'?'ผี':'ผู้เล่น';
  switch(e.type){

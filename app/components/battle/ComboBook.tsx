@@ -3,7 +3,7 @@ import {Modal,Pressable,ScrollView,Text,View} from 'react-native';
 import type {GameState} from '../../../src/core/types';
 import {combosForClass,comboTarget} from '../../../src/core/combat/combos';
 import {ALL_CARDS} from '../../../src/core/pack';
-import {comboPayoff,comboFeedbackText} from '../../comboPresentation';
+import {comboPayoff,comboFeedbackText,comboTurnsRemaining} from '../../comboPresentation';
 import RitualSurface from '../RitualSurface';
 import {CardGlyphArt} from '../DeckCard';
 import {QuietButton} from '../QuietChrome';
@@ -18,6 +18,7 @@ export default function ComboBook({state,visible,onClose}:{state:GameState;visib
      {combosForClass(state.classId??'').map(c=>{const p=state.combo?.progress.find(p=>p.comboId===c.id);const done=state.combo?.done.includes(c.id);return <View key={c.id} style={{gap:8}}>
       <Text style={{fontFamily:font.heading,fontSize:18,color:paper.red}}>{c.name} · {done?'สำเร็จแล้ว':`${p?.cardsPlayed.length??0}/${comboTarget(c)}`}</Text>
       <Text style={{fontFamily:font.ui,fontSize:12,lineHeight:21,color:paper.ink}}>{c.ordered?'เล่นตามลำดับ':'เล่นครบชุด ไม่บังคับลำดับ'} · ภายใน {c.maxTurns>=999?'ไฟต์นี้':`${c.maxTurns} เทิร์น`} · เมื่อครบแล้วใช้ได้ครั้งเดียวต่อไฟต์</Text>
+      {!!p?.cardsPlayed.length&&!done&&<Text style={{fontFamily:font.heading,fontSize:13,color:paper.red}}>{c.maxTurns>=999?'ทำต่อได้จนจบไฟต์':comboTurnsRemaining(state,p)===1?'ต้องทำให้ครบในตานี้':`เหลือตานี้และอีก ${Math.max(0,comboTurnsRemaining(state,p)-1)} ตาของเรา`}</Text>}
       {!!c.requiredCards?.length&&<View style={{flexDirection:'row',gap:5}}>{c.requiredCards.map((id,i)=>{const card=ALL_CARDS.find(x=>x.id===id);const played=done||p?.cardsPlayed.includes(id);return <View key={id} style={{flex:1,alignItems:'center',opacity:played?1:.68}}>
        {card&&<CardGlyphArt card={card} size={48}/>}<Text style={{fontFamily:font.ui,fontSize:11,lineHeight:19,color:paper.ink,textAlign:'center'}}>{i+1}. {card?.name??id}</Text>
        <Text style={{fontFamily:font.heading,fontSize:11,color:played?blessingSealColors.completed:paper.red}}>{played?'✓ เล่นแล้ว':'ยังเหลือ'}</Text>

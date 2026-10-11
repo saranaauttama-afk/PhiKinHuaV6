@@ -53,7 +53,7 @@ try:
                     tap(r'^กลับจุดพัก$'); assert slots(nodes())==before,'Postponed shop must preserve all pages'; shop_checked=True; record('native sparse shop preserves pages'); continue
             if available(ns,r'^ผ่านสามคืน · ระดับ '+str(difficulty)+r'!$') is not None:
                 assert shop_checked and stories==3 and battles==(31 if difficulty==5 else 30),(difficulty,stories,battles)
-                assert len(ghosts)==27,(difficulty,ghosts)
+                assert len(ghosts)==len(set(ghosts))==27,(difficulty,ghosts)
                 snapshot('difficulty-'+str(difficulty)+'-complete',ns); runs.append({'difficulty':difficulty,'battles':battles,'stories':stories,'bosses':bosses,'ghosts':ghosts}); record('difficulty '+str(difficulty)+' completes three nights and unlocks next tier'); tap(r'^กลับหน้าแรก$'); complete=True; break
             if available(ns,r'^(ข้ามบทนี้|เดินทางต่อ)$') is not None:
                 if 'เสียงเรียกจากป่า' in text:
@@ -88,7 +88,10 @@ try:
             choice=next((n for n in ns if 'event-choice-0' in n.attrib.get('resource-id','')),None)
             if choice is not None:
                 click(choice); tap(r'^ยืนยัน · '); tap(r'^กลับจุดพัก$'); stories+=1; record('difficulty '+str(difficulty)+' night '+str(night)+' mandatory story resolved'); continue
-            if available(ns,r'^ทางแยกถัดไป$') is not None: tap(r'^ทางแยกถัดไป$'); tap(r'^ยืนยันไปทางแยกถัดไป$'); continue
+            destroy=available(ns,r'^ทำลายเพจ ');
+            if destroy is not None: click(destroy); continue
+            skip=next((n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and 'ทางแยก' in label(n)),None)
+            if skip is not None: click(skip); tap(r'^เดินต่อ · '); continue
             time.sleep(1)
         assert complete,'Difficulty '+str(difficulty)+' stalled'
     assert resumed and cancel_checked

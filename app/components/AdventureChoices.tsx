@@ -7,7 +7,7 @@ import {encounterClue} from './encounterClue';
 import InkIcon,{type InkSymbol} from './InkIcon';
 import RitualSurface from './RitualSurface';
 import {QuietButton} from './QuietChrome';
-import {font,palette} from '../theme';
+import {layer,font,palette} from '../theme';
 
 const frame=require('../../assets/ui/encounter-frame-v30.webp');
 const kindLabel=(o:PageOffer)=>o.kind==='monster'?'ต่อสู้':o.kind==='boss'?'ศึกใหญ่':o.kind==='story_event'?'สำรวจเรื่องราว':o.kind==='treasure'||o.kind==='treasure_single'?'รับสมบัติ':o.kind==='shop_card'||o.kind==='shop_equipment'?'เข้าร้าน':o.kind==='well'?'ดื่มน้ำ':o.kind==='shop_upgrade'?'ปลุกเสก':o.kind==='shop_remove'?'สละการ์ด':o.kind==='fusion_altar'?'ผสานการ์ด':o.kind==='next_event'?'เดินต่อ':'พักฟื้น';
@@ -16,7 +16,7 @@ const iconFor=(o:PageOffer):InkSymbol=>o.kind==='monster'||o.kind==='boss'?'atta
 const enterLabel=(o:PageOffer,i:number)=>o.kind==='monster'||o.kind==='boss'?'เผชิญหน้า · '+describeOffer(o,i).name:o.kind==='story_event'?'สำรวจเรื่องราว':kindLabel(o)+' · '+describeOffer(o,i).name;
 
 /** Selection and confirmation are siblings inside a stable frame, not nested buttons. */
-export default function AdventureChoices({offers,resolved,slotIds,onEnter,onSkip,skipCount=0}:{offers:PageOffer[];resolved:boolean[];slotIds:(string|null)[];onEnter:(offer:PageOffer,index:number)=>void;onSkip?:()=>void;skipCount?:number}){
+export default function AdventureChoices({offers,resolved,slotIds,onEnter,onSkip,skipCount=0,onDestroy,usedIds=[]}:{offers:PageOffer[];resolved:boolean[];slotIds:(string|null)[];onEnter:(offer:PageOffer,index:number)=>void;onSkip?:()=>void;skipCount?:number;onDestroy?:(index:number)=>void;usedIds?:string[]}){
  const [selected,setSelected]=React.useState<number|null>(null),[confirmSkip,setConfirmSkip]=React.useState(false);
  const {height,width}=useWindowDimensions();
  const [viewport,setViewport]=React.useState({width,height:height-140});
@@ -29,11 +29,12 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,onSkip
    {offers.map((o,i)=>!o||resolved[i]?<View key={'empty-'+i} style={{width:cardWidth}}/>:<View key={slotIds[i]??i} testID={'adventure-frame-'+i} style={{width:cardWidth,height:cardHeight}}>
     <Image accessible={false} source={frame} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight}}/>
     <Image accessible={false} source={frame} tintColor={palette.bloodLit} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight,opacity:selected===i?.28:0}}/>
+    {!!onDestroy&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<Pressable testID={'adventure-destroy-'+i} accessibilityRole="button" accessibilityLabel={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}} style={{position:'absolute',top:0,right:0,width:44,height:44,zIndex:layer.control,alignItems:'flex-end',justifyContent:'flex-start',padding:4}}><Image source={require('../../assets/images/btnDelete.png')} style={{width:25,height:25}}/></Pressable>}
     <View style={{paddingTop:18,paddingHorizontal:8,alignItems:'center'}}>
      <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+pageLabel(o)} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i);setConfirmSkip(false)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
       <Text testID={'adventure-name-'+i} numberOfLines={2} style={{height:42,fontFamily:font.heading,fontSize:titleSize,lineHeight:19,color:palette.moon,textAlign:'center',textAlignVertical:'center'}}>{describeOffer(o,i).name}</Text>
       <EncounterPortrait offer={o} diameter={diameter} index={i} selected={selected===i}/>
-      <Text testID={'adventure-clue-'+i} numberOfLines={3} style={{height:52,marginTop:8,fontFamily:font.ui,fontSize:11,lineHeight:16,color:palette.text,textAlign:'center',textAlignVertical:'center'}}>{encounterClue(o)}</Text>
+      <Text testID={'adventure-clue-'+i} numberOfLines={3} style={{height:52,marginTop:8,fontFamily:font.ui,fontSize:11,lineHeight:16,color:palette.text,textAlign:'center',textAlignVertical:'center'}}>{usedIds.includes(slotIds[i]??'')?'ใช้แล้ว · กลับเข้าได้\nปิดเพจด้วยกากบาทเมื่อพร้อม':encounterClue(o)}</Text>
      </Pressable>
      <View testID={'adventure-action-'+i} style={{height:44,width:'100%',marginTop:3,justifyContent:'center'}}>
       {selected===i?<Pressable testID={'adventure-enter-'+i} accessibilityRole="button" accessibilityLabel={enterLabel(o,i)} onPress={()=>{onEnter(o,i);setSelected(null);}} style={({pressed})=>({height:44,justifyContent:'center',alignItems:'center',opacity:pressed?.75:1})}>

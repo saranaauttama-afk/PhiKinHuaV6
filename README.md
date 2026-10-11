@@ -1,3 +1,5 @@
+> v1.0.32 backlog implementation: fixed three-page batches, persistent service pages, unique three-night ghosts, opening hand/draw separation and full-body battle layout. See [v32 handoff](docs/HANDOFF-backlog-v32.md) for exact behavior, compatibility and validation limits. Start a new run for adventure v5; old saves retain their page rules.
+
 # ผีกินหัว — สามคืนตามหัว
 
 ## Current branch: v1.0.31 / Android code 32

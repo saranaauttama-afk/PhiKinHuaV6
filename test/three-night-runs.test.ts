@@ -23,8 +23,9 @@ function driver(difficulty:Difficulty=1,classId:ClassId='warrior',seed=`three-${
 function step(d:ReturnType<typeof driver>){
  if(d.s.chapter)d.go({type:'SkipChapter'});
  else if(d.s.phase==='map'){
-  const offers=d.s.pages!.current!.offers,ix=offers.findIndex(o=>o&&isCriticalOffer(o));
-  d.go(ix<0?{type:'Proceed'}:{type:'ChooseOffer',index:ix});
+  const p=d.s.pages!.current!,offers=p.offers,ix=offers.findIndex((o,i)=>o&&!p.resolved[i]&&isCriticalOffer(o));
+  const other=offers.findIndex((o,i)=>o&&!p.resolved[i]);
+  d.go(ix>=0?{type:'ChooseOffer',index:ix}:offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});
  }else if(d.s.phase==='combat'){
   d.s.piles.hand=[{id:'structural-test',name:'test',type:'attack',cost:0,dmg:99999}];d.go({type:'PlayCard',index:0});
  }else if(d.s.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}
@@ -36,23 +37,24 @@ function step(d:ReturnType<typeof driver>){
 function finish(d:ReturnType<typeof driver>){for(let i=0;i<700&&!d.s.runSummary;i++)step(d);expect(d.s.runSummary?.won).toBe(true);return d.s;}
 describe('three-night continuous runs',()=>{
  for(const cls of ALL_CLASS_IDS)for(const level of [1,2,3,4,5] as const)it(`${cls} difficulty ${level}: three chapters, exact 30/31 fights, stable save/RNG every screen`,()=>{
-  const d=driver(level,cls),bosses:string[]=[],stages:number[]=[],quotas:number[]=[];let chapter=0;
+  const d=driver(level,cls),bosses:string[]=[],ghosts:string[]=[],stages:number[]=[],quotas:number[]=[];let chapter=0;
   for(let i=0;i<700&&!d.s.runSummary;i++){
    expect(validAdventure(d.s)).toBe(true);const before=JSON.parse(JSON.stringify(d.s));d.restore();expect(d.s).toEqual({...before,pendingEvents:[],deckOpen:false});
    stages.push(mapSceneStage(d.s));
    if(chapter!==d.s.campaign!.night){chapter=d.s.campaign!.night;quotas.push(routeFightQuota(d.s));expect(d.s.campaign!.completedNights).toBe(chapter-1);expect(d.s.runSummary).toBeUndefined();}
    if(d.s.phase==='map'&&!d.s.chapter){const ix=d.s.pages!.current!.offers.findIndex(o=>o?.kind==='boss');if(ix>=0){const a=d.s.pages!.adventure!;expect(a.storyDone).toBe(true);expect(a.fightsWon).toBe(routeFightQuota(d.s));bosses.push((d.s.pages!.current!.offers[ix] as any).enemyId);}}
+   if(d.s.phase==='map'&&!d.s.chapter){const p=d.s.pages!.current!;const ix=p.offers.findIndex((o,i)=>o&&!p.resolved[i]&&isCriticalOffer(o));if(p.offers[ix]?.kind==='monster')ghosts.push((p.offers[ix] as any).enemyId);}
    step(d);
   }
-  expect(d.s.runSummary?.won).toBe(true);expect(d.s.fightCount).toBe(runFightTotal(level));expect(d.s.campaign!.night).toBe(3);expect(d.s.campaign!.completedNights).toBe(3);expect(quotas).toEqual([7,10,10]);expect(bosses).toHaveLength(level===5?4:3);expect(bosses.includes(ULTIMATE_BOSS.id)).toBe(level===5);expect(d.s.runSummary!.beatSecretBoss).toBe(level===5);expect(stages.every((n,i)=>i===0||n>=stages[i-1])).toBe(true);expect(isPlayableSave(toSave(d.s,d.r))).toBe(false);
+  expect(ghosts).toHaveLength(27);expect(new Set(ghosts).size).toBe(27);expect(d.s.runSummary?.won).toBe(true);expect(d.s.fightCount).toBe(runFightTotal(level));expect(d.s.campaign!.night).toBe(3);expect(d.s.campaign!.completedNights).toBe(3);expect(quotas).toEqual([7,10,10]);expect(bosses).toHaveLength(level===5?4:3);expect(bosses.includes(ULTIMATE_BOSS.id)).toBe(level===5);expect(d.s.runSummary!.beatSecretBoss).toBe(level===5);expect(stages.every((n,i)=>i===0||n>=stages[i-1])).toBe(true);expect(isPlayableSave(toSave(d.s,d.r))).toBe(false);
  });
  it('services total eight, mandatory story three, guaranteed opening card shop and chapter elite quotas across seeds',()=>{
   for(const difficulty of [1,2,3,4,5] as const)for(let seed=0;seed<40;seed++){
    const d=driver(difficulty,'warrior','quota-'+seed);let services=0,stories=0;
    for(const night of [1,2,3] as const){d.s.campaign!.night=night;d.s.campaign!.completedNights=night-1;startAdventure(d.s,d.r);
     const deck=d.s.pages!.adventure!.deck,monsters=deck.filter(e=>e.offer.kind==='monster');expect(monsters).toHaveLength(night===1?7:10);expect(new Set(monsters.map(e=>(e.offer as any).enemyId)).size).toBe(monsters.length);expect(monsters.filter(e=>(e.offer as any).tier==='elite')).toHaveLength(runEliteQuota(night,difficulty));expect(deck.filter(e=>e.offer.kind==='story_event')).toHaveLength(1);stories++;
-    const optional=deck.filter(e=>e.offer.kind!=='monster'&&e.offer.kind!=='story_event');services+=optional.length;expect(optional.filter(e=>['shop_card','shop_equipment'].includes(e.offer.kind))).toHaveLength(1);expect(optional.filter(e=>['well','healing_shrine'].includes(e.offer.kind))).toHaveLength(1);if(night===1)expect(optional.some(e=>e.offer.kind==='shop_card')).toBe(true);
-    for(let i=1;i<deck.length;i++)if(deck[i].offer.kind!=='monster')expect(deck[i-1].offer.kind).toBe('monster');expect(validAdventure(d.s)).toBe(true);
+    const optional=deck.filter(e=>e.offer.kind!=='monster'&&e.offer.kind!=='story_event'&&e.offer.kind!=='next_event');services+=optional.length;expect(optional.filter(e=>['shop_card','shop_equipment'].includes(e.offer.kind))).toHaveLength(1);expect(optional.filter(e=>['well','healing_shrine'].includes(e.offer.kind))).toHaveLength(1);if(night===1)expect(optional.some(e=>e.offer.kind==='shop_card')).toBe(true);
+    expect(deck.filter(e=>e.offer.kind==='next_event')).toHaveLength(1);expect(validAdventure(d.s)).toBe(true);
    }expect(services).toBe(8);expect(stories).toBe(3);
   }
  });

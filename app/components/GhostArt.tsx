@@ -3,7 +3,7 @@ import {Image,View} from 'react-native';
 import {artSource} from './Art';
 import bounds from '../ghostArtBounds.json';
 import {archiveColors} from '../theme';
-/** Normalize transparent margins in layout only. Battle crops the enlarged lower body. */
+/** Normalize transparent margins without stretching or losing the silhouette. */
 export default function GhostArt({id,width,height,halfBody=false,silhouette=false}:{id:string;width:number;height:number;halfBody?:boolean;silhouette?:boolean}){
  const b=(bounds as Record<string,{width:number;height:number;bounds:number[]}>)[id];
  if(!b)return <Image source={artSource(`monster/${id}`)} resizeMode="contain" style={{width,height,tintColor:silhouette?archiveColors.silhouette:undefined}}/>;

@@ -27,7 +27,7 @@ import {levelUpConfirmLabel} from '../../levelUpPresentation';
 const BUCKET_LABEL: Record<string, { title: string; detail: string }> = {
   max_hp:         { title: 'พลังชีวิต',      detail: 'ชีวิตสูงสุด +8 · ฟื้นทันที 8' },
   max_energy:     { title: 'พลังงาน',        detail: 'พลังงานต่อเทิร์น +1' },
-  max_hand:       { title: 'ขนาดมือ',        detail: 'จั่วการ์ดได้มากขึ้น 1 ใบต่อเทิร์น' },
+  max_hand:       { title: 'จั่วเพิ่ม',        detail: 'จั่วการ์ดได้มากขึ้น 1 ใบต่อเทิร์น' },
   blessing:       { title: 'พร',             detail: 'รับพรติดตัว 1 อย่าง' },
   remove:         { title: 'สละการ์ด',       detail: 'ถอดการ์ดออกจากสำรับ' },
   upgrade:        { title: 'ปลุกเสก',        detail: 'อัปเกรดการ์ดในสำรับ' },

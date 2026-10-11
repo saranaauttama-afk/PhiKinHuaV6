@@ -43,7 +43,7 @@ for(const kind of ['shop_equipment','treasure','treasure_single'] as const){
 }
 keep('rest-cards',rest);
 const bless=structuredClone(level);bless.levelUp={choice:{optionA:'blessing',optionB:'max_hp',gold:30},blessingChoices:Object.values(BLESSINGS_BY_RARITY).flat().slice(0,2),consumed:false} as any;keep('levelup-blessing',bless);
-keep('hand',s);
+keep('hand',s);const six=structuredClone(s);six.piles.hand=ALL_CARDS.filter(c=>c.type!=='curse').slice(0,6).map((c,i)=>({...c,cost:0,instanceId:'six-'+i}));six.player.energy=6;keep('hand-six',six);
 keep('archive-populated',s);keep('archive-empty',s);
 for(const night of [1,2,3,4,5] as const){
  for(let ix=0;ix<100;ix++){
@@ -61,7 +61,7 @@ for(const difficulty of [1,5] as const){
  for(let guard=0;guard<700&&!state.runSummary;guard++){
   if(lastNight!==state.campaign!.night){lastNight=state.campaign!.night;snapshot('three-map-'+difficulty+'-'+lastNight);if(state.chapter)snapshot('three-dawn-'+difficulty+'-'+lastNight);}
   if(state.chapter)go({type:'SkipChapter'});
-  else if(state.phase==='map'){const ix=state.pages!.current!.offers.findIndex(o=>o&&(o.kind==='monster'||o.kind==='boss'||o.kind==='story_event'));if(ix<0)go({type:'Proceed'});else {const offer=state.pages!.current!.offers[ix];go({type:'ChooseOffer',index:ix});if(offer.kind==='story_event')snapshot('three-story-'+difficulty+'-'+state.campaign!.night);}}
+  else if(state.phase==='map'){const page=state.pages!.current!;const ix=page.offers.findIndex((o,i)=>o&&!page.resolved[i]&&(o.kind==='monster'||o.kind==='boss'||o.kind==='story_event'));if(ix<0){const other=page.offers.findIndex((o,i)=>o&&!page.resolved[i]);go(page.offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});}else {const offer=state.pages!.current!.offers[ix];go({type:'ChooseOffer',index:ix});if(offer.kind==='story_event')snapshot('three-story-'+difficulty+'-'+state.campaign!.night);}}
   else if(state.phase==='combat'){state.piles.hand=[{id:'qa',name:'qa',type:'attack',cost:0,dmg:99999}];go({type:'PlayCard',index:0});}
   else if(state.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});}
   else if(state.phase==='levelup')go({type:'SkipLevelUp'});

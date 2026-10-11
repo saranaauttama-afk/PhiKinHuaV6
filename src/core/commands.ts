@@ -131,7 +131,7 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   processStatusEffectsOnTurnStart('player', state);
 
   // จั่วเพิ่ม maxHandSize ใบ (ไม่ใช่จั่วถึง maxHandSize) — card ค้างมือได้สะสม
-  const drawTarget = state.piles.hand.length + (state.player.maxHandSize ?? HAND_SIZE);
+  const drawTarget = state.piles.hand.length + (state.player.drawPerTurn ?? state.player.maxHandSize ?? HAND_SIZE);
   const out = drawUpTo(state, rng, drawTarget);
   state = out.state; rng = out.rng;
 

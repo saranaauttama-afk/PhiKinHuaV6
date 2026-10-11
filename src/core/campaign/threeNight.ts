@@ -14,7 +14,7 @@ export const DIFFICULTY_RULES=[
 export function isThreeNight(s:Partial<GameState>):boolean{return s.campaign?.difficulty!==undefined;}
 export function difficultyOf(s:Partial<GameState>):Night{return s.campaign?.difficulty??s.campaign?.night??1;}
 export function routeFightQuota(s:Partial<GameState>):number{return isThreeNight(s)&&s.campaign?.night===1?7:10;}
-export function nightEncounterCount(s:Partial<GameState>):number{return routeFightQuota(s)+(isThreeNight(s)&&s.campaign?.night===1?3:4);}
+export function nightEncounterCount(s:Partial<GameState>):number{return routeFightQuota(s)+(isThreeNight(s)&&s.campaign?.night===1?3:4)+(s.pages?.adventure?.version===5?1:0);}
 export function runFightTotal(difficulty:number):number{return difficulty===5?31:30;}
 export function campaignFightTotal(s:Partial<GameState>):number{return isThreeNight(s)?runFightTotal(difficultyOf(s)):10+(s.campaign?.night===5?2:1);}
 export function runEliteQuota(night:number,difficulty:number):number{

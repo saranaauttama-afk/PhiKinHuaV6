@@ -16,6 +16,7 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
  const go=(cmd:Command)=>{const out=applyCommand(s,cmd,r);s=out.state;r=out.rng;steps++;if(s.enemy&&s.phase!=='combat'&&(s.fightCount??0)>lastFightRecorded){const ix=s.pages?._activeOfferIndex;fightDetails.push({id:s.enemy.id,kind:ix!=null?s.pages?.current?.offers[ix]?.kind==='boss'?'boss':(s.pages?.current?.offers[ix] as any)?.tier??'normal':'normal',turns:s.turn,won:true});lastFightRecorded=s.fightCount??0;}observe?.(s,r);};
  const cardValue=(c:CardData)=>((c.dmg??0)*(c.hits??1)+(c.block??0)*.6+(c.draw??0)*4+(c.energyGain??0)*5+(c.heal??0)*.6+(c.summonMinion?9:0)+(c.statusEffect?6:0)+(c.conditional?7:0))/Math.max(1,c.cost);
  go({type:'NewRun',seed,classId:cls,runMode:'full',...(threeNight?{difficulty:night}:{night})});
+ if(threeNight&&process.env.RUN_DRAW_TRIAL)s.player.drawPerTurn=Number(process.env.RUN_DRAW_TRIAL);
  while(!s.runSummary&&steps<(threeNight?6500:2200)){
   if(s.chapter){go({type:'SkipChapter'});continue;}
   if(s.phase==='starter'){const i=s.starter!.choices.findIndex(b=>b.id==='spirit_energy'||b.id==='herbal_wisdom'||b.id==='bamboo_dart_power');go({type:'ChooseStarterBlessing',index:Math.max(0,i)});continue;}
@@ -49,18 +50,20 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
   }
   if(s.phase==='victory'){go({type:'CompleteNode'});continue;}
   if(s.pages?.adventure&&s.phase==='map'){
-   const offers=s.pages.current!.offers;
-   const prep=offers.findIndex(o=>o&&(o.kind==='treasure'||o.kind==='treasure_single'||o.kind==='story_event'||o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75&&s.player.gold>=25+((s as any).healingShrine?.timesUsed??0)*10||o.kind==='shop_upgrade'&&s.player.gold>=upgradeCostForCount(s.runCounters?.upgradeShopCount??0)||o.kind==='shop_card'&&s.player.gold>=80&&s.masterDeck.length<14));
-   const ix=prep>=0?prep:offers.findIndex(o=>o&&isCriticalOffer(o));
-   go(ix>=0?{type:'ChooseOffer',index:ix}:{type:'Proceed'});continue;
+   const offers=s.pages.current!.offers;const current=s.pages.current!,board=s.pages.adventure.version===5;
+   const prep=offers.findIndex((o,i)=>o&&!current.resolved[i]&&!(board&&s.pages!.adventure!.usedIds?.includes(s.pages!.adventure!.slotIds[i]!))&&(o.kind==='treasure'||o.kind==='treasure_single'||o.kind==='story_event'||o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75&&s.player.gold>=25+((s as any).healingShrine?.timesUsed??0)*10||o.kind==='shop_upgrade'&&s.player.gold>=upgradeCostForCount(s.runCounters?.upgradeShopCount??0)||o.kind==='shop_card'&&s.player.gold>=80&&s.masterDeck.length<14));
+   const ix=prep>=0?prep:offers.findIndex((o,i)=>o&&!current.resolved[i]&&isCriticalOffer(o));
+   const other=offers.findIndex((o,i)=>o&&!current.resolved[i]);
+   go(ix>=0?{type:'ChooseOffer',index:ix}:board?(offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other}):{type:'Proceed'});continue;
   }
   if(s.pages?.adventure&&s.phase==='shop'){
+   const board=s.pages.adventure.version===5,slot=s.pages._activeOfferIndex;
    if(s.shopKind==='well')go({type:'UseWell'});
    if(s.shopKind==='healing')go({type:'UseHealingShrine'});
-   if(s.shopKind==='treasure'||s.shopKind==='treasure_single'){go({type:s.shopKind==='treasure'?'TakeTreasureCard':'TakeSingleTreasureCard',index:0});continue;}
+   if(s.shopKind==='treasure'||s.shopKind==='treasure_single'){if(s.shopStock?.length)go({type:s.shopKind==='treasure'?'TakeTreasureCard':'TakeSingleTreasureCard',index:0});if(!board)continue;}
    if(s.shopKind==='upgrade'){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),u:c.upgradeLevel??0})).filter(x=>x.u<3).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'ShopUpgradeBuy',index:rank[0].i});}
    if(s.shopKind==='card'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&it.price<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
-   const used=s.pages._shopUsed;go({type:'CompleteNode'});if(!used&&!s.runSummary)go({type:'Proceed'});continue;
+   const used=s.pages._shopUsed;go({type:'CompleteNode'});if(board&&slot!=null)go({type:'DeleteShopFromMap',index:slot});else if(!used&&!s.runSummary)go({type:'Proceed'});continue;
   }
   if(s.pages?.adventure&&s.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});continue;}
   if(s.phase==='map'){
