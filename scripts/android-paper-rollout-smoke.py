@@ -57,8 +57,12 @@ try:
  tap(r'^พักการต่อสู้$');tap(r'^กลับเมนูหลัก$');adb('shell','am','force-stop',APP);adb('shell','am','start','-W','-n',APP+'/.MainActivity');tap(r'^เล่นต่อ');time.sleep(3.5);quiet()
  after=sorted(label(n) for n in nodes() if label(n).startswith('การ์ด '));assert after==before
  record('production-campaign-route-battle-cold-save-resume-v33-no-combo')
+ # Reproduce activity recreation with saved combat before reviewing fixtures.
+ adb('shell','wm','size','720x1280');adb('shell','wm','density','320');time.sleep(5);quiet();find(r'^จบเทิร์น$');assert adb('shell','pidof',APP).strip()
+ record('saved-combat-survives-portrait-window-recreation')
  reps=['01-village','03-temple-gate','06-bamboo-forest','08-stream','10-mountain-trail','13-cave-river','16-secret-throne']
  for w,h,density in [(720,1280,320),(786,1704,320)]:
+  adb('shell','am','force-stop',APP)
   adb('shell','wm','size',f'{w}x{h}');adb('shell','wm','density',str(density))
   for scene in reps:
    ghost='phi-nang-yai' if scene=='01-village' else 'phi-pop';open_review(scene,ghost);shot(f'route-{scene}-{w}');enter_review(ghost);im=shot(f'battle-{scene}-{w}');assert im.size==(w,h)

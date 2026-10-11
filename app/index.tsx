@@ -35,7 +35,7 @@ import {paper} from './components/Paper';
 import BlessingView from './components/BlessingView';
 import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
 import Panel, { GameButton, Scrim } from './components/Panel';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useRootNavigationState, useNavigationContainerRef, usePathname } from 'expo-router';
 import { screenForState, mapIsReady } from './screenRouter';
 import { useScreenPadding } from './useScreenPadding';
 import { onRestRow } from '../src/core/map/restPage';
@@ -46,6 +46,9 @@ import { palette, font, size, space, surface } from './theme';
 export default function Home() {
   const { state, dispatch, newRun, newDifficultyRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
   const router = useRouter();
+  const rootNavigationState = useRootNavigationState();
+  const navigationRef = useNavigationContainerRef();
+  const pathname = usePathname();
   const {chooseClass}=useLocalSearchParams();
   const [seed, setSeed] = useState('demo-001');
   const [saveSlots, setSaveSlots] = useState<SaveSlotInfo[]>([]);
@@ -80,8 +83,11 @@ export default function Home() {
   }, [state.phase,state.chapter,state.runSummary,journalOpen,nightClass,pickingClass,returnToMainMenu]);
 
   useEffect(() => {
+    // Restored combat can arrive before the navigator mounts on a cold start or
+    // Android activity recreation. Only redirect the active, ready home route.
+    if (!rootNavigationState?.key || !navigationRef.isReady() || pathname !== '/') return;
     if (['combat','victory','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
-  },[state.phase,state.enemy?.id,state.chapter]);
+  },[rootNavigationState?.key,navigationRef,pathname,router,state.phase,state.enemy?.id,state.chapter]);
 
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
