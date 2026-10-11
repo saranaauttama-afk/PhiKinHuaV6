@@ -1,6 +1,6 @@
 """Same final APK: fresh campaign/save resume, then production scene wrappers.
 No user-device interaction; this script only clears a fresh CI emulator app."""
-import json,re,subprocess,time,xml.etree.ElementTree as ET
+import json,re,shlex,subprocess,time,xml.etree.ElementTree as ET
 from pathlib import Path
 from PIL import Image,ImageChops,ImageStat
 APP='com.phikinhua.episode';OUT=Path('paper-rollout-native-audit');OUT.mkdir(exist_ok=True)
@@ -35,7 +35,7 @@ def motion():
  for key in ['window_animation_scale','transition_animation_scale','animator_duration_scale']:adb('shell','settings','put','global',key,'1')
  time.sleep(.5)
 def open_review(scene,ghost='phi-pop'):
- motion();adb('shell','am','start','-W','-a','android.intent.action.VIEW','-d',f'phikinhua://paper-environments-review?sceneId={scene}&ghostId={ghost}',APP);time.sleep(3.7);quiet();find(r'^ตั้งค่า$');find(r'เลือกทางที่จะไปต่อ',clickable=False)
+ motion();adb('shell','am','start','-W','-a','android.intent.action.VIEW','-d',shlex.quote(f'phikinhua://paper-environments-review?sceneId={scene}&ghostId={ghost}'),APP);time.sleep(3.7);quiet();find(r'^ตั้งค่า$');find(r'เลือกทางที่จะไปต่อ',clickable=False)
 def enter_review(ghost='phi-pop',capture=False):
  tap(r'^'+('ผีปอบ' if ghost=='phi-pop' else 'ผีตายโหงเรือนร้าง')+r'$');button=find(r'^เผชิญหน้า$');motion();click(button,0)
  if capture:

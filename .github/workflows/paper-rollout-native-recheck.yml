@@ -1,0 +1,55 @@
+name: Paper rollout native recheck of verified APK
+on:
+  push:
+    branches: ['work/paper-diorama-rollout']
+    paths: ['scripts/android-paper-rollout-smoke.py', '.github/workflows/paper-rollout-native-recheck.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native:
+    if: ${{ contains(github.event.head_commit.message, '[native-recheck]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require application source to match the already built APK
+        run: |
+          python - <<'PY'
+          import subprocess
+          base='53536205b32871fa769bfb13d64a616d057c71b9'
+          changed=subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines()
+          assert all(p.startswith('docs/') or p.startswith('.github/workflows/') or p=='scripts/android-paper-rollout-smoke.py' for p in changed),changed
+          print('Application code, dependencies, gameplay, save format and assets match APK source',base)
+          PY
+      - run: python -m pip install Pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-Paper-Rollout-Test-APK
+          run-id: 38164652063
+          github-token: ${{ github.token }}
+      - name: Require exact signed APK bytes
+        run: echo '6f97d9f9b20c449cfddfe2e6a12e2b47e4331d911815a93207746f01f9701b51  PhiKinHua-Paper-Rollout-Test.apk' | sha256sum -c -
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: false
+          script: |
+            adb install PhiKinHua-Paper-Rollout-Test.apk
+            python -u scripts/android-paper-rollout-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Paper-rollout-native-audit
+          path: paper-rollout-native-audit/
+          retention-days: 30
