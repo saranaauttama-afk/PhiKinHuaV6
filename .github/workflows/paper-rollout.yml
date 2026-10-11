@@ -143,7 +143,14 @@ jobs:
           "$BT/apksigner" sign --ks android/app/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out android/app/build/outputs/apk/release/app-release.apk /tmp/paper-aligned.apk
           "$BT/apksigner" verify --print-certs native-base/PhiKinHua-Paper-Rollout-Test.apk > /tmp/base-certs.txt
           "$BT/apksigner" verify --print-certs android/app/build/outputs/apk/release/app-release.apk > /tmp/new-certs.txt
-          diff /tmp/base-certs.txt /tmp/new-certs.txt
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          digests=lambda p:set(re.findall(r'certificate SHA-256 digest: ([0-9a-f]+)',Path(p).read_text()))
+          before,after=digests('/tmp/base-certs.txt'),digests('/tmp/new-certs.txt')
+          assert len(before)==1 and before==after,(before,after)
+          print('Identical signing certificate SHA-256:',next(iter(after)))
+          PY
       - name: Verify test signature, portrait manifest, offline bundle and 16KB alignment
         run: |
           mkdir -p paper-rollout-apk-audit
