@@ -23,6 +23,7 @@ import type { StatusEffect } from '../../../src/core/types_extended';
 import { palette, space, surface, tint, layer, quietUiColors } from '../../theme';
 
 type Props = {
+  hideArtwork?:boolean;
   monsterId: string | string[];
   enemies?:Array<{id:string;name:string;hp:number;maxHp:number;block?:number;handCount?:number;energy?:number;maxEnergy?:number;handSize?:number;statusEffects?:StatusEffect[]}>;
   monsterName?: string | string[];
@@ -50,6 +51,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   escalating,
   enemies,
   rules=false,
+  hideArtwork=false,
 }, ref) {
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
@@ -63,6 +65,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const monsterShakeX = useSharedValue(0);
 
   React.useEffect(() => {
+    if(hideArtwork)return;
     monsterY.value = withRepeat(
       withSequence(withTiming(8, { duration: 2000 }), withTiming(-8, { duration: 2000 })),
       -1, true
@@ -78,7 +81,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       cancelAnimation(monsterY);
       cancelAnimation(monsterX);
     };
-  }, []);
+  }, [hideArtwork]);
 
   const floatStyle = useAnimatedStyle(() => ({
     transform: [
@@ -102,9 +105,9 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const actors=enemies?.length?enemies:[{id,name:ghostLore(id)?.name??enemy?.name??name??'ผี',hp:enemy?.hp??20,maxHp:enemy?.maxHp??20,...enemy}];
   return <View pointerEvents="box-none" style={{flex:1}}>
    {actors.map((actor,index)=>{const lane=enemyLane(layout,index,actors.length);return <View key={actor.id} pointerEvents="box-none" style={{position:'absolute',top:0,left:0,right:0,bottom:0}}>
-    <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
+    {!hideArtwork&&<Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
      <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize}/>
-    </Animated.View>
+    </Animated.View>}
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
      <RitualSurface kind="quietSlate" style={{height:layout.enemyHudHeight,paddingHorizontal:actors.length>1?6:10,paddingVertical:4,gap:2}}>
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>
