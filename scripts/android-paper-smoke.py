@@ -41,12 +41,12 @@ def switch(pattern):
 def enter(immediate_shot=None):
  tap(r'^เลือกเส้นทางผีตายโหงเรือนร้าง$');button=find(r'^เดินเข้าหมู่บ้าน$');motion();click(button,pause=0)
  if immediate_shot:
-  time.sleep(.25);shot(immediate_shot) # Capture BEFORE any OS reduced-motion override.
- else:time.sleep(2.2) # Complete the full normal animation BEFORE hierarchy inspection.
+  time.sleep(.9);shot(immediate_shot) # Capture BEFORE any OS reduced-motion override.
+ else:time.sleep(3.4) # Complete the full normal animation BEFORE hierarchy inspection.
  quiet()
 def assert_instant(name,reference,box):
- actual=Image.open(OUT/(name+'.png')).convert('RGB').crop(box)
  expected=reference.convert('RGB').crop(box)
+ actual=Image.open(OUT/(name+'.png')).convert('RGB').crop(box)
  assert max(ImageStat.Stat(ImageChops.difference(actual,expected)).mean)<8,(name,'fixed player HP must be visible before quiet()')
 def record(name,**details):checks.append({'check':name,'passed':True,**details});print('PASS native:',name,details,flush=True)
 adb('shell','pm','clear',APP);adb('logcat','-c')
@@ -64,17 +64,17 @@ try:
   tap(r'^กลับฉากเส้นทาง$');enter();find(r'^จบเทิร์น$');record('repeated-entry',resolution=[w,h])
  # Video uses the actual native animation, not a web renderer.
  adb('shell','wm','size','1080x2340');adb('shell','wm','density','440');launch();tap(r'^เลือกเส้นทางผีตายโหงเรือนร้าง$');button=find(r'^เดินเข้าหมู่บ้าน$')
- motion();video=subprocess.Popen(['adb','shell','screenrecord','--time-limit','6','/sdcard/paper-assembly.mp4']);time.sleep(.5);click(button,0)
- for delay,name in [(0.15,'sky'),(.4,'structures'),(.4,'ghost'),(.4,'foliage'),(.65,'assembled')]:time.sleep(delay);shot('native-assembly-'+name)
+ motion();video=subprocess.Popen(['adb','shell','screenrecord','--time-limit','8','/sdcard/paper-assembly.mp4']);time.sleep(.5);click(button,0)
+ for delay,name in [(0.10,'sky'),(.65,'structures'),(.6,'ghost'),(.6,'foliage'),(.9,'assembled')]:time.sleep(delay);shot('native-assembly-'+name)
  video.wait(timeout=15);quiet();adb('pull','/sdcard/paper-assembly.mp4',str(OUT/'native-assembly.mp4'));find(r'^จบเทิร์น$');reference=shot('native-reference');hp=max((n for n in nodes() if 'พลังชีวิต' in label(n) and len(bounds(n))==4),key=lambda n:bounds(n)[1]);hpbox=bounds(hp);early=Image.open(OUT/'native-assembly-sky.png').convert('RGB').crop(hpbox);assert max(ImageStat.Stat(ImageChops.difference(early,reference.convert('RGB').crop(hpbox))).mean)>20,'ON must not show the assembled HUD immediately';record('native-assembly-recording')
  # Defaults ON, then OFF survives a process restart in AsyncStorage.
- assert switch(r'^ฉากประกอบเคลื่อนไหว \(Diorama Animation\)$') is False
- launch();tap(r'^ตั้งค่า$');assert find(r'^ฉากประกอบเคลื่อนไหว \(Diorama Animation\)$').attrib.get('checked')=='false';tap(r'^กลับ$');enter('native-OFF');assert_instant('native-OFF',reference,hpbox);find(r'^จบเทิร์น$');record('OFF-persisted-after-cold-restart')
- assert switch(r'^ฉากประกอบเคลื่อนไหว \(Diorama Animation\)$') is True
+ assert switch(r'^แอนิเมชันฉากกระดาษ$') is False
+ launch();tap(r'^ตั้งค่า$');assert find(r'^แอนิเมชันฉากกระดาษ$').attrib.get('checked')=='false';tap(r'^กลับ$');enter('native-OFF');assert_instant('native-OFF',reference,hpbox);find(r'^จบเทิร์น$');record('OFF-persisted-after-cold-restart')
+ assert switch(r'^แอนิเมชันฉากกระดาษ$') is True
  assert switch(r'^ลดการเคลื่อนไหวของฉาก$') is True
  launch();enter('native-reduced');assert_instant('native-reduced',reference,hpbox);find(r'^จบเทิร์น$');record('reduced-motion-with-ON')
  assert switch(r'^ลดการเคลื่อนไหวของฉาก$') is False
- launch();tap(r'^ตั้งค่า$');assert find(r'^ฉากประกอบเคลื่อนไหว \(Diorama Animation\)$').attrib.get('checked')=='true';tap(r'^กลับ$');record('ON-persisted-after-cold-restart')
+ launch();tap(r'^ตั้งค่า$');assert find(r'^แอนิเมชันฉากกระดาษ$').attrib.get('checked')=='true';tap(r'^กลับ$');record('ON-persisted-after-cold-restart')
  log=adb('logcat','-d');assert not re.search(r'FATAL EXCEPTION|WorkletError|TypeError:|ReferenceError:|ReactNativeJS: Error:',log),log[-5000:]
  record('no-native-crash-or-worklet-errors');assert adb('shell','pidof',APP).strip()
  (OUT/'gfxinfo.txt').write_text(adb('shell','dumpsys','gfxinfo',APP,'framestats'))

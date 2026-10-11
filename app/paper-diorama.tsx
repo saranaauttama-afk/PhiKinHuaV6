@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, Pressable, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
+import {Platform, Pressable, StyleSheet, Text, View, type ViewStyle, useWindowDimensions} from 'react-native';
 import Animated, {cancelAnimation, Easing, runOnJS, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming} from 'react-native-reanimated';
 import {battleGeometry} from './battleGeometry';
 import {BattleLayoutContext} from './components/battle/battleLayout';
@@ -9,6 +9,7 @@ import {makeRng} from '../src/core/rng';
 import type {Command, GameState} from '../src/core/types';
 import {requiredDiscards} from '../src/core/cards/hand';
 import {PAPER_GHOST_ID, PAPER_ASSEMBLY_MS, paperHudOpacity} from '../src/visual/paperDiorama';
+import {paperPlacement} from '../src/visual/paperPlacement';
 import {useAppFonts} from './useAppFonts';
 import {font, palette, layer, paperDioramaColors as ink} from './theme';
 import Settings, {useGameSettings} from './components/Settings';
@@ -71,6 +72,7 @@ export default function PaperDioramaPreview() {
   if (!enabled) return <QuietPage title="ฉากทดลอง"><Text style={{color:palette.text}}>เปิดเฉพาะ Web Preview ของฉากต้นแบบ</Text></QuietPage>;
   if (!ready) return <View style={{flex:1,backgroundColor:ink.loading}}><Text style={{color:palette.moon}}>กำลังเปิดฉาก…</Text></View>;
   const state = snapshot.state;
+  const webHudStyle:ViewStyle & {visibility?:'hidden'|'visible';willChange?:string}=Platform.OS==='web'?{visibility:phase==='route'?'hidden':'visible',willChange:'opacity'}:{};
   return <View onLayout={event=>{const {width,height}=event.nativeEvent.layout;if(width>0&&height>0)setViewport(current=>current.width===width&&current.height===height?current:{width,height});}} testID="paper-preview" style={{flex:1,overflow:'hidden',backgroundColor:ink.backing}}>
     <BattleLayoutContext.Provider value={layout}>
     <PaperDiorama assembly={assembly} x={x} y={y} onReady={onReady}/>
@@ -92,16 +94,17 @@ export default function PaperDioramaPreview() {
           <QuietButton label="เดินเข้าหมู่บ้าน" disabled={!selected||!assetsReady} primary onPress={enter}/>
         </View>
       </>}
-      {(phase==='arrival'||phase==='battle')&&<Animated.View testID="paper-battle-ui" pointerEvents={phase==='battle'?'box-none':'none'} accessibilityElementsHidden={phase!=='battle'} importantForAccessibility={phase==='battle'?'auto':'no-hide-descendants'} style={[StyleSheet.absoluteFill,hudStyle]}>
+      {<View pointerEvents={phase==='battle'?'box-none':'none'} style={[StyleSheet.absoluteFill,{opacity:phase==='route'?0:1}]}><Animated.View testID="paper-battle-ui" pointerEvents={phase==='battle'?'box-none':'none'} accessibilityElementsHidden={phase!=='battle'} importantForAccessibility={phase==='battle'?'auto':'no-hide-descendants'} style={[StyleSheet.absoluteFill,webHudStyle,hudStyle]}>
         <MonsterArea hideArtwork monsterId={PAPER_GHOST_ID} enemy={state.enemy}/>
         <PlayerHand state={state} enabled={phase==='battle'&&state.phase==='combat'} cards={state.piles.hand} energy={state.player.energy} playedCardIds={[]} hoveredCardId={null} onHoverChange={()=>{}} onPlayCard={(_,index)=>dispatch({type:'PlayCard',index})}/>
         <PlayerHUD classId={state.classId} hp={state.player.hp} maxHp={state.player.maxHp} energy={state.player.energy} maxEnergy={state.player.maxEnergy} block={state.player.block} maxHandSize={state.player.maxHandSize} drawCount={state.piles.draw.length} discardCount={state.piles.discard.length} onEndTurn={endTurn} blessings={<BlessingSeals blessings={state.blessings}/>} statuses={<StatusStrip effects={state.player.statusEffects}/>}/>
         {state.phase!=='combat'&&<View style={{position:'absolute',left:24,right:24,top:'44%',zIndex:layer.battleOverlay}}><QuietButton label="ลองฉากอีกครั้ง" primary onPress={reset}/></View>}
-      </Animated.View>}
+      </Animated.View></View>}
+      {phase==='arrival'&&<View testID="paper-input-guard" pointerEvents="auto" style={[StyleSheet.absoluteFill,{zIndex:layer.battleOverlay}]}/>}
       {showSettings&&<Settings onClose={()=>setShowSettings(false)}/>}
       {discard&&<DiscardOverlay cards={state.piles.hand} maxHandSize={state.player.maxHandSize!} onCancel={()=>setDiscard(false)} onConfirm={indices=>{for(const index of [...indices].sort((a,b)=>b-a))dispatch({type:'DiscardCard',index});setDiscard(false);dispatch({type:'EndTurn'});}}/>}
     </View>
-    {Platform.OS==='web'&&<Text testID="paper-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({phase,reduced:motion.reduced,active:motion.active,enemy:state.enemy?.id,hand:state.piles.hand.map(c=>c.id),turn:state.turn,eventTypes:state.pendingEvents?.map(e=>e.t)??[],assemblyMs:PAPER_ASSEMBLY_MS,animationOn:settings.dioramaAnimation,assetsReady,progressionWritten:false,viewport,safe})}</Text>}
+    {Platform.OS==='web'&&<Text testID="paper-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({phase,reduced:motion.reduced,active:motion.active,enemy:state.enemy?.id,hand:state.piles.hand.map(c=>c.id),turn:state.turn,eventTypes:state.pendingEvents?.map(e=>e.t)??[],assemblyMs:PAPER_ASSEMBLY_MS,animationOn:settings.dioramaAnimation,assetsReady,progressionWritten:false,viewport,safe,placement:paperPlacement(viewport.width,viewport.height,safe.top,safe.bottom)})}</Text>}
   </BattleLayoutContext.Provider>
   </View>;
 }

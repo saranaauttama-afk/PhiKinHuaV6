@@ -2,7 +2,7 @@ name: Paper diorama mobile test APK
 on:
   push:
     branches: ['work/paper-diorama-prototype']
-    paths: ['app/components/paper/**', 'app/paper-diorama.tsx', 'app/components/battle/battleLayout.ts', 'src/visual/paperViewport.ts', 'test/paper-viewport.test.ts', 'scripts/android-paper-smoke.py', '.github/workflows/paper-diorama-test-apk.yml']
+    paths: ['app/components/paper/**', 'app/paper-diorama.tsx', 'app/components/battle/battleLayout.ts', 'src/visual/paperViewport.ts', 'src/visual/paperPlacement.ts', 'src/visual/paperDiorama.ts', 'test/paper-viewport.test.ts', 'scripts/android-paper-smoke.py', '.github/workflows/paper-diorama-test-apk.yml']
 permissions:
   contents: read
 jobs:
@@ -51,7 +51,7 @@ jobs:
         run: |
           node - <<'JS'
           const fs=require('fs');const pkg=JSON.parse(fs.readFileSync('package.json'));pkg.main='preview/paper-entry.tsx';fs.writeFileSync('package.json',JSON.stringify(pkg,null,2));
-          const config=JSON.parse(fs.readFileSync('app.json'));config.expo.name='PhiKinHua Diorama Test';config.expo.android.package='com.phikinhua.dioramatest';config.expo.android.versionCode=1;fs.writeFileSync('app.json',JSON.stringify(config,null,2));
+          const config=JSON.parse(fs.readFileSync('app.json'));config.expo.name='PhiKinHua Diorama Test';config.expo.android.package='com.phikinhua.dioramatest';config.expo.android.versionCode=2;fs.writeFileSync('app.json',JSON.stringify(config,null,2));
           JS
       - name: Generate Android project from this commit
         run: CI=1 EXPO_PUBLIC_PAPER_DIORAMA=1 npx expo prebuild --platform android
@@ -69,16 +69,16 @@ jobs:
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > paper-apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > paper-apk-audit/package.txt
           python scripts/check-apk.py "$APK" > paper-apk-audit/libraries.json
-          grep "package: name='com.phikinhua.dioramatest' versionCode='1' versionName='1.0.33'" paper-apk-audit/package.txt
+          grep "package: name='com.phikinhua.dioramatest' versionCode='2' versionName='1.0.33'" paper-apk-audit/package.txt
           grep 'screenOrientation' android/app/src/main/AndroidManifest.xml | grep portrait
-          cp "$APK" PhiKinHua-Paper-Diorama-Test.apk
-          sha256sum PhiKinHua-Paper-Diorama-Test.apk > paper-apk-audit/sha256.txt
+          cp "$APK" PhiKinHua-Paper-Theater-Test.apk
+          sha256sum PhiKinHua-Paper-Theater-Test.apk > paper-apk-audit/sha256.txt
           echo '${{ github.sha }}' > paper-apk-audit/source-commit.txt
           echo 'Test signing key; separate application ID; exact prototype entry component.' > paper-apk-audit/build-mode.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-Paper-Diorama-Test-APK
-          path: PhiKinHua-Paper-Diorama-Test.apk
+          path: PhiKinHua-Paper-Theater-Test.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -108,7 +108,7 @@ jobs:
           profile: pixel_6
           disable-animations: false
           script: |
-            adb install PhiKinHua-Paper-Diorama-Test.apk
+            adb install PhiKinHua-Paper-Theater-Test.apk
             python -u scripts/android-paper-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()

@@ -1,26 +1,24 @@
 import {describe,it,expect} from 'vitest';
-import {PAPER_ASSEMBLY_MS,PAPER_LAYERS,paperProjection,paperHudOpacity} from '../src/visual/paperDiorama';
+import {PAPER_ASSEMBLY_MS,PAPER_LAYERS,paperProjection,paperHudOpacity,assemblyProgress} from '../src/visual/paperDiorama';
 import {readDioramaSettings} from '../src/visual/dioramaSettings';
 describe('paper assembly timeline',()=>{
- it('reveals sky, forest/village, ghost, foliage and fixed HUD in order',()=>{
-  expect(PAPER_ASSEMBLY_MS).toBe(1800);
-  for(const id of Object.keys(PAPER_LAYERS) as (keyof typeof PAPER_LAYERS)[]){const l=PAPER_LAYERS[id];expect(paperProjection(id,l.start).opacity).toBe(0);expect(paperProjection(id,l.end).opacity).toBe(1);}
-  expect(paperProjection('sky',300).opacity).toBe(1);expect(paperProjection('forest',300).opacity).toBe(0);
-  expect(paperProjection('village',700).opacity).toBe(1);expect(paperProjection('ghost',700).opacity).toBe(0);
-  expect(paperProjection('ghost',1100).opacity).toBe(1);expect(paperProjection('foliage',1100).opacity).toBe(0);
-  expect(paperHudOpacity(1500)).toBe(0);expect(paperHudOpacity(1800)).toBe(1);
+ it('keeps sky opaque and stationary from first frame through ambient parallax',()=>{
+  for(const t of [-1,0,400,1500,2500,3000,9000])expect(paperProjection('sky',t,1,1)).toEqual({opacity:1,scale:1,translateX:0,translateY:0});
  });
- it('raises ghost without any zoom and clamps stale/late timeline values',()=>{
-  const initial=paperProjection('ghost',700),middle=paperProjection('ghost',900),final=paperProjection('ghost',1800);
-  expect(initial.translateY).toBe(54);expect(middle.translateY).toBeLessThan(54);expect(final.translateY).toBe(0);
-  for(const t of [-1,0,350,900,1400,1800,9000])for(const id of Object.keys(PAPER_LAYERS) as (keyof typeof PAPER_LAYERS)[])expect(paperProjection(id,t).scale).toBe(1);
-  expect(paperProjection('ghost',-10).opacity).toBe(0);expect(paperProjection('ghost',9000).opacity).toBe(1);
+ it('overlaps independent scenery, ghost, foliage and fixed HUD across three seconds',()=>{
+  expect(PAPER_ASSEMBLY_MS).toBe(3000);
+  for(const id of ['forest','village','ghost','foliage'] as const){const l=PAPER_LAYERS[id];expect(paperProjection(id,l.start).opacity).toBe(0);expect(paperProjection(id,l.end).opacity).toBe(1);}
+  expect(paperProjection('forest',1300).opacity).toBeGreaterThan(0);expect(paperProjection('ghost',1300).opacity).toBeGreaterThan(0);
+  expect(paperProjection('ghost',2000).opacity).toBeLessThan(1);expect(paperProjection('foliage',2000).opacity).toBeGreaterThan(0);
+  expect(paperHudOpacity(2500)).toBe(0);expect(paperHudOpacity(3000)).toBe(1);
  });
- it('uses independent directions and at most one pixel ambient drift',()=>{
-  expect(paperProjection('forest',0).translateX).toBeLessThan(0);expect(paperProjection('village',0).translateX).toBeGreaterThan(0);
-  for(const id of Object.keys(PAPER_LAYERS) as (keyof typeof PAPER_LAYERS)[])expect(Math.abs(paperProjection(id,1800,1).translateX)).toBeLessThanOrEqual(1);
+ it('eases at both ends, rises without zoom and suppresses ambient movement during entry',()=>{
+  expect(assemblyProgress(1,0,1000)).toBeLessThan(.00001);expect(1-assemblyProgress(999,0,1000)).toBeLessThan(.00001);
+  expect(paperProjection('ghost',1200).translateY).toBe(42);expect(paperProjection('ghost',2300).translateY).toBe(0);
+  expect(paperProjection('ghost',2000,1,1)).toEqual(paperProjection('ghost',2000));
+  for(const t of [-1,0,1300,2500,3000,9000])for(const id of Object.keys(PAPER_LAYERS) as (keyof typeof PAPER_LAYERS)[])expect(paperProjection(id,t).scale).toBe(1);
  });
- it('defaults old settings to ON and preserves the reduced motion value',()=>{
+ it('defaults old settings to ON and preserves reduced motion',()=>{
   expect(readDioramaSettings(undefined)).toEqual({reducedMotion:false,dioramaAnimation:true});
   expect(readDioramaSettings({reducedMotion:true})).toEqual({reducedMotion:true,dioramaAnimation:true});
   expect(readDioramaSettings({reducedMotion:false,dioramaAnimation:false})).toEqual({reducedMotion:false,dioramaAnimation:false});
