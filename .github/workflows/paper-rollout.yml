@@ -57,6 +57,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -74,11 +76,64 @@ jobs:
           JS
       - run: CI=1 EXPO_PUBLIC_TEST_WIN_CARD=1 EXPO_PUBLIC_DIORAMA_REVIEW=1 npx expo prebuild --platform android
       - name: Build signed offline test APK
+        if: ${{ !contains(github.event.head_commit.message, '[incremental-js]') }}
         env:
           EXPO_PUBLIC_TEST_WIN_CARD: '1'
           EXPO_PUBLIC_DIORAMA_REVIEW: '1'
         working-directory: android
         run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
+      - uses: actions/download-artifact@v4
+        if: ${{ contains(github.event.head_commit.message, '[incremental-js]') }}
+        with:
+          name: PhiKinHua-Paper-Rollout-Test-APK
+          run-id: 38168344739
+          github-token: ${{ github.token }}
+          path: native-base
+      - name: Require identical native inputs, gameplay, other JS and approved artwork
+        if: ${{ contains(github.event.head_commit.message, '[incremental-js]') }}
+        run: |
+          echo '0c066ed2290f60bda4bb498f27142df0b7aaedab145ab8f87e58540927495f28  native-base/PhiKinHua-Paper-Rollout-Test.apk' | sha256sum -c -
+          python - <<'PY'
+          import subprocess
+          allowed=lambda p:p=='app/index.tsx' or p.startswith('docs/') or p.startswith('.github/workflows/') or p=='scripts/android-paper-rollout-smoke.py'
+          paths=subprocess.check_output(['git','diff','--name-only','6811a6fe0a5a7f4da92ccd6573c908a4691ed99e','HEAD'],text=True).splitlines()
+          assert all(allowed(p) for p in paths),paths
+          print('Native config/dependencies, all assets, gameplay and other application JS are unchanged.')
+          PY
+      - name: Compile current branch production JS and Hermes bytecode
+        if: ${{ contains(github.event.head_commit.message, '[incremental-js]') }}
+        env:
+          EXPO_PUBLIC_TEST_WIN_CARD: '1'
+          EXPO_PUBLIC_DIORAMA_REVIEW: '1'
+        working-directory: android
+        run: ./gradlew :app:createBundleReleaseJsAndAssets --no-daemon --max-workers=2 -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
+      - name: Build signed incremental APK with verified unchanged native libraries
+        if: ${{ contains(github.event.head_commit.message, '[incremental-js]') }}
+        run: |
+          python - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          base=Path('native-base/PhiKinHua-Paper-Rollout-Test.apk')
+          bundle=Path('android/app/build/generated/assets/react/release/index.android.bundle').read_bytes()
+          assert bundle[:8]==bytes.fromhex('c61fbc03c103191f'),'Require compiled Hermes bytecode'
+          out=Path('android/app/build/outputs/apk/release');out.mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile(base) as original,zipfile.ZipFile('/tmp/paper-unsigned.apk','w') as changed:
+            for info in original.infolist():
+              if info.filename.startswith('META-INF/'):continue
+              changed.writestr(info,bundle if info.filename=='assets/index.android.bundle' else original.read(info.filename))
+          with zipfile.ZipFile(base) as original,zipfile.ZipFile('/tmp/paper-unsigned.apk') as changed:
+            names=[n for n in original.namelist() if not n.startswith('META-INF/')]
+            assert set(names)==set(changed.namelist())
+            diffs=[n for n in names if hashlib.sha256(original.read(n)).digest()!=hashlib.sha256(changed.read(n)).digest()]
+            assert diffs==['assets/index.android.bundle'],diffs
+          print('All APK entries except the newly compiled production Hermes bundle are byte-identical.')
+          PY
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/zipalign" -P 16 -f -v 4 /tmp/paper-unsigned.apk /tmp/paper-aligned.apk
+          "$BT/apksigner" sign --ks android/app/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out android/app/build/outputs/apk/release/app-release.apk /tmp/paper-aligned.apk
+          "$BT/apksigner" verify --print-certs native-base/PhiKinHua-Paper-Rollout-Test.apk > /tmp/base-certs.txt
+          "$BT/apksigner" verify --print-certs android/app/build/outputs/apk/release/app-release.apk > /tmp/new-certs.txt
+          diff /tmp/base-certs.txt /tmp/new-certs.txt
       - name: Verify test signature, portrait manifest, offline bundle and 16KB alignment
         run: |
           mkdir -p paper-rollout-apk-audit
