@@ -16,7 +16,7 @@ function PaperActor({id,motion,onReady}:{id:string;motion:TheaterMotion;onReady:
  const style=useAnimatedStyle(()=>{const p=paperProjection('ghost',motion.assembly.value,motion.x.value,motion.y.value);return {opacity:p.opacity,transform:[{translateX:p.translateX+motion.shake.value},{translateY:p.translateY}]};});
  const props={id,width:placement.actor.width,height:placement.actor.height,fadeDuration:0};
  return <>
-  <Animated.View testID="theater-contact-shadow" style={[{position:'absolute',...placement.shadow},style]}><View style={{flex:1,backgroundColor:ink.ghostShadow,borderRadius:100}}/></Animated.View>
+  <Animated.View testID="theater-contact-shadow" style={[{position:'absolute',...placement.shadow},style]}><View style={{flex:1,backgroundColor:ink.ghostShadow,borderRadius:100,opacity:placement.shadow.opacity}}/></Animated.View>
   <Animated.View renderToHardwareTextureAndroid shouldRasterizeIOS testID="theater-character" style={[{position:'absolute',...placement.actor},style]}>
    <View style={[StyleSheet.absoluteFill,{transform:[{translateX:4},{translateY:6}],opacity:.6}]}><GhostArt {...props} paperTint={ink.ghostShadow}/></View>
    {[[-1,-1],[1,1]].map(([x,y],i)=><View key={i} style={[StyleSheet.absoluteFill,{transform:[{translateX:x},{translateY:y}]}]}><GhostArt {...props} paperTint={ink.edge}/></View>)}
