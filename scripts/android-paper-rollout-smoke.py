@@ -37,7 +37,7 @@ def motion():
 def open_review(scene,ghost='phi-pop'):
  motion();adb('shell','am','start','-W','-a','android.intent.action.VIEW','-d',shlex.quote(f'phikinhua://paper-environments-review?sceneId={scene}&ghostId={ghost}'),APP);time.sleep(3.7);quiet();find(r'^ตั้งค่า$');find(r'เลือกทางที่จะไปต่อ',clickable=False)
 def enter_review(ghost='phi-pop',capture=False):
- tap(r'^'+('ผีปอบ' if ghost=='phi-pop' else 'ผีตายโหงเรือนร้าง')+r'$');button=find(r'^เผชิญหน้า$');motion();click(button,0)
+ tap(r'^'+('ผีปอบ' if ghost=='phi-pop' else 'ผีตายโหงเรือนร้าง')+r'$');button=find(r'^เผชิญหน้า');motion();click(button,0)
  if capture:
   time.sleep(.7);shot('OFF-early')
  else:time.sleep(3.6)
@@ -67,7 +67,7 @@ try:
    record('portrait-environment-route-battle',scene=scene,logicalViewport=[w/2,h/2],grounded=ghost=='phi-pop')
    memory[f'{scene}-{w}']=adb('shell','dumpsys','meminfo',APP)
  # Record actual native normal-speed temple assembly with all OS scales at 1.
- open_review('03-temple-gate');tap(r'^ผีปอบ$');button=find(r'^เผชิญหน้า$');motion()
+ open_review('03-temple-gate');tap(r'^ผีปอบ$');button=find(r'^เผชิญหน้า');motion()
  video=subprocess.Popen(['adb','shell','screenrecord','--time-limit','8','/sdcard/rollout-assembly.mp4']);time.sleep(.5);click(button,0)
  for delay,name in [(.15,'first'),(1.3,'middle'),(1.9,'final')]:time.sleep(delay);shot('assembly-'+name)
  video.wait(timeout=15);quiet();adb('pull','/sdcard/rollout-assembly.mp4',str(OUT/'native-assembly-temple.mp4'));find(r'^จบเทิร์น$');reference=shot('reference');hp=box(hp_box())
