@@ -66,10 +66,74 @@ jobs:
     if: ${{ contains(github.event.head_commit.message, '[diagnose]') }}
     runs-on: ubuntu-latest
     steps:
+      - run: python -m pip install Pillow
       - uses: actions/download-artifact@v4
         with:
           name: Paper-rollout-native-audit
-          run-id: 38166885904
+          run-id: 38173301137
           github-token: ${{ github.token }}
-      - run: cat logcat.txt
-      - run: cat results.json
+          path: audit/native
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-APK-signature-audit
+          run-id: 38172779690
+          github-token: ${{ github.token }}
+          path: audit/apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-web-audit
+          run-id: 38171204621
+          github-token: ${{ github.token }}
+          path: audit/web
+      - name: Review exact APK evidence and normal-speed native video samples
+        run: |
+          python - <<'PY'
+          import base64,json,re,statistics,subprocess
+          from pathlib import Path
+          from PIL import Image,ImageOps,ImageDraw
+          def emit_image(p):
+           data=base64.b64encode(p.read_bytes()).decode()
+           for offset in range(0,len(data),16000):print('PNG_CHUNK',p.name,data[offset:offset+16000])
+          root=Path('audit/native')
+          print('NATIVE_RESULTS', (root/'results.json').read_text())
+          raw=(root/'logcat.txt').read_text()
+          for line in raw.splitlines():
+           if re.search(r'FATAL EXCEPTION|Error:|WorkletError|ReferenceError',line):print('NATIVE_ERROR',line)
+          for p in sorted(Path('audit/apk').glob('*.txt')):
+           if p.name in ['sha256.txt','signature.txt','source-commit.txt','package.txt']: print('APK_'+p.name,p.read_text()[:16000])
+          scenes=['01-village','03-temple-gate','06-bamboo-forest','08-stream','10-mountain-trail','13-cave-river','16-secret-throne']
+          for width in [720,786]:
+           tiles=[]
+           for scene in scenes:
+            p=root/f'battle-{scene}-{width}.png';im=Image.open(p).convert('RGB');im.thumbnail((220,480));tile=Image.new('RGB',(240,510),'#171313');tile.paste(im,((240-im.width)//2,24));ImageDraw.Draw(tile).text((6,4),scene,fill='white');tiles.append(tile)
+           canvas=Image.new('RGB',(240*4,510*2),'#171313')
+           for i,tile in enumerate(tiles):canvas.paste(tile,((i%4)*240,(i//4)*510))
+           p=Path(f'preview-{width}.png');canvas.save(p);emit_image(p)
+          for name in ['battle-01-village-720.png','battle-03-temple-gate-786.png','battle-13-cave-river-786.png','OFF-early.png','reference.png']:
+           emit_image(root/name)
+          video=root/'native-assembly-temple.mp4'
+          print('VIDEO_PROBE',subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration:stream=width,height,r_frame_rate','-of','json',str(video)],text=True))
+          subprocess.run(['ffmpeg','-y','-i',str(video),'-vf','fps=2,scale=197:-1,tile=4x4','-frames:v','1','video-sample.png'],check=True)
+          p=Path('video-sample.png');emit_image(p)
+          mem=json.loads((root/'memory.json').read_text()) if (root/'memory.json').exists() else {}
+          for key,raw in mem.items():
+           match=re.search(r'TOTAL PSS:\s*(\d+)',raw);print('MEMORY_PSS_KB',key,int(match.group(1)) if match else 'missing')
+          gfx=(root/'gfxinfo.txt').read_text() if (root/'gfxinfo.txt').exists() else '';print('GFX_SUMMARY',gfx[:4500])
+          durations=[]
+          for section in gfx.split('---PROFILEDATA---')[1::2]:
+           lines=[line.strip() for line in section.splitlines() if line.strip()]
+           if len(lines)<2:continue
+           header=lines[0].split(',')
+           if 'IntendedVsync' not in header or 'FrameCompleted' not in header:continue
+           for line in lines[1:]:
+            values=line.split(',')
+            try:
+             if int(values[header.index('Flags')])!=0:continue
+             duration=(int(values[header.index('FrameCompleted')])-int(values[header.index('IntendedVsync')]))/1e6
+             if 0<duration<10000:durations.append(duration)
+            except (ValueError,IndexError):pass
+          if durations:
+           durations.sort();print('ANDROID_FRAME_STATS',json.dumps({'samples':len(durations),'meanMs':statistics.mean(durations),'p50Ms':statistics.median(durations),'p95Ms':durations[int(len(durations)*.95)],'worstMs':max(durations),'emulatorOnly':True}))
+          web=json.loads(Path('audit/web/paper-rollout/results.json').read_text());print('WEB_CHECK_COUNTS',len(web['reports']),web['errors'])
+          trace=[r for r in web['reports'] if 'perf' in r];print('WEB_FRAME_STATS',json.dumps(trace))
+          PY
