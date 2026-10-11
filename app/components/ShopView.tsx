@@ -266,12 +266,12 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     </Panel>;
   };
 
-  const background=visitedScene(state).source;
+  const location=visitedScene(state);const background=location.source;
   const object=shopObject(kind);
   const purchaseItem=kind==='card'&&selected!==null?stock[selected]:undefined;
   const purchaseCard=purchaseItem?cardOf(purchaseItem):undefined;
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
-    <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
+    <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background} sceneId={location.id}>
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
         <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+20,paddingBottom:24,gap:12}}>
           <Image testID="destination-object" accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>

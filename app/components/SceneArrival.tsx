@@ -1,14 +1,16 @@
 import React from 'react';
+import SceneTheater from './paper/SceneTheater';
 import { View, Image, ImageSourcePropType, StyleSheet } from 'react-native';
 import { pulpColors } from '../theme';
 import { useGameSettings } from './Settings';
 
-type Props = { source: ImageSourcePropType; sceneKey: string; children: React.ReactNode; instant?: boolean };
+type Props = { source: ImageSourcePropType; sceneKey: string; children: React.ReactNode; instant?: boolean;sceneId?:string };
 const WALK_MS = 2600;
 const FADE_MS = 450;
 
 /** A presentation-only camera; no callbacks dispatch rewards or game commands. */
-export default function SceneArrival({ source, sceneKey, children, instant = false }: Props) {
+export default function SceneArrival(props:Props){if(props.sceneId==='01-village')return <SceneTheater key={props.sceneKey} sceneId={props.sceneId} entryKey={props.sceneKey} instant={props.instant}>{props.children}</SceneTheater>;return <LegacyArrival {...props}/>;}
+function LegacyArrival({ source, sceneKey, children, instant = false }: Props) {
   const reducedMotionSetting = useGameSettings(s => s.reducedMotion);
   const reducedMotion = instant || reducedMotionSetting;
   const [frame, setFrame] = React.useState({ key: '', elapsed: 0 });

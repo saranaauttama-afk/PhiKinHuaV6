@@ -71,6 +71,7 @@ export default function BattlePage() {
   const allowLeave=React.useRef(false);
   const [celebratedFight,setCelebratedFight] = React.useState(-1);
   const gameState = useGame((s) => s.state);
+  const battleLocation=React.useRef(battleScene(gameState)).current;
   const dispatch  = useGame((s) => s.dispatch);
   const { monsterId, monsterName } = useLocalSearchParams();
   // หน้านี้ใช้ฟอนต์เหมือนหน้าอื่นแต่เดิมไม่เคยโหลดเอง — รอดมาเพราะปกติผู้เล่น
@@ -320,7 +321,7 @@ export default function BattlePage() {
 
   return (
     <View style={{ flex: 1 }}>
-      <BattleBackdrop source={battleScene(gameState).source}>
+      <BattleBackdrop source={battleLocation.source} sceneId={battleLocation.id} entryKey={`${gameState.seed}:${monsterId}`} ghostId={gameState.enemy?.id??(Array.isArray(monsterId)?monsterId[0]:monsterId)}>
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
           <Pressable accessibilityRole="button" accessibilityLabel="พักการต่อสู้" onPress={openPause} style={{minWidth:44,minHeight:44,alignItems:'center',justifyContent:'center'}}>
             <Image

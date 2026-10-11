@@ -19,7 +19,7 @@ export default function StoryEventView({state,dispatch}:{state:GameState;dispatc
   const ev=getStoryEvent(story.eventId,state);if(!ev)return null;
   const decided=story.result!=null;const location=visitedScene(state);
   return <View style={{flex:1}}>
-    <SceneArrival instant source={location.source} sceneKey={location.key}>
+    <SceneArrival instant source={location.source} sceneId={location.id} sceneKey={location.key}>
       <ScrollView contentContainerStyle={{flexGrow:1,justifyContent:'flex-end',paddingHorizontal:16,paddingTop:pad.top+(decided?24:240),paddingBottom:pad.bottom+20}}>
         <RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:20,gap:14}}>
           <Image testID="story-object" accessible={false} source={storyObject(story.eventId)} resizeMode="contain" style={{width:'100%',height:decided?56:100}}/>

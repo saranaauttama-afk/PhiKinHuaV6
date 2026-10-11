@@ -67,10 +67,10 @@ export function adventureSceneId(state:GameState):string {
  return ADVENTURE_GEOGRAPHY[Math.min(14,adventureStage(state))];
 }
 function sceneForRow(state:GameState,row:number){
- if(state.pages?.adventure){const id=adventureSceneId(state);return {key:`night-${state.campaign?.night}-${id}`,name:JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??'แดนผีกินหัว',source:journeySource(id)};}
+ if(state.pages?.adventure){const id=adventureSceneId(state);return {id,key:`night-${state.campaign?.night}-${id}`,name:JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??'แดนผีกินหัว',source:journeySource(id)};}
  const id=state.runMode==='episode'?episodeSceneId(row):journeySceneId(state,row);
  const name=JOURNEY_LOCATIONS.find(l=>l.id===id)?.name??(id.startsWith('rest-')?'ที่พักระหว่างทาง':'แดนผีกินหัว');
- return {key:`${state.runMode??'full'}-location-${row}-${id}`,name,source:state.runMode==='episode'?episodeSource(row):journeySource(id)};
+ return {id:state.runMode==='episode'?['01-village','rest-02','02-village-edge','rest-04','05-cremation-ground'][Math.max(0,Math.min(row,4))]:id,key:`${state.runMode??'full'}-location-${row}-${id}`,name,source:state.runMode==='episode'?episodeSource(row):journeySource(id)};
 }
 export function battleScene(state:GameState){return sceneForRow(state,battleSceneStage(state));}
 /** Events and shops preserve the visited rest location, including after their result. */

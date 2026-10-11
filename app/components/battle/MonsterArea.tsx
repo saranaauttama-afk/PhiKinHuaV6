@@ -1,4 +1,5 @@
 import React, { useImperativeHandle } from 'react';
+import {TheaterContext} from '../paper/SceneTheater';
 import { View, Text, Image, ImageSourcePropType } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -53,6 +54,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   rules=false,
   hideArtwork=false,
 }, ref) {
+  const theater=React.useContext(TheaterContext);
+  hideArtwork=hideArtwork||!!theater;
   const id     = Array.isArray(monsterId)   ? monsterId[0]   : monsterId;
   const name   = Array.isArray(monsterName) ? monsterName[0] : monsterName;
   // ขนาด/ตำแหน่งของภาพผีมาจากไฟล์เดียวกับที่การ์ดศัตรูใช้อ้างอิง

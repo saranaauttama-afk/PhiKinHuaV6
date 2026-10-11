@@ -189,7 +189,7 @@ export default function Home() {
   const location = mapScene(state);
   return (
     <View style={{ flex: 1 }}>
-      <SceneArrival instant={usesThreePageBoard(state)?state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex:restRow && enteredRest.current === location.key} sceneKey={usesThreePageBoard(state)?`${location.key}:board-${state.pages?.adventure?.boardIndex}`:location.key} source={location.source}>
+      <SceneArrival instant={usesThreePageBoard(state)?state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex:restRow && enteredRest.current === location.key} sceneKey={usesThreePageBoard(state)?`${location.key}:board-${state.pages?.adventure?.boardIndex}`:location.key} source={location.source} sceneId={location.id}>
         <Scrim style={{ paddingTop: pad.top }}>
           <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: surface.glassDim, opacity: selectedCard !== null && offers.some((o, i) => o && describeOffer(o, i).isCombat) ? .55 : 0 }} />
 
