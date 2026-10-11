@@ -56,3 +56,17 @@ The vector contours represent major paper scenery shapes; they are not a repaint
 Milestone 2 verification: TypeScript passed; 956 unit tests passed across 52 files; 64 paper browser checks passed (48 scene/viewport route→battle checks, 14 normal-speed representative assembly checks, two reduced-motion/persistence checks), with no browser errors. Grounded/floating placement is tested for all 34 catalogued ghosts in every environment across five viewport sizes and safe-area variants. Production v33 mobile checks (12) and three-night/five-tier UI checks (44) also passed. Static bitmaps are unchanged.
 
 Browser timing is collected under software rendering and includes screenshot overhead: it is not a physical-device FPS guarantee. World prints are memoized and their native transforms request hardware texture caching; Android memory/frame stats are collected in the final APK job.
+
+## Changed implementation files
+
+Relative to the approved prototype, changes are confined to:
+
+- Production integration: `app/index.tsx`, `app/battle.tsx`, `app/scenePresentation.ts`, `app/components/SceneArrival.tsx`, `app/components/SceneGhostChoices.tsx`, `app/components/ShopView.tsx`, `app/components/StoryEventView.tsx`, `app/components/battle/BattleBackdrop.tsx`, `app/components/battle/MonsterArea.tsx`.
+- Paper rendering/registration: `app/components/paper/SceneTheater.tsx`, `PaperEnvironment.tsx`, `PaperActor.tsx`, `PaperDiorama.tsx`, `app/paperSceneAssets.ts`, `src/visual/paperEnvironments.ts`, `src/visual/paperPlacement.ts`.
+- Review/verification: `app/paper-environments-review.tsx`, `scripts/paper-rollout-check.cjs`, `scripts/android-paper-rollout-smoke.py`, `test/paper-rollout.test.ts`, placement/viewport tests, `.github/workflows/paper-rollout.yml`, this report and the preserved-artwork checksum manifest.
+
+## Final Android validation
+
+The final review build uses the existing full game entry, package `com.phikinhua.episode`, test signing key, version code 35, offline JS/assets, arm64-v8a and x86_64, with signature and 16KB native-library/ZIP checks. The test-only environment review route and existing QA helper are enabled; gameplay data and save format remain v33.
+
+The Android job installs that exact artifact into an API 36 portrait emulator. It checks actual campaign entry, route/battle transition, cold save resume, absence of combo UI, seven representative environments at logical 360×640 and 393×852, normal-speed assembly recording, late HUD, OFF persistence and reduced-motion override. Native memory/frame statistics and crash logs are retained. This is emulator testing; physical phone performance and final visual approval remain manual review of the supplied APK.

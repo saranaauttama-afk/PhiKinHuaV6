@@ -17,19 +17,119 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+      - name: Verify approved artwork bytes
+        run: |
+          python - <<'PYART'
+          import hashlib,json
+          from pathlib import Path
+          expected=json.loads(Path('docs/paper-rollout-artwork-sha256.json').read_text())
+          for path,digest in expected.items():
+            assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest,path
+          print('Preserved',len(expected),'approved artwork files')
+          PYART
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm test -- --maxWorkers=2 --testTimeout=60000
       - run: npm install --no-save --package-lock=false playwright@1.62.1
       - run: npx playwright install --with-deps chromium
+      - run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
       - run: EXPO_PUBLIC_UI_REVIEW=1 EXPO_PUBLIC_TEST_WIN_CARD=1 EXPO_PUBLIC_PAPER_DIORAMA=1 EXPO_PUBLIC_DIORAMA_REVIEW=1 npx expo export --platform web --output-dir /tmp/phikinhua-backlog-web
       - run: EXPO_PUBLIC_TEST_WIN_CARD=1 npx vite-node --config vitest.config.ts scripts/backlog-fixtures.ts
       - run: EXPO_PUBLIC_TEST_WIN_CARD=1 npx vite-node --config vitest.config.ts scripts/v33-fixtures.ts
       - run: node scripts/paper-rollout-check.cjs
       - run: node scripts/v33-mobile-check.cjs
       - run: node scripts/three-night-mobile-check.cjs
+      - run: node scripts/backlog-mobile-check.cjs
+      - run: node scripts/adventure-mobile-check.cjs
+      - run: node scripts/archive-mobile-check.cjs
+      - run: node scripts/final-tuning-mobile-check.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Paper-rollout-web-audit
           path: backlog-audit/
+  android:
+    if: ${{ contains(github.event.head_commit.message, '[apk]') }}
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Configure full-game review build, keeping the production entry and save format
+        run: |
+          node - <<'JS'
+          const fs=require('fs');const c=JSON.parse(fs.readFileSync('app.json'));c.expo.android.versionCode=35;fs.writeFileSync('app.json',JSON.stringify(c,null,2));
+          JS
+      - run: CI=1 EXPO_PUBLIC_TEST_WIN_CARD=1 EXPO_PUBLIC_DIORAMA_REVIEW=1 npx expo prebuild --platform android
+      - name: Build signed offline test APK
+        env:
+          EXPO_PUBLIC_TEST_WIN_CARD: '1'
+          EXPO_PUBLIC_DIORAMA_REVIEW: '1'
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
+      - name: Verify test signature, portrait manifest, offline bundle and 16KB alignment
+        run: |
+          mkdir -p paper-rollout-apk-audit
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > paper-rollout-apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 "$APK" > paper-rollout-apk-audit/zipalign.txt
+          "$BT/aapt" dump badging "$APK" > paper-rollout-apk-audit/package.txt
+          python scripts/check-apk.py "$APK" > paper-rollout-apk-audit/libraries.json
+          grep "package: name='com.phikinhua.episode' versionCode='35' versionName='1.0.33'" paper-rollout-apk-audit/package.txt
+          grep 'screenOrientation' android/app/src/main/AndroidManifest.xml | grep portrait
+          cp "$APK" PhiKinHua-Paper-Rollout-Test.apk
+          sha256sum PhiKinHua-Paper-Rollout-Test.apk > paper-rollout-apk-audit/sha256.txt
+          echo '${{ github.sha }}' > paper-rollout-apk-audit/source-commit.txt
+          echo 'Full game production entry; standard test signing key; QA helper/review enabled; v33 gameplay unchanged.' > paper-rollout-apk-audit/build-mode.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhiKinHua-Paper-Rollout-Test-APK
+          path: PhiKinHua-Paper-Rollout-Test.apk
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Paper-rollout-APK-signature-audit
+          path: paper-rollout-apk-audit/
+  native:
+    needs: android
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m pip install Pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-Paper-Rollout-Test-APK
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: false
+          script: |
+            adb install PhiKinHua-Paper-Rollout-Test.apk
+            python -u scripts/android-paper-rollout-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Paper-rollout-native-audit
+          path: paper-rollout-native-audit/
+          retention-days: 30
