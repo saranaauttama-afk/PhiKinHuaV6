@@ -32,6 +32,7 @@ jobs:
       - run: npm test -- --maxWorkers=2 --testTimeout=60000
       - run: npm install --no-save --package-lock=false playwright@1.62.1
       - run: npx playwright install --with-deps chromium
+      - run: python -m pip install Pillow
       - run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
       - run: EXPO_PUBLIC_UI_REVIEW=1 EXPO_PUBLIC_TEST_WIN_CARD=1 EXPO_PUBLIC_PAPER_DIORAMA=1 EXPO_PUBLIC_DIORAMA_REVIEW=1 npx expo export --platform web --output-dir /tmp/phikinhua-backlog-web
       - run: EXPO_PUBLIC_TEST_WIN_CARD=1 npx vite-node --config vitest.config.ts scripts/backlog-fixtures.ts

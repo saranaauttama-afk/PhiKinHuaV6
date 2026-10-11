@@ -24,8 +24,8 @@ function PrintLayer({id,d,plane,motion,source}:{id:'forest'|'village'|'foliage';
   </Svg>
  </Animated.View>;
 }
-/** Static full image foundation; stationary ink underlays occlude the cutouts
- * until their separate paper prints arrive. No blank holes or stretched sky. */
+/** Static full image foundation; translucent ink underlays give relief beneath separate paper prints.
+ * The entire original foundation stays visible, including the opening frame. */
 function PaperEnvironment({motion,onReady,foregroundOnly=false}:{motion:TheaterMotion;onReady:()=>void;foregroundOnly?:boolean}){
  const env=paperEnvironment(motion.sceneId)!,layout=useBattleLayout(),safe=useSafeAreaInsets();
  const world=paperPlacement(layout.screenW,layout.screenH,safe.top,safe.bottom,env.placement,layout.hudTop-8);
@@ -37,7 +37,7 @@ function PaperEnvironment({motion,onReady,foregroundOnly=false}:{motion:TheaterM
  if(foregroundOnly)return <PrintLayer id="foliage" d={contourPath(env.foreground)} plane={plane} motion={motion} source={svgSource}/>;
  return <View testID={`environment-${env.id}`} pointerEvents="none" style={[StyleSheet.absoluteFill,{overflow:'hidden'}]}>
   <Image testID="environment-static-base" fadeDuration={0} source={source} onLoad={onReady} resizeMode="stretch" style={{position:'absolute',...plane}}/>
-  {cuts.map(([id,points])=><View key={id} style={{position:'absolute',...(id==='village'?structurePlane:plane)}}><Svg width="100%" height="100%" viewBox="0 0 1024 1536"><Path d={contourPath(points)} fill={ink.shadow}/></Svg></View>)}
+  {cuts.map(([id,points])=><View key={id} style={{position:'absolute',...(id==='village'?structurePlane:plane)}}><Svg width="100%" height="100%" viewBox="0 0 1024 1536"><Path d={contourPath(points)} fill={ink.shadow} opacity={.16}/></Svg></View>)}
   {cuts.filter(([id])=>id!=='foliage').map(([id,points])=><PrintLayer key={id} id={id} d={contourPath(points)} plane={id==='village'?structurePlane:plane} motion={motion} source={svgSource}/>)}
  </View>;
 }

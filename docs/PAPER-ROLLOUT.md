@@ -18,7 +18,7 @@ Validation: TypeScript and all 930 unit tests passed. Production save-resume/dis
 
 ## Milestone 2 — environment coverage
 
-24/24 registered environments. The village retains the approved layered bitmaps. The other 23 use scene-specific vector contour clips of their existing paintings, a full static original background, stationary ink underlays, independent distant/terrain/foreground prints, depth-specific ink widths and modest cast shadows. The terrain print registers to the local ground plane; the static background and distant print keep the original field of view. No flattened-image zoom, raster regeneration or new village copies.
+24/24 registered environments. The village retains the approved layered bitmaps. The other 23 use scene-specific vector contour clips of their existing paintings, a full static original background, translucent stationary ink underlays, independent distant/terrain/foreground prints, depth-specific ink widths and modest cast shadows. The terrain print registers to the local ground plane; the static background and distant print keep the original field of view. No flattened-image zoom, raster regeneration or new village copies.
 
 Grounded/floating placement is chosen independently by ghost ID. The original dangling-foot prototype and marsh lights, flying krahang and krasue float; human-body revenants use ground contact. Configuration remains presentation-only. Legacy full-body route choices and battle art use the same scene ground reference; the current three-page encounter portrait layout is retained.
 
@@ -72,3 +72,5 @@ The final review build uses the existing full game entry, package `com.phikinhua
 The Android job installs that exact artifact into an API 36 portrait emulator. It checks actual campaign entry, route/battle transition, cold save resume, absence of combo UI, seven representative environments at logical 360×640 and 393×852, normal-speed assembly recording, late HUD, OFF persistence and reduced-motion override. Native memory/frame statistics and crash logs are retained. This is emulator testing; physical phone performance and final visual approval remain manual review of the supplied APK.
 
 The existing combat hit-shake is forwarded to the independently rendered ghost cutout; its original timing and distance are retained. Additional legacy browser harnesses now tap exposed card corners (matching the existing overlapping hand) and wait for blessing image measurement before checking equal sizes. The UI/card geometry is unchanged.
+
+Opening-frame review caught overly opaque ink underlays on the expanded scenes. They now use 16% opacity so the original full-coverage painting remains visible from the first frame rather than presenting a large solid dark region. The independently moving prints and final ink contours remain sharp.
