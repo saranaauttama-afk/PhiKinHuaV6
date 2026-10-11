@@ -23,8 +23,17 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
       - name: Export opt-in scene prototype
-        run: EXPO_PUBLIC_PAPER_DIORAMA=1 npx expo export --platform web --output-dir /tmp/paper-web
+        run: EXPO_PUBLIC_PAPER_DIORAMA=1 npx expo export --platform web --output-dir /tmp/assembly-web
       - run: node scripts/paper-diorama-check.cjs
+        env:
+          PAPER_AUDIT_DIR: paper-preview-audit
+      - run: python3 scripts/export-paper-review.py
+      - run: python3 scripts/bundle-paper-review.py paper-preview-audit/PhiKinHua-Paper-Assembly-Preview.html
+        env:
+          PAPER_AUDIT_DIR: paper-preview-audit
+      - run: node scripts/paper-review-check.cjs paper-preview-audit/PhiKinHua-Paper-Assembly-Preview.html
+        env:
+          PAPER_AUDIT_DIR: paper-preview-audit
       - uses: actions/upload-artifact@v4
         if: always()
         with:

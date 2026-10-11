@@ -6,6 +6,7 @@ import {useGameSettings} from '../Settings';
 export function usePaperMotion() {
   const preference = useGameSettings(s => s.reducedMotion);
   const [systemReduced, setSystemReduced] = React.useState(false);
+  const [ready,setReady]=React.useState(false);
   const [active, setActive] = React.useState(true);
   React.useEffect(() => {
     let alive = true;
@@ -13,15 +14,15 @@ export function usePaperMotion() {
       const query = window.matchMedia('(prefers-reduced-motion: reduce)');
       const changed = () => setSystemReduced(query.matches);
       const visibility = () => setActive(!document.hidden);
-      changed(); visibility();
+      changed(); visibility(); setReady(true);
       query.addEventListener('change', changed);
       document.addEventListener('visibilitychange', visibility);
       return () => {query.removeEventListener('change', changed); document.removeEventListener('visibilitychange', visibility);};
     }
-    void AccessibilityInfo.isReduceMotionEnabled().then(v => {if (alive) setSystemReduced(v);});
+    void AccessibilityInfo.isReduceMotionEnabled().then(v => {if (alive) {setSystemReduced(v);setReady(true);}}).catch(()=>{if(alive)setReady(true);});
     const motion = AccessibilityInfo.addEventListener('reduceMotionChanged', setSystemReduced);
     const app = AppState.addEventListener('change', value => setActive(value === 'active'));
     return () => {alive = false; motion.remove(); app.remove();};
   }, []);
-  return {reduced: preference || systemReduced, active};
+  return {reduced: preference || systemReduced, active,ready};
 }

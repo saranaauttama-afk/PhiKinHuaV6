@@ -211,4 +211,4 @@ export const archiveColors={scene:'rgba(12,16,12,.90)',scrim:'rgba(0,0,0,.82)',f
 
 export const battleSceneColors={base:'#101714',centre:'#131b19',floor:'#0c120f'} as const;
 /** Opt-in paper stage only; approved battle/HUD tokens stay unchanged. */
-export const paperDioramaColors={backing:'#231c14',shadow:'#070a08',ghostShadow:'#060907',edge:'#dfcda6',floor:'#352c1d',loading:'#171c19',controls:'#171c19dd',controlEdge:'#9b8461',switchOff:'#786e52',switchOn:'#a68148'} as const;
+export const paperDioramaColors={backing:'#231c14',shadow:'#070a08',ghostShadow:'#060907',edge:'#17140f',floor:'#352c1d',loading:'#171c19',controls:'#171c19dd',controlEdge:'#9b8461',switchOff:'#786e52',switchOn:'#a68148'} as const;
