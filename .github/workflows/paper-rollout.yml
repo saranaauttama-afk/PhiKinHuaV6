@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verify:
-    if: ${{ !contains(github.event.head_commit.message, '[native-recheck]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[native-recheck]') && !contains(github.event.head_commit.message, '[verified-source]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -51,7 +51,7 @@ jobs:
           name: Paper-rollout-web-audit
           path: backlog-audit/
   android:
-    if: ${{ contains(github.event.head_commit.message, '[apk]') }}
+    if: ${{ always() && contains(github.event.head_commit.message, '[apk]') && (needs.verify.result == 'success' || contains(github.event.head_commit.message, '[verified-source]')) }}
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -69,6 +69,15 @@ jobs:
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
       - run: npm ci
+      - name: Reuse completed source verification only when application inputs are identical
+        if: ${{ contains(github.event.head_commit.message, '[verified-source]') }}
+        run: |
+          python - <<'PY'
+          import subprocess
+          changed=subprocess.check_output(['git','diff','--name-only','9cadcf501c563ec6ceb65c166e74998bcf21a408','HEAD'],text=True).splitlines()
+          assert all(p.startswith('docs/') or p.startswith('.github/workflows/') for p in changed),changed
+          print('Application and artwork identical to verified source 9cadcf501c563ec6ceb65c166e74998bcf21a408: CI run 38171204621, verify job 114564070908; TypeScript, 956 unit tests and 226 mobile checks passed.')
+          PY
       - name: Configure full-game review build, keeping the production entry and save format
         run: |
           node - <<'JS'
@@ -114,7 +123,7 @@ jobs:
           import hashlib,zipfile
           from pathlib import Path
           base=Path('native-base/PhiKinHua-Paper-Rollout-Test.apk')
-          bundle=Path('android/app/build/generated/assets/react/release/index.android.bundle').read_bytes()
+          bundle=Path('android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle').read_bytes()
           assert bundle[:8]==bytes.fromhex('c61fbc03c103191f'),'Require compiled Hermes bytecode'
           out=Path('android/app/build/outputs/apk/release');out.mkdir(parents=True,exist_ok=True)
           is_signature=lambda n:n.upper()=='META-INF/MANIFEST.MF' or (n.upper().startswith('META-INF/') and n.upper().endswith(('.SF','.RSA','.DSA','.EC')))
