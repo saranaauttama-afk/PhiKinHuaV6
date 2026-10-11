@@ -177,6 +177,7 @@ jobs:
           name: Paper-rollout-APK-signature-audit
           path: paper-rollout-apk-audit/
   native:
+    if: ${{ always() && needs.android.result == 'success' }}
     needs: android
     runs-on: ubuntu-latest
     timeout-minutes: 30

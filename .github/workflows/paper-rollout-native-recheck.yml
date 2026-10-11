@@ -19,7 +19,7 @@ jobs:
         run: |
           python - <<'PY'
           import subprocess
-          base='53536205b32871fa769bfb13d64a616d057c71b9'
+          base='1e786da13fdfaa924c632e0bd485b0e0b6fd9f52'
           changed=subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines()
           assert all(p.startswith('docs/') or p.startswith('.github/workflows/') or p=='scripts/android-paper-rollout-smoke.py' for p in changed),changed
           print('Application code, dependencies, gameplay, save format and assets match APK source',base)
@@ -28,10 +28,19 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: PhiKinHua-Paper-Rollout-Test-APK
-          run-id: 38164652063
+          run-id: 38172779690
           github-token: ${{ github.token }}
-      - name: Require exact signed APK bytes
-        run: echo '6f97d9f9b20c449cfddfe2e6a12e2b47e4331d911815a93207746f01f9701b51  PhiKinHua-Paper-Rollout-Test.apk' | sha256sum -c -
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-APK-signature-audit
+          run-id: 38172779690
+          github-token: ${{ github.token }}
+          path: apk-audit
+      - name: Require exact signed APK bytes and immutable build source
+        run: |
+          sha256sum -c apk-audit/sha256.txt
+          test "$(cat apk-audit/source-commit.txt)" = "1e786da13fdfaa924c632e0bd485b0e0b6fd9f52"
+          cat apk-audit/sha256.txt
       - name: Enable emulator acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -60,15 +69,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Paper-rollout-native-audit
-          run-id: 38168344739
+          run-id: 38166885904
           github-token: ${{ github.token }}
-          path: audit/native
-      - uses: actions/download-artifact@v4
-        with:
-          name: Paper-rollout-APK-signature-audit
-          run-id: 38168344739
-          github-token: ${{ github.token }}
-          path: audit/apk
-      - run: cat audit/native/logcat.txt
-      - run: cat audit/native/results.json
-      - run: cat audit/apk/sha256.txt
+      - run: cat logcat.txt
+      - run: cat results.json
