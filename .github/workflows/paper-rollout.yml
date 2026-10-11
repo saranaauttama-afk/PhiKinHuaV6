@@ -117,12 +117,13 @@ jobs:
           bundle=Path('android/app/build/generated/assets/react/release/index.android.bundle').read_bytes()
           assert bundle[:8]==bytes.fromhex('c61fbc03c103191f'),'Require compiled Hermes bytecode'
           out=Path('android/app/build/outputs/apk/release');out.mkdir(parents=True,exist_ok=True)
+          is_signature=lambda n:n.upper()=='META-INF/MANIFEST.MF' or (n.upper().startswith('META-INF/') and n.upper().endswith(('.SF','.RSA','.DSA','.EC')))
           with zipfile.ZipFile(base) as original,zipfile.ZipFile('/tmp/paper-unsigned.apk','w') as changed:
             for info in original.infolist():
-              if info.filename.startswith('META-INF/'):continue
+              if is_signature(info.filename):continue
               changed.writestr(info,bundle if info.filename=='assets/index.android.bundle' else original.read(info.filename))
           with zipfile.ZipFile(base) as original,zipfile.ZipFile('/tmp/paper-unsigned.apk') as changed:
-            names=[n for n in original.namelist() if not n.startswith('META-INF/')]
+            names=[n for n in original.namelist() if not is_signature(n)]
             assert set(names)==set(changed.namelist())
             diffs=[n for n in names if hashlib.sha256(original.read(n)).digest()!=hashlib.sha256(changed.read(n)).digest()]
             assert diffs==['assets/index.android.bundle'],diffs
