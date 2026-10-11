@@ -30,7 +30,7 @@ function step(d:ReturnType<typeof driver>){
   d.s.piles.hand=[{id:'structural-test',name:'test',type:'attack',cost:0,dmg:99999}];d.go({type:'PlayCard',index:0});
  }else if(d.s.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}
  else if(d.s.phase==='reward')d.go({type:'SkipCardReward'});
- else if(d.s.phase==='levelup')d.go({type:'SkipLevelUp'});
+ else if(d.s.phase==='levelup')d.go(d.s.levelUp?.dawnHandChoice?{type:'ChooseLevelUpOption',option:'A'}:{type:'SkipLevelUp'});
  else if(d.s.phase==='victory')d.go({type:'CompleteNode'});
  else throw Error('Unexpected phase '+d.s.phase);
 }

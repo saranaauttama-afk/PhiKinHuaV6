@@ -7,13 +7,13 @@ import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
 // การ์ดใหม่ไม่ได้มาจากเลเวลอัปแล้ว — ย้ายไปเป็นรางวัลของการชนะไฟต์
 // (ดู `cards/reward.ts`) ตารางนี้จึงเหลือแต่ของที่ไม่ใช่การ์ด
 export type LevelBucket =
-  | 'max_hp' | 'max_energy' | 'max_hand'
+  | 'max_hp' | 'max_energy' | 'max_hand' | 'draw_per_turn'
   | 'blessing'
   | 'remove' | 'upgrade' | 'gold'
   | 'equipment_slot' | 'gold_skip';
 
 const BASE_BUCKET_W: Record<LevelBucket, number> = {
-  max_hp: 30, max_energy: 20, max_hand: 10, blessing: 12,
+  max_hp: 30, max_energy: 20, max_hand: 10, draw_per_turn:10, blessing: 12,
   remove: 10, upgrade: 8, gold: 2, equipment_slot: 15, gold_skip: 8,
 };
 
@@ -27,7 +27,7 @@ export type LevelChoice = {
 // Strategic choice pairs that create meaningful decisions
 const CHOICE_PAIRS: Array<[LevelBucket, LevelBucket]> = [
   // Power scaling choices
-  ['max_energy', 'max_hand'],         // Energy for combos vs Hand size for options
+  ['max_energy', 'max_hand'],         // Energy for plays vs Hand size for options
   ['max_hp', 'equipment_slot'],       // Survivability vs Equipment power
   
   // Build direction choices
@@ -51,9 +51,9 @@ const CHOICE_PAIRS: Array<[LevelBucket, LevelBucket]> = [
 
 function deriveWeights(s: GameState): Record<LevelBucket, number> {
   const w = { ...BASE_BUCKET_W };
-  // Strategic hand size boosts at key levels for combo potential
+  // Strategic hand size boosts at key levels for card options
   const lv = s.player?.level ?? 1;
-  if (lv === 3) w.max_hand += 15; // Early game combo potential
+  if (lv === 3) w.max_hand += 15; // Early game options
   if (lv === 6) w.max_hand += 20; // Mid game strategy expansion  
   if (lv === 9) w.max_hand += 15; // Late game mastery
   return w;
@@ -78,6 +78,16 @@ export function rollLevelUpBucket(rng: RNG, s: GameState): { rng: RNG; bucket: L
 
 // ===== New Choice-Based System =====
 export function rollLevelUpChoice(rng: RNG, s: GameState): { rng: RNG; choice: LevelChoice } {
+  if(s.player.handBalanceVersion===33){
+    const pairs:Array<[LevelBucket,LevelBucket]>=[['max_hp','upgrade'],['blessing','gold_skip'],['remove','upgrade'],['max_hp','equipment_slot']];
+    if(s.player.maxEnergy<5)pairs.push(['max_energy','max_hp']);
+    if((s.campaign?.night??1)>1){
+      if((s.player.drawPerTurn??2)<3)pairs.push(['draw_per_turn','blessing']);
+      if(s.player.maxHandSize<3)pairs.push(['max_hand','upgrade']);
+    }
+    const roll=int(rng,0,pairs.length-1),order=int(roll.rng,0,1);
+    const [a,b]=pairs[roll.value];return {rng:order.rng,choice:{optionA:order.value?a:b,optionB:order.value?b:a}};
+  }
   // Filter choice pairs based on game state and level for more contextual choices
   const level = s.player?.level ?? 1;
   const viablePairs = getViableChoicePairs(s, level).filter(pair=>!s.campaign||((s.player.maxEnergy<5||!pair.includes('max_energy'))&&(s.player.maxHandSize<8||!pair.includes('max_hand')))).filter(pair => s.runMode !== 'episode' || (!pair.includes('equipment_slot') && (s.player.maxEnergy < 4 || !pair.includes('max_energy'))));
@@ -267,8 +277,10 @@ export function getBucketDisplayInfo(bucket: LevelBucket): { name: string; descr
       return { name: '+8 Max HP', description: 'Survive longer encounters', icon: '❤️' };
     case 'max_energy':
       return { name: '+1 Max Energy', description: 'Play more cards each turn', icon: '⚡' };
+    case 'draw_per_turn':
+      return {name:'+1 Draw per Turn',description:'Draw one more card; retained hand is unchanged',icon:'🎴'};
     case 'max_hand':
-      return { name: '+1 Hand Size', description: 'More options and combos', icon: '🎴' };
+      return { name: '+1 Hand Size', description: 'Retain one more card between turns', icon: '🎴' };
     case 'blessing':
       return { name: 'Choose Blessing', description: 'Permanent passive power', icon: '✨' };
     case 'remove':

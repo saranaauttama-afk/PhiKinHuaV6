@@ -4,7 +4,6 @@ import {applyCommand} from '../src/core/reducer';
 import {cardById} from '../src/core/pack';
 import {enemyCardById} from '../src/core/pack_enemy_cards';
 import {chooseEnemyCards} from '../src/core/combat/enemyPlan';
-import {onCardPlayed,resetCombos} from '../src/core/combat/combos';
 import {applyStatusEffect} from '../src/core/statusEffectsRuntime';
 import {effectiveCost} from '../src/core/cards/mechanics';
 import {rollLevelUpChoice} from '../src/core/level';
@@ -19,36 +18,6 @@ describe('live tactical rules',()=>{
   expect(plan.reduce((n,id)=>n+enemyCardById(id)!.energyCost,0)).toBeLessThanOrEqual(2);
   const reordered=chooseEnemyCards(state,[...ids].reverse(),2);
   expect([...plan].sort()).toEqual([...reordered].sort());
- });
- it('ordered starter combo rewards setup then followup, and cannot be farmed',()=>{
-  const {state}=makeCombatState({enemyHp:100});resetCombos(state);
-  onCardPlayed(state,cardById('ward_riposte')!,'warrior');
-  onCardPlayed(state,cardById('muay_stance')!,'warrior');
-  expect(state.combo!.done).not.toContain('ward_counter_chain');
-  onCardPlayed(state,cardById('ward_riposte')!,'warrior');
-  expect(state.combo!.done).toContain('ward_counter_chain');
-  const block=state.player.block;
-  onCardPlayed(state,cardById('muay_stance')!,'warrior');
-  onCardPlayed(state,cardById('ward_riposte')!,'warrior');
-  expect(state.player.block).toBe(block);
- });
- it('next player turn increments the live counter and expires single-turn setup',()=>{
-  const {state,rng}=makeCombatState();resetCombos(state);
-  onCardPlayed(state,cardById('muay_stance')!,'warrior');
-  const out=applyCommand(state,{type:'StartPlayerTurn'},rng).state;
-  expect(out.turn).toBe(state.turn+1);
-  expect(out.combo!.progress.some(p=>p.comboId==='ward_counter_chain')).toBe(false);
-  expect(out.combo!.progress.some(p=>p.comboId==='muay_combination')).toBe(true);
- });
- it('free-card quota works at zero energy and is consumed exactly once',()=>{
-  const {state,rng}=makeCombatState({hand:[attackCard(3,{cost:2}),attackCard(3,{cost:2})],playerEnergy:0});
-  resetCombos(state);state.combo!.freeCards=1;
-  expect(effectiveCost(state,state.piles.hand[0])).toBe(0);
-  const out=applyCommand(state,{type:'PlayCard',index:0},rng);
-  expect(out.state.player.energy).toBe(0);expect(out.state.combo!.freeCards).toBe(0);
-  expect(out.state.piles.hand).toHaveLength(1);
-  const denied=applyCommand(out.state,{type:'PlayCard',index:0},out.rng);
-  expect(denied.state.piles.hand).toHaveLength(1);
  });
  it('entangle rejects attacks before charging or moving the card',()=>{
   const {state,rng}=makeCombatState({hand:[attackCard(3,{cost:1})]});

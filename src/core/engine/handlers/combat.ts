@@ -64,7 +64,6 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     }
     s.player.energy -= cost;
     countCardPlayed(s);
-    require('../../combat/combos').applyComboCardModifiers(s,played);
     armTrap(s, played);
     const [tc] = s.piles.hand.splice(idx, 1);
     // การ์ดดักที่ตั้งไปแล้วไม่กลับเข้ากองจั่วในไฟต์นี้ — ไม่งั้นตั้งซ้ำได้ไม่จำกัด
@@ -76,7 +75,6 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   if (played.type === 'equipment' && played.equipmentId) {
     const cost=effectiveCost(s,played);if(cost>s.player.energy)return {state:s,rng:r};
     s.player.energy-=cost;countCardPlayed(s);
-    require('../../combat/combos').applyComboCardModifiers(s,played);
     const equipmentData = getEquipmentById(played.equipmentId);
     let equipmentInstalled = false;
 
@@ -156,7 +154,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
  *
  * เดิมตรงนี้เป็นสำเนาที่สองของลำดับจบเทิร์นทั้งชุด และมันแตกออกจากกันไปเรื่อยๆ
  * ตามของที่เพิ่มเข้ามาทีหลัง — ไม่มีกับดักนับถอยหลัง ไม่มีการทิ้งคำสาป
- * ไม่มีคอมโบหมดอายุ ไม่มีการ์ดค้างมือ เกมจริงไม่เคยเรียก `EndTurn` เลยสักครั้ง
+ * ไม่มีการ์ดค้างมือ เกมจริงไม่เคยเรียก `EndTurn` เลยสักครั้ง
  * (`battle.tsx` ส่ง `ResolveEnemyTurn` ทางเดียว) มีแต่เทสต์ที่ยังเรียก —
  * ซึ่งแปลว่าเทสต์กำลังตรวจเส้นทางที่เกมไม่ได้ใช้
  */
@@ -167,7 +165,6 @@ export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }
 export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { type: 'StartPlayerTurn' }>, r: RNG) {
   if (s.phase !== 'combat') return { state: s, rng: r };
   s.turn=(s.turn??1)+1;
-  require('../../combat/combos').expireCombos(s);
   ({ state: s, rng: r } = startPlayerTurn(s, r));
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
@@ -206,11 +203,11 @@ export function startMonsterTurn(s: GameState, _cmd: Extract<Command, { type: 'S
  */
 export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'ResolveEnemyTurn' }>, r: RNG) {
   if (s.phase !== 'combat') return { state: s, rng: r };
+  if(s.player.handBalanceVersion===33&&require('../../cards/hand').requiredDiscards(s)>0)return {state:s,rng:r};
 
   const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
   const { processMinionsEndTurn }         = require('../../minionRuntime');
   const { processEnemyTurnBehaviors }     = require('../../enemyBehaviorRuntime');
-  const { expireCombos }                  = require('../../combat/combos');
   const { onPlayerTurnEnd }              = require('../../adaptiveAI');
   const { enemyDrawUpToHand, enemyDiscardHand } = require('./enemy');
 
@@ -225,7 +222,6 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   runEquipmentTurnHook(s, 'on_turn_end', 'player');
   runBlessingsTurnHook(s, 'on_turn_end');
   resetBlessingTurnFlags(s);
-  expireCombos(s);
   onPlayerTurnEnd(s, { energyUsed: 0, blockGained: s.player.block });
 
 

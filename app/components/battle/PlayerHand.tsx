@@ -14,7 +14,6 @@ import {cardSummary} from '../../cardPresentation';
 import {costWithRule,effectiveCost} from '../../../src/core/cards/mechanics';
 import type {GameState} from '../../../src/core/types';
 import {canPlayAttackCards} from '../../../src/core/statusEffectsRuntime';
-import {combosForClass} from '../../../src/core/combat/combos';
 import {cardById} from '../../../src/core/pack';
 import {useBattleLayout} from './battleLayout';
 import {handGeometry} from '../../battleGeometry';
@@ -28,7 +27,6 @@ export default function PlayerHand({state,enabled=true,cards,playedCardIds,hover
  return <View pointerEvents="box-none" style={{position:'absolute',top:0,bottom:0,left:0,right:0,zIndex:layer.control}}>
  {preview&&enabled&&<RitualSurface kind="quietSlate" style={{position:'absolute',bottom:handBottom+handHeight+6,left:12,right:12,padding:18,gap:8,zIndex:layer.overlay,maxHeight:height*.4}}>
  <View style={{flexDirection:'row',gap:12}}><CardGlyphArt card={preview as any} size={68}/><View style={{flex:1}}><Text style={{fontFamily:font.heading,color:pulpColors.bone,fontSize:17}}>{preview.name}</Text><CardBadges card={preview as any} cost={cost} ink={pulpColors.bone}/>{upgradeLevelOf(preview as any)>0&&<Text style={{fontFamily:font.ui,color:pulpColors.bone,fontSize:12}}>ปลุกเสกขั้น {upgradeLevelOf(preview as any)}</Text>}<ScrollView style={{maxHeight:height*.18}}><Text style={{fontFamily:font.body,color:pulpColors.bone,fontSize:20,lineHeight:25}}>{cardSummary(preview as any)}{!preview.upgraded&&preview.desc?`\n${preview.desc}`:null}</Text></ScrollView></View></View>
- {state&&preview&&combosForClass(state.classId??'shaman').filter(c=>c.ordered&&c.requiredCards?.includes(preview.id)&&!state.combo?.done.includes(c.id)).map(c=><Text key={c.id} style={{fontFamily:font.ui,color:pulpColors.bone,fontSize:12,lineHeight:18}}>{c.name}: {c.requiredCards?.map(id=>cardById(id)?.name??id).join(' → ')} · เทิร์นเดียว · ครั้งเดียวต่อไฟต์</Text>)}
  <View style={{flexDirection:'row',gap:12}}><QuietButton label={cannotPlay?'เล่นไม่ได้ในตอนนี้':cost>energy?'พลังไม่พอ':'ใช้การ์ด'} primary disabled={cannotPlay||cost>energy} onPress={()=>{onPlayCard(preview,index);setSelected(null)}} style={{flex:1}}/><QuietButton label="ปิด" onPress={()=>enabled&&setSelected(null)} style={{flex:1}}/></View></RitualSurface>}
 
  <View testID="battle-hand" style={{position:'absolute',bottom:handBottom,left:0,right:0,height:handHeight}}>

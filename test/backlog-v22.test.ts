@@ -7,8 +7,6 @@ import {encounterAction} from '../app/encounterPresentation';
 import {battleGeometry,enemyLane} from '../app/battleGeometry';
 import {canRemoveCard,upgradeCard,MAX_UPGRADE_LEVEL} from '../src/core/engine/shared';
 import {removeCostForCount,upgradeCostForCount} from '../src/core/balance/economy';
-import {onCardPlayed,expireCombos,COMBO_BY_ID} from '../src/core/combat/combos';
-import {comboPayoff,comboFeedbackText} from '../app/comboPresentation';
 import {onRestRow} from '../src/core/map/restPage';
 import {reachableNodes} from '../src/core/map/journey';
 import {resolveStoryIfAny} from './helpers';
@@ -58,17 +56,6 @@ describe('all rest route types and combat labels',()=>{
   const row=s.journey!.rowIndex;const nodes=reachableNodes(s.journey!);s.pages!.current!.offers[0]=offer;nodes[0].offer=offer;
   const before=structuredClone(s.pages!.current);const entered=step(s,{type:'ChooseOffer',index:0});expect(entered.phase).toBe(kind==='story_event'?'event':'shop');expect(entered.phase).not.toBe('combat');
   let result=entered;resolveStoryIfAny(result,c=>{result=step(result,c);});const returned=step(result,{type:'CompleteNode'});expect(returned.phase).toBe('map');expect(returned.journey!.rowIndex).toBe(row);expect(returned.pages!.current?.offers).toEqual(before!.offers);
- });
-});
-describe('actual combo feedback and payoff',()=>{
- it('ordered chain reports progress, reset reason and actual success reward; timeout reports expiry',()=>{
-  const s=newState();s.phase='combat';s.player.block=0;s.piles.hand=[];s.piles.draw=[];s.piles.discard=[];s.enemy={hp:999,maxHp:999,block:0} as any;
-  const card=(id:string)=>ALL_CARDS.find(c=>c.id===id)!;
-  onCardPlayed(s,card('muay_stance'),'warrior');expect(s.combo?.feedback?.some(f=>f.kind==='progress')).toBe(true);
-  s.turn+=2;expireCombos(s);expect(s.combo?.feedback?.some(f=>f.kind==='reset'&&f.reason==='expired')).toBe(true);
-  onCardPlayed(s,card('muay_stance'),'warrior');onCardPlayed(s,card('muay_stance'),'warrior');expect(s.combo?.feedback?.some(f=>f.reason==='restart')).toBe(true);
-  onCardPlayed(s,card('ward_riposte'),'warrior');const f=s.combo!.feedback!.find(f=>f.comboId==='ward_counter_chain'&&f.kind==='success')!;expect(f).toBeDefined();expect(s.player.block).toBe(6);expect(comboFeedbackText(f)).toContain('ป้องกัน +6');
-  for(const e of COMBO_BY_ID.ward_counter_chain.effects)expect(comboPayoff(e)).toMatch(/6|1/);
  });
 });
 describe('portrait card/art/HUD separation, including multiple owners',()=>{

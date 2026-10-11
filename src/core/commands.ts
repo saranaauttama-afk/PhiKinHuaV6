@@ -157,8 +157,6 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   // Import all advanced systems
   const { canPlayAttackCards } = require('./statusEffectsRuntime');
   const { onPlayerCardPlayed } = require('./adaptiveAI');
-  const { applyComboCardModifiers, onCardPlayed: onCardPlayedForCombos } = require('./combat/combos');
-  const { getClass } = require('./classes');
 
   // Check if attack cards can be played (entangle check)
   if (card.type === 'attack' && !canPlayAttackCards(state)) {
@@ -166,11 +164,9 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
     return;
   }
 
-  // ★ Apply combo system modifiers first
-  //   เงื่อนไขคิดหลังคอมโบ เพราะคอมโบเปลี่ยนตัวเลขบนการ์ด แต่เงื่อนไขอ่าน
-  //   **สภาพสนาม** ซึ่งยังไม่เปลี่ยนจนกว่าจะลงผลจริง
+  // Resolve ordinary conditional effects from the current board.
   const { withConditional, hitsOf } = require('./cards/mechanics');
-  const modifiedCard = withConditional(state, applyComboCardModifiers(state, card));
+  const modifiedCard = withConditional(state, card);
 
   // หมายเหตุ: energy ถูกหักไปแล้วโดย combat handler
 
@@ -270,8 +266,6 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
     }
   }
   
-  // ★ Trigger combo system after card effects
-  onCardPlayedForCombos(state, modifiedCard, getClass(state.classId).cardTag);
   
   // ★ AI learning from player card usage
   onPlayerCardPlayed(state, modifiedCard);
@@ -299,11 +293,9 @@ export function endPlayerTurn(state: GameState) {
 export function endEnemyTurn(state: GameState) {
   // ★ Process all advanced systems before enemy turn
   const { processEnemyTurnBehaviors } = require('./enemyBehaviorRuntime');  
-  const { expireCombos } = require('./combat/combos');
   const { onPlayerTurnEnd } = require('./adaptiveAI');
   
-  // Process combos and AI learning
-  expireCombos(state);
+  // Update AI learning
   onPlayerTurnEnd(state, { energyUsed: 0, blockGained: state.player.block });
   
   // (Environment system removed)

@@ -1,3 +1,4 @@
+import {stripObsoleteComboData} from '../saveMigration';
 import {runFightTotal} from './threeNight';
 import {adventureFightTotal} from '../map/adventure';
 import {ALL_CLASS_IDS,type ClassId} from '../classes';
@@ -10,7 +11,6 @@ export const ACHIEVEMENTS=[
  {id:'first_dawn',name:'เห็นแสงแรก',desc:'ผ่านครบสามคืนในหนึ่งรอบ'},
  {id:'fifth_dawn',name:'พ้นอาถรรพ์',desc:'ชนะผีกินหัวในระดับอาถรรพ์ 5'},
  {id:'lean_deck',name:'วิชาน้อย แต่ถึงเช้า',desc:'ชนะด้วยสำรับตอนจบไม่เกิน 8 ใบ'},
- {id:'combo_keeper',name:'ผู้รู้จังหวะ',desc:'ทำคอมโบสำเร็จอย่างน้อย 15 ครั้งในรันที่ชนะ'},
  {id:'untouched',name:'ไร้รอยแผล',desc:'ชนะโดยไม่เสียพลังชีวิตจากความเสียหายในการต่อสู้'},
  {id:'wide_arsenal',name:'ครบเครื่อง',desc:'ชนะด้วยสำรับตอนจบอย่างน้อย 20 ใบ'},
 ] as const;
@@ -29,7 +29,7 @@ export function recordRun(j:Journal,r:RunRecord):Journal{
   p.highestDifficulty=Math.max(p.highestDifficulty,d);
   if(d===5){p.difficultyFiveWins++;p.nightFiveWins++;}
   const old=p.difficultyBest[d];p.difficultyBest[d]={smallestDeck:Math.min(old?.smallestDeck??Infinity,r.deck.length),fewestCards:Math.min(old?.fewestCards??Infinity,r.metrics.cardsPlayed),fewestTurns:Math.min(old?.fewestTurns??Infinity,r.metrics.turns),wins:(old?.wins??0)+1};
-  const earned=['first_dawn',d===5?'fifth_dawn':'',r.deck.length<=8?'lean_deck':'',r.metrics.combos>=15?'combo_keeper':'',r.metrics.damageTaken===0?'untouched':'',r.deck.length>=20?'wide_arsenal':''].filter(Boolean);p.achievements=[...new Set([...p.achievements,...earned])];
+  const earned=['first_dawn',d===5?'fifth_dawn':'',r.deck.length<=8?'lean_deck':'',r.metrics.damageTaken===0?'untouched':'',r.deck.length>=20?'wide_arsenal':''].filter(Boolean);p.achievements=[...new Set([...p.achievements,...earned])];
   return out;
  }
  if(!r.won||r.fights<(r.route==='adventure'?adventureFightTotal(r.night):15))return out;
@@ -40,7 +40,7 @@ export function recordRun(j:Journal,r:RunRecord):Journal{
  if(r.night===5)p.nightFiveWins++;
  const old=p.best[r.night];
  p.best[r.night]={smallestDeck:Math.min(old?.smallestDeck??Infinity,r.deck.length),fewestCards:Math.min(old?.fewestCards??Infinity,r.metrics.cardsPlayed),fewestTurns:Math.min(old?.fewestTurns??Infinity,r.metrics.turns),wins:(old?.wins??0)+1};
- const earned=[r.night>=1?'first_dawn':'',r.night===5?'fifth_dawn':'',r.deck.length<=8?'lean_deck':'',r.metrics.combos>=15?'combo_keeper':'',r.metrics.damageTaken===0?'untouched':'',r.deck.length>=20?'wide_arsenal':''].filter(Boolean);
+ const earned=[r.night>=1?'first_dawn':'',r.night===5?'fifth_dawn':'',r.deck.length<=8?'lean_deck':'',r.metrics.damageTaken===0?'untouched':'',r.deck.length>=20?'wide_arsenal':''].filter(Boolean);
  p.achievements=[...new Set([...p.achievements,...earned])];
  return out;
 }
@@ -50,7 +50,7 @@ export function claimUnlock(j:Journal,id:ClassId,kind:'card'|'blessing'):Journal
 }
 /** Corrupt profile data must never erase a good in-memory journal. */
 export function parseJournal(raw:string):Journal{
- const d=JSON.parse(raw);if(d?.version!==1||!Array.isArray(d.history)||!Array.isArray(d.recordedIds))throw Error('Invalid journal');
+ const d=stripObsoleteComboData(JSON.parse(raw));if(d?.version!==1||!Array.isArray(d.history)||!Array.isArray(d.recordedIds))throw Error('Invalid journal');
  for(const id of ALL_CLASS_IDS){const p=d.classes?.[id];if(!p||!Number.isInteger(p.highestCleared)||p.highestCleared<0||p.highestCleared>5||!Number.isInteger(p.nightFiveWins)||p.nightFiveWins<0||!Array.isArray(p.unlocks)||p.unlocks.some((x:string)=>!['card','blessing'].includes(x))||!p.best||!Array.isArray(p.achievements))throw Error('Invalid class progress');}
  // Older single-night records remain readable but never promote three-night tiers.
  for(const id of ALL_CLASS_IDS){const p=d.classes[id];p.highestDifficulty??=0;p.difficultyFiveWins??=0;p.difficultyBest??={};if(!Number.isInteger(p.highestDifficulty)||p.highestDifficulty<0||p.highestDifficulty>5||!Number.isInteger(p.difficultyFiveWins)||p.difficultyFiveWins<0||!p.difficultyBest||typeof p.difficultyBest!=='object')throw Error('Invalid difficulty progress');}

@@ -41,6 +41,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
     if (s.phase !== 'combat') return { state: s, rng: r };
     const { index } = cmd;
     if (index < 0 || index >= s.piles.hand.length) return { state: s, rng: r };
+    if(s.piles.hand[index].id===require('../cards/testWin').TEST_WIN_CARD_ID)return {state:s,rng:r};
     const [c] = s.piles.hand.splice(index, 1);
     s.piles.discard.push(c);
     return { state: s, rng: r };
@@ -117,12 +118,9 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   QA_SummonEnemyMinion: qa.qaSummonEnemyMinion,
   QA_ClearAllMinions: qa.qaClearAllMinions,
   
-  // QA - Phase 4: Adaptive AI & Combos
+  // QA - Phase 4: Adaptive AI
   QA_DebugAdaptiveAI: qa.qaDebugAdaptiveAI,
   QA_ResetAILearning: qa.qaResetAILearning,
-  QA_DebugCombos: qa.qaDebugCombos,
-  QA_TriggerCombo: qa.qaTriggerCombo,
-  QA_ClearCombos: qa.qaClearCombos,
   QA_LevelUp: qa.qaLevelUp,
 
   // QA - Original

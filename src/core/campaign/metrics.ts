@@ -3,7 +3,7 @@ import type {CardData,Command,GameState} from '../types';
 import {cardsPlayedThisTurn} from '../cards/mechanics';
 
 export type RunMetrics={
- initialDeck:number; smallestDeck:number; cardsPlayed:number; turns:number; combos:number;
+ initialDeck:number; smallestDeck:number; cardsPlayed:number; turns:number;
  added:number; removed:number; upgraded:number; damageTaken:number; playedByCard:Record<string,number>;
 };
 export type RunRecord={
@@ -14,7 +14,7 @@ export type RunRecord={
 export function trackRun(before:GameState,after:GameState,cmd:Command):void{
  if(cmd.type==='NewRun'){
   const n=after.masterDeck.length;
-  after.runMetrics={initialDeck:n,smallestDeck:n,cardsPlayed:0,turns:0,combos:0,added:0,removed:0,upgraded:0,damageTaken:0,playedByCard:{}};
+  after.runMetrics={initialDeck:n,smallestDeck:n,cardsPlayed:0,turns:0,added:0,removed:0,upgraded:0,damageTaken:0,playedByCard:{}};
   return;
  }
  if(!after.runMetrics||before.runSummary)return;
@@ -24,7 +24,6 @@ export function trackRun(before:GameState,after:GameState,cmd:Command):void{
   if(id){m.cardsPlayed++;m.playedByCard[id]=(m.playedByCard[id]??0)+1;}
  }
  if((before.phase!=='combat'&&after.phase==='combat')||(cmd.type==='StartPlayerTurn'&&after.phase==='combat'&&after.turn>before.turn))m.turns++;
- m.combos+=Math.max(0,(after.combo?.done.length??0)-(before.combo?.done.length??0));
  const delta=after.masterDeck.length-before.masterDeck.length;
  if(cmd.type==='FuseCards'&&delta===-1){m.added++;m.removed+=2;}
  else {if(cmd.type!=='UnequipToDeck')m.added+=Math.max(0,delta);if(cmd.type!=='EquipFromDeck')m.removed+=Math.max(0,-delta);}

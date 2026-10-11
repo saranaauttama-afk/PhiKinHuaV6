@@ -1,3 +1,4 @@
+import {stripObsoleteComboData} from './saveMigration';
 import {campaignFightTotal} from './campaign/threeNight';
 // src/core/save.ts — เซฟ/โหลดแบบไม่ทำ IO (ชั้นนอกค่อยเขียนลง storage)
 //
@@ -84,6 +85,7 @@ export type SaveSummary = {
 };
 
 export function toSave(s: GameState,rng?:RNG): SaveV2 {
+  s=stripObsoleteComboData(s);
   if(s.pages?.adventure){
     if(!rng||!Number.isInteger(rng.s))throw Error('ต้องมี RNG เพื่อบันทึกการเดินทาง B17');
     if(s.phase==='combat'){if(!rng)throw Error('Combat RNG required');return toBattleSave(s,rng);}
@@ -102,7 +104,7 @@ export function toSave(s: GameState,rng?:RNG): SaveV2 {
 
 export function toBattleSave(s: GameState, rng: RNG): SaveV2 {
   if (s.phase !== 'combat' || !s.enemy || s.runSummary) throw new Error('Battle is not resumable');
-  const state: GameState = JSON.parse(JSON.stringify(s));
+  const state: GameState = stripObsoleteComboData(s);
   state.pendingEvents = [];
   state.deckOpen = false;
   return {version: SAVE_VERSION, state, battleRng: {...rng}};
@@ -113,7 +115,7 @@ export function fromSave(data: SaveV2): GameState {
     throw new Error(`เซฟเวอร์ชัน ${data.version} ใช้กับเกมเวอร์ชันนี้ไม่ได้`);
   }
 
-  const s = data.state as GameState;
+  const s = stripObsoleteComboData(data.state) as GameState;
   if(s.discovery)parseArchive(JSON.stringify({version:1,runs:{[s.discovery.id]:s.discovery}}));
   if(s.pages?.adventure){
     if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บสมุดบันทึกและของปลดล็อกไว้');
@@ -136,7 +138,6 @@ export function fromSave(data: SaveV2): GameState {
     enemyIntent: undefined,
     minions: [],
     traps: [],
-    combo: undefined,
     pendingEvents: [],
     piles: { draw: [], hand: [], discard: [], exhaust: [] },
     turnFlags: { blessingOnce: {}, equipmentOnce: {} },

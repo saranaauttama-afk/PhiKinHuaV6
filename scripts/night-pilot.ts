@@ -1,3 +1,4 @@
+import {requiredDiscards} from '../src/core/cards/hand';
 import {baseNewState} from '../src/core/commands';
 import {applyCommand} from '../src/core/reducer';
 import {makeRng,int,type RNG} from '../src/core/rng';
@@ -27,7 +28,7 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
     if(s.phase==='combat'&&cardsPlayedThisTurn(s)===before){stalled=true;break;}
    }
    if(s.phase!=='combat')continue;
-   while(s.piles.hand.length>s.player.maxHandSize){const rank=s.piles.hand.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);go({type:'DiscardCard',index:rank[0].i});}
+   while(requiredDiscards(s)>0){const rank=s.piles.hand.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);go({type:'DiscardCard',index:rank[0].i});}
    go({type:'ResolveEnemyTurn'});enemyTurns++;enemyCards+=(s.pendingEvents??[]).filter(e=>e.t==='EnemyCardRevealed').length;
    if(s.phase==='combat')go({type:'StartPlayerTurn'});
    if(s.turn>45){stalled=true;break;}
@@ -36,7 +37,7 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
   if(s.phase==='levelup'){
    const choice=s.levelUp?.choice;
    if(!choice){go({type:'SkipLevelUp'});continue;}
-   const priority=(k:string)=>k==='max_energy'?12:k==='max_hand'?9:k==='upgrade'?8:k==='blessing'?7:k==='max_hp'?6:k==='remove'?5:1;
+   const priority=(k:string)=>k==='max_energy'?12:k==='draw_per_turn'?10:k==='max_hand'?9:k==='upgrade'?8:k==='blessing'?7:k==='max_hp'?6:k==='remove'?5:1;
    const option=priority(choice.optionA)>=priority(choice.optionB)?'A':'B';const kind=option==='A'?choice.optionA:choice.optionB;
    const ranked=s.masterDeck.map((c,i)=>({i,v:cardValue(c),u:c.upgradeLevel??0})).sort((a,b)=>kind==='remove'?a.v-b.v:b.v-a.v);
    const index=kind==='blessing'?0:ranked.find(x=>kind!=='upgrade'||x.u<3)?.i??0;
@@ -85,14 +86,14 @@ export function simulateNight(seed:string,cls:ClassId,night:Night,tactical:boole
   }
   stalled=true;break;
  }
- return {fightDetails,won:!!s.runSummary?.won,fights:s.fightCount??0,hp:s.player.hp,turns:s.runMetrics?.turns??0,combos:s.runMetrics?.combos??0,plays:s.runMetrics?.cardsPlayed??0,deck:s.masterDeck.length,enemyCards,enemyTurns,stalled,phase:s.phase,state:s};
+ return {fightDetails,won:!!s.runSummary?.won,fights:s.fightCount??0,hp:s.player.hp,turns:s.runMetrics?.turns??0,plays:s.runMetrics?.cardsPlayed??0,deck:s.masterDeck.length,enemyCards,enemyTurns,stalled,phase:s.phase,state:s};
 }
 if(process.argv.includes('--night-report')){
  const log=console.log;console.log=()=>{};const rows=[];
  for(const cls of ['warrior','shaman','nun','medium'] as const)for(const night of ([1,2,3,4,5] as const).filter(n=>!process.env.NIGHT_PILOT_NIGHTS||process.env.NIGHT_PILOT_NIGHTS.split(',').includes(String(n))))for(const tactical of [false,true]){
   const runs=Array.from({length:Number(process.env.NIGHT_PILOT_RUNS??8)},(_,i)=>simulateNight(`night-balance-${cls}-${i}`,cls,night,tactical));
   const fights=runs.flatMap(r=>r.fightDetails);
-  rows.push({fightTurns:Object.fromEntries(['normal','elite','boss'].map(kind=>{const list=fights.filter(f=>f.kind===kind);return [kind,{count:list.length,mean:list.length?+(list.reduce((n,f)=>n+f.turns,0)/list.length).toFixed(2):null}]})),class:cls,night,policy:tactical?'public-board':'random-affordable',runs:runs.length,wins:runs.filter(r=>r.won).length,meanFights:+(runs.reduce((n,r)=>n+r.fights,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((n,r)=>n+r.turns,0)/runs.length).toFixed(1),meanCombos:+(runs.reduce((n,r)=>n+r.combos,0)/runs.length).toFixed(1),cardsPerEnemyTurn:+(runs.reduce((n,r)=>n+r.enemyCards,0)/Math.max(1,runs.reduce((n,r)=>n+r.enemyTurns,0))).toFixed(2),stalled:runs.filter(r=>r.stalled).length});
+  rows.push({fightTurns:Object.fromEntries(['normal','elite','boss'].map(kind=>{const list=fights.filter(f=>f.kind===kind);return [kind,{count:list.length,mean:list.length?+(list.reduce((n,f)=>n+f.turns,0)/list.length).toFixed(2):null}]})),class:cls,night,policy:tactical?'public-board':'random-affordable',runs:runs.length,wins:runs.filter(r=>r.won).length,meanFights:+(runs.reduce((n,r)=>n+r.fights,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((n,r)=>n+r.turns,0)/runs.length).toFixed(1),cardsPerEnemyTurn:+(runs.reduce((n,r)=>n+r.enemyCards,0)/Math.max(1,runs.reduce((n,r)=>n+r.enemyTurns,0))).toFixed(2),stalled:runs.filter(r=>r.stalled).length});
  }
  log(JSON.stringify(rows,null,2));
 }

@@ -1,3 +1,5 @@
+> v1.0.33 work branch: independent hand/draw balance and complete explicit combo removal. New runs start at draw 2 / retain 2, with an independent first-guardian choice to reach 3. Existing v32 artwork, battle layout, three nights and five difficulty tiers are preserved. No APK/main merge for this task. See [v33 handoff](docs/HANDOFF-hand-balance-v33.md). Older release notes below are historical.
+
 > v1.0.32 backlog implementation: fixed three-page batches, persistent service pages, unique three-night ghosts, opening hand/draw separation and full-body battle layout. See [v32 handoff](docs/HANDOFF-backlog-v32.md) for exact behavior, compatibility and validation limits. Start a new run for adventure v5; old saves retain their page rules.
 
 # ผีกินหัว — สามคืนตามหัว

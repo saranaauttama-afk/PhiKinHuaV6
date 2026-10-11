@@ -18,7 +18,6 @@ export const STATUS_ART:Record<string,any>={
  draw_reduction:require('../../../assets/cards/thai-v24/whisper_ear.webp'),
  spell_charging:require('../../../assets/cards/thai-v24/count_beads.webp'),
  trap:require('../../../assets/ui/ritual-knife.png'),
- combo:require('../../../assets/cards/thai-v24/fighter_breath.webp'),
  check:require('../../../assets/cards/thai-v24/divine_protection.webp'),
  rest:require('../../../assets/cards/thai-v24/hell_gate.webp'),
  hp:require('../../../assets/cards/thai-v24/salt_in_wound.webp'),

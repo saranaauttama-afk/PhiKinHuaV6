@@ -11,7 +11,7 @@ export interface PlayerPattern {
   // Card Usage Patterns
   cardTypePreference: { [cardType: string]: number }; // attack, skill, equipment
   costDistribution: { [cost: number]: number }; // 0, 1, 2, 3+
-  playStyle: 'aggressive' | 'defensive' | 'balanced' | 'combo';
+  playStyle: 'aggressive' | 'defensive' | 'balanced';
   
   // Strategic Patterns
   blockingFrequency: number; // 0-1, how often player prioritizes defense
@@ -24,7 +24,7 @@ export interface PlayerPattern {
   
   // Combat Timing
   earlyGameStrategy: 'rush' | 'setup' | 'reactive';
-  midGameStrategy: 'pressure' | 'control' | 'combo';
+  midGameStrategy: 'pressure' | 'control';
   lateGameStrategy: 'burst' | 'sustain' | 'desperation';
   
   // Weaknesses Identified
@@ -53,7 +53,6 @@ export interface AIAdaptation {
   
   // Pattern Counters
   antiRushTactics: boolean;
-  antiComboDisruption: boolean;
   blockCounters: boolean;
   statusCleansing: boolean;
 }
@@ -98,7 +97,6 @@ const makeAdaptation = (): AIAdaptation => ({
   energyBonus: 0,
   spellChargeReduction: 0,
   antiRushTactics: false,
-  antiComboDisruption: false,
   blockCounters: false,
   statusCleansing: false
 });
@@ -230,8 +228,7 @@ function updatePlayStyleClassification(state: GameState): void {
     patternsOf(state).playStyle = 'aggressive';
   } else if (attackRatio < 0.4 && blockFreq > 0.6) {
     patternsOf(state).playStyle = 'defensive';
-  } else if (patternsOf(state).cardDrawPreference > 5) {
-    patternsOf(state).playStyle = 'combo';
+
   } else {
     patternsOf(state).playStyle = 'balanced';
   }
@@ -278,7 +275,6 @@ function resetAdaptation(state: GameState): void {
   adaptationOf(state).energyBonus = 0;
   adaptationOf(state).spellChargeReduction = 0;
   adaptationOf(state).antiRushTactics = false;
-  adaptationOf(state).antiComboDisruption = false;
   adaptationOf(state).blockCounters = false;
   adaptationOf(state).statusCleansing = false;
 }
@@ -300,12 +296,6 @@ function counterPlayStyle(state: GameState): void {
       adaptationOf(state).prioritySpells.push('long_term_damage');
       break;
       
-    case 'combo':
-      // Disrupt combos with forced actions and card destruction
-      adaptationOf(state).antiComboDisruption = true;
-      adaptationOf(state).statusFocus.push('corruption', 'entangle');
-      adaptationOf(state).priorityBehaviors.push('disrupt_hand', 'force_discard');
-      break;
       
     case 'balanced':
       // Vary tactics to keep player guessing

@@ -24,7 +24,7 @@ export type BlessingBehavior = {
 const behaviors: Record<string, BlessingBehavior> = {
   build_guard:{on_card_played:[{when:{block:true},oncePerTurnKey:'guard',effect:s=>{s.player.energy+=1;}}]},
   build_fury:{on_card_played:[{when:{multipleHits:true},oncePerTurnKey:'fury',effect:s=>require('../statusEffectsRuntime').applyStatusEffect('player',s,'strength',99,1)}]},
-  build_hex:{on_card_played:[{when:{enemyStatus:true},oncePerTurnKey:'hex',effect:s=>require('../combat/damage').dealDamage(s,'enemy',3,{kind:'blessing',blessingId:'build_hex'})}]},
+  build_hex:{on_card_played:[{when:{enemyStatus:true},oncePerTurnKey:'hex',effect:s=>require('../combat/damage').dealDamage(s,{from:'player',to:'enemy',raw:3,source:{kind:'blessing',blessingId:'build_hex'}})}]},
   build_kuman:{on_card_played:[{when:{summon:true},oncePerTurnKey:'kuman',effect:s=>{for(const m of s.minions??[])if(m.owner==='player'&&m.duration>0)m.duration=Math.min(4,m.duration+1);}}]},
   build_merit:{on_card_played:[{when:{heal:true},oncePerTurnKey:'merit',effect:s=>{require('../commands').drawUpTo(s,require('../rngState').nextStateRng(s),s.piles.hand.length+1);}}]},
   build_wheel:{on_card_played:[{when:{block:true},oncePerTurnKey:'wheel',effect:s=>{s.player.block+=3;}}]},

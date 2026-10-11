@@ -30,7 +30,6 @@ import { fireChapter } from '../../story/chapters';
 import { EPISODE } from '../../balance/episode';
 import { planEnemyIntent } from '../../combat/intent';
 import { winRun } from './runEnd';
-import { resetCombos } from '../../combat/combos';
 import { resetTraps } from '../../combat/traps';
 import {isThreeNight,ultimateRequired} from '../../campaign/threeNight';
 import {startAdventure,settleAdventureSlot,nextIntersection,revealUltimate,isCriticalOffer,usesThreePageBoard,rememberAdventureService,restoreAdventureService,useIntersectionPage} from '../../map/adventure';
@@ -286,9 +285,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
       initializeEnemyBehaviors(s);
       // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
-      // คอมโบเริ่มนับใหม่ทุกไฟต์ — เดิมไม่มีใครล้าง คอมโบที่ติดไปแล้วจึงติดค้าง
-      // ทั้งรัน และความคืบหน้าค้างจากไฟต์ก่อนทำให้ติดคอมโบด้วยการ์ดใบเดียว
-      resetCombos(s);
       resetTraps(s);
       
       // ตั้ง intent แสดงล่วงหน้า (ไพ่บนสุดของ draw)
@@ -363,9 +359,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
       initializeEnemyBehaviors(s);
       // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
-      // คอมโบเริ่มนับใหม่ทุกไฟต์ — เดิมไม่มีใครล้าง คอมโบที่ติดไปแล้วจึงติดค้าง
-      // ทั้งรัน และความคืบหน้าค้างจากไฟต์ก่อนทำให้ติดคอมโบด้วยการ์ดใบเดียว
-      resetCombos(s);
       resetTraps(s);
       
       (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;

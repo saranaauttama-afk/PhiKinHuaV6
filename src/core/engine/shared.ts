@@ -211,6 +211,11 @@ export function advanceAfterVictory(s: GameState): void {
     s.phase = 'reward';
     return;
   }
+  const ix=s.pages?._activeOfferIndex,offer=ix==null?undefined:s.pages?.current?.offers[ix];
+  if(s.player.handBalanceVersion===33&&s.campaign?.night===1&&!s.player.nightOneHandReward&&offer?.kind==='boss'&&offer.bossType==='final'){
+    s.levelUp={dawnHandChoice:true,choice:{optionA:'draw_per_turn',optionB:'max_hand'},consumed:false};
+    s.phase='levelup';return;
+  }
   s.phase = 'victory';
   s.log.push('Victory!');
 }

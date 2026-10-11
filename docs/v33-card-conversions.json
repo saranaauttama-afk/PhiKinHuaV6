@@ -1,0 +1,47 @@
+{
+  "ancestral_spirits": {
+    "draw": 2,
+    "energyGain": 1,
+    "exhaust": true,
+    "desc": "วิญญาณบรรพบุรุษมาช่วย · จั่ว 2 และได้พลังงาน 1 · ใช้แล้วหายไปจากไฟต์นี้"
+  },
+  "black_magic": {
+    "dmg": 40,
+    "desc": "อาถรรพ์ดำโจมตี 40 · ใช้แล้วหายไปจากไฟต์นี้"
+  },
+  "divine_protection": {
+    "heal": 50,
+    "block": 12,
+    "cleanseDebuffs": true,
+    "desc": "ฟื้นชีวิต 50 ป้องกัน 12 และปัดเป่าสถานะลบ · ใช้แล้วหายไปจากไฟต์นี้"
+  },
+  "royal_medicine": {
+    "heal": 8,
+    "block": 4,
+    "desc": "ยาชาววังฟื้นชีวิต 8 และป้องกัน 4 · ใช้แล้วหายไปจากไฟต์นี้"
+  },
+  "sacred_ritual": {
+    "draw": 3,
+    "desc": "ทำพิธีบวงสรวง · จั่ว 3 · ใช้แล้วหายไปจากไฟต์นี้"
+  },
+  "ghost_possession": {
+    "energyGain": 1,
+    "desc": "ทรงผีเข้าร่าง · จั่ว 2 และได้พลังงาน 1"
+  },
+  "bell_sound": {
+    "statusEffect": {
+      "target": "enemy",
+      "effect": "weakness",
+      "duration": 1,
+      "value": 1
+    },
+    "desc": "เสียงระฆัง · ป้องกัน 6 และทำให้ผีอ่อนแอ 1 เทิร์น"
+  },
+  "holy_powder": {
+    "desc": "โรยผงเจ้าพ่อ · ป้องกัน 4"
+  },
+  "soul_drain": {
+    "heal": 5,
+    "desc": "ดูดวิญญาณ · โจมตี 5 และฟื้นชีวิต 5"
+  }
+}

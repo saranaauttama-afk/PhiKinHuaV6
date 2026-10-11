@@ -284,7 +284,7 @@ export function qaClearAllMinions(state: GameState, cmd: Command & { type: 'QA_C
   return { state, rng };
 }
 
-// ===== Phase 4 Debug Commands: Adaptive AI & Combos =====
+// ===== Phase 4 Debug Commands: Adaptive AI =====
 
 export function qaDebugAdaptiveAI(state: GameState, cmd: Command & { type: 'QA_DebugAdaptiveAI' }, rng: RNG) {
   const { debugAdaptiveAI } = require('../../adaptiveAI');
@@ -297,38 +297,6 @@ export function qaResetAILearning(state: GameState, cmd: Command & { type: 'QA_R
   const { resetAILearning } = require('../../adaptiveAI');
   resetAILearning(state);
   state.log.push('🔄 AI learning patterns reset');
-  return { state, rng };
-}
-
-export function qaDebugCombos(state: GameState, cmd: Command & { type: 'QA_DebugCombos' }, rng: RNG) {
-  state.log.push(`คอมโบ: ${JSON.stringify(state.combo ?? {})}`);
-  return { state, rng };
-}
-
-export function qaTriggerCombo(state: GameState, cmd: Command & { type: 'QA_TriggerCombo' }, rng: RNG) {
-  const { COMBOS } = require('../../combat/combos');
-  const allCombos = COMBOS;
-  const combo = allCombos.find((c: any) => c.id === cmd.comboId);
-  
-  if (!combo) {
-    state.log.push(`❌ Unknown combo: ${cmd.comboId}`);
-    state.log.push(`Available combos: ${allCombos.map((c: any) => c.id).join(', ')}`);
-    return { state, rng };
-  }
-
-  // QA: ยัดการ์ดที่คอมโบต้องการเข้าไปในความคืบหน้าให้ครบทีเดียว
-  const { onCardPlayed } = require('../../combat/combos');
-  for (const id of combo.requiredCards ?? []) {
-    onCardPlayed(state, { id, name: id, type: 'skill', cost: 0, tags: [] }, combo.classTag);
-  }
-  state.log.push(`บังคับติดคอมโบ ${combo.name}`);
-  return { state, rng };
-}
-
-export function qaClearCombos(state: GameState, cmd: Command & { type: 'QA_ClearCombos' }, rng: RNG) {
-  const { resetCombos } = require('../../combat/combos');
-  resetCombos(state);
-  state.log.push('🧹 All combo progress cleared');
   return { state, rng };
 }
 

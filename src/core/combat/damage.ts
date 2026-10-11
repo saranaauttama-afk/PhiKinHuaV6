@@ -27,7 +27,6 @@ export type Side = 'player' | 'enemy';
 
 export type DamageSource =
   | { kind: 'card'; cardId: string }
-  | { kind: 'combo'; comboId: string }
   | { kind: 'status'; effectId: string }
   | { kind: 'minion'; minionId: string; ignoresBlock?: boolean }
   | { kind: 'equipment'; equipmentId: string }
@@ -37,8 +36,7 @@ export type DamageSource =
 /**
  * กฎของดาเมจแต่ละชนิด — ที่มาของดาเมจเป็นตัวกำหนดกฎเอง ไม่ต้องส่ง flag เพิ่ม
  *
- * - card / combo: ดาเมจต่อสู้เต็มรูปแบบ ผ่านทุกอย่าง
- *   (combo เกิดจากการเล่นการ์ดของผู้เล่น = พลังของผู้เล่น จึงคิดเหมือนการ์ด)
+ * - card: ดาเมจต่อสู้เต็มรูปแบบ ผ่านทุกอย่าง
  *
  * - status (poison ฯลฯ): ทะลุ block และไม่โดน modifier ใดๆ
  *   block คือการปัดป้องหมัดที่กำลังมา แต่พิษอยู่ในตัวแล้ว — เป็นธรรมเนียมของแนวนี้
@@ -59,7 +57,6 @@ type DamageRules = {
 function rulesFor(source: DamageSource): DamageRules {
   switch (source.kind) {
     case 'card':
-    case 'combo':
       return { useBlock: true, attackerMods: true, defenderMods: true };
     case 'minion':
       return { useBlock: !source.ignoresBlock, attackerMods: false, defenderMods: true };
@@ -163,7 +160,7 @@ export function dealDamage(
   const rules = rulesFor(args.source);
   let modified = computeModifiedDamage(state, { from, to, raw, source: args.source });
 
-  const isAttack=sourceKind==='card'||sourceKind==='combo'||sourceKind==='minion';
+  const isAttack=sourceKind==='card'||sourceKind==='minion';
   const dodge=targetState.statusEffects?.find(e=>e.id==='dodge');
   if(isAttack&&modified>0&&dodge){modified=0;dodge.stacks=(dodge.stacks??1)-1;if(dodge.stacks<=0)targetState.statusEffects=targetState.statusEffects!.filter(e=>e!==dodge);}
   // 4) block ดูดซับ (ดาเมจบางชนิดทะลุ block — ดู rulesFor)

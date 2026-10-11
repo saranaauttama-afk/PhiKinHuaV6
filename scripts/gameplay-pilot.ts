@@ -1,10 +1,10 @@
 /** Same seed/route/preparation for both policies; tactical decisions use public board only. */
+import {requiredDiscards} from '../src/core/cards/hand';
 import {baseNewState} from '../src/core/commands';
 import {applyCommand} from '../src/core/reducer';
 import {makeRng,int} from '../src/core/rng';
 import {effectiveCost,withConditional,conditionMet} from '../src/core/cards/mechanics';
 import {canPlayAttackCards} from '../src/core/statusEffectsRuntime';
-import {combosForClass} from '../src/core/combat/combos';
 import type {ClassId} from '../src/core/classes';
 import type {GameState,Command,CardData} from '../src/core/types';
 
@@ -34,17 +34,13 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
     if(cond.when.kind==='enemy_has_status'&&c.statusEffect?.target==='enemy'&&c.statusEffect.effect===cond.when.statusId)v+=((cond.bonus.dmg??0)+(cond.bonus.block??0)+(cond.bonus.draw??0)*2)*.8;
    }
   }
-  for(const combo of combosForClass(s.classId??'shaman').filter(x=>x.ordered&&!s.combo?.done.includes(x.id))){
-   const p=s.combo?.progress.find(x=>x.comboId===combo.id)?.cardsPlayed??[];
-   if(combo.requiredCards?.[p.length]===card.id)v+=p.length?4:1;
-  }
   return v/Math.max(1,effectiveCost(s,card));
  };
  return playable.map(({c,i})=>({i,v:score(c)})).sort((a,b)=>b.v-a.v||a.i-b.i)[0].i;
 }
 
 export function simulateChapter(seed:string,cls:ClassId,tactical:boolean,prepare=true){
- let state=baseNewState(seed),rng=makeRng(seed),turns=0,enemyCards=0,enemyTurns=0,combos=0;
+ let state=baseNewState(seed),rng=makeRng(seed),turns=0,enemyCards=0,enemyTurns=0;
  const go=(cmd:Command)=>{const result=applyCommand(state,cmd,rng);state=result.state;rng=result.rng;};
  go({type:'NewRun',seed,classId:cls,runMode:'episode'});go({type:'SkipChapter'});go({type:'ChooseStarterBlessing',index:0});
  const route=int(makeRng(seed),0,3).value;
@@ -53,10 +49,10 @@ export function simulateChapter(seed:string,cls:ClassId,tactical:boolean,prepare
   for(let t=0;state.phase==='combat'&&t<35;t++){
    for(let play=0;state.phase==='combat'&&play<24;play++){
     const i=choosePilotCard(state,tactical,`${seed}:${fight}:${t}:${play}`);if(i<0)break;
-    const old=state.combo?.done.length??0;go({type:'PlayCard',index:i});combos+=(state.combo?.done.length??0)-old;
+    go({type:'PlayCard',index:i});
    }
    if(state.phase!=='combat')break;
-   while(state.piles.hand.length>state.player.maxHandSize){
+   while(requiredDiscards(state)>0){
     // Both policies use the same discard rule, preserving known setup pieces.
     const ranked=state.piles.hand.map((c,i)=>({i,v:(c.dmg??0)+(c.block??0)+(c.statusEffect?8:0)+(c.conditional?8:0)})).sort((a,b)=>a.v-b.v);
     go({type:'DiscardCard',index:ranked[0].i});
@@ -77,14 +73,14 @@ export function simulateChapter(seed:string,cls:ClassId,tactical:boolean,prepare
    go({type:'Proceed'});
   }
  }
- return {won:!!state.runSummary?.won,hp:state.player.hp,turns,enemyCards,enemyTurns,combos,fights:state.fightCount??0};
+ return {won:!!state.runSummary?.won,hp:state.player.hp,turns,enemyCards,enemyTurns,fights:state.fightCount??0};
 }
 if(process.argv.includes('--report')){
  const savedLog=console.log;console.log=()=>{};
  const rows=[];
  for(const cls of ['warrior','shaman','nun','medium'] as const)for(const tactical of [false,true]){
   const runs=Array.from({length:40},(_,i)=>simulateChapter(`${process.env.PILOT_SEED_PREFIX??'accept'}-${cls}-${i}`,cls,tactical));
-  rows.push({class:cls,policy:tactical?'public-board':'random-affordable',wins:runs.filter(r=>r.won).length,runs:runs.length,meanHp:+(runs.reduce((a,r)=>a+r.hp,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((a,r)=>a+r.turns,0)/runs.length).toFixed(1),cardsPerEnemyTurn:+(runs.reduce((a,r)=>a+r.enemyCards,0)/Math.max(1,runs.reduce((a,r)=>a+r.enemyTurns,0))).toFixed(2),meanCombos:+(runs.reduce((a,r)=>a+r.combos,0)/runs.length).toFixed(2)});
+  rows.push({class:cls,policy:tactical?'public-board':'random-affordable',wins:runs.filter(r=>r.won).length,runs:runs.length,meanHp:+(runs.reduce((a,r)=>a+r.hp,0)/runs.length).toFixed(1),meanTurns:+(runs.reduce((a,r)=>a+r.turns,0)/runs.length).toFixed(1),cardsPerEnemyTurn:+(runs.reduce((a,r)=>a+r.enemyCards,0)/Math.max(1,runs.reduce((a,r)=>a+r.enemyTurns,0))).toFixed(2)});
  }
  savedLog(JSON.stringify(rows,null,2));
 }

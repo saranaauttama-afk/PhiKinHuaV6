@@ -94,10 +94,13 @@ describe('สูตรปลุกเสก', () => {
     }
   });
 
-  it('ใบ exhaust ในเกมไม่มีใบไหนมีตัวเลข — สูตรจึงลดค่าร่ายให้ทุกใบ', () => {
+  it('exhaust cards retain their one-fight limit when numeric and utility effects are upgraded', () => {
     for (const c of CARDS.filter(c => c.exhaust)) {
       const up = upgradeCard(c);
-      expect(up.cost, `${c.id}`).toBe(Math.max(0, c.cost - 1));
+      expect(up.exhaust,c.id).toBe(true);
+      if(c.dmg!==undefined)expect(up.dmg,c.id).toBeGreaterThan(c.dmg);
+      else if(c.block!==undefined)expect(up.block,c.id).toBeGreaterThan(c.block);
+      else expect(up.cost,c.id).toBe(Math.max(0,c.cost-1));
     }
   });
 });

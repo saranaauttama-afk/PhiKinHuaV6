@@ -297,5 +297,5 @@ export const MINION_USAGE_TIPS = {
   kuman_spirit: "เหมาะกับ build ที่ต้องการ sustain เพราะรักษาต่อเนื่อง",
   poison_spirit: "เหมาะกับการต่อสู้กับ enemy ที่ HP สูง เพราะ poison จะสะสมความเสียหาย",
   ancient_warrior_spirit: "สหายครบสูตร มีทั้งโจมตีและป้องกัน เหมาะกับทุกสถานการณ์",
-  spirit_snail: "เหมาะกับ deck ที่ต้องการพลังงานเยอะ เช่น combo deck"
+  spirit_snail: "เหมาะกับ deck ที่ต้องการพลังงานเยอะ เช่น สำรับที่จั่วและใช้การ์ดหลายใบ"
 } as const;

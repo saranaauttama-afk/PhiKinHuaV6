@@ -1,7 +1,7 @@
 import React from 'react';
 import {paper} from '../theme';
 import Svg, { Path, Circle } from 'react-native-svg';
-export type InkSymbol = 'thorns'|'dodge'|'hp'|'energy'|'block'|'gold'|'deck'|'blessing'|'hand'|'attack'|'rest'|'house'|'lantern'|'walk'|'check'|'settings'|'fear'|'poison'|'curse'|'corruption'|'entangle'|'weakness'|'vulnerable'|'draw_reduction'|'regeneration'|'strength'|'block_next'|'energy_boost'|'spell_charging'|'combo'|'trap';
+export type InkSymbol = 'thorns'|'dodge'|'hp'|'energy'|'block'|'gold'|'deck'|'blessing'|'hand'|'attack'|'rest'|'house'|'lantern'|'walk'|'check'|'settings'|'fear'|'poison'|'curse'|'corruption'|'entangle'|'weakness'|'vulnerable'|'draw_reduction'|'regeneration'|'strength'|'block_next'|'energy_boost'|'spell_charging'|'trap';
 const paths: Record<InkSymbol,string> = {
  thorns:'M3 21L8 12L9 17L14 4L15 11L21 2L18 17L12 15L8 22Z',
  dodge:'M2 12Q12 1 22 12Q12 23 2 12 M4 22L20 2',
@@ -18,7 +18,6 @@ const paths: Record<InkSymbol,string> = {
  block_next:'M12 2L21 6V12Q20 19 12 23Q4 19 3 12V6Z M7 12H17 M12 7V17',
  energy_boost:'M14 2L4 14H11L9 23L21 10H14Z M3 3V8 M1 5H6',
  spell_charging:'M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z M12 7V17',
- combo:'M3 8Q6 2 10 7L16 13Q21 18 17 21Q14 24 10 19L4 13Q0 9 3 8 M8 14L16 6 M13 4L20 11',
  trap:'M3 21L8 4L12 17L16 4L21 21 M4 17H20',
  hp:'M12 21C8 17 2 13 2 7C2 1 10 1 12 6C14 1 22 1 22 7C22 13 16 17 12 21Z',
  energy:'M14 2L4 14H11L9 23L21 10H14Z',

@@ -10,8 +10,6 @@ import {getCardPlayedFns,resetBlessingTurnFlags} from '../src/core/blessingRunti
 import {cardById} from '../src/core/pack';
 import {captureRewardReceipt} from '../src/core/rewardReceipt';
 import {battleGeometry,handGeometry} from '../app/battleGeometry';
-import {activePendingCombos,comboTurnsRemaining} from '../app/comboPresentation';
-import {COMBO_BY_ID} from '../src/core/combat/combos';
 import type {Command,GameState} from '../src/core/types';
 function driver(seed='v32-shop'){
  let s=baseNewState(seed),r=makeRng(seed);const go=(c:Command)=>{({state:s,rng:r}=applyCommand(s,c,r));return s;};
@@ -51,8 +49,8 @@ describe('v32 reported regressions',()=>{
  });
  it('v4 saves retain their previous lifecycle and remain playable across night transitions',()=>{const d=driver();d.s.pages!.adventure!.version=4;startAdventure(d.s,d.r);expect(d.s.pages!.adventure!.version).toBe(4);expect(validAdventure(d.s)).toBe(true);expect(fromSave(toSave(d.s,d.r)).pages!.adventure!.version).toBe(4);});
  it('opening draw is independent from energy and cap; turn draw only adds the requested amount',()=>{
-  const d=driver();d.s.player.maxEnergy=8;d.go({type:'ChooseOffer',index:0});expect(d.s.piles.hand).toHaveLength(2);expect(d.s.player.maxHandSize).toBe(6);
-  d.s.piles.hand=[];d.s.piles.draw=d.s.masterDeck.map(c=>({...c}));startPlayerTurn(d.s,d.r);expect(d.s.piles.hand).toHaveLength(3);
+  const d=driver();d.s.player.maxEnergy=8;d.go({type:'ChooseOffer',index:0});expect(d.s.piles.hand).toHaveLength(2);expect(d.s.player.maxHandSize).toBe(2);
+  d.s.piles.hand=[];d.s.piles.draw=d.s.masterDeck.map(c=>({...c}));startPlayerTurn(d.s,d.r);expect(d.s.piles.hand).toHaveLength(2);
  });
  it('receipts use actual granted copies, preserve upgrades/losses and never mutate inventory',()=>{
   const before=driver().s,after=structuredClone(before),card={...before.masterDeck[0],upgradeLevel:2};after.masterDeck.push(card);after.blessings.push(BUILD_KITS[0].blessing);after.masterDeck.shift();const inventory=structuredClone(after.masterDeck);
@@ -65,10 +63,6 @@ describe('v32 reported regressions',()=>{
  it('broad build triggers are once per turn and unrelated cards never consume their allowance',()=>{
   const d=driver();grantBuildKit(d.s,'guard');const b=d.s.blessings.find(b=>b.id==='build_guard')!,card={id:'any-block',name:'test',type:'skill' as const,cost:1,block:2};const energy=d.s.player.energy;
   expect(getCardPlayedFns(b,{...card,block:0})).toEqual([]);for(let i=0;i<3;i++)for(const fn of getCardPlayedFns(b,card))fn({state:d.s},card);expect(d.s.player.energy).toBe(energy+1);resetBlessingTurnFlags(d.s);for(const fn of getCardPlayedFns(b,card))fn({state:d.s},card);expect(d.s.player.energy).toBe(energy+2);
- });
- it('pending combo badge counts active attempts with the engine round deadline',()=>{
-  const s=driver().s,c=Object.values(COMBO_BY_ID).find(c=>c.maxTurns<999)!;s.turn=10;s.combo={progress:[{comboId:c.id,cardsPlayed:['a'],turnStarted:10}],done:[]} as any;
-  expect(comboTurnsRemaining(s,s.combo!.progress[0])).toBe(c.maxTurns);expect(activePendingCombos(s)).toHaveLength(1);s.turn+=c.maxTurns;expect(activePendingCombos(s)).toHaveLength(0);
  });
  for(const [w,h] of [[360,640],[393,852]])it(`${w}x${h}: six cards, full-body stage and reserved notice do not collide`,()=>{const g=battleGeometry(w,h,24,24),hand=handGeometry(w,6);expect(hand.overflow).toBe(false);expect(hand.span+hand.padding*2).toBeLessThanOrEqual(w);expect(g.monsterTop+g.monsterSize).toBeLessThan(g.hudTop);expect(g.noticeTop).toBeGreaterThanOrEqual(g.hudTop+g.enemyHudHeight+g.enemyExtrasHeight);expect(g.noticeTop+g.noticeHeight).toBeLessThan(g.handTop);});
 });

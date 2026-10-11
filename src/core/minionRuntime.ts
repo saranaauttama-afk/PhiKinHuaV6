@@ -210,7 +210,7 @@ function processMinionAbility(
         // Draw cards using existing system
         const { drawUpTo } = require('./commands');
         const currentHand = state.piles?.hand?.length || 0;
-        const targetHand = Math.min(currentHand + ability.value, state.player.maxHandSize || 7);
+        const targetHand = currentHand + ability.value;
         
         if (targetHand > currentHand && state.piles) {
           // เดิมเป็น `{ seed: Math.random() }` ซึ่งผิดรูปแบบของ RNG จริง (`{ s: number }`)

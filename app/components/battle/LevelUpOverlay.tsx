@@ -27,7 +27,8 @@ import {levelUpConfirmLabel} from '../../levelUpPresentation';
 const BUCKET_LABEL: Record<string, { title: string; detail: string }> = {
   max_hp:         { title: 'พลังชีวิต',      detail: 'ชีวิตสูงสุด +8 · ฟื้นทันที 8' },
   max_energy:     { title: 'พลังงาน',        detail: 'พลังงานต่อเทิร์น +1' },
-  max_hand:       { title: 'จั่วเพิ่ม',        detail: 'จั่วการ์ดได้มากขึ้น 1 ใบต่อเทิร์น' },
+  max_hand:       { title: 'ขนาดมือ',        detail: 'เก็บการ์ดข้ามเทิร์นเพิ่ม 1 ใบ · จำนวนจั่วเท่าเดิม' },
+  draw_per_turn:  { title: 'จั่วเพิ่ม',        detail: 'จั่วเพิ่ม 1 ใบต่อเทิร์นและตอนเปิดศึก · ขนาดมือเท่าเดิม' },
   blessing:       { title: 'พร',             detail: 'รับพรติดตัว 1 อย่าง' },
   remove:         { title: 'สละการ์ด',       detail: 'ถอดการ์ดออกจากสำรับ' },
   upgrade:        { title: 'ปลุกเสก',        detail: 'อัปเกรดการ์ดในสำรับ' },
@@ -95,7 +96,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
   return (
     <PostBattleSurface mat>
       <RitualSurface kind="quietSlate" style={{paddingVertical:18,marginBottom:10}}>
-        <Text style={{color:palette.moon,fontSize:24,textAlign:'center',fontFamily:font.heading}}>เลเวล {playerLevel}</Text>
+        <Text style={{color:palette.moon,fontSize:24,textAlign:'center',fontFamily:font.heading}}>{state.levelUp?.dawnHandChoice?'ผ่านคืนแรก · เลือกพัฒนาวิชา':`เลเวล ${playerLevel}`}</Text>
       </RitualSurface>
       <Text style={{color:palette.text,fontSize:14,fontFamily:font.ui,textAlign:'center',marginBottom:20}}>
         {pending ? bucketOf(pending)==='upgrade'?'เลือกการ์ดที่จะปลุกเสกฟรี 1 ใบ':bucketOf(pending)==='remove'?'เลือกการ์ดที่จะสละ 1 ใบ':'เลือกพรหนึ่งอย่าง' : 'เลือกสิ่งที่จะรับเมื่อเลเวลเพิ่ม'}
@@ -110,7 +111,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
               :bucket==='max_hp'?require('../../../assets/ui/blessing-herb-object.png')
               :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
               :bucket==='upgrade'?RITUAL_OBJECTS.upgrade:bucket==='remove'?RITUAL_OBJECTS.remove
-              :bucket==='max_hand'?require('../../../assets/images/players/iMaxHand.png'):require('../../../assets/ui/ritual-jar.png');
+              :(bucket==='max_hand'||bucket==='draw_per_turn')?require('../../../assets/images/players/iMaxHand.png'):require('../../../assets/ui/ritual-jar.png');
             const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.some(c=>canRemoveCard(c,deck.length)):false;
             return <Pressable disabled={unavailable} key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked,disabled:unavailable}}
               onPress={()=>setSelected(opt)} style={{flex:1}}>
@@ -148,7 +149,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
         </View>
       )}
 
-      <QuietButton label="ข้ามไปก่อน" onPress={onSkip} style={{marginTop:18}}/>
+      {!state.levelUp?.dawnHandChoice&&<QuietButton label="ข้ามไปก่อน" onPress={onSkip} style={{marginTop:18}}/>}
     </PostBattleSurface>
   );
 }

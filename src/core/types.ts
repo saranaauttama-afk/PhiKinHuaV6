@@ -136,7 +136,7 @@ export type Phase =
 // หมายเหตุ: เคยมี 'cards' อยู่ในนี้ — การ์ดใหม่ย้ายไปเป็นรางวัลชนะไฟต์แล้ว
 // (ดู `cards/reward.ts`) เลเวลอัปเหลือแต่ของที่ไม่ใช่การ์ด
 export type Bucket =
-  | 'max_hp' | 'max_energy' | 'max_hand'
+  | 'max_hp' | 'max_energy' | 'max_hand' | 'draw_per_turn'
   | 'blessing' | 'remove' | 'upgrade' | 'gold'
   | 'equipment_slot' | 'gold_skip';
 
@@ -145,7 +145,7 @@ export type PlayerState = {
   level: number; exp: number; expToNext: number;
   maxEnergy: number; maxHandSize: number;
   /** New runs separate opening draw, per-turn draw and the retained-hand cap. */
-  openingDraw?:number;drawPerTurn?:number;
+  openingDraw?:number;drawPerTurn?:number;handBalanceVersion?:33;nightOneHandReward?:'draw'|'hand';
   // Status Effects System
   statusEffects?: StatusEffect[];
 };
@@ -233,7 +233,7 @@ export type CombatEvent = (
       blocked: number;
       hpLoss: number;
       died: boolean;
-      sourceKind: 'card' | 'combo' | 'status' | 'minion' | 'equipment' | 'event' | 'blessing';
+      sourceKind: 'card' | 'status' | 'minion' | 'equipment' | 'event' | 'blessing';
     }
   | { t: 'BlockGained'; target: CombatEventTarget; amount: number }
   | { t: 'Healed'; target: CombatEventTarget; amount: number }
@@ -333,14 +333,6 @@ export type GameState = {
    */
   minions?: import('./types_extended').MinionData[];
 
-  /**
-   * สถานะคอมโบของไฟต์นี้ — ความคืบหน้า คอมโบที่ติดไปแล้ว และผลที่ยังค้างอยู่
-   *
-   * เดิมกระจายอยู่สองที่ที่แย่พอกัน: อาร์เรย์ระดับโมดูลใน `cardComboSystem.ts`
-   * กับฟิลด์ที่แปะบน `(state as any)` อีกสามตัว — ไม่มีไทป์ ไม่ถูกเซฟ
-   * และค้างข้ามไฟต์
-   */
-  combo?: import('./combat/combos').ComboState;
 
   /** กับดักที่ตั้งไว้และยังไม่ทำงาน — เป็นสเตตของไฟต์ ไม่ถูกเก็บลงเซฟ */
   traps?: import('./combat/traps').ArmedTrap[];
@@ -423,6 +415,7 @@ export type GameState = {
   equipment?: any[]; // Equipment inventory (unequipped items from shops)
   // Level up
   levelUp?: {
+    dawnHandChoice?:boolean;
     bucket?: Bucket; // Legacy single bucket system
     choice?: {
       optionA: Bucket;
@@ -558,12 +551,9 @@ export type Command =
   | { type: 'QA_SummonPlayerMinion'; minionId: string }
   | { type: 'QA_SummonEnemyMinion'; minionId: string }
   | { type: 'QA_ClearAllMinions' }
-  // Phase 4 Debug Commands - Adaptive AI & Combos
+  // Phase 4 Debug Commands - Adaptive AI
   | { type: 'QA_DebugAdaptiveAI' }
   | { type: 'QA_ResetAILearning' }
-  | { type: 'QA_DebugCombos' }
-  | { type: 'QA_TriggerCombo'; comboId: string }
-  | { type: 'QA_ClearCombos' }
   | { type: 'QA_LevelUp' };
 
 export type TurnCtx = { state: GameState };

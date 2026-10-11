@@ -5,9 +5,8 @@ import {nightFightTotal} from '../src/core/campaign/bosses';
 import {battleScene} from './scenePresentation';
 import BattleBackdrop from './components/battle/BattleBackdrop';
 import {useBattleLayout} from './components/battle/battleLayout';
-import {activePendingCombos} from './comboPresentation';
 import React from 'react';
-import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler } from 'react-native';
+import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
 import type { CombatEvent, CombatFrame } from '../src/core/types';
@@ -17,8 +16,6 @@ import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea'
 import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
 import BlessingSeals from './components/battle/BlessingSeals';
-import ComboBook from './components/battle/ComboBook';
-import {comboFeedbackText} from './comboPresentation';
 import EnemyHandCard from './components/battle/EnemyHandCard';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
@@ -31,7 +28,6 @@ import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import CardRewardOverlay from './components/battle/CardRewardOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
 import StatusStrip, {type BattleBadge} from './components/battle/StatusStrip';
-import {COMBO_BY_ID,comboTarget} from '../src/core/combat/combos';
 import MinionRow from './components/battle/MinionRow';
 import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
@@ -44,6 +40,8 @@ import StartPage from './components/StartPage';
 import RitualSurface from './components/RitualSurface';
 import {QuietButton} from './components/QuietChrome';
 import {baseNewState} from '../src/core/commands';
+
+import {requiredDiscards} from '../src/core/cards/hand';
 
 type Phase = 'player' | 'discard' | 'enemy';
 
@@ -82,22 +80,6 @@ export default function BattlePage() {
   const [presentation, setPresentation] = React.useState<CombatFrame | null>(null);
   const player = presentation?.player ?? gameState.player;
   const enemy = presentation?.enemy ?? gameState.enemy;
-  const [comboQueue,setComboQueue]=React.useState<string[]>([]);
-  const comboNotice=comboQueue[0]??'';
-  const [comboOpen,setComboOpen]=React.useState(false);
-  const comboFight=React.useRef(gameState.fightCount??0);
-  const seenFeedback=React.useRef(gameState.combo?.feedbackSeq??0);
-  React.useEffect(()=>{
-    if(comboFight.current!==(gameState.fightCount??0)){comboFight.current=gameState.fightCount??0;seenFeedback.current=0;setComboQueue([]);}
-    const feedback=gameState.combo?.feedback??[];const seq=gameState.combo?.feedbackSeq??0;
-    if(seq<seenFeedback.current)seenFeedback.current=0;
-    const fresh=feedback.filter(f=>f.seq>seenFeedback.current);seenFeedback.current=seq;
-    if(!fresh.length)return;
-    const completed=fresh.filter(f=>f.kind==='success');
-    if(!completed.length)return;
-    setComboQueue(q=>[...q,...completed.map(f=>COMBO_BY_ID[f.comboId]?.name??'').filter(Boolean)]);
-  },[gameState.combo?.feedbackSeq,gameState.fightCount]);
-  React.useEffect(()=>{if(!comboNotice)return;const timer=setTimeout(()=>setComboQueue(q=>q.slice(1)),2400);return()=>clearTimeout(timer);},[comboQueue]);
   const bootstrapped = React.useRef(false);
   const turnLocked = React.useRef(false);
 
@@ -162,13 +144,12 @@ export default function BattlePage() {
       if(mainMenu)return false;
       if(settingsOpen){setSettingsOpen(false);return true;}
       if(openPile){setOpenPile(null);return true;}
-      if(comboOpen){setComboOpen(false);return true;}
       if(blessingsOpen){setBlessingsOpen(false);return true;}
       if(paused){setPaused(false);return true;}
       openPause();return true;
     });
     return ()=>back.remove();
-  },[mainMenu,settingsOpen,openPile,blessingsOpen,paused,comboOpen]);
+  },[mainMenu,settingsOpen,openPile,blessingsOpen,paused]);
   React.useEffect(()=>navigation.addListener('beforeRemove',(e)=>{
     if(allowLeave.current || useGame.getState().state.phase!=='combat')return;
     e.preventDefault();openPause();
@@ -226,7 +207,7 @@ export default function BattlePage() {
 
   const handleEndTurn = () => {
     if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
-    if (playerHand.length > player.maxHandSize) {
+    if (requiredDiscards(gameState) > 0) {
       setPhase('discard');
       return;
     }
@@ -237,6 +218,7 @@ export default function BattlePage() {
     [...discardedIndices].sort((a, b) => b - a).forEach(idx => {
       dispatch({ type: 'DiscardCard', index: idx });
     });
+    if(requiredDiscards(useGame.getState().state)>0)return;
     startEnemyTurn();
   };
 
@@ -327,7 +309,6 @@ export default function BattlePage() {
 
   const badges:BattleBadge[]=[
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${t.effects.map(e=>e.desc).join(' · ')}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
-    {id:'combo:book',name:'ตำราคอมโบ',symbol:'combo',neutral:true,count:activePendingCombos(gameState).length?String(activePendingCombos(gameState).length):undefined,detail:'ดูลำดับการ์ด ผลคอมโบ และจำนวนตาที่เหลือ',onPress:()=>setComboOpen(true)},
   ];
   const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
@@ -350,7 +331,6 @@ export default function BattlePage() {
           </Pressable>
         </View>
 
-        {!!comboNotice&&<View testID="combo-completed-notice" pointerEvents="none" style={{position:'absolute',top:battleLayout.noticeTop,height:battleLayout.noticeHeight,left:20,right:20,zIndex:layer.overlay,alignItems:'center',justifyContent:'center'}}><Text numberOfLines={1} style={{fontFamily:font.heading,color:palette.moon,fontSize:13,lineHeight:21,textAlign:'center',textShadowColor:'#000',textShadowRadius:4}}>{comboNotice}</Text></View>}
 
         {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
             ก่อนอนิเมชั่นเริ่มเล่น สิ่งเดียวที่ถูกข้ามคือภาพ */}
@@ -452,7 +432,6 @@ export default function BattlePage() {
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />}
 
-        <ComboBook state={gameState} visible={comboOpen} onClose={()=>setComboOpen(false)}/>
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
           helpers={!victoryIntro&&<MinionRow compact owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
@@ -538,6 +517,7 @@ export default function BattlePage() {
         {!timeline.isPlaying && !presentation && gameState.phase === 'defeat' && (
           <DefeatOverlay onHome={() => router.replace('/')} />
         )}
+        {Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1'&&<Text testID="v33-battle-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({hand:gameState.piles.hand.map(c=>c.id),discard:gameState.piles.discard.length,normalHand:gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length,cap:gameState.player.maxHandSize,draw:gameState.player.drawPerTurn,turn:gameState.turn,phase:gameState.phase})}</Text>}
         <Modal visible={paused} transparent animationType="fade" onRequestClose={()=>settingsOpen?setSettingsOpen(false):setPaused(false)}>
           <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:24,justifyContent:'center'}}>
             <RitualSurface kind="quietSlate" style={{padding:24,gap:14}}>

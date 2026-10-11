@@ -20,7 +20,7 @@ export default function RunCompleteScreen({state,onNewRun,onMainMenu,onJournal}:
     <Row label="ศึกที่ผ่าน" value={s.fights+' / '+(state.pages?.adventure?campaignFightTotal(state):state.campaign?nightFightTotal(state.campaign.night):state.runMode==='episode'?3:15)}/>
     <Row label="เลเวล · เบี้ยที่เหลือ" value={s.level+' · '+s.gold}/>
     <Row label="สำรับตอนจบ" value={state.masterDeck.length+' ใบ'}/>
-    {s.metrics&&<><Row label="ใช้การ์ดทั้งหมด" value={s.metrics.cardsPlayed+' ครั้ง'}/><Row label="เทิร์น · คอมโบ" value={s.metrics.turns+' · '+s.metrics.combos}/><Row label="เพิ่ม · สละ · ปลุกเสก" value={s.metrics.added+' · '+s.metrics.removed+' · '+s.metrics.upgraded}/></>}
+    {s.metrics&&<><Row label="ใช้การ์ดทั้งหมด" value={s.metrics.cardsPlayed+' ครั้ง'}/><Row label="เทิร์น" value={s.metrics.turns+' ครั้ง'}/><Row label="เพิ่ม · สละ · ปลุกเสก" value={s.metrics.added+' · '+s.metrics.removed+' · '+s.metrics.upgraded}/></>}
     {!state.campaign&&state.runMode!=='episode'&&<Row label="ศึกลับ" value={s.beatSecretBoss?'ชนะแล้ว':'ยังไม่ปลดล็อก'}/>}
    </View>
   </RitualSurface>
