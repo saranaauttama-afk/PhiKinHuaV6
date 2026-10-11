@@ -1,0 +1,50 @@
+name: Paper diorama same-APK native recheck
+on:
+  push:
+    branches: ['work/paper-diorama-prototype']
+    paths: ['scripts/android-paper-smoke.py', '.github/workflows/paper-diorama-native-recheck.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native:
+    if: contains(github.event.head_commit.message, '[qa-only]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Confirm application source matches the signed APK
+        run: |
+          test -z "$(git diff --name-only 46febd7a01035a0614c0c8b4ec68dd82f6574691 HEAD -- app src assets preview package.json package-lock.json app.json babel.config.js metro.config.js)"
+          python -m py_compile scripts/android-paper-smoke.py
+      - run: python -m pip install Pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-Paper-Diorama-Test-APK
+          run-id: 38146525306
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check the exact previously signed APK bytes
+        run: echo '166fa1991a73e8cc1da24a25d9d1e4e050180f9c5e499b27f4ab47ce00777143  PhiKinHua-Paper-Diorama-Test.apk' | sha256sum -c
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: false
+          script: |
+            adb install PhiKinHua-Paper-Diorama-Test.apk
+            python -u scripts/android-paper-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Paper-native-mobile-recheck
+          path: paper-native-audit/
+          retention-days: 14

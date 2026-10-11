@@ -31,3 +31,11 @@ The API 36 native emulator job installs that same APK, visits route and battle a
 - Test APK is an isolated prototype, not a production campaign build or Play Store release. The local battle command path remains unchanged from the approved prototype.
 - Pre-existing unrelated local changes to `assets/encounters/enWell2.png` and `assets/images/bgBlessing.png` are excluded. The remote clean build uses their committed versions.
 - No merge into main, additional scene conversion, artwork regeneration, or gameplay/balance changes.
+
+## Native automation follow-up
+
+The signed APK source commit is `46febd7a01035a0614c0c8b4ec68dd82f6574691`; its SHA-256 is `166fa1991a73e8cc1da24a25d9d1e4e050180f9c5e499b27f4ab47ce00777143`. It installed and passed the first native route/battle/hand check. The first automation run then encountered Android UIAutomator's accessibility-idle timeout during ambient parallax and reused a stale XML dump. No native JS crash or worklet error was recorded.
+
+The QA follow-up changes only the inspection harness/workflows/documentation. It deletes stale hierarchy files and requires a fresh dump and clickable control. Each normal entry runs with OS motion enabled for the full assembly; only after 2.2 seconds does the harness temporarily enable the emulator's OS reduced-motion preference to stop ambient parallax for hierarchy reads. The native assembly video runs with motion enabled. OFF and game reduced-motion screenshots are captured before this temporary OS override and compared with the assembled fixed player HP display. The production application never writes OS settings.
+
+`.github/workflows/paper-diorama-native-recheck.yml` downloads the **same already built APK**, verifies its exact hash and asserts all application source/assets/configuration are unchanged from the build commit. A `[qa-only]` commit skips another APK build. The branch's final QA commit and APK build commit may consequently differ only in verification files; report both for provenance. No second APK is built for this follow-up.
