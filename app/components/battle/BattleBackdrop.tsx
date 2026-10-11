@@ -1,11 +1,12 @@
 import React from 'react';
 import SceneTheater from '../paper/SceneTheater';
+import {paperEnvironment} from '../../../src/visual/paperEnvironments';
 import {Image,ImageSourcePropType,StyleSheet,View} from 'react-native';
 import Svg,{Defs,LinearGradient,RadialGradient,Rect,Stop} from 'react-native-svg';
 import {battleSceneColors} from '../../theme';
 /** Existing geography stays visible; its centre/floor no longer compete with UI. */
 export default function BattleBackdrop({source,children,sceneId,entryKey,ghostId}:{source:ImageSourcePropType;children:React.ReactNode;sceneId?:string;entryKey?:string;ghostId?:string}){
- if(sceneId==='01-village')return <SceneTheater key={entryKey} sceneId={sceneId} entryKey={entryKey??sceneId} ghostId={ghostId}>{children}</SceneTheater>;
+ if(sceneId&&paperEnvironment(sceneId))return <SceneTheater key={entryKey} sceneId={sceneId} entryKey={entryKey??sceneId} ghostId={ghostId}>{children}</SceneTheater>;
  return <View style={{flex:1,backgroundColor:battleSceneColors.base}}>
   <Image accessible={false} source={source} resizeMode="cover" style={[StyleSheet.absoluteFill,{opacity:.76}]}/>
   <View pointerEvents="none" style={StyleSheet.absoluteFill}><Svg width="100%" height="100%"><Defs>

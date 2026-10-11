@@ -43,7 +43,7 @@ function BackLayer({id,source,motion,plane,canopy,onLoad}: {id:Exclude<PaperLaye
  </Animated.View>;
 }
 /** Each original bitmap moves independently; screen UI is a separate sibling. */
-export default function PaperDiorama(motion: Motion) {
+function PaperDiorama(motion: Motion) {
   const seen=React.useRef(new Set<string>());
   const onLoad=React.useCallback((key:string)=>{seen.current.add(key);if(seen.current.size===(motion.showGhost===false?8:9))motion.onReady?.();},[motion.onReady,motion.showGhost]);
   const layout = useBattleLayout(), safe=useSafeAreaInsets(), ghostStyle = useLayer('ghost', motion);
@@ -66,3 +66,5 @@ export default function PaperDiorama(motion: Motion) {
   </View>;
 }
 const styles = StyleSheet.create({plane:{...StyleSheet.absoluteFillObject,width:'100%',height:'100%'}});
+
+export default React.memo(PaperDiorama);

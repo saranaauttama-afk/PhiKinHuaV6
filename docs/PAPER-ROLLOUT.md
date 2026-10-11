@@ -15,3 +15,44 @@ A configurable 4% requested downward shift adjusts the floating character's grou
 Inventory audit: 24 distinct environment images under `assets/scence/journey/thai-v24`: 16 primary locations including the secret throne, and eight rest locations. Episode aliases reuse five of those assets. Menus, character selection, chapter illustrations and reward mats are UI/story artwork outside route/battle geography and will remain unchanged.
 
 Validation: TypeScript and all 930 unit tests passed. Production save-resume/discard/next-turn checks are run at 360×640 and 393×852 before this milestone is pushed.
+
+## Milestone 2 — environment coverage
+
+24/24 registered environments. The village retains the approved layered bitmaps. The other 23 use scene-specific vector contour clips of their existing paintings, a full static original background, stationary ink underlays, independent distant/terrain/foreground prints, depth-specific ink widths and modest cast shadows. The terrain print registers to the local ground plane; the static background and distant print keep the original field of view. No flattened-image zoom, raster regeneration or new village copies.
+
+Grounded/floating placement is chosen independently by ghost ID. The original dangling-foot prototype and marsh lights, flying krahang and krasue float; human-body revenants use ground contact. Configuration remains presentation-only. Legacy full-body route choices and battle art use the same scene ground reference; the current three-page encounter portrait layout is retained.
+
+| ID | Location | Environment | Implementation |
+|---|---|---|---|
+| `01-village` | หมู่บ้านใต้จันทร์ | village | Approved 4-layer village |
+| `02-village-edge` | ท้ายหมู่บ้าน | village | Original painting + 3 independent contour prints |
+| `03-temple-gate` | ประตูวัดร้าง | temple | Original painting + 3 independent contour prints |
+| `04-temple-court` | ลานโบสถ์ร้าง | temple | Original painting + 3 independent contour prints |
+| `05-cremation-ground` | ป่าช้าเก่า | forest | Original painting + 3 independent contour prints |
+| `06-bamboo-forest` | ดงไผ่ไร้เสียง | forest | Original painting + 3 independent contour prints |
+| `07-banyan` | ไทรพันวิญญาณ | forest | Original painting + 3 independent contour prints |
+| `08-stream` | ลำธารเงาดำ | riverside | Original painting + 3 independent contour prints |
+| `09-waterfall` | น้ำตกหุบลับ | riverside | Original painting + 3 independent contour prints |
+| `10-mountain-trail` | ทางเขาหมอก | mountain | Original painting + 3 independent contour prints |
+| `11-mountain-shrine` | ศาลข้างทางเขา | mountain | Original painting + 3 independent contour prints |
+| `12-cave-mouth` | ปากถ้ำฟันหิน | cave | Original painting + 3 independent contour prints |
+| `13-cave-river` | แม่น้ำใต้พิภพ | cave | Original painting + 3 independent contour prints |
+| `14-buried-sanctuary` | สำนักร้างในถ้ำ | cave | Original painting + 3 independent contour prints |
+| `15-otherworld-gate` | ประตูแดนอาถรรพ์ | otherworld | Original painting + 3 independent contour prints |
+| `16-secret-throne` | แดนผีกินหัว | otherworld | Original painting + 3 independent contour prints |
+| `rest-02` | ศาลาพักริมนา | village | Original painting + 3 independent contour prints |
+| `rest-04` | ศาลาข้างวัด | temple | Original painting + 3 independent contour prints |
+| `rest-06` | กระท่อมดงไผ่ | forest | Original painting + 3 independent contour prints |
+| `rest-08` | ศาลาริมน้ำ | riverside | Original painting + 3 independent contour prints |
+| `rest-10` | ศาลาพักทางเขา | mountain | Original painting + 3 independent contour prints |
+| `rest-12` | กระท่อมปากถ้ำ | cave | Original painting + 3 independent contour prints |
+| `rest-14` | แท่นพักในถ้ำ | cave | Original painting + 3 independent contour prints |
+| `rest-15` | ศาลาหน้าแดนอาถรรพ์ | otherworld | Original painting + 3 independent contour prints |
+
+Preserved artwork: all original ghost, card, HUD, blessing, equipment and scene bitmaps. Modified artwork files: **none**. New visual data: authored vector cut contours/scene and character registrations. Menu, class-selection, chapter illustrations and reward mats are preserved and excluded from route/battle geography.
+
+The vector contours represent major paper scenery shapes; they are not a repaint or a newly illustrated set of leaf-by-leaf transparent bitmaps. Original paper relief can reveal deliberate seams where terrain is repositioned; those seams require manual visual approval, especially river/cave layers.
+
+Milestone 2 verification: TypeScript passed; 956 unit tests passed across 52 files; 64 paper browser checks passed (48 scene/viewport route→battle checks, 14 normal-speed representative assembly checks, two reduced-motion/persistence checks), with no browser errors. Grounded/floating placement is tested for all 34 catalogued ghosts in every environment across five viewport sizes and safe-area variants. Production v33 mobile checks (12) and three-night/five-tier UI checks (44) also passed. Static bitmaps are unchanged.
+
+Browser timing is collected under software rendering and includes screenshot overhead: it is not a physical-device FPS guarantee. World prints are memoized and their native transforms request hardware texture caching; Android memory/frame stats are collected in the final APK job.

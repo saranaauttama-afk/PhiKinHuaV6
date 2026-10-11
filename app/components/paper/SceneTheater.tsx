@@ -7,6 +7,8 @@ import {BattleLayoutContext} from '../battle/battleLayout';
 import {useGameSettings} from '../Settings';
 import {usePaperMotion} from './usePaperMotion';
 import PaperDiorama from './PaperDiorama';
+import PaperEnvironment from './PaperEnvironment';
+import PaperActor from './PaperActor';
 import {PAPER_ASSEMBLY_MS,paperHudOpacity} from '../../../src/visual/paperDiorama';
 import {paperDioramaColors as ink,layer} from '../../theme';
 
@@ -18,16 +20,18 @@ export default function SceneTheater({sceneId,entryKey,instant=false,ghostId,chi
  const [size,setSize]=React.useState({width:window.width,height:window.height});
  const layout=React.useMemo(()=>battleGeometry(size.width,size.height,safe.top,safe.bottom),[size,safe.top,safe.bottom]);
  const bypass=instant||!settings.dioramaAnimation||motion.reduced;
- const [assetsReady,setAssetsReady]=React.useState(false),[finished,setFinished]=React.useState(bypass);
- const onReady=React.useCallback(()=>setAssetsReady(true),[]);
- const assembly=useSharedValue(bypass?PAPER_ASSEMBLY_MS:0),x=useSharedValue(0),y=useSharedValue(0),generation=React.useRef(0);
+ const [environmentReady,setEnvironmentReady]=React.useState(false),[actorReady,setActorReady]=React.useState(!ghostId),[finished,setFinished]=React.useState(bypass);
+ const onReady=React.useCallback(()=>setEnvironmentReady(true),[]);
+ const onActorReady=React.useCallback(()=>setActorReady(true),[]);
+ const assetsReady=environmentReady&&actorReady;
+ const assembly=useSharedValue(bypass?PAPER_ASSEMBLY_MS:0),x=useSharedValue(0),y=useSharedValue(0),generation=React.useRef(0),started=React.useRef(false);
  const finish=React.useCallback((id:number)=>{if(id===generation.current)setFinished(true);},[]);
  const hydrated=settings.hydrated&&motion.ready;
  React.useEffect(()=>{
   const id=++generation.current;cancelAnimation(assembly);
   if(!hydrated||!assetsReady)return;
-  if(bypass){assembly.value=PAPER_ASSEMBLY_MS;setFinished(true);}
-  else{setFinished(false);assembly.value=0;assembly.value=withTiming(PAPER_ASSEMBLY_MS,{duration:PAPER_ASSEMBLY_MS,easing:Easing.linear},done=>{if(done)runOnJS(finish)(id);});}
+  if(bypass){started.current=true;assembly.value=PAPER_ASSEMBLY_MS;setFinished(true);}
+  else if(!started.current){started.current=true;setFinished(false);assembly.value=0;assembly.value=withTiming(PAPER_ASSEMBLY_MS,{duration:PAPER_ASSEMBLY_MS,easing:Easing.linear},done=>{if(done)runOnJS(finish)(id);});}
   return ()=>{++generation.current;cancelAnimation(assembly);};
  },[entryKey,hydrated,assetsReady,bypass,assembly,finish]);
  React.useEffect(()=>{
@@ -41,8 +45,10 @@ export default function SceneTheater({sceneId,entryKey,instant=false,ghostId,chi
  const context=React.useMemo(()=>({assembly,x,y,sceneId,ready}),[assembly,x,y,sceneId,ready]);
  return <View testID="scene-theater" onLayout={e=>{const {width,height}=e.nativeEvent.layout;if(width>0&&height>0)setSize(s=>s.width===width&&s.height===height?s:{width,height});}} style={{flex:1,overflow:'hidden',backgroundColor:ink.backing}}>
   <BattleLayoutContext.Provider value={layout}><TheaterContext.Provider value={context}>
-   <PaperDiorama assembly={assembly} x={x} y={y} onReady={onReady} showGhost={!!ghostId} ghostId={ghostId}/>
-   <Animated.View testID="theater-screen-ui" pointerEvents={ready?'box-none':'none'} accessibilityElementsHidden={!ready} importantForAccessibility={ready?'auto':'no-hide-descendants'} style={[StyleSheet.absoluteFill,uiStyle]}>{children}</Animated.View>
+   {sceneId==='01-village'?<PaperDiorama assembly={assembly} x={x} y={y} onReady={onReady} showGhost={false}/>:<PaperEnvironment motion={context} onReady={onReady}/>}
+   {ghostId&&<PaperActor id={ghostId} motion={context} onReady={onActorReady}/>}
+   {sceneId!=='01-village'&&<PaperEnvironment motion={context} onReady={onReady} foregroundOnly/>}
+   <Animated.View testID="theater-screen-ui" pointerEvents={ready?'box-none':'none'} accessibilityElementsHidden={!ready} importantForAccessibility={ready?'auto':'no-hide-descendants'} style={[StyleSheet.absoluteFill,{overflow:'hidden'},uiStyle]}>{children}</Animated.View>
    {!ready&&<View testID="theater-input-guard" style={[StyleSheet.absoluteFill,{zIndex:layer.battleOverlay}]} pointerEvents="auto"/>}
    {Platform.OS==='web'&&<View testID={`theater-${sceneId}-${ready?'ready':'assembling'}`} pointerEvents="none" style={{width:0,height:0}}/>}
   </TheaterContext.Provider></BattleLayoutContext.Provider>

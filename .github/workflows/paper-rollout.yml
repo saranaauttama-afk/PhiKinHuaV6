@@ -22,9 +22,10 @@ jobs:
       - run: npm test -- --maxWorkers=2 --testTimeout=60000
       - run: npm install --no-save --package-lock=false playwright@1.62.1
       - run: npx playwright install --with-deps chromium
-      - run: EXPO_PUBLIC_UI_REVIEW=1 EXPO_PUBLIC_TEST_WIN_CARD=1 EXPO_PUBLIC_PAPER_DIORAMA=1 npx expo export --platform web --output-dir /tmp/phikinhua-backlog-web
+      - run: EXPO_PUBLIC_UI_REVIEW=1 EXPO_PUBLIC_TEST_WIN_CARD=1 EXPO_PUBLIC_PAPER_DIORAMA=1 EXPO_PUBLIC_DIORAMA_REVIEW=1 npx expo export --platform web --output-dir /tmp/phikinhua-backlog-web
       - run: EXPO_PUBLIC_TEST_WIN_CARD=1 npx vite-node --config vitest.config.ts scripts/backlog-fixtures.ts
       - run: EXPO_PUBLIC_TEST_WIN_CARD=1 npx vite-node --config vitest.config.ts scripts/v33-fixtures.ts
+      - run: node scripts/paper-rollout-check.cjs
       - run: node scripts/v33-mobile-check.cjs
       - run: node scripts/three-night-mobile-check.cjs
       - uses: actions/upload-artifact@v4
