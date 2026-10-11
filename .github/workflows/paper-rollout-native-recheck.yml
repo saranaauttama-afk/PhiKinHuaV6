@@ -148,3 +148,4 @@ jobs:
           web=json.loads(Path('audit/web/paper-rollout/results.json').read_text());print('WEB_CHECK_COUNTS',len(web['reports']),web['errors'])
           trace=[r for r in web['reports'] if 'perf' in r];print('WEB_FRAME_STATS',json.dumps(trace))
           PY
+
