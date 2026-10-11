@@ -1,0 +1,236 @@
+Game Design Spec – ผีไทย Deck-Builder (สไตล์ Night of the Full Moon)
+🎯 Concept Overview
+
+แนวทาง: Deck-builder, Roguelike Adventure
+
+Theme: ผีไทย (Slime → กุมารทอง, Wolf → ผีกระสือ ฯลฯ)
+
+โครงสร้างรัน:
+
+Part 1: 7 fights → fight #7 = Mid Boss
+
+Part 2: 7 fights → fight #15 = Final Boss
+
+Secret Boss: ต่อท้าย Final Boss ถ้ามีเงื่อนไข
+
+รวมทั้งเกม = 15 fights (แน่นอน, fixed length)
+
+🗺️ Map & Page System
+
+Page = 3 slots (encounter offers)
+
+EncounterKinds: combat, elite, event, shop, next_event, boss, secret_boss
+
+Mechanics:
+
+เมื่อเลือก & จบ encounter (ถ้าไม่ใช่ boss/next_event) → refresh ช่องนั้นทันที ด้วย encounter ใหม่ (Dynamic Refresh)
+
+Force Split: ถ้า encounter ที่เคลียร์สะสมเกิน quota → ช่องถัดไปกลายเป็น next_event → บังคับเปลี่ยนหน้า
+
+Boss: ถูกล็อกที่ fight index (7 = Mid, 15 = Final)
+
+// Page flow constants
+export const PAGE_MIN_BEFORE_SPLIT = 3;
+export const PAGE_FORCE_SPLIT_AT   = 7;
+export const SLOTS_PER_PAGE        = 3;
+
+⚔️ Combat Structure (15 Fights Locked)
+Fight	Part	Type	Notes
+1–2	1	Combat (T1–T2)	No Elite, groupSize 1–2
+3–4	1	Combat (T1–T3)	Elite chance 5%, Lv 2–4
+5–6	1	Combat (T2–T3)	Elite chance 10%, Lv 3–5
+7	1	Mid Boss	Fixed
+8–9	2	Combat (T3–T4)	Elite chance 15%, Lv 6–8
+10–12	2	Combat (T4–T5)	Elite chance 20–25%, Lv 8–10
+13–14	2	Combat (T5)	Elite chance 25–30%, Lv 9–11
+15	2	Final Boss	Fixed
+16	—	Secret Boss	Optional
+👹 Thai Ghost Monster System
+
+## Monster Pool Implementation (IMPLEMENTED ✅)
+ระบบผีไทยแทนที่ระบบ monster เก่า พร้อม deterministic monster selection
+
+### Tier Pools (31 ตัวทั้งหมด)
+Tier	Count	Thai Ghosts
+T1	3	ผีกระสือ (20hp), ผีปอบ (22hp), นางตานี (25hp)
+T2	3	ผีนางรำ (28hp), ผีโป่งค่าง (32hp), งูผีสาง (30hp)  
+T3	5	ผีเปรต (35hp), กระหัง (38hp), กุมารทอง (40hp), ผีตายทั้งกลม (42hp), ผีป่า (45hp)
+T4	3	แม่นาค (50hp), ปอบใหญ่ (55hp), ผีห่าราตรี (60hp)
+T5	3	อสุรกาย (70hp), ยักษ์วัดแจ้ง (75hp), ผีพราย (80hp)
+Elite	6	วิญญาณเร่ร่อน (85hp), ปีศาจไฟ (90hp), เจ้าพ่อป่า (95hp), ผีนางใหญ่ (100hp), วิญญาณเด็ก (105hp), ยักษ์ดำ (110hp)
+BossMid	2	ผีแม่ม่าย (120hp), พระอุปคุต (130hp)
+BossFinal	2	พญานาค (180hp), เทพอักษร (200hp)
+SecretBoss	1	พระยามัจจุราช (250hp)
+
+### Fight Progression Logic (IMPLEMENTED ✅)
+- Fight 1-2: T1-T2 random (60% T1, 40% T2)
+- Fight 3-4: T1-T3 + Elite 5% chance
+- Fight 5-6: T2-T3 + Elite 10% chance  
+- Fight 7: Mid Boss (fixed)
+- Fight 8-9: T3-T4 + Elite 15% chance
+- Fight 10-12: T4-T5 + Elite 20-25% chance
+- Fight 13-14: T5 + Elite 25-30% chance
+- Fight 15: Final Boss (fixed)
+- Fight 16+: Secret Boss (optional)
+
+### Key Features (IMPLEMENTED ✅)
+1. **Deterministic Selection**: ผีถูกเลือกตั้งแต่ map generation แล้วแสดงชื่อให้เห็น
+2. **Thai Theme**: ใช้ชื่อผีไทยแทน generic monsters
+3. **Boss Visual**: กรอบสีแดงและเตือนก่อนเจอบอส
+4. **Fight Counter**: แสดงความคืบหน้า (X/15) และเตือนบอส
+5. **Anti-Duplicate per Tier**: แต่ละ tier ที่โหลดมาในหน้าเดียวกันต้องไม่ซ้ำกัน (ใช้ pool ที่หลากหลาย)
+
+### System Integration
+- File: `src/core/monsters/thai-ghosts.ts`
+- Data: `ThaiGhostData` interface with id, name, tier, hp, description
+- Functions: `getMonsterById()`, `getRandomMonsterFromTier()`, `getTierForFight()`
+- UI: `MapView.tsx` shows specific monster names instead of "Normal Monster"
+🎲 Encounter Generation Algorithm
+interface EncounterOffer {
+  kind: 'combat'|'elite'|'event'|'shop'|'boss';
+  enemyId?: string;   // กรณี combat
+  tier?: string;
+  groupSize?: number;
+  level?: number;
+}
+
+function generateCombatOffer(args: {
+  fightIndex: number;
+  part: 1|2;
+  rng: () => number;
+}): EncounterOffer {
+  // 1) เลือก tier ตาม fightIndex (ดูตาราง)
+  const tier = pickTierForFight(args.fightIndex, args.part, args.rng);
+
+  // 2) เลือก enemy จริงจาก pool
+  const pool = ENEMY_POOLS[tier];
+  const enemyId = pool[Math.floor(args.rng() * pool.length)];
+
+  // 3) group size & level range
+  const groupSize = rollGroupSize(tier, args.fightIndex, args.rng);
+  const level = rollLevel(tier, args.fightIndex, args.rng);
+
+  return { kind: 'combat', enemyId, tier, groupSize, level };
+}
+
+💰 Economy & Progression
+EXP Curve (เลเวล 10 ตอนเข้า Final Boss)
+// EXP required per level (รวม ~960 EXP ถึง L10)
+const NEXT_EXP_TABLE = {
+  1: 20,  // 1->2
+  2: 30,
+  3: 45,
+  4: 65,
+  5: 90,
+  6: 120,
+  7: 155,
+  8: 195,
+  9: 240, // 9->10
+};
+
+function nextExpForLevel(level: number): number {
+  return NEXT_EXP_TABLE[level] ?? 0;
+}
+
+Gold & Rewards
+// Base rewards per enemy
+const BASE_EXP_PER_ENEMY = { T1:4, T2:6, T3:8, T4:10, T5:12, Elite:18 };
+const BASE_GOLD_PER_ENEMY= { T1:3, T2:4, T3:5, T4:6, T5:7, Elite:10 };
+
+// Part multipliers
+const PART_MUL = { 1: 1.0, 2: 1.25 };
+
+// Depth multipliers
+const DEPTH_MUL = { early: 1.0, mid: 1.1, late: 1.2 };
+
+// Boss rewards
+const BOSS_REWARDS = {
+  mid:   { exp: 80,  gold: 60  },
+  final: { exp: 120, gold: 100 },
+  secret:{ exp: 160, gold: 140 },
+};
+
+function rewardForFight({tier, part, depth, groupSize}) {
+  const exp = Math.floor(BASE_EXP_PER_ENEMY[tier] * PART_MUL[part] * DEPTH_MUL[depth] * groupSize);
+  const gold= Math.floor(BASE_GOLD_PER_ENEMY[tier]* PART_MUL[part] * DEPTH_MUL[depth] * groupSize);
+  return { exp, gold };
+}
+
+🛍️ Shops
+
+Card Shop: แสดงการ์ดสุ่ม 3 ใบ (SHOP_STOCK_SIZE = 3)
+
+Bias: 15% เพิ่มโอกาสได้การ์ดดี (SHOP_POWER_BIAS = 1.15)
+
+Persistence:
+
+ออกโดยไม่ซื้อ → ร้านยังอยู่ (carry-over)
+
+ซื้อหมด → ร้านหาย
+
+ผู้เล่นกดลบร้านได้ (DeleteShop command)
+
+Costs:
+
+Remove Card: [50,75,100,150,200]
+
+Upgrade Card: [60,90,130,180,240]
+
+Reroll: 20
+
+🔐 Game Invariants (IMPLEMENTED ✅)
+
+รัน = 15 ไฟต์ (fixed) ✅ Fight counter implemented
+
+Fight #7 = Mid Boss, #15 = Final Boss ✅ Boss warning system implemented
+
+ศัตรูสุ่มจาก pool ตาม tier ✅ Thai ghost pools implemented (31 monsters total)
+
+มอนถูกสุ่มตั้งแต่ generate map → ผู้เล่นเห็นชื่อผี ✅ Deterministic monster display
+
+EXP/Gold เฉลี่ยรวม → ผู้เล่นถึงเลเวล 10 ตอนเข้า Final Boss ✅ Existing system
+
+Shop แสดง 3 ใบเท่านั้น, persistence ตาม registry ✅ Existing system
+
+## TODO: Next Implementation Steps
+1. **Different Rewards per Monster**: แต่ละผีให้รางวัลต่างกัน (EXP/Gold variations)
+2. **Balance HP/DMG**: ปรับ HP และ damage ให้เหมาะสมกับ tier
+3. **Secret Boss Condition**: กำหนดเงื่อนไขปลดล็อค Secret Boss
+4. **Monster Abilities**: signature cards หรือ special abilities (future enhancement)
+
+📑 Example Config (YAML style)
+run:
+  parts: 2
+  total_fights_locked: 15
+  secret_boss_after_final: optional
+
+part_config:
+  - part: 1
+    fights_locked: 7
+    boss_at: 7
+  - part: 2
+    fights_locked: 8   # 7 fights + final boss
+    boss_at: 15
+
+enemy_pools:
+  T1: [ผีกระสือ, ผีปอบ, นางตานี]
+  T2: [ผีนางรำ, ผีโป่งค่าง, งูผีสาง]
+  T3: [ผีเปรต, กระหัง, กุมารทอง]
+  T4: [แม่นาค, ปอบใหญ่, ผีห่าราตรี]
+  T5: [อสุรกาย, ยักษ์วัดแจ้ง, ผีพราย]
+  Elite: [วิญญาณเร่ร่อน, ปีศาจไฟ, เจ้าพ่อป่า]
+  BossMid: [ผีแม่ม่าย]
+  BossFinal: [พญานาค]
+  SecretBoss: [พระยามัจจุราช]
+
+exp_curve:
+  1: 20
+  2: 30
+  3: 45
+  4: 65
+  5: 90
+  6: 120
+  7: 155
+  8: 195
+  9: 240
+target_final_level: 10

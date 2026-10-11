@@ -1,17 +1,19 @@
 // Level/XP — weights & rolling for level-up rewards (buckets)
 import type { RNG } from './rng';
-import { int, shuffle } from './rng';
+import { int, next, shuffle } from './rng';
 import type { GameState, CardData, BlessingDef } from './types';
 import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
 
+// การ์ดใหม่ไม่ได้มาจากเลเวลอัปแล้ว — ย้ายไปเป็นรางวัลของการชนะไฟต์
+// (ดู `cards/reward.ts`) ตารางนี้จึงเหลือแต่ของที่ไม่ใช่การ์ด
 export type LevelBucket =
   | 'max_hp' | 'max_energy' | 'max_hand'
-  | 'cards' | 'blessing'
+  | 'blessing'
   | 'remove' | 'upgrade' | 'gold'
   | 'equipment_slot' | 'gold_skip';
 
 const BASE_BUCKET_W: Record<LevelBucket, number> = {
-  max_hp: 30, max_energy: 20, max_hand: 10, cards: 24, blessing: 12, 
+  max_hp: 30, max_energy: 20, max_hand: 10, blessing: 12,
   remove: 10, upgrade: 8, gold: 2, equipment_slot: 15, gold_skip: 8,
 };
 
@@ -28,9 +30,11 @@ const CHOICE_PAIRS: Array<[LevelBucket, LevelBucket]> = [
   ['max_energy', 'max_hand'],         // Energy for combos vs Hand size for options
   ['max_hp', 'equipment_slot'],       // Survivability vs Equipment power
   
-  // Build direction choices  
-  ['cards', 'blessing'],              // Direct cards vs Passive effects
-  ['cards', 'gold_skip'],             // Cards now vs Gold for later
+  // Build direction choices
+  // (เดิมสองคู่นี้เป็น ['cards','blessing'] กับ ['cards','gold_skip'] —
+  //  การ์ดย้ายไปเป็นรางวัลชนะไฟต์แล้ว ที่ว่างจึงยกให้ตัวเลือกที่หายากอยู่)
+  ['blessing', 'gold_skip'],          // Passive power vs Gold for later
+  ['upgrade', 'max_hp'],              // Improve cards vs Survivability
   
   // Deck refinement choices
   ['remove', 'upgrade'],              // Clean deck vs Improve cards
@@ -58,7 +62,7 @@ function deriveWeights(s: GameState): Record<LevelBucket, number> {
 // Legacy single bucket function (kept for compatibility)
 export function rollLevelUpBucket(rng: RNG, s: GameState): { rng: RNG; bucket: LevelBucket } {
   const w = deriveWeights(s);
-  const order: LevelBucket[] = ['max_hp','max_energy','max_hand','cards','blessing','remove','upgrade','gold'];
+  const order: LevelBucket[] = ['max_hp','max_energy','max_hand','blessing','remove','upgrade','gold'];
   const total = order.reduce((a,k)=>a + w[k], 0);
   const ro = int(rng, 0, Math.max(0, total - 1));
   let r = ro.rng;
@@ -76,7 +80,7 @@ export function rollLevelUpBucket(rng: RNG, s: GameState): { rng: RNG; bucket: L
 export function rollLevelUpChoice(rng: RNG, s: GameState): { rng: RNG; choice: LevelChoice } {
   // Filter choice pairs based on game state and level for more contextual choices
   const level = s.player?.level ?? 1;
-  const viablePairs = getViableChoicePairs(s, level);
+  const viablePairs = getViableChoicePairs(s, level).filter(pair=>!s.campaign||((s.player.maxEnergy<5||!pair.includes('max_energy'))&&(s.player.maxHandSize<8||!pair.includes('max_hand')))).filter(pair => s.runMode !== 'episode' || (!pair.includes('equipment_slot') && (s.player.maxEnergy < 4 || !pair.includes('max_energy'))));
   
   // Select a weighted random choice pair
   const pairRoll = int(rng, 0, viablePairs.length - 1);
@@ -110,11 +114,11 @@ function getViableChoicePairs(s: GameState, level: number): Array<[LevelBucket, 
     // Prioritize basic power scaling and early game cards
     const earlyPairs = pairs.filter(pair => {
       const buckets = [...pair];
-      return buckets.includes('max_hp') || buckets.includes('max_energy') || 
-             buckets.includes('cards') || buckets.includes('max_hand');
+      return buckets.includes('max_hp') || buckets.includes('max_energy') ||
+             buckets.includes('max_hand');
     });
     // Include some early game gold for shop opportunities
-    earlyPairs.push(['cards', 'gold_skip'], ['max_hp', 'gold']);
+    earlyPairs.push(['max_hp', 'gold'],['remove','upgrade'],['blessing','max_hand']);
     return earlyPairs;
   }
   
@@ -145,10 +149,6 @@ function generateChoiceContext(s: GameState, optionA: LevelBucket, optionB: Leve
     return level <= 3 ? "Early survival vs equipment power:" : "Durability vs versatility:";
   }
   
-  if (buckets.includes('cards') && buckets.includes('blessing')) {
-    return level <= 3 ? "Immediate cards vs passive power:" : "Direct strength vs ongoing effects:";
-  }
-  
   if (buckets.includes('remove') && buckets.includes('upgrade')) {
     return level <= 5 ? "Clean your deck or strengthen cards:" : "Perfect your deck strategy:";
   }
@@ -171,7 +171,11 @@ function generateChoiceContext(s: GameState, optionA: LevelBucket, optionB: Leve
   }
 }
 
-export function rollThreeCards(rng: RNG, playerLevel = 1) {
+/**
+ * สุ่มการ์ดรางวัล 3 ใบ — กรองเฉพาะการ์ดของคลาสที่เล่นอยู่
+ * ถ้าไม่กรอง นักรบจะได้การ์ดหมอผีเป็นรางวัล ซึ่งทำให้ตัวตนของคลาสจางหมด
+ */
+export function rollThreeCards(rng: RNG, playerLevel = 1, classTag?: string) {
   let r = rng;
   
   // ปรับน้ำหนักตาม level
@@ -198,15 +202,28 @@ export function rollThreeCards(rng: RNG, playerLevel = 1) {
   const cards: CardData[] = [];
   
   for (let i = 0; i < 3; i++) {
-    const roll = Math.random() * 100;
-    let selectedPool: CardData[] = BY_RARITY.Common;
+    // ใช้ rng ที่ร้อยเข้ามาอยู่แล้ว ไม่ใช่ Math.random —
+    // การ์ดรางวัลตอนเลเวลอัปต้องซ้ำได้เมื่อใช้ seed เดิม
+    const rarityRoll = next(r);
+    r = rarityRoll.rng;
+    const roll = rarityRoll.value * 100;
+    const forClass = (list: CardData[]) =>
+      classTag ? list.filter(c => (c.tags ?? []).includes(classTag)) : list;
+    const POOL = {
+      Common:    forClass(BY_RARITY.Common),
+      Uncommon:  forClass(BY_RARITY.Uncommon),
+      Rare:      forClass(BY_RARITY.Rare),
+      Legendary: forClass(BY_RARITY.Legendary),
+    };
+
+    let selectedPool: CardData[] = POOL.Common;
     
-    if (roll < legendaryWeight && BY_RARITY.Legendary.length > 0) {
-      selectedPool = BY_RARITY.Legendary;
-    } else if (roll < legendaryWeight + rareWeight && BY_RARITY.Rare.length > 0) {
-      selectedPool = BY_RARITY.Rare;
-    } else if (roll < legendaryWeight + rareWeight + uncommonWeight && BY_RARITY.Uncommon.length > 0) {
-      selectedPool = BY_RARITY.Uncommon;
+    if (roll < legendaryWeight && POOL.Legendary.length > 0) {
+      selectedPool = POOL.Legendary;
+    } else if (roll < legendaryWeight + rareWeight && POOL.Rare.length > 0) {
+      selectedPool = POOL.Rare;
+    } else if (roll < legendaryWeight + rareWeight + uncommonWeight && POOL.Uncommon.length > 0) {
+      selectedPool = POOL.Uncommon;
     }
     
     if (selectedPool.length > 0) {
@@ -219,9 +236,26 @@ export function rollThreeCards(rng: RNG, playerLevel = 1) {
   return { rng: r, list: cards };
 }
 
-export function rollTwoBlessings(rng: RNG) {
+/**
+ * สุ่มพรให้เลือกสองอย่าง — **ไม่เสนอพรที่ถืออยู่แล้ว**
+ *
+ * เดิมสุ่มจากคลังทั้ง 12 อย่างโดยไม่สนว่าถืออะไรอยู่ ผลคือรันหนึ่งได้พรซ้ำเป็น
+ * เรื่องปกติ (วัดจริง 5 รัน เกือบทุกรันมีอย่างน้อยหนึ่งคู่) และ **พรซ้ำผลซ้อนกัน**
+ * เพราะ blessingRuntime วนทำงานทีละรายการในลิสต์ — "ผีป้องกัน" สองใบได้ Block 4
+ * ต่อการ์ดโจมตี ซึ่งไม่มีใครออกแบบไว้ มันแค่หลุดมา
+ *
+ * ที่แก้ตรงนี้เพราะรางวัลที่ได้มาแล้วไม่มีผลคือรางวัลที่หายไปเฉยๆ —
+ * กันตอนแจกดีกว่ากันตอนใช้
+ *
+ * @param owned id ของพรที่ถืออยู่แล้ว
+ */
+export function rollTwoBlessings(rng: RNG, owned: string[] = []) {
   let r = rng;
-  const pool: BlessingDef[] = [...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon, ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary];
+  const pool: BlessingDef[] = [
+    ...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon,
+    ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary,
+  ].filter(b => !owned.includes(b.id));
+
   const sh = shuffle(r, pool); r = sh.rng;
   return { rng: r, list: sh.array.slice(0, Math.min(2, sh.array.length)).map(b => ({ ...b })) };
 }
@@ -235,8 +269,6 @@ export function getBucketDisplayInfo(bucket: LevelBucket): { name: string; descr
       return { name: '+1 Max Energy', description: 'Play more cards each turn', icon: '⚡' };
     case 'max_hand':
       return { name: '+1 Hand Size', description: 'More options and combos', icon: '🎴' };
-    case 'cards':
-      return { name: 'Choose Cards', description: 'Add new abilities to deck', icon: '🃏' };
     case 'blessing':
       return { name: 'Choose Blessing', description: 'Permanent passive power', icon: '✨' };
     case 'remove':

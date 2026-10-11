@@ -3,8 +3,14 @@ import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { baseNewState } from '../../commands';
 import { rollTwoBlessings } from '../../level';
+import { EPISODE } from '../../balance/episode';
 import { START_ENERGY } from '../../balance/core';
-import { initPageMap, rollPageOffers } from '../../map/pages';
+import { initPageMap } from '../../map/pages';
+import { startJourney } from '../../map/journeySync';
+import {startAdventure} from '../../map/adventure';
+import { getClass, buildStarterDeck } from '../../classes';
+import { grantBlessing } from '../shared';
+import { fireChapter } from '../../story/chapters';
 import { getEquipmentById } from '../../pack';
 
 // Auto-equip equipment cards from starting deck and remove equipped cards from deck
@@ -93,53 +99,43 @@ function autoEquipStartingCards(s: GameState) {
   }
 }
 
-// export function newRun(
-//   s: GameState,
-//   cmd: Extract<Command, { type: 'NewRun' }>,
-//   r: RNG
-// ) {
-//   // สร้าง state ใหม่ตามปกติ
-//   s = baseNewState(cmd.seed);
-//   s.blessings = s.blessings ?? [];
-//   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
-//   // นับรอบร้านลบ/อัปเกรดไว้ที่นี่ตั้งแต่ต้น run
-//   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };
 
-//   // เด็คตั้งต้น → masterDeck
-//   const { START_DECK } = require('../../balance/core');
-//   s.masterDeck = JSON.parse(JSON.stringify(START_DECK));
-
-//   // ✅ Equipment defaults
-//   s.equipmentSlotsMax = s.equipmentSlotsMax ?? 1;
-//   s.equipped = s.equipped ?? [];
-//   s.backpack = s.backpack ?? [];
-
-//   // ✅ ใช้ PAGES MODE เสมอ (ตัดระบบ Map เดิมทิ้ง)
-//   s.mapMode = 'pages';
-//   //s.map = undefined; // กันหลงเหลือค่าเก่า
-//   const init = initPageMap(r); r = init.rng;
-//   s.pages = init.map;
-
-//   // Starter blessing (เลือกก่อนเข้าเพจแรก)
-//   s.levelUp = null;
-//   const bb = rollTwoBlessings(r); r = bb.rng;
-//   s.starter = { choices: bb.list, consumed: false };
-//   s.phase = 'starter';
-//   return { state: s, rng: r };
-// }
 export function newRun(
   s: GameState,
   cmd: Extract<Command, { type: 'NewRun' }>,
   r: RNG
 ) {
   s = baseNewState(cmd.seed);
+  s.runMode = cmd.runMode ?? 'full';
+  if(cmd.night&&Number.isInteger(cmd.night)&&cmd.night>=1&&cmd.night<=5){s.runMode='full';s.campaign={night:cmd.night,unlocks:[...new Set(cmd.unlocks??[])]};}
+  if(cmd.difficulty&&Number.isInteger(cmd.difficulty)&&cmd.difficulty>=1&&cmd.difficulty<=5){s.runMode='full';s.campaign={night:1,difficulty:cmd.difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])]};}
+  if (s.runMode === 'episode') s.player.gold = EPISODE.startingGold;
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };
   s.turnFlags.equipmentOnce = {};
 
-  const { START_DECK } = require('../../balance/core');
-  s.masterDeck = JSON.parse(JSON.stringify(START_DECK));
+  // ── คลาสกำหนดค่าสถานะตั้งต้นและเด็ค
+  // เดิมทุกรันใช้ START_DECK ชุดเดียวกันหมด เล่นรอบสองจึงเหมือนรอบแรก
+  const cls = getClass(cmd.classId);
+  s.classId = cls.id;
+  s.player.maxHp       = cls.startHp;
+  s.player.hp          = cls.startHp;
+  s.player.maxEnergy   = cls.startEnergy;
+  s.player.energy      = cls.startEnergy;
+  s.player.maxHandSize = cls.startHandSize;
+  if(cmd.difficulty){s.player.maxEnergy=s.player.energy=2;s.player.openingDraw=2;s.player.drawPerTurn=3;s.player.maxHandSize=6;}
+
+  const { ALL_CARDS } = require('../../pack');
+  const deck = buildStarterDeck(cmd.difficulty?{...cls,starterDeck:Object.fromEntries(Object.entries(cls.starterDeck).map(([id,count])=>[id,Math.min(2,count)]))}:cls, ALL_CARDS);
+  if (deck.length > 0) {
+    s.masterDeck = deck;
+  } else {
+    // การ์ดของคลาสหาย — ใช้เด็คกลางไว้ก่อนดีกว่าเริ่มรันด้วยเด็คว่าง
+    const { START_DECK } = require('../../balance/core');
+    s.masterDeck = JSON.parse(JSON.stringify(START_DECK));
+    s.log.push(`ไม่พบการ์ดของคลาส ${cls.name} ใช้เด็คกลางแทน`);
+  }
 
   // ✅ Equipment defaults
   s.equipmentSlotsMax = 1;
@@ -156,9 +152,18 @@ export function newRun(
 
   // Starter blessing
   s.levelUp = null;
-  const bb = rollTwoBlessings(r); r = bb.rng;
+  const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id)); r = bb.rng;
+  if(s.campaign?.unlocks.includes('blessing'))bb.list.push(require('../../campaign/nights').SPECIAL_BLESSINGS[cls.id]);
   s.starter = { choices: bb.list, consumed: false };
   s.phase = 'starter';
+
+  // บทเปิดเรื่องของคลาส — ขึ้นก่อนหน้าเลือกพร เพื่อให้รู้ว่ากำลังเล่นเป็นใคร
+  // และออกเดินทางเพราะอะไร ก่อนจะถูกถามว่าจะเอาพรอะไรติดตัว
+  fireChapter(s, { kind: 'prologue', classId: cls.id });
+  if (s.runMode === 'episode') {
+    s.chapter = { id: 'episode_open', paragraph: 0 };
+  }
+
   return { state: s, rng: r };
 }
 
@@ -171,8 +176,7 @@ export function chooseStarter(
     return { state: s, rng: r };
   }
   const b = s.starter.choices[cmd.index];
-  if (b) {
-    s.blessings.push(b);
+  if (b && grantBlessing(s, b)) {
     s.log.push(`Starter blessing: ${b.name ?? b.id}`);
   }
   s.starter = null;
@@ -183,11 +187,9 @@ export function chooseStarter(
     s.pages = init.map;
   }
 
-  // ✅ Roll ข้อเสนอหน้าแรกทันที (3 ช่อง) แล้วไป phase 'map' เพื่อแสดง Pages UI
-  const ro = rollPageOffers(s.pages, r, s); r = ro.rng;
-  s.pages.current = { offers: ro.offers, resolved: ro.offers.map(() => false) };
-  s.pages._activeOfferIndex = undefined;
-  s.pages._shopUsed = false;
+  // ✅ วางเส้นทางทั้งรันไว้ล่วงหน้า แล้วเปิดตัวเลือกของชั้นแรก
+  // (เดิม roll ถาด 3 ช่องที่สุ่มตัวเองใหม่เรื่อยๆ ผู้เล่นจึงไม่เคยเห็นทางข้างหน้า)
+  r = s.campaign ? startAdventure(s, r) : startJourney(s, r);
 
   s.phase = 'map'; // UI ของคุณใช้ phase 'map' เพื่อโชว์ pages อยู่แล้ว
   s.enemy = undefined;

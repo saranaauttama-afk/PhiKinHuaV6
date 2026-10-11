@@ -41,6 +41,20 @@ export function applyStatusEffect(
   value?: number,
   sourceId?: string
 ): StatusEffectResult {
+  // คอมโบ "เทพเจ้าลงมา" ให้ภูมิคุ้มกันสถานะลบตลอดไฟต์ — เดิมมีตัวธงกับฟังก์ชัน
+  // `shouldBlockDebuff` ครบ แต่ไม่มีใครเรียกมันเลย ภูมิคุ้มกันจึงไม่เคยกันอะไร
+  if (target === 'player') {
+    const { shouldBlockDebuff } = require('../combos');
+    const def0 = getStatusEffectDefinition(statusId);
+    if (def0?.tags?.includes('debuff') && shouldBlockDebuff(state)) {
+      return {
+        success: false,
+        message: `${def0.name} ถูกกันไว้`,
+        logMessages: [`${def0.name} เข้าไม่ได้ — มีภูมิคุ้มกันอยู่`],
+      };
+    }
+  }
+
   // ดึงข้อมูลเป้าหมาย
   const targetState = target === 'player' ? state.player : state.enemy;
   if (!targetState) {
@@ -257,7 +271,7 @@ function reduceStatusEffectDurations(
   const effectsToRemove: string[] = [];
 
   for (const effect of targetState.statusEffects) {
-    if (effect.duration > 0) {
+    if (effect.duration > 0 && effect.duration < 99) {
       effect.duration -= 1;
       
       if (effect.duration <= 0) {
@@ -301,9 +315,15 @@ function processSpecificStatusEffect(
 
     case 'poison':
       if (timing === 'turn_end') {
-        const damage = stacks;
-        targetState.hp = Math.max(0, targetState.hp - damage);
-        state.log.push(`☠️ ${target === 'player' ? 'ผู้เล่น' : 'ศัตรู'} ได้รับความเสียหายจากพิษ ${damage} หน่วย`);
+        // พิษทะลุ block และไม่โดน modifier — ดูเหตุผลใน combat/damage.ts (rulesFor)
+        const { dealDamage } = require('../damage');
+        const result = dealDamage(state, {
+          from: target === 'player' ? 'enemy' : 'player',
+          to: target,
+          raw: stacks,
+          source: { kind: 'status', effectId: 'poison' },
+        });
+        state.log.push(`☠️ ${target === 'player' ? 'ผู้เล่น' : 'ศัตรู'} ได้รับความเสียหายจากพิษ ${result.hpLoss} หน่วย`);
       }
       break;
 
@@ -429,7 +449,7 @@ export function modifyCardCostForStatusEffects(state: GameState, cardCost: numbe
   
   // ตรวจสอบ corruption - เพิ่มต้นทุนการ์ด
   if (hasStatusEffect('player', state, 'corruption')) {
-    const stacks = getStatusEffectStacks('player', state, 'corruption');
+    const stacks = getStatusEffectStacks('player', state, 'corruption') || 1;
     modifiedCost += stacks;
   }
   

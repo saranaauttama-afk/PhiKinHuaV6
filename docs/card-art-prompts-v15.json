@@ -1,0 +1,88 @@
+{
+  "method": "Built-in image_gen",
+  "style": "Use case: illustration-story. Asset type: standalone transparent game card illustration, no card frame. Style: Thai one-baht horror pulp comic, thick rough black ink outlines, flat faded ochre and muted blood-red spot colors, sparse coarse print hatching; handcrafted vintage woodcut. Square canvas, single centered subject occupies 85%, legible when reduced to 80 pixels, generous clean transparent margin. Real alpha background. No lettering, numerals, logos, borders, parchment backdrop, gradients, 3D or luminous effects. Subject: ",
+  "reference": "assets/ui/card-sword.png (ink style only, revised medium and enemy set)",
+  "assets": [
+    {
+      "id": "ward_riposte",
+      "path": "assets/cards/ward_riposte.webp",
+      "subject": "A temple swordsman's crossed forearms wrapped in red sacred thread, one guarding with a wooden shield and the other striking with a short temple sword, dynamic clear counterattack silhouette"
+    },
+    {
+      "id": "last_stand_cut",
+      "path": "assets/cards/last_stand_cut.webp",
+      "subject": "A weathered Thai temple sword clenched in a bruised bandaged hand, a snapped red sacred thread, dramatic desperate diagonal cutting motion"
+    },
+    {
+      "id": "threefold_strike",
+      "path": "assets/cards/threefold_strike.webp",
+      "subject": "A traditional Thai fighter delivering a flying knee, three distinct black motion strokes around the knee, faded red boxing wraps, full figure"
+    },
+    {
+      "id": "spirit_pact",
+      "path": "assets/cards/spirit_pact.webp",
+      "subject": "A Thai female spirit medium offering a small incense bowl to a pale ghost companion, two faces in profile, ghost curls around bowl, strong readable silhouette"
+    },
+    {
+      "id": "poison_echo",
+      "path": "assets/cards/poison_echo.webp",
+      "subject": "A small earthen phrai oil vial with a red tied cloth, three smoke tendrils forming ghost faces, poison rite"
+    },
+    {
+      "id": "ancestor_council",
+      "path": "assets/cards/ancestor_council.webp",
+      "subject": "Three Thai ancestral ghost faces gathered around a small ceremonial offering tray with incense, distinct solemn faces, arc shaped composition"
+    },
+    {
+      "id": "whisper_ear",
+      "path": "assets/cards/whisper_ear-v2.webp",
+      "subject": "A pale spectral woman's face whispering into the ear of a Thai female spirit medium, shoulders and two faces, no sound text"
+    },
+    {
+      "id": "yantra_cloth",
+      "path": "assets/cards/yantra_cloth-v2.webp",
+      "subject": "A folded old ivory yantra cloth held up by two hands, rough black sacred abstract geometric marks, red thread tassels, protective stance, no readable writing"
+    },
+    {
+      "id": "invite_spirit",
+      "path": "assets/cards/invite_spirit-v2.webp",
+      "subject": "A small pale Thai ancestral male ghost with traditional topknot emerging from a red threaded incense pot, welcoming curled hands, friendly ominous face"
+    },
+    {
+      "id": "set_altar",
+      "path": "assets/cards/set_altar-v2.webp",
+      "subject": "A miniature wooden Thai altar table with two red candles and three incense sticks, simple ritual offering bowl, strong silhouette"
+    },
+    {
+      "id": "phrai_oil",
+      "path": "assets/cards/phrai_oil-v2.webp",
+      "subject": "An old round clay bottle wrapped in red thread, a tiny pale ghost face in drifting black smoke above the opening, faded ochre bottle"
+    },
+    {
+      "id": "pop_feast",
+      "path": "assets/cards/pop_feast-v2.webp",
+      "subject": "A starving Thai female phi pop ghost, ragged hair, wide hungry face reaching toward a small bowl, upper torso, ominous but no graphic gore"
+    },
+    {
+      "id": "tanee_roots",
+      "path": "assets/cards/tanee_roots-v2.webp",
+      "subject": "A Thai banana-tree female spirit with flowing greenish ochre wrap, black banana roots curling around her guarding hands, banana leaf silhouette"
+    },
+    {
+      "id": "krasue_venom",
+      "path": "assets/cards/krasue_venom-v2.webp",
+      "subject": "A Thai krasue floating ghost head, tangled hanging black hair and a few black smoke tendrils below, pale face with a muted red mouth, no graphic gore"
+    },
+    {
+      "id": "dancer_steps",
+      "path": "assets/cards/dancer_steps-v2.webp",
+      "subject": "A Thai classical ghost dancer in an old pointed dance crown, two raised angular hands in a graceful dance stance, two black motion arcs"
+    },
+    {
+      "id": "pong_fury",
+      "path": "assets/cards/pong_fury-v2.webp",
+      "subject": "A Thai wild forest guardian ghost with a long ape-like face, bristling hair and fur, clenched hands, a small roof beam below, threatening upper body"
+    }
+  ],
+  "processing": "Final images resized to at most 512px and encoded as alpha-preserving WebP. No background removal or painted edits. Rejected photoreal drafts are unreferenced."
+}

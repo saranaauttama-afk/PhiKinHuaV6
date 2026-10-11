@@ -1,43 +1,21 @@
 // src/core/types_extended.ts — Extended mechanics for Thai Enemy System
 
-// ===== Status Effects System =====
-export type StatusEffect = {
-  id: string;
-  name: string;
-  description: string;
-  duration: number;
-  stacks?: number;
-  value?: number; // For effects that have a numeric value
-  tags?: string[];
-};
+// ===== สถานะผล =====
+//
+// **ไทป์สถานะมีชุดเดียว อยู่ที่ `combat/status-effects/types.ts`**
+//
+// เดิมไฟล์นี้ประกาศ `StatusEffectType` ของตัวเองไว้ 26 ชนิด (sleep, bleed, doom,
+// charm, nightmare, …) ขณะที่ทะเบียนจริงมี 13 — อีก 13 ชนิดไม่มีนิยาม ไม่มีชื่อ
+// ไม่มีคำอธิบาย และไม่มีโค้ดไหนทำอะไรกับมัน แต่ TS ยอมให้เขียนลงไปได้
+// สองชุดยังไม่ตรงกันเองด้วย ('vulnerability' ที่นี่ vs 'vulnerable' ที่โน่น)
+// เขียนถูกตามไทป์หนึ่งแล้วพังกับอีกไทป์หนึ่งโดยไม่มีอะไรเตือน
+//
+// ตรวจแล้วว่า 13 ชนิดที่เกินมาไม่มีใครใช้เลยสักที่ จึงยุบทิ้งได้ตรงๆ
+import type {
+  StatusEffect, StatusEffectType, StatusEffectDefinition,
+} from './combat/status-effects/types';
 
-export type StatusEffectType = 
-  | 'fear'        // Reduce energy or force discard
-  | 'poison'      // Continuous damage over time
-  | 'curse'       // Take +1 damage from all sources
-  | 'corruption'  // Cards in hand cost +1
-  | 'entangle'    // Cannot play attack cards
-  | 'weakness'    // Deal -50% damage
-  | 'vulnerable'  // Take +50% damage
-  | 'vulnerability' // Alias for vulnerable
-  | 'regeneration' // Heal HP over time
-  | 'strength'    // Deal +X damage
-  | 'block_next'  // Block next X damage
-  | 'energy_boost' // Gain +X energy next turn
-  | 'draw_reduction' // Draw X fewer cards
-  // เพิ่มสถานะผลใหม่ที่ใช้ในศัตรูไทย
-  | 'stealth'     // Hidden/invisible for next turn
-  | 'dodge_next'  // Avoid next attack
-  | 'charm'       // Controlled by enemy
-  | 'sleep'       // Cannot act next turn
-  | 'nightmare'   // Take damage over time + fear
-  | 'confusion'   // Random card effects
-  | 'bleed'       // Physical damage over time
-  | 'decay'       // Permanent HP reduction
-  | 'doom'        // Countdown to death
-  | 'intimidate'  // Reduce enemy effectiveness
-  | 'divine_protection' // Reduce damage taken
-  | 'overwhelmed' // Too many enemies, reduce effectiveness;
+export type { StatusEffect, StatusEffectType, StatusEffectDefinition };
 
 // ===== Dynamic Enemy Behaviors =====
 export type BehaviorCondition = 
@@ -203,19 +181,4 @@ export type CombatState = {
     countersUsed: string[];
     difficultyModifier: number;
   };
-};
-
-// ===== Status Effect Registry =====
-export type StatusEffectDefinition = {
-  id: StatusEffectType;
-  name: string;
-  description: string;
-  defaultDuration: number;
-  stackable: boolean;
-  maxStacks?: number;
-  onApply?: (target: 'player' | 'enemy', stacks: number) => void;
-  onTurnStart?: (target: 'player' | 'enemy', stacks: number) => void;
-  onTurnEnd?: (target: 'player' | 'enemy', stacks: number) => void;
-  onRemove?: (target: 'player' | 'enemy', stacks: number) => void;
-  tags?: string[];
 };

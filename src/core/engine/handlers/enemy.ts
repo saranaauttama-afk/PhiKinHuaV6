@@ -2,12 +2,13 @@
 import type { GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { int } from '../../rng';
-import { enemyCardById } from '../../pack_enemy_cards';
+import { enemyCardById, poolForOwner } from '../../pack_enemy_cards';
 import {
   ENEMY_DECK_SIZE, ENEMY_HAND_SIZE,
   ENEMY_MAX_ENERGY_NORMAL, ENEMY_MAX_ENERGY_ELITE, ENEMY_MAX_ENERGY_BOSS
 } from '../../balance/core';
 import { runEquipmentTurnHook, runEquipmentCardPlayed, resetEquipmentTurnFlags } from '../../equipmentRuntime';
+import { dealDamage, gainBlock } from '../../combat/damage';
 // PATCH: import equipment hooks for enemy start/end & on_card_played
 
 type DeckConfig =
@@ -81,7 +82,7 @@ export function buildAndShuffleEnemyDeck(s: GameState, r: RNG) {
   // สุ่มลำดับเด็คหนึ่งครั้งให้ deterministic
   const sh = shuffleIds(ids, r);
   (s as any).enemyPiles = { draw: sh.arr, hand: [], discard: [] };
-  (s as any).enemyEnergy = 0;
+  (s as any).enemyEnergy = 0;s.enemy.energy=0;s.enemy.handCount=0;
 
   // ใช้ค่าจาก deck config ถ้ามี ไม่งั้น default ตาม tier
   (s as any).enemyHandSize = handSizeCfg ?? (s as any).enemyHandSize ?? ENEMY_HAND_SIZE;
@@ -93,7 +94,6 @@ export function buildAndShuffleEnemyDeck(s: GameState, r: RNG) {
   return { state: s, rng: sh.rng };
 }
 
-// (เก็บเผื่ออนาคต: สร้างเด็คจาก config แบบ lists เท่านั้น ณ ตอนนี้)
 function buildDeckFromConfig(_enemyId: string, cfg: DeckConfig, r: RNG): { ids: string[]; rng: RNG; handSize?: number; maxEnergy?: number } {
   let rr = r;
   if ('lists' in cfg && cfg.lists?.length) {
@@ -101,9 +101,33 @@ function buildDeckFromConfig(_enemyId: string, cfg: DeckConfig, r: RNG): { ids: 
     const ro = int(rr, 0, total-1); rr = ro.rng;
     let acc=0, pick = cfg.lists[0];
     for (const opt of cfg.lists) { acc += (opt.weight||0); if (ro.value < acc) { pick = opt; break; } }
-    const ids = pick.cards.slice(0, ENEMY_DECK_SIZE);
+    const ids = pick.cards.slice();
     return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
   }
+
+  // Handle pool config
+  if ('pool' in cfg && cfg.pool?.allowOwners) {
+    const { allowOwners, minAttack, minBlock } = cfg.pool;
+
+    // เดิมอ่านการ์ดจาก `pack.enemyCards || pack.default` ซึ่งไม่มีอยู่จริง
+    // (โมดูลนี้ export เป็นฟังก์ชัน) → รายการว่างเสมอ แล้วตกไป fallback claw/guard
+    // เงียบๆ ทำให้ deck config ไม่เคยถูกใช้เลย ทั้งที่ poolForOwner มีไว้เพื่อการนี้
+    const allCards = poolForOwner(allowOwners)
+      .filter(card => !minAttack || (card.dmg ?? 0) >= minAttack)
+      .filter(card => !minBlock || (card.block ?? 0) >= minBlock)
+      .map(card => card.id);
+
+    if (allCards.length > 0) {
+      const ids: string[] = [];
+      for (let i = 0; i < ENEMY_DECK_SIZE; i++) {
+        const ro = int(rr, 0, allCards.length - 1);
+        rr = ro.rng;
+        ids.push(allCards[ro.value]);
+      }
+      return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
+    }
+  }
+
   // fallback: วน cycle เริ่มต้น (กันเด็คว่าง)
   const ids: string[] = defaultCycleForTier('normal').slice(0, ENEMY_DECK_SIZE);
   return { ids, rng: rr, handSize: cfg.handSize, maxEnergy: cfg.maxEnergy };
@@ -141,7 +165,7 @@ function enemyDrawOne(s: GameState) {
   return true;
 }
 
-function enemyDrawUpToHand(s: GameState) {
+export function enemyDrawUpToHand(s: GameState) {
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] } | undefined;
   if (!piles) return;
   const want = Math.max(0, ((s as any).enemyHandSize ?? ENEMY_HAND_SIZE));
@@ -149,9 +173,10 @@ function enemyDrawUpToHand(s: GameState) {
     const ok = enemyDrawOne(s);
     if (!ok) break;
   }
+  if(s.enemy)s.enemy.handCount=piles.hand.length;
 }
 
-function enemyPlayCardId(s: GameState, idx: number): boolean {
+export function enemyPlayCardId(s: GameState, idx: number): boolean {
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] } | undefined;
   if (!s.enemy || !piles) {
     s.log.push(`DEBUG: enemyPlayCardId - No enemy or piles`);
@@ -181,21 +206,10 @@ s.log.push(`Enemy discards unknown card ${id}.`);
 
   // หักค่า energy
   (s as any).enemyEnergy = ((s as any).enemyEnergy ?? 0) - cost;
+  if(s.enemy){s.enemy.energy=(s as any).enemyEnergy;s.enemy.handCount=Math.max(0,piles.hand.length-1);}
 
   // เล่นเอฟเฟ็กต์
-  if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-    const atk = Math.max(0, def.dmg!);
-    const blockAfter = Math.max(0, s.player.block - atk);
-    const hpLoss = Math.max(0, atk - s.player.block);
-    s.player.block = blockAfter;
-    s.player.hp = Math.max(0, s.player.hp - hpLoss);
-    s.log.push(`Enemy plays ${def.name ?? def.id}: Attack ${atk} (${hpLoss} dmg).`);
-  } else if (def.type === 'skill' && (def.block ?? 0) > 0) {
-    s.enemy.block = (s.enemy.block ?? 0) + (def.block ?? 0);
-    s.log.push(`Enemy plays ${def.name ?? def.id}: Block +${def.block}.`);
-  } else {
-    s.log.push(`Enemy plays ${def.name ?? def.id}.`);
-  }
+  require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
 
   // ย้ายการ์ดไป discard
   const [cardId] = piles.hand.splice(idx, 1);
@@ -204,7 +218,8 @@ s.log.push(`Enemy discards unknown card ${id}.`);
   return true;
 }
 
-function enemyDiscardHand(s: GameState) {
+export function enemyDiscardHand(s: GameState) {
+  if(s.enemy)s.enemy.handCount=0;
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] } | undefined;
   if (!piles) return;
   if (piles.hand.length > 0) {
@@ -234,11 +249,19 @@ export function runEnemyTurn(s: GameState) {
 
   // เริ่มเทิร์นศัตรู
   s.enemy.block = 0;
-  const baseEnemyEnergy = (s as any).enemyMaxEnergy ?? ENEMY_MAX_ENERGY_NORMAL;
-  (s as any).enemyEnergy = baseEnemyEnergy;
+  // Only set energy if not already set by EndTurn handler
+  if ((s as any).enemyEnergy === undefined || (s as any).enemyEnergy === 0) {
+    const baseEnemyEnergy = (s as any).enemyMaxEnergy ?? ENEMY_MAX_ENERGY_NORMAL;
+    (s as any).enemyEnergy = baseEnemyEnergy;
+    console.log(`🔋 runEnemyTurn: Setting default energy to ${baseEnemyEnergy}`);
+  } else {
+    console.log(`🔋 runEnemyTurn: Keeping existing energy ${(s as any).enemyEnergy}`);
+  }
 
+  s.enemy.energy=(s as any).enemyEnergy;
   // จั่วถึงขนาดมือ
   enemyDrawUpToHand(s);
+  s.enemy.handCount=(s as any).enemyPiles?.hand?.length??0;
 
   const piles = (s as any).enemyPiles as { draw: string[]; hand: string[]; discard: string[] };
   const startHand = piles?.hand?.length ?? 0;

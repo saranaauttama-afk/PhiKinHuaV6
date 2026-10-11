@@ -1,0 +1,1247 @@
+{
+  "style": "Rough Thai one-baht horror comic, uneven black ink, muted ochre/olive/brick-red; transparent isolated sprites and icons, opaque rural Thai portrait scenes; no UI, labels, parchment, Chinese fantasy architecture.",
+  "subjects": [
+    {
+      "id": "bamboo_dart",
+      "kind": "card",
+      "subject": "ปาไผ่เผา — ปาไผ่เผา โจมตี 6",
+      "path": "assets/cards/thai-v24/bamboo_dart.png"
+    },
+    {
+      "id": "holy_powder",
+      "kind": "card",
+      "subject": "ผงเจ้าพ่อ — โรยผงเจ้าพ่อป้องกัน Block 4 หากศัตรูโจมตี ศัตรูจะได้รับคำสาป",
+      "path": "assets/cards/thai-v24/holy_powder.png"
+    },
+    {
+      "id": "cooling_cloth",
+      "kind": "card",
+      "subject": "ผ้าเย็น — ตั้งรับด้วยผ้าเย็น ป้องกัน 7",
+      "path": "assets/cards/thai-v24/cooling_cloth.png"
+    },
+    {
+      "id": "bell_sound",
+      "kind": "card",
+      "subject": "เสียงระฆัง — ส่งเสียงระฆังผีป่าย Block 6 และทำให้ศัตรู Weak 1 เทิร์น",
+      "path": "assets/cards/thai-v24/bell_sound.png"
+    },
+    {
+      "id": "cursed_needle",
+      "kind": "card",
+      "subject": "เสกเข็มปัก — โจมตี 7 ถ้าผีติดคำสาป โจมตีเพิ่ม 5",
+      "path": "assets/cards/thai-v24/cursed_needle.png"
+    },
+    {
+      "id": "meditation",
+      "kind": "card",
+      "subject": "นั่งสมาธิ — จั่ว 1 และได้พลังงาน 1 ใช้ได้ครั้งเดียวต่อไฟต์ (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/meditation.png"
+    },
+    {
+      "id": "call_old_ghost",
+      "kind": "card",
+      "subject": "เรียกผีเก่า — เรียกผีเก่ามาช่วยรบ โจมตีศัตรู 4 ทุกต้นเทิร์นโดยทะลุการป้องกัน นาน 3 เทิร์น",
+      "path": "assets/cards/thai-v24/call_old_ghost.png"
+    },
+    {
+      "id": "soul_drain",
+      "kind": "card",
+      "subject": "ดูดวิญญาณ — ดูดวิญญาณศัตรู 5 ดาเมจ และฟื้นฟู HP เท่ากับดาเมจที่ทำ",
+      "path": "assets/cards/thai-v24/soul_drain.png"
+    },
+    {
+      "id": "ghost_possession",
+      "kind": "card",
+      "subject": "ทรงผี — ทรงผีเข้าร่าง เทิร์นนี้การ์ดฟรี (0 Energy) ทั้งหมดใช้ได้ไม่จำกัด และจั่วการ์ด 2 ใบ",
+      "path": "assets/cards/thai-v24/ghost_possession.png"
+    },
+    {
+      "id": "hell_gate",
+      "kind": "card",
+      "subject": "เปิดประตูนรก — เปิดประตูนรกปล่อยปีศาจ 20 ดาเมจ และสร้าง 2 Demon Minions (HP 4, โจมตี 3 แต่ละตัว)",
+      "path": "assets/cards/thai-v24/hell_gate.png"
+    },
+    {
+      "id": "spirit_whisper",
+      "kind": "card",
+      "subject": "กระซิบผี — โจมตี 4 จั่ว 1",
+      "path": "assets/cards/thai-v24/spirit_whisper.png"
+    },
+    {
+      "id": "ghost_dodge",
+      "kind": "card",
+      "subject": "หลบผี — ให้ผีช่วยหลบ Block 2 และจั่วการ์ด 1 ใบ · ใช้แล้วหายไปจากไฟต์นี้",
+      "path": "assets/cards/thai-v24/ghost_dodge.png"
+    },
+    {
+      "id": "herbal_potion",
+      "kind": "card",
+      "subject": "ยาสมุนไพร — ดื่มยาสมุนไพรโบราณ ฟื้นฟู 4 HP และล้างสถานะลบ 1 อย่าง",
+      "path": "assets/cards/thai-v24/herbal_potion.png"
+    },
+    {
+      "id": "curse_chant",
+      "kind": "card",
+      "subject": "เสกคาถาสาป — โจมตี 4 และใส่คำสาป 1 ชั้น นาน 2 เทิร์น ใช้ก่อนเสกเข็มปัก",
+      "path": "assets/cards/thai-v24/curse_chant.png"
+    },
+    {
+      "id": "sacred_ritual",
+      "kind": "card",
+      "subject": "พิธีบวงสรวง — ทำพิธีบวงสรวงผี เลือกการ์ด 3 ใบจากกอง Discard กลับมือ (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/sacred_ritual.png"
+    },
+    {
+      "id": "royal_medicine",
+      "kind": "card",
+      "subject": "ยาชาววัง — ดื่มยาชาววังลับ ฟื้นฟู HP 8 และ Max HP +2 ถาวร (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/royal_medicine.png"
+    },
+    {
+      "id": "create_kuman",
+      "kind": "card",
+      "subject": "สร้างกุมาร — เรียกกุมารทองมาอยู่ข้างกาย ฟื้นพลังชีวิตให้เรา 2 ทุกต้นเทิร์น นาน 6 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/create_kuman.png"
+    },
+    {
+      "id": "summon_poison_spirit",
+      "kind": "card",
+      "subject": "เรียกผีพิษ — เรียกผีพิษมาวนอยู่รอบศัตรู ใส่พิษ 1 ชั้นทุกต้นเทิร์น นาน 4 เทิร์น",
+      "path": "assets/cards/thai-v24/summon_poison_spirit.png"
+    },
+    {
+      "id": "direct_poison_spell",
+      "kind": "card",
+      "subject": "เสกพิษตรง — เสกคาถาพิษใส่ศัตรูโดยตรง ติดพิษ 3 ต่อเทิร์น นาน 4 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/direct_poison_spell.png"
+    },
+    {
+      "id": "salt_circle",
+      "kind": "card",
+      "subject": "วงเกลือศักดิ์สิทธิ์ — วางวงเกลือล้อมรอบ Block 10 และได้ Sanctuary (ลดดาเมจครั้งถัดไป 50%)",
+      "path": "assets/cards/thai-v24/salt_circle.png"
+    },
+    {
+      "id": "phi_tai_hong",
+      "kind": "card",
+      "subject": "ผีตายโหง — เรียกผีตายโหงมาแก้แค้น 12 ดาเมจ หาก HP ตัวเอง < 50% ดาเมจ x2",
+      "path": "assets/cards/thai-v24/phi_tai_hong.png"
+    },
+    {
+      "id": "black_magic",
+      "kind": "card",
+      "subject": "อาถรรพ์ดำ — เสกอาถรรพ์ดำสุดท้าย ศัตรูทุกตัว HP เหลือ 1 (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/black_magic.png"
+    },
+    {
+      "id": "divine_protection",
+      "kind": "card",
+      "subject": "เทพารักษ์ — เรียกเทพารักษ์มาช่วย ฟื้นฟู HP เต็ม และ Immunity ทุกสถานะ 3 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/divine_protection.png"
+    },
+    {
+      "id": "ancestral_spirits",
+      "kind": "card",
+      "subject": "วิญญาณบรรพบุรุษ — เรียกวิญญาณพ่อแม่มาช่วย Copy การ์ดที่เล่นครั้งสุดท้าย (เล่นได้ฟรี)",
+      "path": "assets/cards/thai-v24/ancestral_spirits.png"
+    },
+    {
+      "id": "equipment_cooling_cloth",
+      "kind": "card",
+      "subject": "ติดตั้งผ้าเย็น — Equipment Card: ติดตั้งผ้าเย็นถาวร ฟื้นฟู 2 HP ต้นเทิร์น",
+      "path": "assets/cards/thai-v24/equipment_cooling_cloth.png"
+    },
+    {
+      "id": "equipment_luang_pu_amulet",
+      "kind": "card",
+      "subject": "ติดตั้งเครื่องรางหลวงปู่ — Equipment Card: ติดตั้งเครื่องรางหลวงปู่ ลดดาเมจที่รับ 1 แต้ม",
+      "path": "assets/cards/thai-v24/equipment_luang_pu_amulet.png"
+    },
+    {
+      "id": "equipment_prayer_beads",
+      "kind": "card",
+      "subject": "ติดตั้งลูกประคำ — Equipment Card: ติดตั้งลูกประคำ เมื่อเล่นการ์ดโจมตี +1 ดาเมจ",
+      "path": "assets/cards/thai-v24/equipment_prayer_beads.png"
+    },
+    {
+      "id": "equipment_nang_tani_skull",
+      "kind": "card",
+      "subject": "ติดตั้งกะโหลกนางตานี — ติดกะโหลกนางตานีไว้กับตัว มันกระซิบทางให้ — ต้นเทิร์นจั่วเพิ่ม 1 ใบ",
+      "path": "assets/cards/thai-v24/equipment_nang_tani_skull.png"
+    },
+    {
+      "id": "equipment_shaman_staff",
+      "kind": "card",
+      "subject": "ติดตั้งไม้เท้าหมอผี — Equipment Card: ติดตั้งไม้เท้าหมอผี การ์ดแรกแต่ละเทิร์น ใช้ Energy -1",
+      "path": "assets/cards/thai-v24/equipment_shaman_staff.png"
+    },
+    {
+      "id": "temple_blade",
+      "kind": "card",
+      "subject": "ฟันดาบวัด — ฟันดาบวัด โจมตี 7",
+      "path": "assets/cards/thai-v24/temple_blade.png"
+    },
+    {
+      "id": "muay_stance",
+      "kind": "card",
+      "subject": "ตั้งท่ามวย — ตั้งท่ามวย ป้องกัน 8",
+      "path": "assets/cards/thai-v24/muay_stance.png"
+    },
+    {
+      "id": "flying_knee",
+      "kind": "card",
+      "subject": "เข่าลอย — กระโดดเข่าลอยเข้าใส่ สร้างความเสียหาย 15",
+      "path": "assets/cards/thai-v24/flying_knee.png"
+    },
+    {
+      "id": "parry_step",
+      "kind": "card",
+      "subject": "ปัดป้อง — ปัดหมัดแล้วก้าวออก Block 5 และจั่ว 1 ใบ",
+      "path": "assets/cards/thai-v24/parry_step.png"
+    },
+    {
+      "id": "stand_firm",
+      "kind": "card",
+      "subject": "ยืนหยัด — ปักหลักไม่ถอย Block 16",
+      "path": "assets/cards/thai-v24/stand_firm.png"
+    },
+    {
+      "id": "fighter_breath",
+      "kind": "card",
+      "subject": "ลมหายใจนักสู้ — ได้พลังงาน 1 และจั่ว 1 ใบ ใช้ได้ครั้งเดียวต่อไฟต์",
+      "path": "assets/cards/thai-v24/fighter_breath.png"
+    },
+    {
+      "id": "iron_will",
+      "kind": "card",
+      "subject": "ใจเหล็ก — รวบรวมใจ ได้พลังโจมตี +2 ตลอดไฟต์",
+      "path": "assets/cards/thai-v24/iron_will.png"
+    },
+    {
+      "id": "chant_sutra",
+      "kind": "card",
+      "subject": "สวดมนต์ — สวดบทป้องกัน Block 7",
+      "path": "assets/cards/thai-v24/chant_sutra.png"
+    },
+    {
+      "id": "holy_water",
+      "kind": "card",
+      "subject": "น้ำมนต์ — พรมน้ำมนต์ ฟื้นพลังชีวิต 5",
+      "path": "assets/cards/thai-v24/holy_water.png"
+    },
+    {
+      "id": "loving_kindness",
+      "kind": "card",
+      "subject": "แผ่เมตตา — แผ่เมตตาให้สรรพสัตว์ Block 4 และฟื้น 4",
+      "path": "assets/cards/thai-v24/loving_kindness.png"
+    },
+    {
+      "id": "merit_shield",
+      "kind": "card",
+      "subject": "บุญคุ้มครอง — บุญเก่าคุ้มกาย Block 14",
+      "path": "assets/cards/thai-v24/merit_shield.png"
+    },
+    {
+      "id": "dispel_ill",
+      "kind": "card",
+      "subject": "ปัดเป่า — ปัดเป่าสถานะลบทั้งหมดออกจากตัวเอง · ใช้แล้วหายไปจากไฟต์นี้",
+      "path": "assets/cards/thai-v24/dispel_ill.png"
+    },
+    {
+      "id": "alms_offering",
+      "kind": "card",
+      "subject": "สังฆทาน — รับบิณฑบาต ฟื้นพลังชีวิต 4 ต้องเลือกระหว่างรักษากับโจมตี",
+      "path": "assets/cards/thai-v24/alms_offering.png"
+    },
+    {
+      "id": "dharma_wheel",
+      "kind": "card",
+      "subject": "ธรรมจักร — โจมตี 7 ถ้ามีป้องกันอย่างน้อย 7 โจมตีเพิ่ม 5",
+      "path": "assets/cards/thai-v24/dharma_wheel.png"
+    },
+    {
+      "id": "five_precepts",
+      "kind": "card",
+      "subject": "ศีลห้า — ฟื้นพลังชีวิต 2 ต่อเทิร์น นาน 3 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)",
+      "path": "assets/cards/thai-v24/five_precepts.png"
+    },
+    {
+      "id": "house_guardian",
+      "kind": "card",
+      "subject": "ผีเฝ้าเรือน — เรียกผีเฝ้าเรือนมาคุ้มกัน ได้ Block 3 ทุกต้นเทิร์นและพันศัตรูไว้ นาน 4 เทิร์น",
+      "path": "assets/cards/thai-v24/house_guardian.png"
+    },
+    {
+      "id": "whisper_ear",
+      "kind": "card",
+      "subject": "เสียงกระซิบ — โจมตี 5 และจั่ว 1 ใบ ใช้พลังงาน 1",
+      "path": "assets/cards/thai-v24/whisper_ear.png"
+    },
+    {
+      "id": "yantra_cloth",
+      "kind": "card",
+      "subject": "ผ้ายันต์ — คลี่ผ้ายันต์บังกาย Block 8",
+      "path": "assets/cards/thai-v24/yantra_cloth.png"
+    },
+    {
+      "id": "spirit_possess",
+      "kind": "card",
+      "subject": "ให้ผีเข้า — ปล่อยให้วิญญาณเข้าสิงชั่วครู่ สร้างความเสียหาย 13",
+      "path": "assets/cards/thai-v24/spirit_possess.png"
+    },
+    {
+      "id": "call_phrai",
+      "kind": "card",
+      "subject": "เรียกพราย — เรียกผีพรายมาวนอยู่รอบศัตรู ใส่พิษ 1 ชั้นทุกต้นเทิร์น นาน 4 เทิร์น",
+      "path": "assets/cards/thai-v24/call_phrai.png"
+    },
+    {
+      "id": "phrai_oil",
+      "kind": "card",
+      "subject": "น้ำมันพราย — ป้ายน้ำมันพราย ศัตรูติดพิษ 3 ต่อเทิร์น นาน 4 เทิร์น",
+      "path": "assets/cards/thai-v24/phrai_oil.png"
+    },
+    {
+      "id": "dust_jab",
+      "kind": "card",
+      "subject": "ต่อยฝุ่นตลบ — ต่อยแบบไม่ตั้งท่า ฝุ่นลานวัดฟุ้งขึ้นมา สร้างความเสียหาย 4",
+      "path": "assets/cards/thai-v24/dust_jab.png"
+    },
+    {
+      "id": "elbow_return",
+      "kind": "card",
+      "subject": "ศอกกลับ — ปล่อยให้มันเข้ามาก่อนแล้วศอกกลับ เสียหาย 6 และศัตรูเปราะบาง 2",
+      "path": "assets/cards/thai-v24/elbow_return.png"
+    },
+    {
+      "id": "shin_block",
+      "kind": "card",
+      "subject": "ปิดแข้ง — ยกแข้งรับไว้เฉยๆ ไม่สวย แต่ได้ Block 5",
+      "path": "assets/cards/thai-v24/shin_block.png"
+    },
+    {
+      "id": "war_cry",
+      "kind": "card",
+      "subject": "โห่ลั่นลานวัด — โห่จนเสียงก้องกุฏิ ได้ Block 6 และแข็งแกร่งขึ้น 1 ตลอดไฟต์",
+      "path": "assets/cards/thai-v24/war_cry.png"
+    },
+    {
+      "id": "long_spear",
+      "kind": "card",
+      "subject": "แทงหอกยาว — หอกยาวกว่าที่มันคิด เสียหาย 12 และศัตรูอ่อนแอ 2",
+      "path": "assets/cards/thai-v24/long_spear.png"
+    },
+    {
+      "id": "gate_watch",
+      "kind": "card",
+      "subject": "ยืนเฝ้าประตูโบสถ์ — ยืนตรงที่ที่ต้องยืน ได้ Block 12 และจั่ว 1 ใบ",
+      "path": "assets/cards/thai-v24/gate_watch.png"
+    },
+    {
+      "id": "equipment_iron_bracer",
+      "kind": "card",
+      "subject": "ติดตั้งกำไลเหล็ก — สวมกำไลเหล็กของครูดาบ ยิ่งเลือดน้อยยิ่งยืนแน่น",
+      "path": "assets/cards/thai-v24/equipment_iron_bracer.png"
+    },
+    {
+      "id": "karma_cut",
+      "kind": "card",
+      "subject": "ดาบตัดกรรม — ฟันครั้งเดียวให้จบเรื่อง สร้างความเสียหาย 26",
+      "path": "assets/cards/thai-v24/karma_cut.png"
+    },
+    {
+      "id": "hold_the_line",
+      "kind": "card",
+      "subject": "ยันจนตัวตาย — ปักหลักไม่ถอย ได้ Block 20 และฟื้น 8 — ทำได้ครั้งเดียวต่อไฟต์",
+      "path": "assets/cards/thai-v24/hold_the_line.png"
+    },
+    {
+      "id": "equipment_war_drum",
+      "kind": "card",
+      "subject": "ติดตั้งกลองศึกประจำกาย — สะพายกลองศึกไว้กับตัว เสียงมันลั่นตั้งแต่ก่อนเริ่ม",
+      "path": "assets/cards/thai-v24/equipment_war_drum.png"
+    },
+    {
+      "id": "ancestor_blade",
+      "kind": "card",
+      "subject": "ดาบบรรพบุรุษ — ดาบที่ส่งต่อกันมาเจ็ดชั่วคน เสียหาย 18 และแข็งแกร่ง 3 ตลอดไฟต์ — ชักได้ครั้งเดียว",
+      "path": "assets/cards/thai-v24/ancestor_blade.png"
+    },
+    {
+      "id": "call_ancient_warrior",
+      "kind": "card",
+      "subject": "เรียกวิญญาณนักรบเก่า — เรียกคนที่ตายในสนามรบเดิมขึ้นมายืนข้างๆ ได้ Block 10 และวิญญาณนักสู้โบราณอยู่ช่วย 5 เทิร์น",
+      "path": "assets/cards/thai-v24/call_ancient_warrior.png"
+    },
+    {
+      "id": "morning_alms",
+      "kind": "card",
+      "subject": "บิณฑบาตเช้า — ออกบิณฑบาตตั้งแต่ฟ้ายังไม่สาง ได้ Block 3 และฟื้น 3",
+      "path": "assets/cards/thai-v24/morning_alms.png"
+    },
+    {
+      "id": "count_beads",
+      "kind": "card",
+      "subject": "นับลูกประคำ — นับไปทีละเม็ดจนใจนิ่ง จั่วการ์ด 2 ใบ",
+      "path": "assets/cards/thai-v24/count_beads.png"
+    },
+    {
+      "id": "sprinkle_water",
+      "kind": "card",
+      "subject": "พรมน้ำมนต์ — พรมใส่ตรงๆ เสียหาย 6 และศัตรูอ่อนแอ 2",
+      "path": "assets/cards/thai-v24/sprinkle_water.png"
+    },
+    {
+      "id": "candle_vigil",
+      "kind": "card",
+      "subject": "จุดเทียนเฝ้าศพ — จุดเทียนนั่งเฝ้าทั้งคืน ได้ Block 5 และฟื้นฟูต่อเนื่อง 2 สามเทิร์น",
+      "path": "assets/cards/thai-v24/candle_vigil.png"
+    },
+    {
+      "id": "mantra_wall",
+      "kind": "card",
+      "subject": "กำแพงบทสวด — สวดจนเสียงเป็นกำแพง ได้ Block 11 และจั่ว 1 ใบ",
+      "path": "assets/cards/thai-v24/mantra_wall.png"
+    },
+    {
+      "id": "karma_returns",
+      "kind": "card",
+      "subject": "กรรมสนอง — สิ่งที่มันทำไว้ย้อนกลับเข้าตัวมันเอง เสียหาย 11 และเราฟื้น 5",
+      "path": "assets/cards/thai-v24/karma_returns.png"
+    },
+    {
+      "id": "equipment_alms_bowl",
+      "kind": "card",
+      "subject": "ติดตั้งบาตรพระ — อุ้มบาตรไว้ตลอดทาง บุญที่รับมาก็มากขึ้นตาม",
+      "path": "assets/cards/thai-v24/equipment_alms_bowl.png"
+    },
+    {
+      "id": "great_merit",
+      "kind": "card",
+      "subject": "มหากุศล — บุญใหญ่ที่สะสมมาทั้งชีวิต ฟื้น 20 และฟื้นฟูต่อเนื่อง 5 ห้าเทิร์น — ครั้งเดียวต่อไฟต์",
+      "path": "assets/cards/thai-v24/great_merit.png"
+    },
+    {
+      "id": "dharma_verdict",
+      "kind": "card",
+      "subject": "ธรรมพิพากษา — ตัดสินตามที่มันก่อไว้ เสียหาย 20 และเปราะบาง 3",
+      "path": "assets/cards/thai-v24/dharma_verdict.png"
+    },
+    {
+      "id": "equipment_white_robe",
+      "kind": "card",
+      "subject": "ติดตั้งผ้าขาวห่ม — ห่มผ้าขาวที่ผ่านพิธีมาแล้ว แผลปิดเองได้ทั้งไฟต์",
+      "path": "assets/cards/thai-v24/equipment_white_robe.png"
+    },
+    {
+      "id": "nirvana_moment",
+      "kind": "card",
+      "subject": "ชั่วขณะสงบ — ชั่วขณะที่ไม่กลัวอะไรเลย ได้ Block 25 และฟื้นฟูต่อเนื่อง 8 แปดเทิร์น — ครั้งเดียวต่อไฟต์",
+      "path": "assets/cards/thai-v24/nirvana_moment.png"
+    },
+    {
+      "id": "boundless_compassion",
+      "kind": "card",
+      "subject": "เมตตาไม่มีประมาณ — แผ่ไปจนถึงสิ่งที่ไม่มีใครแผ่ให้ ฟื้น 12 และกุมารทองมาอยู่ด้วย 6 เทิร์น",
+      "path": "assets/cards/thai-v24/boundless_compassion.png"
+    },
+    {
+      "id": "incense_smoke",
+      "kind": "card",
+      "subject": "ควันธูปคลุ้ง — จุดธูปทั้งกำจนควันบังตัว ได้ Block 4",
+      "path": "assets/cards/thai-v24/incense_smoke.png"
+    },
+    {
+      "id": "knock_call",
+      "kind": "card",
+      "subject": "เคาะเรียกวิญญาณ — เคาะสามที มีอะไรตอบกลับมา สร้างความเสียหาย 5",
+      "path": "assets/cards/thai-v24/knock_call.png"
+    },
+    {
+      "id": "offering_tray",
+      "kind": "card",
+      "subject": "ถาดเครื่องเซ่น — ฟื้นชีวิต 5 ใช้พลังงาน 1",
+      "path": "assets/cards/thai-v24/offering_tray.png"
+    },
+    {
+      "id": "ghost_hand",
+      "kind": "card",
+      "subject": "ผีจับมือ — มีมือเย็นๆ มาจับแล้วนำทาง เสียหาย 7 และจั่ว 1 ใบ",
+      "path": "assets/cards/thai-v24/ghost_hand.png"
+    },
+    {
+      "id": "whisper_curse",
+      "kind": "card",
+      "subject": "กระซิบสาป — กระซิบชื่อมันเบาๆ เสียหาย 6 และติดคำสาป 3 ชั้น",
+      "path": "assets/cards/thai-v24/whisper_curse.png"
+    },
+    {
+      "id": "snail_call",
+      "kind": "card",
+      "subject": "เรียกหอยทากผี — เรียกหอยทากผีมาเกาะบ่า ส่งพลังงานให้ทุกเทิร์น อยู่ 4 เทิร์น",
+      "path": "assets/cards/thai-v24/snail_call.png"
+    },
+    {
+      "id": "equipment_spirit_house",
+      "kind": "card",
+      "subject": "ติดตั้งศาลพระภูมิ — ตั้งศาลย่อสะพายไว้ ที่ไหนก็มีผีเฝ้าเรือนตามมา",
+      "path": "assets/cards/thai-v24/equipment_spirit_house.png"
+    },
+    {
+      "id": "shadow_split",
+      "kind": "card",
+      "subject": "แยกเงา — แยกเงาตัวเองออกมาอีกร่าง มันตีแทนเราทุกเทิร์น อยู่ 3 เทิร์น",
+      "path": "assets/cards/thai-v24/shadow_split.png"
+    },
+    {
+      "id": "mass_possession",
+      "kind": "card",
+      "subject": "ผีเข้าหมู่ — ปล่อยให้เข้ามาพร้อมกันทั้งหมด สร้างความเสียหาย 22",
+      "path": "assets/cards/thai-v24/mass_possession.png"
+    },
+    {
+      "id": "equipment_ghost_mirror",
+      "kind": "card",
+      "subject": "ติดตั้งกระจกผี — แขวนกระจกบานที่ไม่ควรมองไว้กับตัว ใครตีเราจะเห็นหน้าตัวเอง",
+      "path": "assets/cards/thai-v24/equipment_ghost_mirror.png"
+    },
+    {
+      "id": "thousand_whispers",
+      "kind": "card",
+      "subject": "พันเสียงกระซิบ — ทุกเสียงพูดพร้อมกันจนหูอื้อ เสียหาย 15 จั่ว 3 ใบ และได้พลังงาน 2 — ครั้งเดียวต่อไฟต์",
+      "path": "assets/cards/thai-v24/thousand_whispers.png"
+    },
+    {
+      "id": "full_body_trance",
+      "kind": "card",
+      "subject": "เข้าทรงเต็มร่าง — ยกร่างให้มันทั้งตัว ได้ Block 8 แข็งแกร่ง 2 ตลอดไฟต์ และปีศาจสหายช่วยรบ 5 เทิร์น",
+      "path": "assets/cards/thai-v24/full_body_trance.png"
+    },
+    {
+      "id": "triple_knee",
+      "kind": "card",
+      "subject": "เข่าสามชั้น — ยกเข่าสามที ทีละ 4 — เกราะกินได้ทีละหมัด และแรงที่สะสมไว้เข้าทุกหมัด",
+      "path": "assets/cards/thai-v24/triple_knee.png"
+    },
+    {
+      "id": "bamboo_volley",
+      "kind": "card",
+      "subject": "ปาไผ่รัว — ขว้างไผ่ทีละดุ้นสี่ครั้ง ทีละ 3",
+      "path": "assets/cards/thai-v24/bamboo_volley.png"
+    },
+    {
+      "id": "thousand_needles",
+      "kind": "card",
+      "subject": "เข็มพันเล่ม — ปักเข็มห้าครั้ง ทีละ 4 และศัตรูติดพิษ 3",
+      "path": "assets/cards/thai-v24/thousand_needles.png"
+    },
+    {
+      "id": "prayer_rain",
+      "kind": "card",
+      "subject": "ฝนบทสวด — สวดรัวเป็นสายฝน โดนหกครั้ง ทีละ 3",
+      "path": "assets/cards/thai-v24/prayer_rain.png"
+    },
+    {
+      "id": "shadow_flurry",
+      "kind": "card",
+      "subject": "เงาซัดรัว — แปดหมัดติด ทีละ 5 — ยิ่งแข็งแกร่งยิ่งต่างกันมาก",
+      "path": "assets/cards/thai-v24/shadow_flurry.png"
+    },
+    {
+      "id": "death_throes",
+      "kind": "card",
+      "subject": "ดิ้นตาย — ยิ่งใกล้ตายยิ่งแรง โจมตี 8 — ถ้าเลือดเหลือไม่ถึงครึ่ง โจมตี 20",
+      "path": "assets/cards/thai-v24/death_throes.png"
+    },
+    {
+      "id": "counter_punch",
+      "kind": "card",
+      "subject": "สวนหมัด — โจมตี 6 ถ้ามีป้องกันอย่างน้อย 10 โจมตี 2 ครั้ง",
+      "path": "assets/cards/thai-v24/counter_punch.png"
+    },
+    {
+      "id": "salt_in_wound",
+      "kind": "card",
+      "subject": "ซ้ำเติมแผล — โจมตี 5 — ถ้าศัตรูติดพิษอยู่แล้ว โจมตี 14",
+      "path": "assets/cards/thai-v24/salt_in_wound.png"
+    },
+    {
+      "id": "all_or_nothing",
+      "kind": "card",
+      "subject": "หมดหน้าตัก — โจมตี 10 — ถ้าไม่มีการ์ดอื่นเหลือในมือแล้ว โจมตี 30 และจั่ว 2 ใบ",
+      "path": "assets/cards/thai-v24/all_or_nothing.png"
+    },
+    {
+      "id": "last_rite",
+      "kind": "card",
+      "subject": "สวดส่งวิญญาณ — ได้ Block 6 — ถ้าเลือดเหลือไม่ถึง 40% ฟื้นอีก 12",
+      "path": "assets/cards/thai-v24/last_rite.png"
+    },
+    {
+      "id": "lean_deck",
+      "kind": "card",
+      "subject": "สำรับคม — จั่ว 1 ใบ — ถ้าสำรับเหลือไม่เกิน 15 ใบ จั่วอีก 2 และได้พลังงาน 1",
+      "path": "assets/cards/thai-v24/lean_deck.png"
+    },
+    {
+      "id": "yantra_in_hand",
+      "kind": "card",
+      "subject": "ยันต์ในมือ — ปล่อยได้ Block 12 — หรือถือไว้เฉยๆ ก็ได้ Block 4 ทุกท้ายเทิร์น",
+      "path": "assets/cards/thai-v24/yantra_in_hand.png"
+    },
+    {
+      "id": "wrist_thread",
+      "kind": "card",
+      "subject": "ด้ายผูกข้อมือ — ปล่อยฟื้น 10 — หรือถือไว้ก็ฟื้น 3 ทุกท้ายเทิร์น",
+      "path": "assets/cards/thai-v24/wrist_thread.png"
+    },
+    {
+      "id": "held_charm",
+      "kind": "card",
+      "subject": "เครื่องรางกำไว้ — ปล่อยได้ Block 14 และแข็งแกร่ง 2 — หรือกำไว้ก็ได้ Block 3 ทุกท้ายเทิร์น",
+      "path": "assets/cards/thai-v24/held_charm.png"
+    },
+    {
+      "id": "spirit_lamp",
+      "kind": "card",
+      "subject": "ตะเกียงผี — ฟื้น 4 และฟื้นฟู 2 นาน 3 เทิร์น หรือถือไว้ได้ฟื้นฟู 1 ท้ายเทิร์น",
+      "path": "assets/cards/thai-v24/spirit_lamp.png"
+    },
+    {
+      "id": "flowing_chant",
+      "kind": "card",
+      "subject": "คาถาไหลลื่น — โจมตี 16 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 0",
+      "path": "assets/cards/thai-v24/flowing_chant.png"
+    },
+    {
+      "id": "gathering_merit",
+      "kind": "card",
+      "subject": "บุญสะสม — ได้ Block 12 และฟื้น 6 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 1",
+      "path": "assets/cards/thai-v24/gathering_merit.png"
+    },
+    {
+      "id": "war_momentum",
+      "kind": "card",
+      "subject": "ได้จังหวะ — โจมตี 5 สามครั้ง ค่าร่ายลด 1 ต่อใบที่เล่นแล้ว ต่ำสุด 1",
+      "path": "assets/cards/thai-v24/war_momentum.png"
+    },
+    {
+      "id": "trance_deepens",
+      "kind": "card",
+      "subject": "ทรงลึกขึ้น — เรียกวิญญาณเพื่อนมาช่วยรบ 3 เทิร์น — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 0",
+      "path": "assets/cards/thai-v24/trance_deepens.png"
+    },
+    {
+      "id": "night_hex_knot",
+      "kind": "card",
+      "subject": "เงื่อนคาถาห้าคืน — โจมตี 5 ใส่พิษ 2 นาน 3 เทิร์น ถ้ามีพิษอยู่ก่อน โจมตี 12",
+      "path": "assets/cards/thai-v24/night_hex_knot.png"
+    },
+    {
+      "id": "night_lotus_wheel",
+      "kind": "card",
+      "subject": "จักรบัวห้าคืน — โจมตี 6 ป้องกัน 5 ถ้าเลือดต่ำกว่าครึ่ง ฟื้น 4",
+      "path": "assets/cards/thai-v24/night_lotus_wheel.png"
+    },
+    {
+      "id": "night_ancestor_pact",
+      "kind": "card",
+      "subject": "สัญญาห้าคืน — โจมตี 4 ถ้ามีวิญญาณคู่กายอย่างน้อย 2 ตน โจมตี 12 และจั่ว 1",
+      "path": "assets/cards/thai-v24/night_ancestor_pact.png"
+    },
+    {
+      "id": "yantra_snare",
+      "kind": "card",
+      "subject": "ยันต์ดัก — วางยันต์ไว้กับพื้น ผีที่เข้ามาตีจะโดนสวนกลับ 9 และติดคำสาป 2 ชั้น",
+      "path": "assets/cards/thai-v24/yantra_snare.png"
+    },
+    {
+      "id": "sacred_thread",
+      "kind": "card",
+      "subject": "ด้ายสายสิญจน์ — ขึงด้ายไว้รอบตัว ผีที่เข้ามาตีจะถูกพันไว้ — ยกเลิกการ์ดใบนั้นทั้งใบ",
+      "path": "assets/cards/thai-v24/sacred_thread.png"
+    },
+    {
+      "id": "bamboo_spike",
+      "kind": "card",
+      "subject": "ขวากไผ่ — ปักขวากไผ่รอบตัว ผีที่ขยับเข้ามาไม่ว่าจะทำอะไร โดน 14",
+      "path": "assets/cards/thai-v24/bamboo_spike.png"
+    },
+    {
+      "id": "salt_circle_trap",
+      "kind": "card",
+      "subject": "วงเกลือดัก — โรยเกลือเป็นวง ผีที่ตั้งท่าหรือเสริมกำลังจะเสียสมาธิ — อ่อนแอ 2 และเราได้พลังงาน 1",
+      "path": "assets/cards/thai-v24/salt_circle_trap.png"
+    },
+    {
+      "id": "grave_soil",
+      "kind": "card",
+      "subject": "ดินหน้าหลุม — โรยดินจากหน้าหลุมศพ ผีตัวไหนขยับก็ติดพิษ 3 และเปราะบาง 2",
+      "path": "assets/cards/thai-v24/grave_soil.png"
+    },
+    {
+      "id": "mirror_ward",
+      "kind": "card",
+      "subject": "กระจกเงาสะท้อน — ตั้งกระจกรับหน้า ท่าโจมตีถัดไปของผีถูกยกเลิกและสะท้อนกลับ 12",
+      "path": "assets/cards/thai-v24/mirror_ward.png"
+    },
+    {
+      "id": "monk_bowl",
+      "kind": "card",
+      "subject": "บาตรคว่ำ — คว่ำบาตรดักไว้ ผีที่เข้ามาไม่ว่าจะทำอะไร เราได้ Block 8",
+      "path": "assets/cards/thai-v24/monk_bowl.png"
+    },
+    {
+      "id": "war_drum_trap",
+      "kind": "card",
+      "subject": "กลองศึกลั่น — ตั้งกลองไว้ ผีที่ตั้งท่าจะถูกขัด — เสียหาย 8 และเราได้ Block 6",
+      "path": "assets/cards/thai-v24/war_drum_trap.png"
+    },
+    {
+      "id": "curse_dread",
+      "kind": "card",
+      "subject": "ความหวาดกลัว — เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง",
+      "path": "assets/cards/thai-v24/curse_dread.png"
+    },
+    {
+      "id": "curse_bad_omen",
+      "kind": "card",
+      "subject": "ลางร้าย — เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง",
+      "path": "assets/cards/thai-v24/curse_bad_omen.png"
+    },
+    {
+      "id": "curse_rot",
+      "kind": "card",
+      "subject": "กลิ่นเน่า — เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง",
+      "path": "assets/cards/thai-v24/curse_rot.png"
+    },
+    {
+      "id": "curse_whisper",
+      "kind": "card",
+      "subject": "เสียงในหู — เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง",
+      "path": "assets/cards/thai-v24/curse_whisper.png"
+    },
+    {
+      "id": "ancestral_blessing",
+      "kind": "blessing",
+      "subject": "พรบรรพบุรุษ — ฟื้นฟู 1 HP ท้ายเทิร์น (วิญญาณบรรพบุรุษคุ้มครอง)",
+      "path": "assets/blessings/thai-v24/ancestral_blessing.png"
+    },
+    {
+      "id": "spirit_energy",
+      "kind": "blessing",
+      "subject": "พลังวิญญาณ — การ์ดใบแรกแต่ละเทิร์น ได้ +1 Energy (ผีช่วยเสริมพลัง)",
+      "path": "assets/blessings/thai-v24/spirit_energy.png"
+    },
+    {
+      "id": "ghost_protection",
+      "kind": "blessing",
+      "subject": "ผีป้องกัน — เมื่อเล่นการ์ดโจมตี ได้ Block 2 (ผีช่วยป้องกัน)",
+      "path": "assets/blessings/thai-v24/ghost_protection.png"
+    },
+    {
+      "id": "meditation_peace",
+      "kind": "blessing",
+      "subject": "สมาธิสงบ — ต้นเทิร์น ได้ Block 3 (จิตใจสงบ ผีไม่รบกวน)",
+      "path": "assets/blessings/thai-v24/meditation_peace.png"
+    },
+    {
+      "id": "herbal_wisdom",
+      "kind": "blessing",
+      "subject": "ปัญญาสมุนไพร — การ์ด Skill ใบแรกแต่ละเทิร์น ได้ +1 Energy",
+      "path": "assets/blessings/thai-v24/herbal_wisdom.png"
+    },
+    {
+      "id": "sacred_cloth",
+      "kind": "blessing",
+      "subject": "ผ้าศักดิ์สิทธิ์ — ท้ายเทิร์น ได้ Block 1 (ผ้าเย็นป้องกัน)",
+      "path": "assets/blessings/thai-v24/sacred_cloth.png"
+    },
+    {
+      "id": "life_steal_spirit",
+      "kind": "blessing",
+      "subject": "ดูดพลังชีวิต — เมื่อเล่นการ์ดโจมตี ฟื้นฟู 1 HP (ดูดวิญญาณศัตรู)",
+      "path": "assets/blessings/thai-v24/life_steal_spirit.png"
+    },
+    {
+      "id": "bamboo_dart_power",
+      "kind": "blessing",
+      "subject": "พลังปาไผ่ — การ์ดโจมตีใบแรกแต่ละเทิร์น ได้ +1 Energy",
+      "path": "assets/blessings/thai-v24/bamboo_dart_power.png"
+    },
+    {
+      "id": "ritual_shield",
+      "kind": "blessing",
+      "subject": "โล่พิธีกรรม — เมื่อเล่นการ์ด Skill ได้ Block 1 (พิธีกรรมป้องกัน)",
+      "path": "assets/blessings/thai-v24/ritual_shield.png"
+    },
+    {
+      "id": "free_card_energy",
+      "kind": "blessing",
+      "subject": "พลังการ์ดฟรี — การ์ดฟรี (0 cost) ใบแรกแต่ละเทิร์น คืน +1 Energy",
+      "path": "assets/blessings/thai-v24/free_card_energy.png"
+    },
+    {
+      "id": "luang_pu_protection",
+      "kind": "blessing",
+      "subject": "เครื่องรางหลวงปู่ — ลดดาเมจที่รับ 1 แต้ม (เครื่องรางศักดิ์สิทธิ์)",
+      "path": "assets/blessings/thai-v24/luang_pu_protection.png"
+    },
+    {
+      "id": "naga_blessing",
+      "kind": "blessing",
+      "subject": "พรพญานาค — ต้นเทิร์น จั่วการ์ด 1 ใบ และได้ Energy +1 (พรจากพญานาค)",
+      "path": "assets/blessings/thai-v24/naga_blessing.png"
+    },
+    {
+      "id": "night_warrior_blessing",
+      "kind": "blessing",
+      "subject": "ครูลานวัด — Thai swordmaster teacher portrait and crossed practice sticks",
+      "path": "assets/blessings/thai-v24/night_warrior_blessing.png"
+    },
+    {
+      "id": "night_shaman_blessing",
+      "kind": "blessing",
+      "subject": "ครูคุ้มคาถา — Thai shaman teacher hands tying a sacred string knot",
+      "path": "assets/blessings/thai-v24/night_shaman_blessing.png"
+    },
+    {
+      "id": "night_nun_blessing",
+      "kind": "blessing",
+      "subject": "แสงบุญ — glowing lotus in Thai nun palms",
+      "path": "assets/blessings/thai-v24/night_nun_blessing.png"
+    },
+    {
+      "id": "night_medium_blessing",
+      "kind": "blessing",
+      "subject": "หิ้งบรรพบุรุษ — small Thai ancestor wooden shelf with portraits and incense",
+      "path": "assets/blessings/thai-v24/night_medium_blessing.png"
+    },
+    {
+      "id": "qa_phra_prathan",
+      "kind": "card",
+      "subject": "พระประธาน — a seated Thai Buddha statue on a simple lotus pedestal, serene protective golden glow, recognizably Buddha, no spirit house",
+      "path": "assets/cards/thai-v24/qa_phra_prathan.png"
+    },
+    {
+      "id": "fused_bamboo_volley",
+      "kind": "card",
+      "subject": "ห่าไผ่ — ปาไผ่เผาพร้อมกันทั้งกำ โจมตี 10 โดยไม่ต้องเสียพลังงาน",
+      "path": "assets/cards/thai-v24/fused_bamboo_volley.png"
+    },
+    {
+      "id": "fused_double_cloth",
+      "kind": "card",
+      "subject": "ผ้าเย็นสองชั้น — พันผ้าเย็นซ้อนสองชั้น ป้องกัน 10 โดยไม่ต้องเสียพลังงาน",
+      "path": "assets/cards/thai-v24/fused_double_cloth.png"
+    },
+    {
+      "id": "fused_dart_and_cloth",
+      "kind": "card",
+      "subject": "ปาไผ่คลุมผ้า — ขว้างไผ่แล้วชักผ้าเย็นคลุมตัวทันที โจมตี 5 และป้องกัน 5",
+      "path": "assets/cards/thai-v24/fused_dart_and_cloth.png"
+    },
+    {
+      "id": "fused_calm_dart",
+      "kind": "card",
+      "subject": "ปาไผ่ใจนิ่ง — ขว้างไผ่ด้วยจิตสงบ โจมตี 5 จั่วการ์ด 1 ใบ และได้พลังงานคืน 1",
+      "path": "assets/cards/thai-v24/fused_calm_dart.png"
+    },
+    {
+      "id": "fused_calm_cloth",
+      "kind": "card",
+      "subject": "ผ้าเย็นใจนิ่ง — คลุมผ้าเย็นแล้วนั่งสงบ ป้องกัน 5 จั่วการ์ด 1 ใบ และได้พลังงานคืน 1",
+      "path": "assets/cards/thai-v24/fused_calm_cloth.png"
+    },
+    {
+      "id": "fused_whisper_dodge",
+      "kind": "card",
+      "subject": "กระซิบหลบเงา — ผีกระซิบบอกทางหลบ โจมตี 3 ป้องกัน 2 และจั่วการ์ด 2 ใบ",
+      "path": "assets/cards/thai-v24/fused_whisper_dodge.png"
+    },
+    {
+      "id": "fused_needle_powder",
+      "kind": "card",
+      "subject": "เข็มคลุกผง — จุ่มเข็มในผงเจ้าพ่อก่อนปัก โจมตี 7 และป้องกัน 4",
+      "path": "assets/cards/thai-v24/fused_needle_powder.png"
+    },
+    {
+      "id": "fused_bell_powder",
+      "kind": "card",
+      "subject": "ระฆังโปรยผง — สั่นระฆังพร้อมโปรยผงเจ้าพ่อ ป้องกัน 10 ในการร่ายครั้งเดียว",
+      "path": "assets/cards/thai-v24/fused_bell_powder.png"
+    },
+    {
+      "id": "fused_drain_powder",
+      "kind": "card",
+      "subject": "ดูดวิญญาณคลุกผง — ดูดวิญญาณพร้อมตั้งเกราะผง โจมตี 5 และป้องกัน 4",
+      "path": "assets/cards/thai-v24/fused_drain_powder.png"
+    },
+    {
+      "id": "fused_chant_cloth",
+      "kind": "card",
+      "subject": "สาปใต้ผ้าเย็น — ร่ายคาถาสาปจากใต้ผ้าเย็น โจมตี 4 และป้องกัน 5",
+      "path": "assets/cards/thai-v24/fused_chant_cloth.png"
+    },
+    {
+      "id": "fused_whisper_dart",
+      "kind": "card",
+      "subject": "ไผ่กระซิบ — ผีบอกจุดอ่อนก่อนขว้าง โจมตี 8 และจั่วการ์ด 1 ใบ โดยไม่เสียพลังงาน",
+      "path": "assets/cards/thai-v24/fused_whisper_dart.png"
+    },
+    {
+      "id": "fused_calm_dodge",
+      "kind": "card",
+      "subject": "สมาธิเงาผี — นั่งสงบให้ผีบังตัว ป้องกัน 2 จั่วการ์ด 2 ใบ และได้พลังงานคืน 1",
+      "path": "assets/cards/thai-v24/fused_calm_dodge.png"
+    },
+    {
+      "id": "phi-krasue",
+      "kind": "ghost",
+      "subject": "floating Thai female head, tangled black hair, dangling stylized non-graphic viscera silhouette, no body",
+      "path": "assets/monsters/thai-v24/phi-krasue.png"
+    },
+    {
+      "id": "phi-pop",
+      "kind": "ghost",
+      "subject": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+      "path": "assets/monsters/thai-v24/phi-pop.png"
+    },
+    {
+      "id": "nang-tanee",
+      "kind": "ghost",
+      "subject": "Thai woman in green sabai and green pha nung, banana leaves curling beside her feet, long black hair, distinctly rural Thai dress",
+      "path": "assets/monsters/thai-v24/nang-tanee.png"
+    },
+    {
+      "id": "phi-nang-ram",
+      "kind": "ghost",
+      "subject": "adult Thai dancer revenant in simple worn Thai dance outfit, Thai chada small headdress, bent Thai dance fingers, no Chinese opera face makeup",
+      "path": "assets/monsters/thai-v24/phi-nang-ram.png"
+    },
+    {
+      "id": "phi-pong-kang",
+      "kind": "ghost",
+      "subject": "gaunt dark Thai forest revenant, tangled hair, ragged rural cloth, rootlike fingers and branch shadows, human spirit not fantasy monster",
+      "path": "assets/monsters/thai-v24/phi-pong-kang.png"
+    },
+    {
+      "id": "ngu-phi-sang",
+      "subject": "Phi Phong of Northern Thai folklore, an ADULT THAI MAN in faded indigo northern farmer cotton tunic and short trousers, hunched stalking stance. Two unmistakable bright ochre fire-like lights emerge from his nostrils and illuminate his face, small floating glow around nose. Rough black hair, sallow skin. Show glowing nose prominently, no green woman, no snake, no armor.",
+      "kind": "ghost",
+      "path": "assets/monsters/thai-v24/ngu-phi-sang.png"
+    },
+    {
+      "id": "phi-pret",
+      "kind": "ghost",
+      "subject": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+      "path": "assets/monsters/thai-v24/phi-pret.png"
+    },
+    {
+      "id": "krahang",
+      "kind": "ghost",
+      "subject": "Thai male ghost with two round woven bamboo winnowing baskets strapped to arms as wings and a wooden rice pestle between legs, short jongkraben, clearly show baskets and pestle, no bat wings",
+      "path": "assets/monsters/thai-v24/krahang.png"
+    },
+    {
+      "id": "kuman-thong",
+      "subject": "Thai Tai Hong revenant, unmistakably ADULT MALE RICE FARMER with weathered masculine face, short messy hair and faint moustache, torn faded indigo cotton shirt, dark checked sarong, a battered woven farmer hat held in one hand, barefoot, furious frightened eyes. Not a woman, not a child, no horns or armor.",
+      "kind": "ghost",
+      "path": "assets/monsters/thai-v24/kuman-thong.png"
+    },
+    {
+      "id": "phi-tai-hong",
+      "kind": "ghost",
+      "subject": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+      "path": "assets/monsters/thai-v24/phi-tai-hong.png"
+    },
+    {
+      "id": "phi-pa",
+      "subject": "Thai forest spirit represented as an elderly ADULT MALE charcoal burner revenant, very gaunt bearded face, tangled coarse hair, dark loincloth, tree-root fingers and a gnarled walking stick, leaves and roots caught around shoulders, hunched old-man silhouette. No long-haired woman or generic zombie girl. No ornate armor.",
+      "kind": "ghost",
+      "path": "assets/monsters/thai-v24/phi-pa.png"
+    },
+    {
+      "id": "mae-nak",
+      "subject": "Mae Nak Phra Khanong, Thai female revenant in old brown sabai and dark olive sarong, holding a gently wrapped cloth cradle bundle against chest. ONE ARM IS SUPERNATURALLY EXTENDED to THREE TIMES normal length, curling down beside body with the hand reaching below feet; visibly elongated forearm as the distinctive legend motif. Long black hair, pale haunted face. Entire extended arm and hand inside frame. No injured baby or gore.",
+      "kind": "ghost",
+      "path": "assets/monsters/thai-v24/mae-nak.png"
+    },
+    {
+      "id": "pop-yai",
+      "kind": "ghost",
+      "subject": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+      "path": "assets/monsters/thai-v24/pop-yai.png"
+    },
+    {
+      "id": "phi-ha-ratri",
+      "kind": "ghost",
+      "subject": "eerie glowing ochre floating marsh light containing a barely visible Thai human face, thin black curling smoke silhouette, no demon body or fire armor",
+      "path": "assets/monsters/thai-v24/phi-ha-ratri.png"
+    },
+    {
+      "id": "asuragaya",
+      "kind": "ghost",
+      "subject": "small hairy Thai forest ghost with exactly one leg centered beneath hunched body, wide eyes, long arms, no goblin armor, unmistakable single leg",
+      "path": "assets/monsters/thai-v24/asuragaya.png"
+    },
+    {
+      "id": "yak-wat-jaeng",
+      "kind": "ghost",
+      "subject": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+      "path": "assets/monsters/thai-v24/yak-wat-jaeng.png"
+    },
+    {
+      "id": "phi-phrai",
+      "kind": "ghost",
+      "subject": "drowned Thai adult woman, soaked old cotton blouse and sarong, waterweed entangled around wrists and ankles, wet hanging black hair, streams of water dripping, no Chinese floating silk",
+      "path": "assets/monsters/thai-v24/phi-phrai.png"
+    },
+    {
+      "id": "winyan-rerorn",
+      "kind": "ghost",
+      "subject": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+      "path": "assets/monsters/thai-v24/winyan-rerorn.png"
+    },
+    {
+      "id": "pisaj-fai",
+      "kind": "ghost",
+      "subject": "eerie glowing ochre floating marsh light containing a barely visible Thai human face, thin black curling smoke silhouette, no demon body or fire armor",
+      "path": "assets/monsters/thai-v24/pisaj-fai.png"
+    },
+    {
+      "id": "jao-por-pa",
+      "subject": "Thai forest revenant of a dead hunter, a broad-shouldered ADULT MALE with short rough hair, hollow eyes, worn dark cotton hunter shirt and jongkraben, moss and tangled twigs hanging from a bamboo staff, reaching with bark-like fingers. Distinct bulky silhouette compared to gaunt forest ghosts; not a woman, no fantasy armor.",
+      "kind": "ghost",
+      "path": "assets/monsters/thai-v24/jao-por-pa.png"
+    },
+    {
+      "id": "phi-nang-yai",
+      "kind": "ghost",
+      "subject": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+      "path": "assets/monsters/thai-v24/phi-nang-yai.png"
+    },
+    {
+      "id": "winyan-dek",
+      "kind": "ghost",
+      "subject": "Thai adult revenant villager in torn cotton shirt and sarong, bruised earth-toned skin, frightened furious eyes, no gore, no infant",
+      "path": "assets/monsters/thai-v24/winyan-dek.png"
+    },
+    {
+      "id": "yak-dam",
+      "kind": "ghost",
+      "subject": "Thai male ghost with two round woven bamboo winnowing baskets strapped to arms as wings and a wooden rice pestle between legs, short jongkraben, clearly show baskets and pestle, no bat wings",
+      "path": "assets/monsters/thai-v24/yak-dam.png"
+    },
+    {
+      "id": "phi-mae-mai",
+      "kind": "ghost",
+      "subject": "Thai adult female revenant in dark rural blouse and faded red sarong, long hair, beckoning hand, red cloth wrapped at wrist, no Chinese robes",
+      "path": "assets/monsters/thai-v24/phi-mae-mai.png"
+    },
+    {
+      "id": "phra-upakut",
+      "kind": "ghost",
+      "subject": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+      "path": "assets/monsters/thai-v24/phra-upakut.png"
+    },
+    {
+      "id": "phaya-nak",
+      "kind": "ghost",
+      "subject": "drowned Thai adult woman, soaked old cotton blouse and sarong, waterweed entangled around wrists and ankles, wet hanging black hair, streams of water dripping, no Chinese floating silk",
+      "path": "assets/monsters/thai-v24/phaya-nak.png"
+    },
+    {
+      "id": "thep-aksorn",
+      "kind": "ghost",
+      "subject": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+      "path": "assets/monsters/thai-v24/thep-aksorn.png"
+    },
+    {
+      "id": "phraya-maccurat",
+      "kind": "ghost",
+      "subject": "possessed elderly Thai villager, emaciated face, wild eyes, clawing hands, simple faded cotton shirt and sarong, human body without horns",
+      "path": "assets/monsters/thai-v24/phraya-maccurat.png"
+    },
+    {
+      "id": "night-head-collector",
+      "kind": "ghost",
+      "subject": "Thai male ghost with two round woven bamboo winnowing baskets strapped to arms as wings and a wooden rice pestle between legs, short jongkraben, clearly show baskets and pestle, no bat wings",
+      "path": "assets/monsters/thai-v24/night-head-collector.png"
+    },
+    {
+      "id": "night-bell-keeper",
+      "kind": "ghost",
+      "subject": "toweringly tall skeletal Thai hungry ghost, tiny pinhole mouth, huge palms, sunken abdomen and ragged loincloth, no horns",
+      "path": "assets/monsters/thai-v24/night-bell-keeper.png"
+    },
+    {
+      "id": "night-root-lord",
+      "kind": "ghost",
+      "subject": "Thai forest ghost of a gigantic ADULT MALE dead timber cutter: bark-textured dark skin, tangled root beard, tree-root fingers, ragged olive waistcloth, a network of banyan roots curling around his limbs, hulking rooted stance. Human revenant from Thai forest tales, not a Chinese tree demon, no palace armor.",
+      "path": "assets/monsters/thai-v24/night-root-lord.png"
+    },
+    {
+      "id": "night-cave-mother",
+      "kind": "ghost",
+      "subject": "drowned Thai adult woman, soaked old cotton blouse and sarong, waterweed entangled around wrists and ankles, wet hanging black hair, streams of water dripping, no Chinese floating silk",
+      "path": "assets/monsters/thai-v24/night-cave-mother.png"
+    },
+    {
+      "id": "night-headless-king",
+      "kind": "ghost",
+      "subject": "Powerful Phi Pop possessed elderly THAI MALE village sorcerer, clearly masculine angular weathered face, short gray hair and moustache, indigo cotton shirt, dark checked sarong, frantic hungry eyes, long clawing human hands, faded Thai protective cord around wrist. Intimidating but recognizably a possessed Thai village man, no horns, crown, Chinese robes or armor.",
+      "path": "assets/monsters/thai-v24/night-headless-king.png"
+    },
+    {
+      "id": "phi-kin-hua",
+      "kind": "ghost",
+      "subject": "original Thai game ghost, towering shadowy elderly villager wrapped in torn burial cloth, looming dark face and many floating faceless head-shaped shadows, no crown, no palace armor, no gore",
+      "path": "assets/monsters/thai-v24/phi-kin-hua.png"
+    },
+    {
+      "id": "01-village",
+      "kind": "scene",
+      "subject": "raised wooden Thai village houses on posts, clay jars, coconut palms, low bamboo fences, muddy central lane, moonlit, few dim oil lamps",
+      "path": "assets/scence/journey/thai-v24/01-village.jpg"
+    },
+    {
+      "id": "02-village-edge",
+      "kind": "scene",
+      "subject": "rice fields at the edge of a Thai village, small bamboo field hut, banana grove, dirt embankment path, a forgotten ox cart",
+      "path": "assets/scence/journey/thai-v24/02-village-edge.jpg"
+    },
+    {
+      "id": "03-temple-gate",
+      "kind": "scene",
+      "subject": "modest rural Thai wat entrance, simple stucco gateway and worn Thai gabled roof, dogs silhouettes, ordinary low temple wall, dirt lane",
+      "path": "assets/scence/journey/thai-v24/03-temple-gate.jpg"
+    },
+    {
+      "id": "04-temple-court",
+      "kind": "scene",
+      "subject": "empty rural Thai temple courtyard, small ubosot with Thai gable and modest naga finials, old bell on wooden frame, scattered dry leaves",
+      "path": "assets/scence/journey/thai-v24/04-temple-court.jpg"
+    },
+    {
+      "id": "05-cremation-ground",
+      "kind": "scene",
+      "subject": "rural Thai cremation ground, old low brick cremation pyre, bamboo bier, burnt wood and a faded cloth hanging on a tree",
+      "path": "assets/scence/journey/thai-v24/05-cremation-ground.jpg"
+    },
+    {
+      "id": "06-bamboo-forest",
+      "kind": "scene",
+      "subject": "dense Thai bamboo thicket, narrow muddy trail, cut bamboo stumps, forest almost swallowing the path",
+      "path": "assets/scence/journey/thai-v24/06-bamboo-forest.jpg"
+    },
+    {
+      "id": "07-banyan",
+      "kind": "scene",
+      "subject": "huge banyan with hanging roots over a dirt path, roots surround a small crude wooden offering shelf and a cracked clay jar",
+      "path": "assets/scence/journey/thai-v24/07-banyan.jpg"
+    },
+    {
+      "id": "08-stream",
+      "kind": "scene",
+      "subject": "shallow forest stream in Thailand with narrow lashed bamboo footbridge, fern banks, muddy footprints that stop at water",
+      "path": "assets/scence/journey/thai-v24/08-stream.jpg"
+    },
+    {
+      "id": "09-waterfall",
+      "kind": "scene",
+      "subject": "small hidden waterfall among rounded Thai forest rocks, dark deep pool, abandoned fishing basket on bank",
+      "path": "assets/scence/journey/thai-v24/09-waterfall.jpg"
+    },
+    {
+      "id": "10-mountain-trail",
+      "kind": "scene",
+      "subject": "rain-darkened narrow dirt hiking trail on a forested Thai hill, tangled roots and fallen trunks, thick ferns, low mist; no sheer karst cliffs or fantasy rope cliff walkways",
+      "path": "assets/scence/journey/thai-v24/10-mountain-trail.jpg"
+    },
+    {
+      "id": "11-mountain-shrine",
+      "kind": "scene",
+      "subject": "small Thai spirit shrine assembled from unpainted wooden planks beside a forested hill trail, tied faded cloths and clay offerings, no pagoda or mountain palace",
+      "path": "assets/scence/journey/thai-v24/11-mountain-shrine.jpg"
+    },
+    {
+      "id": "12-cave-mouth",
+      "kind": "scene",
+      "subject": "low natural limestone cave mouth in Thai jungle, dangling roots, a broken bamboo torch beside entrance, black opening",
+      "path": "assets/scence/journey/thai-v24/12-cave-mouth.jpg"
+    },
+    {
+      "id": "13-cave-river",
+      "kind": "scene",
+      "subject": "natural dark Thai limestone cave with underground stream, improvised bamboo stepping walkway, one distant oil lamp, uneven stone walls",
+      "path": "assets/scence/journey/thai-v24/13-cave-river.jpg"
+    },
+    {
+      "id": "14-buried-sanctuary",
+      "kind": "scene",
+      "subject": "tiny abandoned Thai cave meditation shelter, decayed wooden platform, torn plain cloth, small broken lotus pedestal, humble cave shrine; no monumental architecture",
+      "path": "assets/scence/journey/thai-v24/14-buried-sanctuary.jpg"
+    },
+    {
+      "id": "15-otherworld-gate",
+      "kind": "scene",
+      "subject": "surreal Thai forest threshold: two twisted banyan roots form a narrow arch, faded Thai village cloths hanging, beyond arch a distorted upside-down silhouette of raised Thai houses, no stone palace",
+      "path": "assets/scence/journey/thai-v24/15-otherworld-gate.jpg"
+    },
+    {
+      "id": "16-secret-throne",
+      "kind": "scene",
+      "subject": "the source of the curse in a black Thai banyan grove: humble village wooden bed and clay water jars distorted by roots, floating faceless head-shaped shadows beyond, red dawn barely visible, no throne, no crown, no palace",
+      "path": "assets/scence/journey/thai-v24/16-secret-throne.jpg"
+    },
+    {
+      "id": "rest-02",
+      "kind": "scene",
+      "subject": "empty bamboo field hut beside rice paddies, clay water jar and small reed mat",
+      "path": "assets/scence/journey/thai-v24/rest-02.jpg"
+    },
+    {
+      "id": "rest-04",
+      "kind": "scene",
+      "subject": "wooden rural Thai temple rest pavilion with benches, an old brass bell outside",
+      "path": "assets/scence/journey/thai-v24/rest-04.jpg"
+    },
+    {
+      "id": "rest-06",
+      "kind": "scene",
+      "subject": "small bamboo lean-to beside forest trail, campfire ashes and rolled mat",
+      "path": "assets/scence/journey/thai-v24/rest-06.jpg"
+    },
+    {
+      "id": "rest-08",
+      "kind": "scene",
+      "subject": "abandoned Thai riverside fishing shelter, overturned fish basket, bamboo pier",
+      "path": "assets/scence/journey/thai-v24/rest-08.jpg"
+    },
+    {
+      "id": "rest-10",
+      "kind": "scene",
+      "subject": "rough timber hunter shelter on Thai hillside, clay pot and hanging woven basket",
+      "path": "assets/scence/journey/thai-v24/rest-10.jpg"
+    },
+    {
+      "id": "rest-12",
+      "kind": "scene",
+      "subject": "camp at Thai cave entrance, extinguished bamboo torches and plain rolled sleeping mat",
+      "path": "assets/scence/journey/thai-v24/rest-12.jpg"
+    },
+    {
+      "id": "rest-14",
+      "kind": "scene",
+      "subject": "small makeshift meditation shelter inside natural Thai cave, low wooden offering table and candle",
+      "path": "assets/scence/journey/thai-v24/rest-14.jpg"
+    },
+    {
+      "id": "rest-15",
+      "kind": "scene",
+      "subject": "abandoned Thai village pavilion consumed by banyan roots, one candle, distant distorted houses",
+      "path": "assets/scence/journey/thai-v24/rest-15.jpg"
+    }
+  ]
+}

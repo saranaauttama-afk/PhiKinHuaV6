@@ -1,0 +1,38 @@
+[
+  {
+    "id": "curse_dread",
+    "name": "ความหวาดกลัว",
+    "type": "curse",
+    "cost": 0,
+    "rarity": "Common",
+    "tags": ["curse", "thai"],
+    "desc": "เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง"
+  },
+  {
+    "id": "curse_bad_omen",
+    "name": "ลางร้าย",
+    "type": "curse",
+    "cost": 0,
+    "rarity": "Common",
+    "tags": ["curse", "thai"],
+    "desc": "เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง"
+  },
+  {
+    "id": "curse_rot",
+    "name": "กลิ่นเน่า",
+    "type": "curse",
+    "cost": 0,
+    "rarity": "Common",
+    "tags": ["curse", "thai"],
+    "desc": "เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง"
+  },
+  {
+    "id": "curse_whisper",
+    "name": "เสียงในหู",
+    "type": "curse",
+    "cost": 0,
+    "rarity": "Common",
+    "tags": ["curse", "thai"],
+    "desc": "เล่นไม่ได้ กินที่ในมือจนกว่าจะจบเทิร์น — ถอนออกได้ที่กองไฟริมทาง"
+  }
+]

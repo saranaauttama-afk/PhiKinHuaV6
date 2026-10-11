@@ -1,0 +1,14 @@
+[
+  {
+    "asset": "assets/scence/quiet-village.png",
+    "method": "built-in image_gen",
+    "reference": "approved battle mockup, 2026-10-08",
+    "prompt": "Create a project-ready BACKGROUND ONLY for the Thai one-baht horror comic mobile game. Reference is approved UI mockup, use ONLY its scene style and village setting. Portrait 9:19.5 tall full bleed illustration. Empty Thai rural village path at night, muted black ink, ochre, olive, charcoal, flat coarse vintage cheap horror comic printing. Bamboo houses and banana trees at far left/right edges, dim amber lantern lights, upper far-right small pale moon partly concealed by foliage. Strong atmospheric depth. Center upper 15%-55% must be simple broad dark charcoal silhouettes and subdued mist so a separately rendered ghost stands out, lower 65%-100% broad almost smooth dark dirt/shadow for interface. Side scenery carries most intricate ink details. Avoid noisy scratch texture across central area. No characters, no ghosts, no viscera, no cards, NO UI, NO writing, no bars, no buttons, no borders. This must be scenery only ready to layer dynamic game UI above. Preserve Thai village identity and illustrated ink look, never photoreal or 3D. Keep original reference unchanged."
+  },
+  {
+    "asset": "assets/ui/quiet-slate.png",
+    "method": "built-in image_gen",
+    "reference": "approved battle mockup, 2026-10-08",
+    "prompt": "Create a reusable game UI asset ONLY: the EMPTY plain charcoal slate strip texture from the bottom HUD of the reference, without any portrait, figures, icons, lettering, numbers, bars or props. Wide landscape aspect about 4:1. Full flat dark charcoal slate with very subtle coarse ink printing texture, extremely restrained thin worn ochre outline at the outermost edge. NO wooden border, NO planks, no header panel, no ornament, no inner partitions, no bright scratches. Deep matte charcoal center with very low contrast texture so cream text layered later stays readable. Original Thai one-baht horror comic print feel. Whole canvas is the single rectangular slab texture, edge to edge. No background scene, no shadows around a mockup, no perspective. No UI content of any kind."
+  }
+]

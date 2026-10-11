@@ -3,8 +3,38 @@
     "name": "PhiKinHua",
     "slug": "PhiKinHua",
     "scheme": "phikinhua",
-    "userInterfaceStyle": "automatic",
-    "plugins": ["expo-router"],
-    "extra": { "router": { "origin": false } }
+    "version": "1.0.32",
+    "userInterfaceStyle": "dark",
+    "orientation": "portrait",
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d6a92835-1924-4de9-bb5b-838ec2061dcd"
+      }
+    },
+    "assets": [
+      "./assets/fonts/"
+    ],
+    "android": {
+      "package": "com.phikinhua.episode",
+      "versionCode": 33,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-pulp.png",
+        "backgroundColor": "#1a0a00"
+      }
+    },
+    "icon": "./assets/icon-pulp.png",
+    "splash": {
+      "image": "./assets/scence/menu-haunted.jpg",
+      "resizeMode": "cover",
+      "backgroundColor": "#1a0a00"
+    },
+    "owner": "sarana"
   }
 }

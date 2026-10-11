@@ -1,7 +1,10 @@
 // src/core/engine/apply.ts
 import type { Command, GameState } from '../types';
 import type { RNG } from '../rng';
+import {trackRun} from '../campaign/metrics';
+import {trackDiscovery} from '../archive/progress';
 import { cloneForReducer } from './shared';
+import {captureRewardReceipt} from '../rewardReceipt';
 
 import * as run from './handlers/run';
 import * as combat from './handlers/combat';
@@ -11,6 +14,10 @@ import * as se from './handlers/shops_events';
 import * as qa from './handlers/qa';
 import * as ui from './handlers/ui';
 import * as equipment from './handlers/equipment';
+import * as fusion from './handlers/fusion';
+import * as story from './handlers/story';
+import * as chapter from './handlers/chapter';
+import * as cardReward from './handlers/cardReward';
 
 type Handler<T extends Command['type']> =
   (s: GameState, cmd: Extract<Command, { type: T }>, r: RNG) => { state: GameState; rng: RNG };
@@ -18,13 +25,26 @@ type Handler<T extends Command['type']> =
 // Pages-only: บังคับใช้ handler ฝั่ง pages เสมอ
 const H: { [K in Command['type']]?: Handler<K> } = {
   // Run lifecycle
+  EnterMenu: (s, cmd, r) => ({ state: { ...s, phase: 'menu' }, rng: r }),
   NewRun: run.newRun,
   ChooseStarterBlessing: run.chooseStarter,
 
   // Combat
-  // StartCombat: combat.start, // (ไม่ใช้ใน pages mode)
+  StartCombat: combat.start,
   PlayCard: combat.play,
+  EnemyPlayCard: combat.enemyPlayCard,
+  StartMonsterTurn: combat.startMonsterTurn,
   EndTurn: combat.endTurn,
+  ResolveEnemyTurn: combat.resolveEnemyTurn,
+  StartPlayerTurn: combat.startPlayerTurnHandler,
+  DiscardCard: (s, cmd, r) => {
+    if (s.phase !== 'combat') return { state: s, rng: r };
+    const { index } = cmd;
+    if (index < 0 || index >= s.piles.hand.length) return { state: s, rng: r };
+    const [c] = s.piles.hand.splice(index, 1);
+    s.piles.discard.push(c);
+    return { state: s, rng: r };
+  },
 
   // Node completion (victory/levelup/shop/event) → pages handler
   CompleteNode: mappages.completeNode,
@@ -34,6 +54,10 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   ChooseLevelUpOption: lvl.chooseLevelUpOption,
   CancelLevelUpChoice: lvl.cancelLevelUpChoice,
   SkipLevelUp: lvl.skipLevelUp,
+
+  // การ์ดรางวัลหลังชนะไฟต์
+  ChooseCardReward: cardReward.chooseCardReward,
+  SkipCardReward: cardReward.skipCardReward,
 
   // UI
   OpenDeck: ui.openDeck,
@@ -54,6 +78,10 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EventTreasureOpen: se.eventTreasureOpen,
   ShopRemoveBuy: se.shopRemoveBuy,
   ShopUpgradeBuy: se.shopUpgradeBuy,
+  FuseCards: fusion.fuseCardsCmd,
+  ChooseEventOption: story.chooseEventOption,
+  AdvanceChapter: chapter.advanceChapter,
+  SkipChapter: chapter.skipChapter,
   DoWellUse: se.doWellUse,
   DoWellDismiss: se.doWellDismiss,
   UseWell: se.useWell,
@@ -116,8 +144,11 @@ export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
   const s = cloneForReducer(state);
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
+  // event เป็นผลของ "คำสั่งนี้" เท่านั้น — เคลียร์ของคำสั่งก่อนหน้าทิ้งทุกครั้ง
+  // view ที่ยังเล่นคิวเก่าค้างอยู่จะถือ array เดิมไว้เอง ไม่ถูกกระทบ
+  s.pendingEvents = [];
 
   const h = H[cmd.type] as Handler<typeof cmd.type> | undefined;
-  if (h) return h(s, cmd as any, rng);
+  if (h) {const out=h(s,cmd as any,rng);captureRewardReceipt(state,out.state,cmd);trackRun(state,out.state,cmd);trackDiscovery(state,out.state,cmd);return out;}
   return { state: s, rng };
 }

@@ -1,0 +1,139 @@
+[
+  {
+    "id": "yantra_snare",
+    "name": "ยันต์ดัก",
+    "type": "trap",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": ["trap", "thai", "shaman"],
+    "desc": "วางยันต์ไว้กับพื้น ผีที่เข้ามาตีจะโดนสวนกลับ 9 และติดคำสาป 2 ชั้น",
+    "trap": {
+      "trigger": "enemy_attack",
+      "effects": [
+        { "type": "damage", "value": 9, "desc": "ยันต์ลุกเป็นไฟ" },
+        { "type": "status", "value": 2, "statusId": "curse", "desc": "รอยยันต์ติดตัวไป" }
+      ]
+    }
+  },
+  {
+    "id": "sacred_thread",
+    "name": "ด้ายสายสิญจน์",
+    "type": "trap",
+    "cost": 1,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": ["trap", "thai", "nun"],
+    "desc": "ขึงด้ายไว้รอบตัว ผีที่เข้ามาตีจะถูกพันไว้ — ยกเลิกการ์ดใบนั้นทั้งใบ",
+    "trap": {
+      "trigger": "enemy_attack",
+      "duration": 2,
+      "effects": [
+        { "type": "negate", "value": 1, "desc": "ด้ายพันไว้ ท่านั้นไม่ออก" },
+        { "type": "block", "value": 4, "desc": "ด้ายที่เหลือกันไว้อีกชั้น" }
+      ]
+    }
+  },
+  {
+    "id": "bamboo_spike",
+    "name": "ขวากไผ่",
+    "type": "trap",
+    "cost": 2,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": ["trap", "thai", "warrior"],
+    "desc": "ปักขวากไผ่รอบตัว ผีที่ขยับเข้ามาไม่ว่าจะทำอะไร โดน 14",
+    "trap": {
+      "trigger": "enemy_any",
+      "effects": [
+        { "type": "damage", "value": 14, "desc": "ขวากเสียบเข้าเต็มแรง" }
+      ]
+    }
+  },
+  {
+    "id": "salt_circle_trap",
+    "name": "วงเกลือดัก",
+    "type": "trap",
+    "cost": 1,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": ["trap", "thai", "nun"],
+    "desc": "โรยเกลือเป็นวง ผีที่ตั้งท่าหรือเสริมกำลังจะเสียสมาธิ — อ่อนแอ 2 และเราได้พลังงาน 1",
+    "trap": {
+      "trigger": "enemy_skill",
+      "effects": [
+        { "type": "status", "value": 2, "statusId": "weakness", "desc": "เกลือกัดจนเสียจังหวะ" },
+        { "type": "energy", "value": 1, "desc": "เราได้จังหวะหายใจ" }
+      ]
+    }
+  },
+  {
+    "id": "grave_soil",
+    "name": "ดินหน้าหลุม",
+    "type": "trap",
+    "cost": 2,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": ["trap", "thai", "medium"],
+    "desc": "โรยดินจากหน้าหลุมศพ ผีตัวไหนขยับก็ติดพิษ 3 และเปราะบาง 2",
+    "trap": {
+      "trigger": "enemy_any",
+      "duration": 3,
+      "effects": [
+        { "type": "status", "value": 3, "statusId": "poison", "desc": "ดินศพซึมเข้าแผล" },
+        { "type": "status", "value": 2, "statusId": "vulnerable", "desc": "เนื้อตัวเปื่อยลง" }
+      ]
+    }
+  },
+  {
+    "id": "mirror_ward",
+    "name": "กระจกเงาสะท้อน",
+    "type": "trap",
+    "cost": 2,
+    "rarity": "Rare",
+    "inShop": true,
+    "tags": ["trap", "thai", "medium"],
+    "desc": "ตั้งกระจกรับหน้า ท่าโจมตีถัดไปของผีถูกยกเลิกและสะท้อนกลับ 12",
+    "trap": {
+      "trigger": "enemy_attack",
+      "effects": [
+        { "type": "negate", "value": 1, "desc": "ท่านั้นสะท้อนกลับ" },
+        { "type": "damage", "value": 12, "desc": "แรงของมันเองย้อนเข้าตัว" }
+      ]
+    }
+  },
+  {
+    "id": "monk_bowl",
+    "name": "บาตรคว่ำ",
+    "type": "trap",
+    "cost": 0,
+    "rarity": "Common",
+    "inShop": true,
+    "tags": ["trap", "thai", "shaman"],
+    "desc": "คว่ำบาตรดักไว้ ผีที่เข้ามาไม่ว่าจะทำอะไร เราได้ Block 8",
+    "trap": {
+      "trigger": "enemy_any",
+      "duration": 2,
+      "effects": [
+        { "type": "block", "value": 8, "desc": "บาตรรับไว้แทน" }
+      ]
+    }
+  },
+  {
+    "id": "war_drum_trap",
+    "name": "กลองศึกลั่น",
+    "type": "trap",
+    "cost": 1,
+    "rarity": "Uncommon",
+    "inShop": true,
+    "tags": ["trap", "thai", "warrior"],
+    "desc": "ตั้งกลองไว้ ผีที่ตั้งท่าจะถูกขัด — เสียหาย 8 และเราได้ Block 6",
+    "trap": {
+      "trigger": "enemy_skill",
+      "effects": [
+        { "type": "damage", "value": 8, "desc": "เสียงกลองแตกเข้าหู" },
+        { "type": "block", "value": 6, "desc": "จังหวะกลองทำให้เราตั้งหลักทัน" }
+      ]
+    }
+  }
+]

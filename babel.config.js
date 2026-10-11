@@ -7,7 +7,10 @@ module.exports = function (api) {
             ['babel-preset-expo', { jsxImportSource: 'nativewind' }],
             'nativewind/babel',
         ],
-        // ✅ expo-router เป็น plugin (reanimated v4 ไม่ต้องการ plugin แล้ว)
-        plugins: ['expo-router/babel'],
+        // ✅ expo-router เป็น plugin
+        plugins: [
+            'expo-router/babel',
+            'react-native-reanimated/plugin'
+        ],
     };
 };

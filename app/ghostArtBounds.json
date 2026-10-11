@@ -1,0 +1,342 @@
+{
+  "phi-nang-ram": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      29,
+      8,
+      480,
+      756
+    ]
+  },
+  "night-cave-mother": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      67,
+      6,
+      461,
+      762
+    ]
+  },
+  "pisaj-fai": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      117,
+      2,
+      395,
+      766
+    ]
+  },
+  "pop-yai": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      91,
+      8,
+      480,
+      753
+    ]
+  },
+  "phi-nang-yai": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      68,
+      8,
+      454,
+      758
+    ]
+  },
+  "night-head-collector": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      7,
+      44,
+      509,
+      717
+    ]
+  },
+  "yak-dam": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      7,
+      42,
+      508,
+      704
+    ]
+  },
+  "yak-wat-jaeng": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      96,
+      2,
+      424,
+      764
+    ]
+  },
+  "night-root-lord": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      31,
+      3,
+      496,
+      766
+    ]
+  },
+  "night-headless-king": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      22,
+      7,
+      490,
+      761
+    ]
+  },
+  "winyan-rerorn": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      100,
+      10,
+      471,
+      754
+    ]
+  },
+  "phra-upakut": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      100,
+      4,
+      461,
+      759
+    ]
+  },
+  "phraya-maccurat": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      61,
+      10,
+      481,
+      758
+    ]
+  },
+  "phi-pong-kang": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      27,
+      5,
+      499,
+      760
+    ]
+  },
+  "kuman-thong": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      31,
+      8,
+      482,
+      757
+    ]
+  },
+  "asuragaya": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      35,
+      8,
+      479,
+      761
+    ]
+  },
+  "phi-tai-hong": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      105,
+      6,
+      410,
+      759
+    ]
+  },
+  "phi-kin-hua": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      34,
+      9,
+      490,
+      759
+    ]
+  },
+  "jao-por-pa": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      17,
+      0,
+      507,
+      766
+    ]
+  },
+  "phaya-nak": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      53,
+      2,
+      483,
+      765
+    ]
+  },
+  "thep-aksorn": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      65,
+      8,
+      468,
+      758
+    ]
+  },
+  "phi-ha-ratri": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      114,
+      1,
+      414,
+      766
+    ]
+  },
+  "nang-tanee": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      61,
+      6,
+      451,
+      761
+    ]
+  },
+  "ngu-phi-sang": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      91,
+      5,
+      495,
+      760
+    ]
+  },
+  "mae-nak": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      152,
+      3,
+      383,
+      766
+    ]
+  },
+  "phi-phrai": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      77,
+      8,
+      432,
+      759
+    ]
+  },
+  "phi-krasue": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      30,
+      8,
+      487,
+      767
+    ]
+  },
+  "night-bell-keeper": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      85,
+      5,
+      430,
+      765
+    ]
+  },
+  "phi-mae-mai": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      149,
+      5,
+      390,
+      762
+    ]
+  },
+  "phi-pop": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      47,
+      5,
+      466,
+      761
+    ]
+  },
+  "phi-pret": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      120,
+      5,
+      415,
+      761
+    ]
+  },
+  "krahang": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      5,
+      6,
+      509,
+      743
+    ]
+  },
+  "phi-pa": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      48,
+      3,
+      499,
+      765
+    ]
+  },
+  "winyan-dek": {
+    "width": 512,
+    "height": 768,
+    "bounds": [
+      81,
+      11,
+      458,
+      756
+    ]
+  }
+}

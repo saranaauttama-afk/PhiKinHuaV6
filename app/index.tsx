@@ -1,508 +1,257 @@
-// app/index.tsx — pages-first, cleaned UI with component separation
+import {nightFightTotal} from '../src/core/campaign/bosses';
+// app/index.tsx — Clean version for redesign
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
-import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { create } from 'zustand';
-import type { Command, GameState } from '../src/core/types';
-import { applyCommand } from '../src/core/reducer';
-import { saveGame, loadGame, getSaveSlots, autoSave, type SaveSlotInfo } from '../src/core/storage';
-import { HAND_SIZE, START_ENERGY, START_HP } from '../src/core/balance/core';
-import { nextExpForLevel } from '../src/core/balance/progression';
-import { makeRng, seedFromString, type RNG } from '../src/core/rng';
-import { START_GOLD } from '../src/core/balance';
+import React, { useMemo, useState, useEffect } from 'react';
+import { BackHandler, Pressable, ScrollView, Text, TextInput, View, ImageBackground, Image } from 'react-native';
+import { useAppFonts } from './useAppFonts';
+import type { SaveSlotInfo } from '../src/core/storage';
+import type { PageOffer } from '../src/core/map/pages';
+import { useGame } from '../src/store/gameStore';
+import { describeOffer } from './components/offerDisplay';
 
 // Components
-import CombatView from './components/CombatView';
+import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
-import MapView from './components/MapView';
 import DeckView from './components/DeckView';
-import EventView from './components/EventView';
+import RestDestinations from './components/RestDestinations';
+import AdventureChoices from './components/AdventureChoices';
+import {skippableSlots,FIGHTS_PER_NIGHT,usesThreePageBoard} from '../src/core/map/adventure';
+import SceneGhostChoices from './components/SceneGhostChoices';
+import RunCompleteScreen from './components/RunCompleteScreen';
+import ClassSelectScreen from './components/ClassSelectScreen';
+import NightSelectScreen from './components/NightSelectScreen';
+import JournalView from './components/JournalView';
+import ArchiveView from './components/ArchiveView';
+import type {ClassId} from '../src/core/classes';
+import JourneyTrail from './components/JourneyTrail';
+import StarterBlessingScreen from './components/StarterBlessingScreen';
+import StoryEventView from './components/StoryEventView';
+import ChapterView from './components/ChapterView';
+import SceneArrival from './components/SceneArrival';
+import LoadingScreen from './components/LoadingScreen';
+import { mapScene } from './scenePresentation';
+import {paper} from './components/Paper';
+import BlessingView from './components/BlessingView';
+import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
+import Panel, { GameButton, Scrim } from './components/Panel';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { screenForState, mapIsReady } from './screenRouter';
+import { useScreenPadding } from './useScreenPadding';
+import { onRestRow } from '../src/core/map/restPage';
+import { nextRowPreview } from '../src/core/map/journeySync';
+import { palette, font, size, space, surface } from './theme';
 
-// Commands that should trigger auto-save
-function shouldAutoSave(cmdType: Command['type']): boolean {
-  const autoSaveCommands: Command['type'][] = [
-    'CompleteNode', 'ChooseLevelUp', 'TakeShop', 'EventChooseBlessing',
-    'ChooseOffer', 'Proceed', 'ShopRemoveBuy', 'ShopUpgradeBuy'
-  ];
-  return autoSaveCommands.includes(cmdType);
-}
-
-type Store = {
-  state: GameState;
-  rng: RNG;
-  dispatch: (cmd: Command) => void;
-  newRun: (seed: string) => void;
-  saveToSlot: (slot: number) => Promise<void>;
-  loadFromSlot: (slot: number) => Promise<void>;
-  getSaveSlots: () => Promise<SaveSlotInfo[]>;
-  autoSaveEnabled: boolean;
-};
-
-const makeEmptyState = (): GameState => ({
-  seed: '',
-  phase: 'menu',
-  turn: 0,
-  player: {
-    hp: START_HP, maxHp: START_HP, block: 0,
-    energy: START_ENERGY, gold: START_GOLD,
-    level: 1, exp: 0, expToNext: nextExpForLevel(1),
-    maxEnergy: START_ENERGY, maxHandSize: HAND_SIZE,
-  },
-  enemy: undefined,
-  piles: { draw: [], hand: [], discard: [], exhaust: [] },
-  log: [],
-  blessings: [],
-  turnFlags: { blessingOnce: {} },
-  shopStock: undefined,
-  event: undefined,
-  combatVictoryLock: false,
-  masterDeck: [],
-  mapMode: 'pages',
-  pages: undefined,
-  shopKind: undefined,
-  shopRegistry: [],
-});
-
-const useGame = create<Store>((set, get) => ({
-  state: makeEmptyState(),
-  rng: makeRng(1),
-  autoSaveEnabled: true,
-  dispatch: (cmd) => {
-    const { state, rng, autoSaveEnabled } = get();
-    const out = applyCommand(state, cmd, rng);
-    set({ state: out.state, rng: out.rng });
-    
-    // Auto-save after important actions
-    if (autoSaveEnabled && shouldAutoSave(cmd.type)) {
-      autoSave(out.state).catch(err => console.warn('Auto-save failed:', err));
-    }
-  },
-  newRun: (seed: string) => {
-    const r = makeRng(seedFromString(seed));
-    const out = applyCommand(makeEmptyState(), { type: 'NewRun', seed }, r);
-    set({ state: out.state, rng: out.rng });
-  },
-  saveToSlot: async (slot: number) => {
-    const { state } = get();
-    await saveGame(state, slot);
-  },
-  loadFromSlot: async (slot: number) => {
-    const loadedState = await loadGame(slot);
-    const r = makeRng(seedFromString(loadedState.seed));
-    set({ state: loadedState, rng: r });
-  },
-  getSaveSlots: () => getSaveSlots(3),
-}));
-
-function Button({ title, onPress, disabled }: { title: string; onPress: () => void; disabled?: boolean }) {
-  return (
-    <Pressable
-      onPress={disabled ? undefined : onPress}
-      style={{
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 16,
-        borderWidth: 1,
-        marginTop: 8,
-        opacity: disabled ? 0.5 : 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderColor: 'rgba(255, 255, 255, 0.2)'
-      }}
-    >
-      <Text style={{ fontSize: 16, fontWeight: '600', color: 'white', textAlign: 'center' }}>{title}</Text>
-    </Pressable>
-  );
-}
 
 export default function Home() {
-  const { state, dispatch, newRun, saveToSlot, loadFromSlot, getSaveSlots } = useGame();
+  const { state, dispatch, newRun, newDifficultyRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
+  const router = useRouter();
+  const {chooseClass}=useLocalSearchParams();
   const [seed, setSeed] = useState('demo-001');
   const [saveSlots, setSaveSlots] = useState<SaveSlotInfo[]>([]);
   const [showSaveLoad, setShowSaveLoad] = useState(false);
   const [saveLoadError, setSaveLoadError] = useState<string>('');
+  const [showDebugTools, setShowDebugTools] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const [nightClass,setNightClass]=useState<ClassId|null>(null);
+  const [journalOpen,setJournalOpen]=useState(false);
+  const [archiveOpen,setArchiveOpen]=useState(false);
+  const [pickingClass, setPickingClass] = useState(chooseClass==='1');
+  const [trailOpen,setTrailOpen]=useState(false);
+  const [blessingsOpen, setBlessingsOpen] = useState(false);
+  const enteredRest = React.useRef<string | null>(null);
 
-  // Load save slots when opening save/load panel
-  const refreshSaveSlots = async () => {
-    try {
-      const slots = await getSaveSlots();
-      setSaveSlots(slots);
-      setSaveLoadError('');
-    } catch (error) {
-      setSaveLoadError(`Failed to load save slots: ${error}`);
-    }
+  const [fontsLoaded] = useAppFonts();
+  const pad = useScreenPadding();
+
+  const returnToMainMenu = React.useCallback(() => {
+    setPickingClass(false);
+    setNightClass(null);
+    setJournalOpen(false);
+    setArchiveOpen(false);
+    dispatch({type:'EnterMenu'});
+  }, [dispatch]);
+
+  useEffect(() => {
+    const atEnding=state.phase==='run_complete'||(state.phase==='defeat'&&!!state.runSummary);
+    if (!atEnding||state.chapter||journalOpen||nightClass||pickingClass) return;
+    const back=BackHandler.addEventListener('hardwareBackPress',()=>{returnToMainMenu();return true;});
+    return ()=>back.remove();
+  }, [state.phase,state.chapter,state.runSummary,journalOpen,nightClass,pickingClass,returnToMainMenu]);
+
+  useEffect(() => {
+    if (['combat','victory','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
+  },[state.phase,state.enemy?.id,state.chapter]);
+
+  const page   = state.pages?.current;
+  const offers = page?.offers ?? [];
+
+  // ชั้นสู้: เลือกทางไหนก็เดินไปทางนั้น ไม่มีการวนเก็บให้ครบก่อนไปต่อ
+  // ชั้นพัก: เคลียร์ได้ทุกช่อง ช่องที่เคลียร์แล้วมีของใหม่ขึ้นแทนจนโควตาหมด
+  //          แล้วกดเดินต่อเมื่อไหร่ก็ได้ (ดู `map/restPage.ts`)
+  const restRow = onRestRow(state);
+  const ahead   = restRow ? nextRowPreview(state) : undefined;
+
+  /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
+  const enterOffer = (offer: PageOffer, index: number) => {
+    if (restRow) enteredRest.current = mapScene(state).key;
+    dispatch({ type: 'ChooseOffer', index });
+
+    // Restored and newly entered fights share the combat redirect above.
   };
 
-  const header = useMemo(() => {
-    return `${state.phase.toUpperCase()} • Turn ${state.turn || 0}`;
-  }, [state.phase, state.turn]);
+  if (!fontsLoaded) {
+    return <LoadingScreen />;
+  }
 
+  // หน้าไหนควรขึ้น ตัดสินที่ `screenForState` ซึ่งเป็นฟังก์ชันบริสุทธิ์และมีเทสต์คุม
+  // เดิมเป็น if-chain อยู่ตรงนี้ แล้วพลาดจนเปิดแอปมาค้างที่แผนที่เปล่า
+  const screen = screenForState(state, { pickingClass });
+
+  if(journalOpen)return <JournalView onClose={()=>setJournalOpen(false)}/>;
+  if(archiveOpen)return <ArchiveView onClose={()=>setArchiveOpen(false)}/>;
+  if(nightClass)return <NightSelectScreen classId={nightClass} onBack={()=>setNightClass(null)} onStart={async night=>{const ok=await newDifficultyRun(`run-${Date.now()}`,nightClass,night);if(ok){enteredRest.current=null;setNightClass(null);setPickingClass(false);}return ok;}}/>;
+  if (screen === 'start') {
+    return (
+      <StartPage
+        onStartGame={() => setPickingClass(true)}
+        onJournal={()=>setJournalOpen(true)}
+        onArchive={()=>setArchiveOpen(true)}
+        onContinue={() => { void continueRun(); }}
+      />
+    );
+  }
+
+  // เลือกผู้เดินทางก่อนเริ่มรัน — คลาสกำหนดเด็คและวิธีเล่นทั้งรัน
+  if (screen === 'class-select') {
+    return (
+      <ClassSelectScreen
+        onPick={(classId) => setNightClass(classId)}
+        onBack={() => state.runSummary?returnToMainMenu():setPickingClass(false)}
+      />
+    );
+  }
+
+  // บทคั่น — หยุดทุกอย่างไว้ก่อนจนกว่าจะอ่านจบหรือกดข้าม
+  if (screen === 'chapter') {
+    return <ChapterView state={state} dispatch={dispatch} />;
+  }
+
+  // จบรันแล้ว — แสดงจอสรุปแทนการเด้งกลับแผนที่ที่ไม่มีอะไรเหลือ
+  if (screen === 'run-complete') {
+    return <RunCompleteScreen state={state} onMainMenu={returnToMainMenu} onJournal={()=>setJournalOpen(true)} onNewRun={() => setPickingClass(true)} />;
+  }
+
+  // เลือกพรตั้งต้นก่อนเข้าหน้าแรก
+  if (screen === 'starter-blessing') {
+    return <StarterBlessingScreen state={state} choices={state.starter?.choices ?? []} onPick={index => dispatch({ type: 'ChooseStarterBlessing', index })} />;
+  }
+
+  // มาถึงหน้าแผนที่โดยไม่มีเส้นทาง = หลุดมาผิดทาง (เช่นเซฟเก่าก่อนมีระบบเส้นทาง)
+  // เดิมกรณีนี้จะได้จอเปล่าที่กดอะไรไม่ได้เลย ต้องมีทางออกให้เสมอ
+  if (!mapIsReady(state)) {
+    return (
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={require('../assets/scence/episode-village.jpg')}
+          style={{ flex: 1 }}
+          resizeMode="cover"
+        >
+          <Scrim heavy style={{ justifyContent: 'center', paddingHorizontal: space.xl }}>
+            <Text style={{
+              color: palette.moon, fontSize: size.title, fontFamily: font.display,
+              textAlign: 'center',
+            }}>
+              ไม่พบเส้นทางของรันนี้
+            </Text>
+            <Text style={{
+              color: palette.textDim, fontSize: size.bodyLg, fontFamily: font.body,
+              textAlign: 'center', marginTop: space.sm, lineHeight: 26,
+            }}>
+              อาจเป็นเซฟที่บันทึกไว้ก่อนระบบแผนที่จะเปลี่ยน เริ่มการเดินทางใหม่ได้เลย
+            </Text>
+            <GameButton
+              label="ออกเดินทางใหม่"
+              tone="primary"
+              onPress={() => setPickingClass(true)}
+              style={{ marginTop: space.xl, alignSelf: 'center' }}
+            />
+          </Scrim>
+        </ImageBackground>
+      </View>
+    );
+  }
+
+  // Events own their full-screen arrival; never start it inside a fading map.
+  if (state.phase === 'event' && state.story) {
+    return <StoryEventView state={state} dispatch={dispatch} />;
+  }
+  const location = mapScene(state);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#1a1a2e' }}>
-      <ScrollView style={{ flex: 1, padding: 16, backgroundColor: '#16213e' }}>
-        
-        {/* Header */}
-        <View style={{ borderRadius: 16, padding: 16, backgroundColor: 'rgba(39, 39, 42, 0.7)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', marginBottom: 16 }}>
-          <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>{header}</Text>
-          
-          {/* Player Stats */}
-          <View style={{ marginTop: 12, flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View>
-              <Text style={{ color: 'white' }}>❤️ HP: {state.player.hp}/{state.player.maxHp}</Text>
-              <Text style={{ color: 'white' }}>⚡ Energy: {state.player.energy}/{state.player.maxEnergy}</Text>
-            </View>
-            <View>
-              <Text style={{ color: 'white' }}>🪙 Gold: {state.player.gold}g</Text>
-              <Text style={{ color: 'white' }}>📊 Level: {state.player.level} (EXP: {state.player.exp}/{state.player.expToNext})</Text>
-            </View>
-          </View>
+    <View style={{ flex: 1 }}>
+      <SceneArrival instant={usesThreePageBoard(state)?state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex:restRow && enteredRest.current === location.key} sceneKey={usesThreePageBoard(state)?`${location.key}:board-${state.pages?.adventure?.boardIndex}`:location.key} source={location.source}>
+        <Scrim style={{ paddingTop: pad.top }}>
+          <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: surface.glassDim, opacity: selectedCard !== null && offers.some((o, i) => o && describeOffer(o, i).isCombat) ? .55 : 0 }} />
 
-          {/* Blessings */}
-          {state.blessings.length > 0 && (
-            <View style={{ marginTop: 12 }}>
-              <Text style={{ color: '#c4b5fd', fontWeight: '600' }}>✨ Blessings:</Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
-                {state.blessings.map((b, i) => (
-                  <Text key={i} style={{ color: '#ddd6fe', fontSize: 14, backgroundColor: 'rgba(109, 40, 217, 0.3)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 }}>
-                    {b.name}
-                  </Text>
-                ))}
-              </View>
+          {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
+          {state.runMode === 'episode' && (
+            <View style={{ paddingHorizontal: space.lg, paddingBottom: space.sm }}>
+              <Text style={{ color: palette.moon, fontFamily: font.heading, fontSize: size.heading }}>คืนแรกที่บ้านร้าง</Text>
+              <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
             </View>
           )}
-        </View>
+          {state.campaign&&!state.pages?.adventure&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:16,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · {state.pages?.adventure?`ปราบผี ${state.pages.adventure.fightsWon}/${FIGHTS_PER_NIGHT} · ผีรอ ${state.pages.adventure.pendingIds.length}`:`ปราบผี ${state.fightCount??0}/${nightFightTotal(state.campaign?.night)}`}</Text>}
+          {!state.pages?.adventure&&<Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>}
+          {!state.pages?.adventure&&trailOpen&&<JourneyTrail state={state} compact/>}
+          {!state.pages?.adventure&&<Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>}
+          {!state.pages?.adventure&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>}
 
-        {/* Menu Screen */}
-        {state.phase === 'menu' && (
-          <View style={{ borderRadius: 16, padding: 16, backgroundColor: 'rgba(39, 39, 42, 0.7)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', marginBottom: 16 }}>
-            <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold', marginBottom: 16 }}>🎴 PhiKinHua - Thai Shaman</Text>
-            
-            <View style={{ marginBottom: 16 }}>
-              <Text style={{ color: 'white', marginBottom: 8 }}>Seed:</Text>
-              <TextInput
-                value={seed}
-                onChangeText={setSeed}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 12,
-                  backgroundColor: '#3f3f46',
-                  color: 'white',
-                  borderWidth: 1,
-                  borderColor: 'rgba(255, 255, 255, 0.2)'
-                }}
-                placeholder="Enter seed..."
-                placeholderTextColor="#999"
-              />
+          {state.pages?.adventure || (offers.some(o=>o?.kind==='monster'||o?.kind==='boss')&&offers.some(o=>o&&o.kind!=='monster'&&o.kind!=='boss')) ? <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={usesThreePageBoard(state)?index=>dispatch({type:'DeleteShopFromMap',index}):undefined} skipCount={skippableSlots(state).length} onSkip={state.pages?.adventure&&!usesThreePageBoard(state)?()=>dispatch({type:'Proceed'}):undefined}/></View> : offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
+            <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>
+              <SceneGhostChoices choices={offers.flatMap((offer, index) => offer ? [{ display: describeOffer(offer, index), resolved: page?.resolved[index] ?? false, index }] : [])}
+                selected={selectedCard} onSelect={setSelectedCard}
+                onEnter={index => { const offer = offers[index]; if (offer && !page?.resolved[index]) { setSelectedCard(null); enterOffer(offer, index); } }} />
             </View>
+          ) : <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}>
+            <RestDestinations offers={offers} resolved={page?.resolved??[]} onEnter={(offer,index)=>{setSelectedCard(null);enterOffer(offer,index);}}>
+              {restRow&&ahead&&<View style={{gap:6}}>
+                <GameButton label="เดินทางต่อ" onPress={()=>{setSelectedCard(null);dispatch({type:'Proceed'});}}/>
+                <Text style={{color:palette.textDim,fontFamily:font.ui,fontSize:12,textAlign:'center'}}>ถัดไป · {ahead.label}</Text>
+              </View>}
+            </RestDestinations>
+          </View>}
 
-            <Button title="🚀 New Run" onPress={() => newRun(seed)} />
-            
-            <Button 
-              title={showSaveLoad ? "📂 Hide Save/Load" : "📂 Save/Load"}
-              onPress={() => {
-                setShowSaveLoad(!showSaveLoad);
-                if (!showSaveLoad) refreshSaveSlots();
-              }}
-            />
+          {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
+          {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool
+              กับ "Page X/Y" ซึ่งไม่มีความหมายอีกแล้วบนแผนที่แบบเส้นทาง
+              และยังมีรายการทางเลือกซ้ำกับการ์ด encounter ด้านบนอีกชุด */}
+          <ShopView state={state} dispatch={dispatch} />
 
-            {/* Save/Load Panel */}
-            {showSaveLoad && (
-              <View style={{ marginTop: 16, padding: 16, borderRadius: 12, backgroundColor: 'rgba(63, 63, 70, 0.5)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.2)' }}>
-                <Text style={{ color: 'white', fontWeight: '600', marginBottom: 12 }}>Save/Load Game</Text>
-                
-                {saveLoadError && (
-                  <Text style={{ color: '#f87171', marginBottom: 12 }}>{saveLoadError}</Text>
-                )}
 
-                {saveSlots.map((slot, i) => (
-                  <View key={i} style={{ marginBottom: 12, padding: 12, borderRadius: 8, backgroundColor: 'rgba(82, 82, 91, 0.5)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-                    <Text style={{ color: 'white', fontWeight: '600' }}>Slot {slot.slot}</Text>
-                    {slot.exists ? (
-                      <>
-                        <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 14 }}>
-                          Level {slot.playerLevel || 1} • Gold: {slot.gold || 0}g
-                        </Text>
-                        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 12 }}>Page {slot.currentPage || 0}/{slot.totalPages || 0}</Text>
-                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                          <Pressable
-                            onPress={() => loadFromSlot(slot.slot)}
-                            style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4, backgroundColor: 'rgba(37, 99, 235, 0.5)' }}
-                          >
-                            <Text style={{ color: '#bfdbfe', fontSize: 14 }}>Load</Text>
-                          </Pressable>
-                          <Pressable
-                            onPress={() => saveToSlot(slot.slot)}
-                            style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4, backgroundColor: 'rgba(34, 197, 94, 0.5)' }}
-                          >
-                            <Text style={{ color: '#bbf7d0', fontSize: 14 }}>Overwrite</Text>
-                          </Pressable>
-                        </View>
-                      </>
-                    ) : (
-                      <View>
-                        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14 }}>Empty</Text>
-                        <Pressable
-                          onPress={() => saveToSlot(slot.slot)}
-                          style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4, backgroundColor: 'rgba(34, 197, 94, 0.5)', marginTop: 8 }}
-                        >
-                          <Text style={{ color: '#bbf7d0', fontSize: 14 }}>Save Here</Text>
-                        </Pressable>
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-        )}
 
-        {/* Deck Button */}
-        {state.phase !== 'menu' && (
-          <View style={{ marginBottom: 16 }}>
-            <Pressable
-              onPress={() => dispatch({ type: state.deckOpen ? 'CloseDeck' : 'OpenDeck' })}
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                borderRadius: 12,
-                backgroundColor: 'rgba(99, 102, 241, 0.4)',
-                borderWidth: 1,
-                borderColor: 'rgba(99, 102, 241, 0.4)'
-              }}
-            >
-              <Text style={{ color: '#c7d2fe', fontWeight: '600', textAlign: 'center' }}>
-                {state.deckOpen ? '📚 Close Deck' : '📚 View Deck'}
-              </Text>
-            </Pressable>
-          </View>
-        )}
+          <PlayerStatusBar
+            state={state}
+            onOpenDeck={() => dispatch({ type: 'OpenDeck' })}
+            onOpenBlessings={() => setBlessingsOpen(true)}
+          />
 
-        {/* Game Views */}
-        <CombatView state={state} dispatch={dispatch} />
-        <ShopView state={state} dispatch={dispatch} />
-        <MapView state={state} dispatch={dispatch} />
-        <EventView state={state} dispatch={dispatch} />
-        <DeckView state={state} dispatch={dispatch} />
+        </Scrim>
+      </SceneArrival>
 
-        {/* Defeat Screen */}
-        {state.phase === 'defeat' && (
-          <View style={{ marginTop: 16, padding: 16, borderRadius: 16, backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 2, borderColor: 'rgba(239, 68, 68, 0.3)' }}>
-            <Text style={{ color: '#fecaca', fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 }}>💀 พ่ายแพ้</Text>
-            <Text style={{ color: '#fca5a5', fontSize: 16, textAlign: 'center', marginBottom: 16 }}>หมอผีถูกปีศาจเอาชนะ...</Text>
-            
-            <View style={{ flexDirection: 'row', gap: 12, justifyContent: 'center' }}>
-              <Pressable
-                onPress={() => {
-                  // Restart from beginning
-                  const { newRun } = useGame.getState();
-                  newRun(state.seed);
-                }}
-                style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  borderRadius: 12,
-                  backgroundColor: 'rgba(34, 197, 94, 0.5)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(74, 222, 128, 0.5)',
-                  flex: 1
-                }}
-              >
-                <Text style={{ color: '#bbf7d0', fontWeight: '600', textAlign: 'center' }}>🔄 เริ่มใหม่</Text>
-              </Pressable>
-              
-              <Pressable
-                onPress={() => {
-                  // Go back to menu
-                  useGame.setState({ state: makeEmptyState(), rng: makeRng(1) });
-                }}
-                style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  borderRadius: 12,
-                  backgroundColor: 'rgba(99, 102, 241, 0.5)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(129, 140, 248, 0.5)',
-                  flex: 1
-                }}
-              >
-                <Text style={{ color: '#c7d2fe', fontWeight: '600', textAlign: 'center' }}>🏠 เมนูหลัก</Text>
-              </Pressable>
-            </View>
-          </View>
-        )}
+      {/* BlessingDialog/EncounterDialog แบบ mock ถูกแทนด้วยหน้าเลือกพรจริง
+          และการ์ด encounter ที่มาจาก state.pages แล้ว */}
 
-        {/* Enhanced Log with System Message Formatting */}
-        {state.log.length > 0 && (
-          <View style={{ marginTop: 24, borderRadius: 16, padding: 16, backgroundColor: 'rgba(39, 39, 42, 0.5)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-            <Text style={{ color: 'white', fontWeight: '600', marginBottom: 8 }}>📜 Game Log</Text>
-            <ScrollView style={{ maxHeight: 200 }} showsVerticalScrollIndicator={true}>
-              {state.log.slice(-20).map((entry, i) => {
-                // Enhanced log formatting for different system messages
-                const getLogColor = (text: string) => {
-                  if (text.includes('🎆') || text.includes('✨')) return '#fbbf24'; // Combo messages - gold
-                  if (text.includes('🧠') || text.includes('🤖')) return '#8b5cf6'; // AI messages - purple  
-                  if (text.includes('💫') || text.includes('status')) return '#a78bfa'; // Status messages - light purple
-                  if (text.includes('💥') || text.includes('damage')) return '#ef4444'; // Damage - red
-                  if (text.includes('💚') || text.includes('heal')) return '#22c55e'; // Healing - green
-                  if (text.includes('👹') || text.includes('👿')) return '#f87171'; // Enemy/minion - light red
-                  if (text.includes('🌿') || text.includes('Environment')) return '#10b981'; // Environment - emerald
-                  if (text.includes('⚡') || text.includes('energy')) return '#fcd34d'; // Energy - yellow
-                  return 'rgba(255, 255, 255, 0.7)'; // Default
-                };
-                
-                return (
-                  <Text key={i} style={{ 
-                    color: getLogColor(entry), 
-                    fontSize: 14, 
-                    marginBottom: 4,
-                    fontWeight: entry.includes('🎆') || entry.includes('COMBO') ? '600' : '400'
-                  }}>
-                    • {entry}
-                  </Text>
-                );
-              })}
-            </ScrollView>
-          </View>
-        )}
+      {/* สำรับเป็นจอทับเต็มจอ วางนอก Scrim เพื่อให้อยู่เหนือทุกอย่าง
+          เดิมวางเป็นบล็อกไหลอยู่ในคอลัมน์กลางแผนที่ จึงล้นออกนอกจอ */}
+      <DeckView state={state} dispatch={dispatch} />
 
-        {/* Enhanced QA Debug Panel */}
-        <View style={{ marginTop: 24, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.1)' }}>
-          <Text style={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: '600', marginBottom: 8 }}>🛠️ Debug Tools</Text>
-          
-          {/* Basic Debug */}
-          <View style={{ marginBottom: 12 }}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: 12, marginBottom: 4 }}>Basic:</Text>
-            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_KillEnemy' })} 
-                style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 4, backgroundColor: 'rgba(185, 28, 28, 0.3)' }}
-              >
-                <Text style={{ color: '#fecaca', fontSize: 14 }}>Kill Enemy</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_Draw', count: 1 })} 
-                style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 4, backgroundColor: 'rgba(29, 78, 216, 0.3)' }}
-              >
-                <Text style={{ color: '#bfdbfe', fontSize: 14 }}>Draw Cards</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_SetEnergy', value: 10 })} 
-                style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 4, backgroundColor: 'rgba(161, 98, 7, 0.3)' }}
-              >
-                <Text style={{ color: '#fde68a', fontSize: 14 }}>+Energy</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => newRun(Math.random().toString(36).substring(2, 8))} 
-                style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 4, backgroundColor: 'rgba(34, 197, 94, 0.3)' }}
-              >
-                <Text style={{ color: '#bbf7d0', fontSize: 14 }}>New Game</Text>
-              </Pressable>
-            </View>
-          </View>
+      {blessingsOpen && (
+        <BlessingView
+          blessings={state.blessings}
+          onClose={() => setBlessingsOpen(false)}
+        />
+      )}
 
-          {/* Status Effects Debug */}
-          <View style={{ marginBottom: 12 }}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: 12, marginBottom: 4 }}>Status Effects:</Text>
-            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_ApplyStatusToPlayer', statusId: 'poison', stacks: 3 })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(239, 68, 68, 0.3)' }}
-              >
-                <Text style={{ color: '#fca5a5', fontSize: 12 }}>☠️ Poison Self</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_ApplyStatusToEnemy', statusId: 'vulnerable', stacks: 2 })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(168, 85, 247, 0.3)' }}
-              >
-                <Text style={{ color: '#c084fc', fontSize: 12 }}>🛡️💔 Vuln Enemy</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_ClearPlayerStatus' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(34, 197, 94, 0.3)' }}
-              >
-                <Text style={{ color: '#86efac', fontSize: 12 }}>🧹 Clear Player</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* Phase 4 Debug */}
-          <View style={{ marginBottom: 12 }}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: 12, marginBottom: 4 }}>Phase 4 Systems:</Text>
-            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_DebugAdaptiveAI' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(139, 92, 246, 0.3)' }}
-              >
-                <Text style={{ color: '#a78bfa', fontSize: 12 }}>🧠 AI Debug</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_DebugCombos' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
-              >
-                <Text style={{ color: '#fbbf24', fontSize: 12 }}>✨ Combo Debug</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_TriggerCombo', comboId: 'shaman_meditation' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(34, 197, 94, 0.3)' }}
-              >
-                <Text style={{ color: '#86efac', fontSize: 12 }}>🎆 Force Combo</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* Environment & Minions */}
-          <View style={{ marginBottom: 12 }}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: 12, marginBottom: 4 }}>Environment & Minions:</Text>
-            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_SetEnvironment', environmentId: 'haunted_temple' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(16, 185, 129, 0.3)' }}
-              >
-                <Text style={{ color: '#6ee7b7', fontSize: 12 }}>🌿 Temple</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_SummonPlayerMinion', minionId: 'ghost_ally' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(168, 85, 247, 0.3)' }}
-              >
-                <Text style={{ color: '#c084fc', fontSize: 12 }}>🤝 Summon Ally</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_SummonEnemyMinion', minionId: 'shadow_clone' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(239, 68, 68, 0.3)' }}
-              >
-                <Text style={{ color: '#fca5a5', fontSize: 12 }}>👿 Enemy Minion</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* Shops & Spawns */}
-          <View style={{ marginBottom: 12 }}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: 12, marginBottom: 4 }}>Shops & Spawns:</Text>
-            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_OpenShopHere' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(21, 128, 61, 0.3)' }}
-              >
-                <Text style={{ color: '#bbf7d0', fontSize: 12 }}>🏪 Shop</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_SpawnEquippedEnemy', enemyId: 'thai_ghost_doctor' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(185, 28, 28, 0.3)' }}
-              >
-                <Text style={{ color: '#fecaca', fontSize: 12 }}>👹 Boss Fight</Text>
-              </Pressable>
-              <Pressable 
-                onPress={() => dispatch({ type: 'QA_LevelUp' })} 
-                style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 4, backgroundColor: 'rgba(234, 179, 8, 0.3)' }}
-              >
-                <Text style={{ color: '#fde68a', fontSize: 12 }}>⬆️ Level Up</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

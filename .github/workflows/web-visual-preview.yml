@@ -1,0 +1,28 @@
+name: Web export checks (no captures)
+on:
+  push:
+    branches: ['art/quiet-comic-ui']
+    paths-ignore: ['docs/previews/**', '**/*.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --maxWorkers=2 --testTimeout=60000
+      - run: npx tsc --noEmit
+      - name: Export real game for web
+        run: EXPO_PUBLIC_UI_REVIEW=1 npx expo export --platform web --output-dir /tmp/quiet-web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Web-game-export
+          path: /tmp/quiet-web/
+          retention-days: 14

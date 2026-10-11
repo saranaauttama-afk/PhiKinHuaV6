@@ -3,30 +3,49 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { GameState } from './types';
-import { toSaveV1, fromSaveV1, type SaveV1 } from './save';
+import type { RNG } from './rng';
+import {
+  toSave, fromSave, isPlayableSave, summarize,
+  toBattleSave, type SaveV2, type SaveSummary,
+} from './save';
 
 // Storage keys
 const SAVE_SLOT_PREFIX = 'phikinhua_save_';
 const AUTO_SAVE_KEY = 'phikinhua_autosave';
 const SETTINGS_KEY = 'phikinhua_settings';
+// Serialize autosave writes: an older map checkpoint must never overwrite a
+// later explicit battle snapshot while AsyncStorage is still completing IO.
+let saveWrites:Promise<void>=Promise.resolve();
+function persistSave(key:string,value:string){
+  const write=saveWrites.catch(()=>{}).then(()=>AsyncStorage.setItem(key,value));
+  saveWrites=write;return write;
+}
 
 // Settings type
 export type GameSettings = {
   autoSaveEnabled: boolean;
   maxSaveSlots: number;
   lastPlayedSlot?: number;
+  /**
+   * บทคั่นที่เคยอ่านจบแล้ว — จำข้ามรัน
+   *
+   * อยู่ใน settings ไม่ใช่ในเซฟของรัน เพราะเป็นเรื่องของคนเล่น ไม่ใช่ของรัน
+   * รอบที่สิบไม่ควรถูกบังคับให้แตะผ่านบทเปิดเรื่องเดิมทีละย่อหน้าอีก
+   */
+  seenChapters?: string[];
 };
 
 export const DEFAULT_SETTINGS: GameSettings = {
   autoSaveEnabled: true,
   maxSaveSlots: 3,
+  seenChapters: [],
 };
 
 // === Save/Load Functions ===
 
-export async function saveGame(state: GameState, slot: number = 0): Promise<void> {
+export async function saveGame(state: GameState, slot: number = 0,rng?:RNG): Promise<void> {
   try {
-    const saveData = toSaveV1(state);
+    const saveData = toSave(state,rng);
     const key = slot === -1 ? AUTO_SAVE_KEY : `${SAVE_SLOT_PREFIX}${slot}`;
     
     // Add metadata
@@ -36,7 +55,7 @@ export async function saveGame(state: GameState, slot: number = 0): Promise<void
       slot: slot === -1 ? 'auto' : slot,
     };
 
-    await AsyncStorage.setItem(key, JSON.stringify(enrichedSave));
+    await persistSave(key, JSON.stringify(enrichedSave));
     
     // Update last played slot if it's not auto-save
     if (slot !== -1) {
@@ -49,7 +68,15 @@ export async function saveGame(state: GameState, slot: number = 0): Promise<void
   }
 }
 
+export async function saveBattle(state: GameState, rng: RNG): Promise<void> {
+  await persistSave(AUTO_SAVE_KEY, JSON.stringify({...toBattleSave(state,rng),savedAt:new Date().toISOString(),slot:'auto'}));
+}
+
 export async function loadGame(slot: number = 0): Promise<GameState> {
+  return (await loadGameSnapshot(slot)).state;
+}
+
+export async function loadGameSnapshot(slot: number = 0): Promise<{state:GameState;rng?:RNG}> {
   try {
     const key = slot === -1 ? AUTO_SAVE_KEY : `${SAVE_SLOT_PREFIX}${slot}`;
     const saved = await AsyncStorage.getItem(key);
@@ -58,8 +85,8 @@ export async function loadGame(slot: number = 0): Promise<GameState> {
       throw new Error(`No save found in slot ${slot === -1 ? 'auto' : slot}`);
     }
 
-    const saveData = JSON.parse(saved) as SaveV1 & { savedAt?: string; slot?: string | number };
-    return fromSaveV1(saveData);
+    const saveData = JSON.parse(saved) as SaveV2 & { savedAt?: string; slot?: string | number };
+    return {state:fromSave(saveData),rng:saveData.battleRng??saveData.mapRng};
   } catch (error) {
     console.error('Failed to load game:', error);
     throw new Error(`Failed to load game: ${error}`);
@@ -81,6 +108,8 @@ export async function deleteSave(slot: number): Promise<void> {
 export type SaveSlotInfo = {
   slot: number;
   exists: boolean;
+  /** เซฟเวอร์ชันเก่าหรือเสียหาย — มีอยู่แต่เล่นต่อไม่ได้ */
+  playable?: boolean;
   savedAt?: string;
   playerLevel?: number;
   gold?: number;
@@ -96,15 +125,18 @@ export async function getSaveSlots(maxSlots: number = 3): Promise<SaveSlotInfo[]
     try {
       const saved = await AsyncStorage.getItem(key);
       if (saved) {
-        const data = JSON.parse(saved) as SaveV1 & { savedAt?: string };
+        const data = JSON.parse(saved) as SaveV2 & { savedAt?: string };
+        const ok = isPlayableSave(data);
+        const sum = ok ? summarize(data) : undefined;
         slots.push({
           slot: i,
           exists: true,
+          playable: ok,
           savedAt: data.savedAt,
-          playerLevel: data.player?.level,
-          gold: data.gold,
-          currentPage: (data.pages?.pageIndex ?? 0) + 1,
-          totalPages: data.pages?.totalPages,
+          playerLevel: sum?.level,
+          gold: sum?.gold,
+          currentPage: sum?.fight,
+          totalPages: sum?.totalFights,
         });
       } else {
         slots.push({ slot: i, exists: false });
@@ -118,13 +150,31 @@ export async function getSaveSlots(maxSlots: number = 3): Promise<SaveSlotInfo[]
   return slots;
 }
 
-export async function hasAutoSave(): Promise<boolean> {
+/**
+ * มีการเดินทางที่ค้างไว้และเล่นต่อได้จริงไหม
+ *
+ * เดิมตอบแค่ว่ามีไฟล์อยู่ไหม — เซฟเวอร์ชันเก่าที่ไม่มีเส้นทางก็ตอบ true
+ * แล้วผู้เล่นจะกดเล่นต่อไปเจอจอเปล่า
+ */
+export async function loadAutoSaveSummary(): Promise<SaveSummary | null> {
   try {
     const saved = await AsyncStorage.getItem(AUTO_SAVE_KEY);
-    return saved !== null;
+    if (!saved) return null;
+    const data = JSON.parse(saved);
+    if (!isPlayableSave(data)) return null;
+    return summarize(data);
   } catch {
-    return false;
+    return null;
   }
+}
+
+export async function hasAutoSave(): Promise<boolean> {
+  return (await loadAutoSaveSummary()) !== null;
+}
+
+export async function clearAutoSave(): Promise<void> {
+  const clear=saveWrites.catch(()=>{}).then(()=>AsyncStorage.removeItem(AUTO_SAVE_KEY));
+  saveWrites=clear;try{await clear;}catch{}
 }
 
 // === Settings ===
@@ -149,12 +199,25 @@ export async function loadSettings(): Promise<GameSettings> {
   return DEFAULT_SETTINGS;
 }
 
+/** บทที่เคยอ่านจบแล้วข้ามรัน — ใช้ตัดสินว่าจะเปิดทีละย่อหน้าหรือกางทั้งบทเลย */
+export async function loadSeenChapters(): Promise<string[]> {
+  const settings = await loadSettings();
+  return settings.seenChapters ?? [];
+}
+
+export async function markChapterSeen(id: string): Promise<void> {
+  const settings = await loadSettings();
+  const seen = settings.seenChapters ?? [];
+  if (seen.includes(id)) return;
+  await saveSettings({ ...settings, seenChapters: [...seen, id] });
+}
+
 // === Auto Save ===
 
-export async function autoSave(state: GameState): Promise<void> {
+export async function autoSave(state: GameState,rng?:RNG): Promise<void> {
   const settings = await loadSettings();
   if (settings.autoSaveEnabled) {
-    await saveGame(state, -1); // -1 = auto save slot
+    await saveGame(state, -1,rng); // -1 = auto save slot
   }
 }
 

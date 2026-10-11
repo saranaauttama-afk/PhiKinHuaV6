@@ -79,6 +79,13 @@ export function getCardPlayedFns(def: BlessingDef, card: CardData): BlessingPlay
   if (reg?.on_card_played?.length) {
     for (const spec of reg.on_card_played) {
       // เงื่อนไข
+      if (spec.when?.cost !== undefined && card.cost !== spec.when.cost) continue;
+      if (spec.when?.status && !card.statusEffect) continue;
+      if (spec.when?.block && !(card.block&&card.block>0)) continue;
+      if (spec.when?.heal && !(card.heal&&card.heal>0)) continue;
+      if (spec.when?.summon && !card.summonMinion) continue;
+      if (spec.when?.enemyStatus && card.statusEffect?.target!=='enemy') continue;
+      if (spec.when?.multipleHits && !(card.type==='attack'&&(card.hits??1)>1)) continue;
       if (spec.when?.type && card.type !== spec.when.type) continue;
       if (spec.when?.hasTag && !(card.tags ?? []).includes(spec.when.hasTag)) continue;
 

@@ -151,6 +151,8 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     }
   },
 
+  thorns:{id:'thorns',name:'หนามสะท้อน',description:'เมื่อรับการโจมตี สะท้อนความเสียหายตามจำนวนชั้น',defaultDuration:2,stackable:true,maxStacks:6,tags:['buff','protection']},
+  dodge:{id:'dodge',name:'หลบครั้งถัดไป',description:'หลบการโจมตีถัดไปหนึ่งครั้ง ไม่หลบพิษหรือความเสียหายจากสถานะ',defaultDuration:1,stackable:true,maxStacks:2,tags:['buff','protection']},
   energy_boost: {
     id: 'energy_boost',
     name: 'เพิ่มพลังงาน',
@@ -171,7 +173,10 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     description: 'กำลังร่ายเวทย์อันทรงพลัง - ห้ามขัดจังหวะ',
     defaultDuration: 0, // จัดการพิเศษโดยระบบเวทย์
     stackable: false,
-    tags: ['special', 'casting'],
+    // ติดแท็ก buff เพิ่ม เพราะแถบสถานะต้องตอบให้ได้ว่าสถานะนี้ดีหรือร้าย
+    // "กำลังร่ายเวทย์" เป็นผลบวกของฝ่ายที่ร่าย — ฝั่งตรงข้ามอ่านว่าอันตราย
+    // จากตำแหน่งที่มันขึ้น (ใต้ตัวศัตรู) ไม่ใช่จากสี
+    tags: ['special', 'casting', 'buff'],
     onApply: (target) => {
       console.log(`${target} เริ่มร่ายเวทย์อันทรงพลัง...`);
     },
