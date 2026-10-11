@@ -60,7 +60,15 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Paper-rollout-native-audit
-          run-id: 38166885904
+          run-id: 38168344739
           github-token: ${{ github.token }}
-      - run: cat logcat.txt
-      - run: cat results.json
+          path: audit/native
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paper-rollout-APK-signature-audit
+          run-id: 38168344739
+          github-token: ${{ github.token }}
+          path: audit/apk
+      - run: cat audit/native/logcat.txt
+      - run: cat audit/native/results.json
+      - run: cat audit/apk/sha256.txt
