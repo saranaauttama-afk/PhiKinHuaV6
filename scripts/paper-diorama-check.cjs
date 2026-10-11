@@ -33,7 +33,7 @@ const sampleFrames=p=>p.evaluate(()=>new Promise(resolve=>{const s=[];let last;c
  const server=http.createServer((req,res)=>{let f=path.join(root,decodeURIComponent(req.url.split('?')[0]));if(!fs.existsSync(f)||fs.statSync(f).isDirectory())f=path.join(root,'index.html');res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.ttf':'font/ttf','.json':'application/json'})[path.extname(f)]||'application/octet-stream');fs.createReadStream(f).pipe(res);});await new Promise(r=>server.listen(8140,'127.0.0.1',r));
  const b=await chromium.launch({executablePath:process.env.PAPER_CHROMIUM_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
-  for(const viewport of [{width:360,height:640},{width:360,height:800},{width:393,height:852},{width:412,height:915},{width:432,height:960},{width:480,height:800}]){
+  for(const viewport of [{width:360,height:640},{width:360,height:720},{width:360,height:800},{width:393,height:852},{width:412,height:915},{width:432,height:960},{width:480,height:800}]){
    const ctx=await b.newContext({viewport,hasTouch:true}),p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('request',r=>{const u=new URL(r.url());if(u.pathname.startsWith('/assets/'))assets.add(u.pathname);});
    await p.goto('http://127.0.0.1:8140/paper-diorama');await ready(p);assert.equal((await state(p)).animationOn,true);
    await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem('phi-ui-settings')||'{}');localStorage.setItem('phi-ui-settings',JSON.stringify({...s,audioVolume:0.42}));});await p.reload();await ready(p);

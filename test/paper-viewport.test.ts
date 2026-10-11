@@ -2,8 +2,15 @@ import {describe,it,expect} from 'vitest';
 import {battleGeometry} from '../app/battleGeometry';
 import {paperPlacement} from '../src/visual/paperPlacement';
 import {paperViewport,PAPER_BLEED} from '../src/visual/paperViewport';
-const screens=[[360,640],[360,800],[393,852],[412,915],[432,960],[480,800]];
+const screens=[[360,640],[360,700],[360,720],[360,800],[393,852],[412,915],[432,960],[480,800]];
 describe('paper portrait coverage and safe areas',()=>{
+ it('keeps world character clear of fixed HUD throughout portrait height changes',()=>{
+  for(let h=640;h<=960;h+=4)for(const [top,bottom] of [[0,0],[24,24],[32,48]]){
+   const world=paperPlacement(360,h,top,bottom),hud=battleGeometry(360,h,top,bottom);
+   expect(world.footY).toBeLessThan(hud.hudTop);
+   expect(Math.abs(paperPlacement(360,h+1,top,bottom).footY-world.footY)).toBeLessThan(1.1);
+  }
+ });
  for(const [w,h] of screens)for(const [top,bottom] of [[0,0],[24,24],[32,48]])it(`${w}x${h} insets ${top}/${bottom}`,()=>{
   const layout=battleGeometry(w,h,top,bottom),placement=paperPlacement(w,h,top,bottom),p=paperViewport(layout,placement.groundY);
   for(const plane of Object.values(p))expect(plane.width/plane.height).toBeCloseTo(1024/1536,12);

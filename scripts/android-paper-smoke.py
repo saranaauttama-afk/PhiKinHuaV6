@@ -53,7 +53,7 @@ adb('shell','pm','clear',APP);adb('logcat','-c')
 for key in ['window_animation_scale','transition_animation_scale','animator_duration_scale']:adb('shell','settings','put','global',key,'1')
 logger=subprocess.Popen(['adb','logcat','-v','threadtime','ReactNativeJS:V','ReactNative:V','AndroidRuntime:E','*:S'],stdout=(OUT/'logcat.txt').open('w'),stderr=subprocess.STDOUT)
 try:
- for w,h,density in [(720,1280,320),(720,1600,320),(1080,2340,440),(1080,2400,420),(1440,3200,560),(1080,1800,360)]:
+ for w,h,density in [(720,1280,320),(720,1440,320),(720,1600,320),(1080,2340,440),(1080,2400,420),(1440,3200,560),(1080,1800,360)]:
   adb('shell','wm','size',f'{w}x{h}');adb('shell','wm','density',str(density));launch()
   route=shot(f'route-{w}x{h}');assert route.height>route.width
   entry=next(n for n in nodes() if re.search(r'^เดินเข้าหมู่บ้าน$',label(n)) and len(bounds(n))==4);assert 0<=bounds(entry)[1]<bounds(entry)[3]<=h
