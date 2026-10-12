@@ -254,6 +254,8 @@ export type CombatEvent = (
 export type EnemyIntent = {
   /** ใบที่ศัตรูจะเล่นเทิร์นหน้า ตามลำดับ */
   cardIds: string[];
+  /** Physical positions in the in-turn hand, including duplicate definitions. */
+  handIndexes?: number[];
   /** ดาเมจรวมที่จะเข้าถ้าผู้เล่นไม่ตั้งการ์ด (ผ่านสูตรเดียวกับดาเมจจริง) */
   damage: number;
   /** block ที่ศัตรูจะได้ */
@@ -337,6 +339,11 @@ export type GameState = {
   /** กับดักที่ตั้งไว้และยังไม่ทำงาน — เป็นสเตตของไฟต์ ไม่ถูกเก็บลงเซฟ */
   traps?: import('./combat/traps').ArmedTrap[];
 
+  enemyHandSize?: number;
+  enemyDrawPerTurn?: number;
+  enemyMaxRetained?: number;
+  enemyHandAges?: number[];
+  enemyIdleTurns?: number;
   enemyEnergy?: number;
   enemyLastPlayed?: string[];  // card IDs played last enemy turn, for UI animation
 

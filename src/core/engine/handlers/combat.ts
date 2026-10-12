@@ -1,3 +1,4 @@
+import {consumeEnemyCard,finishEnemyHand} from '../../combat/enemyHand';
 // src/core/engine/handlers/combat.ts — Legacy only (unified system removed)
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
@@ -209,7 +210,6 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   const { processMinionsEndTurn }         = require('../../minionRuntime');
   const { processEnemyTurnBehaviors }     = require('../../enemyBehaviorRuntime');
   const { onPlayerTurnEnd }              = require('../../adaptiveAI');
-  const { enemyDrawUpToHand, enemyDiscardHand } = require('./enemy');
 
   // จบเทิร์น player
   processStatusEffectsOnTurnEnd('player', s);
@@ -242,32 +242,27 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     r = settleCombat(s, r);
     if (s.phase !== 'combat') { emit(s, { t: 'TurnEnded', who: 'enemy' }); return { state: s, rng: r }; }
 
-    // ศัตรูตัดสินใจ ณ ตอนที่ถึงตาจริง ไม่ใช่ตั้งแต่ท้ายเทิร์นก่อน
-    //
-    // เดิมต้องเลือกไว้ล่วงหน้าเพราะต้องเอาไปโชว์บนป้าย intent พอเลิกโชว์แล้ว
-    // การเลื่อนมาตัดสินใจตรงนี้ดีกว่าในเชิงกฎเกม — ศัตรูเห็นกระดานจริงตอนนั้น
-    // ทั้งการ์ดที่ผู้เล่นเพิ่งตั้งและเลือดที่เพิ่งเสีย ไม่ใช่ภาพเมื่อเทิร์นที่แล้ว
-    // The episode commits to the displayed cards. Full runs retain existing AI.
-    if ((s.runMode !== 'episode'&&!s.campaign) || !s.enemyIntent) planEnemyIntent(s);
-    const toPlay: string[] = [...(s.enemyIntent?.cardIds ?? [])];
-
-    s.enemyLastPlayed = [];
-    enemyDiscardHand(s);
-    s.enemy.handCount=toPlay.length;
+    // Decide from the current public board and the real held cards once the turn starts.
+    planEnemyIntent(s,true);
+    const toPlay:string[]=[...(s.enemyIntent?.cardIds??[])];
+    const indexes=s.enemyIntent?.handIndexes??[];
+    const consumed:number[]=[];
+    s.enemyLastPlayed=[];
 
     const { enemyCardById } = require('../../pack_enemy_cards');
 
-    for (const [playIndex,cardId] of toPlay.entries()) {
+    for (const [playIndex,plannedId] of toPlay.entries()) {
       // ผู้เล่นตายกลางคัน → หยุดทันที ใบที่เหลือไม่ถูกเล่น
       if (s.phase !== 'combat') break;
 
-      const def = enemyCardById(cardId);
-      if (!def) continue;
-
-      const cost=def.energyCost??1;
-      if(cost>(s as any).enemyEnergy)continue;
-      (s as any).enemyEnergy-=cost;
-      s.enemy.energy=(s as any).enemyEnergy;s.enemy.handCount=toPlay.length-playIndex-1;
+      const original=indexes[playIndex];
+      const index=original==null?s.enemyPiles!.hand.indexOf(plannedId):original-consumed.filter(i=>i<original).length;
+      // Traps/counters can awaken the boss between reveals. Read the actual transformed copy.
+      const cardId=s.enemyPiles!.hand[index];
+      const def=enemyCardById(cardId);
+      if(!def)continue;
+      if(index<0||!consumeEnemyCard(s,index))continue;
+      if(original!=null)consumed.push(original);
       s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',
@@ -292,11 +287,13 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       }
 
       require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
+      runEquipmentCardPlayed(s,def,'enemy');
 
       r = settleCombat(s, r);
     }
   }
 
+  finishEnemyHand(s,s.enemyLastPlayed?.length??0);
   if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
   // Visible escalation rewards closing the fight rather than healing indefinitely.
   const escalation=require('../../campaign/nights').nightEscalation(s)??(s.runMode==='episode'?{every:3,strength:2}:undefined);
@@ -304,7 +301,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     require('../../statusEffectsRuntime').applyStatusEffect('enemy',s,'strength',99,escalation.strength);
     s.log.push(`ผีคลุ้มคลั่ง: แข็งแกร่งเพิ่ม ${escalation.strength} จนจบไฟต์`);
   }
-  if(s.enemy)s.enemy.handCount=0;
+  if(s.enemy)s.enemy.handCount=s.enemyPiles?.hand.length??0;
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 
   // ไม่ประกาศแผนล่วงหน้าอีกแล้ว — ล้างทิ้งเพื่อไม่ให้ค้างเป็นข้อมูลเก่า

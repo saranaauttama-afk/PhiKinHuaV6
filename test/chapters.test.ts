@@ -77,8 +77,11 @@ function playRun(seed: string, opts: {
     if (opts.dieAtFight === fightNo) {
       // ตายจริงผ่านเส้นทางของ engine — ศัตรูตีจนเลือดหมด
       s.player.hp = 1;
+      s.player.block=0;s.player.statusEffects=[];s.blessings=[];s.equipped=[];s.minions=[];
       s.enemy.hp = 9999;
       s.piles.hand = [];
+      s.enemyPiles={draw:[],hand:['claw'],discard:[]};
+      s.enemyIntent=undefined;
       go({ type: 'EndTurn' });
       go({ type: 'ResolveEnemyTurn' });
       closeChapter();

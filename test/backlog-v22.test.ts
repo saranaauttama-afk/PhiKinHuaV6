@@ -67,11 +67,11 @@ describe('portrait card/art/HUD separation, including multiple owners',()=>{
 });
 
 describe('live enemy HUD and upgrade ability text',()=>{
- it('enemy reveal frames report actual energy spent and queued cards left',()=>{
+ it('enemy reveal frames report actual energy spent and real hand count',()=>{
   let s=newState();s.chapter=undefined;s=step(s,{type:'ChooseStarterBlessing',index:0});s=step(s,{type:'ChooseOffer',index:0});s.player.hp=s.player.maxHp=999;
   s=step(s,{type:'EndTurn'});const reveals=(s.pendingEvents??[]).filter(e=>e.t==='EnemyCardRevealed');expect(reveals.length).toBeGreaterThan(0);
   let energy=s.enemy!.maxEnergy||2;for(const event of reveals){if(event.t!=='EnemyCardRevealed')continue;expect(event.ownerId).toBe(s.enemy!.id);energy-=event.cost??1;expect(event.frame!.enemy!.energy).toBe(energy);expect(event.frame!.enemy!.handCount).toBeGreaterThanOrEqual(0);}
-  expect(s.enemy?.handCount).toBe(0);
+  expect(s.enemy?.handCount).toBe(s.enemyPiles?.hand.length??0);
  });
  it('trap upgrade preview prints upgraded effect values instead of stale descriptions',()=>{
   const c=ALL_CARDS.find(c=>c.type==='trap'&&c.trap?.effects.some(e=>e.type==='damage'))!;const up=upgradeCard(c);expect(cardSummary(up)).toContain(`โจมตีกลับ ${up.trap!.effects.find(e=>e.type==='damage')!.value}`);expect(up.trap!.effects.find(e=>e.type==='damage')!.value).toBeGreaterThan(c.trap!.effects.find(e=>e.type==='damage')!.value);

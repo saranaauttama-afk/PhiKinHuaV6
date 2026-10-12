@@ -1,3 +1,4 @@
+import {initializeEnemyHand} from './combat/enemyHand';
 import {stripObsoleteComboData} from './saveMigration';
 import {campaignFightTotal} from './campaign/threeNight';
 // src/core/save.ts — เซฟ/โหลดแบบไม่ทำ IO (ชั้นนอกค่อยเขียนลง storage)
@@ -116,6 +117,7 @@ export function fromSave(data: SaveV2): GameState {
   }
 
   const s = stripObsoleteComboData(data.state) as GameState;
+  if(s.phase==='combat'&&s.enemy)initializeEnemyHand(s);
   if(s.discovery)parseArchive(JSON.stringify({version:1,runs:{[s.discovery.id]:s.discovery}}));
   if(s.pages?.adventure){
     if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บสมุดบันทึกและของปลดล็อกไว้');

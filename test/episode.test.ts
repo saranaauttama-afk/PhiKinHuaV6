@@ -74,14 +74,16 @@ describe('first chapter', () => {
     d.go({type:'CompleteNode'});expect(d.state.journey!.currentId).toBe('e2_0');
     d.go({type:'Proceed'});expect(d.state.pages!.current!.offers[0].kind).toBe('monster');
   });
-  it('fight budgets grow 3/3/4 and planned cards fit the energy',()=>{
-    for(const [fight,previous,energy,hand]of [[0,'e0_0',3,4],[1,'e1_0',3,4],[2,'e3_0',4,5]] as const){
+  it('episode energy budgets remain 3/3/4; decisions happen in-turn',()=>{
+    for(const [fight,previous,energy,hand]of [[0,'e0_0',3,4],[1,'e1_0',3,4],[2,'e3_0',4,6]] as const){
       const d=driver('energy-'+energy,'warrior');
       if(fight>0){moveTo(d.state.journey!,previous);syncOffersFromJourney(d.state);}
       d.state.fightCount=fight;
       d.go({type:'ChooseOffer',index:0});expect(d.state.enemy!.maxEnergy).toBe(energy);
       expect((d.state as any).enemyHandSize).toBe(hand);
-      const ids=d.state.enemyIntent!.cardIds;
+      expect(d.state.enemyIntent).toBeUndefined();
+      d.go({type:'ResolveEnemyTurn'});
+      const ids=d.state.enemyLastPlayed??[];
       expect(ids.length).toBeGreaterThan(0);expect(ids.reduce((n,id)=>n+(enemyCardById(id)?.energyCost??1),0)).toBeLessThanOrEqual(energy);
     }
   });
@@ -99,18 +101,15 @@ describe('first chapter', () => {
     expect(d.state.pages!.current!.offers.map((o: any) => o.enemyId)).toEqual(['phi-pop', 'nang-tanee']);
   });
 
-  it('shows a committed enemy hand and resolves those same cards', () => {
-    const d = driver(); d.go({ type: 'ChooseOffer', index: 0 });
-    const cards = [...d.state.enemyIntent!.cardIds];
-    expect(cards.length).toBeGreaterThan(0);
-    // Play a block card before handing over the turn: the plan must remain fixed.
-    const ix = d.state.piles.hand.findIndex(c => (c.block ?? 0) > 0);
-    if (ix >= 0) d.go({ type: 'PlayCard', index: ix });
-    expect(d.state.enemyIntent!.cardIds).toEqual(cards);
-    d.go({ type: 'ResolveEnemyTurn' });
-    const shown = d.state.pendingEvents!.filter(e => e.t === 'EnemyCardRevealed').map((e: any) => e.cardId);
-    expect(shown).toEqual(cards);
-    expect(shown.every(id => !!enemyCardById(id))).toBe(true);
+  it('episode cards remain hidden until sequential reveals', () => {
+    const d=driver();d.go({type:'ChooseOffer',index:0});
+    expect(d.state.enemyIntent).toBeUndefined();
+    expect(d.state.enemyPiles?.hand).toEqual([]);
+    d.go({type:'ResolveEnemyTurn'});
+    const shown=d.state.pendingEvents!.filter(e=>e.t==='EnemyCardRevealed').map((e:any)=>e.cardId);
+    expect(shown.length).toBeGreaterThan(0);
+    expect(shown).toEqual(d.state.enemyLastPlayed);
+    expect(d.state.enemyIntent).toBeUndefined();
   });
 
   it('persists episode mode and authored path through save/load', () => {

@@ -87,7 +87,7 @@ describe('chapter class builds and ghost signatures',()=>{
   });
   it('every authored enemy deck references valid owned cards',()=>{
     for(const id of ['phi-pop','nang-tanee','phi-krasue','phi-nang-ram','phi-pong-kang']){
-      const cfg=deckForMonster(getMonsterById(id)!); expect(cfg.lists![0].cards).toHaveLength(15);
+      const cfg=deckForMonster(getMonsterById(id)!); expect(cfg.lists![0].cards).toHaveLength(10);
       for(const card of cfg.lists![0].cards) expect(cfg.pool.allowOwners).toContain(enemyCardById(card)?.owner);
     }
   });

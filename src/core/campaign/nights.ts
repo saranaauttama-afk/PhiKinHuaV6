@@ -34,8 +34,8 @@ export function configureNightEnemy(s:GameState):void{
  const chapterScale=isThreeNight(s)?[1,1.28,1.58][s.campaign.night-1]:1;
  s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*chapterScale*(1+(n-1)*(isThreeNight(s)?.05:adventure?.07:.1)));
  const archetype=ENEMY_ARCHETYPES[s.enemy.id];
- const budget=adventure?(boss?4:elite?3:archetype==='rush'?3:2):boss?4:3;
- const handSize=boss?(n>=3?6:5):elite?5:4;
+ const budget=boss?3:elite?3:2;
+ const handSize=boss?7:elite?6:4;
  s.enemy.maxEnergy=budget;s.enemy.handSize=handSize;
  if(NIGHT_ENEMY_DECKS[s.enemy.id])s.enemy.ai!.deck={lists:[{id:s.enemy.id,weight:1,cards:NIGHT_ENEMY_DECKS[s.enemy.id]}]};
  const deck=s.enemy.ai!.deck!;deck.maxEnergy=budget;deck.handSize=handSize;

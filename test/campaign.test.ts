@@ -79,7 +79,7 @@ describe('five-night campaign',()=>{
   const budget=s.enemy!.maxEnergy!;awakenNightBoss(s);const strength=s.enemy!.statusEffects!.find(e=>e.id==='strength')!.stacks;expect(s.enemy!.block).toBe(14);expect(s.enemy!.maxEnergy).toBe(budget+1);awakenNightBoss(s);expect(s.enemy!.statusEffects!.find(e=>e.id==='strength')!.stacks).toBe(strength);
  });
  it('all new ghosts have resolvable, distinct, mixed full decks',()=>{
-  for(const [owner,ids] of Object.entries(NIGHT_ENEMY_DECKS)){const unique=new Set(ids).size;expect([8,10,12]).toContain(unique);expect(ids.length).toBeGreaterThanOrEqual(18);expect(ids.length).toBeLessThanOrEqual(30);const cards=ids.map(id=>enemyCardById(id)!);expect(cards.every(c=>c&&c.owner===owner)).toBe(true);expect(cards.some(c=>c.type==='skill')).toBe(true);expect(cards.some(c=>c.id.endsWith('_signature'))).toBe(true);}
+  for(const [owner,ids] of Object.entries(NIGHT_ENEMY_DECKS)){const unique=new Set(ids).size;expect([9,11,13]).toContain(unique);expect([10,12,15]).toContain(ids.length);const cards=ids.map(id=>enemyCardById(id)!);expect(cards.every(c=>c&&c.owner===owner)).toBe(true);expect(cards.some(c=>c.type==='skill')).toBe(true);expect(cards.some(c=>c.id.endsWith('_signature'))).toBe(true);}
  });
  it('entangle denies enemy attacks, while curses are fight-only and summons visible',()=>{
   const d=driver();d.go({type:'ChooseOffer',index:0});const s=d.state;const hp=s.player.hp;applyStatusEffect('enemy',s,'entangle',2,1);resolveEnemyCard(s,enemyCardById('thep_aksorn_signature')!);expect(s.player.hp).toBe(hp);expect(s.piles.discard.some(c=>c.type==='curse')).toBe(false);

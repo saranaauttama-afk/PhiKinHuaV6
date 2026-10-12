@@ -2536,7 +2536,7 @@
     "energyCost": 2,
     "desc": "โจมตี 2 · ใส่การ์ดคำสาปในกองทิ้ง",
     "dmg": 2,
-    "curseCard": "curse_burden"
+    "curseCard": "curse_dread"
   },
   {
     "id": "kuman_thong_v29_signature_support",
@@ -2544,11 +2544,11 @@
     "name": "ผีตายโหงชายทุ่ง · อาถรรพ์ประจำตน",
     "type": "skill",
     "energyCost": 1,
-    "desc": "กัน 3 · เปราะบาง 1 · 2 เทิร์น",
+    "desc": "กัน 3 · ลดจั่ว 1 · 2 เทิร์น",
     "block": 3,
     "statusEffect": {
       "target": "player",
-      "effect": "vulnerable",
+      "effect": "draw_reduction",
       "duration": 2,
       "value": 1
     }
@@ -2712,13 +2712,8 @@
     "name": "หักกิ่งบัง",
     "type": "skill",
     "energyCost": 1,
-    "desc": "ตนเอง หลบ 1 · 2 เทิร์น",
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "dodge",
-      "duration": 2,
-      "value": 1
-    }
+    "desc": "กัน 5",
+    "block": 5
   },
   {
     "id": "phi_pa_v29_signature",
@@ -2734,17 +2729,12 @@
     "id": "phi_pa_v29_signature_support",
     "owner": "phi-pa",
     "name": "ผีป่า · อาถรรพ์ประจำตน",
-    "type": "attack",
+    "type": "skill",
     "energyCost": 1,
-    "desc": "โจมตี 2 ×2 · อ่อนแอ 1 · 1 เทิร์น",
-    "dmg": 2,
-    "hits": 2,
-    "statusEffect": {
-      "target": "player",
-      "effect": "weakness",
-      "duration": 1,
-      "value": 1
-    }
+    "desc": "กัน 2 · เรียกกุมารทองช่วยฟื้นชีวิต",
+    "dmg": 0,
+    "block": 2,
+    "summonMinion": "kuman_spirit"
   },
   {
     "id": "phi_pa_v29_setup",
@@ -3405,7 +3395,7 @@
     "energyCost": 2,
     "desc": "โจมตี 3 · ใส่การ์ดคำสาปในกองทิ้ง",
     "dmg": 3,
-    "curseCard": "curse_burden"
+    "curseCard": "curse_dread"
   },
   {
     "id": "winyan_rerorn_v29_signature_support",
@@ -3775,7 +3765,7 @@
     "energyCost": 2,
     "desc": "โจมตี 3 · ใส่การ์ดคำสาปในกองทิ้ง",
     "dmg": 3,
-    "curseCard": "curse_burden"
+    "curseCard": "curse_dread"
   },
   {
     "id": "phi_nang_yai_v29_signature_support",
@@ -4514,7 +4504,7 @@
     "energyCost": 2,
     "desc": "โจมตี 3 · ใส่การ์ดคำสาปในกองทิ้ง",
     "dmg": 3,
-    "curseCard": "curse_burden"
+    "curseCard": "curse_dread"
   },
   {
     "id": "thep_aksorn_v29_signature_support",
@@ -5289,7 +5279,7 @@
     "energyCost": 2,
     "desc": "โจมตี 4 · ใส่การ์ดคำสาปในกองทิ้ง",
     "dmg": 4,
-    "curseCard": "curse_burden"
+    "curseCard": "curse_dread"
   },
   {
     "id": "night_cave_mother_v29_signature_support",
@@ -5727,5 +5717,434 @@
     "desc": "กัน 5 · ฟื้น 6",
     "block": 5,
     "heal": 6
+  },
+  {
+    "id": "phi_krasue_v34_payoff",
+    "owner": "phi-krasue",
+    "name": "ผีกระสือ · พิษกัดซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_poison",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายติดพิษ โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "phi_pop_v34_payoff",
+    "owner": "phi-pop",
+    "name": "ผีปอบ · เขี้ยวหิวโหย",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "heal": 3,
+    "desc": "โจมตี 5 · ฟื้น 3"
+  },
+  {
+    "id": "nang_tanee_v34_payoff",
+    "owner": "nang-tanee",
+    "name": "นางตานี · สวนเงารั้ง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 2,
+    "conditional": {
+      "kind": "enemy_block",
+      "bonusDamage": 1
+    },
+    "desc": "โจมตี 2 ×2 · ถ้ามีเกราะ เพิ่มหมัดละ 1"
+  },
+  {
+    "id": "phi_nang_ram_v34_payoff",
+    "owner": "phi-nang-ram",
+    "name": "ผีตายโหงนางรำ · เสียงหลอนซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    },
+    "desc": "โจมตี 3 · อ่อนแอ 1 · 2 เทิร์น"
+  },
+  {
+    "id": "phi_pong_kang_v34_payoff",
+    "owner": "phi-pong-kang",
+    "name": "ผีป่าโป่งร้าง · ปีกฟาดซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 3,
+    "block": 1,
+    "desc": "โจมตี 2 ×3 · กัน 1"
+  },
+  {
+    "id": "ngu_phi_sang_v34_payoff",
+    "owner": "ngu-phi-sang",
+    "name": "ผีโพงท้ายทุ่ง · พิษกัดซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_poison",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายติดพิษ โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "phi_pret_v34_payoff",
+    "owner": "phi-pret",
+    "name": "ผีเปรต · ดูดแรงเฮือกท้าย",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "heal": 2,
+    "desc": "โจมตี 5 · ฟื้น 2"
+  },
+  {
+    "id": "krahang_v34_payoff",
+    "owner": "krahang",
+    "name": "กระหัง · ปีกฟาดซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 3,
+    "block": 1,
+    "desc": "โจมตี 2 ×3 · กัน 1"
+  },
+  {
+    "id": "kuman_thong_v34_payoff",
+    "owner": "kuman-thong",
+    "name": "ผีตายโหงชายทุ่ง · เงารบกวน",
+    "type": "skill",
+    "energyCost": 2,
+    "dmg": 0,
+    "block": 2,
+    "summonMinion": "kuman_spirit",
+    "desc": "กัน 2 · เรียกกุมารทองช่วยฟื้นชีวิต"
+  },
+  {
+    "id": "phi_tai_hong_v34_payoff",
+    "owner": "phi-tai-hong",
+    "name": "ผีตายโหง · ซ้ำรอยแค้น",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "phi_pa_v34_payoff",
+    "owner": "phi-pa",
+    "name": "ผีป่า · เรียกเงาพง",
+    "type": "skill",
+    "energyCost": 2,
+    "dmg": 0,
+    "block": 3,
+    "summonMinion": "forest_demon",
+    "desc": "กัน 3 · เรียกภูตป่า"
+  },
+  {
+    "id": "mae_nak_v34_payoff",
+    "owner": "mae-nak",
+    "name": "แม่นาค · สวนเงารั้ง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 3,
+    "conditional": {
+      "kind": "enemy_block",
+      "bonusDamage": 1
+    },
+    "desc": "โจมตี 2 ×3 · ถ้ามีเกราะ เพิ่มหมัดละ 1"
+  },
+  {
+    "id": "pop_yai_v34_payoff",
+    "owner": "pop-yai",
+    "name": "ปอบใหญ่ · เขี้ยวหิวโหย",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "heal": 3,
+    "desc": "โจมตี 5 · ฟื้น 3"
+  },
+  {
+    "id": "phi_ha_ratri_v34_payoff",
+    "owner": "phi-ha-ratri",
+    "name": "ผีโขมด · เสียงหลอนซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    },
+    "desc": "โจมตี 3 · อ่อนแอ 1 · 2 เทิร์น"
+  },
+  {
+    "id": "asuragaya_v34_payoff",
+    "owner": "asuragaya",
+    "name": "ผีกองกอย · ฟาดจากกำบัง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 2,
+    "conditional": {
+      "kind": "enemy_block",
+      "bonusDamage": 1
+    },
+    "desc": "โจมตี 2 ×2 · ถ้ามีเกราะ เพิ่มหมัดละ 1"
+  },
+  {
+    "id": "yak_wat_jaeng_v34_payoff",
+    "owner": "yak-wat-jaeng",
+    "name": "เปรตลานวัด · ฟาดจากกำบัง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 2,
+    "conditional": {
+      "kind": "enemy_block",
+      "bonusDamage": 1
+    },
+    "desc": "โจมตี 2 ×2 · ถ้ามีเกราะ เพิ่มหมัดละ 1"
+  },
+  {
+    "id": "phi_phrai_v34_payoff",
+    "owner": "phi-phrai",
+    "name": "ผีพราย · พิษกัดซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_poison",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายติดพิษ โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "winyan_rerorn_v34_payoff",
+    "owner": "winyan-rerorn",
+    "name": "ผีตายโหงเร่ร่อน · อาคมตามเงา",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 2,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 2
+    },
+    "desc": "โจมตี 2 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 2"
+  },
+  {
+    "id": "pisaj_fai_v34_payoff",
+    "owner": "pisaj-fai",
+    "name": "โขมดดง · ซ้ำรอยแค้น",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "jao_por_pa_v34_payoff",
+    "owner": "jao-por-pa",
+    "name": "ผีป่าดงลึก · สวนเงารั้ง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 2,
+    "conditional": {
+      "kind": "enemy_block",
+      "bonusDamage": 1
+    },
+    "desc": "โจมตี 2 ×2 · ถ้ามีเกราะ เพิ่มหมัดละ 1"
+  },
+  {
+    "id": "phi_nang_yai_v34_payoff",
+    "owner": "phi-nang-yai",
+    "name": "ผีตายโหงเรือนร้าง · อาคมตามเงา",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 2,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 2
+    },
+    "desc": "โจมตี 2 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 2"
+  },
+  {
+    "id": "winyan_dek_v34_payoff",
+    "owner": "winyan-dek",
+    "name": "ผีตายโหงริมคลอง · เสียงหลอนซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    },
+    "desc": "โจมตี 3 · อ่อนแอ 1 · 2 เทิร์น"
+  },
+  {
+    "id": "yak_dam_v34_payoff",
+    "owner": "yak-dam",
+    "name": "กระหังครูอาคม · ซ้ำรอยแค้น",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "phi_mae_mai_v34_payoff",
+    "owner": "phi-mae-mai",
+    "name": "ผีแม่ม่าย · ดูดแรงเฮือกท้าย",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "heal": 2,
+    "desc": "โจมตี 5 · ฟื้น 2"
+  },
+  {
+    "id": "phra_upakut_v34_payoff",
+    "owner": "phra-upakut",
+    "name": "เปรตหิวโหย · ฟาดจากกำบัง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 2,
+    "conditional": {
+      "kind": "enemy_block",
+      "bonusDamage": 1
+    },
+    "desc": "โจมตี 2 ×2 · ถ้ามีเกราะ เพิ่มหมัดละ 1"
+  },
+  {
+    "id": "phaya_nak_v34_payoff",
+    "owner": "phaya-nak",
+    "name": "พรายวังน้ำ · พิษกัดซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_poison",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายติดพิษ โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "thep_aksorn_v34_payoff",
+    "owner": "thep-aksorn",
+    "name": "ปอบผู้เฒ่า · อาคมตามเงา",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 2,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 2
+    },
+    "desc": "โจมตี 2 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 2"
+  },
+  {
+    "id": "phraya_maccurat_v34_payoff",
+    "owner": "phraya-maccurat",
+    "name": "ปอบดงร้าง · ดูดแรงเฮือกท้าย",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "heal": 2,
+    "desc": "โจมตี 5 · ฟื้น 2"
+  },
+  {
+    "id": "night_head_collector_v34_payoff",
+    "owner": "night-head-collector",
+    "name": "กระหังหนองร้าง · ปีกฟาดซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 2,
+    "block": 1,
+    "desc": "โจมตี 2 ×2 · กัน 1"
+  },
+  {
+    "id": "night_bell_keeper_v34_payoff",
+    "owner": "night-bell-keeper",
+    "name": "เปรตวัดร้าง · เสียงหลอนซ้ำ",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 3,
+    "statusEffect": {
+      "target": "player",
+      "effect": "weakness",
+      "duration": 2,
+      "value": 1
+    },
+    "desc": "โจมตี 3 · อ่อนแอ 1 · 2 เทิร์น"
+  },
+  {
+    "id": "night_root_lord_v34_payoff",
+    "owner": "night-root-lord",
+    "name": "ผีป่าไทรพันราก · สวนเงารั้ง",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 2,
+    "hits": 2,
+    "conditional": {
+      "kind": "enemy_block",
+      "bonusDamage": 1
+    },
+    "desc": "โจมตี 2 ×2 · ถ้ามีเกราะ เพิ่มหมัดละ 1"
+  },
+  {
+    "id": "night_cave_mother_v34_payoff",
+    "owner": "night-cave-mother",
+    "name": "พรายแอ่งถ้ำ · อาคมตามเงา",
+    "type": "attack",
+    "energyCost": 1,
+    "dmg": 2,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 2
+    },
+    "desc": "โจมตี 2 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 2"
+  },
+  {
+    "id": "night_headless_king_v34_payoff",
+    "owner": "night-headless-king",
+    "name": "ปอบครูอาคม · ซ้ำรอยแค้น",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 4,
+    "conditional": {
+      "kind": "player_vulnerable",
+      "bonusDamage": 3
+    },
+    "desc": "โจมตี 4 · ถ้าเป้าหมายเปราะบาง โจมตีเพิ่ม 3"
+  },
+  {
+    "id": "phi_kin_hua_v34_payoff",
+    "owner": "phi-kin-hua",
+    "name": "ผีกินหัว · เขี้ยวหิวโหย",
+    "type": "attack",
+    "energyCost": 2,
+    "dmg": 5,
+    "heal": 3,
+    "desc": "โจมตี 5 · ฟื้น 3"
   }
 ]

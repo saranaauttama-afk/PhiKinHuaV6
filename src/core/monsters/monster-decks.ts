@@ -1,3 +1,5 @@
+import {NIGHT_ENEMY_DECKS} from '../campaign/enemyDecks';
+import {ENEMY_HAND_RULES} from '../combat/enemyHand';
 // src/core/monsters/monster-decks.ts — เด็คประจำตัวของผีแต่ละตน
 //
 // ก่อนหน้านี้ทุกตัวถูก hardcode เป็น `ai.cycle = ['claw','guard']` ตอนสร้างศัตรู
@@ -77,37 +79,15 @@ const OWNERS_BY_MONSTER: Record<string, string[]> = {
   'phraya-maccurat': ['spirit', 'phi_tai_hong', 'naga_minor'],
 };
 
-/** พลังงานและขนาดมือตาม tier — ยิ่ง tier สูงยิ่งเล่นได้หลายใบต่อเทิร์น */
-const BY_TIER: Record<ThaiGhostData['tier'], { handSize: number; maxEnergy: number }> = {
-  T1:         { handSize: 2, maxEnergy: 2 },
-  T2:         { handSize: 2, maxEnergy: 2 },
-  T3:         { handSize: 2, maxEnergy: 3 },
-  T4:         { handSize: 3, maxEnergy: 3 },
-  T5:         { handSize: 3, maxEnergy: 4 },
-  Elite:      { handSize: 3, maxEnergy: 4 },
-  BossMid:    { handSize: 3, maxEnergy: 4 },
-  BossFinal:  { handSize: 4, maxEnergy: 5 },
-  SecretBoss: { handSize: 4, maxEnergy: 6 },
-};
-
-// Stable attack/defense mix prevents all-guard/all-attack lottery decks.
-const SIGNATURE_DECKS: Record<string, string[]> = {
-  'phi-pop': ['phase_strike','ghost_wail','floating_dodge','pop_feast','ghost_wail'],
-  'nang-tanee': ['cursed_touch','death_wail','tanee_roots','tanee_roots','guard'],
-  'phi-krasue': ['krasue_claw','night_hunt','krasue_guard','krasue_venom','krasue_venom'],
-  'phi-nang-ram': ['graceful_strike','dancer_steps','dancer_steps','guard','brace'],
-  'phi-pong-kang': ['phantom_slash','swipe','maul','pong_fury','guard'],
-};
-
 /** เด็คประจำตัวของผีตนนี้ — ถ้าไม่ได้จับคู่ไว้ จะได้เด็คพื้นฐานแทน */
 export function deckForMonster(monster: ThaiGhostData): EnemyDeckConfig {
-  const tier = BY_TIER[monster.tier] ?? BY_TIER.T1;
-  const owners = OWNERS_BY_MONSTER[monster.id] ?? ['global'];
+  const kind=monster.tier.includes('Boss')?'boss':monster.tier==='Elite'?'elite':'normal';
+  const tier=ENEMY_HAND_RULES[kind];
+  const cards=NIGHT_ENEMY_DECKS[monster.id];
   return {
-    pool: { allowOwners: owners },
-    ...(SIGNATURE_DECKS[monster.id] ? { lists: [{ id: monster.id, weight: 1, cards: Array.from({ length: 15 }, (_, i) => SIGNATURE_DECKS[monster.id][i % 5]) }] } : {}),
-    handSize: tier.handSize,
-    maxEnergy: tier.maxEnergy,
+    pool:{allowOwners:cards?[monster.id]:OWNERS_BY_MONSTER[monster.id]??['global']},
+    ...(cards?{lists:[{id:monster.id,weight:1,cards:[...cards]}]}:{}),
+    handSize:tier.handSize,maxEnergy:tier.maxEnergy,
   };
 }
 

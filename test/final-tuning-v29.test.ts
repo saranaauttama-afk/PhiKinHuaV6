@@ -53,8 +53,8 @@ describe('final tuning v29',()=>{
  });
  for(const [owner,ids] of Object.entries(NIGHT_ENEMY_DECKS))it(`${owner}: all curated cards retained by the live engine; mechanically distinct moves`,()=>{
   const d=driver(3);const final=Object.hasOwn(NIGHT_AWAKENED_DECKS,owner);
-  d.s.pages!.current!.offers[0]=final?{kind:'boss',bossType:owner===ULTIMATE_BOSS.id?'secret':'final',enemyId:owner}:{kind:'monster',tier:ids.length===22?'elite':'normal',enemyId:owner};d.go({type:'ChooseOffer',index:0});
-  const piles=(d.s as any).enemyPiles;expect(piles.draw.length+piles.hand.length+piles.discard.length).toBe(ids.length);expect(d.s.enemy!.handSize).toBe(final?6:ids.length===22?5:4);
+  d.s.pages!.current!.offers[0]=final?{kind:'boss',bossType:owner===ULTIMATE_BOSS.id?'secret':'final',enemyId:owner}:{kind:'monster',tier:ids.length>=12?'elite':'normal',enemyId:owner};d.go({type:'ChooseOffer',index:0});
+  const piles=(d.s as any).enemyPiles;expect(piles.draw.length+piles.hand.length+piles.discard.length).toBe(ids.length);expect(d.s.enemy!.handSize).toBe(final?7:ids.length>=12?6:4);
   const mechanics=new Set([...new Set(ids)].map(id=>{const {id:_,name,desc,owner,...effect}=enemyCardById(id)!;return JSON.stringify(effect)}));expect(mechanics.size).toBe(new Set(ids).size);
  });
  it('boss replaces two moves at half HP, restores exactly and awakens once',()=>{

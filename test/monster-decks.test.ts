@@ -52,7 +52,7 @@ describe('การจับคู่เด็ค', () => {
     const t5 = deckForMonster(THAI_GHOST_POOLS.T5[0]);
     const boss = deckForMonster(THAI_GHOST_POOLS.BossFinal[0]);
 
-    expect(t5.maxEnergy).toBeGreaterThan(t1.maxEnergy);
+    expect(t5.maxEnergy).toBe(t1.maxEnergy); // v34 normals stay at two energy; identity comes from effects.
     expect(boss.maxEnergy).toBeGreaterThanOrEqual(t5.maxEnergy);
     expect(boss.handSize).toBeGreaterThanOrEqual(t1.handSize);
   });

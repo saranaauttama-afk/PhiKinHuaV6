@@ -10,6 +10,8 @@ export type EnemyCardDef = {
   desc?: string;
   hits?: number;
   heal?: number;
+  /** Normal board-state payoff, never a tracked card sequence. */
+  conditional?: {kind:'player_poison'|'player_vulnerable'|'enemy_block'|'enemy_minions'; bonusDamage:number};
   summonMinion?: string;
   curseCard?: string;
   statusEffect?: { target: 'player' | 'enemy'; effect: import('./combat/status-effects/types').StatusEffectType; duration: number; value: number };             // คำอธิบายการ์ด

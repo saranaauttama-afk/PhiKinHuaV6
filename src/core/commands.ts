@@ -337,22 +337,7 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
     return;
   }
 
-  // Map monster to card deck owner
-  function getCardOwnerForMonster(monsterId: string): string[] {
-    // Map specific monsters to their card deck owners
-    const monsterDeckMap: Record<string, string[]> = {
-      'phi-krasue': ['global', 'phi-krasue'],
-      'phi-pop': ['global', 'phi_pop'],
-      'nang-tanee': ['global', 'spirit'],
-      'phi-nang-ram': ['global', 'spirit'],
-      'phi-pong-kang': ['global', 'spirit'],
-      // Add more monster-deck mappings as needed
-    };
-
-    // Return specific deck or fallback to global
-    return monsterDeckMap[monsterId] || ['global'];
-  }
-
+  const deck=require('./monsters/monster-decks').deckForMonster(monsterData);
   // Initialize combat state
   state.phase = 'combat';
   state.enemy = {
@@ -365,32 +350,11 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
     ai: {
       cycle: ['attack', 'defend'],
       index: 0,
-      // Add deck configuration for monster-specific cards
-      deck: monsterId === 'phi-krasue'
-        ? {
-            // For phi-krasue: Use specific list to avoid duplicate IDs
-            lists: [{
-              id: 'phi-krasue-deck',
-              weight: 1,
-              cards: ['krasue_claw', 'krasue_guard', 'krasue_swipe'] // Only 3 unique cards
-            }],
-            handSize: 3,
-            maxEnergy: 3
-          }
-        : {
-            // For other monsters: Use pool system
-            pool: {
-              allowOwners: getCardOwnerForMonster(monsterId),
-              minAttack: 1,
-              minBlock: 1
-            },
-            handSize: 2,
-            maxEnergy: 2
-          }
+      deck
     },
     intentCardId: null,
-    maxEnergy: 3,
-    handSize: 0,
+    maxEnergy: deck.maxEnergy,
+    handSize: deck.handSize,
     equipped: [],
     statusEffects: []
   };

@@ -1,22 +1,11 @@
-// src/core/combat/intent.ts — ศัตรูตัดสินใจล่วงหน้าว่าเทิร์นหน้าจะทำอะไร
-//
-// เดิมศัตรูจั่วการ์ดตอนถึงเทิร์นตัวเองแล้วเปิดคว่ำทีละใบ ผู้เล่นจึงไม่มีทางรู้ว่า
-// กำลังจะโดนอะไร → ตัดสินใจว่า "เทิร์นนี้ควรตีหรือควรตั้งการ์ด" ไม่ได้เลย
-// กลายเป็นเกมเดา ไม่ใช่เกมวางแผน
-//
-// ตอนนี้ศัตรูเลือกไพ่ที่จะเล่นตั้งแต่จบเทิร์นก่อนหน้า เก็บไว้ใน state.enemyIntent
-// แล้ว UI เอาไปแสดงระหว่างเทิร์นผู้เล่น พอถึงเทิร์นศัตรูก็เล่นตามนั้นเป๊ะ
-
 import type { EnemyIntent, GameState } from '../types';
 import { enemyCardById } from '../pack_enemy_cards';
 import { computeModifiedDamage } from './damage';
-import {chooseEnemyCards} from './enemyPlan';
+import {chooseEnemyCardIndexes} from './enemyPlan';
 
-/**
- * เลือกไพ่ที่ศัตรูจะเล่นเทิร์นหน้า จากมือที่จั่วไว้แล้ว โดยดูพลังงานที่มี
- * ไม่แตะ HP หรือ block ของใครทั้งนั้น — แค่วางแผน
- */
-export function planEnemyIntent(s: GameState): void {
+/** Hidden in-turn decision only. Old preparation calls neither draw nor publish future cards. */
+export function planEnemyIntent(s: GameState,duringEnemyTurn=false): void {
+  if(!duringEnemyTurn){s.enemyIntent=undefined;return;}
   const piles = (s as any).enemyPiles as
     | { draw: string[]; hand: string[]; discard: string[] }
     | undefined;
@@ -30,12 +19,13 @@ export function planEnemyIntent(s: GameState): void {
   const { enemyDrawUpToHand } = require('../engine/handlers/enemy');
   enemyDrawUpToHand(s);
 
-  let energy = s.enemy.maxEnergy ?? 2;
+  let energy = s.enemyEnergy ?? s.enemy.maxEnergy ?? 2;
   const cardIds: string[] = [];
   let damage = 0;
   let block = 0;
 
-  const chosen=(s.runMode==='episode'||s.campaign)?chooseEnemyCards(s,piles.hand,energy):piles.hand;
+  const handIndexes=chooseEnemyCardIndexes(s,piles.hand,s.enemyEnergy??energy);
+  const chosen=handIndexes.map(i=>piles.hand[i]);
   for (const id of chosen) {
     const def = enemyCardById(id);
     if (!def) continue;
@@ -59,6 +49,7 @@ export function planEnemyIntent(s: GameState): void {
 
   s.enemyIntent = {
     cardIds,
+    handIndexes,
     damage,
     block,
     kind:
