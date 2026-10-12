@@ -51,10 +51,11 @@ export function awakenNightBoss(s:GameState):void{
 export function rageActive(s:Partial<GameState>):boolean{
  return !!s.campaign&&s.campaign.night>=RAGE.fromNight(difficultyOf(s));
 }
-/** Rage stacks for the current turn (0 before `RAGE.startTurn`). */
+/** Rage stacks for the ghost's current turn (0 before `RAGE.startTurn`). Counts ghost turns, not player turns. */
 export function rageStacks(s:Partial<GameState>):number{
- if(!rageActive(s))return 0;
- return Math.max(0,((s.turn??1)-RAGE.startTurn+1)*RAGE.perTurn);
+ const ghostTurn=s.fight?.ghostTurns??s.turn??1;
+ const start=rageActive(s)?RAGE.startTurn:RAGE.backstopTurn;
+ return Math.max(0,(ghostTurn-start+1)*RAGE.perTurn);
 }
 /** Start of the ghost's turn: rage rises to match how long the fight has lasted. */
 export function applyRage(s:GameState):void{

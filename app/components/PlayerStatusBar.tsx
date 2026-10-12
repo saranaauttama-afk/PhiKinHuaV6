@@ -7,12 +7,19 @@ import { artSource } from './Art';
 import RitualSurface from './RitualSurface';
 import QuietPlayerHud,{HudStat} from './QuietPlayerHud';
 import InkIcon from './InkIcon';
+import SkillSheet, { skillStatus } from './SkillSheet';
+import { skillsFor } from '../../src/core/skills';
 import { font, layer, paper, pulpColors, palette } from '../theme';
 
 export const STATUS_BAR_SPACE = 88;
-export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: {
+export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings, onUseSkill }: {
   state: GameState; onOpenDeck?: () => void; onOpenBlessings?: () => void;
+  /** Slot A skill (map only). */
+  onUseSkill?: (id: string, index?: number) => void;
 }) {
+  const [skillOpen, setSkillOpen] = React.useState<string | null>(null);
+  const mapSkill = onUseSkill ? skillsFor(state.classId).find(d => d.slot === 'A') : undefined;
+  const mapSkillStatus = mapSkill ? skillStatus(state, mapSkill.id) : undefined;
   const p = state.player;
   const pad = useSafeAreaInsets();
   const character = CHARACTER_CLASSES[state.classId ?? 'shaman'];
@@ -20,7 +27,8 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: 
   const health = Math.max(0, Math.min(1, p.hp / Math.max(1, p.maxHp)));
   return <>
     <QuietPlayerHud classId={state.classId} hp={p.hp} maxHp={p.maxHp} onPortrait={()=>setDetailsOpen(true)}
-     stats={<><HudStat icon="gold" text={`${p.gold??0}`} label="เบี้ย"/><HudStat icon="deck" text={`${state.masterDeck?.length??0}`} onPress={onOpenDeck} label={`สำรับ ${state.masterDeck?.length??0}`}/><HudStat icon="blessing" text={`${state.blessings?.length??0}`} onPress={onOpenBlessings} label={`พร ${state.blessings?.length??0}`}/></>}/>
+     stats={<><HudStat icon="gold" text={`${p.gold??0}`} label="เบี้ย"/><HudStat icon="deck" text={`${state.masterDeck?.length??0}`} onPress={onOpenDeck} label={`สำรับ ${state.masterDeck?.length??0}`}/><HudStat icon="blessing" text={`${state.blessings?.length??0}`} onPress={onOpenBlessings} label={`พร ${state.blessings?.length??0}`}/>{mapSkill&&<HudStat icon={mapSkillStatus!.ready?'lantern':'rest'} text={mapSkillStatus!.ready?mapSkill.name:`${state.skills?.[mapSkill.id]??0}`} onPress={()=>setSkillOpen(mapSkill.id)} label={`สกิล ${mapSkill.name} · ${mapSkillStatus!.label}`}/>}</>}/>
+    {onUseSkill&&<SkillSheet state={state} id={skillOpen} onClose={()=>setSkillOpen(null)} onUse={onUseSkill}/>}
     <Modal visible={detailsOpen} transparent animationType="fade" onRequestClose={() => setDetailsOpen(false)}>
       <View style={[styles.scrim, { paddingTop: pad.top + 16, paddingBottom: pad.bottom + 16 }]}>
         <RitualSurface kind="occupationPage" accessibilityViewIsModal style={styles.details}>

@@ -38,17 +38,24 @@ export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopRer
 //   return { state: s, rng: r };
 // }
 
+/** Price after ต่อรองเจ้าที่ (the next purchase only). */
+export function shopPrice(s: GameState, price: number): number {
+  return s.shopPricePct != null ? Math.ceil(price * s.shopPricePct / 100) : price;
+}
+
 export function takeShop(s: GameState, cmd: Extract<Command, { type: 'TakeShop' }>, r: RNG) {
-  if (s.phase !== 'shop' || s.shopKind!=='card' || !s.shopStock) return { state: s, rng: r };
+  if (s.phase !== 'shop' || (s.shopKind !== 'card' && s.shopKind !== 'equipment') || !s.shopStock) return { state: s, rng: r };
   const i = cmd.index;
   const item = s.shopStock[i];
   if (!item) return { state: s, rng: r };
   if (!('card' in item)) return { state: s, rng: r }; // Only handle card items
-  if (s.player.gold < item.price) {
+  const price = shopPrice(s, item.price);
+  if (s.player.gold < price) {
     s.log.push('Shop: Not enough gold');
     return { state: s, rng: r };
   }
-  s.player.gold -= item.price;
+  s.player.gold -= price;
+  s.shopPricePct = undefined;
   s.masterDeck.push(JSON.parse(JSON.stringify(item.card)));
   
   // Track bought item for shop persistence

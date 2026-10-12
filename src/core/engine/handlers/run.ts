@@ -25,6 +25,8 @@ export function newRun(
 
   const cls = getClass(cmd.classId);
   s.classId = cls.id;
+  require('../../skills').initSkills(s);
+  s.shopPricePct = undefined;
   s.player.maxHp = s.player.hp = cls.startHp;
   s.player.startMana = cls.startMana;
   s.equipmentSlotsMax = CARD_RULES.equipmentSlots;

@@ -29,8 +29,8 @@ export const PRAYER_MULT = [1, 2, 3] as const;
 /** Class starting resources (passives and skills are separate). */
 export const CLASS_RESOURCES: Record<ClassId, { hp: number; startMana: number }> = {
   warrior: { hp: 60, startMana: 0 },
-  shaman: { hp: 54, startMana: 3 },
-  nun: { hp: 52, startMana: 0 },
+  shaman: { hp: 60, startMana: 4 },
+  nun: { hp: 56, startMana: 0 },
   medium: { hp: 58, startMana: 4 },
 };
 
@@ -66,4 +66,26 @@ export const RAGE = {
   startTurn: 2,
   perTurn: 1,
   fromNight: (difficulty: number) => (difficulty >= 3 ? 1 : 2),
+  /** Before rage starts for the night, it still starts at this turn, so no fight is endless. */
+  backstopTurn: 10,
 } as const;
+
+/**
+ * Class passives. `triggers`/`armor`/`attackBonus` work like a blessing; the extra fields are
+ * class-only rules. Text on screen is generated from these numbers.
+ */
+export const CLASS_PASSIVES: Record<ClassId, import('../types').Passive & {
+  name: string;
+  /** The first spell each turn costs this much less mana. */
+  spellDiscount?: number;
+  /** The first ghost card revealed each fight is copied into hand (free, removed after use). */
+  copyFirstGhostCard?: boolean;
+}> = {
+  warrior: { name: 'ยืนเฝ้าประตู', triggers: [{ on: 'equip', fx: { block: 3 } }] },
+  shaman: { name: 'ครูพักลักจำ', triggers: [], spellDiscount: 1 },
+  nun: { name: 'อานิสงส์', triggers: [{ on: 'prayerDone', fx: { heal: 3 } }] },
+  medium: { name: 'ผีติดตาม', triggers: [], copyFirstGhostCard: true },
+};
+
+/** Level-up: full heal, more max HP, then one of three rewards. */
+export const LEVEL_UP = { maxHp: 8, skipGold: 25 } as const;

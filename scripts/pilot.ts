@@ -8,7 +8,11 @@ import {applyCommand} from '../src/core/reducer';
 import {makeRng,int,type RNG} from '../src/core/rng';
 import {cardsPlayedThisTurn,conditionMet} from '../src/core/cards/mechanics';
 import {cardCost,cardFx,playBlock,starFx} from '../src/core/cards/model';
-import {canUpgrade} from '../src/core/engine/shared';
+import {canUpgrade,canRemoveCard} from '../src/core/engine/shared';
+import {skillsFor,skillBlock,possessionCards} from '../src/core/skills';
+import {cardFromEnemy} from '../src/core/cards/borrow';
+import {enemyCardById} from '../src/core/pack_enemy_cards';
+import {shopPrice} from '../src/core/engine/handlers/shops_events';
 import {isCriticalOffer} from '../src/core/map/adventure';
 import type {ClassId} from '../src/core/classes';
 import type {Difficulty} from '../src/core/campaign/threeNight';
@@ -61,6 +65,49 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
  return playable.map(({c,i})=>({i,v:score(c)})).sort((a,b)=>b.v-a.v||a.i-b.i)[0].i;
 }
 
+/** Level-up: a strong card while the deck is small, else a star on the best card, else trim. */
+function chooseLevelUp(s:GameState):Command{
+ const cards=(s.levelUp?.cards??[]).map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>b.v-a.v);
+ const up=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v);
+ const low=s.masterDeck.map((c,i)=>({i,v:c.type==='curse'?-99:cardValue(c),ok:canRemoveCard(c,s.masterDeck.length)})).filter(x=>x.ok).sort((a,b)=>a.v-b.v);
+ if(cards[0]&&(s.masterDeck.length<14||cards[0].v>=12))return {type:'ChooseLevelUpOption',option:'card',index:cards[0].i};
+ if(low[0]&&(low[0].v<0||s.masterDeck.length>16))return {type:'ChooseLevelUpOption',option:'remove',index:low[0].i};
+ if(up[0])return {type:'ChooseLevelUpOption',option:'upgrade',index:up[0].i};
+ if(cards[0])return {type:'ChooseLevelUpOption',option:'card',index:cards[0].i};
+ return {type:'SkipLevelUp'};
+}
+
+/** Slot A skills on the map, used as soon as they are ready. */
+function chooseMapSkill(s:GameState):Command|undefined{
+ for(const d of skillsFor(s.classId).filter(d=>d.slot==='A')){
+  let index:number|undefined;
+  if(d.id==='rune_weapon')index=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v)[0]?.i;
+  if(d.id==='pray_change')index=s.masterDeck.map((c,i)=>({i,v:c.type==='curse'?-99:cardValue(c)})).sort((a,b)=>a.v-b.v)[0]?.i;
+  if(d.id==='ask_ancestors')index=s.player.startMana<6?1:0;
+  if(!skillBlock(s,d.id,index))return {type:'UseSkill',id:d.id,index};
+ }
+}
+
+/** Slot B/C skills at the start of a turn, when the board makes them worth it. */
+function chooseFightSkill(s:GameState):Command|undefined{
+ const hand=s.piles.hand,hp=s.player.hp/s.player.maxHp;
+ const want:Record<string,()=>number|boolean|undefined>={
+  muay_teacher:()=>hand.some(c=>!playBlock(s,c)&&cardValue(c)>=6),
+  diamond_heart:()=>(s.fight?.hpLost??0)>=10,
+  composure:()=>hp<.6||hand.some(c=>c.type==='spell'&&(c.mana??0)>=3),
+  consecrate:()=>hand.some(c=>c.type==='spell'),
+  metta:()=>s.player.hp<s.player.maxHp-8&&hand.some(c=>c.type==='attack'),
+  samadhi:()=>(s.prayers?.length??0)>0||hp<.5,
+  ghost_strength:()=>s.player.hp>20&&hand.length<=5,
+  possession:()=>true,
+ };
+ for(const d of skillsFor(s.classId).filter(d=>d.slot!=='A').reverse()){
+  let index:number|undefined;
+  if(d.id==='possession'){const ids=possessionCards(s);index=ids.map((id,i)=>({i,v:cardValue(cardFromEnemy(enemyCardById(id)!))})).sort((a,b)=>b.v-a.v)[0]?.i;}
+  if(want[d.id]?.()&&!skillBlock(s,d.id,index))return {type:'UseSkill',id:d.id,index};
+ }
+}
+
 function activeOffer(s:GameState){const ix=s.pages?._activeOfferIndex;return ix!=null?s.pages?.current?.offers[ix]:undefined;}
 function fightKind(s:GameState):FightKind{const o=activeOffer(s);return o?.kind==='boss'?'boss':o?.kind==='monster'&&o.tier==='elite'?'elite':'normal';}
 
@@ -85,6 +132,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   if(s.chapter){go({type:'SkipChapter'});continue;}
   if(s.phase==='starter'){const i=s.starter!.choices.findIndex(b=>b.id==='spirit_energy'||b.id==='herbal_wisdom'||b.id==='bamboo_dart_power');go({type:'ChooseStarterBlessing',index:Math.max(0,i)});continue;}
   if(s.phase==='combat'){
+   if(tactical){const sk=chooseFightSkill(s);if(sk)go(sk);}
    for(let plays=0;s.phase==='combat'&&plays<32;plays++){
     const i=choosePilotCard(s,tactical,`${seed}:decision:${steps}`);if(i<0)break;
     const before=cardsPlayedThisTurn(s);go({type:'PlayCard',index:i,wait:s.piles.hand[i]?.type==='prayer'&&(s.enemy?.hp??0)>30&&s.player.hp>s.player.maxHp*.5?2:1});
@@ -96,15 +144,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    if(s.turn>60){stalled=true;break;}
    continue;
   }
-  if(s.phase==='levelup'){
-   const choice=s.levelUp?.choice;
-   if(!choice){go({type:'SkipLevelUp'});continue;}
-   const priority=(k:string)=>k==='upgrade'?8:k==='blessing'?7:k==='max_hp'?6:k==='remove'?5:k==='equipment_slot'?4:1;
-   const option=priority(choice.optionA)>=priority(choice.optionB)?'A':'B';const kind=option==='A'?choice.optionA:choice.optionB;
-   const ranked=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).sort((a,b)=>kind==='remove'?a.v-b.v:b.v-a.v);
-   const index=kind==='blessing'?0:ranked.find(x=>kind!=='upgrade'||x.ok)?.i??0;
-   go({type:'ChooseLevelUpOption',option,index});continue;
-  }
+  if(s.phase==='levelup'){go(chooseLevelUp(s));continue;}
   if(s.phase==='reward'){
    const ranked=(s.cardReward?.choices??[]).map((c,i)=>({i,c,v:cardValue(c)})).sort((a,b)=>b.v-a.v);
    const best=ranked[0];const pick=best&&(s.masterDeck.length<16||best.v>=12);
@@ -112,10 +152,11 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   }
   if(s.phase==='victory'){go({type:'CompleteNode'});continue;}
   if(s.phase==='map'&&s.pages?.adventure){
+   if(tactical){const sk=chooseMapSkill(s);if(sk){go(sk);continue;}}
    const p=s.pages.current!,a=s.pages.adventure,offers=p.offers;
    const open=(i:number)=>!!offers[i]&&!p.resolved[i];
    const prep=offers.findIndex((o,i)=>open(i)&&!a.usedIds.includes(a.slotIds[i]!)&&(o.kind==='treasure'||o.kind==='treasure_single'||o.kind==='story_event'||
-    o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75||o.kind==='shop_card'&&s.player.gold>=40||
+    o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75||o.kind==='shop_card'&&s.player.gold>=40||o.kind==='shop_equipment'&&s.player.gold>=40||
     o.kind==='shop_upgrade'&&s.player.gold>=40||o.kind==='shop_remove'&&s.masterDeck.length>8&&s.player.gold>=40));
    const ix=prep>=0?prep:offers.findIndex((o,i)=>open(i)&&isCriticalOffer(o));
    const other=offers.findIndex((_,i)=>open(i));
@@ -130,7 +171,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    if((s.shopKind==='treasure'||s.shopKind==='treasure_single')&&s.shopStock?.length)go({type:s.shopKind==='treasure'?'TakeTreasureCard':'TakeSingleTreasureCard',index:0});
    if(s.shopKind==='upgrade'){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'ShopUpgradeBuy',index:rank[0].i});}
    if(s.shopKind==='remove'&&s.masterDeck.length>8){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);go({type:'ShopRemoveBuy',index:rank[0].i});}
-   if(s.shopKind==='card'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&it.price<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
+   if(s.shopKind==='card'||s.shopKind==='equipment'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&shopPrice(s,it.price)<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
    if(s.phase==='shop')go({type:'CompleteNode'});
    if((s.phase as string)==='map'&&slot!=null&&!s.pages.current!.resolved[slot])go({type:'DeleteShopFromMap',index:slot});
    continue;

@@ -3,11 +3,14 @@ import type { CardType, GameState, Passive, Trigger, TriggerOn } from '../types'
 import type { RNG } from '../rng';
 import { applyFx } from './fx';
 import { conditionMet } from './mechanics';
+import { CLASS_PASSIVES } from '../balance/notfm';
 
 type Source = { key: string; name: string; passive: Passive };
 
 function sources(s: GameState): Source[] {
   const out: Source[] = [];
+  const cls = s.classId && CLASS_PASSIVES[s.classId];
+  if (cls) out.push({ key: 'c:' + s.classId, name: cls.name, passive: cls });
   for (const b of s.blessings ?? []) if (b.triggers) out.push({ key: 'b:' + b.id, name: b.name, passive: b });
   for (const c of s.equipped ?? []) if (c.equip) out.push({ key: 'e:' + (c.instanceId ?? c.id), name: c.name, passive: c.equip });
   return out;
@@ -46,8 +49,8 @@ export function runTriggers(s: GameState, on: TriggerOn, rng: RNG, type?: CardTy
   return rng;
 }
 
-/** An equipment card entering play fires its own `equip` triggers once. */
+/** An equipment card entering play fires its own `equip` triggers and the class's once. */
 export function runEquipTriggers(s: GameState, cardInstance: string, rng: RNG): RNG {
-  const src = sources(s).filter(x => x.key === 'e:' + cardInstance);
+  const src = sources(s).filter(x => x.key === 'e:' + cardInstance || x.key.startsWith('c:'));
   return runTriggers(s, 'equip', rng, undefined, src);
 }

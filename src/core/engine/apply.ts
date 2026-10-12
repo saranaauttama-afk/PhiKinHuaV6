@@ -17,6 +17,7 @@ import * as ui from './handlers/ui';
 import * as story from './handlers/story';
 import * as chapter from './handlers/chapter';
 import * as cardReward from './handlers/cardReward';
+import * as skills from './handlers/skills';
 
 type Handler<T extends Command['type']> =
   (s: GameState, cmd: Extract<Command, { type: T }>, r: RNG) => { state: GameState; rng: RNG };
@@ -42,10 +43,11 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   CompleteNode: mappages.completeNode,
 
   // Level up
-  ChooseLevelUp: lvl.chooseLevelUp,
   ChooseLevelUpOption: lvl.chooseLevelUpOption,
-  CancelLevelUpChoice: lvl.cancelLevelUpChoice,
   SkipLevelUp: lvl.skipLevelUp,
+
+  // Class skills
+  UseSkill: skills.useSkill,
 
   // การ์ดรางวัลหลังชนะไฟต์
   ChooseCardReward: cardReward.chooseCardReward,

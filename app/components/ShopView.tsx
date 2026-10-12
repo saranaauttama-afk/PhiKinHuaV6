@@ -30,6 +30,7 @@ import {canRemoveCard} from '../../src/core/engine/shared';
 import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 import {describeCard} from '../../src/core/cards/describe';
+import {shopPrice} from '../../src/core/engine/handlers/shops_events';
 
 function Panel({title,children}:{title:string;children:React.ReactNode}) {
   return <RitualSurface kind="quietSlate" style={{padding:22,gap:10,width:'100%',minWidth:0}}>
@@ -109,7 +110,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{color:palette.moon,fontFamily:font.ui}}>{notice}</Text>}
       <View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>{stock.map((it,i)=>{const c=cardOf(it);return c&&<View testID={`shop-card-${i}`} key={`${c.id}-${i}`} style={{width:'48%',gap:4}}>
         <View><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/></View>
-        <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {it.price} เบี้ย</Text>
+        <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {shopPrice(state,it.price)} เบี้ย{shopPrice(state,it.price)<it.price?` (จาก ${it.price})`:''}</Text>
       </View>;})}</View>
       <QuietButton label="ขอดูของชุดใหม่ (50 เบี้ย)" disabled={(state.player.gold??0)<50} onPress={()=>{setSelected(null);dispatch({type:'ShopReroll'});}}/>
     </Panel>;
@@ -248,8 +249,8 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,padding:14,gap:6,maxHeight:220}}>
          <Text numberOfLines={2} style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>ยืนยันซื้อ {purchaseCard.name}</Text>
          <ScrollView style={{maxHeight:56}}><Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13,lineHeight:20}}>{describeCard(purchaseCard)}{purchaseCard.flavor?` · ${purchaseCard.flavor}`:''}</Text></ScrollView>
-         <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13}}>ราคา {purchaseItem.price} เบี้ย · มี {state.player.gold} เบี้ย{state.player.gold<purchaseItem.price?' · เบี้ยไม่พอ':''}</Text>
-         <View style={{flexDirection:'row',gap:8}}><QuietButton label={`ยืนยันซื้อ ${purchaseItem.price} เบี้ย`} primary disabled={state.player.gold<purchaseItem.price} style={{flex:2}} onPress={()=>{if(selected===null||state.player.gold<purchaseItem.price)return;dispatch({type:'TakeShop',index:selected});setSelected(null);setNotice(`ซื้อ ${purchaseCard.name} แล้ว`);}}/><QuietButton label="ยกเลิกการเลือก" style={{flex:1}} onPress={()=>setSelected(null)}/></View>
+         <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13}}>ราคา {shopPrice(state,purchaseItem.price)} เบี้ย · มี {state.player.gold} เบี้ย{state.player.gold<shopPrice(state,purchaseItem.price)?' · เบี้ยไม่พอ':''}</Text>
+         <View style={{flexDirection:'row',gap:8}}><QuietButton label={`ยืนยันซื้อ ${shopPrice(state,purchaseItem.price)} เบี้ย`} primary disabled={state.player.gold<shopPrice(state,purchaseItem.price)} style={{flex:2}} onPress={()=>{if(selected===null||state.player.gold<shopPrice(state,purchaseItem.price))return;dispatch({type:'TakeShop',index:selected});setSelected(null);setNotice(`ซื้อ ${purchaseCard.name} แล้ว`);}}/><QuietButton label="ยกเลิกการเลือก" style={{flex:1}} onPress={()=>setSelected(null)}/></View>
         </RitualSurface>}
         <View style={{paddingHorizontal:16,paddingTop:8,paddingBottom:pad.bottom+12}}>
           <QuietButton label="กลับจุดพัก" primary onPress={()=>dispatch({type:'CompleteNode'})}/>

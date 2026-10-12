@@ -1,24 +1,8 @@
-// Level/XP — level-up reward choices (interim until the phase-4 redesign)
+// Level/XP — the card offers for a level-up and the blessing roller used by events.
 import type { RNG } from './rng';
 import { int, next, shuffle } from './rng';
 import type { GameState, CardData, BlessingDef } from './types';
 import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
-
-export type LevelBucket = 'max_hp' | 'blessing' | 'remove' | 'upgrade' | 'gold' | 'equipment_slot' | 'gold_skip';
-
-export type LevelChoice = { optionA: LevelBucket; optionB: LevelBucket; contextDescription?: string };
-
-/** Energy and hand-size choices are gone: draw and Action points are bought in shops. */
-const CHOICE_PAIRS: Array<[LevelBucket, LevelBucket]> = [
-  ['max_hp', 'upgrade'], ['blessing', 'gold_skip'], ['remove', 'upgrade'],
-  ['max_hp', 'equipment_slot'], ['upgrade', 'gold_skip'], ['blessing', 'max_hp'],
-];
-
-export function rollLevelUpChoice(rng: RNG, _s: GameState): { rng: RNG; choice: LevelChoice } {
-  const roll = int(rng, 0, CHOICE_PAIRS.length - 1), order = int(roll.rng, 0, 1);
-  const [a, b] = CHOICE_PAIRS[roll.value];
-  return { rng: order.rng, choice: { optionA: order.value ? a : b, optionB: order.value ? b : a } };
-}
 
 /**
  * สุ่มการ์ดรางวัล 3 ใบ — กรองเฉพาะการ์ดของคลาสที่เล่นอยู่
@@ -106,17 +90,4 @@ export function rollTwoBlessings(rng: RNG, owned: string[] = []) {
 
   const sh = shuffle(r, pool); r = sh.rng;
   return { rng: r, list: sh.array.slice(0, Math.min(2, sh.array.length)).map(b => ({ ...b })) };
-}
-
-// ===== Choice Description System =====
-export function getBucketDisplayInfo(bucket: LevelBucket): { name: string; description: string; icon: string } {
-  switch (bucket) {
-    case 'max_hp': return { name: 'ชีวิตสูงสุด +8', description: 'อยู่รอดได้นานขึ้น', icon: '❤️' };
-    case 'blessing': return { name: 'เลือกพร', description: 'พลังติดตัวถาวร', icon: '✨' };
-    case 'remove': return { name: 'สละการ์ด', description: 'ลบการ์ดหนึ่งใบฟรี', icon: '🗑️' };
-    case 'upgrade': return { name: 'ปลุกเสกการ์ด', description: 'เพิ่มดาวการ์ดหนึ่งใบฟรี', icon: '⬆️' };
-    case 'equipment_slot': return { name: 'ช่องอุปกรณ์ +1', description: 'ใส่อุปกรณ์พร้อมกันได้มากขึ้น', icon: '⚔️' };
-    case 'gold_skip': return { name: 'รับ 50 เบี้ย', description: 'เก็บไว้ซื้อของ', icon: '💰' };
-    case 'gold': return { name: 'รับ 25 เบี้ย', description: 'เก็บไว้ซื้อของ', icon: '🪙' };
-  }
 }

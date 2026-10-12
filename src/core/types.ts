@@ -57,6 +57,8 @@ export type CardData = {
   equip?: Passive;
   /** Copied from an enemy card; never enters the deck. */
   borrowed?: boolean;
+  /** A copy made in this fight (ครูสอนมวย); never copied again, removed after use. */
+  copied?: boolean;
   /** Only offered after the class unlocks it in the journal. */
   locked?: boolean;
   unremovable?: boolean;
@@ -95,11 +97,31 @@ export type Phase =
   | 'reward'
   | 'run_complete'; // จบรันแล้ว (ชนะบอสสุดท้าย) — แสดงจอสรุป
 
-// หมายเหตุ: เคยมี 'cards' อยู่ในนี้ — การ์ดใหม่ย้ายไปเป็นรางวัลชนะไฟต์แล้ว
-// (ดู `cards/reward.ts`) เลเวลอัปเหลือแต่ของที่ไม่ใช่การ์ด
-export type Bucket =
-  | 'max_hp' | 'blessing' | 'remove' | 'upgrade' | 'gold'
-  | 'equipment_slot' | 'gold_skip';
+/** Level-up rewards: a new card, a star on a deck card, or removing a deck card. */
+export type LevelOption = 'card' | 'upgrade' | 'remove';
+
+/** Per-fight state for skills and passives; reset when a fight starts. */
+export type FightState = {
+  /** HP the player lost this fight (ใจเพชร). */
+  hpLost: number;
+  /** Ghost turns taken this fight; rage counts these, so an extra player turn does not raise it. */
+  ghostTurns: number;
+  /** Turn a B/C skill was used (one per turn). */
+  skillTurn?: number;
+  /** ครูสอนมวย: copy the next card played. */
+  copyNext?: boolean;
+  /** ปลุกเสก: the next spell's effect is multiplied. */
+  nextSpellMult?: number;
+  /** สำรวมจิต: spells cost less on this turn, and ghost hits are reduced until the next player turn. */
+  halfSpellTurn?: number;
+  halfDamage?: boolean;
+  /** แผ่เมตตา: lifesteal through this turn number. */
+  lifestealUntil?: number;
+  /** เข้าสมาธิ: skip the next ghost turn. */
+  extraTurn?: boolean;
+  /** Medium passive already copied a ghost card this fight. */
+  mimicUsed?: boolean;
+};
 
 export type PlayerState = {
   hp: number; maxHp: number; block: number; gold: number;
@@ -345,6 +367,8 @@ export type GameState = {
     limited?: string[];
     /** Passive triggers with `once: 'turn'` already fired this turn. */
     triggerOnce?: string[];
+    /** Spells played this turn (shaman passive). */
+    spellsCast?: number;
   };
   runCounters?: RunCounters;
   combatVictoryLock?: boolean;
@@ -356,18 +380,17 @@ export type GameState = {
   prayers?: Array<{ card: CardData; turnsLeft: number; mult: number }>;
   // Level up
   levelUp?: {
-    dawnHandChoice?:boolean;
-    bucket?: Bucket; // Legacy single bucket system
-    choice?: {
-      optionA: Bucket;
-      optionB: Bucket;
-      contextDescription?: string;
-      selectedOption?: 'A' | 'B';
-    };
-    blessingChoices?: BlessingDef[];
+    /** Three card offers for the 'card' option. */
+    cards: CardData[];
     consumed?: boolean;
     result?: { fight: number; text: string };
   } | null;
+
+  /** Skill id → fights left before it is ready (0 = ready). */
+  skills?: Record<string, number>;
+  /** ต่อรองเจ้าที่: percent of the price paid for the next shop purchase. */
+  shopPricePct?: number;
+  fight?: FightState;
 
   /** การ์ดรางวัลที่รอให้เลือกหลังชนะไฟต์ — ดู `cards/reward.ts` */
   cardReward?: import('./cards/reward').CardReward;
@@ -399,10 +422,11 @@ export type Command =
   | { type: 'StartPlayerTurn' }
 
   // Level Up
-  | { type: 'ChooseLevelUp'; index?: number }
-  | { type: 'ChooseLevelUpOption'; option: 'A' | 'B'; index?: number }
-  | { type: 'CancelLevelUpChoice' }
+  | { type: 'ChooseLevelUpOption'; option: LevelOption; index: number }
   | { type: 'SkipLevelUp' }
+
+  // Class skills; `index` picks a deck card, an option or a ghost card where the skill needs one
+  | { type: 'UseSkill'; id: string; index?: number }
 
   // การ์ดรางวัลหลังชนะไฟต์
   | { type: 'ChooseCardReward'; index: number }

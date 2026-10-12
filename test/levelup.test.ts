@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { applyCommand } from '../src/core/reducer';
 import { makeRng } from '../src/core/rng';
 import type { Command, GameState } from '../src/core/types';
+import { LEVEL_UP } from '../src/core/balance/notfm';
 
 /**
  * ลูปเลเวลอัป — engine เตรียม state.levelUp ไว้อยู่แล้ว แต่เดิมไม่มี UI
@@ -41,98 +42,67 @@ function reachLevelUp(seed = 'lvl'): GameState {
   return step(s, { type: 'PlayCard', index: 0 }, seed);
 }
 
-describe('เข้าสู่หน้าเลเวลอัป', () => {
-  it('ชนะแล้วขึ้นเลเวล → phase เป็น levelup พร้อมคู่ตัวเลือก', () => {
-    const s = reachLevelUp();
-    expect(s.phase).toBe('levelup');
-    expect(s.levelUp?.choice).toBeDefined();
-    expect(s.levelUp!.choice!.optionA).toBeTruthy();
-    expect(s.levelUp!.choice!.optionB).toBeTruthy();
-    expect(s.levelUp!.consumed).toBe(false);
-    expect(s.player.level).toBeGreaterThan(1);
+describe('เลเวลอัป: ฟื้นเต็ม + ชีวิตสูงสุด + เลือก 1 จาก 3', () => {
+  it('ขึ้นเลเวลแล้วฟื้นเลือดเต็มและชีวิตสูงสุดเพิ่มทันที', () => {
+    const before = (() => { const s = reachLevelUp(); return s; })();
+    expect(before.phase).toBe('levelup');
+    expect(before.player.hp).toBe(before.player.maxHp);
+    expect(before.levelUp!.consumed).toBe(false);
+    expect(before.levelUp!.cards).toHaveLength(3);
+    expect(before.player.level).toBeGreaterThan(1);
   });
 
-  it('ตัวเลือกสองข้างไม่ซ้ำกัน', () => {
-    const s = reachLevelUp();
-    expect(s.levelUp!.choice!.optionA).not.toBe(s.levelUp!.choice!.optionB);
+  it('ชีวิตสูงสุดเพิ่มตาม LEVEL_UP.maxHp', () => {
+    let s = applyCommand({ seed: 'hp', phase: 'start', turn: 0 } as unknown as GameState, { type: 'NewRun', seed: 'hp', classId: 'warrior' }, makeRng('hp')).state;
+    const base = s.player.maxHp;
+    s = reachLevelUp('hp');
+    expect(s.player.maxHp - base).toBeGreaterThanOrEqual(LEVEL_UP.maxHp);
   });
-});
 
-describe('เลือกรางวัล', () => {
-  it('เลือกแล้ว consumed และไปต่อที่การ์ดรางวัล', () => {
-    // เดิมเลเวลอัปจบแล้วไป 'victory' ตรงๆ — ตอนนี้ทุกไฟต์ที่ชนะมีการ์ดรางวัล
-    // รออยู่อีกด่าน (ดู `advanceAfterVictory`) ถ้าโดดข้ามไป victory
-    // แปลว่ารางวัลหายไปเงียบๆ
+  it('เลือกการ์ดใหม่ → การ์ดใบนั้นเข้าสำรับ', () => {
     let s = reachLevelUp();
-    s = step(s, { type: 'ChooseLevelUpOption', option: 'A', index: 0 });
-
-    expect(s.levelUp!.consumed).toBe(true);
-    // Normal ghosts pay XP/money only; elites and bosses queue a card reward.
-    expect(['reward', 'victory']).toContain(s.phase);
-    expect(s.levelUp!.choice!.selectedOption).toBe('A');
-
-    if (s.phase === 'reward') s = step(s, { type: 'SkipCardReward' });
-    expect(s.phase).toBe('victory');
-  });
-
-  it('เลือกซ้ำอีกครั้งไม่มีผล (กันกดรัว)', () => {
-    let s = reachLevelUp();
-    s = step(s, { type: 'ChooseLevelUpOption', option: 'A', index: 0 });
-    const snapshot = JSON.stringify(s.player);
-
-    s = step(s, { type: 'ChooseLevelUpOption', option: 'B', index: 0 });
-    expect(JSON.stringify(s.player)).toBe(snapshot);
-  });
-
-  it('ตัวเลือกที่เพิ่มค่าสถานะมีผลกับผู้เล่นจริง', () => {
-    let s = reachLevelUp();
-    const choice = s.levelUp!.choice!;
-
-    const statBuckets = ['max_hp', 'max_energy', 'max_hand', 'equipment_slot'];
-    const opt: 'A' | 'B' | null =
-      statBuckets.includes(choice.optionA) ? 'A'
-      : statBuckets.includes(choice.optionB) ? 'B'
-      : null;
-    if (!opt) return;
-
-    const bucket = opt === 'A' ? choice.optionA : choice.optionB;
-    const before = { ...s.player };
-    s = step(s, { type: 'ChooseLevelUpOption', option: opt, index: 0 });
-
-    if (bucket === 'max_hp')          expect(s.player.maxHp).toBeGreaterThan(before.maxHp);
-    if (bucket === 'equipment_slot')  expect(s.equipmentSlotsMax).toBeGreaterThan(0);
-  });
-});
-
-describe('ข้ามเลเวลอัป', () => {
-  it('SkipLevelUp ปิดหน้าโดยไม่ค้าง phase', () => {
-    let s = reachLevelUp();
-    s = step(s, { type: 'SkipLevelUp' });
-
+    const card = s.levelUp!.cards[1], n = s.masterDeck.length;
+    s = step(s, { type: 'ChooseLevelUpOption', option: 'card', index: 1 });
+    expect(s.masterDeck).toHaveLength(n + 1);
+    expect(s.masterDeck[n].id).toBe(card.id);
     expect(s.phase).not.toBe('levelup');
-    expect(s.levelUp?.consumed ?? true).toBe(true);
+    expect(s.levelUp?.result?.text).toContain(card.name);
   });
-});
 
-describe('explicit level reward results',()=>{
- it('upgrades the selected second card and shows its result',()=>{
-  let s=reachLevelUp();s.levelUp={choice:{optionA:'upgrade',optionB:'max_hp'}};
-  const before=s.masterDeck.map(c=>({...c}));
-  s=step(s,{type:'ChooseLevelUpOption',option:'A',index:1});
-  expect(s.masterDeck[0]).toEqual(before[0]);
-  expect(s.masterDeck[1].star).toBe(2);
-  expect(s.levelUp?.result?.text).toContain(s.masterDeck[1].name);
- });
- it('adds 8 max HP and heals 8 with an explicit before/after result',()=>{
-  let s=reachLevelUp();s.levelUp={choice:{optionA:'upgrade',optionB:'max_hp'}};s.player.maxHp=44;s.player.hp=30;
-  s=step(s,{type:'ChooseLevelUpOption',option:'B'});
-  expect(s.player.maxHp).toBe(52);expect(s.player.hp).toBe(38);
-  expect(s.levelUp?.result?.text).toContain('44 → 52');
- });
- it('does not consume an invalid card choice or upgrade another card silently',()=>{
-  let s=reachLevelUp();s.levelUp={choice:{optionA:'upgrade',optionB:'max_hp'}};
-  const before=s.masterDeck;
-  s=step(s,{type:'ChooseLevelUpOption',option:'A',index:999});
-  expect(s.masterDeck).toEqual(before);expect(s.phase).toBe('levelup');expect(s.levelUp?.consumed).not.toBe(true);
- });
+  it('ปลุกเสก → การ์ดใบที่เลือกได้ดาวเพิ่ม ใบอื่นไม่เปลี่ยน', () => {
+    let s = reachLevelUp();
+    const before = s.masterDeck.map(c => ({ ...c }));
+    s = step(s, { type: 'ChooseLevelUpOption', option: 'upgrade', index: 1 });
+    expect(s.masterDeck[0]).toEqual(before[0]);
+    expect(s.masterDeck[1].star).toBe(2);
+  });
+
+  it('สละการ์ด → ใบนั้นออกจากสำรับ', () => {
+    let s = reachLevelUp();
+    const n = s.masterDeck.length, gone = s.masterDeck[2].id;
+    s = step(s, { type: 'ChooseLevelUpOption', option: 'remove', index: 2 });
+    expect(s.masterDeck).toHaveLength(n - 1);
+    expect(s.levelUp?.result?.text).toContain('สละ');
+    void gone;
+  });
+
+  it('ตัวเลือกที่ไม่ถูกต้องไม่ทำอะไร', () => {
+    const s = reachLevelUp();
+    for (const cmd of [
+      { type: 'ChooseLevelUpOption', option: 'card', index: 5 },
+      { type: 'ChooseLevelUpOption', option: 'upgrade', index: 999 },
+      { type: 'ChooseLevelUpOption', option: 'remove', index: -1 },
+    ] as Command[]) {
+      const out = step(s, cmd);
+      expect(out.phase).toBe('levelup');
+      expect(out.masterDeck).toEqual(s.masterDeck);
+    }
+  });
+
+  it('ข้ามได้ ได้เบี้ยแทน', () => {
+    const s = reachLevelUp();
+    const out = step(s, { type: 'SkipLevelUp' });
+    expect(out.phase).not.toBe('levelup');
+    expect(out.player.gold).toBe(s.player.gold + LEVEL_UP.skipGold);
+  });
 });

@@ -1,7 +1,7 @@
 // src/core/cards/model.ts — what a card costs and does right now.
 // Engine, pilot and UI all read cards through these functions so the numbers agree.
 import type { CardData, CardType, Fx, GameState } from '../types';
-import { STAR_RULES } from '../balance/notfm';
+import { CLASS_PASSIVES, STAR_RULES } from '../balance/notfm';
 import { addFx, conditionMet } from './mechanics';
 
 /** Card types that cost nothing to play. */
@@ -40,7 +40,14 @@ export function cardCost(s: GameState, card: CardData): { ap: number; mana: numb
   const effect = s.player?.statusEffects?.find(e => e.id === 'corruption');
   const corruption = effect ? (effect.stacks ?? 1) : 0;
   const ap = card.ap ? card.ap + corruption : 0;
-  const mana = card.mana ? card.mana + corruption : 0;
+  let mana = card.mana ? card.mana + corruption : 0;
+  if (card.type === 'spell' && mana) {
+    // Shaman passive: the first spell each turn is cheaper.
+    const discount = s.classId ? CLASS_PASSIVES[s.classId].spellDiscount ?? 0 : 0;
+    if (discount && !(s.turnFlags?.spellsCast)) mana = Math.max(0, mana - discount);
+    // สำรวมจิต: spells cost half this turn (rounded up).
+    if (s.fight?.halfSpellTurn != null && s.fight.halfSpellTurn === s.turn) mana = Math.ceil(mana * require('../skills').skillParam('composure', 'manaPct') / 100);
+  }
   return { ap, mana };
 }
 

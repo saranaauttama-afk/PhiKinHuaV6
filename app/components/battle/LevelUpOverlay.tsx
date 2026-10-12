@@ -1,155 +1,99 @@
-import {palette,surface} from '../../theme';
+// app/components/battle/LevelUpOverlay.tsx — level-up: the heal already happened; pick one of three rewards.
+import React from 'react';
+import { View, Text, Pressable, Image, useWindowDimensions } from 'react-native';
+import type { GameState, LevelOption } from '../../../src/core/types';
+import { canUpgrade, canRemoveCard } from '../../../src/core/engine/shared';
+import { LEVEL_UP } from '../../../src/core/balance/notfm';
 import PostBattleSurface from './PostBattleSurface';
 import RitualSurface from '../RitualSurface';
-import {QuietButton} from '../QuietChrome';
-import {Image} from 'react-native';
-import {objectSource} from '../BlessingView';
-import {RITUAL_OBJECTS} from '../RitualObject';
-import React from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
-import type { CardData, GameState } from '../../../src/core/types';
-import CardRow from '../CardRow';
 import CandleSelection from '../CandleSelection';
+import { QuietButton } from '../QuietChrome';
+import { RITUAL_OBJECTS } from '../RitualObject';
 import UpgradeCardPicker from '../UpgradeCardPicker';
-import {canUpgrade,canRemoveCard} from '../../../src/core/engine/shared';
-import { font, size, space } from '../../theme';
-import {levelUpConfirmLabel} from '../../levelUpPresentation';
+import Card from '../Card';
+import CardRow from '../CardRow';
+import { font, palette } from '../../theme';
 
-/**
- * หน้าเลือกรางวัลตอนเลเวลอัป
- *
- * engine เตรียม state.levelUp ไว้ให้ตั้งแต่แรกแล้ว (ทั้งคู่ตัวเลือกและการ์ด/พรที่สุ่มมา)
- * แต่ก่อนหน้านี้ไม่มี UI — phase 'levelup' ถูก VictoryOverlay กลืนไป
- * ผู้เล่นจึงไม่เคยได้เลือกเลย
- */
-
-/** คำอธิบายของแต่ละตัวเลือก — ตรงกับ applyBucketChoice ใน handlers/level.ts */
-const BUCKET_LABEL: Record<string, { title: string; detail: string }> = {
-  max_hp:         { title: 'พลังชีวิต',      detail: 'ชีวิตสูงสุด +8 · ฟื้นทันที 8' },
-  max_energy:     { title: 'พลังงาน',        detail: 'พลังงานต่อเทิร์น +1' },
-  max_hand:       { title: 'ขนาดมือ',        detail: 'เก็บการ์ดข้ามเทิร์นเพิ่ม 1 ใบ · จำนวนจั่วเท่าเดิม' },
-  draw_per_turn:  { title: 'จั่วเพิ่ม',        detail: 'จั่วเพิ่ม 1 ใบต่อเทิร์นและตอนเปิดศึก · ขนาดมือเท่าเดิม' },
-  blessing:       { title: 'พร',             detail: 'รับพรติดตัว 1 อย่าง' },
-  remove:         { title: 'สละการ์ด',       detail: 'ถอดการ์ดออกจากสำรับ' },
-  upgrade:        { title: 'ปลุกเสก',        detail: 'อัปเกรดการ์ดในสำรับ' },
-  gold:           { title: 'ทรัพย์',         detail: 'รับเบี้ยเพิ่ม' },
-  equipment_slot: { title: 'ช่องเครื่องราง', detail: 'พกเครื่องรางเพิ่ม 1 ชิ้น' },
-  gold_skip:      { title: 'ข้ามรับเบี้ย',     detail: 'ไม่รับอะไร แลกกับเบี้ย' },
-};
-
-const labelOf = (bucket: string) =>
-  BUCKET_LABEL[bucket] ?? { title: bucket, detail: '' };
-
-/** ตัวเลือกที่ต้องเลือกของย่อยอีกชั้น */
-const NEEDS_PICK = new Set(['blessing','upgrade','remove']);
+const OPTIONS: Array<{ id: LevelOption; title: string; detail: string }> = [
+  { id: 'card', title: 'การ์ดใหม่', detail: 'เลือก 1 ใบจาก 3 ใบเข้าสำรับ' },
+  { id: 'upgrade', title: 'ปลุกเสก', detail: 'เพิ่มดาวการ์ด 1 ใบในสำรับ' },
+  { id: 'remove', title: 'สละการ์ด', detail: 'ถอดการ์ด 1 ใบออกจากสำรับ' },
+];
 
 type Props = {
   state: GameState;
   playerLevel: number;
-  onChoose: (option: 'A' | 'B', index?: number) => void;
+  onChoose: (option: LevelOption, index: number) => void;
   onSkip: () => void;
 };
 
 export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }: Props) {
-  const choice = state.levelUp?.choice;
-  // ตัวเลือกไหนที่ผู้เล่นกดค้างไว้เพื่อเลือกของย่อยต่อ
-  const [selected,setSelected]=React.useState<'A'|'B'|null>(null);
-  const [pending, setPending] = React.useState<'A' | 'B' | null>(null);
-
-  const [cardIndex,setCardIndex]=React.useState<number|null>(null);
-  if (!choice) return null;
-
-  const bucketOf = (opt: 'A' | 'B') => (opt === 'A' ? choice.optionA : choice.optionB);
-
+  const [selected, setSelected] = React.useState<LevelOption | null>(null);
+  const [pending, setPending] = React.useState<LevelOption | null>(null);
+  const [index, setIndex] = React.useState<number | null>(null);
+  const { width } = useWindowDimensions();
+  const level = state.levelUp;
+  if (!level || level.consumed) return null;
   const deck = state.masterDeck ?? [];
-  /** ในสำรับตอนนี้มีการ์ด id นี้อยู่กี่ใบ */
-  const ownedCount = (id: string) => deck.filter(c => c.id === id).length;
-
-  type SubChoice = {
-    key: string;
-    title: string;
-    detail: string;
-    /** ตัวเลือกที่เป็นการ์ดจริง — แสดงเต็มใบแทนที่จะเป็นแค่ชื่อ */
-    card?: CardData;
-  };
-
-  const subChoices = (opt: 'A' | 'B'): SubChoice[] => {
-    const bucket = bucketOf(opt);
-    if (bucket === 'blessing') {
-      return (state.levelUp?.blessingChoices ?? []).map((b, i) => ({
-        key: b.id ?? `${i}`,
-        title: b.name ?? b.id,
-        detail: b.desc ?? '',
-      }));
-    }
-    return [];
-  };
-
-  const press = (opt: 'A' | 'B') => {
-    if (bucketOf(opt)==='upgrade'||bucketOf(opt)==='remove'||(NEEDS_PICK.has(bucketOf(opt)) && subChoices(opt).length > 0)) {
-      setPending(opt);   // ต้องเลือกของย่อยก่อน
-      return;
-    }
-    onChoose(opt);
-  };
+  const unavailable = (o: LevelOption) =>
+    o === 'card' ? !level.cards.length : o === 'upgrade' ? !deck.some(canUpgrade) : !deck.some(c => canRemoveCard(c, deck.length));
+  const image = (o: LevelOption) =>
+    o === 'card' ? require('../../../assets/ui/blessing-amulet.png') : o === 'upgrade' ? RITUAL_OBJECTS.upgrade : RITUAL_OBJECTS.remove;
+  const back = () => { setPending(null); setIndex(null); };
+  const cardWidth = Math.min(132, (width - 56) / 3);
 
   return (
     <PostBattleSurface mat>
-      <RitualSurface kind="quietSlate" style={{paddingVertical:18,marginBottom:10}}>
-        <Text style={{color:palette.moon,fontSize:24,textAlign:'center',fontFamily:font.heading}}>{state.levelUp?.dawnHandChoice?'ผ่านคืนแรก · เลือกพัฒนาวิชา':`เลเวล ${playerLevel}`}</Text>
+      <RitualSurface kind="quietSlate" style={{ paddingVertical: 18, marginBottom: 10, alignItems: 'center', gap: 6 }}>
+        <Text style={{ color: palette.moon, fontSize: 24, fontFamily: font.heading }}>เลเวล {playerLevel}</Text>
+        <Text testID="levelup-heal" style={{ color: palette.text, fontSize: 13, fontFamily: font.ui, textAlign: 'center' }}>
+          ฟื้นพลังชีวิตเต็ม · ชีวิตสูงสุด +{LEVEL_UP.maxHp} ({state.player.hp}/{state.player.maxHp})
+        </Text>
       </RitualSurface>
-      <Text style={{color:palette.text,fontSize:14,fontFamily:font.ui,textAlign:'center',marginBottom:20}}>
-        {pending ? bucketOf(pending)==='upgrade'?'เลือกการ์ดที่จะปลุกเสกฟรี 1 ใบ':bucketOf(pending)==='remove'?'เลือกการ์ดที่จะสละ 1 ใบ':'เลือกพรหนึ่งอย่าง' : 'เลือกสิ่งที่จะรับเมื่อเลเวลเพิ่ม'}
-      </Text>
 
-      {pending === null ? (
-        <View style={{gap:16}}>
-          <View style={{flexDirection:'row',gap:12,alignItems:'stretch'}}>
-          {(['A','B'] as const).map(opt=>{
-            const bucket=bucketOf(opt);const l=labelOf(bucket);const picked=selected===opt;
-            const image=bucket==='equipment_slot'||bucket==='blessing'?require('../../../assets/ui/blessing-amulet.png')
-              :bucket==='max_hp'?require('../../../assets/ui/blessing-herb-object.png')
-              :bucket==='gold'||bucket==='gold_skip'?require('../../../assets/ui/ritual-jar.png')
-              :bucket==='upgrade'?RITUAL_OBJECTS.upgrade:bucket==='remove'?RITUAL_OBJECTS.remove
-              :(bucket==='max_hand'||bucket==='draw_per_turn')?require('../../../assets/images/players/iMaxHand.png'):require('../../../assets/ui/ritual-jar.png');
-            const unavailable=bucket==='upgrade'?!deck.some(canUpgrade):bucket==='remove'?!deck.some(c=>canRemoveCard(c,deck.length)):false;
-            return <Pressable disabled={unavailable} key={opt} accessibilityRole="button" accessibilityLabel={`${l.title}${picked?' · เลือกไว้แล้ว':''}`} accessibilityState={{selected:picked,disabled:unavailable}}
-              onPress={()=>setSelected(opt)} style={{flex:1}}>
-              <CandleSelection selected={picked} dim={!!selected&&!picked}><RitualSurface kind="quietSlate" style={{flex:1,minHeight:235,paddingHorizontal:14,paddingVertical:18}}>
-                <Image accessible={false} source={image} resizeMode="contain" style={{width:72,height:72,alignSelf:'center',marginBottom:12}}/>
-                <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:17,textAlign:'center'}}>{l.title}</Text>
-                <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:22,textAlign:'center',marginTop:8}}>{unavailable?'ไม่มีการ์ดที่เลือกได้':l.detail}</Text>
-                <View style={{minHeight:28,marginTop:10,justifyContent:'center'}}>
-                  {picked&&<Text style={{fontFamily:font.heading,color:palette.bloodLit,fontSize:12,textAlign:'center'}}>✓ เลือกไว้แล้ว</Text>}
-                </View>
-              </RitualSurface></CandleSelection>
+      {pending === null && <View style={{ gap: 16 }}>
+        <Text style={{ color: palette.text, fontSize: 14, fontFamily: font.ui, textAlign: 'center' }}>เลือกรางวัล 1 อย่าง</Text>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'stretch' }}>
+          {OPTIONS.map(o => {
+            const off = unavailable(o.id), picked = selected === o.id;
+            return <Pressable key={o.id} testID={`levelup-option-${o.id}`} disabled={off} accessibilityRole="button"
+              accessibilityLabel={`${o.title}${picked ? ' · เลือกไว้แล้ว' : ''}`} accessibilityState={{ selected: picked, disabled: off }}
+              onPress={() => setSelected(o.id)} style={{ flex: 1 }}>
+              <CandleSelection selected={picked} dim={!!selected && !picked}>
+                <RitualSurface kind="quietSlate" style={{ flex: 1, minHeight: 200, paddingHorizontal: 8, paddingVertical: 14, alignItems: 'center' }}>
+                  <Image accessible={false} source={image(o.id)} resizeMode="contain" style={{ width: 60, height: 60, marginBottom: 10, opacity: off ? .5 : 1 }} />
+                  <Text style={{ fontFamily: font.heading, color: palette.moon, fontSize: 16, textAlign: 'center' }}>{o.title}</Text>
+                  <Text style={{ fontFamily: font.ui, color: palette.text, fontSize: 12, lineHeight: 19, textAlign: 'center', marginTop: 6 }}>{off ? 'ไม่มีการ์ดที่เลือกได้' : o.detail}</Text>
+                </RitualSurface>
+              </CandleSelection>
             </Pressable>;
           })}
-          </View>
-          <QuietButton label={levelUpConfirmLabel(selected?bucketOf(selected):undefined)} primary disabled={!selected} onPress={()=>selected&&press(selected)}/>
         </View>
-      ) : (
-        <View>
-          {(bucketOf(pending)==='upgrade'||bucketOf(pending)==='remove')?<View style={{gap:16}}>
-            <UpgradeCardPicker cards={deck} selected={cardIndex} onSelect={setCardIndex} remove={bucketOf(pending)==='remove'} onConfirm={i=>onChoose(pending,i)}/>
-          </View>:<View style={{gap:14}}>
-            <View style={{flexDirection:'row',gap:10,alignItems:'stretch'}}>
-             {(state.levelUp?.blessingChoices??[]).map((b,i)=><Pressable key={b.id} testID={`level-blessing-${i}`} accessibilityRole="button" accessibilityLabel={`เลือกพร ${b.name}`} onPress={()=>setCardIndex(i)} style={{flex:1}}>
-              <CandleSelection selected={cardIndex===i} dim={cardIndex!==null&&cardIndex!==i}><RitualSurface kind="quietSlate" style={{height:278,padding:12,gap:8}}>
-               <Image source={objectSource(b)} resizeMode="contain" style={{width:76,height:76,alignSelf:'center'}}/>
-               <Text style={{height:48,color:palette.moon,fontFamily:font.heading,fontSize:16,lineHeight:24,textAlign:'center'}}>{b.name}</Text>
-               <ScrollView><Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,lineHeight:22,textAlign:'center'}}>{b.desc}</Text></ScrollView>
-              </RitualSurface></CandleSelection>
-             </Pressable>)}
-            </View>
-            <QuietButton label="ยืนยันรับพร" primary disabled={cardIndex===null} onPress={()=>cardIndex!==null&&onChoose(pending,cardIndex)}/>
-          </View>}
+        <QuietButton label={selected ? `ต่อไป · ${OPTIONS.find(o => o.id === selected)!.title}` : 'เลือกรางวัลก่อน'} primary disabled={!selected} onPress={() => selected && setPending(selected)} />
+        <QuietButton label={`ข้าม · รับ ${LEVEL_UP.skipGold} เบี้ย`} onPress={onSkip} />
+      </View>}
 
-          <QuietButton label="ย้อนกลับ" onPress={()=>{setPending(null);setCardIndex(null);}} style={{marginTop:14}}/>
+      {pending === 'card' && <View style={{ gap: 12 }}>
+        <Text style={{ color: palette.text, fontSize: 14, fontFamily: font.ui, textAlign: 'center' }}>แตะการ์ดเพื่ออ่าน แล้วยืนยัน</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+          {level.cards.map((c, i) => <View key={`${c.id}-${i}`} testID={`levelup-card-${i}`} style={{ width: cardWidth, opacity: index !== null && index !== i ? .68 : 1, transform: [{ translateY: index === i ? -8 : 0 }] }}>
+            <Card card={c} width={cardWidth} height={174} selected={index === i} onPress={() => setIndex(index === i ? null : i)} />
+          </View>)}
         </View>
-      )}
+        {index !== null && <RitualSurface kind="occupationPage" style={{ padding: 20 }}>
+          <CardRow card={level.cards[index]} plain />
+          <QuietButton label={`รับ ${level.cards[index].name}`} primary onPress={() => onChoose('card', index)} />
+        </RitualSurface>}
+        <QuietButton label="ย้อนกลับ" onPress={back} />
+      </View>}
 
-      {!state.levelUp?.dawnHandChoice&&<QuietButton label="ข้ามไปก่อน" onPress={onSkip} style={{marginTop:18}}/>}
+      {(pending === 'upgrade' || pending === 'remove') && <View style={{ gap: 14 }}>
+        <Text style={{ color: palette.text, fontSize: 14, fontFamily: font.ui, textAlign: 'center' }}>
+          {pending === 'upgrade' ? 'เลือกการ์ดที่จะปลุกเสก 1 ใบ' : 'เลือกการ์ดที่จะสละ 1 ใบ'}
+        </Text>
+        <UpgradeCardPicker cards={deck} selected={index} onSelect={setIndex} remove={pending === 'remove'} onConfirm={i => onChoose(pending, i)} />
+        <QuietButton label="ย้อนกลับ" onPress={back} />
+      </View>}
     </PostBattleSurface>
   );
 }

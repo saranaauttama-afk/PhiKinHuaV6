@@ -97,47 +97,7 @@ describe('เริ่มรันด้วยคลาส', () => {
   });
 });
 
-describe('พรติดตัวของคลาส', () => {
-  it('นักรบเริ่มไฟต์ด้วยการ์ดป้องกัน', () => {
-    const s = enterFight('warrior');
-    expect(s.player.block).toBeGreaterThan(0);
-  });
-
-  it('หมอผีเริ่มไฟต์ด้วยมานามากกว่ามานาตั้งต้น', () => {
-    const s = enterFight('shaman');
-    expect(s.player.mana).toBeGreaterThan(s.player.startMana);
-  });
-
-
-
-
-  it('แม่ชีฟื้นเลือดเมื่อชนะไฟต์', () => {
-    let s: any = enterFight('nun');
-    s.player.hp = Math.max(1, s.player.maxHp - 20);
-    const before = s.player.hp;
-
-    if (s.enemy) s.enemy.statusEffects = [];
-
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
-    const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('nun')).state;
-
-    expect(after.player.hp).toBeGreaterThan(before);
-  });
-
-  it('คลาสอื่นไม่ได้ฟื้นเลือดตอนชนะ', () => {
-    let s: any = enterFight('warrior');
-    s.blessings = []; // Isolate the class passive from attack-healing blessings.
-    s.player.hp = Math.max(1, s.player.maxHp - 20);
-    const before = s.player.hp;
-
-    if (s.enemy) s.enemy.statusEffects = [];
-
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
-    const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('war')).state;
-
-    expect(after.player.hp).toBe(before);
-  });
-});
+// Class passives and skills: test/notfm-classes.test.ts
 
 describe('การ์ดฟื้นพลังชีวิตทำงานจริง', () => {
   it('เล่นการ์ดที่มี heal แล้วเลือดเพิ่ม', () => {

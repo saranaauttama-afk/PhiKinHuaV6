@@ -189,6 +189,7 @@ export default function Home() {
             state={state}
             onOpenDeck={() => dispatch({ type: 'OpenDeck' })}
             onOpenBlessings={() => setBlessingsOpen(true)}
+            onUseSkill={(id, index) => dispatch({ type: 'UseSkill', id, index })}
           />
 
         </Scrim>

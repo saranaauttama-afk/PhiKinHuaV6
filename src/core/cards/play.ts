@@ -14,7 +14,7 @@ function equipCard(s: GameState, card: CardData, rng: RNG): RNG {
   s.equipped = s.equipped ?? [];
   while (s.equipped.length >= slots) {
     const old = s.equipped.shift()!;
-    s.piles.discard.push(old);
+    (old.exhaust ? s.piles.exhaust : s.piles.discard).push(old);
     s.log.push(`ถอด ${old.name}`);
   }
   s.equipped.push(card);
@@ -56,11 +56,24 @@ export function playCard(s: GameState, index: number, rng: RNG, wait = 1): { rng
     default: {
       const fx = cardFx(s, card);
       (card.exhaust || card.borrowed ? s.piles.exhaust : s.piles.discard).push(card);
-      rng = applyFx(s, fx, { sourceId: card.id, type: card.type }, rng);
+      // ปลุกเสก: the next spell's effect is multiplied.
+      let mult = 1;
+      if (card.type === 'spell' && s.fight?.nextSpellMult) { mult = s.fight.nextSpellMult; s.fight.nextSpellMult = undefined; }
+      rng = applyFx(s, fx, { sourceId: card.id, type: card.type, mult }, rng);
     }
   }
   rng = runTriggers(s, 'play', rng, card.type);
+  copyPlayedCard(s, card);
   return { rng, played: true };
+}
+
+/** ครูสอนมวย: the next card played gets a one-use copy in hand. A copy is never copied again. */
+function copyPlayedCard(s: GameState, card: CardData): void {
+  if (!s.fight?.copyNext || card.copied) return;
+  s.fight.copyNext = false;
+  if (s.phase !== 'combat' || s.piles.hand.length >= s.player.handMax) return;
+  s.piles.hand.push({ ...JSON.parse(JSON.stringify(card)), instanceId: `${card.instanceId ?? card.id}#copy`, copied: true, exhaust: true });
+  s.log.push(`ครูสอนมวย: ได้สำเนา ${card.name}`);
 }
 
 /** Start of a player turn: prayers count down and the ones that are due resolve. */

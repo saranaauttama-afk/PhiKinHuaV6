@@ -2,12 +2,12 @@
 import type { GameState, CardData, BlessingDef } from '../types';
 import type { RNG } from '../rng';
 import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
-import { rollLevelUpChoice, rollTwoBlessings, type LevelBucket } from '../level';
+import { rollThreeCards } from '../level';
+import { LEVEL_UP } from '../balance/notfm';
 import { rollCardReward } from '../cards/reward';
 import { starOf } from '../cards/model';
 import { STAR_RULES } from '../balance/notfm';
 import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
-import { applyClassVictoryPassive, getClass } from '../classes';
 
 export function getCurrentNodeId(map?: any): string | undefined {
   if (!map) return undefined;
@@ -80,8 +80,6 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   s.player.exp += gained;
   s.player.gold = (s.player.gold || 0) + gold;
 
-  // พรติดตัวของคลาสที่ทำงานตอนชนะไฟต์ (แม่ชีฟื้นเลือดข้ามไฟต์)
-  applyClassVictoryPassive(s);
   const goldResult = { amount: gold };
 
   // เก็บรางวัลไว้เป็นข้อมูล ไม่ใช่ให้ UI ไปแกะจากข้อความ log
@@ -95,17 +93,12 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
     s.player.level += 1;
     s.player.expToNext = nextExpForLevel(s.player.level);
 
+    // Every level: full heal and more max HP. One reward choice is offered at a time.
+    s.player.maxHp += LEVEL_UP.maxHp;
+    s.player.hp = s.player.maxHp;
     if (!s.levelUp || s.levelUp.consumed) {
-      const rolled = rollLevelUpChoice(r, s); r = rolled.rng;
-      const choice = rolled.choice;
-      let blessingChoices;
-
-      if (choice.optionA === 'blessing' || choice.optionB === 'blessing') {
-        const owned = (s.blessings ?? []).map(b => b.id);
-        const bb = rollTwoBlessings(r, owned); r = bb.rng; blessingChoices = bb.list;
-      }
-
-      s.levelUp = { choice, blessingChoices, consumed: false };
+      const rolled = rollThreeCards(r, s.player.level, s.classId); r = rolled.rng;
+      s.levelUp = { cards: rolled.list, consumed: false };
     } else {
       s.log.push('LevelUp queued (multiple levels).');
     }

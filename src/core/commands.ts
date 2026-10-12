@@ -66,6 +66,8 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   require('./cards/mechanics').resetCardsPlayed(state);
   state.player.ap = state.player.maxAp;
   state.player.block = 0;
+  // สำรวมจิต lasts until the start of the next player turn.
+  if (state.fight) state.fight.halfDamage = false;
   processStatusEffectsOnTurnStart('player', state);
   rng = require('./cards/play').resolvePrayers(state, rng);
   if (state.phase !== 'combat') return { state, rng };
@@ -83,13 +85,14 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   ({ state: s, rng } = buildAndShuffleDeck(s, rng));
   s.cardHistory = []; s.cardHistorySeq = 0;
   s.equipped = []; s.prayers = []; s.traps = [];
+  s.fight = { hpLost: 0, ghostTurns: 0 };
+  require('./skills').tickSkillCooldowns(s);
   s.player.block = 0;
   s.player.ap = s.player.maxAp;
   s.player.mana = s.player.startMana;
   require('./cards/mechanics').resetCardsPlayed(s);
   ({ state: s, rng } = drawCards(s, rng, s.player.openingDraw));
   rng = require('./cards/passives').runTriggers(s, 'battleStart', rng);
-  require('./classes').applyClassCombatStart(s);
   require('./cards/testWin').dealTestWinCard(s);
   return rng;
 }

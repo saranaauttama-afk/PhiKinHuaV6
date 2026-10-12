@@ -20,6 +20,7 @@ import CardHistory from './components/battle/CardHistory';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
 import PrayerWaitPicker from './components/battle/PrayerWaitPicker';
+import SkillButtons from './components/battle/SkillButtons';
 import VictoryOverlay from './components/battle/VictoryOverlay';
 import {needsVictoryIntro} from './postBattleFlow';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -285,6 +286,11 @@ export default function BattlePage() {
   }, [currentEvent]);
 
   const badges:BattleBadge[]=[
+    ...(gameState.fight?.copyNext?[{id:'skill:copy',name:'ครูสอนมวย',symbol:'check',neutral:true,detail:'การ์ดใบถัดไปที่เล่นได้สำเนาเข้ามือ'}]:[]),
+    ...(gameState.fight?.nextSpellMult?[{id:'skill:spell',name:'ปลุกเสก',symbol:'spell_charging',neutral:true,detail:`คาถาใบถัดไปได้ผล ×${gameState.fight.nextSpellMult}`}]:[]),
+    ...(gameState.fight?.halfDamage?[{id:'skill:half',name:'สำรวมจิต',symbol:'block',neutral:true,detail:'รับดาเมจจากผีครึ่งเดียวจนถึงเทิร์นหน้า'}]:[]),
+    ...(gameState.fight?.lifestealUntil!=null&&gameState.turn<=gameState.fight.lifestealUntil?[{id:'skill:metta',name:'แผ่เมตตา',symbol:'regeneration',neutral:true,detail:'ฟื้นเลือดครึ่งหนึ่งของดาเมจที่ทำกับผี'}]:[]),
+    ...(gameState.fight?.extraTurn?[{id:'skill:extra',name:'เข้าสมาธิ',symbol:'check',neutral:true,detail:'จบเทิร์นนี้แล้วได้เทิร์นเพิ่ม ผีไม่ได้เล่น'}]:[]),
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${fxText(t.fx).join(' · ')}${t.negate?' · ยกเลิกการ์ดผี':''}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
   ];
   const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
@@ -311,7 +317,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea rage={rageActive(gameState)?RAGE:undefined}
+        <MonsterArea rage={{startTurn:rageActive(gameState)?RAGE.startTurn:RAGE.backstopTurn,perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
@@ -389,6 +395,7 @@ export default function BattlePage() {
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
           statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges}/>:null}
+          helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>dispatch({type:'UseSkill',id,index})}/>}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
           hp={player.hp}
@@ -428,7 +435,7 @@ export default function BattlePage() {
         )}
 
         {/* หลังรับทราบชัยชนะ จึงแสดงตัวเลือกเลเวลอัปที่ engine เตรียมไว้ */}
-        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'levelup' && gameState.levelUp?.choice && (
+        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'levelup' && gameState.levelUp && !gameState.levelUp.consumed && (
           <LevelUpOverlay
             state={gameState}
             playerLevel={player.level}

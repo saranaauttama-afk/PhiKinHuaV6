@@ -111,6 +111,8 @@ export function computeModifiedDamage(
 
   // Armor from blessings and equipment cards reduces each hit on the player.
   if (rules.defenderMods && to === 'player' && from === 'enemy') dmg -= require('../cards/passives').armor(state);
+  // สำรวมจิต: ghost hits are halved until the next player turn.
+  if (rules.defenderMods && to === 'player' && from === 'enemy' && state.fight?.halfDamage) dmg = dmg * (100 - require('../skills').skillParam('composure', 'damagePct')) / 100;
   return Math.max(0, Math.round(dmg));
 }
 
@@ -167,6 +169,13 @@ export function dealDamage(
     sourceKind,
   });
   if (died) emit(state, { t: 'Died', who: to });
+
+  // ใจเพชร reads the HP lost this fight.
+  if (to === 'player' && state.fight) state.fight.hpLost += targetState.hp < hpBefore ? hpBefore - targetState.hp : 0;
+  // แผ่เมตตา: heal part of the damage dealt to the ghost.
+  if (from === 'player' && to === 'enemy' && hpLoss > 0 && state.fight?.lifestealUntil != null && (state.turn ?? 0) <= state.fight.lifestealUntil && state.player.hp > 0) {
+    heal(state, 'player', Math.floor(hpLoss * require('../skills').skillParam('metta', 'healPct') / 100));
+  }
 
   const thorns=targetState.statusEffects?.find(e=>e.id==='thorns');
   if(isAttack&&modified>0&&thorns&&((from==='player'?state.player:state.enemy)?.hp??0)>0)dealDamage(state,{from:to,to:from,raw:thorns.stacks??thorns.value??1,source:{kind:'status',effectId:'thorns'}});

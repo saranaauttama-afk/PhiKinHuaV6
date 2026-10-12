@@ -56,7 +56,7 @@ export const AUTO_SAVE_COMMANDS = [
  */
 const DROP_ON_SAVE = [
   'enemy', 'enemyIntent', 'enemyPiles', 'playerPiles', 'enemyIntentCardId', 'traps', 'combo',
-  'piles', 'pendingEvents', 'cardHistory', 'cardHistorySeq', 'turnFlags', 'levelUp', 'cardReward', 'starter',
+  'piles', 'pendingEvents', 'cardHistory', 'cardHistorySeq', 'turnFlags', 'levelUp', 'cardReward', 'starter', 'fight',
   'shopKind', 'shopStock', 'shopBoughtItems', 'currentShopId',
   'event', 'deckOpen', 'combatVictoryLock', 'equipmentTempSlots',
   // บทที่ค้างอ่านอยู่เป็นของหน้าจอ ไม่ใช่ความคืบหน้า — `chaptersSeen` ต่างหากที่เก็บ

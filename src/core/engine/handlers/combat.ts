@@ -15,12 +15,25 @@ import { TEST_WIN_CARD_ID, testWinCardEnabled } from '../../cards/testWin';
 import { playCard } from '../../cards/play';
 import { runTriggers } from '../../cards/passives';
 import { cardFromEnemy } from '../../cards/borrow';
+import { CLASS_PASSIVES } from '../../balance/notfm';
 import { enemyCardCost } from '../../pack_enemy_cards';
 import { cardFx as enemyCardFx } from '../../combat/enemyCardEffects';
 import { describeCard } from '../../cards/describe';
 
 /** Resolve deaths from helper/status/trap effects as well as direct played cards. */
-function settleCombat(s: GameState, r: RNG): RNG {
+/** Medium passive: the first ghost card revealed each fight is copied into hand. */
+function mimicGhostCard(s: GameState, def: import('../../pack_enemy_cards').EnemyCardDef): void {
+  if (!s.classId || !CLASS_PASSIVES[s.classId].copyFirstGhostCard || !s.fight || s.fight.mimicUsed) return;
+  s.fight.mimicUsed = true;
+  if (s.piles.hand.length >= s.player.handMax) return;
+  const card = cardFromEnemy(def, true);
+  card.name = 'ยืม·' + card.name;
+  card.instanceId = `mimic__${def.id}__${s.cardHistorySeq ?? 0}`;
+  s.piles.hand.push(card);
+  s.log.push(`ผีติดตาม: ได้สำเนา ${def.name}`);
+}
+
+export function settleCombat(s: GameState, r: RNG): RNG {
   if (s.phase !== 'combat') return r;
   require('../../campaign/nights').awakenNightBoss(s);
   if (isDefeat(s)) {
@@ -121,10 +134,18 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   r = settleCombat(s, r);
   if (s.phase !== 'combat') return { state: s, rng: r };
 
+  // เข้าสมาธิ: the player takes another turn; the ghost does not act, so rage does not rise.
+  if (s.fight?.extraTurn) {
+    s.fight.extraTurn = false;
+    s.log.push('เข้าสมาธิ: ได้เทิร์นเพิ่ม');
+    return { state: s, rng: r };
+  }
+
   // ── เทิร์นศัตรู
   if (s.enemy && (s as any).enemyPiles) {
     s.enemy.ap = s.enemy.maxAp ?? 2;
     s.enemy.block = 0;
+    if (s.fight) s.fight.ghostTurns += 1;
     require('../../campaign/nights').applyRage(s);
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
@@ -155,6 +176,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       if(index<0||!consumeEnemyCard(s,index))continue;
       if(original!=null)consumed.push(original);
       const shown=enemyCardFx(s,def);
+      mimicGhostCard(s,def);
       s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',
