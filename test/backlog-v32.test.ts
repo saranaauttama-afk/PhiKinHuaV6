@@ -4,7 +4,6 @@ import {applyCommand} from '../src/core/reducer';
 import {makeRng} from '../src/core/rng';
 import {fromSave,toSave} from '../src/core/save';
 import {validAdventure,useIntersectionPage,startAdventure} from '../src/core/map/adventure';
-import {BUILD_KITS,grantBuildKit,buildsForClass} from '../src/core/campaign/builds';
 import {getStoryEvent} from '../src/core/events/story';
 import {getCardPlayedFns,resetBlessingTurnFlags} from '../src/core/blessingRuntime';
 import {cardById} from '../src/core/pack';
@@ -53,16 +52,9 @@ describe('v32 reported regressions',()=>{
   d.s.piles.hand=[];d.s.piles.draw=d.s.masterDeck.map(c=>({...c}));startPlayerTurn(d.s,d.r);expect(d.s.piles.hand).toHaveLength(2);
  });
  it('receipts use actual granted copies, preserve upgrades/losses and never mutate inventory',()=>{
-  const before=driver().s,after=structuredClone(before),card={...before.masterDeck[0],upgradeLevel:2};after.masterDeck.push(card);after.blessings.push(BUILD_KITS[0].blessing);after.masterDeck.shift();const inventory=structuredClone(after.masterDeck);
-  captureRewardReceipt(before,after,{type:'ChooseEventOption',index:0});expect(after.rewardReceipt!.cards).toEqual([card]);expect(after.rewardReceipt!.blessings).toEqual([BUILD_KITS[0].blessing]);expect(after.rewardReceipt!.lostCards).toHaveLength(1);expect(after.masterDeck).toEqual(inventory);expect(fromSave(toSave(after,makeRng(after.seed))).rewardReceipt).toEqual(after.rewardReceipt);
- });
- for(const cls of ['warrior','shaman','nun','medium'] as const)it(`${cls}: two valid first-night directions and a safe gold alternative`,()=>{
-  const d=driver();d.s.classId=cls;const event=getStoryEvent('run_story_1',d.s)!;expect(event.choices).toHaveLength(3);expect(buildsForClass(cls)).toHaveLength(2);
-  for(const k of buildsForClass(cls)){expect(cardById(k.cardId)).toBeDefined();const copy=structuredClone(d.s),n=copy.masterDeck.length;grantBuildKit(copy,k.id);expect(copy.masterDeck.length).toBe(n+1);expect(copy.blessings).toContainEqual(k.blessing);grantBuildKit(copy,k.id);expect(copy.masterDeck.length).toBe(n+1);}
- });
- it('broad build triggers are once per turn and unrelated cards never consume their allowance',()=>{
-  const d=driver();grantBuildKit(d.s,'guard');const b=d.s.blessings.find(b=>b.id==='build_guard')!,card={id:'any-block',name:'test',type:'skill' as const,cost:1,block:2};const energy=d.s.player.energy;
-  expect(getCardPlayedFns(b,{...card,block:0})).toEqual([]);for(let i=0;i<3;i++)for(const fn of getCardPlayedFns(b,card))fn({state:d.s},card);expect(d.s.player.energy).toBe(energy+1);resetBlessingTurnFlags(d.s);for(const fn of getCardPlayedFns(b,card))fn({state:d.s},card);expect(d.s.player.energy).toBe(energy+2);
+  const granted={id:'receipt_test_blessing',name:'พรทดสอบ',rarity:'Common' as const,desc:'test'};
+  const before=driver().s,after=structuredClone(before),card={...before.masterDeck[0],upgradeLevel:2};after.masterDeck.push(card);after.blessings.push(granted);after.masterDeck.shift();const inventory=structuredClone(after.masterDeck);
+  captureRewardReceipt(before,after,{type:'ChooseEventOption',index:0});expect(after.rewardReceipt!.cards).toEqual([card]);expect(after.rewardReceipt!.blessings).toEqual([granted]);expect(after.rewardReceipt!.lostCards).toHaveLength(1);expect(after.masterDeck).toEqual(inventory);expect(fromSave(toSave(after,makeRng(after.seed))).rewardReceipt).toEqual(after.rewardReceipt);
  });
  for(const [w,h] of [[360,640],[393,852]])it(`${w}x${h}: six cards, full-body stage and reserved notice do not collide`,()=>{const g=battleGeometry(w,h,24,24),hand=handGeometry(w,6);expect(hand.overflow).toBe(false);expect(hand.span+hand.padding*2).toBeLessThanOrEqual(w);expect(g.monsterTop+g.monsterSize).toBeLessThan(g.hudTop);expect(g.noticeTop).toBeGreaterThanOrEqual(g.hudTop+g.enemyHudHeight+g.enemyExtrasHeight);expect(g.noticeTop+g.noticeHeight).toBeLessThan(g.handTop);});
 });

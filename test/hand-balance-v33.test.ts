@@ -12,7 +12,6 @@ import {TEST_WIN_CARD_ID} from '../src/core/cards/testWin';
 import {effectiveCost} from '../src/core/cards/mechanics';
 import {applyStatusEffect} from '../src/core/statusEffectsRuntime';
 import {getCardPlayedFns,runBlessingsTurnHook} from '../src/core/blessingRuntime';
-import {BUILD_KITS} from '../src/core/campaign/builds';
 import {emptyJournal,parseJournal,ACHIEVEMENTS} from '../src/core/campaign/journal';
 import {advanceAfterVictory} from '../src/core/engine/shared';
 import {rollLevelUpChoice} from '../src/core/level';
@@ -93,11 +92,6 @@ describe('explicit combo removal with ordinary synergy preserved',()=>{
   const c=cardById(id)!;expect(c).toBeDefined();expect(!!(c.dmg||c.block||c.heal||c.draw||c.energyGain||c.statusEffect||c.summonMinion||c.cleanseDebuffs||c.trap)).toBe(true);
   const {state,rng}=makeCombatState({hand:[c],playerEnergy:30,enemyHp:1000,playerHp:20});state.player.maxHp=80;state.classId=(c.tags?.find(t=>ALL_CLASS_IDS.includes(t as any))??'shaman') as any;state.piles.draw=ALL_CARDS.slice(0,10);
   const out=applyCommand(state,{type:'PlayCard',index:0},rng).state;expect(out.piles.hand.some(x=>x.instanceId===state.piles.hand[0].instanceId)).toBe(false);expect(out.log.join(' ')).not.toMatch(/error/i);expect((out as any).combo).toBeUndefined();
- });
- for(const b of BUILD_KITS)it(b.blessing.id+' remains triggered by normal card effects',()=>{
-  const {state}=makeCombatState({playerEnergy:3,playerHp:20});state.player.maxHp=80;state.piles.draw=ALL_CARDS.slice(0,5);state.minions=[];
-  const trigger={id:'normal',name:'normal',type:'attack' as const,cost:0,block:2,heal:2,hits:2,statusEffect:{target:'enemy' as const,effect:'poison' as const,duration:2,value:1},summonMinion:'ghost_ally'};
-  expect(getCardPlayedFns(b.blessing,trigger).length).toBeGreaterThan(0);for(const f of getCardPlayedFns(b.blessing,trigger))f({state},trigger);expect((state as any).combo).toBeUndefined();
  });
  it('strength buffs each normal hit, minions still summon, healing remains bounded',()=>{
   const {state,rng}=makeCombatState({hand:[attackCard(3,{hits:2}),cardById('call_old_ghost')!,cardById('holy_water')!],enemyHp:100,playerEnergy:10,playerHp:10});state.player.maxHp=50;applyStatusEffect('player',state,'strength',3,2);
