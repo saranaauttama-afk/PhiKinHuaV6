@@ -18,7 +18,6 @@ import {rollLevelUpChoice} from '../src/core/level';
 import {summonMinion,processPlayerTurnMinions} from '../src/core/minionRuntime';
 import {runEquipmentTurnHook} from '../src/core/equipmentRuntime';
 import {getEquipmentById} from '../src/core/pack';
-import conversions from '../src/data/packs/base/card_migrations_v33.json';
 import {makeCombatState,attackCard} from './helpers';
 import formerCards from '../docs/v33-former-chain-cards.json';
 import type {GameState,Command} from '../src/core/types';
@@ -108,22 +107,5 @@ describe('explicit combo removal with ordinary synergy preserved',()=>{
  });
  it('normal blessing draw adds cards without increasing the hand limit',()=>{
   const {state}=makeCombatState();state.player.maxHandSize=2;state.blessings=[{id:'naga_blessing',name:'test'}];state.piles.draw=ALL_CARDS.slice(0,5);runBlessingsTurnHook(state,'on_turn_start');expect(state.piles.hand).toHaveLength(1);expect(state.player.maxHandSize).toBe(2);
- });
-});
-describe('v32 save compatibility',()=>{
- for(const mode of ['battle','map'] as const)it(mode+' cleans old combo state and preserves v32 balance, discoveries and progression',()=>{
-  const d=driver();if(mode==='battle')d.go({type:'ChooseOffer',index:0});delete d.s.player.handBalanceVersion;d.s.player.drawPerTurn=3;d.s.player.maxHandSize=6;d.s.player.gold=123;
-  const save=mode==='battle'?toBattleSave(d.s,d.r):toSave(d.s,d.r);(save.state as any).combo={progress:[{}],done:['x'],freeCards:5};(save.state as any).completedCombos=['x'];(save.state.runMetrics as any).combos=100;
-  const s=fromSave(save);expect((s as any).combo).toBeUndefined();expect((s as any).completedCombos).toBeUndefined();expect((s.runMetrics as any).combos).toBeUndefined();expect(s.player).toEqual(d.s.player);expect(s.discovery).toEqual(d.s.discovery);expect(s.campaign).toEqual(d.s.campaign);expect(toSave(s,d.r).state).not.toHaveProperty('combo');
- });
- for(const [id,conversion] of Object.entries(conversions))it(id+' saved v32 copies migrate once while retaining upgrades and artwork identity',()=>{
-  const d=driver();const card={...cardById(id)!,...conversion.before,name:cardById(id)!.name+' +2',upgradeLevel:2,upgraded:true,cost:0,instanceId:'old-'+id};
-  if(id==='black_magic')(card as any).dmg=8;
-  d.s.masterDeck.push(card as any);const data=toSave(d.s,d.r);const loaded=fromSave(data),c=loaded.masterDeck.at(-1)!;
-  expect(c.id).toBe(id);expect(c.name).toBe(card.name);expect(c.instanceId).toBe(card.instanceId);expect(c.upgradeLevel).toBe(2);expect(c.cost).toBe(0);expect(c.desc).toBe(conversion.after.desc);
-  if(id==='black_magic')expect(c.dmg).toBe(48);expect(fromSave(toSave(loaded,d.r)).masterDeck).toEqual(loaded.masterDeck);
- });
- it('retains old journal unlocks and achievement history, without granting new combo rewards',()=>{
-  const j=emptyJournal();j.classes.warrior.highestDifficulty=4;j.classes.warrior.unlocks=['card'];j.classes.warrior.achievements=['combo_keeper','first_dawn'];expect(parseJournal(JSON.stringify(j))).toEqual(j);
  });
 });

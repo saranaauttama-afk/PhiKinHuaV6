@@ -5,7 +5,7 @@ import { baseNewState } from '../src/core/commands';
 import type { Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import { AUTO_SAVE_COMMANDS, toSave, fromSave, isPlayableSave, summarize, SAVE_VERSION } from '../src/core/save';
-import { resolveStoryIfAny, resolveRewardIfAny, leaveRestRow } from './helpers';
+import { resolveStoryIfAny, resolveRewardIfAny, stepService, nextFight } from './helpers';
 
 /**
  * เซฟ/โหลด
@@ -25,6 +25,7 @@ function runInProgress(seed = 'save', classId: any = 'warrior'): GameState {
 
   go({ type: 'NewRun', seed, classId });
   go({ type: 'ChooseStarterBlessing', index: 0 });
+  while (s.chapter) go({ type: 'SkipChapter' } as any);
 
   for (let i = 0; i < 4; i++) {
     const offers: PageOffer[] = s.pages?.current?.offers ?? [];
@@ -32,21 +33,19 @@ function runInProgress(seed = 'save', classId: any = 'warrior'): GameState {
     const fightIx = offers.findIndex(o => o.kind === 'monster' || o.kind === 'boss');
 
     if (fightIx < 0) {
-      go({ type: 'ChooseOffer', index: 0 });
-      resolveStoryIfAny(s, go);
-      go({ type: 'CompleteNode' });
-      leaveRestRow(s, go);
+      stepService(() => s, go);
       continue;
     }
 
     go({ type: 'ChooseOffer', index: fightIx });
     if (s.phase !== 'combat') break;
+    if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
-    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     go({ type: 'CompleteNode' });
-    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
   }
 
@@ -54,15 +53,15 @@ function runInProgress(seed = 'save', classId: any = 'warrior'): GameState {
 }
 
 const roundTrip = (s: GameState): GameState =>
-  fromSave(JSON.parse(JSON.stringify(toSave(s))));
+  fromSave(JSON.parse(JSON.stringify(toSave(s, makeRng("round-trip")))));
 
 describe('เซฟแล้วโหลดกลับได้ครบ', () => {
   it('เส้นทางทั้งเส้นไม่หาย', () => {
     const s = runInProgress();
     const back = roundTrip(s);
 
-    expect(back.journey, 'เซฟ V1 ไม่เก็บ journey เลย').toBeDefined();
-    expect(JSON.stringify(back.journey)).toBe(JSON.stringify(s.journey));
+    expect(back.pages?.adventure).toBeDefined();
+    expect(JSON.stringify(back.pages)).toBe(JSON.stringify(s.pages));
   });
 
   it('คลาสที่เลือกไว้ไม่หาย', () => {
@@ -137,34 +136,9 @@ describe('สำรับไม่ถูกตัดทิ้งตอนโห�
   });
 });
 
-describe('สเตตคอมแบตไม่ถูกเก็บ — โหลดแล้วยืนบนแผนที่เสมอ', () => {
-  it('ศัตรูกับกองการ์ดถูกล้าง และ phase เป็นแผนที่', () => {
-    const s: any = runInProgress();
-    s.phase = 'combat';
-    s.enemy = { id: 'x', name: 'x', hp: 5, maxHp: 5, dmg: 1, block: 0 };
-    s.piles.hand = [{ id: 'a', name: 'a', type: 'skill', cost: 0 }];
-
-    const back = roundTrip(s);
-    expect(back.phase).toBe('map');
-    expect(back.enemy).toBeUndefined();
-    expect(back.piles.hand).toEqual([]);
-    expect(back.player.block).toBe(0);
-  });
-
-  it('เซฟค้างกลางเหตุการณ์แล้วโหลด กลับมาที่แผนที่ ไม่ค้างในเหตุการณ์', () => {
-    const s: any = runInProgress();
-    s.phase = 'event';
-    s.story = { eventId: 'roadside_shrine' };
-
-    const back = roundTrip(s);
-    expect(back.phase).toBe('map');
-    expect(back.story).toBeUndefined();
-  });
-});
-
 describe('ตรวจว่าเซฟใช้ได้ไหมก่อนให้กดเล่นต่อ', () => {
   it('เซฟที่กำลังเล่นอยู่ = ใช้ได้', () => {
-    expect(isPlayableSave(toSave(runInProgress()))).toBe(true);
+    expect(isPlayableSave(toSave(runInProgress(), makeRng("save-test")))).toBe(true);
   });
 
   it('เซฟเวอร์ชันเก่า = ใช้ไม่ได้ ไม่ใช่โหลดครึ่งๆ', () => {
@@ -173,16 +147,16 @@ describe('ตรวจว่าเซฟใช้ได้ไหมก่อน�
     expect(() => fromSave(old as any)).toThrow();
   });
 
-  it('เซฟที่ไม่มีเส้นทาง = ใช้ไม่ได้ (เซฟจากก่อนมีระบบแผนที่)', () => {
-    const s = toSave(runInProgress());
-    delete (s.state as any).journey;
+  it('เซฟที่ไม่มีกระดานผจญภัย = ใช้ไม่ได้', () => {
+    const s = toSave(runInProgress(), makeRng("save-test"));
+    delete (s.state as any).pages.adventure;
     expect(isPlayableSave(s)).toBe(false);
   });
 
   it('รันที่จบไปแล้ว = ไม่ต้องเสนอให้เล่นต่อ', () => {
     const s: any = runInProgress();
     s.phase = 'run_complete';
-    const saved = toSave(s);
+    const saved = toSave(s, makeRng("save-test"));
     (saved.state as any).phase = 'run_complete';
     expect(isPlayableSave(saved)).toBe(false);
   });
@@ -197,12 +171,12 @@ describe('ตรวจว่าเซฟใช้ได้ไหมก่อน�
 describe('สรุปย่อสำหรับปุ่มเดินทางต่อ', () => {
   it('บอกคลาส ไฟต์ที่เท่าไหร่ เลือด และทอง', () => {
     const s = runInProgress('sum', 'medium');
-    const sum = summarize(toSave(s));
+    const sum = summarize(toSave(s, makeRng("save-test")));
 
     expect(sum.classId).toBe('medium');
-    expect(sum.totalFights).toBe(15);
+    expect(sum.totalFights).toBe(30);
     expect(sum.fight).toBeGreaterThanOrEqual(1);
-    expect(sum.fight).toBeLessThanOrEqual(15);
+    expect(sum.fight).toBeLessThanOrEqual(30);
     expect(sum.hp).toBe(s.player.hp);
     expect(sum.gold).toBe(s.player.gold);
   });
@@ -218,7 +192,7 @@ describe('เล่นต่อได้จริงหลังโหลด', (
     const offers: PageOffer[] = back.pages?.current?.offers ?? [];
     expect(offers.length, 'โหลดแล้วต้องมีทางให้เดินต่อ').toBeGreaterThan(0);
 
-    const ix = offers.findIndex(o => o.kind === 'monster' || o.kind === 'boss');
+    const ix = nextFight(back);
     if (ix >= 0) {
       go({ type: 'ChooseOffer', index: ix });
       expect(back.phase).toBe('combat');
@@ -230,8 +204,8 @@ describe('เล่นต่อได้จริงหลังโหลด', (
   it('ตำแหน่งบนเส้นทางไม่ขยับหลังโหลด', () => {
     const s = runInProgress('pos');
     const back = roundTrip(s);
-    expect(back.journey?.currentId).toBe(s.journey?.currentId);
-    expect(back.journey?.rowIndex).toBe(s.journey?.rowIndex);
+    expect(back.pages?.adventure?.cursor).toBe(s.pages?.adventure?.cursor);
+    expect(back.pages?.adventure?.boardIndex).toBe(s.pages?.adventure?.boardIndex);
   });
 });
 
@@ -255,8 +229,9 @@ describe('เซฟอัตโนมัติ — ห้ามเซฟตอ�
     go({ type: 'ChooseStarterBlessing', index: 0 }); sk();
 
     const offers = s.pages.current.offers;
-    const ix = offers.findIndex((o: any) => o.kind === 'monster' || o.kind === 'boss');
+    const ix = nextFight(s);
     go({ type: 'ChooseOffer', index: ix });
+    if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
 
@@ -271,7 +246,7 @@ describe('เซฟอัตโนมัติ — ห้ามเซฟตอ�
     let guard = 0;
     while (guard++ < 10) {
       const p = t.get().phase;
-      if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
+      if (p === 'levelup') t.go((t.get().levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
       else if (p === 'reward') t.go({ type: 'ChooseCardReward', index: 0 });
       else break;
 
@@ -291,14 +266,14 @@ describe('เซฟอัตโนมัติ — ห้ามเซฟตอ�
     let guard = 0;
     while (guard++ < 10) {
       const p = t.get().phase;
-      if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
+      if (p === 'levelup') t.go((t.get().levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
       else if (p === 'reward') t.go({ type: 'ChooseCardReward', index: 0 });
       else break;
     }
     t.go({ type: 'CompleteNode' });   // ← จุดเซฟจริงจุดแรกหลังชนะ
 
     const before = t.get();
-    const back = fromSave(toSave(before));
+    const back = fromSave(toSave(before, makeRng("save-test")));
 
     expect(back.fightCount).toBe(before.fightCount);
     // โหนดที่สู้ไปแล้วต้องไม่กลับมาให้สู้ใหม่

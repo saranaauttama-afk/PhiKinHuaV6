@@ -23,6 +23,7 @@ function startFight(seed = 'enemy-turn', monsterId = 'phi-krasue'): GameState {
 
   go({ type: 'NewRun', seed });
   go({ type: 'ChooseStarterBlessing', index: 0 });
+  while (s.chapter) go({ type: 'SkipChapter' } as any);
   s.pages.current.offers[0] = { kind: 'monster', tier: 'normal', enemyId: monsterId } as PageOffer;
   go({ type: 'ChooseOffer', index: 0 });
   return s;

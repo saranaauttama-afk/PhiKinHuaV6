@@ -25,6 +25,7 @@ function deckOf(monsterId: string, seed = 'deck'): string[] {
 
   go({ type: 'NewRun', seed });
   go({ type: 'ChooseStarterBlessing', index: 0 });
+  while (s.chapter) go({ type: 'SkipChapter' } as any);
 
   s.pages.current.offers[0] = {
     kind: 'monster', tier: 'normal', enemyId: monsterId,
@@ -92,6 +93,7 @@ describe('เด็คที่สร้างจริงตอนเข้า�
     const go = (c: any) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
     go({ type: 'NewRun', seed: 'boss-deck' });
     go({ type: 'ChooseStarterBlessing', index: 0 });
+    while (s.chapter) go({ type: 'SkipChapter' } as any);
 
     s.pages.current.offers[0] = {
       kind: 'boss', bossType: 'final', enemyId: 'phaya-nak',

@@ -3,7 +3,7 @@ import React from 'react';
 import {View,Text,Pressable,Image} from 'react-native';
 import type {ClassId} from '../../src/core/classes';
 import {CHARACTER_CLASSES} from '../../src/core/classes';
-import {type Night} from '../../src/core/campaign/nights';
+import type {Difficulty} from '../../src/core/campaign/threeNight';
 import {unlockedDifficulty} from '../../src/core/campaign/journal';
 import {useJournal} from '../../src/store/journalStore';
 import {QuietButton,QuietPage,QuietSection} from './QuietChrome';
@@ -11,11 +11,11 @@ import {playerPortraits} from './QuietPlayerHud';
 import {font,palette} from '../theme';
 import CandleSelection from './CandleSelection';
 import JournalView from './JournalView';
-export default function NightSelectScreen({classId,onStart,onBack}:{classId:ClassId;onStart:(n:Night)=>Promise<boolean>;onBack:()=>void}){
+export default function NightSelectScreen({classId,onStart,onBack}:{classId:ClassId;onStart:(n:Difficulty)=>Promise<boolean>;onBack:()=>void}){
  const {journal,ready,saving,error,hydrate,retry}=useJournal();
  const [busy,setBusy]=React.useState(false),[showJournal,setShowJournal]=React.useState(false),[localError,setError]=React.useState('');
  const p=journal.classes[classId],top=unlockedDifficulty(journal,classId);
- const [selected,setSelected]=React.useState<Night>(1);
+ const [selected,setSelected]=React.useState<Difficulty>(1);
  React.useEffect(()=>{void hydrate().catch(()=>{});},[]);
  if(showJournal)return <JournalView classId={classId} onClose={()=>setShowJournal(false)}/>;
  const rule=DIFFICULTY_RULES.find(r=>r.level===selected)!,b=p.difficultyBest[selected],locked=selected>top;

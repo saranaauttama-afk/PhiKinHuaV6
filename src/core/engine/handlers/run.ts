@@ -4,10 +4,8 @@ import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import { baseNewState } from '../../commands';
 import { rollTwoBlessings } from '../../level';
-import { EPISODE } from '../../balance/episode';
 import { START_ENERGY } from '../../balance/core';
 import { initPageMap } from '../../map/pages';
-import { startJourney } from '../../map/journeySync';
 import {startAdventure} from '../../map/adventure';
 import { getClass, buildStarterDeck } from '../../classes';
 import { grantBlessing } from '../shared';
@@ -107,10 +105,9 @@ export function newRun(
   r: RNG
 ) {
   s = baseNewState(cmd.seed);
-  s.runMode = cmd.runMode ?? 'full';
-  if(cmd.night&&Number.isInteger(cmd.night)&&cmd.night>=1&&cmd.night<=5){s.runMode='full';s.campaign={night:cmd.night,unlocks:[...new Set(cmd.unlocks??[])]};}
-  if(cmd.difficulty&&Number.isInteger(cmd.difficulty)&&cmd.difficulty>=1&&cmd.difficulty<=5){s.runMode='full';s.campaign={night:1,difficulty:cmd.difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])]};}
-  if (s.runMode === 'episode') s.player.gold = EPISODE.startingGold;
+  // Every run is the three-night campaign. Difficulty defaults to the first tier.
+  const difficulty=cmd.difficulty&&Number.isInteger(cmd.difficulty)&&cmd.difficulty>=1&&cmd.difficulty<=5?cmd.difficulty:1;
+  s.campaign={night:1,difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])]};
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };
@@ -125,10 +122,10 @@ export function newRun(
   s.player.maxEnergy   = cls.startEnergy;
   s.player.energy      = cls.startEnergy;
   s.player.maxHandSize = cls.startHandSize;
-  if(cmd.difficulty){s.player.maxEnergy=s.player.energy=V33_HAND_BALANCE.energy;s.player.openingDraw=V33_HAND_BALANCE.openingDraw;s.player.drawPerTurn=V33_HAND_BALANCE.drawPerTurn;s.player.maxHandSize=V33_HAND_BALANCE.retainedHand;s.player.handBalanceVersion=33;}
+  {s.player.maxEnergy=s.player.energy=V33_HAND_BALANCE.energy;s.player.openingDraw=V33_HAND_BALANCE.openingDraw;s.player.drawPerTurn=V33_HAND_BALANCE.drawPerTurn;s.player.maxHandSize=V33_HAND_BALANCE.retainedHand;s.player.handBalanceVersion=33;}
 
   const { ALL_CARDS } = require('../../pack');
-  const deck = buildStarterDeck(cmd.difficulty?{...cls,starterDeck:Object.fromEntries(Object.entries(cls.starterDeck).map(([id,count])=>[id,Math.min(2,count)]))}:cls, ALL_CARDS);
+  const deck = buildStarterDeck({...cls,starterDeck:Object.fromEntries(Object.entries(cls.starterDeck).map(([id,count])=>[id,Math.min(2,count)]))}, ALL_CARDS);
   if (deck.length > 0) {
     s.masterDeck = deck;
   } else {
@@ -146,10 +143,8 @@ export function newRun(
   // ✅ Auto-equip equipment cards from starting deck
   autoEquipStartingCards(s);
 
-  // ✅ ใช้ PAGES MODE เสมอ
   s.mapMode = 'pages';
-  const init = initPageMap(r); r = init.rng;
-  s.pages = init.map;
+  s.pages = initPageMap();
 
   // Starter blessing
   s.levelUp = null;
@@ -161,9 +156,6 @@ export function newRun(
   // บทเปิดเรื่องของคลาส — ขึ้นก่อนหน้าเลือกพร เพื่อให้รู้ว่ากำลังเล่นเป็นใคร
   // และออกเดินทางเพราะอะไร ก่อนจะถูกถามว่าจะเอาพรอะไรติดตัว
   fireChapter(s, { kind: 'prologue', classId: cls.id });
-  if (s.runMode === 'episode') {
-    s.chapter = { id: 'episode_open', paragraph: 0 };
-  }
 
   return { state: s, rng: r };
 }
@@ -182,15 +174,7 @@ export function chooseStarter(
   }
   s.starter = null;
 
-  // ให้แน่ใจว่ามี pages แล้ว
-  if (!s.pages) {
-    const init = initPageMap(r); r = init.rng;
-    s.pages = init.map;
-  }
-
-  // ✅ วางเส้นทางทั้งรันไว้ล่วงหน้า แล้วเปิดตัวเลือกของชั้นแรก
-  // (เดิม roll ถาด 3 ช่องที่สุ่มตัวเองใหม่เรื่อยๆ ผู้เล่นจึงไม่เคยเห็นทางข้างหน้า)
-  r = s.campaign ? startAdventure(s, r) : startJourney(s, r);
+  r = startAdventure(s, r);
 
   s.phase = 'map'; // UI ของคุณใช้ phase 'map' เพื่อโชว์ pages อยู่แล้ว
   s.enemy = undefined;

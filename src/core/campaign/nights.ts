@@ -1,19 +1,12 @@
-import {difficultyOf,isThreeNight} from './threeNight';
+import {difficultyOf} from './threeNight';
 import type {ClassId} from '../classes';
 import type {BlessingDef,GameState} from '../types';
-import {NIGHT_ENEMY_DECKS,NIGHT_AWAKENED_DECKS,ENEMY_ARCHETYPES} from './enemyDecks';
+import {NIGHT_ENEMY_DECKS,NIGHT_AWAKENED_DECKS } from './enemyDecks';
 import {applyStatusEffect} from '../statusEffectsRuntime';
 import {applyEnemyBattleRule} from './enemyRules';
 
-export type Night=1|2|3|4|5;
-export type CampaignRun={night:Night;difficulty?:import('./threeNight').Difficulty;completedNights?:number;unlocks:Array<'card'|'blessing'>;bossAwakened?:boolean};
-export const NIGHT_RULES=[
- {night:1,name:'คืนแรก',desc:'สามหน้า · ผี 10 ตัวกับบอสประจำคืน · ผีสะสมแรงทุก 4 เทิร์น'},
- {night:2,name:'คืนเสียงเรียก',desc:'ผีเลือดเพิ่ม 7% · การโจมตีแต่ละหมัดแรงขึ้น 1'},
- {night:3,name:'คืนอาถรรพ์',desc:'ผีเลือดเพิ่ม 14% · แรงขึ้น 1 · สะสมแรงทุก 3 เทิร์น'},
- {night:4,name:'คืนล้อมบ้าน',desc:'ผีเลือดเพิ่ม 21% · ผีชั้นสูงและบอสเริ่มด้วยเกราะ 6 · บอสตื่นเมื่อเลือดครึ่งหนึ่ง'},
- {night:5,name:'คืนผีกินหัว',desc:'ผีเลือดเพิ่ม 28% · แรงขึ้น 1 · บอสตื่นแล้วเล่นได้เพิ่ม 1 พลังงาน · หลังปราบบอสประจำคืน ต้องปราบผีกินหัวตัวจริง'},
-] as const;
+export type Night=import('./threeNight').RunNight;
+export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficulty;completedNights:number;unlocks:Array<'card'|'blessing'>;bossAwakened?:boolean};
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};
 export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>={
  warrior:{id:'night_warrior_blessing',name:'ครูลานวัด',rarity:'Rare',desc:'สกิลใบแรกแต่ละเทิร์นได้ป้องกันเพิ่ม 3'},
@@ -23,31 +16,28 @@ export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>={
 };
 export function configureNightEnemy(s:GameState):void{
  if(!s.campaign||!s.enemy)return;
- const n=difficultyOf(s),f=(s.fightCount??0)+1;
+ const d=difficultyOf(s);
  const monster=require('../monsters/thai-ghosts').getMonsterById(s.enemy.id);
- const boss=monster?.tier.includes('Boss')&&!(adventureRoute(s));
- const adventure=!!s.pages?.adventure;
- const routeOffer=s.pages?.current?.offers[s.pages?._activeOfferIndex??-1];
- const elite=s.pages?.adventure?.version===5&&routeOffer?.kind==='monster'?routeOffer.tier==='elite':monster?.tier==='Elite'||adventureRoute(s)&&!monster?.tier.startsWith('T');
- const compact=s.pages?.adventure?.version===5;
- const baseHp=adventure?(boss?(s.enemy.id==='phi-kin-hua'?compact?125:165:isThreeNight(s)?compact?78:110:110+(n-1)*8):elite?compact?48:70:(compact?28:48)+Math.max(0,Math.min(5,Number(monster?.tier.slice(1))||1))*(compact?2:3)):Math.max(s.enemy.maxHp,f<=2?34:0);
- const chapterScale=isThreeNight(s)?[1,1.28,1.58][s.campaign.night-1]:1;
- s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*chapterScale*(1+(n-1)*(isThreeNight(s)?.05:adventure?.07:.1)));
- const archetype=ENEMY_ARCHETYPES[s.enemy.id];
- const budget=boss?3:elite?3:2;
+ const offer=s.pages?.current?.offers[s.pages?._activeOfferIndex??-1];
+ const boss=offer?.kind==='boss';
+ const elite=offer?.kind==='monster'&&offer.tier==='elite';
+ const baseHp=boss?(s.enemy.id==='phi-kin-hua'?125:78):elite?48:28+Math.max(0,Math.min(5,Number(monster?.tier.slice(1))||1))*2;
+ const chapterScale=[1,1.28,1.58][s.campaign.night-1];
+ s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*chapterScale*(1+(d-1)*.05));
+ const budget=boss||elite?3:2;
  const handSize=boss?7:elite?6:4;
  s.enemy.maxEnergy=budget;s.enemy.handSize=handSize;
  if(NIGHT_ENEMY_DECKS[s.enemy.id])s.enemy.ai!.deck={lists:[{id:s.enemy.id,weight:1,cards:NIGHT_ENEMY_DECKS[s.enemy.id]}]};
  const deck=s.enemy.ai!.deck!;deck.maxEnergy=budget;deck.handSize=handSize;
  s.campaign.bossAwakened=false;
- if(n>=2&&(!isThreeNight(s)||n>=3||elite||boss))applyStatusEffect('enemy',s,'strength',99,n>=4&&!adventure?2:1);
- if(n>=4&&(boss||elite))s.enemy.block=6;
+ if(d>=3||(d>=2&&(elite||boss)))applyStatusEffect('enemy',s,'strength',99,1);
+ if(d>=4&&(boss||elite))s.enemy.block=6;
  applyEnemyBattleRule(s);
 }
 export function awakenNightBoss(s:GameState):void{
  if(!s.campaign||s.campaign.bossAwakened||!s.enemy||s.enemy.hp<=0||s.enemy.hp>s.enemy.maxHp*.5)return;
  const monster=require('../monsters/thai-ghosts').getMonsterById(s.enemy.id);
- if(!monster?.tier.includes('Boss')||adventureRoute(s)||isThreeNight(s)&&difficultyOf(s)<3)return;
+ if(!monster?.tier.includes('Boss')||adventureRoute(s)||difficultyOf(s)<3)return;
  s.campaign.bossAwakened=true;
  if(difficultyOf(s)>=4)applyStatusEffect('enemy',s,'strength',99,1);
  const phaseDeck=NIGHT_AWAKENED_DECKS[s.enemy.id];

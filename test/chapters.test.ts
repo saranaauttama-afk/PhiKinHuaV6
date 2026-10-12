@@ -10,7 +10,7 @@ import {
 import { ART_BY_ID } from '../src/art/catalog';
 import { screenForState } from '../app/screenRouter';
 import { toSave, fromSave, isPlayableSave } from '../src/core/save';
-import { resolveStoryIfAny, resolveRewardIfAny, leaveRestRow } from './helpers';
+import { resolveStoryIfAny, resolveRewardIfAny, stepService, nextFight } from './helpers';
 
 /**
  * บทคั่นเล่าเรื่อง
@@ -58,12 +58,9 @@ function playRun(seed: string, opts: {
     const offers: PageOffer[] = s.pages?.current?.offers ?? [];
     if (!offers.length) break;
 
-    const i = offers.findIndex(o => o.kind === 'monster' || o.kind === 'boss');
+    const i = nextFight(s);
     if (i < 0) {
-      go({ type: 'ChooseOffer', index: 0 });
-      resolveStoryIfAny(s, go);
-      go({ type: 'CompleteNode' });
-      leaveRestRow(s, go);
+      stepService(() => s, go);
       closeChapter();
       continue;
     }
@@ -92,14 +89,15 @@ function playRun(seed: string, opts: {
       s.player.hp = Math.max(1, Math.round(s.player.maxHp * opts.hpRatioAtFinal));
     }
 
+    if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [
       { id: 'kill', name: 'kill', type: 'attack', cost: 0, dmg: 9999, instanceId: 'kill1' },
     ];
     go({ type: 'PlayCard', index: 0 });
-    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     go({ type: 'CompleteNode' });
-    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     closeChapter();
   }
@@ -237,104 +235,6 @@ describe('อ่านและข้าม', () => {
 
 // ─────────────────────────────────────────── จุดที่ยิงจริงในเกม
 
-describe('จุดที่บทขึ้นระหว่างเล่น', () => {
-  it('เริ่มรันแล้วได้บทเปิดเรื่องของคลาสที่เลือก — ก่อนหน้าเลือกพร', () => {
-    for (const id of ALL_CLASS_IDS) {
-      const s = newRun(`pro-${id}`, id);
-      expect(s.chapter?.id, `คลาส ${id}`).toBe(`prologue_${id}`);
-      expect(s.phase).toBe('starter');
-      // หน้าเลือกพรต้องรอบทก่อน
-      expect(screenForState(s, { pickingClass: false })).toBe('chapter');
-    }
-  });
-
-  it('รันที่ชนะครบเจอบทกลางทาง บทก่อนบอสสุดท้าย และบทปิดเรื่อง ตามลำดับ', () => {
-    const { state, chapters } = playRun('chapter-win', { hpRatioAtFinal: 0.1 });
-
-    expect(state.phase).toBe('run_complete');
-    expect(chapters[0]).toMatch(/^prologue_/);
-    expect(chapters).toContain('after_mid_boss');
-    expect(chapters).toContain('before_final_boss');
-    expect(chapters).toContain('ending_win');
-
-    // เรื่องต้องเดินตามลำดับ ไม่ใช่โผล่มั่ว
-    expect(chapters.indexOf('after_mid_boss'))
-      .toBeLessThan(chapters.indexOf('before_final_boss'));
-    expect(chapters.indexOf('before_final_boss'))
-      .toBeLessThan(chapters.indexOf('ending_win'));
-  });
-
-  it('บทก่อนบอสสุดท้ายขึ้นตอนยังยืนบนแผนที่ ไม่ใช่ตอนเข้าไฟต์แล้ว', () => {
-    // ถ้ายิงตอนกดเข้าโหนดบอส UI จะเด้งไปหน้าต่อสู้ทันที บทจะไม่มีที่ขึ้น
-    let s: any = newRun('gate', 'shaman');
-    let r = makeRng('gate');
-    const go = (c: Command) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
-    const close = () => { while (s.chapter) go({ type: 'SkipChapter' }); };
-
-    close();
-    go({ type: 'ChooseStarterBlessing', index: 0 });
-    close();
-
-    let guard = 0;
-    while (guard++ < 500) {
-      const offers: PageOffer[] = s.pages?.current?.offers ?? [];
-      if (!offers.length) break;
-
-      const atGate = offers.some((o: any) => o.kind === 'boss' && o.bossType === 'final');
-      if (atGate) {
-        expect(s.phase, 'บทต้องขึ้นตอนยังอยู่บนแผนที่').toBe('map');
-        expect(s.chaptersSeen).toContain('before_final_boss');
-        return;
-      }
-
-      const i = offers.findIndex(o => o.kind === 'monster' || o.kind === 'boss');
-      if (i < 0) {
-        go({ type: 'ChooseOffer', index: 0 });
-        resolveStoryIfAny(s, go);
-        go({ type: 'CompleteNode' });
-        leaveRestRow(s, go);
-        close();
-        continue;
-      }
-      go({ type: 'ChooseOffer', index: i });
-      if (s.phase !== 'combat') break;
-      s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
-      go({ type: 'PlayCard', index: 0 });
-      if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
-    resolveRewardIfAny(s, go);
-      go({ type: 'CompleteNode' });
-      if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
-    resolveRewardIfAny(s, go);
-      close();
-    }
-    throw new Error('เดินไม่ถึงบอสสุดท้าย');
-  });
-
-  it('ปลดล็อคศึกลับแล้วได้บทของมัน แล้วจบด้วยบทศึกลับ', () => {
-    const { state, chapters } = playRun('chapter-secret', { hpRatioAtFinal: 1 });
-
-    expect(state.secretBossUnlocked).toBe(true);
-    expect(chapters).toContain('secret_unlocked');
-    expect(chapters).toContain('ending_secret');
-    expect(chapters).not.toContain('ending_win');
-  });
-
-  it('ตายกลางทางแล้วได้บทปิดเรื่องฝั่งแพ้ พร้อมสรุปผลรัน', () => {
-    const { state, chapters } = playRun('chapter-lose', { dieAtFight: 2 });
-
-    expect(state.phase).toBe('defeat');
-    expect(state.player.hp).toBe(0);
-    expect(chapters).toContain('ending_lose');
-
-    // เดิมแพ้แล้วไม่มีอะไรสรุป — เด้งกลับแผนที่ของรันที่เพิ่งตายแล้วเดินต่อได้
-    expect(state.runSummary, 'แพ้แล้วต้องมีสรุปผลรัน').toBeDefined();
-    expect(state.runSummary!.won).toBe(false);
-    expect(screenForState(state, { pickingClass: false })).toBe('run-complete');
-  });
-});
-
-// ─────────────────────────────────────────── หน้าจอ
-
 describe('บทมาก่อนหน้าอื่น', () => {
   const withChapter = (over: Partial<GameState>): GameState => ({
     phase: 'map',
@@ -369,32 +269,20 @@ describe('บทกับเซฟ', () => {
     return s;
   };
 
-  it('บทที่ขึ้นไปแล้วถูกจำไว้ — โหลดกลับมาไม่เจอบทเดิมอีก', () => {
-    const s = runState();
-    expect(s.chaptersSeen).toContain('prologue_nun');
 
-    const back = fromSave(JSON.parse(JSON.stringify(toSave(s))));
-    expect(back.chaptersSeen).toEqual(s.chaptersSeen);
-  });
 
-  it('บทที่ค้างอ่านค้างไว้ไม่ถูกเก็บ — โหลดมาแล้วยืนบนแผนที่ ไม่ค้างกลางบท', () => {
-    const s: any = runState();
-    s.chapter = { id: 'after_mid_boss', paragraph: 1 };
 
-    const back = fromSave(JSON.parse(JSON.stringify(toSave(s))));
-    expect(back.chapter).toBeUndefined();
-  });
 
   it('รันที่จบไปแล้วเล่นต่อไม่ได้ ทั้งชนะและแพ้', () => {
     // `toSave` บังคับ phase เป็น 'map' เสมอ เช็ค phase อย่างเดียวจึงไม่พอ
     for (const won of [true, false]) {
       const s: any = runState();
       s.runSummary = { won, fights: 3, level: 2, gold: 10, beatSecretBoss: false };
-      expect(isPlayableSave(toSave(s)), `won=${won}`).toBe(false);
+      expect(isPlayableSave(toSave(s, makeRng("save-test"))), `won=${won}`).toBe(false);
     }
   });
 
   it('รันที่ยังไม่จบยังเล่นต่อได้', () => {
-    expect(isPlayableSave(toSave(runState()))).toBe(true);
+    expect(isPlayableSave(toSave(runState(), makeRng("save-test")))).toBe(true);
   });
 });

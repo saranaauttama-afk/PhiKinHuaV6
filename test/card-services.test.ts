@@ -4,7 +4,6 @@ import { makeRng } from '../src/core/rng';
 import { baseNewState } from '../src/core/commands';
 import type { CardData, Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
-import { buildJourney } from '../src/core/map/journey';
 import {
   upgradeCard, canUpgrade, upgradeLevelOf, UPGRADE_BONUS, MAX_UPGRADE_LEVEL,
 } from '../src/core/engine/shared';
@@ -198,64 +197,3 @@ describe('ร้านสละการ์ด', () => {
   });
 });
 
-describe('สองร้านนี้อยู่บนแผนที่จริง', () => {
-  /** นับชนิดโหนดพักที่เส้นทางสร้างได้ จากหลาย seed */
-  function restKinds(seeds: string[]): Set<string> {
-    const kinds = new Set<string>();
-    for (const seed of seeds) {
-      const { journey } = buildJourney(makeRng(seed));
-      for (const node of Object.values(journey.nodes)) kinds.add(node.offer.kind);
-    }
-    return kinds;
-  }
-
-  const SEEDS = Array.from({ length: 40 }, (_, i) => `svc-${i}`);
-
-  it('ร้านปลุกเสกโผล่บนเส้นทางได้', () => {
-    expect(restKinds(SEEDS)).toContain('shop_upgrade');
-  });
-
-  it('ร้านสละการ์ดโผล่บนเส้นทางได้', () => {
-    expect(restKinds(SEEDS)).toContain('shop_remove');
-  });
-
-  it('ทุก offer ของสองชนิดนี้มี shopId และ phase ครบ — ไม่งั้นบัญชี pool พัง', () => {
-    for (const seed of SEEDS) {
-      const { journey } = buildJourney(makeRng(seed));
-      for (const node of Object.values(journey.nodes)) {
-        const o = node.offer as any;
-        if (o.kind !== 'shop_remove' && o.kind !== 'shop_upgrade') continue;
-        expect(o.shopId, `${seed}/${node.id}`).toBeTruthy();
-        expect([1, 2], `${seed}/${node.id} phase=${o.phase}`).toContain(o.phase);
-      }
-    }
-  });
-
-  it('เดินเข้าไปแล้วเปิดร้านถูกชนิด และปิดโหนดเดินต่อได้', () => {
-    for (const kind of ['shop_remove', 'shop_upgrade'] as const) {
-      let s: any = baseNewState(`walk-${kind}`);
-      let r = makeRng(`walk-${kind}`);
-      const go = (c: Command) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
-
-      go({ type: 'NewRun', seed: `walk-${kind}` });
-      while (s.chapter) go({ type: 'SkipChapter' });
-      go({ type: 'ChooseStarterBlessing', index: 0 });
-      while (s.chapter) go({ type: 'SkipChapter' });
-
-      s.pages.current.offers[0] = { kind, shopId: `test_${kind}`, phase: 1 } as PageOffer;
-
-      go({ type: 'ChooseOffer', index: 0 });
-      expect(s.phase, `${kind} ไม่เปิดหน้าร้าน`).toBe('shop');
-      expect(s.shopKind, `${kind} เปิดผิดชนิด`)
-        .toBe(kind === 'shop_remove' ? 'remove' : 'upgrade');
-
-      const stoodAt = s.journey.currentId;
-      go({ type: 'CompleteNode' });
-
-      expect(s.phase, `${kind} ปิดโหนดไม่ลง`).toBe('map');
-      expect(s.pages.current.offers).toEqual(
-        s.journey.nodes[stoodAt].next.map((id: string) => s.journey.nodes[id].offer)
-      );
-    }
-  });
-});

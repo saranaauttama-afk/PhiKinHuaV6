@@ -72,9 +72,6 @@ describe('three-night continuous runs',()=>{
   for(const difficulty of [2,3,4,5] as const)j=recordRun(j,makeRunRecord(finish(driver(difficulty)),'2026-10-10')!);
   expect(j.classes.warrior.highestDifficulty).toBe(5);expect(j.classes.warrior.difficultyFiveWins).toBe(1);j=claimUnlock(j,'warrior','card');expect(j.classes.warrior.unlocks).toEqual(['card']);expect(claimUnlock(j,'warrior','blessing')).toBe(j);expect(parseJournal(JSON.stringify(j))).toEqual(j);
  });
- it('old progress is retained without interpreting one-night victories as three-night clears',()=>{
-  const j=emptyJournal();j.classes.warrior.highestCleared=5;j.classes.warrior.nightFiveWins=2;j.classes.warrior.unlocks=['card','blessing'];const old:any=structuredClone(j);for(const p of Object.values(old.classes) as any[]){delete p.highestDifficulty;delete p.difficultyFiveWins;delete p.difficultyBest;}const migrated=parseJournal(JSON.stringify(old));expect(migrated.classes.warrior.unlocks).toEqual(['card','blessing']);expect(unlockedDifficulty(migrated,'warrior')).toBe(1);
- });
  it('low tiers never awaken bosses; tiers 3–5 swap live cards once, tier 5 adds energy and persists it',()=>{
   for(const difficulty of [1,2,3,4,5] as const){const d=driver(difficulty);for(let guard=0;guard<500&&d.s.pages!.adventure!.boss!=='night';guard++)step(d);expect(d.s.pages!.adventure!.boss).toBe('night');d.go({type:'ChooseOffer',index:d.s.pages!.current!.offers.findIndex(o=>o?.kind==='boss')});if(d.s.chapter)d.go({type:'SkipChapter'});d.s.enemy!.hp=Math.floor(d.s.enemy!.maxHp/2);const energy=d.s.enemy!.maxEnergy;awakenNightBoss(d.s);expect(!!d.s.campaign!.bossAwakened).toBe(difficulty>=3);expect(d.s.enemy!.maxEnergy).toBe(energy!+Number(difficulty===5));const expected=structuredClone(d.s.enemy);awakenNightBoss(d.s);expect(d.s.enemy).toEqual(expected);d.restore();expect(d.s.enemy).toEqual(expected);}
  });
@@ -83,6 +80,6 @@ describe('three-night continuous runs',()=>{
  });
  it('fresh runs reset resources while malformed chapters/difficulty/counters cannot load',()=>{
   const d=driver();const initial=structuredClone(d.s.masterDeck);finish(d);d.go({type:'NewRun',seed:'fresh',classId:'warrior',difficulty:1});expect(d.s.campaign).toMatchObject({night:1,difficulty:1,completedNights:0});expect(d.s.masterDeck).toEqual(initial);expect(d.s.runSummary).toBeUndefined();expect(d.s.fightCount??0).toBe(0);
-  const good=toSave(driver().s,driver().r);for(const change of [((s:GameState)=>s.campaign!.night=4),((s:GameState)=>s.campaign!.difficulty=6 as any),((s:GameState)=>s.campaign!.completedNights=2)]){const bad=structuredClone(good);change(bad.state as GameState);expect(isPlayableSave(bad)).toBe(false);expect(()=>fromSave(bad)).toThrow();}
+  const good=toSave(driver().s,driver().r);for(const change of [((s:GameState)=>s.campaign!.night=4 as any),((s:GameState)=>s.campaign!.difficulty=6 as any),((s:GameState)=>s.campaign!.completedNights=2)]){const bad=structuredClone(good);change(bad.state as GameState);expect(isPlayableSave(bad)).toBe(false);expect(()=>fromSave(bad)).toThrow();}
  });
 });

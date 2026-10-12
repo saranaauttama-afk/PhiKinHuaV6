@@ -16,14 +16,14 @@ const iconFor=(o:PageOffer):InkSymbol=>o.kind==='monster'||o.kind==='boss'?'atta
 const enterLabel=(o:PageOffer,i:number)=>o.kind==='monster'||o.kind==='boss'?'เผชิญหน้า · '+describeOffer(o,i).name:o.kind==='story_event'?'สำรวจเรื่องราว':kindLabel(o)+' · '+describeOffer(o,i).name;
 
 /** Selection and confirmation are siblings inside a stable frame, not nested buttons. */
-export default function AdventureChoices({offers,resolved,slotIds,onEnter,onSkip,skipCount=0,onDestroy,usedIds=[]}:{offers:PageOffer[];resolved:boolean[];slotIds:(string|null)[];onEnter:(offer:PageOffer,index:number)=>void;onSkip?:()=>void;skipCount?:number;onDestroy?:(index:number)=>void;usedIds?:string[]}){
- const [selected,setSelected]=React.useState<number|null>(null),[confirmSkip,setConfirmSkip]=React.useState(false);
+export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCount=0,onDestroy,usedIds=[]}:{offers:PageOffer[];resolved:boolean[];slotIds:(string|null)[];onEnter:(offer:PageOffer,index:number)=>void;skipCount?:number;onDestroy?:(index:number)=>void;usedIds?:string[]}){
+ const [selected,setSelected]=React.useState<number|null>(null);
  const {height,width}=useWindowDimensions();
  const [viewport,setViewport]=React.useState({width,height:height-140});
  const cardWidth=Math.min(175,(viewport.width-40)/3),diameter=cardWidth-18,cardHeight=diameter+178;
  const titleSize=cardWidth<112?13:14;
  const topSpace=Math.min(height*.22,Math.max(8,viewport.height-cardHeight-84));
- React.useEffect(()=>{setSelected(null);setConfirmSkip(false)},[slotIds.join('|')]);
+ React.useEffect(()=>{setSelected(null)},[slotIds.join('|')]);
  return <ScrollView testID="adventure-choices" style={{flex:1}} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setViewport(v=>v.width===width&&v.height===height?v:{width,height})}} contentContainerStyle={{paddingHorizontal:12,paddingTop:topSpace,paddingBottom:10,flexGrow:1}}>
   <View testID="adventure-row" style={{flexDirection:'row',gap:8,justifyContent:'center'}}>
    {offers.map((o,i)=>!o||resolved[i]?<View key={'empty-'+i} style={{width:cardWidth}}/>:<View key={slotIds[i]??i} testID={'adventure-frame-'+i} style={{width:cardWidth,height:cardHeight}}>
@@ -31,7 +31,7 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,onSkip
     <Image accessible={false} source={frame} tintColor={palette.bloodLit} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight,opacity:selected===i?.28:0}}/>
     {!!onDestroy&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<Pressable testID={'adventure-destroy-'+i} accessibilityRole="button" accessibilityLabel={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}} style={{position:'absolute',top:0,right:0,width:44,height:44,zIndex:layer.control,alignItems:'flex-end',justifyContent:'flex-start',padding:4}}><Image source={require('../../assets/images/btnDelete.png')} style={{width:25,height:25}}/></Pressable>}
     <View style={{paddingTop:18,paddingHorizontal:8,alignItems:'center'}}>
-     <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+pageLabel(o)} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i);setConfirmSkip(false)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
+     <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+pageLabel(o)} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
       <Text testID={'adventure-name-'+i} numberOfLines={2} style={{height:42,fontFamily:font.heading,fontSize:titleSize,lineHeight:19,color:palette.moon,textAlign:'center',textAlignVertical:'center'}}>{describeOffer(o,i).name}</Text>
       <EncounterPortrait offer={o} diameter={diameter} index={i} selected={selected===i}/>
       <Text testID={'adventure-clue-'+i} numberOfLines={3} style={{height:52,marginTop:8,fontFamily:font.ui,fontSize:11,lineHeight:16,color:palette.text,textAlign:'center',textAlignVertical:'center'}}>{usedIds.includes(slotIds[i]??'')?'ใช้แล้ว · กลับเข้าได้\nปิดเพจด้วยกากบาทเมื่อพร้อม':encounterClue(o)}</Text>
@@ -45,8 +45,5 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,onSkip
    </View>)}
   </View>
   <View style={{flex:1,minHeight:20}}/>
-  {!!onSkip&&<View style={{gap:6,paddingTop:8}}>
-   {confirmSkip?<RitualSurface kind="quietSlate" style={{padding:12,gap:8}}><Text style={{fontFamily:font.ui,fontSize:13,lineHeight:21,color:palette.moon}}>เดินผ่าน {skipCount} หน้า · ผีที่ข้ามจะรอเจอทีหลัง · จุดพักที่เดินผ่านจะเสียไป · เรื่องสำคัญยังอยู่</Text><QuietButton label="ยืนยันไปทางแยกถัดไป" onPress={()=>{onSkip();setConfirmSkip(false)}}/><QuietButton label="เก็บหน้าเหล่านี้ไว้" onPress={()=>setConfirmSkip(false)}/></RitualSurface>:<Pressable accessibilityRole="button" accessibilityLabel="ทางแยกถัดไป" accessibilityState={{disabled:!skipCount}} disabled={!skipCount} onPress={()=>setConfirmSkip(true)} style={({pressed})=>({alignSelf:'center',minHeight:44,paddingHorizontal:20,flexDirection:'row',gap:8,alignItems:'center',opacity:!skipCount?.4:pressed?.75:1})}><InkIcon name="walk" size={20} color={palette.moon}/><Text style={{fontFamily:font.ui,fontSize:12,color:palette.moon}}>ทางแยกถัดไป</Text></Pressable>}
-  </View>}
  </ScrollView>;
 }

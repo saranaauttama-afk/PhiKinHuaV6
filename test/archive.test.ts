@@ -9,10 +9,10 @@ import {makeRng} from '../src/core/rng';
 import {toSave,fromSave} from '../src/core/save';
 import {ALL_CARDS} from '../src/core/pack';
 import type {Command} from '../src/core/types';
-function run(id='archive-a',night:1|2|3|4|5=1){
+function run(id='archive-a',difficulty:1|2|3|4|5=1){
  let rng=makeRng(id),s=baseNewState(id);
  const step=(cmd:Command)=>{const r=applyCommand(s,cmd,rng);s=r.state;rng=r.rng;return s;};
- step({type:'NewRun',seed:id,discoveryId:id,classId:'warrior',night});while(s.chapter)step({type:'SkipChapter'});step({type:'ChooseStarterBlessing',index:0});
+ step({type:'NewRun',seed:id,discoveryId:id,classId:'warrior',difficulty});while(s.chapter)step({type:'SkipChapter'});step({type:'ChooseStarterBlessing',index:0});
  return {get s(){return s;},get rng(){return rng;},step};
 }
 describe('archive catalog and real discoveries',()=>{
@@ -26,11 +26,11 @@ describe('archive catalog and real discoveries',()=>{
   const r=run();const visible=r.s.pages!.current!.offers.filter(o=>o?.kind==='monster');expect(Object.keys(r.s.discovery!.ghosts)).toHaveLength(visible.length);
   expect(Object.keys(r.s.discovery!.cards).length).toBeGreaterThan(0);
   const id=Object.keys(r.s.discovery!.ghosts)[0],p=mergeDiscovery(emptyArchive(),r.s.discovery!);
-  r.step({type:'Proceed'});const next=mergeDiscovery(p,r.s.discovery!);
+  const fight=r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster');r.step({type:'ChooseOffer',index:fight});r.s.enemy!.statusEffects=[];r.s.piles.hand=[{id:'k',name:'k',type:'attack',cost:0,dmg:9999} as any];r.step({type:'PlayCard',index:0});for(let g=0;g<20&&r.s.phase!=='map';g++)r.step(r.s.phase==='levelup'?(r.s.levelUp?.dawnHandChoice?{type:'ChooseLevelUpOption',option:'A'}:{type:'SkipLevelUp'}):r.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});const next=mergeDiscovery(p,r.s.discovery!);
   expect(archiveProgress(next).ghosts[id].seen).toBe(1);expect(Object.keys(r.s.discovery!.ghosts).length).toBeGreaterThan(1);
  });
  it('viewing or leaving a shop does not discover its stock; buying records only the acquired card',()=>{
-  const r=run();r.step({type:'ChooseOffer',index:1});const stock=r.s.shopStock!;
+  const r=run();const a=r.s.pages!.adventure!,shop=a.deck.find(e=>e.offer.kind==='shop_card')!;r.s.pages!.current!.offers[1]=shop.offer;r.s.pages!.current!.resolved[1]=false;a.slotIds[1]=shop.id;r.step({type:'ChooseOffer',index:1});const stock=r.s.shopStock!;
   const unowned=stock.find(x=>'card' in x&&!r.s.discovery!.cards[x.card.id]);
   if(!unowned||!('card' in unowned))throw Error('Fixture needs unowned stock');
   expect(r.s.discovery!.cards[unowned.card.id]).toBeUndefined();r.s.player.gold=999;
@@ -45,7 +45,7 @@ describe('archive catalog and real discoveries',()=>{
   expect(mergeDiscovery(p,won.discovery!)).toBe(p);
  });
  it('checkpoint serialization retains discoveries and merging an older checkpoint cannot remove newer ones',()=>{
-  const r=run(),saved=toSave(r.s,r.rng);r.step({type:'Proceed'});const p=mergeDiscovery(emptyArchive(),r.s.discovery!);
+  const r=run(),saved=toSave(r.s,r.rng);r.step({type:'ChooseOffer',index:r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster')});const p=mergeDiscovery(emptyArchive(),r.s.discovery!);
   const loaded=fromSave(saved);expect(loaded.discovery?.id).toBe('archive-a');expect(mergeDiscovery(p,loaded.discovery!)).toBe(p);
  });
  it('new runs accumulate independently while seed, card upgrades and copies do not create extra identities',()=>{

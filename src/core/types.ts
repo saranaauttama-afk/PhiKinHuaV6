@@ -276,7 +276,6 @@ export type GameState = {
 
   /** คลาสที่ผู้เล่นเลือกไว้ตอนเริ่มรัน — กำหนดเด็ค ค่าสถานะ และพรติดตัว */
   classId?: import('./classes').ClassId;
-  runMode?: 'episode' | 'full';
   campaign?: import('./campaign/nights').CampaignRun;
   runMetrics?: import('./campaign/metrics').RunMetrics;
   discovery?: import('./archive/progress').DiscoveryRun;
@@ -365,7 +364,6 @@ export type GameState = {
    * `pages.current.offers` ถูกสร้างจากโหนดที่เดินไปได้ตอนนี้ เพื่อให้ handler
    * ของคอมแบต/ร้าน/event ที่มีอยู่ทำงานต่อได้โดยไม่ต้องแก้
    */
-  journey?: import('./map/journey').JourneyMap;
 
   // Shop / Events
   shopKind?: ShopKind;
@@ -454,7 +452,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; runMode?: 'episode' | 'full'; night?: import('./campaign/nights').Night; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'> }
+  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'> }
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }
 
@@ -518,10 +516,8 @@ export type Command =
   | { type: 'TakeShopEquipment'; index: number }
 
   // Pages
-  | { type: 'OpenPage' }
   | { type: 'ChooseOffer'; index: number }
   | { type: 'DismissOffer'; index: number }
-  | { type: 'Proceed' }
   
   // Shop Management
   | { type: 'DeleteShop' }
@@ -542,8 +538,6 @@ export type Command =
   | { type: 'QA_OpenRemove' }
   | { type: 'QA_OpenGamble' }
   | { type: 'QA_OpenTreasure' }
-  | { type: 'QA_InitPages' }
-  | { type: 'QA_PrintPage' }
   | { type: 'QA_SpawnEquippedEnemy'; enemyId?: string }
   // Status Effects Debug Commands
   | { type: 'QA_ApplyStatusToPlayer'; statusId: string; stacks?: number; duration?: number }

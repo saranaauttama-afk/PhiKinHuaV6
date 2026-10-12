@@ -284,6 +284,7 @@ describe('ดักและคำสาปไม่ค้างข้ามไ�
     go({ type: 'NewRun', seed: 'trap-run', classId: 'warrior' });
     while (s.chapter) go({ type: 'SkipChapter' });
     go({ type: 'ChooseStarterBlessing', index: 0 });
+    while (s.chapter) go({ type: 'SkipChapter' } as any);
     while (s.chapter) go({ type: 'SkipChapter' });
 
     s.traps = [{ cardId: 'x', name: 'ดักเก่า', trigger: 'enemy_any', effects: [] }];

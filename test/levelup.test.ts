@@ -20,7 +20,9 @@ function reachLevelUp(seed = 'lvl'): GameState {
     { type: 'NewRun', seed },
     makeRng(seed)
   ).state;
+  while (s.chapter) s = step(s, { type: 'SkipChapter' } as any, seed);
   s = step(s, { type: 'ChooseStarterBlessing', index: 0 }, seed);
+  while (s.chapter) s = step(s, { type: 'SkipChapter' } as any, seed);
 
   const idx = (s.pages!.current!.offers as any[]).findIndex(
     o => o.kind === 'monster' || o.kind === 'boss'
@@ -32,6 +34,7 @@ function reachLevelUp(seed = 'lvl'): GameState {
   // ดัน EXP ให้ใกล้ขึ้นเลเวล แล้วฆ่าศัตรูด้วยการ์ด
   s.player.exp = s.player.expToNext - 1;
   s.enemy!.hp = 1;
+  if (s.enemy) s.enemy.statusEffects = [];
   s.piles.hand = [
     { id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 99, instanceId: 'k1' },
   ];
@@ -64,10 +67,11 @@ describe('เลือกรางวัล', () => {
     s = step(s, { type: 'ChooseLevelUpOption', option: 'A', index: 0 });
 
     expect(s.levelUp!.consumed).toBe(true);
-    expect(s.phase).toBe('reward');
+    // Normal ghosts pay XP/money only; elites and bosses queue a card reward.
+    expect(['reward', 'victory']).toContain(s.phase);
     expect(s.levelUp!.choice!.selectedOption).toBe('A');
 
-    s = step(s, { type: 'SkipCardReward' });
+    if (s.phase === 'reward') s = step(s, { type: 'SkipCardReward' });
     expect(s.phase).toBe('victory');
   });
 

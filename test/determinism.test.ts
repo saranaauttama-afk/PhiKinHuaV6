@@ -28,6 +28,8 @@ function playRun(seed: string, cmds: Command[]): GameState {
 const START: Command[] = [
   { type: 'NewRun', seed: 'determinism' },
   { type: 'ChooseStarterBlessing', index: 0 },
+  { type: 'SkipChapter' },
+  { type: 'SkipChapter' },
 ];
 
 const offerKinds = (s: GameState) =>
@@ -46,6 +48,8 @@ describe('การสร้างแผนที่ซ้ำได้ตาม 
       const s = playRun(seed, [
         { type: 'NewRun', seed },
         { type: 'ChooseStarterBlessing', index: 0 },
+        { type: 'SkipChapter' },
+        { type: 'SkipChapter' },
       ]);
       seen.add(offerKinds(s).join('|'));
     }
@@ -55,16 +59,15 @@ describe('การสร้างแผนที่ซ้ำได้ตาม 
   it('รันยาวหลายหน้าแล้วยังตรงกันทุกขั้น', () => {
     const longRun: Command[] = [
       ...START,
+      { type: 'DismissOffer', index: 1 },
       { type: 'DismissOffer', index: 2 },
-      { type: 'Proceed' },
-      { type: 'Proceed' },
     ];
     const a = playRun('determinism', longRun);
     const b = playRun('determinism', longRun);
 
     expect(offerKinds(a)).toEqual(offerKinds(b));
     expect(a.pages?.pageIndex).toBe(b.pages?.pageIndex);
-    expect(JSON.stringify(a.pages?.pools)).toBe(JSON.stringify(b.pages?.pools));
+    expect(JSON.stringify(a.pages?.adventure)).toBe(JSON.stringify(b.pages?.adventure));
   });
 });
 
@@ -113,6 +116,8 @@ describe('การต่อสู้ซ้ำได้ตาม seed', () => {
     let s = playRun(seed, [
       { type: 'NewRun', seed },
       { type: 'ChooseStarterBlessing', index: 0 },
+      { type: 'SkipChapter' },
+      { type: 'SkipChapter' },
     ]);
     const idx = (s.pages!.current!.offers as PageOffer[]).findIndex(
       o => o.kind === 'monster' || o.kind === 'boss'

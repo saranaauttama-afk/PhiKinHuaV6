@@ -93,23 +93,6 @@ export function qaOpenTreasure(s: GameState, _cmd: Extract<Command, { type: 'QA_
   return { state: s, rng: r };
 }
 
-// tail of src/core/engine/handlers/qa.ts (เพิ่มสองฟังก์ชัน)
-export function qaInitPages(s: GameState, _cmd: Extract<Command, { type: 'QA_InitPages' }>, r: RNG) {
-  const { initPageMap } = require('../../map/pages');
-  s.mapMode = 'pages';
-  const init = initPageMap(r); r = init.rng; s.pages = init.map;
-  s.phase = 'map';
-  const mapPages = require('./map_pages');
-  return mapPages.open(s, { type: 'OpenPage' } as any, r);
-}
-
-export function qaPrintPage(s: GameState, _cmd: Extract<Command, { type: 'QA_PrintPage' }>, r: RNG) {
-  if (!s.pages?.current) { s.log.push('No page open.'); return { state: s, rng: r }; }
-  const list = s.pages.current.offers.map((o: any) => o.kind === 'monster' ? `monster:${o.tier}` : o.kind);
-  s.log.push(`Offers: ${list.join(' | ')}`);
-  return { state: s, rng: r };
-}
-
 export function qaSpawnEquippedEnemy(s: GameState, cmd: Extract<Command, { type: 'QA_SpawnEquippedEnemy' }>, r: RNG) {
   const enemyId = cmd.enemyId || 'phi_pong';
   

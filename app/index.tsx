@@ -1,4 +1,3 @@
-import {nightFightTotal} from '../src/core/campaign/bosses';
 // app/index.tsx — Clean version for redesign
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -8,23 +7,19 @@ import { useAppFonts } from './useAppFonts';
 import type { SaveSlotInfo } from '../src/core/storage';
 import type { PageOffer } from '../src/core/map/pages';
 import { useGame } from '../src/store/gameStore';
-import { describeOffer } from './components/offerDisplay';
 
 // Components
 import StartPage from './components/StartPage';
 import ShopView from './components/ShopView';
 import DeckView from './components/DeckView';
-import RestDestinations from './components/RestDestinations';
 import AdventureChoices from './components/AdventureChoices';
-import {skippableSlots,FIGHTS_PER_NIGHT,usesThreePageBoard} from '../src/core/map/adventure';
-import SceneGhostChoices from './components/SceneGhostChoices';
+import {skippableSlots} from '../src/core/map/adventure';
 import RunCompleteScreen from './components/RunCompleteScreen';
 import ClassSelectScreen from './components/ClassSelectScreen';
 import NightSelectScreen from './components/NightSelectScreen';
 import JournalView from './components/JournalView';
 import ArchiveView from './components/ArchiveView';
 import type {ClassId} from '../src/core/classes';
-import JourneyTrail from './components/JourneyTrail';
 import StarterBlessingScreen from './components/StarterBlessingScreen';
 import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
@@ -38,13 +33,11 @@ import Panel, { GameButton, Scrim } from './components/Panel';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { screenForState, mapIsReady } from './screenRouter';
 import { useScreenPadding } from './useScreenPadding';
-import { onRestRow } from '../src/core/map/restPage';
-import { nextRowPreview } from '../src/core/map/journeySync';
 import { palette, font, size, space, surface } from './theme';
 
 
 export default function Home() {
-  const { state, dispatch, newRun, newDifficultyRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
+  const { state, dispatch, newDifficultyRun, saveToSlot, loadFromSlot, getSaveSlots, continueRun } = useGame();
   const router = useRouter();
   const {chooseClass}=useLocalSearchParams();
   const [seed, setSeed] = useState('demo-001');
@@ -52,14 +45,11 @@ export default function Home() {
   const [showSaveLoad, setShowSaveLoad] = useState(false);
   const [saveLoadError, setSaveLoadError] = useState<string>('');
   const [showDebugTools, setShowDebugTools] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [nightClass,setNightClass]=useState<ClassId|null>(null);
   const [journalOpen,setJournalOpen]=useState(false);
   const [archiveOpen,setArchiveOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
-  const [trailOpen,setTrailOpen]=useState(false);
   const [blessingsOpen, setBlessingsOpen] = useState(false);
-  const enteredRest = React.useRef<string | null>(null);
 
   const [fontsLoaded] = useAppFonts();
   const pad = useScreenPadding();
@@ -86,15 +76,8 @@ export default function Home() {
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
 
-  // ชั้นสู้: เลือกทางไหนก็เดินไปทางนั้น ไม่มีการวนเก็บให้ครบก่อนไปต่อ
-  // ชั้นพัก: เคลียร์ได้ทุกช่อง ช่องที่เคลียร์แล้วมีของใหม่ขึ้นแทนจนโควตาหมด
-  //          แล้วกดเดินต่อเมื่อไหร่ก็ได้ (ดู `map/restPage.ts`)
-  const restRow = onRestRow(state);
-  const ahead   = restRow ? nextRowPreview(state) : undefined;
-
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
-    if (restRow) enteredRest.current = mapScene(state).key;
     dispatch({ type: 'ChooseOffer', index });
 
     // Restored and newly entered fights share the combat redirect above.
@@ -110,7 +93,7 @@ export default function Home() {
 
   if(journalOpen)return <JournalView onClose={()=>setJournalOpen(false)}/>;
   if(archiveOpen)return <ArchiveView onClose={()=>setArchiveOpen(false)}/>;
-  if(nightClass)return <NightSelectScreen classId={nightClass} onBack={()=>setNightClass(null)} onStart={async night=>{const ok=await newDifficultyRun(`run-${Date.now()}`,nightClass,night);if(ok){enteredRest.current=null;setNightClass(null);setPickingClass(false);}return ok;}}/>;
+  if(nightClass)return <NightSelectScreen classId={nightClass} onBack={()=>setNightClass(null)} onStart={async night=>{const ok=await newDifficultyRun(`run-${Date.now()}`,nightClass,night);if(ok){setNightClass(null);setPickingClass(false);}return ok;}}/>;
   if (screen === 'start') {
     return (
       <StartPage
@@ -189,37 +172,10 @@ export default function Home() {
   const location = mapScene(state);
   return (
     <View style={{ flex: 1 }}>
-      <SceneArrival instant={usesThreePageBoard(state)?state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex:restRow && enteredRest.current === location.key} sceneKey={usesThreePageBoard(state)?`${location.key}:board-${state.pages?.adventure?.boardIndex}`:location.key} source={location.source}>
+      <SceneArrival instant={state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex} sceneKey={`${location.key}:board-${state.pages?.adventure?.boardIndex}`} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
-          <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: surface.glassDim, opacity: selectedCard !== null && offers.some((o, i) => o && describeOffer(o, i).isCombat) ? .55 : 0 }} />
 
-          {/* เส้นทางทั้งรัน — เห็นว่าเดินมาไกลแค่ไหนและบอสอยู่ตรงไหน */}
-          {state.runMode === 'episode' && (
-            <View style={{ paddingHorizontal: space.lg, paddingBottom: space.sm }}>
-              <Text style={{ color: palette.moon, fontFamily: font.heading, fontSize: size.heading }}>คืนแรกที่บ้านร้าง</Text>
-              <Text style={{ color: palette.text, fontFamily: font.ui, fontSize: size.label }}>ปราบผี {state.fightCount ?? 0}/3 · {restRow ? 'แตะสถานที่เพื่อแวะ หรือเดินผ่าน' : 'แตะเลือกผี แล้วกดเผชิญหน้า'}</Text>
-            </View>
-          )}
-          {state.campaign&&!state.pages?.adventure&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:16,paddingHorizontal:16}}>คืนที่ {state.campaign.night} · {state.pages?.adventure?`ปราบผี ${state.pages.adventure.fightsWon}/${FIGHTS_PER_NIGHT} · ผีรอ ${state.pages.adventure.pendingIds.length}`:`ปราบผี ${state.fightCount??0}/${nightFightTotal(state.campaign?.night)}`}</Text>}
-          {!state.pages?.adventure&&<Pressable accessibilityRole="button" accessibilityLabel="ดูเส้นทางทั้งหมด" onPress={()=>setTrailOpen(!trailOpen)} style={{minHeight:44,paddingHorizontal:16,justifyContent:'center'}}><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:12}}>{trailOpen?'เก็บเส้นทาง ▴':'ดูเส้นทาง ▾'}</Text></Pressable>}
-          {!state.pages?.adventure&&trailOpen&&<JourneyTrail state={state} compact/>}
-          {!state.pages?.adventure&&<Text style={{color:palette.text,fontFamily:font.ui,fontSize:13,textAlign:'center',marginTop:4}}>{location.name}</Text>}
-          {!state.pages?.adventure&&<Text style={{color:palette.moon,fontFamily:font.heading,fontSize:22,textAlign:'center',marginVertical:8}}>{restRow?'แวะพักระหว่างทาง':'เลือกทางเดิน'}</Text>}
-
-          {state.pages?.adventure || (offers.some(o=>o?.kind==='monster'||o?.kind==='boss')&&offers.some(o=>o&&o.kind!=='monster'&&o.kind!=='boss')) ? <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={usesThreePageBoard(state)?index=>dispatch({type:'DeleteShopFromMap',index}):undefined} skipCount={skippableSlots(state).length} onSkip={state.pages?.adventure&&!usesThreePageBoard(state)?()=>dispatch({type:'Proceed'}):undefined}/></View> : offers.some((o, i) => o && describeOffer(o, i).isCombat) ? (
-            <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: STATUS_BAR_SPACE + pad.bottom }}>
-              <SceneGhostChoices choices={offers.flatMap((offer, index) => offer ? [{ display: describeOffer(offer, index), resolved: page?.resolved[index] ?? false, index }] : [])}
-                selected={selectedCard} onSelect={setSelectedCard}
-                onEnter={index => { const offer = offers[index]; if (offer && !page?.resolved[index]) { setSelectedCard(null); enterOffer(offer, index); } }} />
-            </View>
-          ) : <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}>
-            <RestDestinations offers={offers} resolved={page?.resolved??[]} onEnter={(offer,index)=>{setSelectedCard(null);enterOffer(offer,index);}}>
-              {restRow&&ahead&&<View style={{gap:6}}>
-                <GameButton label="เดินทางต่อ" onPress={()=>{setSelectedCard(null);dispatch({type:'Proceed'});}}/>
-                <Text style={{color:palette.textDim,fontFamily:font.ui,fontSize:12,textAlign:'center'}}>ถัดไป · {ahead.label}</Text>
-              </View>}
-            </RestDestinations>
-          </View>}
+          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
           {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool

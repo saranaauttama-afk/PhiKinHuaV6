@@ -28,6 +28,8 @@ function enterFight(classId: ClassId, seed = 'cls'): GameState {
   const go = (c: Command) => { const o = applyCommand(s, c, r); s = o.state; r = o.rng; };
 
   go({ type: 'ChooseStarterBlessing', index: 0 });
+
+  while (s.chapter) go({ type: 'SkipChapter' } as any);
   s.pages.current.offers[0] = {
     kind: 'monster', tier: 'normal', enemyId: 'phi-krasue',
   } as PageOffer;
@@ -89,15 +91,18 @@ describe('เริ่มรันด้วยคลาส', () => {
       expect(s.classId).toBe(id);
       expect(s.player.maxHp).toBe(cls.startHp);
       expect(s.player.hp).toBe(cls.startHp);
-      expect(s.player.maxEnergy).toBe(cls.startEnergy);
-      expect(s.player.maxHandSize).toBe(cls.startHandSize);
+      // Every run uses the shared v33 hand: 2 energy, 2 retained cards.
+      expect(s.player.maxEnergy).toBe(2);
+      expect(s.player.maxHandSize).toBe(2);
     }
   });
 
   it('masterDeck เป็นเด็คของคลาสนั้น', () => {
     for (const id of ALL_CLASS_IDS) {
       const s = startRun(id);
-      const expected = buildStarterDeck(CHARACTER_CLASSES[id], ALL_CARDS);
+      const cls = CHARACTER_CLASSES[id];
+      // Campaign runs cap each starter entry at two copies.
+      const expected = buildStarterDeck({ ...cls, starterDeck: Object.fromEntries(Object.entries(cls.starterDeck).map(([k, n]) => [k, Math.min(2, n as number)])) } as any, ALL_CARDS);
       expect(s.masterDeck.map(c => c.id).sort()).toEqual(expected.map(c => c.id).sort());
     }
   });
@@ -122,7 +127,7 @@ describe('พรติดตัวของคลาส', () => {
 
   it('หมอผีเริ่มไฟต์ด้วยพลังงานมากกว่าค่าปกติของตัวเอง', () => {
     const s = enterFight('shaman');
-    expect(s.player.energy).toBeGreaterThan(getClass('shaman').startEnergy);
+    expect(s.player.energy).toBeGreaterThan(s.player.maxEnergy);
   });
 
   it('คนทรงเริ่มไฟต์พร้อมผีคู่กาย', () => {
@@ -138,6 +143,8 @@ describe('พรติดตัวของคลาส', () => {
     s.player.hp = Math.max(1, s.player.maxHp - 20);
     const before = s.player.hp;
 
+    if (s.enemy) s.enemy.statusEffects = [];
+
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
     const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('nun')).state;
 
@@ -149,6 +156,8 @@ describe('พรติดตัวของคลาส', () => {
     s.blessings = []; // Isolate the class passive from attack-healing blessings.
     s.player.hp = Math.max(1, s.player.maxHp - 20);
     const before = s.player.hp;
+
+    if (s.enemy) s.enemy.statusEffects = [];
 
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
     const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('war')).state;

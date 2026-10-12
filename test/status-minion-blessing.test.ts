@@ -34,6 +34,7 @@ function playToEnd(seed: string): GameState {
   go({ type: 'NewRun', seed, classId: 'shaman' });
   skipChapters();
   go({ type: 'ChooseStarterBlessing', index: 0 });
+  while (s.chapter) go({ type: 'SkipChapter' } as any);
   skipChapters();
 
   let guard = 0;
@@ -50,6 +51,7 @@ function playToEnd(seed: string): GameState {
     }
     go({ type: 'ChooseOffer', index: i });
     if (s.phase !== 'combat') break;
+    if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
     if (s.phase === 'levelup') {

@@ -10,8 +10,6 @@ import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
 import { SHOP_STOCK_SIZE, SHOP_POWER_BIAS } from '../../balance/weights';
 import { upgradeCard, canUpgrade, upgradeLevelOf, grantBlessing } from '../shared';
-import { replaceSingleOffer } from './map_pages';
-import { consumeToken } from '../../map/pages';
 import { loseRun } from './runEnd';
 // ===== Fallback stock (ใช้เมื่อ rollShopStock พัง/ยังไม่พร้อม) =====
 import { int } from '../../rng';
@@ -109,7 +107,7 @@ export function takeShop(s: GameState, cmd: Extract<Command, { type: 'TakeShop' 
   s.shopStock.splice(i, 1);
   s.log.push(`Shop: bought ${item.card.name} for ${item.price}g`);
   // โหมด pages: ถือว่า "ใช้ร้าน" แล้ว (จะ resolve ตอนปิดร้าน)
-  if (s.mapMode === 'pages' && s.pages) {
+  if (s.pages) {
     s.pages._shopUsed = true;
   }  
   return { state: s, rng: r };
@@ -131,7 +129,7 @@ export function shopRemoveBuy(s: GameState, cmd: Extract<Command, { type: 'ShopR
   s.runCounters = s.runCounters || ({} as any);
   (s.runCounters as any).removeShopCount = count + 1;
   s.log.push(`Remove shop: removed card #${i} (-${price}g).`);
-  if (s.mapMode === 'pages' && s.pages) s.pages._shopUsed = true;
+  if (s.pages) s.pages._shopUsed = true;
   return { state: s, rng: r };
 }
 
@@ -180,7 +178,7 @@ export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'Shop
   s.runCounters = s.runCounters || ({} as any);
   (s.runCounters as any).upgradeShopCount = count + 1;
   s.log.push(`Upgrade shop: upgraded card #${i} (-${price}g).`);
-  if (s.mapMode === 'pages' && s.pages) s.pages._shopUsed = true;
+  if (s.pages) s.pages._shopUsed = true;
   return { state: s, rng: r };
 }
 
@@ -498,30 +496,7 @@ export function takeTreasureCard(s: GameState, cmd: Extract<Command, { type: 'Ta
     s.shopRegistry = s.shopRegistry.filter(shop => shop.id !== treasureId);
   }
   
-  if(s.pages?.adventure&&s.pages._activeOfferIndex!=null){require('../../map/adventure').settleAdventureSlot(s,s.pages._activeOfferIndex);return {state:s,rng:r};}
-  // Mark treasure as used and trigger map refresh
-  if (s.pages && s.pages.current && s.pages._activeOfferIndex !== undefined) {
-    const mp = s.pages;
-    const ix = mp._activeOfferIndex!;
-    const offer = mp.current!.offers[ix];
-
-    // Consume treasure token and mark slot as resolved
-    consumeToken(mp, offer);
-    mp.current!.resolved[ix] = true;
-
-    // Replace treasure slot with new encounter
-    try {
-      const out = replaceSingleOffer(mp, r, s, ix);
-      r = out.rng;
-      s.log.push(`Treasure slot ${ix} refreshed with new encounter`);
-    } catch (e) {
-      s.log.push(`Auto-refresh treasure slot failed: ${e}`);
-    }
-
-    // Clear active offer index
-    mp._activeOfferIndex = undefined;
-    mp._shopUsed = false;
-  }
+  if(s.pages?.adventure&&s.pages._activeOfferIndex!=null)require('../../map/adventure').settleAdventureSlot(s,s.pages._activeOfferIndex);
   
   s.log.push(`Treasure: took ${item.card.name} (FREE)`);
   return { state: s, rng: r };
@@ -568,30 +543,7 @@ export function takeSingleTreasureCard(s: GameState, cmd: Extract<Command, { typ
     s.shopRegistry = s.shopRegistry.filter(shop => shop.id !== treasureId);
   }
   
-  if(s.pages?.adventure&&s.pages._activeOfferIndex!=null){require('../../map/adventure').settleAdventureSlot(s,s.pages._activeOfferIndex);return {state:s,rng:r};}
-  // Mark treasure as used and trigger map refresh
-  if (s.pages && s.pages.current && s.pages._activeOfferIndex !== undefined) {
-    const mp = s.pages;
-    const ix = mp._activeOfferIndex!;
-    const offer = mp.current!.offers[ix];
-
-    // Consume treasure token and mark slot as resolved
-    consumeToken(mp, offer);
-    mp.current!.resolved[ix] = true;
-
-    // Replace treasure slot with new encounter
-    try {
-      const out = replaceSingleOffer(mp, r, s, ix);
-      r = out.rng;
-      s.log.push(`Single treasure slot ${ix} refreshed with new encounter`);
-    } catch (e) {
-      s.log.push(`Auto-refresh single treasure slot failed: ${e}`);
-    }
-    
-    // Clear active offer index
-    mp._activeOfferIndex = undefined;
-    mp._shopUsed = false;
-  }
+  if(s.pages?.adventure&&s.pages._activeOfferIndex!=null)require('../../map/adventure').settleAdventureSlot(s,s.pages._activeOfferIndex);
   
   s.log.push(`Single Treasure: took ${item.card.name} (FREE)`);
   return { state: s, rng: r };
@@ -599,7 +551,7 @@ export function takeSingleTreasureCard(s: GameState, cmd: Extract<Command, { typ
 
 export function randomizeSingleTreasure(s: GameState, _cmd: Extract<Command, { type: 'RandomizeSingleTreasure' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'treasure_single' || !s.shopStock) return { state: s, rng: r };
-  if(s.pages?.adventure?.version===5&&!s.shopStock.length)return {state:s,rng:r};
+  if(!s.shopStock.length)return {state:s,rng:r};
   
   // Check if already used randomize (limit once per treasure)
   if ((s as any)._singleTreasureRandomized) {
@@ -661,7 +613,7 @@ export function takeShopEquipment(s: GameState, cmd: Extract<Command, { type: 'T
   s.shopStock.splice(i, 1);
   s.log.push(`Equipment Shop: bought ${item.equipment.name} for ${item.price}g`);
   
-  if (s.mapMode === 'pages' && s.pages) {
+  if (s.pages) {
     s.pages._shopUsed = true;
   }
   return { state: s, rng: r };

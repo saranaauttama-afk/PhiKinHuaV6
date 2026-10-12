@@ -71,15 +71,31 @@ export function resolveStoryIfAny(s: GameState, go: (c: Command) => void): void 
   go({ type: 'ChooseEventOption', index: index >= 0 ? index : 0 });
 }
 
+/** Index of an unresolved fight (ghost or boss) on the adventure board, or -1. */
+export function nextFight(s: GameState): number {
+  const p = s.pages?.current;
+  if (!p) return -1;
+  return p.offers.findIndex((o, i) => !!o && !p.resolved[i] && (o.kind === 'monster' || o.kind === 'boss'));
+}
+
 /**
- * เดินออกจากชั้นพัก
- *
- * ชั้นพักไม่เดินต่อเองแล้ว — เคลียร์ช่องหนึ่งแล้วมีของใหม่ขึ้นแทน ผู้เล่น
- * (และตัวขับรัน) ต้องกดเดินต่อเอง ไม่งั้นจะวนเคลียร์ของบนชั้นเดิมไม่รู้จบ
+ * Clears one non-fight slot: visits it, then passes by if visiting did not settle it
+ * (a shop left without buying stays on the board). Returns false when no slot is left.
+ * `get` must return the live state, because each command replaces it.
  */
-export function leaveRestRow(s: GameState, go: (c: Command) => void): void {
-  if (s.phase !== 'map') return;
-  go({ type: 'Proceed' });
+export function stepService(get: () => GameState, go: (c: Command) => void): boolean {
+  const p = get().pages?.current;
+  if (get().phase !== 'map' || get().chapter || !p) return false;
+  const i = p.offers.findIndex((o, ix) => !!o && !p.resolved[ix] && o.kind !== 'monster' && o.kind !== 'boss');
+  if (i < 0) return false;
+  go({ type: 'ChooseOffer', index: i });
+  resolveStoryIfAny(get(), go);
+  go({ type: 'CompleteNode' });
+  const after = get();
+  if (after.phase === 'map' && after.pages?.current && !after.pages.current.resolved[i] && after.pages.current.offers[i]?.kind !== 'story_event') {
+    go({ type: 'DeleteShopFromMap', index: i });
+  }
+  return true;
 }
 
 /**

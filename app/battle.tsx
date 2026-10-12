@@ -1,7 +1,5 @@
 import {difficultyOf} from '../src/core/campaign/threeNight';
-import {adventureFightTotal} from '../src/core/map/adventure';
 import {ghostLore} from '../src/core/monsters/folklore';
-import {nightFightTotal} from '../src/core/campaign/bosses';
 import {battleScene} from './scenePresentation';
 import BattleBackdrop from './components/battle/BattleBackdrop';
 import {useBattleLayout} from './components/battle/battleLayout';
@@ -327,7 +325,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea escalating={gameState.campaign?{every:difficultyOf(gameState)>=3?3:4,strength:1}:gameState.runMode==='episode'?{every:3,strength:2}:undefined}
+        <MonsterArea escalating={gameState.campaign?{every:difficultyOf(gameState)>=3?3:4,strength:1}:undefined}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}

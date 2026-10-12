@@ -95,10 +95,8 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   TakeShopEquipment: se.takeShopEquipment,
 
   // Pages mode
-  OpenPage: mappages.open,
   ChooseOffer: mappages.choose,
   DismissOffer: mappages.dismiss,
-  Proceed: mappages.proceed,
   
   // Shop Management
   DeleteShop: mappages.deleteShop,
@@ -131,8 +129,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   QA_OpenRemove: qa.qaOpenRemove,
   QA_OpenGamble: qa.qaOpenGamble,
   QA_OpenTreasure: qa.qaOpenTreasure,
-  QA_InitPages: qa.qaInitPages,
-  QA_PrintPage: qa.qaPrintPage,
   QA_SpawnEquippedEnemy: qa.qaSpawnEquippedEnemy,
 };
 

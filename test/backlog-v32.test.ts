@@ -23,7 +23,7 @@ describe('v32 reported regressions',()=>{
   d.go({type:'CompleteNode'});expect(d.s.pages!.adventure!.slotIds).toEqual(board);expect(d.s.pages!.current!.resolved[ix]).toBe(false);
   const saved=fromSave(toSave(d.s,d.r));expect(validAdventure(saved)).toBe(true);
   d.go({type:'ChooseOffer',index:ix});expect(d.s.shopStock).toEqual(stock);expect(d.s.rewardReceipt).toEqual(receipt);d.go({type:'CompleteNode'});
-  d.go({type:'Proceed'});expect(d.s.pages!.adventure!.slotIds).toEqual(board);d.go({type:'DeleteShopFromMap',index:ix});expect(d.s.pages!.current!.resolved[ix]).toBe(true);expect(d.s.pages!.adventure!.slotIds).toEqual(board);expect(validAdventure(d.s)).toBe(true);
+  d.go({type:'DeleteShopFromMap',index:ix});expect(d.s.pages!.current!.resolved[ix]).toBe(true);expect(d.s.pages!.adventure!.slotIds).toEqual(board);expect(validAdventure(d.s)).toBe(true);
  });
  it('completing a ghost keeps its slot terminal until all three pages finish, and cannot delete another ghost',()=>{
   const d=driver(),a=d.s.pages!.adventure!,before=structuredClone(a.slotIds),cursor=a.cursor;d.go({type:'ChooseOffer',index:0});d.s.piles.hand=[{id:'test',name:'test',type:'attack',cost:0,dmg:9999}];d.go({type:'PlayCard',index:0});
@@ -46,7 +46,6 @@ describe('v32 reported regressions',()=>{
    if(d.s.chapter)d.go({type:'SkipChapter'});else if(d.s.phase==='map'){const critical=p.offers.findIndex((o,i)=>!p.resolved[i]&&(o?.kind==='monster'||o?.kind==='story_event'));const other=p.offers.findIndex((o,i)=>o&&!p.resolved[i]);d.go(critical>=0?{type:'ChooseOffer',index:critical}:p.offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});}else if(d.s.phase==='combat'){d.s.piles.hand=[{id:'test',name:'test',type:'attack',cost:0,dmg:99999}];d.go({type:'PlayCard',index:0});}else if(d.s.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}else d.go(d.s.phase==='levelup'?{type:'SkipLevelUp'}:d.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});
   }throw Error('Chest was never reached');
  });
- it('v4 saves retain their previous lifecycle and remain playable across night transitions',()=>{const d=driver();d.s.pages!.adventure!.version=4;startAdventure(d.s,d.r);expect(d.s.pages!.adventure!.version).toBe(4);expect(validAdventure(d.s)).toBe(true);expect(fromSave(toSave(d.s,d.r)).pages!.adventure!.version).toBe(4);});
  it('opening draw is independent from energy and cap; turn draw only adds the requested amount',()=>{
   const d=driver();d.s.player.maxEnergy=8;d.go({type:'ChooseOffer',index:0});expect(d.s.piles.hand).toHaveLength(2);expect(d.s.player.maxHandSize).toBe(2);
   d.s.piles.hand=[];d.s.piles.draw=d.s.masterDeck.map(c=>({...c}));startPlayerTurn(d.s,d.r);expect(d.s.piles.hand).toHaveLength(2);

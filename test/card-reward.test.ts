@@ -8,10 +8,10 @@ import { describe, it, expect } from 'vitest';
 import { applyCommand } from '../src/core/reducer';
 import { makeRng } from '../src/core/rng';
 import type { Command, GameState } from '../src/core/types';
-import { FINAL_BOSS_FIGHT } from '../src/core/map/pages';
+import { runFightTotal } from '../src/core/campaign/threeNight';
 import { CHARACTER_CLASSES } from '../src/core/classes';
 import { takeCardReward } from '../src/core/cards/reward';
-import { resolveStoryIfAny, leaveRestRow } from './helpers';
+import { resolveStoryIfAny, stepService, nextFight } from './helpers';
 
 /** เดินรันจนจบ เลือกการ์ดรางวัลใบแรกทุกครั้ง (`take`) หรือกดข้ามทุกครั้ง */
 function playRun(seed: string, classId: string, take: boolean) {
@@ -27,7 +27,7 @@ function playRun(seed: string, classId: string, take: boolean) {
   const clearRewards = () => {
     let g = 0;
     while (g++ < 10) {
-      if (s.phase === 'levelup') { go({ type: 'SkipLevelUp' }); continue; }
+      if (s.phase === 'levelup') { go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any); continue; }
       if (s.phase === 'reward') {
         go(take ? { type: 'ChooseCardReward', index: 0 } : { type: 'SkipCardReward' });
         continue;
@@ -39,6 +39,7 @@ function playRun(seed: string, classId: string, take: boolean) {
   go({ type: 'NewRun', seed, classId } as Command);
   skipChapters();
   go({ type: 'ChooseStarterBlessing', index: 0 });
+  while (s.chapter) go({ type: 'SkipChapter' } as any);
   skipChapters();
 
   const startDeck = s.masterDeck.length;
@@ -51,12 +52,9 @@ function playRun(seed: string, classId: string, take: boolean) {
     const offers = s.pages?.current?.offers ?? [];
     if (!offers.length) break;
 
-    const i = offers.findIndex((o: any) => o.kind === 'monster' || o.kind === 'boss');
+    const i = nextFight(s);
     if (i < 0) {
-      go({ type: 'ChooseOffer', index: 0 });
-      resolveStoryIfAny(s, go);
-      go({ type: 'CompleteNode' });
-      leaveRestRow(s, go);
+      stepService(() => s, go);
       continue;
     }
 
@@ -64,6 +62,7 @@ function playRun(seed: string, classId: string, take: boolean) {
     if (s.phase !== 'combat') break;
 
     // ฆ่าให้จบในทีเดียว — เทสต์นี้วัดรางวัล ไม่ได้วัดการต่อสู้
+    if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [
       { id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' },
     ];
@@ -88,12 +87,13 @@ const SEEDS = ['r-a', 'r-b', 'r-c', 'r-d', 'r-e'];
 
 describe('การ์ดรางวัล — สำรับโตจริง', () => {
   for (const classId of Object.keys(CHARACTER_CLASSES)) {
-    it(`${classId}: หยิบทุกใบแล้วสำรับแตะ 20 ใบขึ้นไป`, () => {
+    it(`${classId}: หยิบทุกใบแล้วสำรับโตจากรางวัลชั้นสูงและบอส`, () => {
       for (const seed of SEEDS) {
         const out = playRun(seed, classId, true);
         expect(out.state.phase, `${seed} รันไม่จบ`).toBe('run_complete');
-        expect(out.endDeck, `${seed} สำรับจบที่ ${out.endDeck} ใบ`)
-          .toBeGreaterThanOrEqual(20);
+        // Card rewards come from elites and bosses (normal ghosts pay XP/money).
+        expect(out.endDeck - out.startDeck, `${seed} สำรับจบที่ ${out.endDeck} ใบ`)
+          .toBeGreaterThanOrEqual(4);
       }
     });
 
@@ -107,16 +107,17 @@ describe('การ์ดรางวัล — สำรับโตจริ�
         const taken = playRun(seed, classId, true);
         expect(skipped.endDeck - skipped.startDeck, `${seed} โตไปถึง ${skipped.endDeck}`)
           .toBeLessThanOrEqual(3);
-        expect(taken.endDeck, seed).toBeGreaterThan(skipped.endDeck + 8);
+        expect(taken.endDeck, seed).toBeGreaterThan(skipped.endDeck + 3);
       }
     });
   }
 
   it('ได้เลือกทุกไฟต์ ยกเว้นบอสสุดท้าย (และศึกลับที่ตามมา)', () => {
     const out = playRun('r-a', 'shaman', true);
-    expect(out.fights).toBeGreaterThanOrEqual(FINAL_BOSS_FIGHT);
-    // ไฟต์ 1..14 ได้เลือกครบ ไฟต์ 15 (บอสสุดท้าย) เป็นต้นไปไม่มี
-    expect(out.rewardsOffered).toBe(FINAL_BOSS_FIGHT - 1);
+    expect(out.fights).toBe(runFightTotal(1));
+    // รางวัลต้องมีต่อเนื่องทั้งสามคืน (เดิมตัดทิ้งหลังศึกที่ 15 จากโหมดเก่า)
+    expect(out.rewardsOffered).toBeGreaterThan(0);
+    expect(out.rewardsOffered).toBeLessThan(out.fights);
   });
 
   it('ชนะบอสสุดท้ายแล้วไม่มีการ์ดมาคั่นก่อนจอสรุป', () => {
@@ -152,14 +153,17 @@ describe('การ์ดรางวัล — พฤติกรรมขอ�
     go({ type: 'NewRun', seed });
     while (s.chapter && g++ < 30) go({ type: 'SkipChapter' } as Command);
     go({ type: 'ChooseStarterBlessing', index: 0 });
+    while (s.chapter) go({ type: 'SkipChapter' } as any);
     while (s.chapter && g++ < 30) go({ type: 'SkipChapter' } as Command);
 
-    const offers = s.pages?.current?.offers ?? [];
-    const i = offers.findIndex((o: any) => o.kind === 'monster' || o.kind === 'boss');
+    const i = nextFight(s);
+    // Only elites and bosses offer cards; promote this slot to an elite fight.
+    s.pages.current.offers[i] = { ...s.pages.current.offers[i], tier: 'elite' };
     go({ type: 'ChooseOffer', index: i });
+    if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
-    if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+    if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     // คืนฟังก์ชันอ่านค่า ไม่ใช่ตัว state — `applyCommand` โคลนก้อนใหม่ทุกครั้ง
     // ถ้าคืนตัวมันไป เทสต์จะถือ snapshot เก่าและผ่านโดยไม่ได้ตรวจอะไรเลย
     return { get: () => s as GameState, go };

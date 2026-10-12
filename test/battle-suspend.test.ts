@@ -7,7 +7,7 @@ import type {Command,GameState} from '../src/core/types';
 function fight(){
  let state=baseNewState('suspend'),rng=makeRng('suspend');
  const go=(cmd:Command)=>{const result=applyCommand(state,cmd,rng);state=result.state;rng=result.rng;};
- go({type:'NewRun',seed:'suspend',classId:'medium',runMode:'episode'});
+ go({type:'NewRun',seed:'suspend',classId:'medium'});
  while(state.chapter)go({type:'SkipChapter'});
  go({type:'ChooseStarterBlessing',index:0});
  while(state.chapter)go({type:'SkipChapter'});
@@ -28,7 +28,7 @@ describe('paused battle resume',()=>{
  });
  it('cannot advance or complete an unfinished battle even through a map command',()=>{
   const {state,rng}=fight().get();
-  for(const type of ['Proceed','CompleteNode'] as const){
+  for(const type of ['CompleteNode'] as const){
    const result=applyCommand(state,{type},rng);expect(result.state).toEqual(state);expect(result.rng).toEqual(rng);
   }
  });

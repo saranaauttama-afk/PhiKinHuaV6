@@ -6,7 +6,7 @@ import type { GameState } from './types';
 import type { RNG } from './rng';
 import {
   toSave, fromSave, isPlayableSave, summarize,
-  toBattleSave, type SaveV2, type SaveSummary,
+  toBattleSave, type SaveData, type SaveSummary,
 } from './save';
 
 // Storage keys
@@ -85,7 +85,7 @@ export async function loadGameSnapshot(slot: number = 0): Promise<{state:GameSta
       throw new Error(`No save found in slot ${slot === -1 ? 'auto' : slot}`);
     }
 
-    const saveData = JSON.parse(saved) as SaveV2 & { savedAt?: string; slot?: string | number };
+    const saveData = JSON.parse(saved) as SaveData & { savedAt?: string; slot?: string | number };
     return {state:fromSave(saveData),rng:saveData.battleRng??saveData.mapRng};
   } catch (error) {
     console.error('Failed to load game:', error);
@@ -125,7 +125,7 @@ export async function getSaveSlots(maxSlots: number = 3): Promise<SaveSlotInfo[]
     try {
       const saved = await AsyncStorage.getItem(key);
       if (saved) {
-        const data = JSON.parse(saved) as SaveV2 & { savedAt?: string };
+        const data = JSON.parse(saved) as SaveData & { savedAt?: string };
         const ok = isPlayableSave(data);
         const sum = ok ? summarize(data) : undefined;
         slots.push({

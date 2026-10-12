@@ -144,7 +144,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   }
 
   require('../../campaign/nights').awakenNightBoss(s);
-  if ((s.runMode === 'episode'||s.campaign) && s.enemyIntent) {
+  if (s.campaign && s.enemyIntent) {
     require('../../combat/intent').refreshIntentEstimate(s);
   }
   r = settleCombat(s,r);
@@ -171,7 +171,7 @@ export function startPlayerTurnHandler(s: GameState, _cmd: Extract<Command, { ty
   resetBlessingTurnFlags(s);
   runBlessingsTurnHook(s, 'on_turn_start');
   r = settleCombat(s, r);
-  if (s.phase === 'combat' && (s.runMode === 'episode'||s.campaign)) planEnemyIntent(s);
+  if (s.phase === 'combat' && !!s.campaign) planEnemyIntent(s);
   return { state: s, rng: r };
 }
 
@@ -301,7 +301,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   finishEnemyHand(s,s.enemyLastPlayed?.length??0);
   if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
   // Visible escalation rewards closing the fight rather than healing indefinitely.
-  const escalation=require('../../campaign/nights').nightEscalation(s)??(s.runMode==='episode'?{every:3,strength:2}:undefined);
+  const escalation=require('../../campaign/nights').nightEscalation(s);
   if(s.phase==='combat' && escalation && s.turn%escalation.every===0){
     require('../../statusEffectsRuntime').applyStatusEffect('enemy',s,'strength',99,escalation.strength);
     s.log.push(`ผีคลุ้มคลั่ง: แข็งแกร่งเพิ่ม ${escalation.strength} จนจบไฟต์`);

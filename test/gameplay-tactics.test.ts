@@ -49,20 +49,13 @@ describe('live tactical rules',()=>{
  });
  it('enemy poison ticks, weakness expires and escalation appears after attacks',()=>{
   const {state,rng}=makeCombatState({enemyHp:100,playerBlock:100});
-  state.runMode='episode';state.turn=3;state.enemyIntent={cardIds:[],damage:0,block:0} as any;
+  state.campaign={night:1,difficulty:3,completedNights:0,unlocks:[]};state.turn=3;state.enemyIntent={cardIds:[],damage:0,block:0} as any;
   applyStatusEffect('enemy',state,'poison',2,3);applyStatusEffect('enemy',state,'weakness',1);
   const out=applyCommand(state,{type:'ResolveEnemyTurn'},rng).state;
   expect(out.enemy!.hp).toBe(state.enemy!.hp-3);
   expect(out.enemy!.statusEffects?.some(e=>e.id==='weakness')).toBe(false);
-  expect(out.enemy!.statusEffects?.find(e=>e.id==='strength')?.stacks).toBe(2);
+  expect(out.enemy!.statusEffects?.find(e=>e.id==='strength')?.stacks).toBe(1);
   expect(out.enemy!.statusEffects?.find(e=>e.id==='strength')?.duration).toBe(99);
   expect(out.enemyLastPlayed).toEqual([]);
- });
- it('episode never offers a fifth energy point',()=>{
-  const {state}=makeCombatState();state.runMode='episode';state.player.maxEnergy=4;
-  for(let n=0;n<50;n++){
-   const {choice}=rollLevelUpChoice(makeRng(`energy-cap-${n}`),state);
-   expect([choice.optionA,choice.optionB]).not.toContain('max_energy');
-  }
  });
 });

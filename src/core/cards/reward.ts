@@ -16,10 +16,9 @@
 import type { CardData, GameState } from '../types';
 import type { RNG } from '../rng';
 import { rollThreeCards } from '../level';
-import { rollChapterCards } from './chapterRewards';
 import { getClass } from '../classes';
 import { rollNightCards } from '../campaign/rewards';
-import { FINAL_BOSS_FIGHT } from '../map/pages';
+import { ultimateRequired } from '../campaign/threeNight';
 
 export type CardReward = {
   /** การ์ดที่เสนอให้เลือก */
@@ -38,9 +37,11 @@ export const REWARD_CHOICE_COUNT = 3;
 export function rollCardReward(s: GameState, r: RNG): RNG {
   // บอสสุดท้ายไม่ต้องมีการ์ดให้เลือก — รันจบตรงนั้น การ์ดที่หยิบมาไม่มีที่ใช้
   // และการเอาหน้าเลือกของมาคั่นก่อนจอสรุปทำให้จังหวะจบเรื่องสะดุด
-  if ((s.fightCount ?? 0) >= FINAL_BOSS_FIGHT) return r;
+  // (เดิมเช็ค fightCount >= 15 จากโหมดเก่า ทำให้รันสามคืนไม่ได้การ์ดเลยหลังศึกที่ 15)
+  const active = s.pages?.current?.offers[s.pages?._activeOfferIndex ?? -1];
+  if (active?.kind === 'boss' && (active.bossType === 'secret' || (s.campaign?.night === 3 && !ultimateRequired(s)))) return r;
 
-  const out = (s.campaign ? rollNightCards(s,r) : undefined) ?? (s.runMode === 'episode' ? rollChapterCards(getClass(s.classId).id, r) : undefined)
+  const out = (s.campaign ? rollNightCards(s,r) : undefined) 
     ?? rollThreeCards(r, s.player.level, getClass(s.classId).cardTag);
   if (out.list.length > 0) {
     s.cardReward = { choices: out.list };

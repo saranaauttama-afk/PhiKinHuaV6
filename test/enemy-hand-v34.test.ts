@@ -106,7 +106,7 @@ describe('v34 decisions and ordinary interactions',()=>{
  it('retained cards are not revealed or included in a future intent during player turns',()=>{
   const s=fixture(['claw','winyan_rerorn_v29_recover']);s.enemyDrawPerTurn=0;const a=turn(s);
   expect(a.enemyPiles!.hand).toEqual(['winyan_rerorn_v29_recover']);expect(a.enemyLastPlayed).toEqual(['claw']);expect(a.enemyIntent).toBeUndefined();
-  a.campaign={night:1,difficulty:1,unlocks:[]};const b=applyCommand(a,{type:'StartPlayerTurn'},makeRng('v34')).state;
+  a.campaign={night:1,difficulty:1,completedNights:0,unlocks:[]};const b=applyCommand(a,{type:'StartPlayerTurn'},makeRng('v34')).state;
   expect(b.enemyIntent).toBeUndefined();expect(b.enemyPiles).toEqual(a.enemyPiles);
  });
 });
@@ -149,7 +149,7 @@ for(const card of Object.values(NIGHT_ENEMY_DECKS).flat().filter((id,i,all)=>id.
 it('boss awakening between reveals uses the transformed physical card and matching cost/effect',()=>{
  const s=fixture(['night_head_collector_v29_setup','night_head_collector_v29_double']);
  s.enemy!.id='night-head-collector';s.enemy!.maxHp=100;s.enemy!.hp=51;s.enemy!.maxEnergy=3;s.enemyDrawPerTurn=0;
- s.campaign={night:1,difficulty:3,unlocks:[],bossAwakened:false};
+ s.campaign={night:1,difficulty:3,completedNights:0,unlocks:[],bossAwakened:false};
  s.traps=[{cardId:'v34-skill-trap',name:'test',trigger:'enemy_skill',effects:[{type:'damage',value:2,desc:'test'}]}];
  const a=turn(s);expect(a.campaign?.bossAwakened).toBe(true);
  expect(a.enemyLastPlayed).toEqual(['night_head_collector_v29_setup','night_head_collector_v29_awakened_strike']);
