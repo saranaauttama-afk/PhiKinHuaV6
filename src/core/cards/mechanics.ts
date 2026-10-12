@@ -135,6 +135,8 @@ export function cardsPlayedThisTurn(s: GameState): number {
  * ตัวเลขที่หักจริงมาคนละที่ ผู้เล่นจะวางแผนจากเลขที่โกหก
  */
 export function effectiveCost(s: GameState, card: CardData): number {
+  // The authorized QA victory bypass pays no energy, even under corruption.
+  if(card.id==='qa_phra_prathan')return 0;
   return require('../statusEffectsRuntime').modifyCardCostForStatusEffects(s,costWithRule(card, cardsPlayedThisTurn(s)));
 }
 

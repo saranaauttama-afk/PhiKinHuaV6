@@ -3,6 +3,8 @@ import {makeCombatState} from './helpers';
 import {applyCommand} from '../src/core/reducer';
 import {fromSave,toBattleSave} from '../src/core/save';
 import {startCombat} from '../src/core/commands';
+import {applyStatusEffect} from '../src/core/statusEffectsRuntime';
+import {effectiveCost} from '../src/core/cards/mechanics';
 import {armTrap} from '../src/core/combat/traps';
 import type {CardData} from '../src/core/types';
 import {battleGeometry,enemyHandGeometry} from '../app/battleGeometry';
@@ -29,8 +31,9 @@ describe('six-card combined combat history',()=>{
  });
  it('records overkill as actual HP lost and includes the authorized test win card',()=>{
   vi.stubEnv('EXPO_PUBLIC_TEST_WIN_CARD','1');
-  const {state:s,rng:r}=makeCombatState({hand:[{id:'qa_phra_prathan',name:'พระประธาน',type:'skill',cost:0}],enemyHp:5,enemyBlock:999});
-  const out=applyCommand(s,{type:'PlayCard',index:0},r).state;expect(out.cardHistory![0].results).toContain('ผีเสีย HP 5');expect(out.combatVictoryLock).toBe(true);
+  const {state:s,rng:r}=makeCombatState({hand:[{id:'qa_phra_prathan',name:'พระประธาน',type:'skill',cost:0}],enemyHp:5,enemyBlock:999,playerEnergy:0});
+  applyStatusEffect('player',s,'corruption',3,2);expect(effectiveCost(s,s.piles.hand[0])).toBe(0);
+  const out=applyCommand(s,{type:'PlayCard',index:0},r).state;expect(out.cardHistory![0].results).toContain('ผีเสีย HP 5');expect(out.combatVictoryLock).toBe(true);expect(out.cardHistory![0].results).not.toContain('ใช้พลัง 2');expect(out.cardHistory![0].results).not.toContain('เราได้พลัง 2');
   const f=makeCombatState({hand:[{...attack,dmg:100}],enemyHp:5});expect(applyCommand(f.state,{type:'PlayCard',index:0},f.rng).state.cardHistory![0].results).toContain('ผีเสีย HP 5');
  });
  it('interleaves both sides in actual play order and preserves an unplayed recovery card',()=>{
