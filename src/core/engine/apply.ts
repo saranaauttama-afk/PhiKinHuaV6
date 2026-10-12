@@ -4,6 +4,8 @@ import type { RNG } from '../rng';
 import {trackRun} from '../campaign/metrics';
 import {trackDiscovery} from '../archive/progress';
 import { cloneForReducer } from './shared';
+import {effectiveCost} from '../cards/mechanics';
+import {recordCardHistory, historySnapshot} from '../combat/cardHistory';
 import {captureRewardReceipt} from '../rewardReceipt';
 
 import * as run from './handlers/run';
@@ -146,7 +148,13 @@ export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
   // view ที่ยังเล่นคิวเก่าค้างอยู่จะถือ array เดิมไว้เอง ไม่ถูกกระทบ
   s.pendingEvents = [];
 
+  const historyBefore = cmd.type==='PlayCard'&&state.phase==='combat'&&state.piles?.hand[cmd.index]?historySnapshot(state):undefined;
+  const historyCost = cmd.type==='PlayCard'&&state.phase==='combat'&&state.piles?.hand[cmd.index]?effectiveCost(state,state.piles.hand[cmd.index]):0;
   const h = H[cmd.type] as Handler<typeof cmd.type> | undefined;
-  if (h) {const out=h(s,cmd as any,rng);captureRewardReceipt(state,out.state,cmd);trackRun(state,out.state,cmd);trackDiscovery(state,out.state,cmd);return out;}
+  if (h) {const out=h(s,cmd as any,rng);
+    if(cmd.type==='PlayCard' && historyBefore && (out.state.turnFlags?.cardsPlayed??0)>(state.turnFlags?.cardsPlayed??0)){
+      recordCardHistory(out.state,'player',state.piles.hand[cmd.index],historyBefore,0,undefined,historyCost);
+    }
+    captureRewardReceipt(state,out.state,cmd);trackRun(state,out.state,cmd);trackDiscovery(state,out.state,cmd);return out;}
   return { state: s, rng };
 }

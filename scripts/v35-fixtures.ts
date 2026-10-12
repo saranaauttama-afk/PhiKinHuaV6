@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import {baseNewState} from '../src/core/commands';
+import {applyCommand} from '../src/core/reducer';
+import {makeRng} from '../src/core/rng';
+import {cardById} from '../src/core/pack';
+import {toBattleSave,toSave} from '../src/core/save';
+const dir=process.env.PHIKINHUA_WEB_DIR||'/tmp/phikinhua-v35-web';
+let state=baseNewState('v32-shop'),rng=makeRng(state.seed);
+for(const cmd of [{type:'NewRun',seed:state.seed,classId:'warrior',difficulty:1},{type:'SkipChapter'},{type:'ChooseStarterBlessing',index:0}] as const)({state,rng}=applyCommand(state,cmd,rng));
+state.player.gold=1000;fs.writeFileSync(dir+'/v35-map.json',JSON.stringify(toSave(state,rng)));
+({state,rng}=applyCommand(state,{type:'ChooseOffer',index:0},rng));
+state.blessings=[];state.equipped=[];state.minions=[];state.player.hp=state.player.maxHp=500;state.enemy!.hp=state.enemy!.maxHp=500;
+state.enemy!.maxEnergy=2;state.enemy!.energy=0;state.enemyHandSize=4;state.enemyDrawPerTurn=2;state.enemyMaxRetained=2;
+state.enemyPiles={hand:['winyan_rerorn_v29_recover'],draw:['claw','claw','claw','claw'],discard:[]};state.enemyHandAges=[1];state.enemy!.handCount=1;
+const qa=state.piles.hand.find(c=>c.id==='qa_phra_prathan');if(!qa)throw Error('QA build required for fixtures');
+state.piles.hand=[qa,...Array.from({length:2},(_,i)=>({...cardById(i===0?'muay_stance':'temple_blade')!,instanceId:'v35-opening-'+i}))];
+state.piles.draw=Array.from({length:4},(_,i)=>({...cardById('temple_blade')!,instanceId:'v35-draw-'+i}));
+fs.writeFileSync(dir+'/v35-battle.json',JSON.stringify(toBattleSave(state,rng)));

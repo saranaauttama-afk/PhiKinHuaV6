@@ -1,4 +1,4 @@
-name: v34 Enemy Hand APK
+name: v35 Battle Backlog Test APK
 on:
   push:
     branches: ['work/enemy-hand-v34']
@@ -18,16 +18,23 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx tsc --noEmit
-      - run: npm test -- --maxWorkers=2 --testTimeout=60000
+      - run: npm test -- --maxWorkers=2 --testTimeout=60000 --silent
       - run: V34_REPORT=docs/v34-ci-balance.json npx vite-node --config vitest.config.ts scripts/v34-balance.ts
+      - run: cmp docs/v34-balance-results.json docs/v34-ci-balance.json
       - run: npx vite-node --config vitest.config.ts scripts/v34-enemy-audit.ts
-      - run: CI=1 npx expo export --platform web --output-dir /tmp/v34-web
+      - run: CI=1 EXPO_PUBLIC_UI_REVIEW=1 EXPO_PUBLIC_TEST_WIN_CARD=1 npx expo export --platform web --output-dir /tmp/v34-web
+      - run: npm install --no-save --package-lock=false playwright@1.62.1
+      - run: npx playwright install --with-deps chromium
+      - run: PHIKINHUA_WEB_DIR=/tmp/v34-web EXPO_PUBLIC_TEST_WIN_CARD=1 npx vite-node --config vitest.config.ts scripts/v35-fixtures.ts
+      - run: PHIKINHUA_WEB_DIR=/tmp/v34-web node scripts/v35-mobile-check.cjs
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: v34-verification
+          name: v35-verification
           path: |
             docs/v34-ci-balance.json
             docs/v34-enemy-audit.json
+            backlog-audit/v35-mobile-ui.json
   android:
     needs: verify
     runs-on: ubuntu-latest
@@ -45,7 +52,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: npm ci
       - run: CI=1 npx expo prebuild --platform android
-      - name: Build installable test APK without the QA win card
+      - name: Build installable test APK with the authorized QA win card
+        env:
+          EXPO_PUBLIC_TEST_WIN_CARD: '1'
         working-directory: android
         run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
       - name: Verify signing, package and alignment
@@ -56,14 +65,14 @@ jobs:
           "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
-          grep "package: name='com.phikinhua.episode' versionCode='35' versionName='1.0.34'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-EnemyHand-v1.0.34.apk
-          sha256sum PhiKinHua-EnemyHand-v1.0.34.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='36' versionName='1.0.35'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-Backlog-v1.0.35.apk
+          sha256sum PhiKinHua-Backlog-v1.0.35.apk > apk-audit/sha256.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: PhiKinHua-v34-APK
-          path: PhiKinHua-EnemyHand-v1.0.34.apk
+          name: PhiKinHua-v35-APK
+          path: PhiKinHua-Backlog-v1.0.35.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -78,7 +87,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: PhiKinHua-v34-APK
+          name: PhiKinHua-v35-APK
       - name: Enable emulator acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -92,10 +101,10 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-EnemyHand-v1.0.34.apk
-            python scripts/android-v34-smoke.py
+            adb install PhiKinHua-Backlog-v1.0.35.apk
+            python scripts/android-v35-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v34-native-smoke
-          path: v34-native-audit/
+          name: v35-native-smoke
+          path: v35-native-audit/

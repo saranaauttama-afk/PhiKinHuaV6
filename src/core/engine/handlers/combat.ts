@@ -1,3 +1,4 @@
+import {historySnapshot,recordCardHistory} from '../../combat/cardHistory';
 import {consumeEnemyCard,finishEnemyHand} from '../../combat/enemyHand';
 // src/core/engine/handlers/combat.ts — Legacy only (unified system removed)
 import type { Command, GameState } from '../../types';
@@ -243,7 +244,9 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     if (s.phase !== 'combat') { emit(s, { t: 'TurnEnded', who: 'enemy' }); return { state: s, rng: r }; }
 
     // Decide from the current public board and the real held cards once the turn starts.
+    const handBeforeDraw=s.enemyPiles!.hand.length;
     planEnemyIntent(s,true);
+    emit(s,{t:'EnemyHandChanged',drawn:s.enemyPiles!.hand.length-handBeforeDraw});
     const toPlay:string[]=[...(s.enemyIntent?.cardIds??[])];
     const indexes=s.enemyIntent?.handIndexes??[];
     const consumed:number[]=[];
@@ -261,12 +264,13 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       const cardId=s.enemyPiles!.hand[index];
       const def=enemyCardById(cardId);
       if(!def)continue;
+      const historyBefore=historySnapshot(s),eventStart=s.pendingEvents?.length??0;
       if(index<0||!consumeEnemyCard(s,index))continue;
       if(original!=null)consumed.push(original);
       s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',
-        ownerId:s.enemy.id,
+        ownerId:s.enemy.id, handIndex:index,
         cardId,
         name: def.name ?? def.id,
         dmg: def.dmg ?? 0,
@@ -280,14 +284,17 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       // ต้องยกเลิกก่อนดาเมจเข้า ไม่งั้นมันคือการ "ยกเลิกหลังโดนแล้ว"
       const trapped = springTraps(s, def.type === 'attack' ? 'attack' : 'skill');
       r = settleCombat(s, r);
-      if (s.phase !== 'combat') break;
+      const historyCard={...def,cost:def.energyCost,dmg:def.dmg,name:def.name??def.id};
+      if (s.phase !== 'combat') {recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart,'ถูกขัดจังหวะ');break;}
       if (trapped.negated) {
         s.log.push(`${def.name ?? def.id} ถูกขัดจังหวะ`);
+        recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart,'ถูกขัดจังหวะ');
         continue;
       }
 
       require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
       runEquipmentCardPlayed(s,def,'enemy');
+      recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart);
 
       r = settleCombat(s, r);
     }

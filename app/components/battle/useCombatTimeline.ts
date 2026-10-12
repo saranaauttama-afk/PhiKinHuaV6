@@ -14,7 +14,9 @@ import type { CombatEvent } from '../../../src/core/types';
 
 /** เวลาที่ใช้แสดงผลของ event แต่ละชนิด (ms) — ปรับได้อิสระ ไม่กระทบกฎเกม */
 const DURATION: Record<CombatEvent['t'], number> = {
-  EnemyCardRevealed: 1800,
+  EnemyCardRevealed: 2100,
+  EnemyHandChanged: 450,
+  CardResolved: 100,
   MinionActing: 600,
   MinionResolved: 250,
   Damage: 450,

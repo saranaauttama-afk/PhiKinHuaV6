@@ -25,7 +25,7 @@ const SLOT_W      = 40;
 const PHASE_ENTER = 450;
 const PHASE_FLIP  = 250;
 const PHASE_RISE  = 250;
-const PHASE_HOLD  = 1100;
+const PHASE_HOLD  = 1400;
 const PHASE_EXIT  = 160;
 
 export const ENEMY_PLAY_TOTAL      = PHASE_FLIP + PHASE_RISE + PHASE_HOLD + PHASE_EXIT;
@@ -54,19 +54,19 @@ export default function EnemyHandCard({
   const layout = useBattleLayout();
 
   const lane=enemyLane(layout,ownerIndex,ownerCount);
-  const peakScale=Math.min(lane.cardW/CARD_W,lane.cardH/CARD_H)/1.12;
-  const slotStep=Math.min(18,lane.cardW/Math.max(1,totalCards));
+  const peakScale=Math.min(.92,(layout.screenW-48)/CARD_W,(layout.hudTop-layout.monsterTop-8)/CARD_H);
+  const slotStep=28;
   const slotCenterX=lane.cardX-(totalCards-1)*slotStep/2+cardIndex*slotStep;
   const idlePosX=slotCenterX-CARD_W/2;
-  const idlePosY=lane.cardY-CARD_H/2;
+  const idlePosY=layout.enemyHandCenterY-CARD_H/2;
   const centerX=lane.cardX-CARD_W/2;
-  const centerY=lane.cardY-CARD_H/2;
+  const centerY=layout.hudTop-8-CARD_H*peakScale/2-CARD_H/2;
 
   // The native owner anchor is always valid, even before a worklet runs or
   // with reduced motion. Only local offsets animate; never animate top/left.
-  const posX    = useSharedValue(0);
-  const posY    = useSharedValue(-24);
-  const scale   = useSharedValue(Math.min(.20,peakScale*.65));
+  const posX    = useSharedValue(idlePosX-centerX);
+  const posY    = useSharedValue(idlePosY-centerY);
+  const scale   = useSharedValue(Math.min(.12,peakScale*.65));
   const opacity = useSharedValue(0);
   const flip    = useSharedValue(0);
 
@@ -98,7 +98,7 @@ export default function EnemyHandCard({
     );
 
     scale.value = withSequence(
-      withTiming(Math.min(.20,peakScale*.65), { duration: PHASE_FLIP }),
+      withTiming(Math.min(.12,peakScale*.65), { duration: PHASE_FLIP }),
       withTiming(peakScale,  { duration: PHASE_RISE, easing: easeBack }),
       withTiming(peakScale,  { duration: PHASE_HOLD }),
       withTiming(peakScale*1.12,{ duration: PHASE_EXIT, easing: easeOut }),

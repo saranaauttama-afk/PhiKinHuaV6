@@ -19,7 +19,7 @@ import SceneArrival from './SceneArrival';
 import UpgradeCardPicker,{upgradeSummary} from './UpgradeCardPicker';
 import {upgradeCard} from '../../src/core/engine/shared';
 import React from 'react';
-import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { BackHandler, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import RewardReceiptView from './RewardReceiptView';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
 import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
@@ -108,6 +108,7 @@ function Lead({ children }: { children: React.ReactNode }) {
 export default function ShopView({ state, dispatch }: ShopViewProps) {
   const pad = useScreenPadding();
   const [selected,setSelected]=React.useState<number|null>(null);
+  React.useEffect(()=>{const sub=BackHandler.addEventListener('hardwareBackPress',()=>{if(selected!==null)setSelected(null);else dispatch({type:'CompleteNode'});return true;});return ()=>sub.remove();},[selected,dispatch]);
   const [notice,setNotice]=React.useState('');
   React.useEffect(()=>{setSelected(null);setNotice('');},[state.phase,state.shopKind,state.currentShopId]);
   if (state.phase !== 'shop') return null;
@@ -121,7 +122,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     return <Panel title="ร้านขายคาถา">
       <Lead>แตะการ์ดเพื่ออ่าน แล้วกดยืนยันซื้อ · ยังไม่เสียเบี้ยจนกว่าจะยืนยัน</Lead><Money state={state}/>
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{color:palette.moon,fontFamily:font.ui}}>{notice}</Text>}
-      <View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>{stock.map((it,i)=>{const c=cardOf(it);return c&&<View key={`${c.id}-${i}`} style={{width:'48%',gap:4}}>
+      <View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>{stock.map((it,i)=>{const c=cardOf(it);return c&&<View testID={`shop-card-${i}`} key={`${c.id}-${i}`} style={{width:'48%',gap:4}}>
         <View><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/></View>
         <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {it.price} เบี้ย</Text>
       </View>;})}</View>
@@ -250,7 +251,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     return <Panel title={single?'สมบัติชิ้นเดียว':'หีบสมบัติ'}>
       <Lead>แตะการ์ดเพื่ออ่าน · เลือกได้หนึ่งใบ แล้วกดยืนยันรับการ์ด</Lead>
       {stock.length?<View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>
-       {stock.map((it,i)=>{const c=cardOf(it);return c&&<View key={`${c.id}-${i}`} style={{width:'48%',gap:4}}><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/><Text style={{fontFamily:font.ui,color:palette.moon,textAlign:'center'}}>หยิบฟรี</Text></View>;})}
+       {stock.map((it,i)=>{const c=cardOf(it);return c&&<View testID={`shop-card-${i}`} key={`${c.id}-${i}`} style={{width:'48%',gap:4}}><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/><Text style={{fontFamily:font.ui,color:palette.moon,textAlign:'center'}}>หยิบฟรี</Text></View>;})}
       </View>:<Unavailable text="หีบว่างเปล่า"/>}
       <Modal visible={!!card} transparent animationType="fade" onRequestClose={()=>setSelected(null)}>
        <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>
@@ -273,7 +274,8 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
     <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
-        <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+20,paddingBottom:24,gap:12}}>
+        {state.pages?.adventure?.version===5&&<Pressable testID="shop-destroy-page" accessibilityRole="button" accessibilityLabel="ปิดและทำลายเพจร้าน" onPress={()=>dispatch({type:'DeleteShop'})} style={{position:'absolute',top:pad.top+4,right:8,width:44,height:44,alignItems:'center',justifyContent:'center',zIndex:layer.control}}><Image source={require('../../assets/images/btnDelete.png')} style={{width:32,height:32}}/></Pressable>}
+        <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+48,paddingBottom:24,gap:12}}>
           <Image testID="destination-object" accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>
           <RewardReceiptView receipt={state.rewardReceipt}/>
           {kind === 'card'            && cardShop()}

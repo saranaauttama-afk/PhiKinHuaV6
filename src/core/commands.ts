@@ -340,6 +340,7 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
   const deck=require('./monsters/monster-decks').deckForMonster(monsterData);
   // Initialize combat state
   state.phase = 'combat';
+  state.cardHistory = []; state.cardHistorySeq = 0;
   state.enemy = {
     id: monsterData.id,
     name: monsterData.name,

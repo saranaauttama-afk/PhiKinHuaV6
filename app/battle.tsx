@@ -9,7 +9,7 @@ import React from 'react';
 import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
-import type { CombatEvent, CombatFrame } from '../src/core/types';
+import type { CombatEvent, CombatFrame, CardHistoryEntry } from '../src/core/types';
 
 import { combatFrame } from '../src/core/combat/damage';
 import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
@@ -17,6 +17,8 @@ import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
 import BlessingSeals from './components/battle/BlessingSeals';
 import EnemyHandCard from './components/battle/EnemyHandCard';
+import EnemyHandRack from './components/battle/EnemyHandRack';
+import CardHistory from './components/battle/CardHistory';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
 import DiscardOverlay from './components/battle/DiscardOverlay';
@@ -91,6 +93,7 @@ export default function BattlePage() {
   const [enemyDamagePopups, setEnemyDamagePopups] = React.useState<{ id: string; damage: number }[]>([]);
   const [statGainPopups, setStatGainPopups] = React.useState<{ id: string; statType: 'block' | 'energy'; side: 'player' | 'enemy'; amount: number }[]>([]);
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
+  const [historyAtTurnStart,setHistoryAtTurnStart]=React.useState<CardHistoryEntry[]>([]);
 
   const monsterRef = React.useRef<MonsterAreaHandle>(null);
   const flashRef   = React.useRef<ScreenFlashHandle>(null);
@@ -235,6 +238,7 @@ export default function BattlePage() {
     if (turnLocked.current || useGame.getState().state.phase !== 'combat') return;
     turnLocked.current = true;
     setPhase('enemy');
+    setHistoryAtTurnStart(useGame.getState().state.cardHistory??[]);
     setPresentation(combatFrame(useGame.getState().state));
 
     dispatch({ type: 'ResolveEnemyTurn' });
@@ -242,21 +246,9 @@ export default function BattlePage() {
     const after = useGame.getState().state;
     const events = after.pendingEvents ?? [];
 
-    // เตรียมการ์ดคว่ำทั้งมือให้เห็นก่อน แล้วค่อยเปิดทีละใบตาม event
-    const revealOrder = events.filter(e => e.t === 'EnemyCardRevealed');
-    setEnemyHandCards(
-      revealOrder.map((e, i) => ({
-        key: `${i}-${e.cardId}`,
-        card: { id: e.cardId, ownerId:e.ownerId??after.enemy?.id, name: e.name, damage: e.dmg, block: e.block, cost: e.cost, hits: e.hits, desc: e.desc },
-        cardIndex: i,
-        totalCards: revealOrder.length,
-        delay: i * 100,
-        playing: false,
-      }))
-    );
-
     timeline.play(events, () => {
       setEnemyHandCards([]);
+      setHistoryAtTurnStart(useGame.getState().state.cardHistory??[]);
       setPresentation(null);
       if (useGame.getState().state.phase === 'combat') {
         const before = combatFrame(useGame.getState().state);
@@ -278,9 +270,11 @@ export default function BattlePage() {
 
     switch (currentEvent.t) {
       case 'EnemyCardRevealed': {
-        // ใบที่เท่าไหร่ ดูจากจำนวน reveal ที่เล่นไปแล้ว
-        const idx = timeline.played.filter(e => e.t === 'EnemyCardRevealed').length - 1;
-        setEnemyHandCards(prev => prev.map((c, i) => (i === idx ? { ...c, playing: true } : c)));
+        setEnemyHandCards([{
+          key:`${gameState.turn}-${timeline.played.length}`,
+          card:{id:currentEvent.cardId,ownerId:currentEvent.ownerId,name:currentEvent.name,damage:currentEvent.dmg,block:currentEvent.block,cost:currentEvent.cost,hits:currentEvent.hits,desc:currentEvent.desc},
+          cardIndex:currentEvent.handIndex??0,totalCards:(currentEvent.frame?.enemy?.handCount??0)+1,delay:0,playing:true,
+        }]);
         break;
       }
 
@@ -332,27 +326,8 @@ export default function BattlePage() {
         </View>
 
 
-        {/* ข้ามอนิเมชั่นเทิร์นศัตรู — ปลอดภัยเสมอ เพราะ state ถูกคำนวณจบไปแล้ว
-            ก่อนอนิเมชั่นเริ่มเล่น สิ่งเดียวที่ถูกข้ามคือภาพ */}
-        {timeline.isPlaying && (
-          <Pressable
-            onPress={timeline.skip}
-            style={{
-              position: 'absolute', top: safe.top + 110, left: 14, zIndex: layer.control,
-              paddingHorizontal: 14, paddingVertical: 6,
-              borderRadius: 14,
-              backgroundColor: surface.glassDim,
-              borderWidth: 1, borderColor: palette.line,
-            }}
-          >
-            <Text style={{
-              color: palette.text, fontSize: 12,
-              fontFamily: 'Prompt_600SemiBold',
-            }}>
-              ข้าม ▸▸
-            </Text>
-          </Pressable>
-        )}
+        <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
+        {(gameState.phase==='combat'||!!presentation)&&<EnemyHandRack count={enemy?.handCount??gameState.enemyPiles?.hand.length??0}/>}
 
         <MonsterArea escalating={gameState.campaign?{every:difficultyOf(gameState)>=3?3:4,strength:1}:gameState.runMode==='episode'?{every:3,strength:2}:undefined}
           rules={gameState.pages?.adventure?.version===5}
@@ -517,7 +492,7 @@ export default function BattlePage() {
         {!timeline.isPlaying && !presentation && gameState.phase === 'defeat' && (
           <DefeatOverlay onHome={() => router.replace('/')} />
         )}
-        {Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1'&&<Text testID="v33-battle-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({hand:gameState.piles.hand.map(c=>c.id),discard:gameState.piles.discard.length,normalHand:gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length,cap:gameState.player.maxHandSize,draw:gameState.player.drawPerTurn,turn:gameState.turn,phase:gameState.phase})}</Text>}
+        {Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1'&&<Text testID="v33-battle-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({hand:gameState.piles.hand.map(c=>c.id),discard:gameState.piles.discard.length,normalHand:gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length,cap:gameState.player.maxHandSize,draw:gameState.player.drawPerTurn,turn:gameState.turn,phase:gameState.phase,enemyHand:gameState.enemyPiles?.hand.length??0,presentedEnemyHand:enemy?.handCount??0,history:gameState.cardHistory,uiPhase:phase})}</Text>}
         <Modal visible={paused} transparent animationType="fade" onRequestClose={()=>settingsOpen?setSettingsOpen(false):setPaused(false)}>
           <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:24,justifyContent:'center'}}>
             <RitualSurface kind="quietSlate" style={{padding:24,gap:14}}>

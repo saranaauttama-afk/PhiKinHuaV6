@@ -11,6 +11,7 @@ import Animated, {
   cancelAnimation,
   runOnJS
 } from 'react-native-reanimated';
+import {useGameSettings} from './Settings';
 import type { CardData } from '../../src/core/types';
 import { palette, surface, tint, layer, font } from '../theme';
 import {paper} from './Paper';
@@ -30,7 +31,7 @@ interface CardProps {
   onDragPlay?: () => void;
   onHoverChange?: (isHovered: boolean) => void;
   isPlayed?: boolean;
-  animationDelay?: number; // Compatibility prop: dealt cards now appear immediately.
+  animationDelay?: number; // Stagger only newly mounted physical copies.
   /** ค่าร่ายจริง ณ ตอนนี้ — การ์ดบางใบถูกลงตามจำนวนใบที่เล่นไปแล้วในเทิร์น */
   costNow?: number;
 }
@@ -45,9 +46,13 @@ export default function Card({
   onDragPlay,
   onHoverChange,
   isPlayed = false,
+  animationDelay = 0,
   costNow,
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const reducedMotion=useGameSettings(s=>s.reducedMotion);
+  const entrance=useSharedValue(reducedMotion?1:0);
+  React.useEffect(()=>{entrance.value=reducedMotion?1:withDelay(animationDelay,withTiming(1,{duration:420}));},[reducedMotion]);
 
   const updateHoverState = (hovered: boolean) => {
     setIsHovered(hovered);
@@ -149,8 +154,9 @@ export default function Card({
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: shakeX.value },
-      { translateY: translateY.value + dragOffsetY.value },
+      { translateX: shakeX.value - 24*(1-entrance.value) },
+      { translateY: translateY.value + dragOffsetY.value + 26*(1-entrance.value) },
+      { rotate: `${-6*(1-entrance.value)}deg` },
       { scale: scale.value },
     ],
     opacity: opacity.value,
@@ -158,7 +164,7 @@ export default function Card({
 
   return (
     <GestureDetector gesture={isPlayed ? Gesture.Tap() : composedGesture}>
-      <Animated.View accessible accessibilityRole="button" accessibilityLabel={`การ์ด ${card.name} พลัง ${costNow ?? card.cost}`} style={[
+      <Animated.View testID={`hand-card-${card.instanceId??card.id}`} accessible accessibilityRole="button" accessibilityLabel={`การ์ด ${card.name} พลัง ${costNow ?? card.cost}`} style={[
         {
           width,
           height,

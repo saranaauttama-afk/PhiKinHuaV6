@@ -38,7 +38,7 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,onSkip
      </Pressable>
      <View testID={'adventure-action-'+i} style={{height:44,width:'100%',marginTop:3,justifyContent:'center'}}>
       {selected===i?<Pressable testID={'adventure-enter-'+i} accessibilityRole="button" accessibilityLabel={enterLabel(o,i)} onPress={()=>{onEnter(o,i);setSelected(null);}} style={({pressed})=>({height:44,justifyContent:'center',alignItems:'center',opacity:pressed?.75:1})}>
-       <RitualSurface kind="hudPaper" style={{height:44,width:'100%',padding:4,alignItems:'center',justifyContent:'center'}}><View pointerEvents="none" style={{position:'absolute',top:5,bottom:5,left:3,right:3,backgroundColor:palette.bloodDeep,opacity:.92}}/><Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:palette.text,textAlign:'center'}}>{kindLabel(o)}</Text></RitualSurface>
+       <RitualSurface kind="hudPaper" style={{height:44,width:'100%',padding:4,alignItems:'center',justifyContent:'center'}}><View pointerEvents="none" style={{flexDirection:'row',alignItems:'center',gap:4}}><InkIcon name={iconFor(o)} size={18} color={palette.ink}/><Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:13,lineHeight:17,color:palette.ink,textAlign:'center'}}>{kindLabel(o)}</Text></View></RitualSurface>
       </Pressable>:<View pointerEvents="none" style={{alignItems:'center',gap:2}}><InkIcon name={iconFor(o)} color={palette.textDim} size={17}/><Text style={{fontFamily:font.ui,fontSize:10,color:palette.textDim,textAlign:'center'}}>{pageLabel(o)}</Text></View>}
      </View>
     </View>

@@ -216,13 +216,17 @@ export interface EquipmentRuntimeState {
 
 export type CombatEventTarget = 'player' | 'enemy';
 
+export type CardHistoryEntry = {
+  seq: number; side: CombatEventTarget; turn: number; ownerId?: string; card: CardData; results: string[];
+};
+
 export type CombatFrame = {
-  player: GameState["player"]; enemy: GameState["enemy"]; minions: GameState["minions"];
+  player: GameState["player"]; enemy: GameState["enemy"]; minions: GameState["minions"]; historySeq?: number;
 };
 
 export type CombatEvent = (
   /** ศัตรูเปิดการ์ดใบหนึ่ง — view ใช้จังหวะนี้พลิกการ์ด */
-  | { t: 'EnemyCardRevealed'; ownerId?:string; cardId: string; name: string; dmg: number; block: number; cost?: number; hits?: number; desc?: string }
+  | { t: 'EnemyCardRevealed'; ownerId?:string; handIndex?:number; cardId: string; name: string; dmg: number; block: number; cost?: number; hits?: number; desc?: string }
   | {
       t: 'Damage';
       target: CombatEventTarget;
@@ -235,6 +239,8 @@ export type CombatEvent = (
       died: boolean;
       sourceKind: 'card' | 'status' | 'minion' | 'equipment' | 'event' | 'blessing';
     }
+  | { t: 'EnemyHandChanged'; drawn: number }
+  | { t: 'CardResolved'; entry: CardHistoryEntry }
   | { t: 'BlockGained'; target: CombatEventTarget; amount: number }
   | { t: 'Healed'; target: CombatEventTarget; amount: number }
   | { t: 'StatusApplied'; target: CombatEventTarget; effectId: string; stacks: number }
@@ -284,6 +290,8 @@ export type GameState = {
    * (ตอน loadGame จะถูกตั้งเป็น [] เสมอ)
    */
   pendingEvents?: CombatEvent[];
+  cardHistory?: CardHistoryEntry[];
+  cardHistorySeq?: number;
 
   /** รางวัลจากชัยชนะครั้งล่าสุด — UI อ่านจากที่นี่ ไม่ใช่จากข้อความใน log */
   lastReward?: { exp: number; gold: number };
