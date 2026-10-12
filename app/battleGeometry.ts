@@ -29,3 +29,9 @@ export function handGeometry(screenW:number,count:number) {
  const span=cardW+step*Math.max(0,count-1),overflow=span>screenW-gutter*2;
  return {cardW,step,span,overflow,padding:overflow?gutter:Math.max(gutter,(screenW-span)/2)};
 }
+
+/** Hidden card slots are confined to their owner's HUD lane, including multiple actors. */
+export function enemyHandGeometry(g:ReturnType<typeof battleGeometry>,count:number,index=0,owners=1){
+ const lane=enemyLane(g,index,owners),cardW=Math.min(24,(lane.hudWidth-4*Math.max(0,count-1))/Math.max(1,count));
+ return {left:lane.hudX,width:lane.hudWidth,top:g.enemyHandCenterY-17,height:34,cardW,cardH:cardW*34/24,step:cardW+4};
+}

@@ -17,7 +17,6 @@ import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
 import BlessingSeals from './components/battle/BlessingSeals';
 import EnemyHandCard from './components/battle/EnemyHandCard';
-import EnemyHandRack from './components/battle/EnemyHandRack';
 import CardHistory from './components/battle/CardHistory';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
@@ -327,7 +326,6 @@ export default function BattlePage() {
 
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
-        {(gameState.phase==='combat'||!!presentation)&&<EnemyHandRack count={enemy?.handCount??gameState.enemyPiles?.hand.length??0}/>}
 
         <MonsterArea escalating={gameState.campaign?{every:difficultyOf(gameState)>=3?3:4,strength:1}:gameState.runMode==='episode'?{every:3,strength:2}:undefined}
           rules={gameState.pages?.adventure?.version===5}

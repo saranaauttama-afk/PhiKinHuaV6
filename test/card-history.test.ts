@@ -5,7 +5,7 @@ import {fromSave,toBattleSave} from '../src/core/save';
 import {startCombat} from '../src/core/commands';
 import {armTrap} from '../src/core/combat/traps';
 import type {CardData} from '../src/core/types';
-import {battleGeometry} from '../app/battleGeometry';
+import {battleGeometry,enemyHandGeometry} from '../app/battleGeometry';
 const attack:CardData={id:'test-hit',name:'ทดสอบตี',type:'attack',cost:0,dmg:8};
 afterEach(()=>vi.unstubAllEnvs());
 describe('six-card combined combat history',()=>{
@@ -49,6 +49,9 @@ describe('six-card combined combat history',()=>{
   const out=applyCommand(s,{type:'ResolveEnemyTurn'},r).state;expect(out.cardHistory).toHaveLength(1);expect(out.cardHistory![0].results).toContain('ถูกขัดจังหวะ');expect(out.cardHistory![0].results).not.toContain('เราเสีย HP 5');expect(out.player.hp).toBe(500);
  });
  for(const [w,h] of [[320,568],[360,640],[393,852],[412,915]])it(`${w}x${h}: history, art, held cards and HUD have reserved space`,()=>{
-  const g=battleGeometry(w,h,24,24);expect(g.monsterTop).toBeGreaterThanOrEqual(24+42);expect(g.monsterTop+g.monsterSize).toBeLessThan(g.enemyHandCenterY-17);expect(g.enemyHandCenterY+17).toBeLessThan(g.hudTop);
+  const g=battleGeometry(w,h,24,24);
+  const a=enemyHandGeometry(g,7,0,2),b=enemyHandGeometry(g,7,1,2);
+  expect(a.cardW*7+4*6).toBeLessThanOrEqual(a.width+.01);expect(a.left+a.width).toBeLessThanOrEqual(b.left);
+  expect(g.monsterTop).toBeGreaterThanOrEqual(24+42);expect(g.monsterTop+g.monsterSize).toBeLessThan(g.enemyHandCenterY-17);expect(g.enemyHandCenterY+17).toBeLessThan(g.hudTop);
  });
 });

@@ -8,7 +8,7 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-import {enemyLane} from '../../battleGeometry';
+import {enemyLane,enemyHandGeometry} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
 import {font,layer} from '../../theme';
 import {paper} from '../Paper';
@@ -54,8 +54,8 @@ export default function EnemyHandCard({
   const layout = useBattleLayout();
 
   const lane=enemyLane(layout,ownerIndex,ownerCount);
-  const peakScale=Math.min(.92,(layout.screenW-48)/CARD_W,(layout.hudTop-layout.monsterTop-8)/CARD_H);
-  const slotStep=28;
+  const peakScale=Math.min(.92,(lane.hudWidth-16)/CARD_W,(layout.hudTop-layout.monsterTop-8)/CARD_H);
+  const slotStep=enemyHandGeometry(layout,totalCards,ownerIndex,ownerCount).step;
   const slotCenterX=lane.cardX-(totalCards-1)*slotStep/2+cardIndex*slotStep;
   const idlePosX=slotCenterX-CARD_W/2;
   const idlePosY=layout.enemyHandCenterY-CARD_H/2;

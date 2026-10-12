@@ -12,6 +12,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {enemyLane} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
 import GhostArt from '../GhostArt';
+import EnemyHandRack from './EnemyHandRack';
 import {ghostLore} from '../../../src/core/monsters/folklore';
 import {paper} from '../Paper';
 import RitualSurface,{chalk} from '../RitualSurface';
@@ -105,6 +106,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
      <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize}/>
     </Animated.View>
+    <EnemyHandRack count={actor.handCount??0} ownerIndex={index} ownerCount={actors.length}/>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
      <RitualSurface kind="quietSlate" style={{height:layout.enemyHudHeight,paddingHorizontal:actors.length>1?6:10,paddingVertical:4,gap:2}}>
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>
