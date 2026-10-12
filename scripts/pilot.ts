@@ -123,7 +123,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    if(s.shopKind==='remove'&&s.masterDeck.length>8){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);go({type:'ShopRemoveBuy',index:rank[0].i});}
    if(s.shopKind==='card'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&it.price<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
    if(s.phase==='shop')go({type:'CompleteNode'});
-   if(s.phase==='map'&&slot!=null&&!s.pages.current!.resolved[slot])go({type:'DeleteShopFromMap',index:slot});
+   if((s.phase as string)==='map'&&slot!=null&&!s.pages.current!.resolved[slot])go({type:'DeleteShopFromMap',index:slot});
    continue;
   }
   if(s.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});continue;}
