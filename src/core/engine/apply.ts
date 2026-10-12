@@ -16,7 +16,6 @@ import * as se from './handlers/shops_events';
 import * as qa from './handlers/qa';
 import * as ui from './handlers/ui';
 import * as equipment from './handlers/equipment';
-import * as fusion from './handlers/fusion';
 import * as story from './handlers/story';
 import * as chapter from './handlers/chapter';
 import * as cardReward from './handlers/cardReward';
@@ -81,7 +80,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EventTreasureOpen: se.eventTreasureOpen,
   ShopRemoveBuy: se.shopRemoveBuy,
   ShopUpgradeBuy: se.shopUpgradeBuy,
-  FuseCards: fusion.fuseCardsCmd,
   ChooseEventOption: story.chooseEventOption,
   AdvanceChapter: chapter.advanceChapter,
   SkipChapter: chapter.skipChapter,

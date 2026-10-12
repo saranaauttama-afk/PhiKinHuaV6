@@ -73,7 +73,6 @@ const ENCOUNTERS: ArtSlot[] = [
   { id: 'encounter/treasure',        label: 'หีบสมบัติ',      file: 'encounters/enTreasureOpenMini.png', size: [200, 200], brief: 'หีบไม้เก่าเปิดอยู่ มีแสงลอดออกมา', group: 'encounter' },
   { id: 'encounter/treasure_single', label: 'สมบัติชิ้นเดียว', file: 'encounters/thai-v29/treasure-single.webp',    size: [200, 200], brief: 'ห่อผ้าเล็กๆ วางบนตอไม้ มีของชิ้นเดียวข้างใน', group: 'encounter' },
   { id: 'encounter/next_event',      label: 'ทางไปต่อ',       file: 'encounters/thai-v29/next-path.webp',         size: [200, 200], brief: 'ทางเดินลึกเข้าไปในความมืด มีรอยเท้าบนดินเปียก', group: 'encounter' },
-  { id: 'encounter/fusion_altar',    label: 'แท่นผสาน',       file: 'encounters/thai-v29/fusion-altar.webp',       size: [200, 200], brief: 'แท่นหินกลางป่า มีรอยยันต์เรืองแสง ใช้รวมการ์ดสองใบเป็นใบเดียว', group: 'encounter' },
 ];
 
 /** ไอคอนบนแถบเส้นทาง — ตอนนี้ยังเป็น emoji อยู่ */

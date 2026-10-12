@@ -84,9 +84,6 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
     case 'treasure_single':
       return { ...base, type: 'treasure_single', name: 'สมบัติชิ้นเดียว', description: 'ได้การ์ดฟรีหนึ่งใบ' };
 
-    case 'fusion_altar':
-      return { ...base, type: 'fusion_altar', name: 'แท่นผสาน', description: 'รวมการ์ดสองใบเป็นใบเดียว สำรับบางลง แต่แน่นขึ้น' };
-
     case 'story_event': {
       // ชื่อจริงของเหตุการณ์บอกไปเลย แต่ไม่บอกว่าเลือกอะไรได้บ้าง
       const ev = getStoryEvent(offer.eventId);

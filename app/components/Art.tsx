@@ -28,7 +28,6 @@ export const ART_SOURCES: Record<string, any> = {
  'encounter/healing_shrine':ENCOUNTER_OBJECTS.healing_shrine,
  'encounter/treasure':ENCOUNTER_OBJECTS.treasure,
  'encounter/treasure_single':ENCOUNTER_OBJECTS.treasure_single,
- 'encounter/fusion_altar':ENCOUNTER_OBJECTS.fusion_altar,
  'encounter/next_event':ENCOUNTER_OBJECTS.next_event,
  'blessing/night_medium_blessing': require('../../assets/blessings/thai-v24/night_medium_blessing.webp'),
  'blessing/night_nun_blessing': require('../../assets/blessings/thai-v24/night_nun_blessing.webp'),

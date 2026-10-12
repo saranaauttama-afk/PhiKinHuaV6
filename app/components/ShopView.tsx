@@ -24,7 +24,6 @@ import RewardReceiptView from './RewardReceiptView';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
 import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
-import FusionAltarView from './FusionAltarView';
 import {QuietButton} from './QuietChrome';
 import DeckCard,{CardGlyphArt,CardFace} from './DeckCard';
 import {canRemoveCard} from '../../src/core/engine/shared';
@@ -286,7 +285,6 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {kind === 'well'            && well()}
           {kind === 'treasure'        && treasure()}
           {kind === 'treasure_single' && treasure(true)}
-          {kind === 'fusion'          && <FusionAltarView state={state} dispatch={dispatch} />}
         </ScrollView>
         {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,padding:14,gap:6,maxHeight:220}}>
          <Text numberOfLines={2} style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>ยืนยันซื้อ {purchaseCard.name}</Text>

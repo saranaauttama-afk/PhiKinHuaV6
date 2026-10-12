@@ -31,7 +31,7 @@ for(let n=0;n<20;n++){
   }
  });
  if(result.won){keep('summary',result.state,{s:0});const record=makeRunRecord(result.state,'2026-10-08T12:30:00Z');if(record)journal=recordRun(journal,record);}
- if(fixtures.summary&&['rest','event','levelup','reward','shop-card','shop-equipment','shop-healing','shop-upgrade','shop-remove','shop-fusion'].every(k=>fixtures[k]))break;
+ if(fixtures.summary&&['rest','event','levelup','reward','shop-card','shop-equipment','shop-healing','shop-upgrade','shop-remove'].every(k=>fixtures[k]))break;
 }
 for(let n=0;n<8&&!fixtures['summary-defeat'];n++){const result=simulateNight('quiet-lose-'+n,'warrior',5,false,(s,r)=>{if(s.phase==='defeat')keep('defeat',s,r);if(s.runSummary&&!s.runSummary.won)keep('summary-defeat',s,r);});if(!result.won&&result.state.runSummary)keep('summary-defeat',result.state,{s:0});}
 console.log=originalLog;

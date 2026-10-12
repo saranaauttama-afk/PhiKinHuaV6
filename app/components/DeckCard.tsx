@@ -6,7 +6,6 @@ import { cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
 import { font, paper } from '../theme';
 import {upgradeLevelOf} from '../../src/core/engine/shared';
-import {fusedArtParents} from '../cardArtIdentity';
 import CardBadges from './CardBadges';
 import CandleSelection from './CandleSelection';
 
@@ -23,8 +22,6 @@ const grayGlyphs = {
   equipment: require('../../assets/ui/card-gray/ritual-jar.webp'), curse: require('../../assets/ui/card-gray/trail-ghost.webp'),
 };
 export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardData; size?: number; muted?: boolean }) {
-  const parents=fusedArtParents(card.id);
-  if(parents.length===2&&!CARD_ART_SOURCES[card.id])return <View style={{width:size,height:size,flexDirection:'row',alignItems:'center'}}>{parents.map(id=><CardGlyphArt key={id} card={{...card,id}} size={size/2} muted={muted}/>)}</View>;
   return <Image accessible={false} source={muted ? (GRAY_CARD_ART_SOURCES[card.id] ?? grayGlyphs[cardGlyph(card)]) : (CARD_ART_SOURCES[card.id] ?? glyphs[cardGlyph(card)])} resizeMode="contain" style={{ width: size, height: size, filter:(muted?(Platform.OS==='web'?'grayscale(1)':[ {grayscale:1} ]):undefined) as any, tintColor: !muted && !CARD_ART_SOURCES[card.id] && cardGlyph(card) === 'curse' ? paper.red : undefined }} />;
 }
 /** Same paper, art, energy, level and complete ability text in deck and all shops. */

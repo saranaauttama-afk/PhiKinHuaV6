@@ -45,7 +45,6 @@ function poolKeyFor(kind: PageOffer['kind'], act: 1 | 2): keyof Pools | undefine
     case 'treasure':        return 'treasure';
     case 'treasure_single': return 'treasureSingle';
     case 'story_event':     return 'storyEvent';
-    case 'fusion_altar':    return 'fusionAltar';
     default:                return undefined;
   }
 }
@@ -90,7 +89,7 @@ export function restBudgetLeft(s: GameState): number {
 const ALL_REST_KINDS: PageOffer['kind'][] = [
   'shop_card', 'shop_equipment', 'shop_remove', 'shop_upgrade',
   'well', 'healing_shrine', 'treasure', 'treasure_single',
-  'story_event', 'fusion_altar',
+  'story_event',
 ];
 
 /**

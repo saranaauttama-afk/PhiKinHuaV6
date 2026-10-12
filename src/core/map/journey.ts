@@ -123,7 +123,6 @@ const REST_WEIGHTS: Array<[PageOffer['kind'], number]> = [
   ['story_event', 8],
   ['shop_card', 3],
   ['healing_shrine', 3],
-  ['fusion_altar', 3],
   // ปลุกเสก/สละการ์ด — สองอย่างนี้มีระบบครบมาตั้งแต่ต้น (handler, ราคาที่แพงขึ้น
   // ตามจำนวนครั้ง, หน้าร้าน, ช่องรูป) แต่ตอนย้ายจากถาดหมุนมาเป็นแผนที่เดินทาง
   // มันตกจากตารางนี้ไป กลายเป็นโค้ดที่เดินไปไม่ถึงมาตลอด
@@ -195,7 +194,6 @@ export function makeRestOffer(
     case 'well':            return { kind, shopId: `${id}_well` };
     case 'treasure':        return { kind, shopId: `${id}_treasure` };
     case 'treasure_single': return { kind, shopId: `${id}_treasure1` };
-    case 'fusion_altar':    return { kind, shopId: `${id}_fusion` };
     case 'story_event':     return { kind, shopId: `${id}_event`, eventId };
     default:                return { kind: 'shop_card', shopId: `${id}_shop_card` };
   }

@@ -30,7 +30,7 @@ for(let guard=0;guard<60&&!(rest.phase==='map'&&onRestRow(rest));guard++){
 }
 if(rest.phase!=='map'||!onRestRow(rest))throw Error('QA failed to reach a real rest row');
 rest.campaign={night:2,unlocks:[]};
-for(const kind of ['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event']){
+for(const kind of ['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','story_event']){
  const a=structuredClone(rest);const offer={kind,nodeId:'qa-rest',shopId:'qa-rest',eventId:'episode_lantern'} as any;
  a.pages!.current!.offers[0]=offer;reachableNodes(a.journey!)[0].offer=offer;keep('rest-'+kind,a);
  if(kind==='story_event')keep('event',applyCommand(a,{type:'ChooseOffer',index:0},rng).state);
@@ -69,7 +69,7 @@ for(const difficulty of [1,5] as const){
  if(!state.runSummary)throw Error('Three-night QA did not finish');go({type:'SkipChapter'});snapshot('three-summary-'+difficulty);
 }
 // All actual destination kinds presented on the route, using the same object mapping.
-for(const kind of ['shop_card','shop_equipment','shop_upgrade','shop_remove','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event','next_event']){
+for(const kind of ['shop_card','shop_equipment','shop_upgrade','shop_remove','well','healing_shrine','treasure','treasure_single','story_event','next_event']){
  const a=structuredClone(fixtures['adventure-1'].state),o=structuredClone(fixtures['rest-'+kind]?.state.pages!.current!.offers[0]??{kind:'next_event'});
  a.pages!.current!.offers[1]=o;a.pages!.adventure!.deck.find(e=>e.id===a.pages!.adventure!.slotIds[1])!.offer=o;
  keep('adventure-prop-'+kind,a);

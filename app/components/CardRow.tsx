@@ -8,7 +8,6 @@ import React from 'react';
 import InkIcon from './InkIcon';
 import { Text, View } from 'react-native';
 import type { CardData } from '../../src/core/types';
-import { isFused } from '../../src/core/cards/fusion';
 import { hitsOf, conditionLabel } from '../../src/core/cards/mechanics';
 import { font, radius, size, space, tint, paper } from '../theme';
 
@@ -100,7 +99,6 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
             <Badge label={spent ? 'ใช้ไปแล้ว' : 'ใช้แล้วหาย'} tone="blood" />
           )}
           {card.upgraded && <Badge label="ปลุกเสกแล้ว" />}
-          {isFused(card) && <Badge label="ผสาน" />}
           {hitsOf(card) > 1 && <Badge label={`${hitsOf(card)} หมัด`} tone="blood" />}
           {!!card.whileHeld && <Badge label="ถือไว้ก็ทำงาน" />}
           {!!card.costRule && <Badge label="ยิ่งร่ายยิ่งถูก" />}

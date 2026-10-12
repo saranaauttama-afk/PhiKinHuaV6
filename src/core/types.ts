@@ -170,7 +170,7 @@ export type EventState =
 export type ShopItem = 
   | { card: CardData; price: number }
   | { equipment: any; price: number };
-export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single' | 'fusion';
+export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single';
 
 export type ShopState = 'unused' | 'visited' | 'completed';
 
@@ -375,7 +375,6 @@ export type GameState = {
   event?: EventState;
 
   /** แท่นผสานการ์ด — ผสานได้ครั้งเดียวต่อแท่น การเลือกจึงมีน้ำหนัก */
-  fusionAltar?: { timesUsed: number };
 
   /**
    * ผีที่ปราบไปแล้วในรันนี้ — จะไม่โผล่บนแผนที่อีก
@@ -493,7 +492,6 @@ export type Command =
   | { type: 'ShopUpgradeBuy'; index: number }
 
   // ผสานการ์ด — index อ้างตำแหน่งใน masterDeck
-  | { type: 'FuseCards'; indexA: number; indexB: number }
 
   // เหตุการณ์เล่าเรื่อง
   | { type: 'ChooseEventOption'; index: number }

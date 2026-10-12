@@ -14,7 +14,6 @@ export function encounterClue(o:PageOffer):string{
   case 'treasure_single':return 'รับสมบัติหนึ่งชิ้น\nเพิ่มการ์ดในสำรับ';
   case 'shop_upgrade':return 'ปลุกเสกการ์ด\nเพิ่มพลังวิชา';
   case 'shop_remove':return 'สละการ์ดที่ไม่ใช้\nจัดสำรับให้กระชับ';
-  case 'fusion_altar':return 'ผสานการ์ดสองใบ\nรวมพลังเป็นวิชาใหม่';
   case 'story_event':return 'เรื่องราวระหว่างทาง\nเลือกชะตาด้วยตนเอง';
   case 'next_event':return 'เดินทางต่อ\nสู่พื้นที่ถัดไป';
  }

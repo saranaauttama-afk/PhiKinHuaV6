@@ -128,7 +128,7 @@ function completeAdventure(s:GameState,r:RNG){
  }
  if(s.phase==='shop'){
   rememberAdventureService(s);
-  const used=mp._shopUsed||!!s.shopBoughtItems?.length||(s.shopKind==='fusion'&&(s.fusionAltar?.timesUsed??0)>0);
+  const used=mp._shopUsed||!!s.shopBoughtItems?.length;
   if(s.currentShopId&&s.shopKind){
    const {addShopToRegistry,updateShopInRegistry}=require('../../shopRegistry');
    if(s.shopRegistry?.some(sh=>sh.id===s.currentShopId))updateShopInRegistry(s,s.currentShopId,s.shopStock??[],s.shopBoughtItems??[]);
@@ -669,19 +669,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       return { state: s, rng };
     }
 
-    case 'fusion_altar': {
-      // แท่นผสานไม่มีของขาย ไม่ต้องสุ่มสต็อก — แค่เปิดหน้าให้เลือกการ์ดสองใบ
-      s.shopKind = 'fusion';
-      s.shopStock = undefined;
-      s.shopBoughtItems = [];
-      s.currentShopId = offer.shopId;
-      // นับใหม่ทุกแท่น — แท่นละหนึ่งครั้ง
-      s.fusionAltar = { timesUsed: 0 };
-      s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
-      s.log.push(`ChooseOffer → แท่นผสาน (${offer.shopId})`);
-      return { state: s, rng };
-    }
 
     case 'next_event': {
       if(usesThreePageBoard(s)){useIntersectionPage(s,ix);return {state:s,rng};}

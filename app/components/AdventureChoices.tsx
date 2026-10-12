@@ -10,7 +10,7 @@ import {QuietButton} from './QuietChrome';
 import {layer,font,palette} from '../theme';
 
 const frame=require('../../assets/ui/encounter-frame-v30.webp');
-const kindLabel=(o:PageOffer)=>o.kind==='monster'?'ต่อสู้':o.kind==='boss'?'ศึกใหญ่':o.kind==='story_event'?'สำรวจเรื่องราว':o.kind==='treasure'||o.kind==='treasure_single'?'รับสมบัติ':o.kind==='shop_card'||o.kind==='shop_equipment'?'เข้าร้าน':o.kind==='well'?'ดื่มน้ำ':o.kind==='shop_upgrade'?'ปลุกเสก':o.kind==='shop_remove'?'สละการ์ด':o.kind==='fusion_altar'?'ผสานการ์ด':o.kind==='next_event'?'เดินต่อ':'พักฟื้น';
+const kindLabel=(o:PageOffer)=>o.kind==='monster'?'ต่อสู้':o.kind==='boss'?'ศึกใหญ่':o.kind==='story_event'?'สำรวจเรื่องราว':o.kind==='treasure'||o.kind==='treasure_single'?'รับสมบัติ':o.kind==='shop_card'||o.kind==='shop_equipment'?'เข้าร้าน':o.kind==='well'?'ดื่มน้ำ':o.kind==='shop_upgrade'?'ปลุกเสก':o.kind==='shop_remove'?'สละการ์ด':o.kind==='next_event'?'เดินต่อ':'พักฟื้น';
 const pageLabel=(o:PageOffer)=>o.kind==='story_event'?'เรื่องสำคัญ':kindLabel(o);
 const iconFor=(o:PageOffer):InkSymbol=>o.kind==='monster'||o.kind==='boss'?'attack':o.kind==='story_event'?'lantern':o.kind==='well'||o.kind==='healing_shrine'?'rest':o.kind==='next_event'?'walk':o.kind==='shop_card'||o.kind==='treasure'||o.kind==='treasure_single'||o.kind==='shop_remove'?'deck':'blessing';
 const enterLabel=(o:PageOffer,i:number)=>o.kind==='monster'||o.kind==='boss'?'เผชิญหน้า · '+describeOffer(o,i).name:o.kind==='story_event'?'สำรวจเรื่องราว':kindLabel(o)+' · '+describeOffer(o,i).name;

@@ -5,7 +5,6 @@ import { baseNewState } from '../src/core/commands';
 import type { Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import { AUTO_SAVE_COMMANDS, toSave, fromSave, isPlayableSave, summarize, SAVE_VERSION } from '../src/core/save';
-import { isFused } from '../src/core/cards/fusion';
 import { resolveStoryIfAny, resolveRewardIfAny, leaveRestRow } from './helpers';
 
 /**
@@ -130,7 +129,7 @@ describe('สำรับไม่ถูกตัดทิ้งตอนโห�
     ];
 
     const back = roundTrip(s);
-    const fused = back.masterDeck.filter(isFused);
+    const fused = back.masterDeck.filter(c => c.id === 'fused_test__pair');
 
     expect(fused, 'การ์ดผสานหายตอนโหลด').toHaveLength(1);
     expect(fused[0].dmg).toBe(9);

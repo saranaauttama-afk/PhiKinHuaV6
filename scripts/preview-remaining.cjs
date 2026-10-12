@@ -23,7 +23,7 @@ module.exports=async function({browser,base,errors}){
  await p.getByRole('button',{name:'ดูคืนที่ 5',exact:true}).click();if(await p.getByRole('button',{name:'ผ่านคืนที่ 4 ก่อน',exact:true}).isEnabled())throw Error('Locked night selectable');await shot('08-night-locked');
  await p.getByRole('button',{name:'ดูคืนที่ 1',exact:true}).click();await shot('09-night-select');
  // Snapshot routes render the production components and apply real engine commands.
- const screens=['chapter','event','event-result','shop-card','shop-equipment','shop-healing','shop-upgrade','shop-remove','shop-fusion','shop-treasure_single','levelup','reward','deck','blessings','summary','defeat','summary-defeat'];
+ const screens=['chapter','event','event-result','shop-card','shop-equipment','shop-healing','shop-upgrade','shop-remove','shop-treasure_single','levelup','reward','deck','blessings','summary','defeat','summary-defeat'];
  for(const screen of screens){
   if(!data.fixtures[screen])throw Error('Missing review fixture '+screen);
   await p.goto(base+'/ui-review?screen='+screen);await p.getByText('กำลังเปิดภาพจากเกม…',{exact:true}).waitFor({state:'hidden'});await p.waitForTimeout(800);
@@ -34,11 +34,6 @@ module.exports=async function({browser,base,errors}){
   }
   if(screen==='shop-healing'){
    const action=p.getByRole('button',{name:/^ขอพร /});if(await action.count()){await action.click();await p.getByText(/พักฟื้นแล้ว/).waitFor();}
-  }
-  if(screen==='shop-fusion'){
-   await p.getByText('เลือกการ์ดสองใบ (0/2)',{exact:true}).waitFor();
-   const picks=p.getByRole('button',{name:/^ผสาน /});await picks.nth(0).click();await picks.nth(1).click();await shot('11-fusion-selected');
-   const confirm=p.getByRole('button',{name:'ผสาน',exact:true});if(await confirm.count())await confirm.click();
   }
   if(screen==='deck'){
    await p.getByRole('button',{name:/^ดูการ์ด /}).first().click();await shot('11-deck-detail');await p.getByRole('button',{name:'กลับไปดูสำรับ',exact:true}).click();await p.getByRole('button',{name:'ปิด',exact:true}).click();await p.getByText('ปุ่มตอบสนองแล้ว').waitFor();

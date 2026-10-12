@@ -39,7 +39,7 @@ describe('shop confirmation engine and boundaries',()=>{
  });
 });
 describe('all rest route types and combat labels',()=>{
- const kinds=['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','fusion_altar','story_event'] as const;
+ const kinds=['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','story_event'] as const;
  for(const kind of kinds)it(`${kind} enters correct phase and returns to identical rest row`,()=>{
   let s=newState();s.chapter=undefined;s=step(s,{type:'ChooseStarterBlessing',index:0});
   for(let guard=0;guard<60&&!(s.phase==='map'&&onRestRow(s));guard++){

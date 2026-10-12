@@ -34,7 +34,7 @@ export function startJourney(s: GameState, r: RNG): RNG {
   s.journey = out.journey;
   if(s.campaign){
     for(const node of Object.values(s.journey.nodes))if(node.offer.kind==='boss'&&node.offer.bossType==='final')node.offer={...node.offer,enemyId:nightFinalBoss(s.campaign.night).id};
-    const restKinds=[['healing_shrine','shop_card','shop_remove'],['story_event','shop_upgrade','shop_equipment'],['healing_shrine','shop_remove','shop_upgrade'],['treasure_single','shop_card','story_event'],['healing_shrine','shop_upgrade','fusion_altar'],['shop_remove','shop_card','story_event'],['healing_shrine','shop_upgrade','shop_equipment']] as const;
+    const restKinds=[['healing_shrine','shop_card','shop_remove'],['story_event','shop_upgrade','shop_equipment'],['healing_shrine','shop_remove','shop_upgrade'],['treasure_single','shop_card','story_event'],['healing_shrine','shop_upgrade','shop_card'],['shop_remove','shop_card','story_event'],['healing_shrine','shop_upgrade','shop_equipment']] as const;
     let restIndex=0;
     for(let row=0;row<s.journey.rows.length;row++)if(s.journey.plans[row].kind==='rest'){
       const kinds=restKinds[restIndex++];

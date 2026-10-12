@@ -15,7 +15,6 @@ export type PageOffer =
   | { kind: 'healing_shrine'; shopId: string }
   | { kind: 'treasure'; shopId: string }
   | { kind: 'treasure_single'; shopId: string }
-  | { kind: 'fusion_altar'; shopId: string }
   | { kind: 'story_event'; shopId: string; eventId: string }
   | { kind: 'next_event' } // ไปหน้าถัดไปแบบเหตุการณ์พิเศษ
   | { kind: 'boss', bossType: 'mid' | 'final' | 'secret', enemyId: string };
@@ -32,7 +31,7 @@ export type MapStatePages = {
     wells: number; healingShrine: number;
     treasure: number; treasureSingle: number; nextEvent: number;
     /** เหตุการณ์เล่าเรื่องกับแท่นผสาน — เดิมไม่มีโควตาเพราะไม่เคยเติมช่องซ้ำ */
-    storyEvent: number; fusionAltar: number;
+    storyEvent: number;
   };
   // Track deleted shops for sequential logic
   deletedShops: string[];
@@ -76,7 +75,6 @@ export function isRestOfferKind(kind: PageOffer['kind']): boolean {
     kind === 'healing_shrine' ||
     kind === 'treasure' ||
     kind === 'treasure_single' ||
-    kind === 'fusion_altar' ||
     kind === 'story_event'
   );
 }
@@ -105,8 +103,7 @@ export function consumeToken(mp: MapStatePages, offer: PageOffer) {
     case 'treasure':        if (mp.pools.treasure      > 0) mp.pools.treasure--;       break;
     case 'treasure_single': if (mp.pools.treasureSingle > 0) mp.pools.treasureSingle--; break;
     case 'next_event':      if (mp.pools.nextEvent     > 0) mp.pools.nextEvent--;      break;
-    // แท่นผสานกับเหตุการณ์มีเฉพาะบนแผนที่แบบเส้นทาง ซึ่งไม่ใช้ระบบ pool
-    case 'fusion_altar':    break;
+    // เหตุการณ์มีเฉพาะบนแผนที่แบบเส้นทาง ซึ่งไม่ใช้ระบบ pool
     case 'story_event':     break;
     case 'boss':            break;
   }

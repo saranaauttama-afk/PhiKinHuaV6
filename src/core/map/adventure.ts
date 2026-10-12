@@ -56,7 +56,7 @@ export function startAdventure(s:GameState,r:RNG):RNG {
  const pick=<T,>(pool:T[]):T=>{const out=shuffle(r,pool);r=out.rng;return out.array[0];};
  const shop=modern&&night===1?{kind:'shop_card' as const,shopId:''}:pick<PageOffer>([{kind:'shop_card',shopId:''},{kind:'shop_equipment',shopId:''}]);
  const healing=pick<PageOffer>([{kind:'well',shopId:''},{kind:'healing_shrine',shopId:''}]);
- const special=pick<PageOffer>([{kind:'treasure',shopId:''},{kind:'treasure_single',shopId:''},{kind:'shop_upgrade',shopId:'',phase:1},{kind:'shop_remove',shopId:'',phase:1},{kind:'fusion_altar',shopId:''}]);
+ const special=pick<PageOffer>([{kind:'treasure',shopId:''},{kind:'treasure_single',shopId:''},{kind:'shop_upgrade',shopId:'',phase:1},{kind:'shop_remove',shopId:'',phase:1}]);
  const story:PageOffer={kind:'story_event',shopId:'',eventId:`${modern?'run_story':'night_story'}_${night}`};
  const early=pick(modern?[1,2]:[1,2,3]),middle=pick(modern&&night===1?[3,4]:[4,5]),late=pick([8,9]);
  const kinds:PageOffer[]=[];
@@ -167,17 +167,17 @@ export function useIntersectionPage(s:GameState,ix:number):void {
  s.pages!._activeOfferIndex=undefined;s.pages!._shopUsed=false;
  advanceThreePageBoard(s);
 }
-const serviceFields=['shopStock','shopBoughtItems','fusionAltar','mysticalWell','healingShrine','_singleTreasureRandomized','rewardReceipt'] as const;
+const serviceFields=['shopStock','shopBoughtItems','mysticalWell','healingShrine','_singleTreasureRandomized','rewardReceipt'] as const;
 export function rememberAdventureService(s:GameState):void {
  if(!usesThreePageBoard(s)||!s.currentShopId)return;
  const a=s.pages!.adventure!,saved:Record<string,unknown>={};
  for(const key of serviceFields)if((s as any)[key]!==undefined)saved[key]=JSON.parse(JSON.stringify((s as any)[key]));
  (a.serviceStates??={})[s.currentShopId]=saved;
- if((s.pages!._shopUsed||s.shopBoughtItems?.length||(s.fusionAltar?.timesUsed??0)>0)&&!a.usedIds!.includes(s.currentShopId))a.usedIds!.push(s.currentShopId);
+ if((s.pages!._shopUsed||s.shopBoughtItems?.length)&&!a.usedIds!.includes(s.currentShopId))a.usedIds!.push(s.currentShopId);
 }
 export function restoreAdventureService(s:GameState,offer:PageOffer,index:number):boolean {
  if(!usesThreePageBoard(s)||!('shopId' in offer)||offer.kind==='story_event')return false;
- const kinds:Record<string,string>={shop_card:'card',shop_equipment:'equipment',shop_remove:'remove',shop_upgrade:'upgrade',well:'well',healing_shrine:'healing',treasure:'treasure',treasure_single:'treasure_single',fusion_altar:'fusion'};
+ const kinds:Record<string,string>={shop_card:'card',shop_equipment:'equipment',shop_remove:'remove',shop_upgrade:'upgrade',well:'well',healing_shrine:'healing',treasure:'treasure',treasure_single:'treasure_single'};
  const saved=s.pages!.adventure!.serviceStates?.[offer.shopId];
  for(const key of serviceFields)delete (s as any)[key];
  if(!saved)return false;
@@ -200,7 +200,7 @@ function validThreePageBoard(s:Partial<GameState>):boolean {
  const finished=a.deck.filter(e=>a.resolvedIds.includes(e.id));
  if(a.fightsWon!==finished.filter(e=>e.offer.kind==='monster').length||a.storyDone!==finished.some(e=>e.offer.kind==='story_event'&&e.offer.eventId===storyId(s)))return false;
  const services=a.deck.filter(e=>e.offer.kind!=='monster').map(e=>e.offer);
- if(services.filter(o=>o.kind==='next_event').length!==1||services.filter(o=>o.kind==='story_event'&&o.eventId===storyId(s)).length!==1||services.filter(o=>o.kind==='shop_card'||o.kind==='shop_equipment').length!==1||services.filter(o=>o.kind==='well'||o.kind==='healing_shrine').length!==1||services.filter(o=>['treasure','treasure_single','shop_upgrade','shop_remove','fusion_altar'].includes(o.kind)).length!==(c.night===1?0:1))return false;
+ if(services.filter(o=>o.kind==='next_event').length!==1||services.filter(o=>o.kind==='story_event'&&o.eventId===storyId(s)).length!==1||services.filter(o=>o.kind==='shop_card'||o.kind==='shop_equipment').length!==1||services.filter(o=>o.kind==='well'||o.kind==='healing_shrine').length!==1||services.filter(o=>['treasure','treasure_single','shop_upgrade','shop_remove'].includes(o.kind)).length!==(c.night===1?0:1))return false;
  const active=a.slotIds.filter((id,i):id is string=>id!==null&&!p.resolved[i]),outstanding=[...active,...a.pendingIds];
  if(new Set(outstanding).size!==outstanding.length||a.pendingIds.some(id=>!a.deferredIds.includes(id)||consumed.includes(id)))return false;
  if(a.usedIds!.some(id=>!drawn.includes(id)||isCriticalOffer(a.deck.find(e=>e.id===id)!.offer)))return false;
@@ -222,7 +222,7 @@ export function validAdventure(s:Partial<GameState>):boolean {
  const monsters=a.deck.filter(e=>e.offer.kind==='monster').map(e=>(e.offer as Extract<PageOffer,{kind:'monster'}>).enemyId);
  if(monsters.length!==routeFightQuota(s)||new Set(monsters).size!==routeFightQuota(s)||monsters.some(id=>!ADVENTURE_GHOSTS.some(m=>m.id===id)))return false;
  const services=a.deck.filter(e=>e.offer.kind!=='monster').map(e=>e.offer);
- if(services.filter(o=>o.kind==='shop_card'||o.kind==='shop_equipment').length!==1||services.filter(o=>o.kind==='well'||o.kind==='healing_shrine').length!==1||services.filter(o=>o.kind==='story_event'&&o.eventId===storyId(s)).length!==1||services.filter(o=>['treasure','treasure_single','shop_upgrade','shop_remove','fusion_altar'].includes(o.kind)).length!==(isThreeNight(s)&&s.campaign.night===1?0:1))return false;
+ if(services.filter(o=>o.kind==='shop_card'||o.kind==='shop_equipment').length!==1||services.filter(o=>o.kind==='well'||o.kind==='healing_shrine').length!==1||services.filter(o=>o.kind==='story_event'&&o.eventId===storyId(s)).length!==1||services.filter(o=>['treasure','treasure_single','shop_upgrade','shop_remove'].includes(o.kind)).length!==(isThreeNight(s)&&s.campaign.night===1?0:1))return false;
  const consumed=[...a.resolvedIds,...a.skippedIds],ids=a.deck.map(e=>e.id),drawn=ids.slice(0,a.cursor);
  if(new Set(ids).size!==ids.length||new Set(consumed).size!==consumed.length||consumed.some(id=>!drawn.includes(id)))return false;
  const resolved=a.deck.filter(e=>a.resolvedIds.includes(e.id));

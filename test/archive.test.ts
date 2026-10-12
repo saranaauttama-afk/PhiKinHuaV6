@@ -8,7 +8,6 @@ import {baseNewState} from '../src/core/commands';
 import {makeRng} from '../src/core/rng';
 import {toSave,fromSave} from '../src/core/save';
 import {ALL_CARDS} from '../src/core/pack';
-import {fuseCards} from '../src/core/cards/fusion';
 import type {Command} from '../src/core/types';
 function run(id='archive-a',night:1|2|3|4|5=1){
  let rng=makeRng(id),s=baseNewState(id);
@@ -17,12 +16,11 @@ function run(id='archive-a',night:1|2|3|4|5=1){
  return {get s(){return s;},get rng(){return rng;},step};
 }
 describe('archive catalog and real discoveries',()=>{
- it('lists all 34 unique ghosts in staged groups and 126 core identities plus 17 special entries',()=>{
+ it('lists all 34 unique ghosts in staged groups and 126 core identities plus 5 special entries',()=>{
   expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);expect(CORE_CARD_IDS.size).toBe(126);
-  expect(CARD_CATALOG).toHaveLength(143);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(143);
+  expect(CARD_CATALOG).toHaveLength(131);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(131);
   expect(GHOST_CATALOG.filter(g=>g.group==='บอสแต่ละคืน').map(g=>g.night)).toEqual([1,2,3,4,5]);
   expect(GHOST_CATALOG.at(-1)?.id).toBe('phi-kin-hua');
-  expect(CARD_CATALOG.filter(c=>c.group==='สูตรผสาน').every(c=>c.card.tags?.includes('fused'))).toBe(true);
  });
  it('records only map ghosts revealed to the player, not the ten prebuilt future fights',()=>{
   const r=run();const visible=r.s.pages!.current!.offers.filter(o=>o?.kind==='monster');expect(Object.keys(r.s.discovery!.ghosts)).toHaveLength(visible.length);
@@ -55,12 +53,6 @@ describe('archive catalog and real discoveries',()=>{
   const card=a.s.masterDeck[0];expect(archiveProgress(p).cards[card.id].seen).toBe(2);
   const count=Object.keys(a.s.discovery!.cards).length;a.s.masterDeck.push({...card,upgraded:true,upgradeLevel:2});trackDiscovery(a.s,a.s);
   expect(Object.keys(a.s.discovery!.cards)).toHaveLength(count);
- });
- it('records received curses, named and unnamed fusion without counting generated possibilities',()=>{
-  const r=run(),a=ALL_CARDS.find(c=>c.id==='muay_stance')!,b=ALL_CARDS.find(c=>c.id==='parry_step')!;const fused=fuseCards(a,b);
-  r.s.masterDeck.push(fused);trackDiscovery(r.s,r.s);const p=archiveProgress(mergeDiscovery(emptyArchive(),r.s.discovery!));
-  expect(p.cards[fused.id]).toBeTruthy();expect(archiveCards(p.cardData).some(x=>x.card.id===fused.id)).toBe(true);
-  expect(Object.keys(p.cards).some(id=>id==='curse_whisper')).toBe(false);
  });
  it('rejects corrupt progress rather than granting discoveries',()=>{
   expect(()=>parseArchive('{"version":1}')).toThrow();

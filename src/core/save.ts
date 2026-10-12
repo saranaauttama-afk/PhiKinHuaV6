@@ -47,7 +47,7 @@ export const AUTO_SAVE_COMMANDS = [
   'TakeTreasureCard', 'TakeSingleTreasureCard',
   'UseWell', 'UseHealingShrine',
   'EventChooseBlessing',
-  'ChooseEventOption', 'FuseCards',
+  'ChooseEventOption',
 ] as const;
 
 /**

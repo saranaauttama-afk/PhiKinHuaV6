@@ -44,7 +44,6 @@ export const POOL_DEFAULT = {
   treasureSingle: 0, // Single card treasure with random option
   nextEvent: 2, // next_page แบบ event พิเศษ
   storyEvent: 2,
-  fusionAltar: 1,
 };
 
 export const WEIGHTS = {

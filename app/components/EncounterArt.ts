@@ -9,7 +9,6 @@ export const ENCOUNTER_OBJECTS={
  healing_shrine:require('../../assets/ui/blessing-shrine-object.png'),
  shop_upgrade:require('../../assets/encounters/thai-v29/upgrade-altar.webp'),
  shop_remove:require('../../assets/ui/remove-torn-card-b17.webp'),
- fusion_altar:require('../../assets/encounters/thai-v29/fusion-altar.webp'),
  story_event:require('../../assets/ui/trail-rest.png'),
  next_event:require('../../assets/encounters/thai-v29/next-path.webp'),
 };
@@ -28,4 +27,4 @@ export function storyObject(eventId:string){
  return ENCOUNTER_OBJECTS.story_event;
 }
 export function encounterObject(o:PageOffer){return o.kind==='story_event'?storyObject(o.eventId):o.kind==='monster'||o.kind==='boss'?undefined:ENCOUNTER_OBJECTS[o.kind];}
-export function shopObject(kind?:string){return ENCOUNTER_OBJECTS[({card:'shop_card',equipment:'shop_equipment',upgrade:'shop_upgrade',remove:'shop_remove',healing:'healing_shrine',fusion:'fusion_altar'} as Record<string,keyof typeof ENCOUNTER_OBJECTS>)[kind??'']??kind as keyof typeof ENCOUNTER_OBJECTS];}
+export function shopObject(kind?:string){return ENCOUNTER_OBJECTS[({card:'shop_card',equipment:'shop_equipment',upgrade:'shop_upgrade',remove:'shop_remove',healing:'healing_shrine'} as Record<string,keyof typeof ENCOUNTER_OBJECTS>)[kind??'']??kind as keyof typeof ENCOUNTER_OBJECTS];}
