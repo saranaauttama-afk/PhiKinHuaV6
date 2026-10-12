@@ -2,7 +2,7 @@ name: v35 Battle Backlog Test APK
 on:
   push:
     branches: ['work/enemy-hand-v34']
-    paths-ignore: ['**/*.md', 'docs/**/*.json']
+    paths-ignore: ['**/*.md', 'docs/**/*.json', 'scripts/android-v35-smoke.py', '.github/workflows/v35-native-verify.yml', '.github/workflows/android-v34.yml']
   workflow_dispatch:
 permissions:
   contents: read
