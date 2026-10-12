@@ -15,7 +15,6 @@ import {getCardPlayedFns,runBlessingsTurnHook} from '../src/core/blessingRuntime
 import {emptyJournal,parseJournal,ACHIEVEMENTS} from '../src/core/campaign/journal';
 import {advanceAfterVictory} from '../src/core/engine/shared';
 import {rollLevelUpChoice} from '../src/core/level';
-import {summonMinion,processPlayerTurnMinions} from '../src/core/minionRuntime';
 import {runEquipmentTurnHook} from '../src/core/equipmentRuntime';
 import {getEquipmentById} from '../src/core/pack';
 import {makeCombatState,attackCard} from './helpers';
@@ -87,20 +86,16 @@ describe('explicit combo removal with ordinary synergy preserved',()=>{
   expect(hp-s.enemy!.hp).toBe(damage);expect((s as any).combo).toBeUndefined();expect((s.runMetrics as any)?.combos).toBeUndefined();expect(s.log.join(' ')).not.toMatch(/combo|คอมโบ/i);
   if(cls==='warrior'||cls==='nun')expect(s.player.block).toBe(block); // no old bonus block
  });
- for(const id of formerCards)it(id+' retains an independently playable effect',()=>{
-  const c=cardById(id)!;expect(c).toBeDefined();expect(!!(c.dmg||c.block||c.heal||c.draw||c.energyGain||c.statusEffect||c.summonMinion||c.cleanseDebuffs||c.trap)).toBe(true);
+ for(const id of (formerCards as string[]).filter(id=>cardById(id)))it(id+' retains an independently playable effect',()=>{
+  const c=cardById(id)!;expect(c).toBeDefined();expect(!!(c.dmg||c.block||c.heal||c.draw||c.energyGain||c.statusEffect||c.cleanseDebuffs||c.trap)).toBe(true);
   const {state,rng}=makeCombatState({hand:[c],playerEnergy:30,enemyHp:1000,playerHp:20});state.player.maxHp=80;state.classId=(c.tags?.find(t=>ALL_CLASS_IDS.includes(t as any))??'shaman') as any;state.piles.draw=ALL_CARDS.slice(0,10);
   const out=applyCommand(state,{type:'PlayCard',index:0},rng).state;expect(out.piles.hand.some(x=>x.instanceId===state.piles.hand[0].instanceId)).toBe(false);expect(out.log.join(' ')).not.toMatch(/error/i);expect((out as any).combo).toBeUndefined();
  });
- it('strength buffs each normal hit, minions still summon, healing remains bounded',()=>{
-  const {state,rng}=makeCombatState({hand:[attackCard(3,{hits:2}),cardById('call_old_ghost')!,cardById('holy_water')!],enemyHp:100,playerEnergy:10,playerHp:10});state.player.maxHp=50;applyStatusEffect('player',state,'strength',3,2);
-  let s=applyCommand(state,{type:'PlayCard',index:0},rng).state;expect(s.enemy!.hp).toBe(90);s=applyCommand(s,{type:'PlayCard',index:0},rng).state;expect(s.minions?.some(m=>m.owner==='player')).toBe(true);s=applyCommand(s,{type:'PlayCard',index:0},rng).state;expect(s.player.hp).toBe(15);
- });
- it('equipment and minion draw exceed retention without modifying base draw or hand cap',()=>{
+
+ it('equipment draw exceeds retention without modifying base draw or hand cap',()=>{
   const {state}=makeCombatState({hand:[attackCard(1),attackCard(1)]});state.player.maxHandSize=2;state.player.drawPerTurn=2;state.piles.draw=ALL_CARDS.slice(0,8);state.equipmentSlotsMax=3;state.equipped=[getEquipmentById('nang_tani_skull')!];
   runEquipmentTurnHook(state,'on_turn_start','player');expect(state.piles.hand).toHaveLength(3);
-  summonMinion(state,'ghost_ally','player',1);state.minions![0].abilities=[{type:'draw',value:2,target:'owner',trigger:'turn_start',description:'draw 2'}];processPlayerTurnMinions(state);
-  expect(state.piles.hand).toHaveLength(5);expect(requiredDiscards(state)).toBe(3);expect(state.player.drawPerTurn).toBe(2);expect(state.player.maxHandSize).toBe(2);
+  expect(requiredDiscards(state)).toBe(1);expect(state.player.drawPerTurn).toBe(2);expect(state.player.maxHandSize).toBe(2);
  });
  it('old free-card/immunity flags are ignored, not interpreted as effects',()=>{
   const {state,rng}=makeCombatState({hand:[attackCard(8,{cost:2})],playerEnergy:0});(state as any).combo={freeCards:99,debuffImmunity:true,damageBoost:99};expect(effectiveCost(state,state.piles.hand[0])).toBe(2);const s=applyCommand(state,{type:'PlayCard',index:0},rng).state;expect(s.enemy!.hp).toBe(state.enemy!.hp);expect(applyStatusEffect('player',s,'poison',2,1).success).toBe(true);

@@ -48,7 +48,6 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
       cursed_needle: 1,
       meditation: 1,
       direct_poison_spell: 1,
-      create_kuman: 1,
     },
     passiveName: 'ครูพักลักจำ',
     passiveDesc: 'เทิร์นแรกของทุกไฟต์ได้พลังงานเพิ่ม 1',
@@ -103,7 +102,7 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
     id: 'medium',
     name: 'คนทรง',
     title: 'ผู้เชิญวิญญาณ',
-    desc: 'เลือกสะสมวิญญาณคู่กาย หรือวางพิษแล้วซ้ำแผล ต้องแบ่งพลังงานระหว่างตั้งรับกับตั้งพิธี',
+    desc: 'วางพิษแล้วซ้ำแผล ต้องแบ่งพลังงานระหว่างตั้งรับกับตั้งพิธี',
     cardTag: 'medium',
     startHp: 46,
     startEnergy: 3,
@@ -112,13 +111,12 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
       whisper_ear: 2,
       poison_echo: 1,
       yantra_cloth: 3,
-      invite_spirit: 1,
       spirit_pact: 1,
       set_altar: 1,
       phrai_oil: 1,
     },
     passiveName: 'ผีติดตาม',
-    passiveDesc: 'เริ่มทุกไฟต์พร้อมวิญญาณคู่กาย 1 ตน',
+    passiveDesc: 'เริ่มทุกไฟต์ด้วยการ์ดป้องกัน 4',
   },
 };
 
@@ -157,11 +155,10 @@ export function applyClassCombatStart(s: GameState): void {
       s.player.block = (s.player.block ?? 0) + 6;
       break;
 
-    case 'medium': {
-      const { summonMinion } = require('./minionRuntime');
-      summonMinion(s, 'ghost_ally', 'player', 1);
+    case 'medium':
+      // Interim until the borrow-cards redesign: a small opening guard.
+      s.player.block = (s.player.block ?? 0) + 4;
       break;
-    }
 
     case 'nun':
       // อานิสงส์ทำงานตอนชนะไฟต์ ไม่ใช่ตอนเริ่ม

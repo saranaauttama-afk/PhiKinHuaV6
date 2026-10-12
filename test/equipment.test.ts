@@ -16,7 +16,6 @@ import {
   runEquipmentCardPlayed,
 } from '../src/core/equipmentRuntime';
 import { getEquipmentById } from '../src/core/pack';
-import { getPlayerMinions } from '../src/core/minionRuntime';
 import { makeCombatState, attackCard } from './helpers';
 
 /** ใส่ของให้ผู้เล่นจริงๆ ผ่านข้อมูลในไฟล์ pack ไม่ใช่ของปลอมที่เขียนในเทสต์ */
@@ -68,14 +67,7 @@ describe('ของที่ทำงานตอนเริ่มไฟต์'
     expect(getStatusEffectStacks('player', state, 'regeneration')).toBe(3);
   });
 
-  it('ศาลพระภูมิเรียกผีเฝ้าเรือนมาเป็นของผู้เล่น', () => {
-    const { state } = makeCombatState();
-    equip(state, 'spirit_house');
-    runEquipmentOnBattleStart(state, 'player');
-    const mine = getPlayerMinions(state);
-    expect(mine.length).toBe(1);
-    expect(mine[0].name).toContain('ผู้พิทักษ์ต้นไม้');
-  });
+
 });
 
 describe('บาตรพระ — ฟื้นเพิ่มจากการ์ดที่ฟื้นเลือด', () => {

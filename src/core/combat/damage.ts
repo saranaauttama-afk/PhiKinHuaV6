@@ -15,7 +15,7 @@ import {
 } from './status-effects';
 
 export function combatFrame(state: GameState) {
-  return JSON.parse(JSON.stringify({ player: state.player, enemy: state.enemy, minions: state.minions ?? [], historySeq: state.cardHistorySeq ?? 0 }));
+  return JSON.parse(JSON.stringify({ player: state.player, enemy: state.enemy, historySeq: state.cardHistorySeq ?? 0 }));
 }
 
 /** ปล่อย event ให้ view เอาไปเล่นเป็นอนิเมชั่น (ดู CombatEvent ใน types.ts) */
@@ -28,7 +28,6 @@ export type Side = 'player' | 'enemy';
 export type DamageSource =
   | { kind: 'card'; cardId: string }
   | { kind: 'status'; effectId: string }
-  | { kind: 'minion'; minionId: string; ignoresBlock?: boolean }
   | { kind: 'equipment'; equipmentId: string }
   | { kind: 'blessing'; blessingId:string }
   | { kind: 'event' };
@@ -42,10 +41,6 @@ export type DamageSource =
  *   block คือการปัดป้องหมัดที่กำลังมา แต่พิษอยู่ในตัวแล้ว — เป็นธรรมเนียมของแนวนี้
  *   และ DoT ที่ stack ได้ต้องคาดเดาได้ ไม่ใช่คูณซ้อนกับ buff จนบานปลาย
  *
- * - minion: โดน block ตามปกติ (เว้นแต่ ability ระบุ ignoresBlock)
- *   ผู้รับที่ติด vulnerable กินเพิ่ม แต่ *ไม่* สืบทอด strength ของผู้เรียก
- *   เพราะ minion เป็นคนละตัวกับผู้เรียก มีพลังของตัวเอง
- *
  * - event: ดาเมจเชิงเนื้อเรื่อง ไม่ใช่การต่อสู้ → ทะลุทุกอย่าง
  */
 type DamageRules = {
@@ -58,10 +53,8 @@ function rulesFor(source: DamageSource): DamageRules {
   switch (source.kind) {
     case 'card':
       return { useBlock: true, attackerMods: true, defenderMods: true };
-    case 'minion':
-      return { useBlock: !source.ignoresBlock, attackerMods: false, defenderMods: true };
     // equipment (หนามสะท้อน ฯลฯ): โดน block ตามปกติ แต่ไม่สืบทอด buff ของผู้สวม
-    // ด้วยเหตุผลเดียวกับ minion — แรงมาจากตัวของ ไม่ใช่จากคนถือ
+    // — แรงมาจากตัวของ ไม่ใช่จากคนถือ
     case 'equipment':
     case 'blessing':
       return { useBlock: true, attackerMods: false, defenderMods: true };
@@ -151,7 +144,7 @@ export function dealDamage(
   const rules = rulesFor(args.source);
   let modified = computeModifiedDamage(state, { from, to, raw, source: args.source });
 
-  const isAttack=sourceKind==='card'||sourceKind==='minion';
+  const isAttack=sourceKind==='card';
   const dodge=targetState.statusEffects?.find(e=>e.id==='dodge');
   if(isAttack&&modified>0&&dodge){modified=0;dodge.stacks=(dodge.stacks??1)-1;if(dodge.stacks<=0)targetState.statusEffects=targetState.statusEffects!.filter(e=>e!==dodge);}
   // 4) block ดูดซับ (ดาเมจบางชนิดทะลุ block — ดู rulesFor)

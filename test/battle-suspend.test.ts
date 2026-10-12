@@ -22,7 +22,7 @@ describe('paused battle resume',()=>{
   expect(isPlayableSave(save)).toBe(true);
   expect(restored).toEqual({...state,pendingEvents:[],deckOpen:false});
   expect(restored.enemy).toEqual(state.enemy);expect(restored.pages).toEqual(state.pages);
-  expect(restored.minions).toEqual(state.minions);expect(restored.piles).toEqual(state.piles);
+  expect(restored.piles).toEqual(state.piles);
   // Compare the next real enemy resolution to detect RNG reset or repeated helper effects.
   expect(applyCommand(restored,{type:'ResolveEnemyTurn'},save.battleRng)).toEqual(applyCommand({...state,pendingEvents:[],deckOpen:false},{type:'ResolveEnemyTurn'},rng));
  });

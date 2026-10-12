@@ -130,12 +130,7 @@ describe('พรติดตัวของคลาส', () => {
     expect(s.player.energy).toBeGreaterThan(s.player.maxEnergy);
   });
 
-  it('คนทรงเริ่มไฟต์พร้อมผีคู่กาย', () => {
-    const s = enterFight('medium');
-    // ผีอยู่ใน `state.minions` แล้ว เดิมเป็นอาร์เรย์ระดับโมดูลที่ก๊อปลง state
-    const minions = (s.minions ?? []).filter(m => m.owner === 'player');
-    expect(minions.length).toBeGreaterThan(0);
-  });
+
 
 
   it('แม่ชีฟื้นเลือดเมื่อชนะไฟต์', () => {

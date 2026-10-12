@@ -59,7 +59,7 @@ export function finishEnemyHand(s:GameState,played:number):void{
  const rank=p.hand.map((id,i)=>{
   const c=enemyCardById(id),age=(s.enemyHandAges?.[i]??0)+1;
   const missing=s.enemy?s.enemy.maxHp-s.enemy.hp:0;
-  const useful=c?Math.min(c.heal??0,missing)+(c.dmg??0)*(c.hits??1)+(c.block??0)*.5+(c.statusEffect?3:0)+(c.summonMinion?4:0):0;
+  const useful=c?Math.min(c.heal??0,missing)+(c.dmg??0)*(c.hits??1)+(c.block??0)*.5+(c.statusEffect?3:0):0;
   return {i,age,score:useful+(c?.heal&&missing===0?4:0)};
  }).filter(x=>x.age<MAX_ENEMY_CARD_WAIT).sort((a,b)=>b.score-a.score||a.i-b.i);
  const keep=new Set(rank.slice(0,s.enemyMaxRetained).map(x=>x.i));

@@ -7,7 +7,7 @@ import {enemyConditionalDamage} from './enemyCardEffects';
  * future draws, traps, RNG and progression. Ordinary visible statuses drive all interactions. */
 export function chooseEnemyCardIndexes(s:GameState,hand:string[],budget:number):number[]{
  if(!s.enemy)return [];
- const publicBoard=JSON.parse(JSON.stringify({player:s.player,enemy:s.enemy,minions:s.minions??[],blessings:s.blessings??[]})) as GameState;
+ const publicBoard=JSON.parse(JSON.stringify({player:s.player,enemy:s.enemy,blessings:s.blessings??[]})) as GameState;
  const stacks=(b:GameState,who:'player'|'enemy',id:string)=>(who==='enemy'?b.enemy:b.player)?.statusEffects?.find(e=>e.id===id)?.stacks??0;
  const update=(b:GameState,c:EnemyCardDef)=>{
   const e=c.statusEffect;if(!e)return;
@@ -19,7 +19,7 @@ export function chooseEnemyCardIndexes(s:GameState,hand:string[],budget:number):
  };
  const step=(b:GameState,c:EnemyCardDef,index:number,remaining:number)=>{
   let value=0;
-  if(c.heal&&!c.dmg&&!c.summonMinion&&!c.curseCard&&!c.statusEffect&&b.enemy!.hp===b.enemy!.maxHp&&(s.enemyHandAges?.[index]??0)<2&&(s.enemyIdleTurns??0)===0)return 0;
+  if(c.heal&&!c.dmg&&!c.curseCard&&!c.statusEffect&&b.enemy!.hp===b.enemy!.maxHp&&(s.enemyHandAges?.[index]??0)<2&&(s.enemyIdleTurns??0)===0)return 0;
   const raw=(c.dmg??0)+enemyConditionalDamage(b,c);
   if(raw&&!(c.type==='attack'&&stacks(b,'enemy','entangle'))){
    const dmg=computeModifiedDamage(b,{from:'enemy',to:'player',raw,source:{kind:'card',cardId:c.id}})*(c.hits??1);
@@ -33,9 +33,8 @@ export function chooseEnemyCardIndexes(s:GameState,hand:string[],budget:number):
   }
   const missing=Math.max(0,b.enemy!.maxHp-b.enemy!.hp),healed=Math.min(missing,c.heal??0);
   value+=healed*(b.enemy!.hp<b.enemy!.maxHp*.4?2:.75);b.enemy!.hp+=healed;
-  if(c.block){const danger=6+stacks(b,'player','strength')*2+(b.minions??[]).filter(m=>m.owner==='player').length*2;
+  if(c.block){const danger=6+stacks(b,'player','strength')*2;
    value+=Math.max(0,Math.min(c.block,danger-b.enemy!.block))*(b.enemy!.hp<b.enemy!.maxHp*.4?1:.65);b.enemy!.block+=c.block;}
-  if(c.summonMinion){value+=(b.minions??[]).filter(m=>m.owner==='enemy').length>=2?0:4;b.minions!.push({owner:'enemy'} as any);}
   if(c.curseCard)value+=2;
   if(c.statusEffect){
    const e=c.statusEffect,existing=stacks(b,e.target,e.effect);

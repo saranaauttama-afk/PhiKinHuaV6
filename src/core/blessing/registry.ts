@@ -6,7 +6,7 @@ type When = {
   type?: CardData['type'];
   cost?: number;
   status?: boolean;
-  block?:boolean;heal?:boolean;summon?:boolean;enemyStatus?:boolean;multipleHits?:boolean;
+  block?:boolean;heal?:boolean;enemyStatus?:boolean;multipleHits?:boolean;
 };
 
 type OnPlaySpec = {
@@ -30,7 +30,7 @@ const behaviors: Record<string, BlessingBehavior> = {
   night_warrior_blessing: {on_card_played:[{when:{type:'skill'},oncePerTurnKey:'skill',effect:s=>{s.player.block+=3;}}]},
   night_shaman_blessing: {on_card_played:[{when:{status:true},oncePerTurnKey:'status',effect:s=>{s.player.block+=3;}}]},
   night_nun_blessing: {on_turn_start:s=>{if(s.player.hp<s.player.maxHp*.5)s.player.hp=Math.min(s.player.maxHp,s.player.hp+2);else s.player.block+=2;}},
-  night_medium_blessing: {on_turn_start:s=>{s.player.block+=Math.min(4,(s.minions??[]).filter(m=>m.owner==='player'&&m.duration>0).length*2);}},
+  night_medium_blessing: {on_turn_start:s=>{s.player.block+=2;}},
   regen_1: {
     on_turn_end: (s) => {
       s.player.hp = Math.min(s.player.maxHp, s.player.hp + 1);

@@ -280,21 +280,6 @@
     "exhaust": true
   },
   {
-    "id": "invite_spirit",
-    "name": "เชิญร่าง",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "summonMinion": "ghost_ally",
-    "tags": [
-      "minion",
-      "thai",
-      "medium"
-    ],
-    "desc": "เชิญวิญญาณเข้ามาช่วยรบ โจมตีศัตรู 4 ทุกต้นเทิร์นโดยทะลุการป้องกัน นาน 3 เทิร์น"
-  },
-  {
     "id": "house_guardian",
     "name": "ผีเฝ้าเรือน",
     "type": "skill",
@@ -302,14 +287,12 @@
     "block": 6,
     "rarity": "Uncommon",
     "inShop": true,
-    "summonMinion": "tree_guardian",
     "tags": [
-      "minion",
       "block",
       "thai",
       "medium"
     ],
-    "desc": "เรียกผีเฝ้าเรือนมาคุ้มกัน ได้ Block 3 ทุกต้นเทิร์นและพันศัตรูไว้ นาน 4 เทิร์น"
+    "desc": "ผีเฝ้าเรือนคุ้มกัน ได้ป้องกัน 6"
   },
   {
     "id": "whisper_ear",
@@ -373,21 +356,6 @@
       "medium"
     ],
     "desc": "ปล่อยให้วิญญาณเข้าสิงชั่วครู่ สร้างความเสียหาย 13"
-  },
-  {
-    "id": "call_phrai",
-    "name": "เรียกพราย",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "summonMinion": "poison_spirit",
-    "tags": [
-      "minion",
-      "thai",
-      "medium"
-    ],
-    "desc": "เรียกผีพรายมาวนอยู่รอบศัตรู ใส่พิษ 1 ชั้นทุกต้นเทิร์น นาน 4 เทิร์น"
   },
   {
     "id": "phrai_oil",
@@ -623,14 +591,12 @@
     "rarity": "Legendary",
     "inShop": true,
     "tags": [
-      "minion",
       "block",
       "thai",
       "warrior"
     ],
-    "desc": "เรียกคนที่ตายในสนามรบเดิมขึ้นมายืนข้างๆ ได้ Block 10 และวิญญาณนักสู้โบราณอยู่ช่วย 5 เทิร์น",
-    "block": 10,
-    "summonMinion": "ancient_warrior_spirit"
+    "desc": "คนที่ตายในสนามรบเดิมยืนบังให้ ได้ป้องกัน 10",
+    "block": 10
   },
   {
     "id": "morning_alms",
@@ -855,13 +821,11 @@
     "inShop": true,
     "tags": [
       "heal",
-      "minion",
       "thai",
       "nun"
     ],
-    "desc": "แผ่ไปจนถึงสิ่งที่ไม่มีใครแผ่ให้ ฟื้น 12 และกุมารทองมาอยู่ด้วย 6 เทิร์น",
-    "heal": 12,
-    "summonMinion": "kuman_spirit"
+    "desc": "แผ่ไปจนถึงสิ่งที่ไม่มีใครแผ่ให้ ฟื้น 12",
+    "heal": 12
   },
   {
     "id": "incense_smoke",
@@ -950,54 +914,6 @@
     }
   },
   {
-    "id": "snail_call",
-    "name": "เรียกหอยทากผี",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "minion",
-      "energy",
-      "thai",
-      "medium"
-    ],
-    "desc": "เรียกหอยทากผีมาเกาะบ่า ส่งพลังงานให้ทุกเทิร์น อยู่ 4 เทิร์น",
-    "summonMinion": "spirit_snail"
-  },
-  {
-    "id": "equipment_spirit_house",
-    "name": "ติดตั้งศาลพระภูมิ",
-    "type": "equipment",
-    "cost": 0,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "equipment",
-      "minion",
-      "thai",
-      "medium"
-    ],
-    "desc": "ตั้งศาลย่อสะพายไว้ ที่ไหนก็มีผีเฝ้าเรือนตามมา",
-    "equipmentId": "spirit_house",
-    "slotCost": 1
-  },
-  {
-    "id": "shadow_split",
-    "name": "แยกเงา",
-    "type": "skill",
-    "cost": 3,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "minion",
-      "thai",
-      "medium"
-    ],
-    "desc": "แยกเงาตัวเองออกมาอีกร่าง มันตีแทนเราทุกเทิร์น อยู่ 3 เทิร์น",
-    "summonMinion": "shadow_clone"
-  },
-  {
     "id": "mass_possession",
     "name": "ผีเข้าหมู่",
     "type": "attack",
@@ -1058,15 +974,13 @@
     "rarity": "Legendary",
     "inShop": true,
     "tags": [
-      "minion",
       "block",
       "strength",
       "thai",
       "medium"
     ],
-    "desc": "ยกร่างให้มันทั้งตัว ได้ Block 8 แข็งแกร่ง 2 ตลอดไฟต์ และปีศาจสหายช่วยรบ 5 เทิร์น",
+    "desc": "ยกร่างให้มันทั้งตัว ได้ Block 8 แข็งแกร่ง 2 ตลอดไฟต์",
     "block": 8,
-    "summonMinion": "demon_minion",
     "statusEffect": {
       "target": "player",
       "effect": "strength",
@@ -1484,27 +1398,6 @@
     }
   },
   {
-    "id": "trance_deepens",
-    "name": "ทรงลึกขึ้น",
-    "type": "skill",
-    "cost": 3,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "minion",
-      "cheapen",
-      "thai",
-      "medium"
-    ],
-    "desc": "เรียกวิญญาณเพื่อนมาช่วยรบ 3 เทิร์น — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 0",
-    "summonMinion": "ghost_ally",
-    "costRule": {
-      "kind": "per_card_played",
-      "step": 1,
-      "min": 0
-    }
-  },
-  {
     "id": "ward_riposte",
     "name": "ยันต์รับแล้วสวน",
     "type": "attack",
@@ -1586,18 +1479,10 @@
       "medium",
       "build"
     ],
-    "desc": "จั่ว 1 ถ้ามีวิญญาณคู่กายอยู่ ได้พลังงาน 2 ใช้ได้ครั้งเดียวต่อไฟต์",
+    "desc": "จั่ว 1 ได้พลังงาน 1 ใช้ได้ครั้งเดียวต่อไฟต์",
     "draw": 1,
     "exhaust": true,
-    "conditional": {
-      "when": {
-        "kind": "player_minions_at_least",
-        "value": 1
-      },
-      "bonus": {
-        "energyGain": 2
-      }
-    }
+    "energyGain": 1
   },
   {
     "id": "poison_echo",
@@ -1636,19 +1521,10 @@
       "medium",
       "build"
     ],
-    "desc": "ป้องกัน 6 ถ้ามีวิญญาณคู่กายอย่างน้อย 2 ตน ป้องกัน 12 และจั่ว 2 ใช้ได้ครั้งเดียวต่อไฟต์",
-    "block": 6,
+    "desc": "ป้องกัน 9 จั่ว 1 ใช้ได้ครั้งเดียวต่อไฟต์",
+    "block": 9,
     "exhaust": true,
-    "conditional": {
-      "when": {
-        "kind": "player_minions_at_least",
-        "value": 2
-      },
-      "bonus": {
-        "block": 6,
-        "draw": 2
-      }
-    }
+    "draw": 1
   },
   {
     "id": "night_guardian_cut",
@@ -1740,18 +1616,8 @@
     "name": "สัญญาห้าคืน",
     "type": "attack",
     "cost": 1,
-    "dmg": 4,
-    "conditional": {
-      "when": {
-        "kind": "player_minions_at_least",
-        "value": 2
-      },
-      "bonus": {
-        "dmg": 8,
-        "draw": 1
-      }
-    },
-    "desc": "โจมตี 4 ถ้ามีวิญญาณคู่กายอย่างน้อย 2 ตน โจมตี 12 และจั่ว 1",
+    "dmg": 8,
+    "desc": "โจมตี 8 จั่ว 1",
     "tags": [
       "medium",
       "thai",
@@ -1760,6 +1626,7 @@
     ],
     "rarity": "Rare",
     "inRewards": false,
-    "inShop": false
+    "inShop": false,
+    "draw": 1
   }
 ]

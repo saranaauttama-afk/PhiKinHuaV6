@@ -2,7 +2,6 @@ import type { GameState } from '../types';
 import type { EnemyCardDef } from '../pack_enemy_cards';
 import { dealDamage, gainBlock, heal } from './damage';
 import {hasStatusEffect} from '../combat/status-effects';
-import {summonMinion} from '../minionRuntime';
 import {curseById} from '../pack';
 import { applyStatusEffect } from '../statusEffectsRuntime';
 
@@ -10,7 +9,7 @@ export function enemyConditionalDamage(s:GameState,card:EnemyCardDef):number {
  const c=card.conditional;if(!c)return 0;
  const active=c.kind==='player_poison'?hasStatusEffect('player',s,'poison'):
   c.kind==='player_vulnerable'?hasStatusEffect('player',s,'vulnerable'):
-  c.kind==='enemy_block'?(s.enemy?.block??0)>0:(s.minions??[]).some(m=>m.owner==='enemy');
+  (s.enemy?.block??0)>0;
  return active?c.bonusDamage:0;
 }
 
@@ -23,7 +22,6 @@ export function resolveEnemyCard(s: GameState, card: EnemyCardDef): void {
     if (raw) dealDamage(s, { from: 'enemy', to: 'player', raw, source: { kind: 'card', cardId: card.id } });
   }
   if(s.enemy.hp<=0||s.player.hp<=0)return;
-  if(card.summonMinion)summonMinion(s,card.summonMinion,'enemy');
   if(card.curseCard){const c=curseById(card.curseCard);if(c)s.piles.discard.push(JSON.parse(JSON.stringify(c)));}
   if (card.block) gainBlock(s, 'enemy', card.block);
   if (card.heal) heal(s, 'enemy', card.heal);

@@ -242,30 +242,8 @@ export function qaSetEnvironment(state: GameState, cmd: Command & { type: 'QA_Se
   return { state, rng };
 }
 
-export function qaSummonPlayerMinion(state: GameState, cmd: Command & { type: 'QA_SummonPlayerMinion' }, rng: RNG) {
-  const { summonMinion } = require('../../minionRuntime');
-  const minionId = cmd.minionId || 'ghost_ally';
-  
-  summonMinion(state, minionId, 'player', 1);
-  state.log.push(`🤝 Summoned player minion: ${minionId}`);
-  return { state, rng };
-}
 
-export function qaSummonEnemyMinion(state: GameState, cmd: Command & { type: 'QA_SummonEnemyMinion' }, rng: RNG) {
-  const { summonMinion } = require('../../minionRuntime');
-  const minionId = cmd.minionId || 'shadow_clone';
-  
-  summonMinion(state, minionId, 'enemy', 1);
-  state.log.push(`👿 Summoned enemy minion: ${minionId}`);
-  return { state, rng };
-}
 
-export function qaClearAllMinions(state: GameState, cmd: Command & { type: 'QA_ClearAllMinions' }, rng: RNG) {
-  const { clearAllMinions } = require('../../minionRuntime');
-  clearAllMinions(state);
-  state.log.push(`💨 Cleared all minions from battlefield`);
-  return { state, rng };
-}
 
 export function qaLevelUp(state: GameState, cmd: Command & { type: 'QA_LevelUp' }, rng: RNG) {
   const { grantExpAndQueueLevelUp } = require('../shared');

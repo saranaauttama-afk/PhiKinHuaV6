@@ -131,7 +131,6 @@ const GROUP_TITLE: Record<ArtSlot['group'], string> = {
   chapter: 'ภาพประกอบบทคั่น',
   node: 'ไอคอนบนเส้นทาง',
   encounter: 'การ์ดจุดแวะ',
-  minion: 'ผีที่เรียกมาช่วย',
 };
 
 /** ของแถมเฉพาะกลุ่ม — ภาพคนละหน้าที่ต้องการองค์ประกอบคนละแบบ */
@@ -145,7 +144,6 @@ const GROUP_EXTRA: Record<ArtSlot['group'], string> = {
   chapter:   'wide cinematic establishing shot, no main character in frame',
   node:      'flat symbolic icon, high contrast, centred in a circle, transparent background',
   encounter: 'a single place or object seen from a short distance, square composition',
-  minion:    'a small spirit companion, full body, genuinely transparent background, no backdrop or halo',
 };
 
 /** ช่องนี้ได้คำบรรยายตัวแบบจากตารางแปลไหม — ถ้าไม่ คำสั่งจะมีแต่สไตล์กับองค์ประกอบ */

@@ -116,21 +116,6 @@
     "exhaust": true
   },
   {
-    "id": "call_old_ghost",
-    "name": "เรียกผีเก่า",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "summonMinion": "ghost_ally",
-    "tags": [
-      "thai",
-      "shaman",
-      "minion"
-    ],
-    "desc": "เรียกผีเก่ามาช่วยรบ โจมตีศัตรู 4 ทุกต้นเทิร์นโดยทะลุการป้องกัน นาน 3 เทิร์น"
-  },
-  {
     "id": "soul_drain",
     "name": "ดูดวิญญาณ",
     "type": "attack",
@@ -175,10 +160,9 @@
     "tags": [
       "attack",
       "thai",
-      "shaman",
-      "minion"
+      "shaman"
     ],
-    "desc": "เปิดประตูนรกปล่อยปีศาจ 20 ดาเมจ และสร้าง 2 Demon Minions (HP 4, โจมตี 3 แต่ละตัว)"
+    "desc": "เปิดประตูนรกปล่อยไฟผี 20 ดาเมจ"
   },
   {
     "id": "spirit_whisper",
@@ -285,40 +269,6 @@
     "desc": "ยาชาววังฟื้นชีวิต 8 และป้องกัน 4 · ใช้แล้วหายไปจากไฟต์นี้",
     "heal": 8,
     "block": 4
-  },
-  {
-    "id": "create_kuman",
-    "name": "สร้างกุมาร",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "starter": 1,
-    "tags": [
-      "thai",
-      "shaman",
-      "minion",
-      "exhaust"
-    ],
-    "exhaust": true,
-    "summonMinion": "kuman_spirit",
-    "desc": "เรียกกุมารทองมาอยู่ข้างกาย ฟื้นพลังชีวิตให้เรา 2 ทุกต้นเทิร์น นาน 6 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)"
-  },
-  {
-    "id": "summon_poison_spirit",
-    "name": "เรียกผีพิษ",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "summonMinion": "poison_spirit",
-    "tags": [
-      "thai",
-      "shaman",
-      "minion",
-      "status"
-    ],
-    "desc": "เรียกผีพิษมาวนอยู่รอบศัตรู ใส่พิษ 1 ชั้นทุกต้นเทิร์น นาน 4 เทิร์น"
   },
   {
     "id": "direct_poison_spell",

@@ -17,8 +17,6 @@ const DURATION: Record<CombatEvent['t'], number> = {
   EnemyCardRevealed: 2100,
   EnemyHandChanged: 450,
   CardResolved: 100,
-  MinionActing: 600,
-  MinionResolved: 250,
   Damage: 450,
   BlockGained: 350,
   Healed: 350,

@@ -24,11 +24,9 @@ function settleCombat(s: GameState, r: RNG): RNG {
   require('../../campaign/nights').awakenNightBoss(s);
   if (isDefeat(s)) {
     loseRun(s);
-    require('../../minionRuntime').clearAllMinions(s);
   } else if (isVictory(s) && !s.combatVictoryLock) {
     r = grantExpAndQueueLevelUp(s, r);
     s.combatVictoryLock = true;
-    require('../../minionRuntime').clearAllMinions(s);
     advanceAfterVictory(s);
   }
   return r;
@@ -208,12 +206,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   if(s.player.handBalanceVersion===33&&require('../../cards/hand').requiredDiscards(s)>0)return {state:s,rng:r};
 
   const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
-  const { processMinionsEndTurn }         = require('../../minionRuntime');
   const { processEnemyTurnBehaviors }     = require('../../enemyBehaviorRuntime');
 
   // จบเทิร์น player
   processStatusEffectsOnTurnEnd('player', s);
-  processMinionsEndTurn(s);
   // การ์ดที่ยังค้างอยู่ในมือทำงานก่อนเทิร์นศัตรู — ทั้งหมดของกลไกนี้คือ
   // "ถือไว้แล้วมันกันให้" ถ้าไปทำงานหลังโดนตีแล้วก็ไม่มีความหมาย
   applyHeldEffects(s);
@@ -236,10 +232,6 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
     if(s.phase!=='combat')return {state:s,rng:r};
-
-    require('../../minionRuntime').processEnemyTurnMinions(s);
-    r = settleCombat(s, r);
-    if (s.phase !== 'combat') { emit(s, { t: 'TurnEnded', who: 'enemy' }); return { state: s, rng: r }; }
 
     // Decide from the current public board and the real held cards once the turn starts.
     const handBeforeDraw=s.enemyPiles!.hand.length;

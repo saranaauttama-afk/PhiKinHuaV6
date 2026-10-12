@@ -12,7 +12,7 @@ export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>={
  warrior:{id:'night_warrior_blessing',name:'ครูลานวัด',rarity:'Rare',desc:'สกิลใบแรกแต่ละเทิร์นได้ป้องกันเพิ่ม 3'},
  shaman:{id:'night_shaman_blessing',name:'ครูคุ้มคาถา',rarity:'Rare',desc:'การ์ดใส่สถานะใบแรกแต่ละเทิร์นได้ป้องกันเพิ่ม 3'},
  nun:{id:'night_nun_blessing',name:'แสงบุญ',rarity:'Rare',desc:'ต้นเทิร์น: เลือดต่ำกว่าครึ่งฟื้น 2 มิฉะนั้นได้ป้องกัน 2'},
- medium:{id:'night_medium_blessing',name:'หิ้งบรรพบุรุษ',rarity:'Rare',desc:'ต้นเทิร์นได้ป้องกัน 2 ต่อวิญญาณคู่กายที่ยังอยู่ สูงสุด 4'},
+ medium:{id:'night_medium_blessing',name:'หิ้งบรรพบุรุษ',rarity:'Rare',desc:'ต้นเทิร์นได้ป้องกัน 2'},
 };
 export function configureNightEnemy(s:GameState):void{
  if(!s.campaign||!s.enemy)return;

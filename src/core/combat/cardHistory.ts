@@ -3,7 +3,7 @@ import {emit} from './damage';
 
 /** Presentation receipts only. Never used by AI, costs, rewards or RNG. */
 export function historySnapshot(s:GameState) {
-  return JSON.parse(JSON.stringify({player:s.player,enemy:s.enemy,hand:s.piles.hand.length,minions:s.minions??[],traps:s.traps??[],equipped:s.equipped??[]}));
+  return JSON.parse(JSON.stringify({player:s.player,enemy:s.enemy,hand:s.piles.hand.length,traps:s.traps??[],equipped:s.equipped??[]}));
 }
 export function recordCardHistory(s:GameState,side:CombatEventTarget,card:CardData,before:ReturnType<typeof historySnapshot>,eventStart:number,note?:string,costPaid=card.cost) {
   const results:string[]=[];
@@ -36,8 +36,6 @@ export function recordCardHistory(s:GameState,side:CombatEventTarget,card:CardDa
   if(energyGained>0)results.push(`เราได้พลัง ${energyGained}`);
   const drawn=s.piles.hand.length-before.hand+(side==='player'?1:0);
   if(drawn>0)results.push(`เราได้ไพ่ ${drawn} ใบ`);
-  const summoned=(s.minions??[]).filter(m=>!before.minions.some((old:{id:string})=>old.id===m.id));
-  for(const m of summoned)results.push(`เรียก ${m.name}`);
   if((s.traps?.length??0)>before.traps.length)results.push('ตั้งกับดัก');
   for(const eq of s.equipped??[])if(!before.equipped.some((old:{id:string})=>old.id===eq.id))results.push(`สวม ${eq.name}`);
   if(note)results.unshift(note);

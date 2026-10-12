@@ -112,9 +112,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   
   // QA - Environment & Minions  
   QA_SetEnvironment: qa.qaSetEnvironment,
-  QA_SummonPlayerMinion: qa.qaSummonPlayerMinion,
-  QA_SummonEnemyMinion: qa.qaSummonEnemyMinion,
-  QA_ClearAllMinions: qa.qaClearAllMinions,
   
   // QA - Phase 4: Adaptive AI
   QA_LevelUp: qa.qaLevelUp,

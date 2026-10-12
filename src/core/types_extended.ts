@@ -51,7 +51,6 @@ export type BehaviorAction =
   | 'gain_extra_energy'
   | 'change_ai_pattern'
   // (change_environment removed - environment system discontinued)
-  | 'summon_minion'
   | 'enter_phase_2';
 
 export type EnemyBehavior = {
@@ -81,40 +80,12 @@ export type DelayedEffectType =
   | 'damage_target'
   | 'heal_target'
   | 'apply_status'
-  | 'summon_minion'
   | 'force_discard'
   | 'destroy_equipment'
   | 'double_next_attack';
 
 
 // ===== Environmental Effects ===== (REMOVED - Environment system discontinued)
-
-// ===== Minion System =====
-export type MinionAbility = {
-  type: 'attack' | 'heal' | 'energy' | 'draw' | 'block' | 'status' 
-       | 'damage_over_time' | 'modify_damage' | 'block_cards' | 'cleanse'; // Extended for status effects
-  trigger: 'turn_start' | 'turn_end' | 'on_summon' | 'on_death';
-  target: 'owner' | 'enemy' | 'all_allies' | 'all_enemies';
-  value: number;
-  effect?: string; // For status type
-  duration?: number; // For status type
-  ignores_block?: boolean; // For attack type - some minions can bypass block
-  modifyType?: 'multiply' | 'add' | 'reduce'; // For modify_damage type
-  cardTypes?: string[]; // For block_cards type - which card types to block
-  description: string;
-};
-
-export type MinionData = {
-  id: string;
-  name: string;
-  duration: number; // Required - how many turns it lasts
-  owner: 'player' | 'enemy';
-  abilities: MinionAbility[];
-  statusEffects?: StatusEffect[]; // Runtime effects on the minion
-  isStatusEffect?: boolean; // True if this minion represents a status effect
-  invisible?: boolean; // True if this shouldn't show in minion UI (for status effects)
-  stacks?: number; // For stackable status effects
-};
 
 // ===== Enhanced Enemy Definition =====
 export type EnhancedEnemyData = {
@@ -137,10 +108,6 @@ export type EnhancedEnemyData = {
   startingStatusEffects?: StatusEffect[];
   
   // (Environment system removed)
-  
-  // Minion summoning
-  summonableMinions?: string[];
-  maxMinions?: number;
   
   // Signature cards (in addition to base deck)
   signatureCards: string[];
@@ -174,7 +141,6 @@ export type CombatState = {
   turn: number;
   phase: 'player' | 'enemy'; // (environment phase removed)
   delayedEffects: DelayedEffect[];
-  activeMinions: MinionData[];
   behaviorHistory: string[]; // Track which behaviors have been triggered
   adaptationState?: { // For adaptive AI
     playerPreferences: { [cardType: string]: number };

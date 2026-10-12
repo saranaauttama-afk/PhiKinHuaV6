@@ -1,7 +1,6 @@
 import type { EquipmentData, GameState } from './types';
 import { dealDamage, gainBlock, heal } from './combat/damage';
 import { applyStatusEffect } from './combat/status-effects';
-import { summonMinion } from './minionRuntime';
 
 // ===== New: shared types =====
 type TurnSide = 'player' | 'enemy';
@@ -181,14 +180,6 @@ const REGISTRY: Record<string, EquipBehavior> = {
       if (side !== 'player') return;
       applyStatusEffect('player', s, 'regeneration', 99, 3);
       s.log.push('ผ้าขาว: ฟื้นฟูต่อเนื่อง 3 ตลอดไฟต์');
-    },
-  },
-
-  // ศาลพระภูมิย่อ (ร่างทรง): ที่ไหนก็มีผีเฝ้าเรือนตามมา
-  spirit_house: {
-    on_battle_start: ({ state: s, side }) => {
-      if (side !== 'player') return;
-      summonMinion(s, 'tree_guardian', 'player', 1);
     },
   },
 

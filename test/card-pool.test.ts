@@ -14,7 +14,6 @@ import trapCardsJson from '../src/data/packs/base/trap_cards.json';
 import curseCardsJson from '../src/data/packs/base/curse_cards.json';
 import equipmentJson from '../src/data/packs/base/equipment.json';
 
-import { THAI_MINIONS } from '../src/core/combat/minions/thai-minions';
 import { STATUS_EFFECTS_REGISTRY } from '../src/core/combat/status-effects/registry';
 import { equipmentBehaviorIds } from '../src/core/equipmentRuntime';
 import { CHARACTER_CLASSES } from '../src/core/classes';
@@ -70,13 +69,7 @@ describe('คลังการ์ด — ความถูกต้องข�
     }
   });
 
-  it('summonMinion อ้างผีที่มีอยู่จริง', () => {
-    for (const c of PLAYABLE) {
-      if (!c.summonMinion) continue;
-      expect(THAI_MINIONS[c.summonMinion], `${c.id} เรียกผี "${c.summonMinion}" ที่ไม่มีในคลัง`)
-        .toBeDefined();
-    }
-  });
+
 
   it('การ์ดติดตั้งอ้างของประจำกายที่มีอยู่จริง', () => {
     const ids = new Set((equipmentJson as AnyCard[]).map(e => e.id));

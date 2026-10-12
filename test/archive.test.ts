@@ -16,9 +16,9 @@ function run(id='archive-a',difficulty:1|2|3|4|5=1){
  return {get s(){return s;},get rng(){return rng;},step};
 }
 describe('archive catalog and real discoveries',()=>{
- it('lists all 34 unique ghosts in staged groups and 126 core identities plus 5 special entries',()=>{
-  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);expect(CORE_CARD_IDS.size).toBe(126);
-  expect(CARD_CATALOG).toHaveLength(131);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(131);
+ it('lists all 34 unique ghosts in staged groups and 117 core identities plus 5 special entries',()=>{
+  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);expect(CORE_CARD_IDS.size).toBe(117);
+  expect(CARD_CATALOG).toHaveLength(122);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(122);
   expect(GHOST_CATALOG.filter(g=>g.group==='บอสแต่ละคืน').map(g=>g.night)).toEqual([1,2,3,4,5]);
   expect(GHOST_CATALOG.at(-1)?.id).toBe('phi-kin-hua');
  });

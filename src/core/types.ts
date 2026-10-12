@@ -32,8 +32,6 @@ export type CardData = {
   block?: number;
   draw?: number;
   energyGain?: number;
-  summonMinion?: string;
-  minionTarget?: 'player' | 'enemy';
   statusEffect?: { target: 'player' | 'enemy'; effect: import('./combat/status-effects/types').StatusEffectType; duration: number; value: number };
   /** ฟื้นพลังชีวิตให้ผู้เล่น */
   heal?: number;
@@ -221,7 +219,7 @@ export type CardHistoryEntry = {
 };
 
 export type CombatFrame = {
-  player: GameState["player"]; enemy: GameState["enemy"]; minions: GameState["minions"]; historySeq?: number;
+  player: GameState["player"]; enemy: GameState["enemy"]; historySeq?: number;
 };
 
 export type CombatEvent = (
@@ -237,7 +235,7 @@ export type CombatEvent = (
       blocked: number;
       hpLoss: number;
       died: boolean;
-      sourceKind: 'card' | 'status' | 'minion' | 'equipment' | 'event' | 'blessing';
+      sourceKind: 'card' | 'status' | 'equipment' | 'event' | 'blessing';
     }
   | { t: 'EnemyHandChanged'; drawn: number }
   | { t: 'CardResolved'; entry: CardHistoryEntry }
@@ -246,8 +244,6 @@ export type CombatEvent = (
   | { t: 'StatusApplied'; target: CombatEventTarget; effectId: string; stacks: number }
   | { t: 'Died'; who: CombatEventTarget }
   | { t: 'TurnEnded'; who: CombatEventTarget }
-  | { t: 'MinionResolved'; minionId: string }
-  | { t: 'MinionActing'; minionId: string; name: string; owner: CombatEventTarget }
 ) & { frame?: CombatFrame };
 
 /**
@@ -325,16 +321,6 @@ export type GameState = {
     hand: string[];
     discard: string[];
   };
-  /**
-   * ผีที่ถูกเรียกมาช่วยในไฟต์นี้ ทั้งสองฝั่ง (แยกด้วย `owner`)
-   *
-   * เคยเป็นอาร์เรย์ระดับโมดูลใน `minionRuntime.ts` — ไม่ถูกเซฟ ไม่ถูกโคลนตอน
-   * `applyCommand` และเป็นของกลางที่ทุก state ใช้ร่วมกัน (บั๊กชนิดเดียวกับที่
-   * adaptiveAI เคยเป็นก่อน Phase 5)
-   *
-   * เป็นสเตตของคอมแบต จึงไม่ถูกเก็บลงเซฟ เหมือน `piles`
-   */
-  minions?: import('./types_extended').MinionData[];
 
 
   /** กับดักที่ตั้งไว้และยังไม่ทำงาน — เป็นสเตตของไฟต์ ไม่ถูกเก็บลงเซฟ */
@@ -547,11 +533,7 @@ export type Command =
   // Enemy Behavior Debug Commands
   | { type: 'QA_TriggerEnemyBehavior' }
   | { type: 'QA_ForcePhase2' }
-  // Minion Debug Commands
   | { type: 'QA_SetEnvironment' }
-  | { type: 'QA_SummonPlayerMinion'; minionId: string }
-  | { type: 'QA_SummonEnemyMinion'; minionId: string }
-  | { type: 'QA_ClearAllMinions' }
   // Phase 4 Debug Commands - Adaptive AI
   | { type: 'QA_LevelUp' };
 

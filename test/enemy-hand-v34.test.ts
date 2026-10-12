@@ -128,7 +128,7 @@ describe('v34 migration and scope',()=>{
  it('all 34 ghosts have valid owned decks with meaningful mixed effects',()=>{
   for(const id of getAllMonsterIds()){
    const deck=NIGHT_ENEMY_DECKS[id];expect(deck,id).toBeDefined();expect([10,12,15]).toContain(deck.length);
-   for(const cardId of deck){const c=enemyCardById(cardId)!;expect(c,cardId).toBeDefined();expect(c.owner).toBe(id);expect(c.dmg||c.block||c.heal||c.statusEffect||c.summonMinion||c.curseCard).toBeTruthy();}
+   for(const cardId of deck){const c=enemyCardById(cardId)!;expect(c,cardId).toBeDefined();expect(c.owner).toBe(id);expect(c.dmg||c.block||c.heal||c.statusEffect||c.curseCard).toBeTruthy();}
   }
  });
  it('new runtime has no sequence tracking, meters or explicit combo handlers',()=>{
@@ -140,9 +140,9 @@ for(const card of Object.values(NIGHT_ENEMY_DECKS).flat().filter((id,i,all)=>id.
  it(card+' has a useful resolved effect with approved existing art identity',()=>{
   const s=fixture([]);s.enemy!.hp=20;s.enemy!.block=2;
   applyStatusEffect('player',s,'poison',3,1);applyStatusEffect('player',s,'vulnerable',2,1);
-  const before=JSON.stringify({player:s.player,enemy:s.enemy,minions:s.minions});
+  const before=JSON.stringify({player:s.player,enemy:s.enemy,discard:s.piles.discard});
   resolveEnemyCard(s,enemyCardById(card)!);
-  expect(JSON.stringify({player:s.player,enemy:s.enemy,minions:s.minions})).not.toBe(before);
+  expect(JSON.stringify({player:s.player,enemy:s.enemy,discard:s.piles.discard})).not.toBe(before);
  });
 }
 

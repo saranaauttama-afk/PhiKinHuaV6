@@ -27,7 +27,6 @@ import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import CardRewardOverlay from './components/battle/CardRewardOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
 import StatusStrip, {type BattleBadge} from './components/battle/StatusStrip';
-import MinionRow from './components/battle/MinionRow';
 import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
@@ -248,13 +247,8 @@ export default function BattlePage() {
       setHistoryAtTurnStart(useGame.getState().state.cardHistory??[]);
       setPresentation(null);
       if (useGame.getState().state.phase === 'combat') {
-        const before = combatFrame(useGame.getState().state);
         dispatch({ type: 'StartPlayerTurn' });
-        const startEvents = useGame.getState().state.pendingEvents ?? [];
-        if (startEvents.some(e => e.t === 'MinionActing')) {
-          setPresentation(before);
-          timeline.play(startEvents, () => { setPresentation(null); turnLocked.current = false; setPhase('player'); });
-        } else { turnLocked.current = false; setPhase('player'); }
+        turnLocked.current = false; setPhase('player');
       }
     });
   };
@@ -332,7 +326,6 @@ export default function BattlePage() {
           monsterName={monsterName}
           enemy={enemy ?? null}
           turnLabel={`เทิร์น ${gameState.turn} · ${phase==='enemy'?'ตาผี':'ตาเรา'}`}
-          helpers={<MinionRow compact owner="enemy" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/> }
         />
 
 
@@ -405,7 +398,6 @@ export default function BattlePage() {
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
-          helpers={!victoryIntro&&<MinionRow compact owner="player" minions={presentation?.minions??gameState.minions} activeId={currentEvent?.t==='MinionActing'?currentEvent.minionId:undefined}/>}
           statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges}/>:null}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}

@@ -129,18 +129,6 @@
     ]
   },
   {
-    "id": "spirit_house",
-    "name": "ศาลพระภูมิย่อ",
-    "rarity": "Uncommon",
-    "slotCost": 1,
-    "desc": "เริ่มไฟต์ เรียกผีเฝ้าเรือนมา 1 ตน",
-    "tags": [
-      "thai",
-      "medium",
-      "minion"
-    ]
-  },
-  {
     "id": "ghost_mirror",
     "name": "กระจกผี",
     "rarity": "Rare",

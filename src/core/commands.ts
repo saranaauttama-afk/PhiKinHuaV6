@@ -116,7 +116,6 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   // return drawUpTo(state,rng ,state.player.maxHandSize ?? HAND_SIZE);
   // Import systems
   const { processStatusEffectsOnTurnStart } = require('./statusEffectsRuntime');
-  const { processPlayerTurnMinions } = require('./minionRuntime');
 
   // ★ รีเซ็ต once-per-turn ของอุปกรณ์สำหรับเทิร์นใหม่นี้
   resetEquipmentTurnFlags(state);
@@ -137,9 +136,6 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
 
   // ★ ยิง on_turn_start (ฝั่งผู้เล่น)
   runEquipmentTurnHook(state, 'on_turn_start', 'player');
-
-  // Process player minions actions
-  processPlayerTurnMinions(state);
 
   // เดิม: ให้พร reset ที่อื่นด้วย แต่ถ้าจะคงไว้ตรงนี้ก็ได้
   resetBlessingTurnFlags(state);
@@ -217,32 +213,6 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
     state.log.push(`Gained +${modifiedCard.energyGain} energy`);
   }
   
-  try {
-    // ✅ รองรับการเรียก minion
-    if (modifiedCard.summonMinion) {
-      const { summonMinion } = require('./minionRuntime');
-
-      // ตรวจสอบ minionTarget สำหรับ status effects
-      const minionTarget = (modifiedCard as any).minionTarget;
-      let owner = 'player'; // Default owner
-
-      if (minionTarget === 'enemy') {
-        // สำหรับ status effects ที่กระทบศัตรู - minion จะมี owner เป็น 'enemy'
-        owner = 'enemy';
-      }
-
-      summonMinion(state, modifiedCard.summonMinion, owner as 'player' | 'enemy', 1);
-    }
-
-    // ✅ Special minion effects for specific cards
-    if (card.id === 'hell_gate') {
-      const { summonMinion } = require('./minionRuntime');
-      summonMinion(state, 'demon_minion', 'player', 2);
-    }
-  } catch (error) {
-    state.log.push(`Error in minion summoning: ${error}`);
-  }
-
   // ✅ Status Effect cards (direct application)
   if ((modifiedCard as any).statusEffect) {
     const statusConfig = (modifiedCard as any).statusEffect;
@@ -294,16 +264,7 @@ export function endEnemyTurn(state: GameState) {
   
   // (Environment system removed)
   
-  // Process enemy minions and behaviors (check if function exists)
-  try {
-    const { processEnemyTurnMinions } = require('./minionRuntime');
-    if (typeof processEnemyTurnMinions === 'function') {
-      processEnemyTurnMinions(state);
-    }
-    processEnemyTurnBehaviors(state);
-  } catch (e) {
-    // Minion/behavior system not available, skip
-  }
+  processEnemyTurnBehaviors(state);
   
   // Run standard enemy turn
   const { runEnemyTurn } = require('./engine/handlers/enemy');

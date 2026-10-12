@@ -634,8 +634,7 @@
     "type": "attack",
     "energyCost": 2,
     "dmg": 4,
-    "summonMinion": "forest_demon",
-    "desc": "โจมตี 4 เรียกปีศาจป่าทำให้อ่อนแอ"
+    "desc": "โจมตี 4"
   },
   {
     "id": "phi_pa_ritual",
@@ -1036,8 +1035,7 @@
     "type": "attack",
     "energyCost": 2,
     "dmg": 6,
-    "summonMinion": "forest_demon",
-    "desc": "โจมตี 6 เรียกปีศาจป่าทำให้อ่อนแอ"
+    "desc": "โจมตี 6"
   },
   {
     "id": "jao_por_pa_ritual",
@@ -1529,8 +1527,7 @@
     "type": "attack",
     "energyCost": 2,
     "dmg": 6,
-    "summonMinion": "forest_demon",
-    "desc": "โจมตี 6 เรียกปีศาจป่าทำให้อ่อนแอ"
+    "desc": "โจมตี 6"
   },
   {
     "id": "night_root_lord_ritual",
@@ -2731,10 +2728,9 @@
     "name": "ผีป่า · อาถรรพ์ประจำตน",
     "type": "skill",
     "energyCost": 1,
-    "desc": "กัน 2 · เรียกกุมารทองช่วยฟื้นชีวิต",
+    "desc": "กัน 2",
     "dmg": 0,
-    "block": 2,
-    "summonMinion": "kuman_spirit"
+    "block": 2
   },
   {
     "id": "phi_pa_v29_setup",
@@ -5823,8 +5819,7 @@
     "energyCost": 2,
     "dmg": 0,
     "block": 2,
-    "summonMinion": "kuman_spirit",
-    "desc": "กัน 2 · เรียกกุมารทองช่วยฟื้นชีวิต"
+    "desc": "กัน 2"
   },
   {
     "id": "phi_tai_hong_v34_payoff",
@@ -5847,8 +5842,7 @@
     "energyCost": 2,
     "dmg": 0,
     "block": 3,
-    "summonMinion": "forest_demon",
-    "desc": "กัน 3 · เรียกภูตป่า"
+    "desc": "กัน 3"
   },
   {
     "id": "mae_nak_v34_payoff",
