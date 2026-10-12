@@ -34,6 +34,8 @@ type Props = {
   rage?:{startTurn:number;perTurn:number};
   /** The boss's relic: its rule works until the player's hits break it. */
   relic?:{name:string;durability:number;text:string;flavor:string;broken:boolean;stolen:number};
+  /** Stable face-down slots for the single ghost: total places and which are still held. */
+  handSlots?:{total:number;remaining:number[]};
   enemy?: {
     hp: number; maxHp: number; name: string;
     handCount?:number; ap?: number; block?: number; maxAp?: number; handSize?: number;
@@ -53,6 +55,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   helpers,
   rage,
   relic,
+  handSlots,
   enemies,
   rules=false,
 }, ref) {
@@ -110,7 +113,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
      <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize}/>
     </Animated.View>
-    <EnemyHandRack count={actor.handCount??0} ownerIndex={index} ownerCount={actors.length}/>
+    <EnemyHandRack count={actor.handCount??0} slots={actors.length===1?handSlots:undefined} ownerIndex={index} ownerCount={actors.length}/>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
      <RitualSurface kind="quietSlate" style={{height:layout.enemyHudHeight,paddingHorizontal:actors.length>1?6:10,paddingVertical:4,gap:2}}>
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>

@@ -6,7 +6,7 @@ import { rollShopStock } from '../../shop';
 import { applyRemoveCard, rollGamble, rollTreasure } from '../../events';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
-import { BOONS, DIFFICULTY, ECONOMY, type BoonId } from '../../balance/notfm';
+import { DIFFICULTY, ECONOMY } from '../../balance/notfm';
 import { rollTwoBlessings } from '../../level';
 import { upgradeCard, canUpgrade, upgradeLevelOf, grantBlessing } from '../shared';
 import { loseRun } from './runEnd';
@@ -38,36 +38,9 @@ export function stopUses(s: Partial<GameState>): number { return s.shopBoughtIte
 export function removePrice(s: Partial<GameState>): number { return markedUp(s, removeCostForCount(stopUses(s))); }
 export function upgradePrice(s: Partial<GameState>): number { return markedUp(s, upgradeCostForCount(stopUses(s))); }
 
-export function boonPrice(s: GameState, id: BoonId): number { return shopPrice(s, BOONS[id].price); }
-/** Why a boon cannot be bought now, or undefined. */
-export function boonBlock(s: GameState, id: BoonId): string | undefined {
-  const def = BOONS[id], bought = s.runCounters?.boons?.[id] ?? [];
-  if (def.limit === 'run' && bought.length) return 'ซื้อไปแล้ว';
-  if (def.limit === 'night' && bought.includes(s.campaign?.night ?? 1)) return 'คืนนี้ซื้อแล้ว';
-  if ((s.player.gold ?? 0) < boonPrice(s, id)) return 'เบี้ยไม่พอ';
-  return undefined;
-}
-
-export function shopBuyBoon(s: GameState, cmd: Extract<Command, { type: 'ShopBuyBoon' }>, r: RNG) {
-  if (s.phase !== 'shop' || s.shopKind !== 'card' || !BOONS[cmd.id] || boonBlock(s, cmd.id)) return { state: s, rng: r };
-  const price = boonPrice(s, cmd.id);
-  s.player.gold -= price;
-  s.shopPricePct = undefined;
-  if (cmd.id === 'maxHp') { s.player.maxHp += 10; s.player.hp += 10; }
-  if (cmd.id === 'ap') { s.player.maxAp += 1; s.player.ap = s.player.maxAp; }
-  if (cmd.id === 'slot') s.equipmentSlotsMax = (s.equipmentSlotsMax ?? 1) + 1;
-  if (cmd.id === 'draw') s.player.drawPerTurn += 1;
-  s.runCounters = s.runCounters ?? { removed: 0 };
-  const boons = s.runCounters.boons = s.runCounters.boons ?? {};
-  boons[cmd.id] = [...(boons[cmd.id] ?? []), s.campaign?.night ?? 1];
-  s.log.push(`ร้าน: ซื้อ ${BOONS[cmd.id].name} (-${price})`);
-  if (s.pages) s.pages._shopUsed = true;
-  return { state: s, rng: r };
-}
-
 /** The night's blessing stop: pick one of ECONOMY.blessingChoices. */
 export function openBlessingStop(s: GameState, r: RNG): { state: GameState; rng: RNG } {
-  const out = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), ECONOMY.blessingChoices); r = out.rng;
+  const out = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), ECONOMY.blessingChoices, s.campaign?.blessingTier ?? 0); r = out.rng;
   s.blessingStock = out.list;
   s.shopKind = 'blessing';
   s.shopBoughtItems = [];

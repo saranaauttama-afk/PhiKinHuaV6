@@ -18,7 +18,11 @@ A Thai-ghost-themed deck-building roguelike, mobile app (Expo/React Native). Str
 
 Run locally: `npm install && npx expo start` (`--web` / `--android` / `--ios` variants in `package.json` scripts).
 
-## Branches (as of last check)
+## NOTFM rebuild (current work)
+
+The game was rebuilt toward Night of the Full Moon in six phases (PR #9–#14, branches `work/notfm-rebuild` → `work/notfm-phase6`, never merged to `main`). **Read `docs/HANDOFF-notfm-rebuild.md` first**: it covers every system, balance numbers, commands, the APK workflow and the open backlog. The owner wants design changes discussed before code is changed.
+
+## Branches (older, before the NOTFM rebuild)
 
 - `main` — oldest, has `PATCH_NOTES.md`, `PHASE4_INTEGRATION_SUMMARY.md`, `TESTING_CHECKLIST.md` (not present on newer branches)
 - `monster` — Thai Ghost Monster System introduction

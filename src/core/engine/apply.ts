@@ -36,6 +36,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EnemyPlayCard: combat.enemyPlayCard,
   StartMonsterTurn: combat.startMonsterTurn,
   EndTurn: combat.endTurn,
+  DiscardForTurnEnd: combat.discardForTurnEnd,
   ResolveEnemyTurn: combat.resolveEnemyTurn,
   StartPlayerTurn: combat.startPlayerTurnHandler,
 
@@ -65,7 +66,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   // TakeReward: se.takeReward, // (เลิกใช้: reward-on-victory ถูกตัด)
   TakeShop: se.takeShop,
   ShopReroll: se.shopReroll,
-  ShopBuyBoon: se.shopBuyBoon,
   TakeShopBlessing: se.takeShopBlessing,
   DoBonfireHeal: se.doBonfireHeal,
   EventChooseBlessing: se.eventChooseBlessing,

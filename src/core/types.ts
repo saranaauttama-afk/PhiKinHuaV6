@@ -8,8 +8,16 @@ export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayer
 export type Trigger={on:TriggerOn;type?:CardType;once?:'turn';when?:import('./cards/mechanics').CardCondition;fx:Fx};
 /** Always-on modifiers plus triggers, shared by blessings and equipment cards. */
 export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number};
+/** One-time changes when a blessing is gained (แพนโดรา: a gain paid for with a cost). */
+export type BlessingGain = { hp?: number; maxHp?: number; gold?: number; ap?: number; draw?: number; retain?: number; startMana?: number; slot?: number };
 export type BlessingDef = Passive & {
   id: string; name: string; rarity?: Rarity; desc?: string; class?: import('./classes').ClassId;
+  /** แพนโดรา: strong, with a price. */
+  pandora?: boolean;
+  /** Nights cleared across all runs (journal) before it can be offered. */
+  unlock?: number;
+  onGain?: BlessingGain;
+  flavor?: string;
 };
 
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Legendary';
@@ -100,7 +108,7 @@ export type Phase =
   | 'run_complete'; // จบรันแล้ว (ชนะบอสสุดท้าย) — แสดงจอสรุป
 
 /** Level-up rewards: a new card, a star on a deck card, or removing a deck card. */
-export type LevelOption = 'card' | 'upgrade' | 'remove';
+export type LevelOption = 'card' | 'upgrade' | 'remove' | 'slot' | 'retain';
 
 /** Per-fight state for skills and passives; reset when a fight starts. */
 export type FightState = {
@@ -146,6 +154,8 @@ export type PlayerState = {
   /** Mana carries over between turns of a fight; reset to `startMana` each fight. */
   mana: number; startMana: number;
   openingDraw: number; drawPerTurn: number; handMax: number;
+  /** Cards kept in hand past the end of a turn; the rest are discarded by the player's choice. */
+  retain?: number;
   // Status Effects System
   statusEffects?: StatusEffect[];
 };
@@ -154,8 +164,6 @@ export type RunCounters = {
   removed: number;
   removeShopCount?: number;
   upgradeShopCount?: number;
-  /** Permanent upgrades bought: boon id → nights it was bought on. */
-  boons?: Partial<Record<import('./balance/notfm').BoonId, number[]>>;
 };
 
 // ===== Events =====
@@ -399,6 +407,10 @@ export type GameState = {
   levelUp?: {
     /** Three card offers for the 'card' option. */
     cards: CardData[];
+    /** The two rewards offered this level (NOTFM: pick one of two). Missing on old saves: all three classic ones. */
+    offers?: LevelOption[];
+    /** 'upgrade' grants this many upgrades; the reward ends when they are used or nothing can be upgraded. */
+    upgradesLeft?: number;
     consumed?: boolean;
     result?: { fight: number; text: string };
   } | null;
@@ -427,7 +439,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'>;
+  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'>; blessingTier?: number;
       /** Has beaten a final boss before (journal); needed for the secret boss. */
       veteran?: boolean }
   | { type: 'AnswerGhostTalk'; choice: AlignmentChoice }
@@ -441,6 +453,7 @@ export type Command =
   | { type: 'EnemyPlayCard'; cardIndex: number }
   | { type: 'StartMonsterTurn' }
   | { type: 'EndTurn' }
+  | { type: 'DiscardForTurnEnd'; indices: number[] }
   /** ทำเทิร์นศัตรูจบในทีเดียว แล้วคายผลออกมาทาง state.pendingEvents */
   | { type: 'ResolveEnemyTurn' }
   | { type: 'StartPlayerTurn' }
@@ -463,7 +476,6 @@ export type Command =
   // Shop (card)
   | { type: 'TakeShop'; index: number }
   | { type: 'ShopReroll' }
-  | { type: 'ShopBuyBoon'; id: import('./balance/notfm').BoonId }
   | { type: 'TakeShopBlessing'; index: number }
 
   // Shop (remove/upgrade)

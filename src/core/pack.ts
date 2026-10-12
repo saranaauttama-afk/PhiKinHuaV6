@@ -7,6 +7,7 @@ import classCardsJson from '../data/packs/base/class_cards.json';
 import curseCardsJson from '../data/packs/base/curse_cards.json';
 import blessingsJson from '../data/packs/base/blessings.json';
 import classBlessingsJson from '../data/packs/base/class_blessings.json';
+import pandoraBlessingsJson from '../data/packs/base/pandora_blessings.json';
 
 type CardJson = CardData & { starter?: number };
 
@@ -43,11 +44,13 @@ export const START_DECK: CardData[] = [];
 
 export const BLESSING_POOL: BlessingDef[] = blessingsJson as any;
 export const CLASS_BLESSINGS: BlessingDef[] = classBlessingsJson as any;
+/** แพนโดรา blessings: gain with a cost, unlocked by nights cleared across runs. */
+export const PANDORA_BLESSINGS: BlessingDef[] = pandoraBlessingsJson as any;
 export function classBlessing(id: ClassId): BlessingDef {
   return JSON.parse(JSON.stringify(CLASS_BLESSINGS.find(b => b.class === id)!));
 }
 export function blessingById(id: string): BlessingDef | undefined {
-  return [...BLESSING_POOL, ...CLASS_BLESSINGS].find(b => b.id === id);
+  return [...BLESSING_POOL, ...CLASS_BLESSINGS, ...PANDORA_BLESSINGS].find(b => b.id === id);
 }
 
 export const BLESSINGS_BY_RARITY: Record<Rarity, BlessingDef[]> = {

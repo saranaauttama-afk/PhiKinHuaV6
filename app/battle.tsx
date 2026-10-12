@@ -27,6 +27,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
+import TurnEndDiscard from './components/battle/TurnEndDiscard';
+import { retainLimit, turnEndExcess } from '../src/core/engine/handlers/combat';
 import { bossRule } from '../src/core/campaign/bossRules';
 
 function bossRelicView(s: import('../src/core/types').GameState) {
@@ -88,6 +90,11 @@ export default function BattlePage() {
   const [presentation, setPresentation] = React.useState<CombatFrame | null>(null);
   const player = presentation?.player ?? gameState.player;
   const enemy = presentation?.enemy ?? gameState.enemy;
+  // Face-down ghost cards keep their places while the ghost plays: a played card leaves a gap
+  // instead of the rest sliding together (playtest 13 Oct). `remaining` maps hand index → slot.
+  const handSlotsRef = React.useRef<{ total: number; remaining: number[] }>({ total: 0, remaining: [] });
+  const heldCount = enemy?.handCount ?? 0;
+  if (heldCount !== handSlotsRef.current.remaining.length) handSlotsRef.current = { total: heldCount, remaining: Array.from({ length: heldCount }, (_, i) => i) };
   const bootstrapped = React.useRef(false);
   const turnLocked = React.useRef(false);
 
@@ -218,9 +225,13 @@ export default function BattlePage() {
     }
   };
 
+  const [discardNeed, setDiscardNeed] = React.useState(0);
   const handleEndTurn = () => {
     if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
     setPrayerAt(null);
+    // Over the retain limit: the player picks what to discard first (NOTFM).
+    const need = turnEndExcess(gameState);
+    if (need > 0) { setDiscardNeed(need); return; }
     startEnemyTurn();
   };
 
@@ -262,10 +273,15 @@ export default function BattlePage() {
 
     switch (currentEvent.t) {
       case 'EnemyCardRevealed': {
+        // The frame already left this card out of the hand; take its slot out of the map too.
+        const slots = handSlotsRef.current, k = currentEvent.handIndex ?? 0;
+        const before = slots.remaining.length === (currentEvent.frame?.enemy?.handCount ?? -1) + 1 ? slots.remaining : Array.from({ length: (currentEvent.frame?.enemy?.handCount ?? 0) + 1 }, (_, i) => i);
+        const slot = before[k] ?? k, total = Math.max(slots.total, before.length);
+        handSlotsRef.current = { total, remaining: before.filter((_, i) => i !== k) };
         setEnemyHandCards([{
           key:`${gameState.turn}-${timeline.played.length}`,
           card:{id:currentEvent.cardId,ownerId:currentEvent.ownerId,name:currentEvent.name,damage:currentEvent.dmg,block:currentEvent.block,cost:currentEvent.cost,hits:currentEvent.hits,desc:currentEvent.desc},
-          cardIndex:currentEvent.handIndex??0,totalCards:(currentEvent.frame?.enemy?.handCount??0)+1,delay:0,playing:true,
+          cardIndex:slot,totalCards:total,delay:0,playing:true,
         }]);
         break;
       }
@@ -331,6 +347,7 @@ export default function BattlePage() {
           monsterId={monsterId}
           monsterName={monsterName}
           enemy={enemy ?? null}
+          handSlots={handSlotsRef.current}
           turnLabel={`เทิร์น ${gameState.turn} · ${phase==='enemy'?'ตาผี':'ตาเรา'}`}
         />
 
@@ -433,6 +450,12 @@ export default function BattlePage() {
           onChangePile={setOpenPile}
           onClose={() => setOpenPile(null)}
         />
+
+        {discardNeed > 0 && gameState.phase === 'combat' && (
+          <TurnEndDiscard hand={gameState.piles.hand} need={discardNeed} retain={retainLimit(gameState)}
+            onCancel={() => setDiscardNeed(0)}
+            onConfirm={indices => { dispatch({ type: 'DiscardForTurnEnd', indices }); setDiscardNeed(0); startEnemyTurn(); }} />
+        )}
 
         {prayerAt != null && playerHand[prayerAt]?.type === 'prayer' && (
           <PrayerWaitPicker

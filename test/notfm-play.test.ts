@@ -90,8 +90,8 @@ describe('การจั่ว', () => {
     expect(s.piles.hand).toHaveLength(CARD_RULES.openingDraw + CARD_RULES.drawPerTurn);
   });
 
-  it('มือเต็ม 7 แล้วหยุดจั่ว ไพ่ยังอยู่ในกองจั่ว', () => {
-    const s = fight(Array.from({ length: 6 }, (_, i) => attackCard(1, { id: `h${i}` })));
+  it('มือเต็มขีดสูงสุดแล้วหยุดจั่ว ไพ่ยังอยู่ในกองจั่ว', () => {
+    const s = fight(Array.from({ length: CARD_RULES.handMax - 1 }, (_, i) => attackCard(1, { id: `h${i}` })));
     s.piles.draw = Array.from({ length: 5 }, (_, i) => attackCard(1, { id: `d${i}` }));
     startPlayerTurn(s, rng);
     expect(s.piles.hand).toHaveLength(CARD_RULES.handMax);

@@ -1,4 +1,4 @@
-// test/notfm-economy.test.ts — phase 6: shop boons, flat service prices, blessing stop, difficulty 1–5.
+// test/notfm-economy.test.ts — phase 6: flat service prices, blessing stop, difficulty 1–5.
 import { describe, it, expect } from 'vitest';
 import { baseNewState } from '../src/core/commands';
 import { applyCommand } from '../src/core/reducer';
@@ -6,10 +6,10 @@ import { makeRng } from '../src/core/rng';
 import type { Command, GameState } from '../src/core/types';
 import type { Difficulty } from '../src/core/campaign/threeNight';
 import { DIFFICULTY_RULES, campaignBoss } from '../src/core/campaign/threeNight';
-import { BOONS, DIFFICULTY, ECONOMY, ENEMY_HP } from '../src/core/balance/notfm';
+import { DIFFICULTY, ECONOMY, ENEMY_HP } from '../src/core/balance/notfm';
 import { START_GOLD } from '../src/core/balance';
 import { configureNightEnemy, rageActive } from '../src/core/campaign/nights';
-import { boonBlock, markedUp, removePrice, upgradePrice, wellHeal, shrineCost, healAmount } from '../src/core/engine/handlers/shops_events';
+import { markedUp, removePrice, upgradePrice, wellHeal, shrineCost, healAmount } from '../src/core/engine/handlers/shops_events';
 
 function run(difficulty: Difficulty = 1, seed = 'eco') {
   let s = baseNewState(seed), r = makeRng(seed);
@@ -38,40 +38,9 @@ describe('เศรษฐกิจ', () => {
     expect(stock).toHaveLength(ECONOMY.shopStock.cards + ECONOMY.shopStock.equipment);
   });
 
-  it('พลังถาวรได้ผลตามที่เขียน', () => {
+  it('ร้านไม่ขายพลังถาวรแล้ว (ย้ายไปเป็นรางวัลเลเวลอัปและพรแพนโดรา)', () => {
     const d = run(); openStop(d, 'shop_card');
-    d.s.player.gold = 999;
-    const { maxHp, maxAp, drawPerTurn } = d.s.player, slots = d.s.equipmentSlotsMax!;
-    for (const id of ['maxHp', 'ap', 'slot', 'draw'] as const) d.go({ type: 'ShopBuyBoon', id });
-    expect(d.s.player.maxHp).toBe(maxHp + 10);
-    expect(d.s.player.maxAp).toBe(maxAp + 1);
-    expect(d.s.equipmentSlotsMax).toBe(slots + 1);
-    expect(d.s.player.drawPerTurn).toBe(drawPerTurn + 1);
-    expect(d.s.player.gold).toBe(999 - Object.values(BOONS).reduce((n, b) => n + b.price, 0));
-  });
-
-  it('ชีวิตกับช่องอุปกรณ์ซื้อได้คืนละครั้ง แต้มกับจั่วซื้อได้ครั้งเดียวทั้งรอบ', () => {
-    const d = run(); openStop(d, 'shop_card');
-    d.s.player.gold = 999;
-    for (const id of ['maxHp', 'ap', 'slot', 'draw'] as const) d.go({ type: 'ShopBuyBoon', id });
-    const gold = d.s.player.gold, ap = d.s.player.maxAp;
-    d.go({ type: 'ShopBuyBoon', id: 'ap' });
-    expect(d.s.player.maxAp).toBe(ap);
-    expect(d.s.player.gold).toBe(gold);
-    expect(boonBlock(d.s, 'slot')).toBe('คืนนี้ซื้อแล้ว');
-    expect(boonBlock(d.s, 'maxHp')).toBe('คืนนี้ซื้อแล้ว');
-    d.s.campaign!.night = 2;
-    expect(boonBlock(d.s, 'slot')).toBeUndefined();
-    expect(boonBlock(d.s, 'maxHp')).toBeUndefined();
-    expect(boonBlock(d.s, 'ap')).toBe('ซื้อไปแล้ว');
-    expect(boonBlock(d.s, 'draw')).toBe('ซื้อไปแล้ว');
-  });
-
-  it('ซื้อพลังถาวรได้แค่ในร้านค้า', () => {
-    const d = run(); openStop(d, 'shop_upgrade');
-    d.s.player.gold = 999;
-    d.go({ type: 'ShopBuyBoon', id: 'ap' });
-    expect(d.s.player.gold).toBe(999);
+    expect(d.s.shopStock!.every(i => 'card' in i)).toBe(true);
   });
 
   it('ปลุกเสกกับสละการ์ด: ใบแรกที่แต่ละจุดฟรี ใบต่อไป 40', () => {
@@ -140,8 +109,9 @@ describe('ระดับความยาก', () => {
     expect(healAmount(high, 30)).toBe(15);
     expect(shrineCost(high)).toBe(Math.ceil(ECONOMY.shrine.price * 1.25));
     const d = run(4); openStop(d, 'shop_card'); d.s.player.gold = 999;
-    d.go({ type: 'ShopBuyBoon', id: 'ap' });
-    expect(d.s.player.gold).toBe(999 - Math.ceil(BOONS.ap.price * 1.25));
+    const price = d.s.shopStock![0].price;
+    d.go({ type: 'TakeShop', index: 0 });
+    expect(d.s.player.gold).toBe(999 - Math.ceil(price * 1.25));
   });
 
   it('ระดับ 5 คืนที่ 3 จั่วต่อเทิร์นน้อยลง 1', () => {

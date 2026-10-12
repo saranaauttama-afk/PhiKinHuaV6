@@ -8,8 +8,10 @@ export const CARD_RULES = {
   openingDraw: 4,
   /** Cards drawn at the start of each later player turn. */
   drawPerTurn: 2,
-  /** Draws stop while the hand holds this many cards. */
-  handMax: 7,
+  /** Hard cap on cards held during a turn; draws past it stay in the draw pile. */
+  handMax: 10,
+  /** Cards kept past the end of a turn; above it the player picks cards to discard (NOTFM). */
+  retain: 3,
   /** Action points restored each player turn. */
   apPerTurn: 2,
   /** Equipment cards that can be in play at once; a new one replaces the oldest. */
@@ -87,8 +89,21 @@ export const CLASS_PASSIVES: Record<ClassId, import('../types').Passive & {
   medium: { name: 'ผีติดตาม', triggers: [], copyFirstGhostCard: true },
 };
 
-/** Level-up: full heal, more max HP, then one of three rewards. */
-export const LEVEL_UP = { maxHp: 8, skipGold: 25 } as const;
+/**
+ * EXP per win on the three-night route, by night (1–3). Later ghosts give more, so level-ups
+ * keep coming about every 3–4 fights (see NEXT_EXP_TABLE in balance/progression.ts).
+ */
+export const NIGHT_EXP = { normal: [12, 18, 24], elite: [20, 30, 40], boss: [30, 45, 60] } as const;
+
+/**
+ * Level-up: full heal, more max HP, then pick one of two rewards rolled from `weights`
+ * (NOTFM). 'upgrade' upgrades `upgrades` cards; 'slot' and 'retain' stop at their caps.
+ */
+export const LEVEL_UP = {
+  maxHp: 8, skipGold: 25, offers: 2, upgrades: 2,
+  weights: { card: 3, upgrade: 3, remove: 2, slot: 1, retain: 2 },
+  caps: { slot: 3, retain: 6 },
+} as const;
 
 /**
  * ความกล้า / บุญ. Dialogues after some wins move one of them by 1 (capped at `max`).
@@ -125,15 +140,6 @@ export const ECONOMY = {
   well: { heal: 10, uses: 2 },
   shrine: { price: 25, step: 10, uses: 3 },
 } as const;
-
-/** Permanent upgrades sold at the shop. `limit`: per night, per run, or none. */
-export type BoonId = 'maxHp' | 'ap' | 'slot' | 'draw';
-export const BOONS: Record<BoonId, { name: string; text: string; price: number; limit?: 'night' | 'run' }> = {
-  maxHp: { name: 'ชีวิตสูงสุด +10', text: 'ชีวิตสูงสุดและชีวิตปัจจุบัน +10 · ซื้อได้คืนละครั้ง', price: 10, limit: 'night' },
-  ap: { name: 'แต้ม +1', text: 'แต้มต่อเทิร์น +1 ถาวร · ซื้อได้ครั้งเดียวทั้งรอบ', price: 120, limit: 'run' },
-  slot: { name: 'ช่องอุปกรณ์ +1', text: 'ใส่อุปกรณ์พร้อมกันได้เพิ่ม 1 ชิ้น · ซื้อได้คืนละครั้ง', price: 70, limit: 'night' },
-  draw: { name: 'จั่วต่อเทิร์น +1', text: 'จั่วเพิ่ม 1 ใบทุกเทิร์น · ซื้อได้ครั้งเดียวทั้งรอบ', price: 150, limit: 'run' },
-};
 
 /** Difficulty 1–5: each level adds one rule on top of the ones below it. */
 export const DIFFICULTY = {

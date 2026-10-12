@@ -20,7 +20,7 @@ export function baseNewState(seed: string): GameState {
     player: {
       hp: START_HP, maxHp: START_HP, block: 0,
       ap: CARD_RULES.apPerTurn, maxAp: CARD_RULES.apPerTurn, mana: 0, startMana: 0,
-      openingDraw: CARD_RULES.openingDraw, drawPerTurn: CARD_RULES.drawPerTurn, handMax: CARD_RULES.handMax,
+      openingDraw: CARD_RULES.openingDraw, drawPerTurn: CARD_RULES.drawPerTurn, handMax: CARD_RULES.handMax, retain: CARD_RULES.retain,
       gold: START_GOLD, level: 1, exp: 0, expToNext: nextExpForLevel(1),
     },
     enemy: undefined,

@@ -13,19 +13,23 @@
 
 import type { ThaiGhostData } from '../monsters/thai-ghosts';
 
-/** EXP ที่ต้องใช้เพื่อขึ้นจากเลเวลนี้ไปเลเวลถัดไป (รวม 1→10 = 960) */
+/**
+ * EXP ที่ต้องใช้เพื่อขึ้นจากเลเวลนี้ไปเลเวลถัดไป
+ * เกลี่ยให้เลเวลอัปราวทุก 3–4 ไฟต์ตลอดสามคืน คู่กับ NIGHT_EXP ใน balance/notfm.ts
+ * (เดิมคืนแรกขึ้น 4 ครั้งใน 8 ไฟต์ คืนที่ 3 ขึ้นครั้งเดียว)
+ */
 const NEXT_EXP_TABLE: Record<number, number> = {
-  1: 20, 2: 30, 3: 45, 4: 65, 5: 90,
-  6: 120, 7: 155, 8: 195, 9: 240,
+  1: 30, 2: 40, 3: 55, 4: 65, 5: 80,
+  6: 90, 7: 105, 8: 120,
 };
 
-/** เลเวล 10 ขึ้นไปยังเล่นต่อได้ (ศึกลับ) — โตต่อแบบชัน */
-const LATE_LEVEL_STEP = 60;
+/** เลเวลถัดจากตาราง */
+const LATE_LEVEL_STEP = 15;
 
 export function nextExpForLevel(level: number) {
   const known = NEXT_EXP_TABLE[level];
   if (known != null) return known;
-  return NEXT_EXP_TABLE[9] + (level - 9) * LATE_LEVEL_STEP;
+  return NEXT_EXP_TABLE[8] + (level - 8) * LATE_LEVEL_STEP;
 }
 
 /**

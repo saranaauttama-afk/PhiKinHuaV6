@@ -68,7 +68,11 @@ function checkGate(s:GameState){
   a.boss='night';a.slotIds[ix]='night-boss';p.offers[ix]={kind:'boss',bossType:'final',enemyId:boss.id};p.resolved[ix]=false;
  }
 }
-/** Completion settles only its own slot. Discard commands cannot delete ghosts. */
+/**
+ * Completion settles only its own slot, and a new page is dealt into it straight away
+ * (Night of the Full Moon style), so stops the player is saving for stay on the board.
+ * Discard commands cannot delete ghosts.
+ */
 export function settleAdventureSlot(s:GameState,ix:number,skipped=false):void {
  const a=s.pages?.adventure,p=s.pages?.current;if(!a||!p)return;
  const id=a.slotIds[ix],offer=p.offers[ix];
@@ -79,7 +83,14 @@ export function settleAdventureSlot(s:GameState,ix:number,skipped=false):void {
  if(!skipped&&offer.kind==='story_event'&&isNightStory(offer.eventId))a.storyDone=true;
  s.pages!._activeOfferIndex=undefined;s.pages!._shopUsed=false;
  s.pages!.pageIndex=a.resolvedIds.length+a.skippedIds.length;
- advanceThreePageBoard(s);
+ refillSlot(s,ix);
+}
+/** Deal the next page into a settled slot; once the night's work is done the boss takes a free slot. */
+function refillSlot(s:GameState,ix:number):void {
+ const a=s.pages!.adventure!;
+ if(a.boss!=='locked')return;
+ a.slotIds[ix]=null;fillSlot(s,ix);
+ checkGate(s);
 }
 export function revealUltimate(s:GameState):void {
  const a=s.pages!.adventure!;for(const id of a.slotIds)if(id&&a.deck.some(e=>e.id===id)&&!a.skippedIds.includes(id))a.skippedIds.push(id);a.boss='ultimate';a.slotIds=['ultimate-boss',null,null];
@@ -158,7 +169,10 @@ export function validAdventure(s:Partial<GameState>):boolean {
   if(!drawn.includes(id)||JSON.stringify(p.offers[i])!==JSON.stringify(a.deck.find(e=>e.id===id)?.offer)||p.resolved[i]!==consumed.includes(id))return false;
  }
  if(a.boss==='locked')return consumed.length+outstanding.length===a.cursor&&outstanding.every(id=>drawn.includes(id)&&!consumed.includes(id));
- if(consumed.length!==a.cursor||a.cursor!==a.deck.length||a.pendingIds.length||!a.storyDone||a.fightsWon!==routeFightQuota(s))return false;
+ // Unused stops may still share the board with the boss.
+ const waiting=active.filter(id=>id!=='night-boss'&&id!=='ultimate-boss');
+ if(consumed.length+waiting.length!==a.cursor||a.cursor!==a.deck.length||a.pendingIds.length||!a.storyDone||a.fightsWon!==routeFightQuota(s))return false;
+ if(waiting.some(id=>isCriticalOffer(a.deck.find(e=>e.id===id)!.offer)))return false;
  const id=a.boss==='ultimate'||a.slotIds.includes('ultimate-boss')?'ultimate-boss':'night-boss',ix=a.slotIds.indexOf(id),offer=p.offers[ix];
  return ix>=0&&offer?.kind==='boss'&&offer.enemyId===(id==='ultimate-boss'?ULTIMATE_BOSS.id:campaignBoss(s).id)&&p.resolved[ix]===(a.boss==='done')&&(id!=='ultimate-boss'||ultimateRequired(s));
 }

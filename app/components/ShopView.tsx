@@ -23,7 +23,7 @@ import { BackHandler, Image, Modal, Pressable, ScrollView, Text, View } from 're
 import RewardReceiptView from './RewardReceiptView';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
 import { SHOP_REROLL_COST } from '../../src/core/balance/economy';
-import { BOONS, ECONOMY, type BoonId } from '../../src/core/balance/notfm';
+import { ECONOMY } from '../../src/core/balance/notfm';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import {QuietButton} from './QuietChrome';
 import DeckCard,{CardGlyphArt,CardFace} from './DeckCard';
@@ -31,7 +31,7 @@ import {canRemoveCard} from '../../src/core/engine/shared';
 import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 import {describeCard,describeBlessing} from '../../src/core/cards/describe';
-import {shopPrice,markedUp,removePrice,upgradePrice,boonPrice,boonBlock,shrineCost,wellHeal,healAmount} from '../../src/core/engine/handlers/shops_events';
+import {shopPrice,markedUp,removePrice,upgradePrice,shrineCost,wellHeal,healAmount} from '../../src/core/engine/handlers/shops_events';
 
 function Panel({title,children}:{title:string;children:React.ReactNode}) {
   return <RitualSurface kind="quietSlate" style={{padding:22,gap:10,width:'100%',minWidth:0}}>
@@ -114,13 +114,6 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {shopPrice(state,it.price)} เบี้ย{shopPrice(state,it.price)<it.price?` (จาก ${it.price})`:''}</Text>
       </View>;})}</View>
       <QuietButton label={`ขอดูของชุดใหม่ (${markedUp(state,SHOP_REROLL_COST)} เบี้ย)`} disabled={(state.player.gold??0)<markedUp(state,SHOP_REROLL_COST)} onPress={()=>{setSelected(null);dispatch({type:'ShopReroll'});}}/>
-      {kind==='card'&&<View style={{gap:8,marginTop:6}}>
-        <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:17}}>พลังถาวร</Text>
-        {(Object.keys(BOONS) as BoonId[]).map(id=>{const block=boonBlock(state,id),b=BOONS[id];return <View key={id} testID={`boon-${id}`} style={{flexDirection:'row',alignItems:'center',gap:10}}>
-          <View style={{flex:1}}><Text style={{fontFamily:font.heading,color:palette.text,fontSize:14}}>{b.name}</Text><Text style={{fontFamily:font.ui,color:palette.textDim,fontSize:12,lineHeight:18}}>{b.text}</Text></View>
-          <QuietButton testID={`boon-buy-${id}`} label={block&&block!=='เบี้ยไม่พอ'?block:`${boonPrice(state,id)} เบี้ย`} disabled={!!block} onPress={()=>{dispatch({type:'ShopBuyBoon',id});setNotice(`ได้ ${b.name}`);}} style={{minWidth:104}}/>
-        </View>;})}
-      </View>}
     </Panel>;
   };
 

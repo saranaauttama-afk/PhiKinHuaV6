@@ -15,6 +15,8 @@ export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficult
  /** Ghosts already talked to this run, and dialogues held this night. */
  talked?:string[];talksThisNight?:number;
  veteran?:boolean;
+ /** Nights cleared across all runs when this run began: unlocks แพนโดรา blessings. */
+ blessingTier?:number;
  /** The night-3 boss, fixed when its slot appears. */
  finalBossId?:string};
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};

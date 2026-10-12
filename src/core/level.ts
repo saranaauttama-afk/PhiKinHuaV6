@@ -81,11 +81,16 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./cl
  *
  * @param owned id ของพรที่ถืออยู่แล้ว
  */
-export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2) {
+/**
+ * `tier` = nights cleared across all runs; แพนโดรา blessings with `unlock` <= tier join the pool
+ * (undefined: none, e.g. tests and old callers).
+ */
+export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2, tier?: number) {
   let r = rng;
   const pool: BlessingDef[] = [
     ...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon,
     ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary,
+    ...(tier == null ? [] : require('./pack').PANDORA_BLESSINGS.filter((b: BlessingDef) => (b.unlock ?? 0) <= tier)),
   ].filter(b => !owned.includes(b.id));
 
   const sh = shuffle(r, pool); r = sh.rng;

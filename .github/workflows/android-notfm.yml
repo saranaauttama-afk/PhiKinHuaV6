@@ -47,14 +47,14 @@ jobs:
           "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
-          grep "package: name='com.phikinhua.episode' versionCode='37' versionName='1.0.36'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-NOTFM-v1.0.36.apk
-          sha256sum PhiKinHua-NOTFM-v1.0.36.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='38' versionName='1.0.37'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-NOTFM-v1.0.37.apk
+          sha256sum PhiKinHua-NOTFM-v1.0.37.apk > apk-audit/sha256.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-NOTFM-APK
-          path: PhiKinHua-NOTFM-v1.0.36.apk
+          path: PhiKinHua-NOTFM-v1.0.37.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
