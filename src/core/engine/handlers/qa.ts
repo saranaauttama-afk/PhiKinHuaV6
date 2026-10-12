@@ -284,22 +284,6 @@ export function qaClearAllMinions(state: GameState, cmd: Command & { type: 'QA_C
   return { state, rng };
 }
 
-// ===== Phase 4 Debug Commands: Adaptive AI =====
-
-export function qaDebugAdaptiveAI(state: GameState, cmd: Command & { type: 'QA_DebugAdaptiveAI' }, rng: RNG) {
-  const { debugAdaptiveAI } = require('../../adaptiveAI');
-  debugAdaptiveAI(state);
-  state.log.push('🧠 Adaptive AI debug info logged to console');
-  return { state, rng };
-}
-
-export function qaResetAILearning(state: GameState, cmd: Command & { type: 'QA_ResetAILearning' }, rng: RNG) {
-  const { resetAILearning } = require('../../adaptiveAI');
-  resetAILearning(state);
-  state.log.push('🔄 AI learning patterns reset');
-  return { state, rng };
-}
-
 export function qaLevelUp(state: GameState, cmd: Command & { type: 'QA_LevelUp' }, rng: RNG) {
   const { grantExpAndQueueLevelUp } = require('../shared');
   rng = grantExpAndQueueLevelUp(state, rng);

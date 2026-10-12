@@ -5,11 +5,6 @@ import type { Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import { getTierForFight, getRandomMonsterFromTier } from '../src/core/monsters/thai-ghosts';
 import { rollThreeCards } from '../src/core/level';
-import {
-  getCurrentAdaptation,
-  learnFromPlayerAction,
-  resetAILearning,
-} from '../src/core/adaptiveAI';
 
 /**
  * Phase 5 — seed เดียวกันต้องได้รันเดียวกันทุกครั้ง
@@ -110,64 +105,6 @@ describe('รางวัลเลเวลอัปซ้ำได้ตาม 
     const a = rollThreeCards(makeRng('lvl'), 8);
     const b = rollThreeCards(makeRng('lvl'), 8);
     expect(a.list.map(c => c.id)).toEqual(b.list.map(c => c.id));
-  });
-});
-
-describe('สถานะ AI ผูกกับ state ไม่ใช่ตัวแปรระดับโมดูล', () => {
-  /** ดันให้ AI ปรับความยากขึ้น: ผู้เล่นเลือดต่ำ + ศัตรูเลือดเต็ม → damageMultiplier 0.9 */
-  function makeAIAdapt(s: GameState) {
-    s.player.hp = Math.floor(s.player.maxHp * 0.1);
-    s.enemy = { id: 'x', name: 'x', hp: 100, maxHp: 100, dmg: 1, block: 0 } as any;
-    learnFromPlayerAction(s, 'turn_end', { energyUsed: 0, blockGained: 0 });
-    return s;
-  }
-
-  it('รันใหม่ไม่รับค่าความยากที่ค้างจากรันก่อน', () => {
-    // รันแรก — ดันให้ AI ปรับตัวจนตัวคูณเปลี่ยนไปจากค่าเริ่มต้น
-    const first = makeAIAdapt(
-      playRun('ai-a', [
-        { type: 'NewRun', seed: 'ai-a' },
-        { type: 'ChooseStarterBlessing', index: 0 },
-      ])
-    );
-    expect(getCurrentAdaptation(first).damageMultiplier).not.toBe(1.0);
-
-    // รันใหม่ต้องเริ่มที่ค่าเริ่มต้นเสมอ
-    // (เดิมตัวแปรอยู่ระดับโมดูล ค่านี้จะค้างข้ามรันใน session เดียวกัน)
-    const second = playRun('ai-b', [
-      { type: 'NewRun', seed: 'ai-b' },
-      { type: 'ChooseStarterBlessing', index: 0 },
-    ]);
-    expect(getCurrentAdaptation(second).damageMultiplier).toBe(1.0);
-  });
-
-  it('สองรันที่เล่นพร้อมกันไม่กวนสถานะ AI ของกันและกัน', () => {
-    const a = makeAIAdapt(
-      playRun('par-a', [
-        { type: 'NewRun', seed: 'par-a' },
-        { type: 'ChooseStarterBlessing', index: 0 },
-      ])
-    );
-    const b = playRun('par-b', [
-      { type: 'NewRun', seed: 'par-b' },
-      { type: 'ChooseStarterBlessing', index: 0 },
-    ]);
-
-    expect(getCurrentAdaptation(a).damageMultiplier).not.toBe(1.0);
-    expect(getCurrentAdaptation(b).damageMultiplier).toBe(1.0);
-  });
-
-  it('resetAILearning ล้างตัวคูณความยากกลับเป็นค่าเริ่มต้นจริง', () => {
-    const s = makeAIAdapt(
-      playRun('reset', [
-        { type: 'NewRun', seed: 'reset' },
-        { type: 'ChooseStarterBlessing', index: 0 },
-      ])
-    );
-    expect(getCurrentAdaptation(s).damageMultiplier).not.toBe(1.0);
-
-    resetAILearning(s);
-    expect(getCurrentAdaptation(s).damageMultiplier).toBe(1.0);
   });
 });
 

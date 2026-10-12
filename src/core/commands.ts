@@ -156,7 +156,6 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
 
   // Import all advanced systems
   const { canPlayAttackCards } = require('./statusEffectsRuntime');
-  const { onPlayerCardPlayed } = require('./adaptiveAI');
 
   // Check if attack cards can be played (entangle check)
   if (card.type === 'attack' && !canPlayAttackCards(state)) {
@@ -268,7 +267,6 @@ export function applyCardEffect(state: GameState, idxInHand: number) {
   
   
   // ★ AI learning from player card usage
-  onPlayerCardPlayed(state, modifiedCard);
   
   if(modifiedCard.cleanseDebuffs)require('./statusEffectsRuntime').clearAllStatusEffects('player',state,'debuff');
   // draw will be handled by reducer after moving the card
@@ -293,10 +291,6 @@ export function endPlayerTurn(state: GameState) {
 export function endEnemyTurn(state: GameState) {
   // ★ Process all advanced systems before enemy turn
   const { processEnemyTurnBehaviors } = require('./enemyBehaviorRuntime');  
-  const { onPlayerTurnEnd } = require('./adaptiveAI');
-  
-  // Update AI learning
-  onPlayerTurnEnd(state, { energyUsed: 0, blockGained: state.player.block });
   
   // (Environment system removed)
   

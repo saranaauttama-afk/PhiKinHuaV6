@@ -304,12 +304,6 @@ export type GameState = {
   /** ตัวนับสำหรับสร้าง id ที่ไม่ซ้ำแบบ deterministic (แทน Date.now + Math.random) */
   idCursor?: number;
 
-  /**
-   * สถานะการเรียนรู้ของ AI — เดิมเก็บเป็นตัวแปรระดับโมดูลใน adaptiveAI.ts
-   * ทำให้ไม่ถูก save ไม่ผูกกับ seed และค้างข้ามรัน
-   */
-  ai?: import('./adaptiveAI').AIState;
-
   player: PlayerState;
   enemy?: EnemyState;
   
@@ -567,8 +561,6 @@ export type Command =
   | { type: 'QA_SummonEnemyMinion'; minionId: string }
   | { type: 'QA_ClearAllMinions' }
   // Phase 4 Debug Commands - Adaptive AI
-  | { type: 'QA_DebugAdaptiveAI' }
-  | { type: 'QA_ResetAILearning' }
   | { type: 'QA_LevelUp' };
 
 export type TurnCtx = { state: GameState };

@@ -105,15 +105,6 @@ export function computeModifiedDamage(
   // 1) ฝั่งผู้ตี — ฟังก์ชันนี้อ่าน status ของ "ผู้ตี" จาก flag ตัวที่สอง
   if (rules.attackerMods) {
     dmg = modifyDamageForStatusEffects(state, dmg, from === 'player');
-
-    // 2) adaptive AI — ใช้กับดาเมจผู้เล่นเท่านั้นในรูปแบบ inverse
-    if (from === 'player') {
-      const { getAdaptiveDamageMultiplier } = require('../adaptiveAI');
-      const mult = getAdaptiveDamageMultiplier(state);
-      if (Number.isFinite(mult) && mult > 0) {
-        dmg = dmg * (1 / mult);
-      }
-    }
   }
 
   // Curse adds a flat point per stack for every damage source.

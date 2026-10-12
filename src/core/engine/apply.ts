@@ -121,8 +121,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   QA_ClearAllMinions: qa.qaClearAllMinions,
   
   // QA - Phase 4: Adaptive AI
-  QA_DebugAdaptiveAI: qa.qaDebugAdaptiveAI,
-  QA_ResetAILearning: qa.qaResetAILearning,
   QA_LevelUp: qa.qaLevelUp,
 
   // QA - Original
