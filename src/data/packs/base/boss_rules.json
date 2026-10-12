@@ -2,12 +2,13 @@
  "night-head-collector": {
   "relic": "ตะเกียงหนอง",
   "kind": "weaken",
-  "durability": 8,
+  "durability": 6,
   "params": {
+   "every": 2,
    "stacks": 1,
    "turns": 2
   },
-  "text": "ทุกเทิร์นผี เราติดอ่อนแอ 1",
+  "text": "ทุก 2 เทิร์นผี เราติดอ่อนแอ 1",
   "flavor": "แสงตะเกียงกลางหนองทำให้มือไม้อ่อน"
  },
  "night-bell-keeper": {

@@ -3555,34 +3555,6 @@
   }
  },
  {
-  "id": "night_head_collector_v29_awakened_strike",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · ตื่นอาฆาต",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "hits": 2
-  }
- },
- {
-  "id": "night_head_collector_v29_awakened_ritual",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · พิธีครึ่งชีวิต",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
   "id": "night_bell_keeper_v29_strike",
   "owner": "night-bell-keeper",
   "name": "เปรตวัดร้าง · ตะปบ",
@@ -3752,34 +3724,6 @@
   "fx": {
    "dmg": 6,
    "hits": 2
-  }
- },
- {
-  "id": "night_bell_keeper_v29_awakened_strike",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · ตื่นอาฆาต",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "hits": 2
-  }
- },
- {
-  "id": "night_bell_keeper_v29_awakened_ritual",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · พิธีครึ่งชีวิต",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "status": [
-    {
-     "id": "draw_reduction",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
   }
  },
  {
@@ -3956,34 +3900,6 @@
   }
  },
  {
-  "id": "night_root_lord_v29_awakened_strike",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · ตื่นอาฆาต",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "hits": 2
-  }
- },
- {
-  "id": "night_root_lord_v29_awakened_ritual",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · พิธีครึ่งชีวิต",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 3,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "night_cave_mother_v29_strike",
   "owner": "night-cave-mother",
   "name": "พรายแอ่งถ้ำ · ตะปบ",
@@ -4146,34 +4062,6 @@
   "fx": {
    "dmg": 6,
    "hits": 2
-  }
- },
- {
-  "id": "night_cave_mother_v29_awakened_strike",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · ตื่นอาฆาต",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "hits": 2
-  }
- },
- {
-  "id": "night_cave_mother_v29_awakened_ritual",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · พิธีครึ่งชีวิต",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
   }
  },
  {
@@ -4341,34 +4229,6 @@
   }
  },
  {
-  "id": "night_headless_king_v29_awakened_strike",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · ตื่นอาฆาต",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "hits": 2
-  }
- },
- {
-  "id": "night_headless_king_v29_awakened_ritual",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · พิธีครึ่งชีวิต",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
   "id": "phi_kin_hua_v29_strike",
   "owner": "phi-kin-hua",
   "name": "ผีกินหัว · ตะปบ",
@@ -4524,27 +4384,6 @@
   "fx": {
    "dmg": 6,
    "hits": 2
-  }
- },
- {
-  "id": "phi_kin_hua_v29_awakened_strike",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · ตื่นอาฆาต",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "hits": 2
-  }
- },
- {
-  "id": "phi_kin_hua_v29_awakened_ritual",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · พิธีครึ่งชีวิต",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "heal": 6
   }
  },
  {

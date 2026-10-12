@@ -81,7 +81,7 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./cl
  *
  * @param owned id ของพรที่ถืออยู่แล้ว
  */
-export function rollTwoBlessings(rng: RNG, owned: string[] = []) {
+export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2) {
   let r = rng;
   const pool: BlessingDef[] = [
     ...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon,
@@ -89,5 +89,5 @@ export function rollTwoBlessings(rng: RNG, owned: string[] = []) {
   ].filter(b => !owned.includes(b.id));
 
   const sh = shuffle(r, pool); r = sh.rng;
-  return { rng: r, list: sh.array.slice(0, Math.min(2, sh.array.length)).map(b => ({ ...b })) };
+  return { rng: r, list: sh.array.slice(0, Math.min(count, sh.array.length)).map(b => ({ ...b })) };
 }

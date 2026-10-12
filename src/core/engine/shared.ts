@@ -75,7 +75,8 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   const offer=s.pages?.current?.offers[s.pages._activeOfferIndex??-1];
   const elite=offer?.kind==='monster'&&offer.tier==='elite';
   const gained = s.pages?.adventure?(offer?.kind==='boss'?60:elite?32:18):expForMonster(tier);
-  const gold = s.pages?.adventure?(offer?.kind==='boss'?60:elite?28:18):goldForMonster(tier);
+  const {ECONOMY}=require('../balance/notfm');
+  const gold = s.pages?.adventure?(offer?.kind==='boss'?ECONOMY.gold.boss:elite?ECONOMY.gold.elite:Math.round(goldForMonster(tier)*ECONOMY.gold.normalPct/100)):goldForMonster(tier);
 
   s.player.exp += gained;
   require('../campaign/alignment').queueGhostTalk(s);

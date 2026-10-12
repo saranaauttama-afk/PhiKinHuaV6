@@ -39,6 +39,8 @@ function completeAdventure(s:GameState,r:RNG){
     if(s.campaign!.night<3){
      s.campaign!.night=(s.campaign!.night+1) as 2|3;
      s.campaign!.talksThisNight=0;
+     // DIFFICULTY.drawCutFrom: night 3 draws one card fewer per turn.
+     if(s.campaign!.night===3&&s.campaign!.difficulty>=require('../../balance/notfm').DIFFICULTY.drawCutFrom){s.player.drawPerTurn=Math.max(1,s.player.drawPerTurn-1);s.log.push('คืนที่ 3: จั่วต่อเทิร์น −1');}
      const healed=Math.min(s.player.maxHp-s.player.hp,Math.ceil(s.player.maxHp*.12));s.player.hp+=healed;
      s.log.push(`ฟ้าสาง คืนหัวสำเร็จ · พักฟื้น ${healed} · ออกตามรอยคืนที่ ${s.campaign!.night}`);
      s.phase='map';s.levelUp=null;s.cardReward=undefined;s.combatVictoryLock=false;
@@ -365,6 +367,14 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       
         mp._activeOfferIndex = ix; mp._shopUsed = false;
           s.log.push(`ChooseOffer → new single treasure (${offer.shopId})`);
+      return { state: s, rng };
+    }
+
+    case 'blessing': {
+      const out = ShopEv.openBlessingStop(s, rng);
+      s = out.state; rng = out.rng;
+      s.currentShopId = offer.shopId;
+      mp._activeOfferIndex = ix; mp._shopUsed = false;
       return { state: s, rng };
     }
 

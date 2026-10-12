@@ -154,6 +154,8 @@ export type RunCounters = {
   removed: number;
   removeShopCount?: number;
   upgradeShopCount?: number;
+  /** Permanent upgrades bought: boon id → nights it was bought on. */
+  boons?: Partial<Record<import('./balance/notfm').BoonId, number[]>>;
 };
 
 // ===== Events =====
@@ -170,7 +172,7 @@ export type EventState =
 export type ShopItem = 
   | { card: CardData; price: number }
   | { equipment: any; price: number };
-export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single';
+export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single' | 'blessing';
 
 export type ShopState = 'unused' | 'visited' | 'completed';
 
@@ -407,6 +409,8 @@ export type GameState = {
   shopPricePct?: number;
   /** A dialogue waiting after a win. */
   ghostTalk?: { ghostId: string };
+  /** Blessings offered at the night's blessing stop; emptied once one is taken. */
+  blessingStock?: BlessingDef[];
   fight?: FightState;
 
   /** การ์ดรางวัลที่รอให้เลือกหลังชนะไฟต์ — ดู `cards/reward.ts` */
@@ -459,6 +463,8 @@ export type Command =
   // Shop (card)
   | { type: 'TakeShop'; index: number }
   | { type: 'ShopReroll' }
+  | { type: 'ShopBuyBoon'; id: import('./balance/notfm').BoonId }
+  | { type: 'TakeShopBlessing'; index: number }
 
   // Shop (remove/upgrade)
   | { type: 'ShopRemoveBuy'; index: number }

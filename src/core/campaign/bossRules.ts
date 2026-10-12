@@ -38,6 +38,7 @@ export function applyBossRule(s: GameState): void {
   const turn = s.fight!.ghostTurns, p = rule.params;
   switch (rule.kind) {
     case 'weaken':
+      if (turn % (p.every ?? 1) !== 0) return;
       applyStatusEffect('player', s, 'weakness', p.turns, p.stacks);
       break;
     case 'curse': {

@@ -51,11 +51,11 @@ export const ENEMY_RULES: Record<EnemyKind, { handSize: number; drawPerTurn: num
 
 /** Ghost HP before night and difficulty scaling. Normal ghosts add `perTier` per tier (T1–T5). */
 export const ENEMY_HP = {
-  normal: 28, perTier: 2, elite: 48, boss: 78, ultimateBoss: 105,
+  normal: 28, perTier: 2, elite: 48, boss: 72, ultimateBoss: 105,
   /** Multiplier for nights 1–3. */
-  night: [1, 1.28, 1.58],
-  /** Extra HP per difficulty level above 1. */
-  perDifficulty: 0.05,
+  night: [1, 1.8, 2.6],
+  /** Night bosses use their own multipliers: the night-1 boss is the first wall, kept short. */
+  bossNight: [0.85, 2, 2.9],
 } as const;
 
 /**
@@ -63,9 +63,9 @@ export const ENEMY_HP = {
  * has lasted. It starts on night `fromNight(difficulty)`, so long fights cost more.
  */
 export const RAGE = {
-  startTurn: 2,
+  startTurn: 3,
   perTurn: 1,
-  fromNight: (difficulty: number) => (difficulty >= 3 ? 1 : 2),
+  fromNight: (difficulty: number) => (difficulty >= 3 ? 1 : 2), // DIFFICULTY.rageNight1From
   /** Before rage starts for the night, it still starts at this turn, so no fight is endless. */
   backstopTurn: 10,
 } as const;
@@ -102,4 +102,47 @@ export const ALIGNMENT = {
   talksPerNight: 4,
   courageGold: 10,
   meritHeal: 5,
+} as const;
+
+/**
+ * Economy. Every night guarantees one each of: shop, blacksmith (upgrade), ศาลาลืมเลือน
+ * (remove), blessing, story and healing, plus a chest with `chestChance`. The first upgrade
+ * or removal at each stop is free; later ones cost the flat price.
+ */
+export const ECONOMY = {
+  startGold: 50,
+  /** Gold per win. Normal ghosts get GOLD_BY_TIER (balance/progression.ts) × `normalPct`%. */
+  gold: { normalPct: 50, elite: 25, boss: 40 },
+  removePrice: 40,
+  upgradePrice: 40,
+  /** Free upgrades / removals at each blacksmith / ศาลาลืมเลือน. */
+  freePerStop: 1,
+  rerollPrice: 20,
+  /** Card shop stock: `cards` from the class pool plus `equipment` equipment cards. */
+  shopStock: { cards: 4, equipment: 1 },
+  blessingChoices: 3,
+  chestChance: 0.5,
+  well: { heal: 10, uses: 2 },
+  shrine: { price: 25, step: 10, uses: 3 },
+} as const;
+
+/** Permanent upgrades sold at the shop. `limit`: per night, per run, or none. */
+export type BoonId = 'maxHp' | 'ap' | 'slot' | 'draw';
+export const BOONS: Record<BoonId, { name: string; text: string; price: number; limit?: 'night' | 'run' }> = {
+  maxHp: { name: 'ชีวิตสูงสุด +10', text: 'ชีวิตสูงสุดและชีวิตปัจจุบัน +10 · ซื้อได้คืนละครั้ง', price: 10, limit: 'night' },
+  ap: { name: 'แต้ม +1', text: 'แต้มต่อเทิร์น +1 ถาวร · ซื้อได้ครั้งเดียวทั้งรอบ', price: 120, limit: 'run' },
+  slot: { name: 'ช่องอุปกรณ์ +1', text: 'ใส่อุปกรณ์พร้อมกันได้เพิ่ม 1 ชิ้น · ซื้อได้คืนละครั้ง', price: 70, limit: 'night' },
+  draw: { name: 'จั่วต่อเทิร์น +1', text: 'จั่วเพิ่ม 1 ใบทุกเทิร์น · ซื้อได้ครั้งเดียวทั้งรอบ', price: 150, limit: 'run' },
+};
+
+/** Difficulty 1–5: each level adds one rule on top of the ones below it. */
+export const DIFFICULTY = {
+  /** From this level rage starts on night 1 (below it, night 2). */
+  rageNight1From: 3,
+  /** From this level ghosts have `hpPct` more HP. */
+  hpFrom: 2, hpPct: 20,
+  /** From this level gold prices rise by `markupPct` and healing stops heal half. */
+  priceFrom: 4, markupPct: 25,
+  /** From this level the player draws one card fewer per turn on night 3. */
+  drawCutFrom: 5,
 } as const;
