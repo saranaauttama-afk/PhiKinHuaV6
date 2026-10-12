@@ -1,6 +1,5 @@
 // Commands — pure helpers used by reducer
-// baseNewState, buildAndShuffleDeck, drawCards, startPlayerTurn, isVictory/isDefeat, endEnemyTurn
-// isVictory/isDefeat, endEnemyTurn
+// baseNewState, buildAndShuffleDeck, drawCards, startPlayerTurn, beginPlayerFight, isVictory/isDefeat, startCombat
 import type { CardData, GameState } from './types';
 import { START_DECK, START_GOLD, START_HP, nextExpForLevel } from './balance';
 import { CARD_RULES } from './balance/notfm';
@@ -103,26 +102,6 @@ export function isDefeat(state: GameState): boolean {
   return state.player.hp <= 0;
 }
 
-export function endPlayerTurn(state: GameState) {
-  // Process status effects at end of player turn (poison, regeneration, etc.)
-  const { processStatusEffectsOnTurnEnd } = require('./statusEffectsRuntime');
-  processStatusEffectsOnTurnEnd('player', state);
-  processStatusEffectsOnTurnEnd('enemy', state);
-}
-
-export function endEnemyTurn(state: GameState) {
-  // ★ Process all advanced systems before enemy turn
-  const { processEnemyTurnBehaviors } = require('./enemyBehaviorRuntime');  
-  
-  // (Environment system removed)
-  
-  processEnemyTurnBehaviors(state);
-  
-  // Run standard enemy turn
-  const { runEnemyTurn } = require('./engine/handlers/enemy');
-  runEnemyTurn(state);
-}
-
 // ===== START COMBAT =====
 export function startCombat(state: GameState, monsterId: string, rng?: RNG): RNG | undefined {
   // Find monster from Thai ghost pools
@@ -144,31 +123,13 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG): RNG
     return;
   }
 
-  const deck=require('./monsters/monster-decks').deckForMonster(monsterData);
-  // Initialize combat state
   state.phase = 'combat';
   state.cardHistory = []; state.cardHistorySeq = 0;
   state.enemy = {
-    id: monsterData.id,
-    name: monsterData.name,
-    hp: monsterData.hp,
-    maxHp: monsterData.hp,
-    dmg: 5, // Default damage
-    block: 0,
-    ai: {
-      cycle: ['attack', 'defend'],
-      index: 0,
-      deck
-    },
-    intentCardId: null,
-    maxEnergy: deck.maxEnergy,
-    handSize: deck.handSize,
-    statusEffects: []
+    id: monsterData.id, name: monsterData.name, hp: monsterData.hp, maxHp: monsterData.hp, block: 0,
+    deck: require('./monsters/monster-decks').deckForMonster(monsterData), statusEffects: [],
   };
-
-  // Initialize enemy deck and hand
   state.enemyPiles = { draw: [], hand: [], discard: [] };
-  state.enemyEnergy = 0;
 
   if (rng) {
     const enemyHandlers = require('./engine/handlers/enemy');

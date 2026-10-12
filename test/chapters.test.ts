@@ -77,7 +77,7 @@ function playRun(seed: string, opts: {
       s.player.block=0;s.player.statusEffects=[];s.blessings=[];s.equipped=[];s.minions=[];
       s.enemy.hp = 9999;
       s.piles.hand = [];
-      s.enemyPiles={draw:[],hand:['claw'],discard:[]};
+      s.enemyPiles={draw:[],hand:['pisaj_fai_v29_signature'],discard:[]};
       s.enemyIntent=undefined;
       go({ type: 'EndTurn' });
       go({ type: 'ResolveEnemyTurn' });

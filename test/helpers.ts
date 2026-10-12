@@ -32,7 +32,7 @@ export function makeCombatState(opts: {
 
   if (state.enemy) {
     // Controlled combat fixtures use a three-energy budget; live v34 normal encounters use two.
-    state.enemy.maxEnergy=3;
+    state.enemy.maxAp=3;
     state.enemy.hp = opts.enemyHp ?? 30;
     state.enemy.maxHp = Math.max(state.enemy.maxHp, state.enemy.hp);
     state.enemy.block = opts.enemyBlock ?? 0;

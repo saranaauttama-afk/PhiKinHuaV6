@@ -32,7 +32,8 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
  if(!playable.length)return -1;
  if(!tactical)return playable[int(makeRng(decisionSeed),0,playable.length-1).value].i;
  const strength=s.enemy?.statusEffects?.find(e=>e.id==='strength')?.stacks??0;
- const threat=(s.enemy?.maxEnergy??2)*4.5+strength*2;
+ const rage=s.enemy?.statusEffects?.find(e=>e.id==='rage')?.stacks??0;
+ const threat=((s.enemy?.maxAp??2)+1)*3.5+(strength+rage)*2;
  const guardNeed=Math.max(0,threat-s.player.block);
  const low=s.player.hp<s.player.maxHp*.4;
  const score=(card:CardData)=>{

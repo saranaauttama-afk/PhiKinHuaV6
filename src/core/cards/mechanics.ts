@@ -22,18 +22,25 @@ export type CardConditional = { when: CardCondition; bonus: Fx };
 /** ผลท้ายเทิร์นถ้าการ์ดใบนี้ยังอยู่ในมือ */
 export type HeldEffect = { block?: number; heal?: number };
 
-export function conditionMet(s: GameState, cond: CardCondition, self?: CardData): boolean {
+/**
+ * Conditions are written from the card owner's side. `side` is who owns the card:
+ * for a ghost card, "player_*" reads the ghost and "enemy_has_status" reads the player.
+ */
+export function conditionMet(s: GameState, cond: CardCondition, self?: CardData, side: 'player' | 'enemy' = 'player'): boolean {
+  const own = side === 'player' ? s.player : s.enemy;
+  const other: 'player' | 'enemy' = side === 'player' ? 'enemy' : 'player';
+  if (!own) return false;
   switch (cond.kind) {
     case 'player_hp_below':
-      return s.player.hp * 100 < s.player.maxHp * cond.value;
+      return own.hp * 100 < own.maxHp * cond.value;
     case 'player_block_at_least':
-      return (s.player.block ?? 0) >= cond.value;
+      return (own.block ?? 0) >= cond.value;
     case 'enemy_has_status':
-      return !!s.enemy && hasStatusEffect('enemy', s, cond.statusId as StatusEffectType);
+      return (other === 'player' || !!s.enemy) && hasStatusEffect(other, s, cond.statusId as StatusEffectType);
     case 'hand_empty':
-      return s.piles.hand.filter(c => c !== self).length === 0;
+      return side === 'player' ? s.piles.hand.filter(c => c !== self).length === 0 : !s.enemyPiles?.hand.length;
     case 'deck_at_most':
-      return (s.masterDeck?.length ?? 0) <= cond.value;
+      return side === 'player' && (s.masterDeck?.length ?? 0) <= cond.value;
   }
 }
 
@@ -84,11 +91,12 @@ export function applyHeldEffects(s: GameState): void {
   }
 }
 
-export function conditionText(c: CardCondition): string {
+export function conditionText(c: CardCondition, side: 'player' | 'enemy' = 'player'): string {
+  const me = side === 'player' ? 'เรา' : 'ผี', them = side === 'player' ? 'ผี' : 'เรา';
   switch (c.kind) {
-    case 'player_hp_below': return `ถ้าเลือดเหลือไม่ถึง ${c.value}%`;
-    case 'player_block_at_least': return `ถ้ามีเกราะตั้งแต่ ${c.value}`;
-    case 'enemy_has_status': return `ถ้าผีติด${require('../combat/status-effects/registry').STATUS_EFFECTS_REGISTRY[c.statusId]?.name ?? c.statusId}`;
+    case 'player_hp_below': return `ถ้า${side === 'player' ? '' : 'ผี'}เลือดเหลือไม่ถึง ${c.value}%`;
+    case 'player_block_at_least': return c.value <= 1 && side === 'enemy' ? 'ถ้าผีมีเกราะ' : `ถ้า${side === 'player' ? '' : me}มีเกราะตั้งแต่ ${c.value}`;
+    case 'enemy_has_status': return `ถ้า${them}ติด${require('../combat/status-effects/registry').STATUS_EFFECTS_REGISTRY[c.statusId]?.name ?? c.statusId}`;
     case 'hand_empty': return 'ถ้าไม่มีการ์ดอื่นในมือ';
     case 'deck_at_most': return `ถ้าสำรับเหลือไม่เกิน ${c.value} ใบ`;
   }

@@ -25,15 +25,16 @@ import { palette, space, surface, tint, layer, quietUiColors } from '../../theme
 
 type Props = {
   monsterId: string | string[];
-  enemies?:Array<{id:string;name:string;hp:number;maxHp:number;block?:number;handCount?:number;energy?:number;maxEnergy?:number;handSize?:number;statusEffects?:StatusEffect[]}>;
+  enemies?:Array<{id:string;name:string;hp:number;maxHp:number;block?:number;handCount?:number;ap?:number;maxAp?:number;handSize?:number;statusEffects?:StatusEffect[]}>;
   monsterName?: string | string[];
   turnLabel?: string;
   rules?:boolean;
   helpers?:React.ReactNode;
-  escalating?:{every:number;strength:number};
+  /** Rage is on this fight; shown as a rule until the ghost's rage status appears. */
+  rage?:{startTurn:number;perTurn:number};
   enemy?: {
     hp: number; maxHp: number; name: string;
-    handCount?:number; energy?: number; block?: number; maxEnergy?: number; handSize?: number;
+    handCount?:number; ap?: number; block?: number; maxAp?: number; handSize?: number;
     statusEffects?: StatusEffect[];
   } | null;
 };
@@ -48,7 +49,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   enemy,
   turnLabel,
   helpers,
-  escalating,
+  rage,
   enemies,
   rules=false,
 }, ref) {
@@ -114,13 +115,13 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
        <View style={{flex:1.2}}><HealthBar hp={actor.hp} maxHp={actor.maxHp} compact label={actor.name}/></View>
       </View>
       <View style={{flexDirection:'row',gap:actors.length>1?4:12,alignItems:'center',minHeight:24}}>
-       <EnemyStatItem icon="energy" label="" value={`${actor.energy??actor.maxEnergy??0}`}/>
+       <EnemyStatItem icon="energy" label="" value={`${actor.ap??actor.maxAp??0}`}/>
        <EnemyStatItem icon="block" label="" value={`${actor.block??0}`}/>
        <EnemyStatItem icon="deck" label="" value={`${actor.handCount??actor.handSize??0}`}/>
       </View>
      </RitualSurface>
       <View testID={`enemy-extras-${index}`} style={{height:layout.enemyExtrasHeight,flexDirection:'row',gap:4,alignItems:'center'}}>
-       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={[...(rules&&enemyBattleRule(actor.id)?[{id:'ghost-rule',...enemyBattleRule(actor.id),neutral:true}]:[]),...(escalating?[{id:'rage-rule',name:'ผีคลุ้มคลั่ง',symbol:'strength',bad:true,detail:`ทุก ${escalating.every} เทิร์น ผีได้ความแข็งแกร่งเพิ่ม ${escalating.strength} จนจบไฟต์`}]:[])]} compact/></View>
+       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={[...(rules&&enemyBattleRule(actor.id)?[{id:'ghost-rule',...enemyBattleRule(actor.id)!,neutral:true}]:[]),...(rage&&!actor.statusEffects?.some(e=>e.id==='rage')?[{id:'rage-rule',name:'โกรธ',symbol:'strength',bad:true,detail:`ตั้งแต่เทิร์น ${rage.startTurn} ทุกหมัดของผีแรงขึ้น ${rage.perTurn} ทุกเทิร์นที่ไฟต์ยืดออกไป`}]:[])]} compact/></View>
        {index===0&&<View style={{flex:1,minWidth:0}}>{helpers}</View>}
       </View>
     </View>

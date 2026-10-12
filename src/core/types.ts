@@ -65,41 +65,19 @@ export type CardData = {
 };
 
 // Enemy
-export type EnemyCard = {
-  id: string;
-  name?: string;
-  type: 'attack' | 'skill';
-  dmg?: number;
-  block?: number;
-  energyCost?: number; // ถ้าไม่ใส่ จะ default = 1
-  owner?: string | 'global';
-  tags?: string[];
-};
-
 export type EnemyState = {
-  energy?:number;
-  handCount?:number;
   id: string;
   name: string;
   hp: number;
   maxHp: number;
-  dmg: number;
   block: number;
-  // ↓ เพิ่มใหม่ (E1)
-  ai?: {
-    cycle: string[];
-    index: number;
-    deck?: {
-      lists?: Array<{ id: string; weight: number; cards: string[] }>;
-      pool?: { allowOwners: string[]; include?: Array<{ id: string; w: number }>; minAttack?: number; minBlock?: number };
-      handSize?: number;
-      maxEnergy?: number;
-    };
-  }; // อ้างถึง enemy card id
-  intentCardId?: string | null;             // ใบที่จะเล่น "เทิร์นนี้"
-  maxEnergy?: number;  // ค่าพลังงานสูงสุดของศัตรู (ต่อเทิร์น)
-  handSize?: number;   // จำนวนการ์ดที่จั่วตอนเริ่มเทิร์นศัตรู
-  // Status Effects System
+  /** AP left this turn and AP per turn. Ghost attacks are free; actions cost AP. */
+  ap?: number;
+  maxAp?: number;
+  handCount?: number;
+  handSize?: number;
+  /** Card ids the ghost's deck is built from (swapped when a boss awakens). */
+  deck?: string[];
   statusEffects?: StatusEffect[];
 };
 
@@ -299,7 +277,6 @@ export type GameState = {
   enemyMaxRetained?: number;
   enemyHandAges?: number[];
   enemyIdleTurns?: number;
-  enemyEnergy?: number;
   enemyLastPlayed?: string[];  // card IDs played last enemy turn, for UI animation
 
   piles: DeckPiles;

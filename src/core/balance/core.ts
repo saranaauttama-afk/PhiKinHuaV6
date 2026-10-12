@@ -7,9 +7,4 @@ export const START_GOLD = 80;
 
 export const START_DECK: CardData[] = START_DECK_FROM_PACK;
 
-// ขนาดเด็ค/มือ/พลังงานของศัตรู
-export const ENEMY_HAND_SIZE = 3;
-export const ENEMY_DECK_SIZE = 15;
-export const ENEMY_MAX_ENERGY_NORMAL = 2;
-export const ENEMY_MAX_ENERGY_ELITE  = 3;
-export const ENEMY_MAX_ENERGY_BOSS   = 3;
+// Ghost hands, HP and rage live in balance/notfm.ts.

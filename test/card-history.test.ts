@@ -37,8 +37,8 @@ describe('six-card combined combat history',()=>{
   const f=makeCombatState({hand:[{...attack,fx:{dmg:100}}],enemyHp:5});expect(applyCommand(f.state,{type:'PlayCard',index:0},f.rng).state.cardHistory![0].results).toContain('ผีเสีย HP 5');
  });
  it('interleaves both sides in actual play order and preserves an unplayed recovery card',()=>{
-  let {state:s,rng:r}=makeCombatState({hand:[attack],enemyHp:200,playerHp:500});s.enemy!.maxHp=200;s.enemy!.maxEnergy=2;
-  s.enemyPiles={hand:['winyan_rerorn_v29_recover'],draw:['claw','claw'],discard:[]};s.enemyHandAges=[1];
+  let {state:s,rng:r}=makeCombatState({hand:[attack],enemyHp:200,playerHp:500});s.enemy!.maxHp=200;s.enemy!.maxAp=2;
+  s.enemyPiles={hand:['winyan_rerorn_v29_recover'],draw:['pisaj_fai_v29_signature','pisaj_fai_v29_signature'],discard:[]};s.enemyHandAges=[1];
   ({state:s,rng:r}=applyCommand(s,{type:'PlayCard',index:0},r));s.enemy!.hp=200;
   ({state:s,rng:r}=applyCommand(s,{type:'ResolveEnemyTurn'},r));
   expect(s.cardHistory!.map(e=>e.side)).toEqual(['player','enemy','enemy']);expect(s.enemyPiles!.hand).toEqual(['winyan_rerorn_v29_recover']);
@@ -47,7 +47,7 @@ describe('six-card combined combat history',()=>{
   expect(s.cardHistory!.slice(1).every(e=>e.results.some(r=>r.startsWith('เราเสีย HP')))).toBe(true);
  });
  it('records an interrupted enemy card once without inventing damage',()=>{
-  const {state:s,rng:r}=makeCombatState({enemyHp:80,playerHp:500});s.enemy!.maxEnergy=1;s.enemyPiles={hand:['claw'],draw:[],discard:[]};s.enemyDrawPerTurn=0;s.enemyHandAges=[0];
+  const {state:s,rng:r}=makeCombatState({enemyHp:80,playerHp:500});s.enemy!.maxAp=1;s.enemyPiles={hand:['pisaj_fai_v29_signature'],draw:[],discard:[]};s.enemyDrawPerTurn=0;s.enemyHandAges=[0];
   armTrap(s,{id:'stop',name:'หยุด',type:'counter',fx:{},counter:{trigger:'enemy_attack',negate:true}});
   const out=applyCommand(s,{type:'ResolveEnemyTurn'},r).state;expect(out.cardHistory).toHaveLength(1);expect(out.cardHistory![0].results).toContain('ถูกขัดจังหวะ');expect(out.cardHistory![0].results).not.toContain('เราเสีย HP 5');expect(out.player.hp).toBe(500);
  });

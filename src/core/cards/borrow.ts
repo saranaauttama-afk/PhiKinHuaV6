@@ -5,20 +5,16 @@ import { enemyCardById } from '../pack_enemy_cards';
 import { lastEnemyCards } from './model';
 
 /**
- * An enemy card as a player card. Damage and block keep their numbers; a status the
- * ghost put on us lands on the ghost, and a buff it gave itself becomes ours.
+ * A ghost card as a player card. Ghost cards are already written from the owner's side,
+ * so effects and conditions carry over as they are; only the curse a ghost puts into
+ * our pile is left out.
  */
 export function cardFromEnemy(def: EnemyCardDef, borrowed = false): CardData {
-  const status = def.statusEffect
-    ? [{ id: def.statusEffect.effect, stacks: def.statusEffect.value, turns: def.statusEffect.duration,
-        to: (def.statusEffect.target === 'player' ? 'enemy' : 'self') as 'enemy' | 'self' }]
-    : undefined;
   return {
-    id: def.id, name: def.name ?? def.id,
-    type: def.dmg ? 'attack' : 'action', ap: 0,
-    fx: { dmg: def.dmg || undefined, hits: def.hits, block: def.block || undefined, heal: def.heal || undefined, status },
+    id: def.id, name: def.name, type: def.type, ap: 0,
+    fx: JSON.parse(JSON.stringify(def.fx)),
+    ...(def.conditional ? { conditional: JSON.parse(JSON.stringify(def.conditional)) } : {}),
     ...(borrowed ? { borrowed: true, exhaust: true } : {}),
-    flavor: def.desc,
   };
 }
 

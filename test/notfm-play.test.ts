@@ -194,7 +194,7 @@ describe('อุปกรณ์', () => {
     const s = fight([card('equipment_luang_pu_amulet')]);
     play(s);
     const hp = s.player.hp;
-    dealDamage(s, { from: 'enemy', to: 'player', raw: 5, source: { kind: 'card', cardId: 'claw' } } as any);
+    dealDamage(s, { from: 'enemy', to: 'player', raw: 5, source: { kind: 'card', cardId: 'pisaj_fai_v29_signature' } } as any);
     expect(s.player.hp).toBe(hp - 4);
   });
 
@@ -217,7 +217,7 @@ describe('ยืมการ์ดผี', () => {
 
   it('ได้สำเนาฟรีเข้ามือ ใช้แล้วนำออก ไม่เข้าสำรับ', () => {
     const s = fight([card('borrow_breath')]);
-    s.cardHistory = []; s.enemyLastPlayed = ['claw'];
+    s.cardHistory = []; s.enemyLastPlayed = ['pisaj_fai_v29_signature'];
     const deck = s.masterDeck.length;
     expect(play(s)).toBe(true);
     const borrowed = s.piles.hand.find(c => c.borrowed)!;
@@ -287,7 +287,7 @@ describe('กันเทิร์นไม่รู้จบ', () => {
       const deck = Array.from({ length: 12 }, (_, k) => ({ ...pair[k % 2], instanceId: `e${k}` }));
       const s = fight(deck.slice(0, 4), { playerMana: 0, playerAp: CARD_RULES.apPerTurn, enemyHp: 100000 });
       s.piles.draw = deck.slice(4);
-      s.cardHistory = []; s.enemyLastPlayed = ['claw'];
+      s.cardHistory = []; s.enemyLastPlayed = ['pisaj_fai_v29_signature'];
       let plays = 0;
       for (;;) {
         const idx = s.piles.hand.findIndex(c => !playBlock(s, c));

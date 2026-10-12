@@ -113,3 +113,12 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
 export function isShopLike(offer: PageOffer): boolean {
   return isRestOfferKind(offer.kind);
 }
+
+/** Risk label shown under a ghost's name on the map, so the player can judge before choosing. */
+export function ghostTierLabel(offer: PageOffer): string | undefined {
+  if (offer.kind === 'boss') return 'บอสประจำคืน';
+  if (offer.kind !== 'monster') return undefined;
+  if (offer.tier === 'elite') return 'ผีชั้นสูง';
+  const n = Number(getMonsterById(offer.enemyId)?.tier.slice(1));
+  return n ? `ผีระดับ ${n}` : 'ผีธรรมดา';
+}

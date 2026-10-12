@@ -18,7 +18,6 @@ function clearCombatState(s: GameState) {
   s.enemy = undefined;
   (s as any).enemyPiles = undefined;
   (s as any).playerPiles = undefined;
-  (s as any).enemyIntentCardId = null;
   s.player.block = 0;
   s.player.statusEffects = [];
   s.player.ap = s.player.maxAp;
@@ -80,22 +79,11 @@ function startCombat(s:GameState,offer:Extract<PageOffer,{kind:'monster'|'boss'}
   (s as any).nodePhase = 'in_combat';
   s.turn = 1;
   s.combatVictoryLock = false;
-  (s as any).enemyPiles = undefined;
-  (s as any).playerPiles = undefined;
-  (s as any).enemyIntentCardId = null;
+  s.enemyPiles = undefined;
   s.player.block = 0;
-  const deck = deckForMonster(monster);
-  s.enemy = {
-    id: monster.id, name: monster.name, hp: monster.hp, maxHp: monster.hp,
-    dmg: Math.floor(monster.hp / (offer.kind === 'boss' ? 4 : 5)), block: 0,
-    ai: { cycle: ['claw', 'guard'], index: 0, deck },
-    maxEnergy: deck.maxEnergy, handSize: deck.handSize, intentCardId: null,
-  };
+  s.enemy = { id: monster.id, name: monster.name, hp: monster.hp, maxHp: monster.hp, block: 0, deck: deckForMonster(monster) };
   require('../../campaign/nights').configureNightEnemy(s);
   ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
-  const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
-  initializeEnemyBehaviors(s);
-  (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
   rng = beginPlayerFight(s, rng);
   planEnemyIntent(s);
   s.log.push(`ChooseOffer → combat (${offer.kind === 'boss' ? 'boss' : offer.tier}) vs ${s.enemy?.id}`);

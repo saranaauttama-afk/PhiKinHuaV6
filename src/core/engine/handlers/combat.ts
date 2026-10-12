@@ -3,7 +3,7 @@ import {consumeEnemyCard,finishEnemyHand} from '../../combat/enemyHand';
 // src/core/engine/handlers/combat.ts — player card play and the enemy turn
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
-import { endEnemyTurn, isVictory, isDefeat, startPlayerTurn, startCombat } from '../../commands';
+import { isVictory, isDefeat, startPlayerTurn, startCombat } from '../../commands';
 import { planEnemyIntent } from '../../combat/intent';
 import { grantExpAndQueueLevelUp, advanceAfterVictory } from '../shared';
 import { emit } from '../../combat/damage';
@@ -15,6 +15,9 @@ import { TEST_WIN_CARD_ID, testWinCardEnabled } from '../../cards/testWin';
 import { playCard } from '../../cards/play';
 import { runTriggers } from '../../cards/passives';
 import { cardFromEnemy } from '../../cards/borrow';
+import { enemyCardCost } from '../../pack_enemy_cards';
+import { cardFx as enemyCardFx } from '../../combat/enemyCardEffects';
+import { describeCard } from '../../cards/describe';
 
 /** Resolve deaths from helper/status/trap effects as well as direct played cards. */
 function settleCombat(s: GameState, r: RNG): RNG {
@@ -103,7 +106,6 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   if (s.phase !== 'combat') return { state: s, rng: r };
 
   const { processStatusEffectsOnTurnEnd } = require('../../statusEffectsRuntime');
-  const { processEnemyTurnBehaviors }     = require('../../enemyBehaviorRuntime');
 
   // จบเทิร์น player
   processStatusEffectsOnTurnEnd('player', s);
@@ -121,9 +123,9 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
 
   // ── เทิร์นศัตรู
   if (s.enemy && (s as any).enemyPiles) {
-    (s as any).enemyEnergy = s.enemy.maxEnergy || 2;
-    s.enemy.energy=(s as any).enemyEnergy;
+    s.enemy.ap = s.enemy.maxAp ?? 2;
     s.enemy.block = 0;
+    require('../../campaign/nights').applyRage(s);
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
     if(s.phase!=='combat')return {state:s,rng:r};
@@ -152,17 +154,19 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       const historyBefore=historySnapshot(s),eventStart=s.pendingEvents?.length??0;
       if(index<0||!consumeEnemyCard(s,index))continue;
       if(original!=null)consumed.push(original);
+      const shown=enemyCardFx(s,def);
       s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',
         ownerId:s.enemy.id, handIndex:index,
         cardId,
-        name: def.name ?? def.id,
-        dmg: def.dmg ?? 0,
-        hits: def.hits,
-        desc: def.desc,
-        block: def.block ?? 0,
-        cost: def.energyCost ?? 1,
+        name: def.name,
+        dmg: shown.dmg ?? 0,
+        hits: shown.hits,
+        // Damage and block have their own lines on the revealed card; the rest is rules text.
+        desc: describeCard({ ...def, conditional: undefined, fx: { ...shown, dmg: undefined, hits: undefined, block: undefined } }, 'enemy') || undefined,
+        block: shown.block ?? 0,
+        cost: enemyCardCost(def),
       });
 
       // กับดักที่ตั้งไว้ทำงานก่อนการ์ดของศัตรูจะมีผล — ดักที่ยกเลิกได้
@@ -178,7 +182,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       }
 
       require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
-      recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart,undefined,def.energyCost??1);
+      recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart,undefined,{ap:enemyCardCost(def),mana:0});
 
       r = settleCombat(s, r);
     }
@@ -186,12 +190,6 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
 
   finishEnemyHand(s,s.enemyLastPlayed?.length??0);
   if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
-  // Visible escalation rewards closing the fight rather than healing indefinitely.
-  const escalation=require('../../campaign/nights').nightEscalation(s);
-  if(s.phase==='combat' && escalation && s.turn%escalation.every===0){
-    require('../../statusEffectsRuntime').applyStatusEffect('enemy',s,'strength',99,escalation.strength);
-    s.log.push(`ผีคลุ้มคลั่ง: แข็งแกร่งเพิ่ม ${escalation.strength} จนจบไฟต์`);
-  }
   if(s.enemy)s.enemy.handCount=s.enemyPiles?.hand.length??0;
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 

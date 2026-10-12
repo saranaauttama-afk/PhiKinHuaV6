@@ -54,33 +54,33 @@ describe('ผู้เล่นโจมตีศัตรู', () => {
 describe('ศัตรูโจมตีผู้เล่น', () => {
   it('ผู้เล่นไม่มี block → HP ลดเต็มจำนวน', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
-    const out = runEnemyCards(state, ['claw']); // dmg 6
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature']); // dmg 6
     expect(out.player.hp).toBe(44);
   });
 
   it('ผู้เล่นมี block น้อยกว่าดาเมจ → block หมด ส่วนเกินลง HP', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 4 });
-    const out = runEnemyCards(state, ['claw']); // dmg 6
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature']); // dmg 6
     expect(out.player.block).toBe(0);
     expect(out.player.hp).toBe(48); // 6 - 4 = 2
   });
 
   it('ผู้เล่นมี block มากกว่าดาเมจ → HP ไม่ลด', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 10 });
-    const out = runEnemyCards(state, ['claw']); // dmg 6
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature']); // dmg 6
     expect(out.player.hp).toBe(50);
     expect(out.player.block).toBe(4);
   });
 
   it('การ์ด skill ของศัตรูเพิ่ม block ให้ศัตรู', () => {
     const { state } = makeCombatState({ enemyBlock: 0 });
-    const out = runEnemyCards(state, ['guard']); // block 7
-    expect(out.enemy!.block).toBe(7);
+    const out = runEnemyCards(state, ['phi_krasue_v29_ward']); // block 4
+    expect(out.enemy!.block).toBe(4);
   });
 
   it('HP ผู้เล่นถึง 0 → phase เป็น defeat', () => {
     const { state } = makeCombatState({ playerHp: 5, playerBlock: 0 });
-    const out = runEnemyCards(state, ['maul']); // dmg 13
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature']); // dmg 6
     expect(out.player.hp).toBe(0);
     expect(isDefeat(out)).toBe(true);
     expect(out.phase).toBe('defeat');
@@ -107,7 +107,7 @@ describe('status effect กับดาเมจ', () => {
   it('strength ของศัตรูเพิ่มดาเมจที่ศัตรูตี', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
     applyStatusEffect('enemy', state, 'strength' as any, 3, 5);
-    const out = runEnemyCards(state, ['claw']);
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature']);
     // 6 + 5 stacks = 11
     expect(out.player.hp).toBe(39);
   });
@@ -115,7 +115,7 @@ describe('status effect กับดาเมจ', () => {
   it('weakness ของศัตรูลดดาเมจที่ศัตรูตี 25%', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
     applyStatusEffect('enemy', state, 'weakness' as any, 3, 1);
-    const out = runEnemyCards(state, ['claw']);
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature']);
     // floor(6 * 0.75) = 4
     expect(out.player.hp).toBe(46);
   });
@@ -131,7 +131,7 @@ describe('status effect กับดาเมจ', () => {
   it('vulnerable ทำงานฝั่งผู้เล่นเป็นผู้รับด้วย', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
     applyStatusEffect('player', state, 'vulnerable' as any, 3, 1);
-    const out = runEnemyCards(state, ['claw']);
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature']);
     // 6 * 1.5 = 9
     expect(out.player.hp).toBe(41);
   });
@@ -141,7 +141,7 @@ describe('เทิร์นศัตรูหยุดเมื่อคอม�
   it('ใบที่เหลือไม่ถูกเล่นต่อหลังผู้เล่นตาย', () => {
     const { state } = makeCombatState({ playerHp: 7, playerBlock: 0 });
     // claw = 6 → ใบที่สองฆ่าพอดี ใบที่สามต้องไม่ถูกแตะ
-    const out = runEnemyCards(state, ['claw', 'claw', 'claw']);
+    const out = runEnemyCards(state, ['pisaj_fai_v29_signature', 'pisaj_fai_v29_signature', 'pisaj_fai_v29_signature']);
 
     expect(out.phase).toBe('defeat');
     expect(out.player.hp).toBe(0);
@@ -152,10 +152,10 @@ describe('เทิร์นศัตรูหยุดเมื่อคอม�
 
   it('สั่ง ResolveEnemyTurn ซ้ำหลังแพ้แล้วไม่ทำอะไรเพิ่ม', () => {
     const { state } = makeCombatState({ playerHp: 5, playerBlock: 0 });
-    const dead = runEnemyCards(state, ['maul']);
+    const dead = runEnemyCards(state, ['pisaj_fai_v29_signature']);
     expect(dead.phase).toBe('defeat');
 
-    const again = runEnemyCards(dead, ['maul']);
+    const again = runEnemyCards(dead, ['pisaj_fai_v29_signature']);
     expect(again.player.hp).toBe(0);
     expect(again.pendingEvents ?? []).toHaveLength(0);
   });

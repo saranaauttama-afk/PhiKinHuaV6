@@ -4,7 +4,7 @@ import { makeRng } from '../src/core/rng';
 import type { Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import { applyStatusEffect } from '../src/core/combat/status-effects';
-import { enemyCardById } from '../src/core/pack_enemy_cards';
+import { enemyCardById, enemyCardCost } from '../src/core/pack_enemy_cards';
 
 /**
  * เทิร์นศัตรู — ตัดสินใจตอนถึงตาจริง ไม่ประกาศล่วงหน้า
@@ -53,14 +53,14 @@ describe('ศัตรูลงมือจริงเมื่อถึงต�
     expect(s.enemyLastPlayed).toEqual(revealed.map(e => (e as any).cardId));
   });
 
-  it('ไม่เล่นเกินพลังงานที่มี', () => {
+  it('ไม่เล่นเกินแต้มที่มี', () => {
     for (const seed of ['e1', 'e2', 'e3', 'e4', 'e5']) {
       const before = startFight(seed);
-      const budget = before.enemy!.maxEnergy ?? 2;
+      const budget = before.enemy!.maxAp ?? 2;
       const s = step(before, { type: 'ResolveEnemyTurn' }, seed);
 
       const used = (s.enemyLastPlayed ?? [])
-        .reduce((sum, id) => sum + (enemyCardById(id)?.energyCost ?? 1), 0);
+        .reduce((sum, id) => sum + enemyCardCost(enemyCardById(id)!), 0);
 
       expect(used, `seed ${seed}`).toBeLessThanOrEqual(budget);
     }

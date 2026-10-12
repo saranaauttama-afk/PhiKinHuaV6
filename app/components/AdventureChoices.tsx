@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image,Pressable,ScrollView,Text,View,useWindowDimensions} from 'react-native';
 import type {PageOffer} from '../../src/core/map/pages';
-import {describeOffer} from './offerDisplay';
+import {describeOffer,ghostTierLabel} from './offerDisplay';
 import EncounterPortrait from './EncounterPortrait';
 import {encounterClue} from './encounterClue';
 import InkIcon,{type InkSymbol} from './InkIcon';
@@ -31,8 +31,11 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCo
     <Image accessible={false} source={frame} tintColor={palette.bloodLit} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight,opacity:selected===i?.28:0}}/>
     {!!onDestroy&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<Pressable testID={'adventure-destroy-'+i} accessibilityRole="button" accessibilityLabel={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}} style={{position:'absolute',top:0,right:0,width:44,height:44,zIndex:layer.control,alignItems:'flex-end',justifyContent:'flex-start',padding:4}}><Image source={require('../../assets/images/btnDelete.png')} style={{width:25,height:25}}/></Pressable>}
     <View style={{paddingTop:18,paddingHorizontal:8,alignItems:'center'}}>
-     <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+pageLabel(o)} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
-      <Text testID={'adventure-name-'+i} numberOfLines={2} style={{height:42,fontFamily:font.heading,fontSize:titleSize,lineHeight:19,color:palette.moon,textAlign:'center',textAlignVertical:'center'}}>{describeOffer(o,i).name}</Text>
+     <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+(ghostTierLabel(o)??pageLabel(o))} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
+      {ghostTierLabel(o)?<View style={{height:42,justifyContent:'center',alignItems:'center'}}>
+       <Text testID={'adventure-name-'+i} numberOfLines={1} adjustsFontSizeToFit style={{fontFamily:font.heading,fontSize:titleSize,lineHeight:19,color:palette.moon,textAlign:'center'}}>{describeOffer(o,i).name}</Text>
+       <Text testID={'adventure-tier-'+i} numberOfLines={1} style={{fontFamily:font.ui,fontSize:11,lineHeight:15,color:o.kind==='boss'||(o.kind==='monster'&&o.tier==='elite')?palette.bloodLit:palette.moonDim,textAlign:'center'}}>{ghostTierLabel(o)}</Text>
+      </View>:<Text testID={'adventure-name-'+i} numberOfLines={2} style={{height:42,fontFamily:font.heading,fontSize:titleSize,lineHeight:19,color:palette.moon,textAlign:'center',textAlignVertical:'center'}}>{describeOffer(o,i).name}</Text>}
       <EncounterPortrait offer={o} diameter={diameter} index={i} selected={selected===i}/>
       <Text testID={'adventure-clue-'+i} numberOfLines={3} style={{height:52,marginTop:8,fontFamily:font.ui,fontSize:11,lineHeight:16,color:palette.text,textAlign:'center',textAlignVertical:'center'}}>{usedIds.includes(slotIds[i]??'')?'ใช้แล้ว · กลับเข้าได้\nปิดเพจด้วยกากบาทเมื่อพร้อม':encounterClue(o)}</Text>
      </Pressable>
