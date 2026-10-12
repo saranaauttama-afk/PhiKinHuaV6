@@ -4,7 +4,8 @@ import type { RNG } from '../rng';
 import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
 import { rollLevelUpChoice, rollTwoBlessings, type LevelBucket } from '../level';
 import { rollCardReward } from '../cards/reward';
-import { hitsOf } from '../cards/mechanics';
+import { starOf } from '../cards/model';
+import { STAR_RULES } from '../balance/notfm';
 import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
 import { applyClassVictoryPassive, getClass } from '../classes';
 
@@ -37,98 +38,23 @@ export function grantBlessing(s: GameState, b: BlessingDef): boolean {
   return true;
 }
 
-/** ปลุกเสกได้สูงสุดกี่ขั้นต่อใบ */
-export const MAX_UPGRADE_LEVEL = 3;
 export function canRemoveCard(card:CardData|undefined,deckSize:number):boolean {
  return !!card&&deckSize>1&&!card.unremovable&&card.id!=='qa_phra_prathan';
 }
 
-/** ปลุกเสกไปแล้วกี่ขั้น */
+/** Upgrades raise a card from 1 to 3 stars (ช่างตีเหล็ก). */
+export const MAX_UPGRADE_LEVEL = STAR_RULES.maxStar - 1;
+/** Upgrades already applied (star − 1). */
 export function upgradeLevelOf(c: CardData): number {
-  return c.upgradeLevel ?? (c.upgraded ? 1 : 0);
+  return starOf(c) - 1;
 }
-
-/** ใบนี้ปลุกเสกได้อีกไหม */
 export function canUpgrade(c: CardData): boolean {
-  // คำสาปปลุกเสกไม่ได้ — มันไม่ได้มีไว้ใช้ตั้งแต่แรก
-  if (c.type === 'curse') return false;
-  return upgradeLevelOf(c) < MAX_UPGRADE_LEVEL;
+  return c.type !== 'curse' && !c.borrowed && starOf(c) < STAR_RULES.maxStar;
 }
-
-/** จำนวนที่บวกให้ใบที่มีตัวเลข ต่อหนึ่งขั้น */
-export const UPGRADE_BONUS = 4;
-
-/**
- * ปลุกเสกการ์ดหนึ่งใบ — สูงสุด 3 ขั้น
- *
- * ของเดิมบวก +3 dmg / +3 block ให้ทุกใบเหมือนกันหมด **ไม่จำกัดจำนวนครั้ง**
- * อัพใบเดิมสามรอบได้ชื่อ "ฟันดาบ + + +" และตัวเลขวิ่งหนีทั้งสำรับ — ทางที่ดีที่สุด
- * คือทุ่มทองใส่ใบเดียวแล้วถือยาว รอบก่อนหน้านี้จึงจำกัดไว้ครั้งเดียวต่อใบ
- * ซึ่งแก้ปัญหาแต่ตัดความรู้สึกว่า "การ์ดใบนี้คือใบที่เราปั้นมา" ทิ้งไปด้วย
- *
- * ตอนนี้อยู่ตรงกลาง: ปลุกได้ถึงขั้น 3 มีเพดานชัดเจน และ **ราคาขึ้นตามขั้นของใบนั้น**
- * (ดู `upgradeCostForCount`) ไม่ใช่ตามจำนวนครั้งที่ใช้ร้านอย่างเดียว
- *
- * สูตรแยกตามสิ่งที่ใบนั้นทำจริง:
- *   - มีตัวเลขโจมตี/กัน → บวกตัวเลขนั้น
- *   - ไม่มีตัวเลขเลย (ใบผลพิเศษ) → ลดค่าร่ายลงหนึ่ง ค่าร่ายศูนย์แล้วก็จั่วเพิ่มหนึ่ง
- *   - การ์ดดัก → บวกให้ผลที่เป็นตัวเลขของกับดัก
- *
- * **ใบที่ใช้แล้วหายยังหายเหมือนเดิม** — ใบ exhaust ทั้งหกในเกมไม่มีตัวเลขให้บวก
- * มันเป็นผลพิเศษล้วน และสองใบในนั้นคือ "ฟื้นเต็มหลอด + กันสถานะ 3 เทิร์น" กับ
- * "ฟื้น 8 และ Max HP +2 ถาวร" — ปลดข้อจำกัดให้ = ร่ายซ้ำได้ไม่จำกัด
- */
+/** One more star. Numbers follow `STAR_RULES` or the card's own star values. */
 export function upgradeCard(c: CardData): CardData {
   if (!canUpgrade(c)) return c;
-
-  const level = upgradeLevelOf(c) + 1;
-  const up: CardData = {
-    ...c,
-    name: `${stripPlus(c.name ?? c.id)} +${level}`,
-    upgraded: true,
-    upgradeLevel: level,
-  };
-
-  // การ์ดดัก: ตัวเลขอยู่ในผลของกับดัก ไม่ได้อยู่บนตัวการ์ด
-  if (up.type === 'trap' && up.trap) {
-    up.trap = {
-      ...up.trap,
-      effects: up.trap.effects.map(e =>
-        e.type === 'negate' ? e : { ...e, value: e.value + UPGRADE_BONUS }
-      ),
-    };
-    return up;
-  }
-
-  // การ์ดที่ถือไว้ก็ทำงาน — ค่าตอนค้างมือคือตัวตนของมัน ถ้าไม่ขยับด้วย
-  // การปลุกเสกจะเปลี่ยนแค่ครึ่งเดียวของสิ่งที่การ์ดใบนั้นเป็น
-  if (up.whileHeld) {
-    up.whileHeld = { ...up.whileHeld };
-    if (up.whileHeld.block) up.whileHeld.block += 1;
-    if (up.whileHeld.heal) up.whileHeld.heal += 1;
-  }
-
-  const hasNumbers = typeof up.dmg === 'number' || typeof up.block === 'number';
-  if (hasNumbers) {
-    // การ์ดหลายหมัดบวกทีละหมัด — ถ้าบวกเต็ม UPGRADE_BONUS ให้ทุกหมัด
-    // ใบ 8 หมัดจะได้ +32 ในขณะที่ใบหมัดเดียวได้ +4 จากราคาปลุกเสกเท่ากัน
-    // เฉลี่ยให้ผลรวมใกล้เคียงกัน แต่ไม่ต่ำกว่า +1 ต่อหมัด
-    const hits = hitsOf(up);
-    if (typeof up.dmg === 'number') {
-      up.dmg += hits > 1 ? Math.max(1, Math.round(UPGRADE_BONUS / hits)) : UPGRADE_BONUS;
-    }
-    if (typeof up.block === 'number') up.block += UPGRADE_BONUS;
-    return up;
-  }
-
-  if ((up.cost ?? 0) > 0) up.cost = up.cost - 1;
-  else up.draw = (up.draw ?? 0) + 1;
-  return up;
-}
-
-/** ตัด " +2" ท้ายชื่อออกก่อนเติมขั้นใหม่ ไม่งั้นชื่อจะยาวขึ้นเรื่อยๆ */
-function stripPlus(name: string): string {
-  return name.replace(/\s*\+\d+$/, '');
+  return { ...c, star: starOf(c) + 1 };
 }
 
 /** tier ของผีที่เพิ่งถูกฆ่า — อ่านจาก enemy ที่ยังอยู่ใน state ตอนชนะ */
@@ -210,11 +136,6 @@ export function advanceAfterVictory(s: GameState): void {
   if (s.cardReward) {
     s.phase = 'reward';
     return;
-  }
-  const ix=s.pages?._activeOfferIndex,offer=ix==null?undefined:s.pages?.current?.offers[ix];
-  if(s.player.handBalanceVersion===33&&s.campaign?.night===1&&!s.player.nightOneHandReward&&offer?.kind==='boss'&&offer.bossType==='final'){
-    s.levelUp={dawnHandChoice:true,choice:{optionA:'draw_per_turn',optionB:'max_hand'},consumed:false};
-    s.phase='levelup';return;
   }
   s.phase = 'victory';
   s.log.push('Victory!');

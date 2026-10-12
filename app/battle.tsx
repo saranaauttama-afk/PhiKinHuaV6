@@ -18,7 +18,7 @@ import EnemyHandCard from './components/battle/EnemyHandCard';
 import CardHistory from './components/battle/CardHistory';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
-import DiscardOverlay from './components/battle/DiscardOverlay';
+import PrayerWaitPicker from './components/battle/PrayerWaitPicker';
 import VictoryOverlay from './components/battle/VictoryOverlay';
 import {needsVictoryIntro} from './postBattleFlow';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -38,10 +38,10 @@ import StartPage from './components/StartPage';
 import RitualSurface from './components/RitualSurface';
 import {QuietButton} from './components/QuietChrome';
 import {baseNewState} from '../src/core/commands';
+import {fxText} from '../src/core/cards/describe';
 
-import {requiredDiscards} from '../src/core/cards/hand';
 
-type Phase = 'player' | 'discard' | 'enemy';
+type Phase = 'player' | 'enemy';
 
 /** key ที่ไม่ซ้ำสำหรับ popup ของแต่ละ event */
 let _popupSeq = 0;
@@ -163,14 +163,18 @@ export default function BattlePage() {
 
 
 
-  const handlePlayCard = (card: any, index: number) => {
+  const [prayerAt, setPrayerAt] = React.useState<number | null>(null);
+  const handlePlayCard = (card: any, index: number, wait?: number) => {
     if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
+    // A prayer asks how many turns to wait before it resolves.
+    if (card.type === 'prayer' && wait == null) { setPrayerAt(index); return; }
+    setPrayerAt(null);
     const identifier = card.instanceId ?? card.id;
     setPlayedCardIds(prev => [...prev, identifier]);
 
-    const prevEnergy = player.energy;
+    const prevMana = player.mana;
 
-    dispatch({ type: 'PlayCard', index });
+    dispatch({ type: 'PlayCard', index, wait });
 
     const t = setTimeout(
       () => setPlayedCardIds(prev => prev.filter(id => id !== identifier)),
@@ -194,34 +198,21 @@ export default function BattlePage() {
       }
     }
 
-    // energy ยังไม่มี event ของตัวเอง — เทียบค่าก่อน/หลังไปก่อน
-    const nextEnergy = after.player.energy;
-    if (nextEnergy > prevEnergy) {
+    // Mana has no event of its own; compare before and after.
+    const nextMana = after.player.mana;
+    if (nextMana > prevMana) {
       setStatGainPopups(prev => [...prev, {
-        id: `energy-${Date.now()}`,
-        statType: 'energy', side: 'player', amount: nextEnergy - prevEnergy,
+        id: `mana-${Date.now()}`,
+        statType: 'energy', side: 'player', amount: nextMana - prevMana,
       }]);
     }
   };
 
   const handleEndTurn = () => {
     if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
-    if (requiredDiscards(gameState) > 0) {
-      setPhase('discard');
-      return;
-    }
+    setPrayerAt(null);
     startEnemyTurn();
   };
-
-  const handleDiscardConfirm = (discardedIndices: number[]) => {
-    [...discardedIndices].sort((a, b) => b - a).forEach(idx => {
-      dispatch({ type: 'DiscardCard', index: idx });
-    });
-    if(requiredDiscards(useGame.getState().state)>0)return;
-    startEnemyTurn();
-  };
-
-  const handleDiscardCancel = () => setPhase('player');
 
   /**
    * เทิร์นศัตรู: engine คำนวณจนจบในทีเดียว แล้วเราเอา event ที่ได้มาเล่นเป็นอนิเมชั่น
@@ -293,7 +284,7 @@ export default function BattlePage() {
   }, [currentEvent]);
 
   const badges:BattleBadge[]=[
-    ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${t.effects.map(e=>e.desc).join(' · ')}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
+    ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${fxText(t.fx).join(' · ')}${t.negate?' · ยกเลิกการ์ดผี':''}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
   ];
   const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
@@ -390,8 +381,6 @@ export default function BattlePage() {
           cards={playerHand}
           playedCardIds={playedCardIds}
           hoveredCardId={hoveredCardId}
-          energy={player.energy}
-          cardsPlayedThisTurn={gameState.turnFlags?.cardsPlayed ?? 0}
           onPlayCard={handlePlayCard}
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />}
@@ -403,10 +392,10 @@ export default function BattlePage() {
           discardCount={gameState.piles.discard.length}
           hp={player.hp}
           maxHp={player.maxHp}
-          energy={player.energy}
-          maxEnergy={player.maxEnergy}
+          ap={player.ap}
+          maxAp={player.maxAp}
+          mana={player.mana}
           block={player.block}
-          maxHandSize={player.maxHandSize}
           drawCount={drawCount}
           onEndTurn={handleEndTurn}
           onOpenPiles={() => setOpenPile('draw')}
@@ -429,12 +418,11 @@ export default function BattlePage() {
           onClose={() => setOpenPile(null)}
         />
 
-        {phase === 'discard' && (
-          <DiscardOverlay
-            cards={playerHand}
-            maxHandSize={player.maxHandSize}
-            onConfirm={handleDiscardConfirm}
-            onCancel={handleDiscardCancel}
+        {prayerAt != null && playerHand[prayerAt]?.type === 'prayer' && (
+          <PrayerWaitPicker
+            card={playerHand[prayerAt]}
+            onPick={wait => handlePlayCard(playerHand[prayerAt], prayerAt, wait)}
+            onCancel={() => setPrayerAt(null)}
           />
         )}
 
@@ -480,7 +468,7 @@ export default function BattlePage() {
         {!timeline.isPlaying && !presentation && gameState.phase === 'defeat' && (
           <DefeatOverlay onHome={() => router.replace('/')} />
         )}
-        {Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1'&&<Text testID="v33-battle-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({hand:gameState.piles.hand.map(c=>c.id),discard:gameState.piles.discard.length,normalHand:gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length,cap:gameState.player.maxHandSize,draw:gameState.player.drawPerTurn,turn:gameState.turn,phase:gameState.phase,enemyHand:gameState.enemyPiles?.hand.length??0,presentedEnemyHand:enemy?.handCount??0,history:gameState.cardHistory,uiPhase:phase})}</Text>}
+        {Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1'&&<Text testID="v33-battle-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({hand:gameState.piles.hand.map(c=>c.id),discard:gameState.piles.discard.length,normalHand:gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length,cap:gameState.player.handMax,draw:gameState.player.drawPerTurn,turn:gameState.turn,phase:gameState.phase,enemyHand:gameState.enemyPiles?.hand.length??0,presentedEnemyHand:enemy?.handCount??0,history:gameState.cardHistory,uiPhase:phase})}</Text>}
         <Modal visible={paused} transparent animationType="fade" onRequestClose={()=>settingsOpen?setSettingsOpen(false):setPaused(false)}>
           <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:24,justifyContent:'center'}}>
             <RitualSurface kind="quietSlate" style={{padding:24,gap:14}}>

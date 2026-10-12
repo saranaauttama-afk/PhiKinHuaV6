@@ -9,7 +9,6 @@ import {
   ENEMY_DECK_SIZE, ENEMY_HAND_SIZE,
   ENEMY_MAX_ENERGY_NORMAL, ENEMY_MAX_ENERGY_ELITE, ENEMY_MAX_ENERGY_BOSS
 } from '../../balance/core';
-import { runEquipmentTurnHook, runEquipmentCardPlayed, resetEquipmentTurnFlags } from '../../equipmentRuntime';
 // PATCH: import equipment hooks for enemy start/end & on_card_played
 
 type DeckConfig =
@@ -161,7 +160,6 @@ export function enemyPlayCardId(s: GameState, idx: number): boolean {
 
   // เล่นเอฟเฟ็กต์
   require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
-  runEquipmentCardPlayed(s,def,'enemy');
 
   return true;
 }
@@ -190,8 +188,6 @@ export function runEnemyTurn(s: GameState) {
   const { processEnemyTurnBehaviors } = require('../../enemyBehaviorRuntime');
   
   // PATCH: equipment once-per-turn reset and start-turn hook for ENEMY
-  resetEquipmentTurnFlags(s);
-  runEquipmentTurnHook(s, 'on_turn_start', 'enemy');
 
   // Process simple enemy behaviors (just basic defend/attack patterns)
   processEnemyTurnBehaviors(s);
@@ -223,7 +219,6 @@ export function runEnemyTurn(s: GameState) {
   // Simplified - no complex minion or status effect processing
 
   // PATCH: equipment end-turn hook for ENEMY
-  runEquipmentTurnHook(s, 'on_turn_end', 'enemy');
 
   // ตั้ง intent preview สำหรับเทิร์นถัดไป = ไพ่บนสุดของ draw (ถ้ามี)
   (s as any).enemyIntentCardId = (s as any).enemyPiles.draw[0];

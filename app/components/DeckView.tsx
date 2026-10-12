@@ -37,10 +37,6 @@ export default function DeckView({ state, dispatch }: Props) {
 
   const rows = groupCards(deck);
 
-  const equipped = state.equipped ?? [];
-  const slotsMax = state.equipmentSlotsMax ?? 1;
-  const slotsUsed = equipped.reduce((sum, eq) => sum + (eq.slotCost || 1), 0);
-  const equipmentCards = deck.filter(c => c.type === 'equipment');
 
   return (
     <ImageBackground source={require('../../assets/ui/deck-mat.jpg')} resizeMode="cover" style={{
@@ -65,93 +61,6 @@ export default function DeckView({ state, dispatch }: Props) {
           </Text>
         )}
 
-        {(equipped.length > 0 || equipmentCards.length > 0) && (
-          <Section title={`เครื่องราง (${slotsUsed}/${slotsMax} ช่อง)`}>
-            {equipped.map((eq, i) => (
-              <View
-                key={eq.id ?? i}
-                style={{
-                  flexDirection: 'row', alignItems: 'center', gap: space.md,
-                  padding: space.md, borderRadius: 0,
-                  backgroundColor: surface.glassDim,
-                  borderWidth: 1, borderColor: palette.line,
-                }}
-              >
-                <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-                    <Text style={{ color: palette.moon, fontSize: size.ui, fontFamily: font.uiMed }}>
-                      {eq.name || eq.id}
-                    </Text>
-                    {eq.temporary && (
-                      <Text style={{ color: palette.textFaint, fontSize: size.tiny, fontFamily: font.ui }}>
-                        ชั่วคราว (หมดเมื่อจบไฟต์)
-                      </Text>
-                    )}
-                  </View>
-                  {!!eq.desc && (
-                    <Text style={{
-                      color: palette.textFaint, fontSize: size.body,
-                      fontFamily: font.body, marginTop: 2, lineHeight: 22,
-                    }}>
-                      {eq.desc}
-                    </Text>
-                  )}
-                </View>
-
-                {/* ของชั่วคราวถอดไม่ได้ — มันจะหายเองตอนจบไฟต์ */}
-                {!eq.temporary && (
-                  <SmallButton
-                    label="ถอด"
-                    onPress={() => dispatch({ type: 'UnequipToDeck', equipmentId: eq.id })}
-                  />
-                )}
-              </View>
-            ))}
-
-            {equipmentCards.map((card, i) => {
-              const isEquipped = equipped.some(eq => eq.id === card.equipmentId);
-              if (isEquipped) return null;
-              const canEquip = slotsUsed < slotsMax;
-
-              return (
-                <View
-                  key={`${card.id}-${i}`}
-                  style={{
-                    flexDirection: 'row', alignItems: 'center', gap: space.md,
-                    padding: space.md, borderRadius: 0,
-                    backgroundColor: surface.glassDim,
-                    borderWidth: 1, borderColor: surface.panelWell,
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.uiMed }}>
-                      {card.name || card.id}
-                    </Text>
-                    {!!card.desc && (
-                      <Text style={{
-                        color: palette.textFaint, fontSize: size.body,
-                        fontFamily: font.body, marginTop: 2, lineHeight: 22,
-                      }}>
-                        {card.desc}
-                      </Text>
-                    )}
-                  </View>
-
-                  {canEquip ? (
-                    <SmallButton
-                      label="สวม"
-                      onPress={() => dispatch({ type: 'EquipFromDeck', cardId: card.id })}
-                    />
-                  ) : (
-                    <Text style={{ color: palette.textFaint, fontSize: size.label, fontFamily: font.ui }}>
-                      ช่องเต็ม
-                    </Text>
-                  )}
-                </View>
-              );
-            })}
-          </Section>
-        )}
 
         {TYPE_ORDER.map(type => {
           const list = rows.filter(r => r.card.type === type);
@@ -196,4 +105,3 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function SmallButton({label,onPress}:{label:string;onPress:()=>void}) {return <QuietButton label={label} onPress={onPress}/>;}

@@ -40,7 +40,7 @@ function runInProgress(seed = 'save', classId: any = 'warrior'): GameState {
     go({ type: 'ChooseOffer', index: fightIx });
     if (s.phase !== 'combat') break;
     if (s.enemy) s.enemy.statusEffects = [];
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
@@ -116,23 +116,11 @@ describe('สำรับไม่ถูกตัดทิ้งตอนโห�
     }
   });
 
-  it('การ์ดที่ผสานแล้วไม่หาย — มันไม่มีอยู่ในไฟล์ข้อมูลใดๆ', () => {
+  it('ดาวที่ปลุกเสกแล้วไม่หายตอนโหลด', () => {
     const s: any = runInProgress();
-    // ใส่การ์ดผสานลงสำรับตรงๆ (ปกติได้จากแท่นผสาน)
-    s.masterDeck = [
-      ...s.masterDeck,
-      {
-        id: 'fused_test__pair', name: 'ทดสอบผสาน', type: 'attack', cost: 1,
-        dmg: 9, block: 4, tags: ['fused'], desc: 'ผสานจากสองใบ',
-      },
-    ];
-
+    s.masterDeck[0] = { ...s.masterDeck[0], star: 3 };
     const back = roundTrip(s);
-    const fused = back.masterDeck.filter(c => c.id === 'fused_test__pair');
-
-    expect(fused, 'การ์ดผสานหายตอนโหลด').toHaveLength(1);
-    expect(fused[0].dmg).toBe(9);
-    expect(fused[0].block).toBe(4);
+    expect(back.masterDeck[0].star).toBe(3);
   });
 });
 
@@ -232,7 +220,7 @@ describe('เซฟอัตโนมัติ — ห้ามเซฟตอ�
     const ix = nextFight(s);
     go({ type: 'ChooseOffer', index: ix });
     if (s.enemy) s.enemy.statusEffects = [];
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
 
     return { get: () => s as GameState, go, ix, lastCmd: () => done[done.length - 1] };

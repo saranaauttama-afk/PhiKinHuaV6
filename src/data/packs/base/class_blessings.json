@@ -1,0 +1,76 @@
+[
+ {
+  "id": "night_warrior_blessing",
+  "name": "ครูลานวัด",
+  "rarity": "Rare",
+  "unlock": true,
+  "triggers": [
+   {
+    "on": "play",
+    "type": "action",
+    "once": "turn",
+    "fx": {
+     "block": 3
+    }
+   }
+  ],
+  "class": "warrior"
+ },
+ {
+  "id": "night_shaman_blessing",
+  "name": "ครูคุ้มคาถา",
+  "rarity": "Rare",
+  "unlock": true,
+  "triggers": [
+   {
+    "on": "play",
+    "type": "spell",
+    "once": "turn",
+    "fx": {
+     "block": 3
+    }
+   }
+  ],
+  "class": "shaman"
+ },
+ {
+  "id": "night_nun_blessing",
+  "name": "แสงบุญ",
+  "rarity": "Rare",
+  "unlock": true,
+  "triggers": [
+   {
+    "on": "turnStart",
+    "when": {
+     "kind": "player_hp_below",
+     "value": 50
+    },
+    "fx": {
+     "heal": 2
+    }
+   },
+   {
+    "on": "turnStart",
+    "fx": {
+     "block": 2
+    }
+   }
+  ],
+  "class": "nun"
+ },
+ {
+  "id": "night_medium_blessing",
+  "name": "หิ้งบรรพบุรุษ",
+  "rarity": "Rare",
+  "unlock": true,
+  "triggers": [
+   {
+    "on": "turnStart",
+    "fx": {
+     "mana": 1
+    }
+   }
+  ],
+  "class": "medium"
+ }
+]

@@ -5,8 +5,9 @@ import { baseNewState } from '../src/core/commands';
 import type { CardData, Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import {
-  upgradeCard, canUpgrade, upgradeLevelOf, UPGRADE_BONUS, MAX_UPGRADE_LEVEL,
+  upgradeCard, canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL,
 } from '../src/core/engine/shared';
+import { starFx, starOf } from '../src/core/cards/model';
 import { upgradeCostForCount, removeCostForCount } from '../src/core/balance/economy';
 import cardsJson from '../src/data/packs/base/cards.json';
 
@@ -21,85 +22,53 @@ const CARDS = cardsJson as CardData[];
  */
 
 const attack = (over: Partial<CardData> = {}): CardData =>
-  ({ id: 'atk', name: 'ฟันดาบ', type: 'attack', cost: 1, dmg: 6, ...over });
+  ({ id: 'atk', name: 'ฟันดาบ', type: 'attack', fx: { dmg: 6 }, ...over });
+const dmgOf = (c: CardData) => starFx(c).dmg;
 
-describe('สูตรปลุกเสก', () => {
-  it('ใบโจมตีได้ดาเมจเพิ่ม', () => {
-    const up = upgradeCard(attack());
-    expect(up.dmg).toBe(6 + UPGRADE_BONUS);
+describe('ปลุกเสก = เพิ่มดาว', () => {
+  it('ดาว 2 คูณ 1.5 ดาว 3 คูณ 2', () => {
+    const two = upgradeCard(attack());
+    expect(starOf(two)).toBe(2);
+    expect(dmgOf(two)).toBe(9);
+    expect(dmgOf(upgradeCard(two))).toBe(12);
   });
 
-  it('ใบป้องกันได้ค่ากันเพิ่ม', () => {
-    const up = upgradeCard({ id: 'blk', name: 'กัน', type: 'skill', cost: 1, block: 5 });
-    expect(up.block).toBe(5 + UPGRADE_BONUS);
+  it('สถานะได้ซ้อนเพิ่มตามดาว', () => {
+    const c: CardData = { id: 's', name: 'สาป', type: 'spell', mana: 1, fx: { status: [{ id: 'poison', stacks: 2, turns: 3, to: 'enemy' }] } };
+    expect(starFx(upgradeCard(c)).status![0].stacks).toBe(3);
+    expect(starFx(upgradeCard(upgradeCard(c))).status![0].stacks).toBe(4);
   });
 
-  it('ใบผลพิเศษที่ไม่มีตัวเลข ได้ลดค่าร่ายแทน', () => {
-    const up = upgradeCard({ id: 'sp', name: 'พิเศษ', type: 'skill', cost: 2 });
-    expect(up.cost).toBe(1);
+  it('การ์ดกำหนดค่าดาวเองได้', () => {
+    const c = attack({ stars: [{ dmg: 10 }, { dmg: 20 }] });
+    expect(dmgOf(upgradeCard(c))).toBe(10);
+    expect(dmgOf(upgradeCard(upgradeCard(c)))).toBe(20);
   });
 
-  it('ใบผลพิเศษที่ค่าร่ายศูนย์อยู่แล้ว ได้จั่วเพิ่มแทน — ลดต่ำกว่าศูนย์ไม่ได้', () => {
-    const up = upgradeCard({ id: 'sp0', name: 'พิเศษฟรี', type: 'skill', cost: 0 });
-    expect(up.cost).toBe(0);
-    expect(up.draw).toBe(1);
-  });
-
-  it('ชื่อมีเครื่องหมายบอกว่าปลุกแล้ว', () => {
-    expect(upgradeCard(attack()).name).toContain('+');
-  });
-
-  /**
-   * เดิมปลุกซ้ำได้ไม่จำกัด ทางที่ดีที่สุดคือทุ่มทองใส่ใบเดียวแล้วถือยาว
-   * ("ฟันดาบ + + +") ตอนนี้มีเพดานที่ 3 ขั้น
-   */
-  it('ปลุกได้ถึงขั้นสูงสุดแล้วหยุด', () => {
+  it('ปลุกได้ถึงดาวสูงสุดแล้วหยุด', () => {
     let c = attack();
     for (let lvl = 1; lvl <= MAX_UPGRADE_LEVEL; lvl++) {
-      expect(canUpgrade(c), `ขั้น ${lvl - 1} ควรปลุกต่อได้`).toBe(true);
+      expect(canUpgrade(c)).toBe(true);
       c = upgradeCard(c);
       expect(upgradeLevelOf(c)).toBe(lvl);
-      expect(c.dmg).toBe(6 + UPGRADE_BONUS * lvl);
     }
-
-    expect(canUpgrade(c), 'เต็มขั้นแล้วยังปลุกได้อีก').toBe(false);
-    const over = upgradeCard(c);
-    expect(over.dmg).toBe(c.dmg);
-    expect(over.name).toBe(c.name);
+    expect(canUpgrade(c)).toBe(false);
+    expect(upgradeCard(c)).toEqual(c);
   });
 
-  it('ชื่อบอกขั้นปัจจุบัน ไม่ใช่ต่อ + ไปเรื่อยๆ', () => {
-    let c = attack();
-    c = upgradeCard(c);
-    expect(c.name).toBe('ฟันดาบ +1');
-    c = upgradeCard(c);
-    expect(c.name, 'ชื่อกลายเป็น "ฟันดาบ +1 +2"').toBe('ฟันดาบ +2');
-  });
-
-  it('การ์ดคำสาปปลุกเสกไม่ได้', () => {
-    const curse = { id: 'c1', name: 'คำสาป', type: 'curse', cost: 0 } as CardData;
+  it('คำสาปและการ์ดยืมปลุกไม่ได้', () => {
+    const curse = { id: 'c1', name: 'คำสาป', type: 'curse', fx: {} } as CardData;
     expect(canUpgrade(curse)).toBe(false);
-    expect(upgradeCard(curse)).toEqual(curse);
+    expect(canUpgrade(attack({ borrowed: true }))).toBe(false);
   });
 
-  /**
-   * ตอนแรกตั้งใจให้ปลุกเสกปลดข้อจำกัด "ใช้แล้วหาย" แต่ใบ exhaust ทั้งหมดในเกม
-   * ไม่มีตัวเลขให้บวก มันเป็นผลพิเศษล้วน และในนั้นมี "ฟื้นเต็มหลอด" กับ
-   * "Max HP +2 ถาวร" — ปลดให้ร่ายซ้ำได้ = เลือดสูงสุดไม่มีเพดานและตายไม่เป็น
-   */
-  it('ใบใช้แล้วหาย ปลุกแล้วยังหายเหมือนเดิม', () => {
-    for (const c of CARDS.filter(c => c.exhaust)) {
-      expect(upgradeCard(c).exhaust, `${c.id} ปลุกแล้วเล่นซ้ำได้`).toBe(true);
-    }
-  });
-
-  it('exhaust cards retain their one-fight limit when numeric and utility effects are upgraded', () => {
+  it('ใบนำออกยังนำออกหลังปลุก และตัวเลขขึ้น', () => {
     for (const c of CARDS.filter(c => c.exhaust)) {
       const up = upgradeCard(c);
-      expect(up.exhaust,c.id).toBe(true);
-      if(c.dmg!==undefined)expect(up.dmg,c.id).toBeGreaterThan(c.dmg);
-      else if(c.block!==undefined)expect(up.block,c.id).toBeGreaterThan(c.block);
-      else expect(up.cost,c.id).toBe(Math.max(0,c.cost-1));
+      expect(up.exhaust, c.id).toBe(true);
+      const f = starFx(c), u = starFx(up);
+      if (f.dmg) expect(u.dmg!, c.id).toBeGreaterThan(f.dmg);
+      if (f.block) expect(u.block!, c.id).toBeGreaterThan(f.block);
     }
   });
 });
@@ -121,7 +90,7 @@ describe('ร้านปลุกเสก', () => {
     const price = upgradeCostForCount(0);
     const out = go(s, { type: 'ShopUpgradeBuy', index: 0 });
 
-    expect(out.masterDeck[0].dmg).toBe(6 + UPGRADE_BONUS);
+    expect(dmgOf(out.masterDeck[0])).toBe(9);
     expect(out.player.gold).toBe(999 - price);
   });
 
@@ -131,7 +100,7 @@ describe('ร้านปลุกเสก', () => {
     (s as any).runCounters = { upgradeShopCount: 3 };
 
     const out = go(s, { type: 'ShopUpgradeBuy', index: 0 });
-    expect(out.masterDeck[0].dmg).toBe(6);
+    expect(dmgOf(out.masterDeck[0])).toBe(6);
     expect(out.player.gold).toBe(0);
   });
 
@@ -143,11 +112,11 @@ describe('ร้านปลุกเสก', () => {
     expect(upgradeLevelOf(s.masterDeck[0])).toBe(MAX_UPGRADE_LEVEL);
 
     const goldAtCap = s.player.gold;
-    const dmgAtCap = s.masterDeck[0].dmg;
+    const dmgAtCap = dmgOf(s.masterDeck[0]);
     const out = go(s, { type: 'ShopUpgradeBuy', index: 0 });
 
     expect(out.player.gold, 'เสียทองทั้งที่ไม่มีอะไรเปลี่ยน').toBe(goldAtCap);
-    expect(out.masterDeck[0].dmg).toBe(dmgAtCap);
+    expect(dmgOf(out.masterDeck[0])).toBe(dmgAtCap);
   });
 
   it('ปลุกขั้นสูงแพงกว่าปลุกขั้นแรก', () => {

@@ -8,9 +8,6 @@ export function levelUpConfirmLabel(bucket?: Bucket): string {
     case 'blessing': return 'เลือกพรที่จะรับ';
     case 'gold': case 'gold_skip': return 'รับเบี้ย';
     case 'max_hp': return 'เพิ่มพลังชีวิต';
-    case 'max_energy': return 'เพิ่มพลังงาน';
-    case 'draw_per_turn': return 'เพิ่มจำนวนจั่ว';
-    case 'max_hand': return 'เพิ่มขนาดมือ';
     case 'equipment_slot': return 'เพิ่มช่องเครื่องราง';
     default: return 'เลือกสิ่งที่จะรับ';
   }

@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { applyCardEffect, isVictory, isDefeat } from '../src/core/commands';
+import { isVictory, isDefeat } from '../src/core/commands';
+import { playCard } from '../src/core/cards/play';
+import { makeRng } from '../src/core/rng';
+import type { GameState } from '../src/core/types';
+
+const applyCardEffect = (s: GameState, i: number) => playCard(s, i, makeRng('t'));
 import { applyStatusEffect } from '../src/core/combat/status-effects';
 import { makeCombatState, runEnemyCards, attackCard, blockCard } from './helpers';
 

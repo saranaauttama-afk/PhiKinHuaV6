@@ -13,7 +13,7 @@ import {
   saveGame, loadGame, loadGameSnapshot, saveBattle, getSaveSlots, autoSave, clearAutoSave, type SaveSlotInfo,
 } from '../../src/core/storage';
 import { AUTO_SAVE_COMMANDS } from '../../src/core/save';
-import { HAND_SIZE, START_ENERGY, START_HP } from '../../src/core/balance/core';
+import { START_HP } from '../../src/core/balance/core';
 import { nextExpForLevel } from '../../src/core/balance/progression';
 import { makeRng, seedFromString, type RNG } from '../../src/core/rng';
 import { START_GOLD } from '../../src/core/balance';

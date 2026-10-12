@@ -122,9 +122,7 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
 
     case 'randomCard': {
       const { rollThreeCards } = require('../level');
-      const { getClass } = require('../classes');
-      const tag = getClass(s.classId).cardTag;
-      const out = rollThreeCards(r, s.player.level ?? 1, tag);
+      const out = rollThreeCards(r, s.player.level ?? 1, s.classId);
       const pick = out.list[0];
       if (pick) {
         s.masterDeck = [...(s.masterDeck ?? []), { ...pick }];

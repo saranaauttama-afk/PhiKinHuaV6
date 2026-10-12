@@ -6,10 +6,10 @@ import DeckCard,{CardFace} from './DeckCard';
 import RitualSurface from './RitualSurface';
 import {QuietButton} from './QuietChrome';
 import {cardSummary} from '../cardPresentation';
+import {costLabel} from '../../src/core/cards/describe';
 import {font,palette} from '../theme';
 export function upgradeSummary(card:CardData):string {
- const extra=card.trap?.effects.map(e=>`${e.type==='negate'?'ยกเลิก':e.type==='damage'?'โจมตี':'ผลกับดัก'} ${'value' in e?e.value:''}`).join(' · ');
- return `พลัง ${card.cost??0} · ${extra||cardSummary(card)}`;
+ return `${costLabel(card)} · ${cardSummary(card)}`;
 }
 export default function UpgradeCardPicker({cards,selected,onSelect,price,remove=false,onConfirm,disabledConfirm=false}:{cards:CardData[];selected:number|null;onSelect:(i:number|null)=>void;price?:(card:CardData)=>number;remove?:boolean;onConfirm?:(i:number)=>void;disabledConfirm?:boolean}) {
  const card=selected===null?undefined:cards[selected];

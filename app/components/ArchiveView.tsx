@@ -11,6 +11,7 @@ import RitualSurface from './RitualSurface';
 import {QuietButton,QuietHeader} from './QuietChrome';
 import {font,palette,paper,archiveColors} from '../theme';
 import {useScreenPadding} from '../useScreenPadding';
+import {describeCard} from '../../src/core/cards/describe';
 
 type Ghost=typeof GHOST_CATALOG[number];
 type Entry={id:string;name:string;group:string;ghost?:Ghost;card?:ArchiveCard;progress?:Discovery};
@@ -37,7 +38,7 @@ export default function ArchiveView({onClose,fixture}:{onClose:()=>void;fixture?
   const seen=!!e.progress;if(group&&e.group!==group)return false;
   if((mode==='seen'&&!seen)||(mode==='unseen'&&seen))return false;
   if(tab==='cards'&&((type&&e.card?.card.type!==type)||(rarity&&e.card?.card.rarity!==rarity)))return false;
-  if(query.trim()){if(mode==='progress'&&!seen)return false;const search=e.name+' '+(e.ghost?.description??e.card?.card.desc??'');return search.toLocaleLowerCase('th').includes(query.trim().toLocaleLowerCase('th'));}
+  if(query.trim()){if(mode==='progress'&&!seen)return false;const search=e.name+' '+(e.ghost?.description??(e.card?describeCard(e.card.card):''));return search.toLocaleLowerCase('th').includes(query.trim().toLocaleLowerCase('th'));}
   return true;
  });
  const groups=tab==='ghosts'?GHOST_GROUPS:CARD_GROUPS;

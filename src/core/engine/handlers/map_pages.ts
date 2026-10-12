@@ -3,28 +3,15 @@ import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import * as ShopEv from './shops_events';
 import type { PageOffer } from '../../map/pages';
-import { buildAndShuffleDeck, drawUpTo } from '../../commands';
-import { resetBlessingTurnFlags, runBlessingsTurnHook } from '../../blessingRuntime';
-import { START_ENERGY } from '../../balance/core';
+import { beginPlayerFight } from '../../commands';
 import { buildAndShuffleEnemyDeck } from './enemy';
-import { runEquipmentOnEquip } from '../../equipmentRuntime';
 import { deckForMonster } from '../../monsters/monster-decks';
-import { applyClassCombatStart } from '../../classes';
 import { fireChapter } from '../../story/chapters';
 import { planEnemyIntent } from '../../combat/intent';
 import { winRun } from './runEnd';
-import { resetTraps } from '../../combat/traps';
 import { ultimateRequired } from '../../campaign/threeNight';
 import { startAdventure, settleAdventureSlot, revealUltimate, rememberAdventureService, restoreAdventureService, useIntersectionPage } from '../../map/adventure';
 
-// ถอดเครื่องรางชั่วคราวออกหลังจบคอมแบต
-function removeTemporaryEquipment(s: GameState) {
-  if (!s.equipped) return;
-  const permanent = s.equipped.filter(eq => !eq.temporary);
-  const removed = s.equipped.length - permanent.length;
-  s.equipped = permanent;
-  if (removed > 0) s.log.push(`ถอดเครื่องรางชั่วคราว ${removed} ชิ้น`);
-}
 
 /** ล้างสเตตที่เหลือจากคอมแบตก่อนกลับสู่แผนที่ */
 function clearCombatState(s: GameState) {
@@ -34,7 +21,10 @@ function clearCombatState(s: GameState) {
   (s as any).enemyIntentCardId = null;
   s.player.block = 0;
   s.player.statusEffects = [];
-  s.player.energy = s.player.maxEnergy ?? START_ENERGY;
+  s.player.ap = s.player.maxAp;
+  s.equipped = [];
+  s.prayers = [];
+  s.traps = [];
 }
 
 function completeAdventure(s:GameState,r:RNG){
@@ -43,7 +33,7 @@ function completeAdventure(s:GameState,r:RNG){
  const offer=mp.current.offers[ix];if(!offer)return {state:s,rng:r};
  if(s.phase==='victory'&&(offer.kind==='monster'||offer.kind==='boss')){
   s.defeatedEnemyIds=[...(s.defeatedEnemyIds??[]),offer.enemyId];
-  removeTemporaryEquipment(s);s.equipmentTempSlots=0;clearCombatState(s);
+  clearCombatState(s);
   if(offer.kind==='boss'){
    if(offer.bossType==='final'){
     s.campaign!.completedNights=s.campaign!.night;
@@ -94,8 +84,6 @@ function startCombat(s:GameState,offer:Extract<PageOffer,{kind:'monster'|'boss'}
   (s as any).playerPiles = undefined;
   (s as any).enemyIntentCardId = null;
   s.player.block = 0;
-  s.player.energy = s.player.maxEnergy ?? START_ENERGY;
-  s.equipmentTempSlots = 5;
   const deck = deckForMonster(monster);
   s.enemy = {
     id: monster.id, name: monster.name, hp: monster.hp, maxHp: monster.hp,
@@ -105,20 +93,12 @@ function startCombat(s:GameState,offer:Extract<PageOffer,{kind:'monster'|'boss'}
   };
   require('../../campaign/nights').configureNightEnemy(s);
   ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
-  applyClassCombatStart(s);
   const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
   initializeEnemyBehaviors(s);
-  resetTraps(s);
   (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
-  ({ state: s, rng } = buildAndShuffleDeck(s, rng));
-  ({ state: s, rng } = drawUpTo(s, rng, s.player.openingDraw ?? s.player.maxHandSize));
-  runEquipmentOnEquip(s);
-  runEquipmentOnEquip(s, 'enemy');
-  resetBlessingTurnFlags(s);
-  runBlessingsTurnHook(s, 'on_turn_start');
+  rng = beginPlayerFight(s, rng);
   planEnemyIntent(s);
   s.log.push(`ChooseOffer → combat (${offer.kind === 'boss' ? 'boss' : offer.tier}) vs ${s.enemy?.id}`);
-  require('../../cards/testWin').dealTestWinCard(s);
   return { state: s, rng };
 }
 

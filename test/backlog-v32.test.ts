@@ -5,7 +5,6 @@ import {makeRng} from '../src/core/rng';
 import {fromSave,toSave} from '../src/core/save';
 import {validAdventure,useIntersectionPage,startAdventure} from '../src/core/map/adventure';
 import {getStoryEvent} from '../src/core/events/story';
-import {getCardPlayedFns,resetBlessingTurnFlags} from '../src/core/blessingRuntime';
 import {cardById} from '../src/core/pack';
 import {captureRewardReceipt} from '../src/core/rewardReceipt';
 import {battleGeometry,handGeometry} from '../app/battleGeometry';
@@ -26,7 +25,7 @@ describe('v32 reported regressions',()=>{
   d.go({type:'DeleteShopFromMap',index:ix});expect(d.s.pages!.current!.resolved[ix]).toBe(true);expect(d.s.pages!.adventure!.slotIds).toEqual(board);expect(validAdventure(d.s)).toBe(true);
  });
  it('completing a ghost keeps its slot terminal until all three pages finish, and cannot delete another ghost',()=>{
-  const d=driver(),a=d.s.pages!.adventure!,before=structuredClone(a.slotIds),cursor=a.cursor;d.go({type:'ChooseOffer',index:0});d.s.piles.hand=[{id:'test',name:'test',type:'attack',cost:0,dmg:9999}];d.go({type:'PlayCard',index:0});
+  const d=driver(),a=d.s.pages!.adventure!,before=structuredClone(a.slotIds),cursor=a.cursor;d.go({type:'ChooseOffer',index:0});d.s.piles.hand=[{id:'test',name:'test',type:'attack',fx:{dmg:9999}}];d.go({type:'PlayCard',index:0});
   while(d.s.phase!=='map'){d.go(d.s.phase==='levelup'?{type:'SkipLevelUp'}:d.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});}
   expect(d.s.pages!.current!.resolved[0]).toBe(true);expect(d.s.pages!.adventure!.slotIds).toEqual(before);expect(d.s.pages!.adventure!.cursor).toBe(cursor);
   const other=d.s.pages!.current!.offers.findIndex((o,i)=>o?.kind==='monster'&&!d.s.pages!.current!.resolved[i]);d.go({type:'DeleteShopFromMap',index:other});expect(d.s.pages!.adventure!.slotIds).toEqual(before);expect(validAdventure(d.s)).toBe(true);
@@ -43,17 +42,17 @@ describe('v32 reported regressions',()=>{
   expect(found).toBeDefined();const d=found!;
   for(let i=0;i<200;i++){
    const p=d.s.pages!.current!;const ix=p.offers.findIndex((o,i)=>!p.resolved[i]&&(o?.kind==='treasure'||o?.kind==='treasure_single'));if(ix>=0){d.go({type:'ChooseOffer',index:ix});const n=d.s.masterDeck.length;const command=d.s.shopKind==='treasure'?{type:'TakeTreasureCard' as const,index:0}:{type:'TakeSingleTreasureCard' as const,index:0};d.go(command);expect(d.s.masterDeck).toHaveLength(n+1);expect(d.s.phase).toBe('shop');const receipt=structuredClone(d.s.rewardReceipt);d.go(command);expect(d.s.masterDeck).toHaveLength(n+1);d.go({type:'CompleteNode'});expect(fromSave(toSave(d.s,d.r)).pages!.current!.resolved[ix]).toBe(false);d.go({type:'ChooseOffer',index:ix});expect(d.s.shopStock).toHaveLength(0);expect(d.s.rewardReceipt).toEqual(receipt);const gold=d.s.player.gold;d.go({type:'RandomizeSingleTreasure'});d.go(command);expect(d.s.player.gold).toBe(gold);expect(d.s.masterDeck).toHaveLength(n+1);return;}
-   if(d.s.chapter)d.go({type:'SkipChapter'});else if(d.s.phase==='map'){const critical=p.offers.findIndex((o,i)=>!p.resolved[i]&&(o?.kind==='monster'||o?.kind==='story_event'));const other=p.offers.findIndex((o,i)=>o&&!p.resolved[i]);d.go(critical>=0?{type:'ChooseOffer',index:critical}:p.offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});}else if(d.s.phase==='combat'){d.s.piles.hand=[{id:'test',name:'test',type:'attack',cost:0,dmg:99999}];d.go({type:'PlayCard',index:0});}else if(d.s.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}else d.go(d.s.phase==='levelup'?{type:'SkipLevelUp'}:d.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});
+   if(d.s.chapter)d.go({type:'SkipChapter'});else if(d.s.phase==='map'){const critical=p.offers.findIndex((o,i)=>!p.resolved[i]&&(o?.kind==='monster'||o?.kind==='story_event'));const other=p.offers.findIndex((o,i)=>o&&!p.resolved[i]);d.go(critical>=0?{type:'ChooseOffer',index:critical}:p.offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});}else if(d.s.phase==='combat'){d.s.piles.hand=[{id:'test',name:'test',type:'attack',fx:{dmg:99999}}];d.go({type:'PlayCard',index:0});}else if(d.s.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}else d.go(d.s.phase==='levelup'?{type:'SkipLevelUp'}:d.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});
   }throw Error('Chest was never reached');
  });
  it('opening draw is independent from energy and cap; turn draw only adds the requested amount',()=>{
-  const d=driver();d.s.player.maxEnergy=8;d.go({type:'ChooseOffer',index:0});expect(d.s.piles.hand).toHaveLength(2);expect(d.s.player.maxHandSize).toBe(2);
-  d.s.piles.hand=[];d.s.piles.draw=d.s.masterDeck.map(c=>({...c}));startPlayerTurn(d.s,d.r);expect(d.s.piles.hand).toHaveLength(2);
+  const d=driver();d.go({type:'ChooseOffer',index:0});expect(d.s.piles.hand.filter(c=>c.id!=='qa_phra_prathan')).toHaveLength(d.s.player.openingDraw);expect(d.s.player.handMax).toBe(7);
+  d.s.piles.hand=[];d.s.piles.draw=d.s.masterDeck.map(c=>({...c}));startPlayerTurn(d.s,d.r);expect(d.s.piles.hand.filter(c=>c.id!=='qa_phra_prathan')).toHaveLength(d.s.player.drawPerTurn);
  });
  it('receipts use actual granted copies, preserve upgrades/losses and never mutate inventory',()=>{
-  const granted={id:'receipt_test_blessing',name:'พรทดสอบ',rarity:'Common' as const,desc:'test'};
-  const before=driver().s,after=structuredClone(before),card={...before.masterDeck[0],upgradeLevel:2};after.masterDeck.push(card);after.blessings.push(granted);after.masterDeck.shift();const inventory=structuredClone(after.masterDeck);
+  const granted={id:'receipt_test_blessing',name:'พรทดสอบ',rarity:'Common' as const,desc:'test',triggers:[]};
+  const before=driver().s,after=structuredClone(before),card={...before.masterDeck[0],star:3};after.masterDeck.push(card);after.blessings.push(granted);after.masterDeck.shift();const inventory=structuredClone(after.masterDeck);
   captureRewardReceipt(before,after,{type:'ChooseEventOption',index:0});expect(after.rewardReceipt!.cards).toEqual([card]);expect(after.rewardReceipt!.blessings).toEqual([granted]);expect(after.rewardReceipt!.lostCards).toHaveLength(1);expect(after.masterDeck).toEqual(inventory);expect(fromSave(toSave(after,makeRng(after.seed))).rewardReceipt).toEqual(after.rewardReceipt);
  });
- for(const [w,h] of [[360,640],[393,852]])it(`${w}x${h}: six cards, full-body stage and reserved notice do not collide`,()=>{const g=battleGeometry(w,h,24,24),hand=handGeometry(w,6);expect(hand.overflow).toBe(false);expect(hand.span+hand.padding*2).toBeLessThanOrEqual(w);expect(g.monsterTop+g.monsterSize).toBeLessThan(g.hudTop);expect(g.noticeTop).toBeGreaterThanOrEqual(g.hudTop+g.enemyHudHeight+g.enemyExtrasHeight);expect(g.noticeTop+g.noticeHeight).toBeLessThan(g.handTop);});
+ for(const [w,h] of [[360,640],[393,852]])it(`${w}x${h}: seven cards, full-body stage and reserved notice do not collide`,()=>{const g=battleGeometry(w,h,24,24),hand=handGeometry(w,7);expect(hand.overflow).toBe(false);expect(hand.span+hand.padding*2).toBeLessThanOrEqual(w);expect(g.monsterTop+g.monsterSize).toBeLessThan(g.hudTop);expect(g.noticeTop).toBeGreaterThanOrEqual(g.hudTop+g.enemyHudHeight+g.enemyExtrasHeight);expect(g.noticeTop+g.noticeHeight).toBeLessThan(g.handTop);});
 });

@@ -3,66 +3,65 @@
 // Import status effects from extended system
 import type { StatusEffect } from './types_extended';
 
-export type BlessingFn = (tc: TurnCtx, card?: CardData, target?: any) => void;
-export type BlessingCardHookConfig = { tag?: string; once_per_turn?: boolean; effects: BlessingFn[] };
-export type BlessingDef = {
-  id: string; name: string; rarity?: Rarity; desc?: string; oncePerTurn?: boolean;
-  on_turn_start?: BlessingFn;
-  on_turn_end?: BlessingFn;
-  on_card_played?: BlessingFn | BlessingCardHookConfig;
+/** A passive (blessing or equipped card) reacts to these moments of a fight. */
+export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayerDone';
+export type Trigger={on:TriggerOn;type?:CardType;once?:'turn';when?:import('./cards/mechanics').CardCondition;fx:Fx};
+/** Always-on modifiers plus triggers, shared by blessings and equipment cards. */
+export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number};
+export type BlessingDef = Passive & {
+  id: string; name: string; rarity?: Rarity; desc?: string; class?: import('./classes').ClassId;
 };
 
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Legendary';
 /**
- * ชนิดการ์ด
+ * ชนิดการ์ด (แบบ Night of the Full Moon)
  *
- * `trap`  — ตั้งไว้แล้วรอศัตรูทำสิ่งที่ตรงเงื่อนไข (ดู `combat/traps.ts`)
- * `curse` — เล่นไม่ได้ ยัดเข้าสำรับเพื่อถ่วง ทิ้งเองท้ายเทิร์น
+ * attack / equipment / mana / counter เล่นฟรี · action / prayer ใช้แต้ม Action ·
+ * spell ใช้มานาที่สะสมข้ามเทิร์น · curse เล่นไม่ได้ ทิ้งเองท้ายเทิร์น
  */
-export type CardType = 'attack' | 'skill' | 'equipment' | 'trap' | 'curse';
+export type CardType = 'attack' | 'action' | 'spell' | 'equipment' | 'mana' | 'prayer' | 'counter' | 'curse';
+
+export type StatusFx = { id: import('./combat/status-effects/types').StatusEffectType; stacks: number; turns: number; to: 'enemy' | 'self' };
+/** Everything a card, counter, prayer or passive can do, resolved in this order. */
+export type Fx = {
+  dmg?: number; hits?: number; block?: number; heal?: number; draw?: number;
+  mana?: number; ap?: number; status?: StatusFx[]; cleanse?: boolean;
+  /** Copy the last N enemy cards into hand (free, removed after use). */
+  borrow?: number;
+};
+export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negate?: boolean; turns?: number };
 
 export type CardData = {
-  unremovable?: boolean;
   id: string;
-  instanceId?: string;  // unique per card instance in play — assigned on deck build
+  instanceId?: string;
   name: string;
   type: CardType;
-  cost: number;
-  dmg?: number;
-  block?: number;
-  draw?: number;
-  energyGain?: number;
-  statusEffect?: { target: 'player' | 'enemy'; effect: import('./combat/status-effects/types').StatusEffectType; duration: number; value: number };
-  /** ฟื้นพลังชีวิตให้ผู้เล่น */
-  heal?: number;
-  cleanseDebuffs?: boolean;
-  /**
-   * เล่นแล้วออกจากไฟต์ไปเลย (เข้ากองเผา ไม่กลับมาในกองจั่วอีก)
-   *
-   * มีในไฟล์ข้อมูลและ `combat.ts` อ่านใช้มาตลอด แต่ไม่เคยอยู่ในไทป์
-   * ทุกที่ที่ใช้จึงต้อง cast เป็น any — และ UI ก็เลยไม่เคยแสดงมันเลย
-   */
-  exhaust?: boolean;
-  /** ปลุกเสกไปแล้วกี่ขั้น (ดู `upgradeCard`) */
-  upgraded?: boolean;
-  upgradeLevel?: number;
-  /** เฉพาะการ์ดชนิด `trap` — ดักอะไรและเด้งกลับยังไง */
-  trap?: import('./combat/traps').TrapSpec;
-
-  // ── กลไกที่ตัวเลขอย่างเดียวทำแทนไม่ได้ (ดู `cards/mechanics.ts`) ──
-  /** ตีกี่ครั้ง — แต่ละครั้งเจอ block/strength/vulnerable แยกกัน */
-  hits?: number;
-  /** อ่านสภาพสนามแล้วแรงไม่เท่ากัน */
-  conditional?: import('./cards/mechanics').CardConditional;
-  /** ถือไว้ไม่เล่นก็มีผลท้ายเทิร์น */
-  whileHeld?: import('./cards/mechanics').HeldEffect;
-  /** ค่าร่ายที่เปลี่ยนตามสถานการณ์ — ต้องอ่านผ่าน `effectiveCost` เสมอ */
-  costRule?: import('./cards/mechanics').CostRule;
-  tags?: string[];
   rarity?: Rarity;
-  equipmentId?: string;
-  slotCost?: number;
-  desc?: string;
+  class?: import('./classes').ClassId;
+  /** Action points; only action and prayer cards. */
+  ap?: number;
+  /** Mana; only spell cards. */
+  mana?: number;
+  fx: Fx;
+  /** Star 1–3 (upgrades). Missing = 1. */
+  star?: number;
+  /** Optional explicit star-2/3 values; otherwise `STAR_RULES` scale the base. */
+  stars?: Partial<Fx>[];
+  /** นำออก: removed from this fight after use. */
+  exhaust?: boolean;
+  /** Playable once per turn. Required on free cards that draw. */
+  limit?: 'turn';
+  conditional?: import('./cards/mechanics').CardConditional;
+  whileHeld?: import('./cards/mechanics').HeldEffect;
+  counter?: CounterSpec;
+  equip?: Passive;
+  /** Copied from an enemy card; never enters the deck. */
+  borrowed?: boolean;
+  /** Only offered after the class unlocks it in the journal. */
+  locked?: boolean;
+  unremovable?: boolean;
+  flavor?: string;
+  tags?: string[];
 };
 
 // Enemy
@@ -100,7 +99,6 @@ export type EnemyState = {
   intentCardId?: string | null;             // ใบที่จะเล่น "เทิร์นนี้"
   maxEnergy?: number;  // ค่าพลังงานสูงสุดของศัตรู (ต่อเทิร์น)
   handSize?: number;   // จำนวนการ์ดที่จั่วตอนเริ่มเทิร์นศัตรู
-  equipped?: EquipmentData[];  // ศัตรูก็มี equipment ได้เหมือนกัน
   // Status Effects System
   statusEffects?: StatusEffect[];
 };
@@ -110,18 +108,6 @@ export type DeckPiles = {
   hand: CardData[];
   discard: CardData[];
   exhaust: CardData[];
-};
-
-export type EquipmentData = {
-  id: string;
-  name?: string;
-  rarity?: Rarity;
-  desc?: string;
-  slotCost?: number; // default 1
-  tags?: string[];
-  temporary?: boolean; // For equipment installed temporarily during combat
-  sourceCardId?: string; // ID of the equipment card that was consumed
-  sourceCard?: CardData; // Full card data of the consumed card
 };
 
 export type Phase =
@@ -134,16 +120,17 @@ export type Phase =
 // หมายเหตุ: เคยมี 'cards' อยู่ในนี้ — การ์ดใหม่ย้ายไปเป็นรางวัลชนะไฟต์แล้ว
 // (ดู `cards/reward.ts`) เลเวลอัปเหลือแต่ของที่ไม่ใช่การ์ด
 export type Bucket =
-  | 'max_hp' | 'max_energy' | 'max_hand' | 'draw_per_turn'
-  | 'blessing' | 'remove' | 'upgrade' | 'gold'
+  | 'max_hp' | 'blessing' | 'remove' | 'upgrade' | 'gold'
   | 'equipment_slot' | 'gold_skip';
 
 export type PlayerState = {
-  hp: number; maxHp: number; block: number; energy: number; gold: number;
+  hp: number; maxHp: number; block: number; gold: number;
   level: number; exp: number; expToNext: number;
-  maxEnergy: number; maxHandSize: number;
-  /** New runs separate opening draw, per-turn draw and the retained-hand cap. */
-  openingDraw?:number;drawPerTurn?:number;handBalanceVersion?:33;nightOneHandReward?:'draw'|'hand';
+  /** Action points this turn / per turn. */
+  ap: number; maxAp: number;
+  /** Mana carries over between turns of a fight; reset to `startMana` each fight. */
+  mana: number; startMana: number;
+  openingDraw: number; drawPerTurn: number; handMax: number;
   // Status Effects System
   statusEffects?: StatusEffect[];
 };
@@ -184,27 +171,8 @@ export type PersistentShop = {
 export type MapMode = 'pages';
 export type MapStatePages = import('./map/pages').MapStatePages;
 
-// Equipment
 export type TurnSide = 'player' | 'enemy';
 
-export type EquipmentHookEvent =
-  | { type: 'battle_start' }
-  | { type: 'turn_start'; side: TurnSide }
-  | { type: 'turn_end'; side: TurnSide }
-  | { type: 'card_played'; side: TurnSide; cardId: string; amount?: number }
-  | { type: 'damage_dealt'; side: TurnSide; amount: number; target: 'player' | 'enemy' };
-
-export interface EquipmentInstance {
-  id: string; // unique per run
-  modifierId: string; // refers to effect/behavior id (data-driven)
-  oncePerTurn?: boolean; // simple gate; advanced rates can extend
-}
-
-export interface EquipmentRuntimeState {
-  items: EquipmentInstance[];
-  turnStamp: number; // increases every turn (player + enemy turns)
-  onceGate: Record<string, number>; // equipment.id -> lastTurnStampUsed
-}
 // ── Combat events ────────────────────────────────────────────────────────────
 // engine คำนวณจนจบแล้วคายเหตุการณ์ออกมาเป็นลิสต์ — view เอาไปเล่นเป็นอนิเมชั่น
 // ตามจังหวะของตัวเอง ไม่มี setTimeout ตัวไหนได้แตะ game state อีก
@@ -388,23 +356,27 @@ export type GameState = {
     result?: string;
   };
   /** Frozen actual grant, shown on the result screen and preserved on resume. */
-  rewardReceipt?: {cards:CardData[];blessings:BlessingDef[];equipment:EquipmentData[];lostCards:CardData[];hp:number;gold:number};
+  rewardReceipt?: {cards:CardData[];blessings:BlessingDef[];lostCards:CardData[];hp:number;gold:number};
 
   // flags & counters
   turnFlags: {
     blessingOnce: Record<string, boolean>;
     equipmentOnce?: Record<string, boolean>;
-    /** เล่นการ์ดไปแล้วกี่ใบในเทิร์นนี้ — การ์ดค่าร่ายลื่นอ่านค่านี้ */
+    /** เล่นการ์ดไปแล้วกี่ใบในเทิร์นนี้ */
     cardsPlayed?: number;
+    /** Card ids with `limit: 'turn'` already played this turn. */
+    limited?: string[];
+    /** Passive triggers with `once: 'turn'` already fired this turn. */
+    triggerOnce?: string[];
   };
   runCounters?: RunCounters;
   combatVictoryLock?: boolean;
 
   equipmentSlotsMax?: number;
-  equipmentTempSlots?: number; // Additional slots available during combat
-  equipped?: EquipmentData[];
-  backpack?: EquipmentData[];
-  equipment?: any[]; // Equipment inventory (unequipped items from shops)
+  /** Equipment cards in play this fight (oldest first); emptied after each fight. */
+  equipped?: CardData[];
+  /** Prayers waiting to resolve at the start of a later player turn. */
+  prayers?: Array<{ card: CardData; turnsLeft: number; mult: number }>;
   // Level up
   levelUp?: {
     dawnHandChoice?:boolean;
@@ -426,10 +398,6 @@ export type GameState = {
   // Starter
   starter?: { choices: BlessingDef[]; consumed?: boolean } | null;
 
-  runtime?: {
-    equipment?: EquipmentRuntimeState;
-  };
-
   // Shop Registry System
   shopRegistry?: PersistentShop[];
 };
@@ -444,14 +412,14 @@ export type Command =
 
   // Combat
   | { type: 'StartCombat'; monsterId: string }
-  | { type: 'PlayCard'; index: number }
+  /** `wait` (1–3) is chosen for prayer cards; longer waits multiply the effect. */
+  | { type: 'PlayCard'; index: number; wait?: number }
   | { type: 'EnemyPlayCard'; cardIndex: number }
   | { type: 'StartMonsterTurn' }
   | { type: 'EndTurn' }
   /** ทำเทิร์นศัตรูจบในทีเดียว แล้วคายผลออกมาทาง state.pendingEvents */
   | { type: 'ResolveEnemyTurn' }
   | { type: 'StartPlayerTurn' }
-  | { type: 'DiscardCard'; index: number }
 
   // Level Up
   | { type: 'ChooseLevelUp'; index?: number }
@@ -499,7 +467,6 @@ export type Command =
   | { type: 'DoHealingShrineUse' }
   | { type: 'DoHealingShrineDismiss' }
   | { type: 'UseHealingShrine' }
-  | { type: 'TakeShopEquipment'; index: number }
 
   // Pages
   | { type: 'ChooseOffer'; index: number }
@@ -507,34 +474,7 @@ export type Command =
   
   // Shop Management
   | { type: 'DeleteShop' }
-  | { type: 'DeleteShopFromMap'; index: number }
+  | { type: 'DeleteShopFromMap'; index: number };
 
-  // Equipment Management
-  | { type: 'EquipFromDeck'; cardId: string }
-  | { type: 'UnequipToDeck'; equipmentId: string }
-
-  // QA / Debug
-  | { type: 'QA_KillEnemy' }
-  | { type: 'QA_Draw'; count: number }
-  | { type: 'QA_SetEnergy'; value: number }
-  | { type: 'QA_AddBlessingDemo' }
-  | { type: 'QA_AddEquipmentDemo' }
-  | { type: 'QA_OpenShopHere' }
-  | { type: 'QA_OpenShrine' }
-  | { type: 'QA_OpenRemove' }
-  | { type: 'QA_OpenGamble' }
-  | { type: 'QA_OpenTreasure' }
-  | { type: 'QA_SpawnEquippedEnemy'; enemyId?: string }
-  // Status Effects Debug Commands
-  | { type: 'QA_ApplyStatusToPlayer'; statusId: string; stacks?: number; duration?: number }
-  | { type: 'QA_ApplyStatusToEnemy'; statusId: string; stacks?: number; duration?: number }
-  | { type: 'QA_ClearPlayerStatus' }
-  | { type: 'QA_ClearEnemyStatus' }
-  // Enemy Behavior Debug Commands
-  | { type: 'QA_TriggerEnemyBehavior' }
-  | { type: 'QA_ForcePhase2' }
-  | { type: 'QA_SetEnvironment' }
-  // Phase 4 Debug Commands - Adaptive AI
-  | { type: 'QA_LevelUp' };
 
 export type TurnCtx = { state: GameState };

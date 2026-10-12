@@ -27,7 +27,7 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings }: 
           <Text accessibilityRole="header" style={styles.detailTitle}>ข้อมูลผู้เดินทาง</Text>
           <Text style={styles.detailText}>{character.name} · เลเวล {p.level}</Text>
           <Text style={styles.detailText}>พลังชีวิต {p.hp}/{p.maxHp}</Text>
-          <Text style={styles.detailText}>พลังงาน {p.energy}/{p.maxEnergy}</Text>
+          <Text style={styles.detailText}>แต้ม {p.maxAp} · มานาตั้งต้น {p.startMana}</Text>
           <Text style={styles.detailText}>EXP {p.exp}/{p.expToNext}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel="ปิดข้อมูลผู้เดินทาง" onPress={() => setDetailsOpen(false)} style={styles.close}><Text style={styles.linkText}>กลับไปเลือกทาง</Text></Pressable>
         </RitualSurface>

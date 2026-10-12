@@ -109,7 +109,8 @@ export function computeModifiedDamage(
     dmg = dmg * VULNERABLE_MULTIPLIER;
   }
 
-  if (rules.defenderMods && to === 'player' && state.blessings?.some(b=>b.id==='luang_pu_protection')) dmg-=1;
+  // Armor from blessings and equipment cards reduces each hit on the player.
+  if (rules.defenderMods && to === 'player' && from === 'enemy') dmg -= require('../cards/passives').armor(state);
   return Math.max(0, Math.round(dmg));
 }
 
@@ -166,20 +167,6 @@ export function dealDamage(
     sourceKind,
   });
   if (died) emit(state, { t: 'Died', who: to });
-
-  // ★ ของประจำกายที่ทำงานตอนโดน/ทำดาเมจ (หนามสะท้อน, ลดดาเมจที่รับ)
-  //
-  // hook นี้มีมาตั้งแต่ต้นแต่ **ไม่เคยมีใครเรียก** — `luang_pu_amulet` (Rare)
-  // จึงเป็นของที่ผู้เล่นซื้อมาแล้วไม่เกิดอะไรขึ้นเลย
-  //
-  // ส่ง `hpLoss` ไม่ใช่ `modified`: ของพวกนี้พูดถึงดาเมจที่เข้าตัวจริง
-  // กัน block ไว้ได้หมด = ไม่มีอะไรให้สะท้อนหรือให้ลด
-  //
-  // ดาเมจที่มาจากของประจำกายเองไม่ยิง hook ซ้ำ — กันวนไม่รู้จบระหว่างของสองชิ้น
-  if (sourceKind !== 'equipment' && hpLoss > 0) {
-    const { runEquipmentDamageDealt } = require('../equipmentRuntime');
-    runEquipmentDamageDealt(state, { amount: hpLoss, side: from, target: to });
-  }
 
   const thorns=targetState.statusEffects?.find(e=>e.id==='thorns');
   if(isAttack&&modified>0&&thorns&&((from==='player'?state.player:state.enemy)?.hp??0)>0)dealDamage(state,{from:to,to:from,raw:thorns.stacks??thorns.value??1,source:{kind:'status',effectId:'thorns'}});

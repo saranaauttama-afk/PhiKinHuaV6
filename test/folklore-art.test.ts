@@ -35,7 +35,7 @@ describe('complete researched Thai ghost roster',()=>{
 
 describe('player card and blessing art coverage',()=>{
  it('every required artwork exists and player cards and blessings have distinct file content',()=>{
-  const hashes=new Map<string,string>();const playerIds=new Set(['cards','class_cards','trap_cards','curse_cards'].flatMap(f=>JSON.parse(read(`src/data/packs/base/${f}.json`))).map(c=>c.id));playerIds.add('qa_phra_prathan');
+  const hashes=new Map<string,string>();const playerIds=new Set(['cards','class_cards','curse_cards'].flatMap(f=>JSON.parse(read(`src/data/packs/base/${f}.json`))).map(c=>c.id));playerIds.add('qa_phra_prathan');
   for(const file of ['app/cardArt.ts','app/blessingArt.ts'])for(const [id,asset] of sources(file)){
    const location=path.resolve(root,path.dirname(file),asset);expect(fs.existsSync(location),id+' missing '+asset).toBe(true);
    if(file==='app/blessingArt.ts'||playerIds.has(id)){const hash=createHash('sha256').update(fs.readFileSync(location)).digest('hex');expect(hashes.get(hash),id+' duplicates '+hashes.get(hash)).toBeUndefined();hashes.set(hash,id);}
@@ -45,7 +45,7 @@ describe('player card and blessing art coverage',()=>{
 
  it('every player card has an individual wired image, including traps and curses',()=>{
   const art=sources('app/cardArt.ts');
-  const cards=['cards','class_cards','trap_cards','curse_cards'].flatMap(f=>JSON.parse(read(`src/data/packs/base/${f}.json`)));
+  const cards=['cards','class_cards','curse_cards'].flatMap(f=>JSON.parse(read(`src/data/packs/base/${f}.json`)));
   const used=new Map<string,string>();
   for(const card of cards){
    const file=art.get(card.id);

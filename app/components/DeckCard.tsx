@@ -5,7 +5,8 @@ import { CARD_ART_SOURCES, GRAY_CARD_ART_SOURCES } from '../cardArt';
 import { cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
 import { font, paper } from '../theme';
-import {upgradeLevelOf} from '../../src/core/engine/shared';
+import {costLabel} from '../../src/core/cards/describe';
+import {starOf} from '../../src/core/cards/model';
 import CardBadges from './CardBadges';
 import CandleSelection from './CandleSelection';
 
@@ -30,15 +31,13 @@ export function CardFace({card,count}:{card:CardData;count?:number}) {
   <CardBadges card={card}/>
   <View style={styles.symbol}><CardGlyphArt card={card}/></View>
   <Text style={styles.name}>{card.name??card.id}</Text>
-  {upgradeLevelOf(card)>0&&<Text style={styles.note}>ปลุกเสกขั้น {upgradeLevelOf(card)}</Text>}
   <Text style={[styles.summary,{color:card.type==='attack'?paper.red:paper.ink}]}>{cardSummary(card)}</Text>
-  {!!card.desc&&!card.upgraded&&<Text style={styles.summary}>{card.desc}</Text>}
+  {!!card.flavor&&<Text style={styles.summary}>{card.flavor}</Text>}
   {count!=null&&<Text style={styles.note}>×{count} ใบ</Text>}
-  {(card.exhaust||card.type==='trap')&&<Text style={styles.note}>ใช้แล้วหายจากไฟต์</Text>}
  </RitualSurface>;
 }
 export default function DeckCard({card,count,onPress,selected=false,dim=false,fullWidth=false}:{card:CardData;count?:number;onPress:()=>void;selected?:boolean;dim?:boolean;fullWidth?:boolean}) {
- return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`พลังงาน ${card.cost??0} · ขั้น ${upgradeLevelOf(card)} · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,fullWidth&&{width:'100%'}]}>
+ return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${costLabel(card)} · ${starOf(card)} ดาว · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,fullWidth&&{width:'100%'}]}>
   <CandleSelection selected={selected} dim={dim}><CardFace card={card} count={count}/></CandleSelection>
  </Pressable>;
 }

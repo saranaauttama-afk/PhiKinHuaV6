@@ -16,9 +16,9 @@ function run(id='archive-a',difficulty:1|2|3|4|5=1){
  return {get s(){return s;},get rng(){return rng;},step};
 }
 describe('archive catalog and real discoveries',()=>{
- it('lists all 34 unique ghosts in staged groups and 117 core identities plus 5 special entries',()=>{
-  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);expect(CORE_CARD_IDS.size).toBe(117);
-  expect(CARD_CATALOG).toHaveLength(122);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(122);
+ it('lists all 34 unique ghosts in staged groups and 106 core identities plus 4 curses and the test card',()=>{
+  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);expect(CORE_CARD_IDS.size).toBe(106);
+  expect(CARD_CATALOG).toHaveLength(111);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(111);
   expect(GHOST_CATALOG.filter(g=>g.group==='บอสแต่ละคืน').map(g=>g.night)).toEqual([1,2,3,4,5]);
   expect(GHOST_CATALOG.at(-1)?.id).toBe('phi-kin-hua');
  });
@@ -26,7 +26,7 @@ describe('archive catalog and real discoveries',()=>{
   const r=run();const visible=r.s.pages!.current!.offers.filter(o=>o?.kind==='monster');expect(Object.keys(r.s.discovery!.ghosts)).toHaveLength(visible.length);
   expect(Object.keys(r.s.discovery!.cards).length).toBeGreaterThan(0);
   const id=Object.keys(r.s.discovery!.ghosts)[0],p=mergeDiscovery(emptyArchive(),r.s.discovery!);
-  const fight=r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster');r.step({type:'ChooseOffer',index:fight});r.s.enemy!.statusEffects=[];r.s.piles.hand=[{id:'k',name:'k',type:'attack',cost:0,dmg:9999} as any];r.step({type:'PlayCard',index:0});for(let g=0;g<20&&r.s.phase!=='map';g++)r.step(r.s.phase==='levelup'?(r.s.levelUp?.dawnHandChoice?{type:'ChooseLevelUpOption',option:'A'}:{type:'SkipLevelUp'}):r.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});const next=mergeDiscovery(p,r.s.discovery!);
+  const fight=r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster');r.step({type:'ChooseOffer',index:fight});r.s.enemy!.statusEffects=[];r.s.piles.hand=[{id:'k',name:'k',type:'attack',fx:{dmg:9999}} as any];r.step({type:'PlayCard',index:0});for(let g=0;g<20&&r.s.phase!=='map';g++)r.step(r.s.phase==='levelup'?(r.s.levelUp?.dawnHandChoice?{type:'ChooseLevelUpOption',option:'A'}:{type:'SkipLevelUp'}):r.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});const next=mergeDiscovery(p,r.s.discovery!);
   expect(archiveProgress(next).ghosts[id].seen).toBe(1);expect(Object.keys(r.s.discovery!.ghosts).length).toBeGreaterThan(1);
  });
  it('viewing or leaving a shop does not discover its stock; buying records only the acquired card',()=>{
@@ -51,7 +51,7 @@ describe('archive catalog and real discoveries',()=>{
  it('new runs accumulate independently while seed, card upgrades and copies do not create extra identities',()=>{
   const a=run('a',1),b=run('b',2);let p=mergeDiscovery(emptyArchive(),a.s.discovery!);p=mergeDiscovery(p,b.s.discovery!);
   const card=a.s.masterDeck[0];expect(archiveProgress(p).cards[card.id].seen).toBe(2);
-  const count=Object.keys(a.s.discovery!.cards).length;a.s.masterDeck.push({...card,upgraded:true,upgradeLevel:2});trackDiscovery(a.s,a.s);
+  const count=Object.keys(a.s.discovery!.cards).length;a.s.masterDeck.push({...card,star:3});trackDiscovery(a.s,a.s);
   expect(Object.keys(a.s.discovery!.cards)).toHaveLength(count);
  });
  it('rejects corrupt progress rather than granting discoveries',()=>{

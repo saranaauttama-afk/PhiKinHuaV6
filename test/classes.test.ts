@@ -6,7 +6,9 @@ import type { PageOffer } from '../src/core/map/pages';
 import {
   ALL_CLASS_IDS, CHARACTER_CLASSES, buildStarterDeck, getClass, type ClassId,
 } from '../src/core/classes';
-import { ALL_CARDS } from '../src/core/pack';
+import { ALL_CARDS, CARD_LIST_WITH_STARTERS } from '../src/core/pack';
+import { starFx } from '../src/core/cards/model';
+import { CARD_RULES } from '../src/core/balance/notfm';
 import { rollThreeCards } from '../src/core/level';
 import { rollShopStock } from '../src/core/shop';
 
@@ -37,49 +39,28 @@ function enterFight(classId: ClassId, seed = 'cls'): GameState {
   return s;
 }
 
-describe('นิยามคลาส', () => {
-  it('ทุกคลาสมีการ์ดตั้งต้นครบ ไม่มีใบไหนหาไม่เจอ', () => {
-    for (const id of ALL_CLASS_IDS) {
-      const cls = CHARACTER_CLASSES[id];
-      const known = new Set(ALL_CARDS.map(c => c.id));
-      const missing = Object.keys(cls.starterDeck).filter(cid => !known.has(cid));
-      expect(missing, `คลาส ${cls.name}`).toEqual([]);
-    }
-  });
+const starter = (id: ClassId) => buildStarterDeck(CHARACTER_CLASSES[id], CARD_LIST_WITH_STARTERS);
 
-  it('เด็คตั้งต้นของทุกคลาสมีจำนวนใบพอเล่น', () => {
-    for (const id of ALL_CLASS_IDS) {
-      const deck = buildStarterDeck(CHARACTER_CLASSES[id], ALL_CARDS);
-      expect(deck.length, `คลาส ${id}`).toBeGreaterThanOrEqual(8);
-    }
+describe('นิยามคลาส', () => {
+  it('เด็คตั้งต้นของทุกคลาสมี 10 ใบ', () => {
+    for (const id of ALL_CLASS_IDS) expect(starter(id).length, `คลาส ${id}`).toBe(10);
   });
 
   it('แต่ละคลาสมีเด็คต่างกันจริง', () => {
-    const signatures = ALL_CLASS_IDS.map(id =>
-      buildStarterDeck(CHARACTER_CLASSES[id], ALL_CARDS)
-        .map(c => c.id).sort().join(',')
-    );
+    const signatures = ALL_CLASS_IDS.map(id => starter(id).map(c => c.id).sort().join(','));
     expect(new Set(signatures).size).toBe(ALL_CLASS_IDS.length);
   });
 
   it('ทุกคลาสมีทั้งการ์ดโจมตีและการ์ดป้องกัน/ฟื้นฟู', () => {
     for (const id of ALL_CLASS_IDS) {
-      const deck = buildStarterDeck(CHARACTER_CLASSES[id], ALL_CARDS);
-      expect(deck.some(c => (c.dmg ?? 0) > 0), `คลาส ${id} ไม่มีการ์ดโจมตี`).toBe(true);
-      expect(
-        deck.some(c => (c.block ?? 0) > 0 || (c.heal ?? 0) > 0),
-        `คลาส ${id} ไม่มีการ์ดป้องกันหรือฟื้นฟู`
-      ).toBe(true);
+      const deck = starter(id).map(starFx);
+      expect(deck.some(f => (f.dmg ?? 0) > 0), `คลาส ${id} ไม่มีการ์ดโจมตี`).toBe(true);
+      expect(deck.some(f => (f.block ?? 0) > 0 || (f.heal ?? 0) > 0), `คลาส ${id} ไม่มีการ์ดป้องกันหรือฟื้นฟู`).toBe(true);
     }
   });
 
-  it('การ์ดของคลาสติดแท็กของคลาสตัวเอง', () => {
-    for (const id of ALL_CLASS_IDS) {
-      const cls = CHARACTER_CLASSES[id];
-      for (const c of buildStarterDeck(cls, ALL_CARDS)) {
-        expect(c.tags ?? [], `${c.id} ในเด็ค ${id}`).toContain(cls.cardTag);
-      }
-    }
+  it('การ์ดตั้งต้นเป็นของคลาสตัวเอง', () => {
+    for (const id of ALL_CLASS_IDS) for (const c of starter(id)) expect(c.class, `${c.id} ในเด็ค ${id}`).toBe(id);
   });
 });
 
@@ -91,19 +72,16 @@ describe('เริ่มรันด้วยคลาส', () => {
       expect(s.classId).toBe(id);
       expect(s.player.maxHp).toBe(cls.startHp);
       expect(s.player.hp).toBe(cls.startHp);
-      // Every run uses the shared v33 hand: 2 energy, 2 retained cards.
-      expect(s.player.maxEnergy).toBe(2);
-      expect(s.player.maxHandSize).toBe(2);
+      expect(s.player.startMana).toBe(cls.startMana);
+      expect(s.player.maxAp).toBe(CARD_RULES.apPerTurn);
+      expect(s.player.handMax).toBe(CARD_RULES.handMax);
     }
   });
 
   it('masterDeck เป็นเด็คของคลาสนั้น', () => {
     for (const id of ALL_CLASS_IDS) {
       const s = startRun(id);
-      const cls = CHARACTER_CLASSES[id];
-      // Campaign runs cap each starter entry at two copies.
-      const expected = buildStarterDeck({ ...cls, starterDeck: Object.fromEntries(Object.entries(cls.starterDeck).map(([k, n]) => [k, Math.min(2, n as number)])) } as any, ALL_CARDS);
-      expect(s.masterDeck.map(c => c.id).sort()).toEqual(expected.map(c => c.id).sort());
+      expect(s.masterDeck.map(c => c.id).sort()).toEqual(starter(id).map(c => c.id).sort());
     }
   });
 
@@ -125,9 +103,9 @@ describe('พรติดตัวของคลาส', () => {
     expect(s.player.block).toBeGreaterThan(0);
   });
 
-  it('หมอผีเริ่มไฟต์ด้วยพลังงานมากกว่าค่าปกติของตัวเอง', () => {
+  it('หมอผีเริ่มไฟต์ด้วยมานามากกว่ามานาตั้งต้น', () => {
     const s = enterFight('shaman');
-    expect(s.player.energy).toBeGreaterThan(s.player.maxEnergy);
+    expect(s.player.mana).toBeGreaterThan(s.player.startMana);
   });
 
 
@@ -140,7 +118,7 @@ describe('พรติดตัวของคลาส', () => {
 
     if (s.enemy) s.enemy.statusEffects = [];
 
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('nun')).state;
 
     expect(after.player.hp).toBeGreaterThan(before);
@@ -154,7 +132,7 @@ describe('พรติดตัวของคลาส', () => {
 
     if (s.enemy) s.enemy.statusEffects = [];
 
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('war')).state;
 
     expect(after.player.hp).toBe(before);
@@ -168,7 +146,7 @@ describe('การ์ดฟื้นพลังชีวิตทำงาน�
     const before = s.player.hp;
 
     s.piles.hand = [
-      { id: 'holy_water', name: 'น้ำมนต์', type: 'skill', cost: 0, heal: 7, instanceId: 'h1' },
+      { id: 'holy_water', name: 'น้ำมนต์', type: 'action', ap: 0, fx: { heal: 7 }, instanceId: 'h1' },
     ];
     const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('heal')).state;
 
@@ -180,7 +158,7 @@ describe('การ์ดฟื้นพลังชีวิตทำงาน�
     s.player.hp = s.player.maxHp - 2;
 
     s.piles.hand = [
-      { id: 'holy_water', name: 'น้ำมนต์', type: 'skill', cost: 0, heal: 99, instanceId: 'h1' },
+      { id: 'holy_water', name: 'น้ำมนต์', type: 'action', ap: 0, fx: { heal: 99 }, instanceId: 'h1' },
     ];
     const after = applyCommand(s, { type: 'PlayCard', index: 0 }, makeRng('heal')).state;
 
@@ -189,23 +167,19 @@ describe('การ์ดฟื้นพลังชีวิตทำงาน�
 });
 
 describe('รางวัลและร้านค้าจำกัดตามคลาส', () => {
-  it('การ์ดรางวัลตอนเลเวลอัปเป็นของคลาสที่เล่นอยู่', () => {
+  it('การ์ดรางวัลตอนเลเวลอัปเป็นของคลาสที่เล่นอยู่หรือกลาง', () => {
     for (const id of ALL_CLASS_IDS) {
-      const tag = CHARACTER_CLASSES[id].cardTag;
-      const { list } = rollThreeCards(makeRng(`rw-${id}`), 9, tag);
-      for (const c of list) {
-        expect(c.tags ?? [], `${c.id} ไม่ใช่การ์ดของ ${id}`).toContain(tag);
-      }
+      const { list } = rollThreeCards(makeRng(`rw-${id}`), 9, id);
+      for (const c of list) expect([undefined, id], `${c.id} ไม่ใช่การ์ดของ ${id}`).toContain(c.class);
     }
   });
 
-  it('ร้านขายเฉพาะการ์ดของคลาสที่เล่นอยู่', () => {
+  it('ร้านขายเฉพาะการ์ดของคลาสที่เล่นอยู่หรือกลาง', () => {
     for (const id of ALL_CLASS_IDS) {
-      const tag = CHARACTER_CLASSES[id].cardTag;
-      const { items } = rollShopStock(makeRng(`sh-${id}`), 6, 1, tag);
+      const { items } = rollShopStock(makeRng(`sh-${id}`), 6, 1, id);
       for (const it of items) {
         if (!('card' in it)) continue;
-        expect(it.card.tags ?? [], `${it.card.id} ไม่ใช่การ์ดของ ${id}`).toContain(tag);
+        expect([undefined, id], `${it.card.id} ไม่ใช่การ์ดของ ${id}`).toContain(it.card.class);
       }
     }
   });

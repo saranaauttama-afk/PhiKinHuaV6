@@ -1,29 +1,34 @@
 // scripts/pilot.ts — automated player for balance runs.
 //
 // Plays one full three-night run with real commands only (no QA card, no state edits),
-// deciding from the public board: visible hand, energy, enemy HP/block/statuses.
+// deciding from the public board: visible hand, points, mana, enemy HP/block/statuses.
 // Every fight is recorded, including the one that ends the run.
-import {requiredDiscards} from '../src/core/cards/hand';
 import {baseNewState} from '../src/core/commands';
 import {applyCommand} from '../src/core/reducer';
 import {makeRng,int,type RNG} from '../src/core/rng';
-import {cardsPlayedThisTurn,effectiveCost,withConditional,conditionMet} from '../src/core/cards/mechanics';
-import {canPlayAttackCards} from '../src/core/statusEffectsRuntime';
+import {cardsPlayedThisTurn,conditionMet} from '../src/core/cards/mechanics';
+import {cardCost,cardFx,playBlock,starFx} from '../src/core/cards/model';
+import {canUpgrade} from '../src/core/engine/shared';
 import {isCriticalOffer} from '../src/core/map/adventure';
 import type {ClassId} from '../src/core/classes';
 import type {Difficulty} from '../src/core/campaign/threeNight';
-import type {Command,CardData,GameState} from '../src/core/types';
+import type {Command,CardData,Fx,GameState} from '../src/core/types';
 
 export type FightKind='normal'|'elite'|'boss';
 export type FightRecord={night:number;index:number;enemyId:string;kind:FightKind;turns:number;hpBefore:number;hpAfter:number;maxHp:number;won:boolean};
 export type RunRecord={seed:string;classId:ClassId;difficulty:Difficulty;won:boolean;stalled:boolean;nightReached:number;fights:FightRecord[];deck:number;level:number;gold:number;turns:number;plays:number};
 
-/** Rough value per energy, used for rewards, removal and forced discards. */
-export const cardValue=(c:CardData)=>((c.dmg??0)*(c.hits??1)+(c.block??0)*.6+(c.draw??0)*4+(c.energyGain??0)*5+(c.heal??0)*.6+(c.statusEffect?6:0)+(c.conditional?7:0))/Math.max(1,c.cost);
+const fxValue=(fx:Fx)=>(fx.dmg??0)*(fx.hits??1)+(fx.block??0)*.6+(fx.draw??0)*4+(fx.mana??0)*2+(fx.heal??0)*.6+(fx.status??[]).reduce((n,e)=>n+e.stacks*2.5,0)+(fx.borrow??0)*5;
+/** Rough worth per resource spent; used for rewards, shop and removal. */
+export const cardValue=(c:CardData)=>{
+ const fx=starFx(c);let v=fxValue(fx)+(c.conditional?fxValue(c.conditional.bonus)*.5:0)+(c.equip?8:0)+(c.counter?4:0)+(c.type==='prayer'?fxValue(fx)*.6:0);
+ if(c.exhaust)v*=.8;
+ return v/Math.max(1,(c.ap??0)+(c.mana??0)/2.5);
+};
 
-/** Highest-scoring affordable card, judged from what a player can see. -1 = end turn. */
+/** Next card to play from what a player can see, or -1 to end the turn. */
 export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string):number{
- const playable=s.piles.hand.map((c,i)=>({c,i})).filter(({c})=>c.type!=='curse'&&effectiveCost(s,c)<=s.player.energy&&(c.type!=='attack'||canPlayAttackCards(s)));
+ const playable=s.piles.hand.map((c,i)=>({c,i})).filter(({c})=>!playBlock(s,c));
  if(!playable.length)return -1;
  if(!tactical)return playable[int(makeRng(decisionSeed),0,playable.length-1).value].i;
  const strength=s.enemy?.statusEffects?.find(e=>e.id==='strength')?.stacks??0;
@@ -31,22 +36,26 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
  const guardNeed=Math.max(0,threat-s.player.block);
  const low=s.player.hp<s.player.maxHp*.4;
  const score=(card:CardData)=>{
-  const c=withConditional(s,card);
+  // Free resource builders first: mana and equipment pay off for the rest of the fight.
+  if(card.type==='mana')return 100;
+  if(card.type==='equipment')return 90;
+  if(card.type==='counter')return 60;
+  const c=cardFx(s,card);
   let v=Math.max(0,(c.dmg??0)*(c.hits??1)-(s.enemy?.block??0)*.45)*1.2;
   v+=Math.min(c.block??0,guardNeed)*(low?1.15:.6);
   v+=Math.min(c.heal??0,s.player.maxHp-s.player.hp)*.8;
-  v+=(c.energyGain??0)*5+(c.draw??0)*1.8;
-  if(c.statusEffect){const e=c.statusEffect;v+=e.effect==='poison'?e.value*2.2:e.effect==='strength'?e.value*4:e.effect==='weakness'?4:e.effect==='regeneration'?Math.min(6,s.player.maxHp-s.player.hp)*.7:3;}
-  if(c.cleanseDebuffs)v+=(s.player.statusEffects??[]).filter(e=>e.id==='poison'||e.id==='weakness').length*4;
+  v+=(c.draw??0)*1.8+(c.mana??0)+(c.borrow??0)*5;
+  for(const e of c.status??[])v+=e.id==='poison'?e.stacks*e.turns*.8:e.id==='strength'?e.stacks*4:e.id==='regeneration'?Math.min(6,s.player.maxHp-s.player.hp)*.7:3;
+  if(c.cleanse)v+=(s.player.statusEffects??[]).filter(e=>e.id==='poison'||e.id==='weakness').length*4;
+  if(card.type==='prayer')v*=1.4;
   for(const follow of s.piles.hand){
-   if(follow===card||effectiveCost(s,follow)+effectiveCost(s,card)>s.player.energy)continue;
-   const cond=follow.conditional;
-   if(cond&&!conditionMet(s,cond.when,follow)){
-    if(cond.when.kind==='player_block_at_least'&&(c.block??0)+s.player.block>=cond.when.value)v+=(cond.bonus.dmg??0)*.9;
-    if(cond.when.kind==='enemy_has_status'&&c.statusEffect?.target==='enemy'&&c.statusEffect.effect===cond.when.statusId)v+=((cond.bonus.dmg??0)+(cond.bonus.block??0)+(cond.bonus.draw??0)*2)*.8;
-   }
+   const cond=follow.conditional;if(follow===card||!cond||conditionMet(s,cond.when,follow))continue;
+   if(cond.when.kind==='player_block_at_least'&&(c.block??0)+s.player.block>=cond.when.value)v+=(cond.bonus.dmg??0)*.9;
+   if(cond.when.kind==='enemy_has_status'&&c.status?.some(e=>e.to==='enemy'&&cond.when.kind==='enemy_has_status'&&e.id===cond.when.statusId))v+=((cond.bonus.dmg??0)+(cond.bonus.block??0))*.8;
   }
-  return v/Math.max(1,effectiveCost(s,card));
+  const cost=cardCost(s,card);
+  // Free cards cost nothing now; paid cards compete for this turn's points and mana.
+  return v/Math.max(1,cost.ap*1.5+cost.mana/2);
  };
  return playable.map(({c,i})=>({i,v:score(c)})).sort((a,b)=>b.v-a.v||a.i-b.i)[0].i;
 }
@@ -77,11 +86,10 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   if(s.phase==='combat'){
    for(let plays=0;s.phase==='combat'&&plays<32;plays++){
     const i=choosePilotCard(s,tactical,`${seed}:decision:${steps}`);if(i<0)break;
-    const before=cardsPlayedThisTurn(s);go({type:'PlayCard',index:i});
+    const before=cardsPlayedThisTurn(s);go({type:'PlayCard',index:i,wait:s.piles.hand[i]?.type==='prayer'&&(s.enemy?.hp??0)>30&&s.player.hp>s.player.maxHp*.5?2:1});
     if(s.phase==='combat'&&cardsPlayedThisTurn(s)===before){stalled=true;break;}
    }
    if(s.phase!=='combat')continue;
-   while(requiredDiscards(s)>0){const rank=s.piles.hand.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);go({type:'DiscardCard',index:rank[0].i});}
    go({type:'ResolveEnemyTurn'});
    if(s.phase==='combat')go({type:'StartPlayerTurn'});
    if(s.turn>60){stalled=true;break;}
@@ -89,16 +97,16 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   }
   if(s.phase==='levelup'){
    const choice=s.levelUp?.choice;
-   if(!choice){go(s.levelUp?.dawnHandChoice?{type:'ChooseLevelUpOption',option:'A'}:{type:'SkipLevelUp'});continue;}
-   const priority=(k:string)=>k==='max_energy'?12:k==='draw_per_turn'?10:k==='max_hand'?9:k==='upgrade'?8:k==='blessing'?7:k==='max_hp'?6:k==='remove'?5:1;
+   if(!choice){go({type:'SkipLevelUp'});continue;}
+   const priority=(k:string)=>k==='upgrade'?8:k==='blessing'?7:k==='max_hp'?6:k==='remove'?5:k==='equipment_slot'?4:1;
    const option=priority(choice.optionA)>=priority(choice.optionB)?'A':'B';const kind=option==='A'?choice.optionA:choice.optionB;
-   const ranked=s.masterDeck.map((c,i)=>({i,v:cardValue(c),u:c.upgradeLevel??0})).sort((a,b)=>kind==='remove'?a.v-b.v:b.v-a.v);
-   const index=kind==='blessing'?0:ranked.find(x=>kind!=='upgrade'||x.u<3)?.i??0;
+   const ranked=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).sort((a,b)=>kind==='remove'?a.v-b.v:b.v-a.v);
+   const index=kind==='blessing'?0:ranked.find(x=>kind!=='upgrade'||x.ok)?.i??0;
    go({type:'ChooseLevelUpOption',option,index});continue;
   }
   if(s.phase==='reward'){
    const ranked=(s.cardReward?.choices??[]).map((c,i)=>({i,c,v:cardValue(c)})).sort((a,b)=>b.v-a.v);
-   const best=ranked[0];const pick=best&&(s.masterDeck.length<14||best.v>=15)&&!s.masterDeck.some(c=>c.id===best.c.id);
+   const best=ranked[0];const pick=best&&(s.masterDeck.length<16||best.v>=12);
    go(pick?{type:'ChooseCardReward',index:best.i}:{type:'SkipCardReward'});continue;
   }
   if(s.phase==='victory'){go({type:'CompleteNode'});continue;}
@@ -119,7 +127,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    if(s.shopKind==='well')go({type:'UseWell'});
    if(s.shopKind==='healing')go({type:'UseHealingShrine'});
    if((s.shopKind==='treasure'||s.shopKind==='treasure_single')&&s.shopStock?.length)go({type:s.shopKind==='treasure'?'TakeTreasureCard':'TakeSingleTreasureCard',index:0});
-   if(s.shopKind==='upgrade'){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),u:c.upgradeLevel??0})).filter(x=>x.u<3).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'ShopUpgradeBuy',index:rank[0].i});}
+   if(s.shopKind==='upgrade'){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'ShopUpgradeBuy',index:rank[0].i});}
    if(s.shopKind==='remove'&&s.masterDeck.length>8){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);go({type:'ShopRemoveBuy',index:rank[0].i});}
    if(s.shopKind==='card'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&it.price<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
    if(s.phase==='shop')go({type:'CompleteNode'});

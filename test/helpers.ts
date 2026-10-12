@@ -12,7 +12,8 @@ export function makeCombatState(opts: {
   hand?: CardData[];
   playerHp?: number;
   playerBlock?: number;
-  playerEnergy?: number;
+  playerAp?: number;
+  playerMana?: number;
   enemyHp?: number;
   enemyBlock?: number;
   monsterId?: string;
@@ -26,7 +27,8 @@ export function makeCombatState(opts: {
   state.player.hp = opts.playerHp ?? 50;
   state.player.maxHp = Math.max(state.player.maxHp, state.player.hp);
   state.player.block = opts.playerBlock ?? 0;
-  state.player.energy = opts.playerEnergy ?? 3;
+  state.player.ap = opts.playerAp ?? 2;
+  state.player.mana = opts.playerMana ?? 0;
 
   if (state.enemy) {
     // Controlled combat fixtures use a three-energy budget; live v34 normal encounters use two.
@@ -117,9 +119,9 @@ export function resolveRewardIfAny(
 }
 
 export function attackCard(dmg: number, over: Partial<CardData> = {}): CardData {
-  return { id: 'test_attack', name: 'Test Attack', type: 'attack', cost: 0, dmg, ...over };
+  return { id: 'test_attack', name: 'Test Attack', type: 'attack', fx: { dmg }, ...over };
 }
 
 export function blockCard(block: number, over: Partial<CardData> = {}): CardData {
-  return { id: 'test_block', name: 'Test Block', type: 'skill', cost: 0, block, ...over };
+  return { id: 'test_block', name: 'Test Block', type: 'action', ap: 0, fx: { block }, ...over };
 }

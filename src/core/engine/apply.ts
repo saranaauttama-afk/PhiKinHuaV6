@@ -4,7 +4,7 @@ import type { RNG } from '../rng';
 import {trackRun} from '../campaign/metrics';
 import {trackDiscovery} from '../archive/progress';
 import { cloneForReducer } from './shared';
-import {effectiveCost} from '../cards/mechanics';
+import {cardCost} from '../cards/model';
 import {recordCardHistory, historySnapshot} from '../combat/cardHistory';
 import {captureRewardReceipt} from '../rewardReceipt';
 
@@ -13,9 +13,7 @@ import * as combat from './handlers/combat';
 import * as mappages from './handlers/map_pages';
 import * as lvl from './handlers/level';
 import * as se from './handlers/shops_events';
-import * as qa from './handlers/qa';
 import * as ui from './handlers/ui';
-import * as equipment from './handlers/equipment';
 import * as story from './handlers/story';
 import * as chapter from './handlers/chapter';
 import * as cardReward from './handlers/cardReward';
@@ -38,15 +36,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EndTurn: combat.endTurn,
   ResolveEnemyTurn: combat.resolveEnemyTurn,
   StartPlayerTurn: combat.startPlayerTurnHandler,
-  DiscardCard: (s, cmd, r) => {
-    if (s.phase !== 'combat') return { state: s, rng: r };
-    const { index } = cmd;
-    if (index < 0 || index >= s.piles.hand.length) return { state: s, rng: r };
-    if(s.piles.hand[index].id===require('../cards/testWin').TEST_WIN_CARD_ID)return {state:s,rng:r};
-    const [c] = s.piles.hand.splice(index, 1);
-    s.piles.discard.push(c);
-    return { state: s, rng: r };
-  },
+
 
   // Node completion (victory/levelup/shop/event) → pages handler
   CompleteNode: mappages.completeNode,
@@ -64,10 +54,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   // UI
   OpenDeck: ui.openDeck,
   CloseDeck: ui.closeDeck,
-
-  // Equipment Management
-  EquipFromDeck: equipment.equipFromDeck,
-  UnequipToDeck: equipment.unequipToDeck,
 
   // Shops & Events
   // TakeReward: se.takeReward, // (เลิกใช้: reward-on-victory ถูกตัด)
@@ -92,7 +78,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   DoHealingShrineUse: se.doHealingShrineUse,
   DoHealingShrineDismiss: se.doHealingShrineDismiss,
   UseHealingShrine: se.useHealingShrine,
-  TakeShopEquipment: se.takeShopEquipment,
 
   // Pages mode
   ChooseOffer: mappages.choose,
@@ -102,31 +87,6 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   DeleteShop: mappages.deleteShop,
   DeleteShopFromMap: mappages.deleteShopFromMap,
 
-  // QA - Status Effects & Enemy Behavior
-  QA_ApplyStatusToPlayer: qa.qaApplyStatusToPlayer,
-  QA_ApplyStatusToEnemy: qa.qaApplyStatusToEnemy,
-  QA_ClearPlayerStatus: qa.qaClearPlayerStatus,
-  QA_ClearEnemyStatus: qa.qaClearEnemyStatus,
-  QA_TriggerEnemyBehavior: qa.qaTriggerEnemyBehavior,
-  QA_ForcePhase2: qa.qaForcePhase2,
-  
-  // QA - Environment & Minions  
-  QA_SetEnvironment: qa.qaSetEnvironment,
-  
-  // QA - Phase 4: Adaptive AI
-  QA_LevelUp: qa.qaLevelUp,
-
-  // QA - Original
-  QA_KillEnemy: qa.qaKillEnemy,
-  QA_Draw: qa.qaDraw,
-  QA_SetEnergy: qa.qaSetEnergy,
-  QA_AddBlessingDemo: qa.qaAddBlessingDemo,
-  QA_OpenShopHere: qa.qaOpenShop,
-  QA_OpenShrine: qa.qaOpenShrine,
-  QA_OpenRemove: qa.qaOpenRemove,
-  QA_OpenGamble: qa.qaOpenGamble,
-  QA_OpenTreasure: qa.qaOpenTreasure,
-  QA_SpawnEquippedEnemy: qa.qaSpawnEquippedEnemy,
 };
 
 export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
@@ -138,7 +98,7 @@ export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
   s.pendingEvents = [];
 
   const historyBefore = cmd.type==='PlayCard'&&state.phase==='combat'&&state.piles?.hand[cmd.index]?historySnapshot(state):undefined;
-  const historyCost = cmd.type==='PlayCard'&&state.phase==='combat'&&state.piles?.hand[cmd.index]?effectiveCost(state,state.piles.hand[cmd.index]):0;
+  const historyCost = cmd.type==='PlayCard'&&state.phase==='combat'&&state.piles?.hand[cmd.index]?cardCost(state,state.piles.hand[cmd.index]):{ap:0,mana:0};
   const h = H[cmd.type] as Handler<typeof cmd.type> | undefined;
   if (h) {const out=h(s,cmd as any,rng);
     if(cmd.type==='PlayCard' && historyBefore && (out.state.turnFlags?.cardsPlayed??0)>(state.turnFlags?.cardsPlayed??0)){

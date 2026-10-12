@@ -13,7 +13,7 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   fear: {
     id: 'fear',
     name: 'ความกลัว',
-    description: 'ลดพลังงาน 1 และทิ้งไพ่สุ่ม 1 ใบ',
+    description: 'ต้นเทิร์นแต้ม Action ลดลง 1',
     defaultDuration: 2,
     stackable: true,
     maxStacks: 3,
@@ -53,7 +53,7 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   corruption: {
     id: 'corruption',
     name: 'ความเสื่อม',
-    description: 'ไพ่ในมือใช้พลังงานเพิ่ม +1',
+    description: 'การ์ดที่ใช้แต้มหรือมานาแพงขึ้นตามชั้น',
     defaultDuration: 3,
     stackable: false,
     tags: ['debuff', 'energy_manipulation'],
@@ -155,8 +155,8 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   dodge:{id:'dodge',name:'หลบครั้งถัดไป',description:'หลบการโจมตีถัดไปหนึ่งครั้ง ไม่หลบพิษหรือความเสียหายจากสถานะ',defaultDuration:1,stackable:true,maxStacks:2,tags:['buff','protection']},
   energy_boost: {
     id: 'energy_boost',
-    name: 'เพิ่มพลังงาน',
-    description: 'ได้พลังงานเพิ่มเทิร์นต่อไปตามจำนวนชั้น',
+    name: 'แต้มเพิ่ม',
+    description: 'ต้นเทิร์นได้แต้ม Action เพิ่มตามชั้น',
     defaultDuration: 1,
     stackable: true,
     tags: ['buff', 'energy_manipulation'],

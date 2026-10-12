@@ -152,7 +152,7 @@ export function fromSave(data: SaveData): GameState {
     chapter: undefined,
     deckOpen: false,
     combatVictoryLock: false,
-    player: { ...s.player, block: 0, energy: s.player.maxEnergy },
+    player: { ...s.player, block: 0, ap: s.player.maxAp },
     log: [...(s.log ?? []), 'โหลดการเดินทางที่ค้างไว้'],
   };
 }

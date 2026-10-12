@@ -64,7 +64,7 @@ function playRun(seed: string, classId: string, take: boolean) {
     // ฆ่าให้จบในทีเดียว — เทสต์นี้วัดรางวัล ไม่ได้วัดการต่อสู้
     if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [
-      { id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' },
+      { id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' },
     ];
     go({ type: 'PlayCard', index: 0 });
 
@@ -129,15 +129,8 @@ describe('การ์ดรางวัล — สำรับโตจริ�
 describe('การ์ดรางวัล — การ์ดที่ได้ตรงคลาส', () => {
   for (const classId of Object.keys(CHARACTER_CLASSES)) {
     it(`${classId} ไม่ได้การ์ดของคลาสอื่นติดมา`, () => {
-      const tag = CHARACTER_CLASSES[classId as keyof typeof CHARACTER_CLASSES].cardTag;
-      const otherTags = Object.values(CHARACTER_CLASSES)
-        .map(c => c.cardTag)
-        .filter(t => t !== tag);
-
       const out = playRun('r-c', classId, true);
-      const foreign = out.state.masterDeck.filter(
-        c => otherTags.some(t => (c.tags ?? []).includes(t))
-      );
+      const foreign = out.state.masterDeck.filter(c => c.class && c.class !== classId);
       expect(foreign.map(c => c.id)).toEqual([]);
     });
   }
@@ -161,7 +154,7 @@ describe('การ์ดรางวัล — พฤติกรรมขอ�
     s.pages.current.offers[i] = { ...s.pages.current.offers[i], tier: 'elite' };
     go({ type: 'ChooseOffer', index: i });
     if (s.enemy) s.enemy.statusEffects = [];
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     // คืนฟังก์ชันอ่านค่า ไม่ใช่ตัว state — `applyCommand` โคลนก้อนใหม่ทุกครั้ง

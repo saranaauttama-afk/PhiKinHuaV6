@@ -42,7 +42,7 @@ export function rollCardReward(s: GameState, r: RNG): RNG {
   if (active?.kind === 'boss' && (active.bossType === 'secret' || (s.campaign?.night === 3 && !ultimateRequired(s)))) return r;
 
   const out = (s.campaign ? rollNightCards(s,r) : undefined) 
-    ?? rollThreeCards(r, s.player.level, getClass(s.classId).cardTag);
+    ?? rollThreeCards(r, s.player.level, s.classId);
   if (out.list.length > 0) {
     s.cardReward = { choices: out.list };
   }

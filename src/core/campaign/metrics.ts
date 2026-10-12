@@ -25,11 +25,11 @@ export function trackRun(before:GameState,after:GameState,cmd:Command):void{
  }
  if((before.phase!=='combat'&&after.phase==='combat')||(cmd.type==='StartPlayerTurn'&&after.phase==='combat'&&after.turn>before.turn))m.turns++;
  const delta=after.masterDeck.length-before.masterDeck.length;
- if(cmd.type!=='UnequipToDeck')m.added+=Math.max(0,delta);
- if(cmd.type!=='EquipFromDeck')m.removed+=Math.max(0,-delta);
+ m.added+=Math.max(0,delta);
+ m.removed+=Math.max(0,-delta);
  m.smallestDeck=Math.min(m.smallestDeck,after.masterDeck.length);
  if(['ShopUpgradeBuy','ChooseLevelUpOption','ChooseLevelUp'].includes(cmd.type)){
-  const count=(s:GameState)=>s.masterDeck.reduce((n,c)=>n+(c.upgradeLevel??(c.upgraded?1:0)),0);
+  const count=(s:GameState)=>s.masterDeck.reduce((n,c)=>n+(c.star??1)-1,0);
   m.upgraded+=Math.max(0,count(after)-count(before));
  }
  m.damageTaken+=(after.pendingEvents??[]).reduce((n,e)=>n+(e.t==='Damage'&&e.target==='player'?e.hpLoss:0),0);

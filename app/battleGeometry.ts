@@ -25,7 +25,7 @@ export function enemyLane(g:ReturnType<typeof battleGeometry>,index=0,count=1) {
 /** Six exposed cost corners remain tappable; larger hands browse explicitly. */
 export function handGeometry(screenW:number,count:number) {
  const cardW=Math.min(118,Math.max(100,screenW*.29)),gutter=14;
- const step=count<=6?Math.min(cardW*.88,(screenW-gutter*2-cardW)/Math.max(1,count-1)):48;
+ const step=Math.min(cardW*.88,(screenW-gutter*2-cardW)/Math.max(1,count-1));
  const span=cardW+step*Math.max(0,count-1),overflow=span>screenW-gutter*2;
  return {cardW,step,span,overflow,padding:overflow?gutter:Math.max(gutter,(screenW-span)/2)};
 }

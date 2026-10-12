@@ -150,7 +150,7 @@ it('boss awakening between reveals uses the transformed physical card and matchi
  const s=fixture(['night_head_collector_v29_setup','night_head_collector_v29_double']);
  s.enemy!.id='night-head-collector';s.enemy!.maxHp=100;s.enemy!.hp=51;s.enemy!.maxEnergy=3;s.enemyDrawPerTurn=0;
  s.campaign={night:1,difficulty:3,completedNights:0,unlocks:[],bossAwakened:false};
- s.traps=[{cardId:'v34-skill-trap',name:'test',trigger:'enemy_skill',effects:[{type:'damage',value:2,desc:'test'}]}];
+ s.traps=[{cardId:'v34-skill-trap',name:'test',trigger:'enemy_skill',fx:{dmg:2}}];
  const a=turn(s);expect(a.campaign?.bossAwakened).toBe(true);
  expect(a.enemyLastPlayed).toEqual(['night_head_collector_v29_setup','night_head_collector_v29_awakened_strike']);
  const raw=a.pendingEvents!.filter(e=>e.t==='Damage'&&e.target==='player').map(e=>(e as any).raw);

@@ -13,9 +13,9 @@ export const GHOST_CATALOG=Object.values(THAI_GHOST_POOLS).flat().map(g=>{
 }).sort((a,b)=>GHOST_GROUPS.indexOf(a.group)-GHOST_GROUPS.indexOf(b.group)||(a.night??a.hp)-(b.night??b.hp));
 export type ArchiveCard={card:CardData;group:string;pair?:string[]};
 export const CARD_CATALOG:ArchiveCard[]=[
- ...ALL_CARDS.map(card=>({card,group:ALL_CLASS_IDS.filter(id=>card.tags?.includes(id)).map(id=>CHARACTER_CLASSES[id].name).join(' / ')||'ใช้ร่วมกัน'})),
+ ...ALL_CARDS.map(card=>({card,group:card.class?CHARACTER_CLASSES[card.class].name:'ใช้ร่วมกัน'})),
  ...CURSE_CARDS.map(card=>({card,group:'คำสาป'})),
- {card:{id:'qa_phra_prathan',name:'พระประธาน',type:'skill',cost:0,rarity:'Legendary',exhaust:true,desc:'ชนะการต่อสู้ทันที · ใช้ทดสอบเท่านั้น'},group:'ทดสอบ'},
+ {card:{id:'qa_phra_prathan',name:'พระประธาน',type:'action',ap:0,fx:{},rarity:'Legendary',exhaust:true,flavor:'ชนะการต่อสู้ทันที · ใช้ทดสอบเท่านั้น'},group:'ทดสอบ'},
 ];
 export const CORE_CARD_IDS=new Set(ALL_CARDS.map(c=>c.id));
 export function archiveCards(discovered:Record<string,CardData>):ArchiveCard[]{

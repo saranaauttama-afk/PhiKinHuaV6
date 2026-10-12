@@ -315,19 +315,15 @@ function processSpecificStatusEffect(
 
     case 'energy_boost':
       if (timing === 'turn_start' && target === 'player') {
-        state.player.energy += stacks;
-        state.log.push(`⚡ ผู้เล่นได้พลังงานเพิ่ม ${stacks} หน่วย`);
+        state.player.ap += stacks;
+        state.log.push(`⚡ ผู้เล่นได้แต้ม Action เพิ่ม ${stacks}`);
       }
       break;
 
     case 'fear':
       if (timing === 'turn_start' && target === 'player') {
-        // ลดพลังงาน
-        state.player.energy = Math.max(0, state.player.energy - 1);
-        state.log.push(`😨 ผู้เล่นกลัว - พลังงานลดลง 1 หน่วย`);
-        
-        // ทิ้งไพ่สุ่ม (จะต้องเพิ่มระบบทิ้งไพ่ในอนาคต)
-        state.log.push(`😨 ผู้เล่นทิ้งไพ่สุ่ม 1 ใบจากความกลัว`);
+        state.player.ap = Math.max(0, state.player.ap - 1);
+        state.log.push(`😨 ผู้เล่นกลัว - แต้ม Action ลดลง 1`);
       }
       break;
   }

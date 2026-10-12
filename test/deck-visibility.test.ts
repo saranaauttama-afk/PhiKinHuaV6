@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { applyCommand } from '../src/core/reducer';
 import { makeRng } from '../src/core/rng';
-import { baseNewState, buildAndShuffleDeck, drawUpTo } from '../src/core/commands';
+import { baseNewState, buildAndShuffleDeck } from '../src/core/commands';
+import { drawCards } from '../src/core/cards/fx';
+import { describeCard } from '../src/core/cards/describe';
 import type { CardData, GameState } from '../src/core/types';
 import { groupCards } from '../src/core/cards/group';
 import { makeCombatState, attackCard } from './helpers';
@@ -22,7 +24,7 @@ const CARDS = cardsJson as CardData[];
 
 describe('รวมใบซ้ำเป็นแถวเดียว', () => {
   const card = (id: string, name: string): CardData =>
-    ({ id, name, type: 'attack', cost: 1, dmg: 5 });
+    ({ id, name, type: 'attack', fx: { dmg: 5 } });
 
   it('ใบเดียวกันสี่ใบ = หนึ่งแถว นับได้สี่', () => {
     const rows = groupCards([
@@ -81,7 +83,7 @@ describe('เลขกองจั่วในหน้าต่อสู้', (
     ({ rng: r } = buildAndShuffleDeck(s, r));
 
     const before = s.piles.draw.length;
-    drawUpTo(s, r, 2);
+    drawCards(s, r, 2);
 
     expect(s.piles.draw.length).toBe(before - 2);
     expect(s.piles.hand).toHaveLength(2);
@@ -99,14 +101,14 @@ describe('การ์ดใช้แล้วหาย', () => {
     expect(exhausters.length, 'ไม่มีใบ exhaust เลย = ข้อนี้ไม่มีความหมาย')
       .toBeGreaterThan(0);
     for (const c of exhausters) {
-      expect(c.desc ?? '', `${c.id} ไม่ได้บอกว่าใช้แล้วหาย`).toContain('หายไปจากไฟต์นี้');
+      expect(describeCard(c), `${c.id} ไม่ได้บอกว่าใช้แล้วหาย`).toContain('นำออก');
     }
   });
 
   it('ใบที่เผาแล้วกลับมาในไฟต์ถัดไป — ข้อความจึงต้องไม่บอกว่าหายตลอดรัน', () => {
     const s = baseNewState('fresh-fight');
     s.masterDeck = [
-      { id: 'one_shot', name: 'ใบครั้งเดียว', type: 'skill', cost: 0, exhaust: true },
+      { id: 'one_shot', name: 'ใบครั้งเดียว', type: 'action', ap: 0, fx: {}, exhaust: true },
       attackCard(5, { id: 'plain', name: 'ธรรมดา' }),
     ];
     // ไฟต์ใหม่สร้างกองจั่วจาก masterDeck ใหม่ทั้งกอง กองเผาของไฟต์ก่อนไม่เกี่ยว
@@ -118,7 +120,6 @@ describe('การ์ดใช้แล้วหาย', () => {
   it('เล่นแล้วเข้ากองเผา ไม่ใช่กองทิ้ง', () => {
     const { state, rng } = makeCombatState({
       hand: [attackCard(4, { id: 'one_shot', name: 'ใบครั้งเดียว', exhaust: true })],
-      playerEnergy: 3,
     });
 
     const out = applyCommand(state, { type: 'PlayCard', index: 0 }, rng).state;
@@ -130,7 +131,6 @@ describe('การ์ดใช้แล้วหาย', () => {
   it('ใบธรรมดาเล่นแล้วเข้ากองทิ้ง กองเผายังว่าง', () => {
     const { state, rng } = makeCombatState({
       hand: [attackCard(4, { id: 'plain', name: 'ใบธรรมดา' })],
-      playerEnergy: 3,
     });
 
     const out = applyCommand(state, { type: 'PlayCard', index: 0 }, rng).state;
@@ -145,7 +145,6 @@ describe('การ์ดใช้แล้วหาย', () => {
         attackCard(4, { id: 'one_shot', name: 'ใบครั้งเดียว', exhaust: true }),
         attackCard(4, { id: 'plain', name: 'ใบธรรมดา' }),
       ],
-      playerEnergy: 3,
     });
 
     let s: GameState = applyCommand(state, { type: 'PlayCard', index: 0 }, rng).state;
@@ -153,7 +152,7 @@ describe('การ์ดใช้แล้วหาย', () => {
 
     // กองจั่วหมด → จั่วอีกครั้งจะสับกองทิ้งกลับมา
     s.piles.draw = [];
-    drawUpTo(s, makeRng('reshuffle'), 5);
+    drawCards(s, makeRng('reshuffle'), 5);
 
     const everywhere = [...s.piles.draw, ...s.piles.hand, ...s.piles.discard];
     expect(everywhere.map(c => c.id), 'ใบที่เผาแล้วโผล่กลับมา').not.toContain('one_shot');

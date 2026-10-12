@@ -32,7 +32,7 @@ describe('พระประธาน test APK card', () => {
           expect(s.piles.hand.filter(c => c.id === TEST_WIN_CARD_ID)).toHaveLength(1);
           const restored = fromSave(toBattleSave(s, r));
           expect(restored?.piles.hand[0].id).toBe(TEST_WIN_CARD_ID);
-          s.player.energy = 0; s.enemy!.block = 99999;
+          s.player.ap = 0; s.enemy!.block = 99999;
           const hp = s.player.hp;
           go({ type: 'PlayCard', index: 0 }); wins++;
           expect(s.enemy!.hp).toBe(0); expect(s.player.hp).toBe(hp);

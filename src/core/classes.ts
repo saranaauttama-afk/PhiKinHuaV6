@@ -11,6 +11,7 @@
 // ที่ทำงานทุกไฟต์
 
 import type { CardData, GameState } from './types';
+import { CLASS_RESOURCES } from './balance/notfm';
 
 export type ClassId = 'shaman' | 'warrior' | 'nun' | 'medium';
 
@@ -19,13 +20,9 @@ export type CharacterClass = {
   name: string;
   title: string;
   desc: string;
-  /** แท็กของการ์ดที่คลาสนี้เจอในร้านและรางวัล */
-  cardTag: string;
   startHp: number;
-  startEnergy: number;
-  startHandSize: number;
-  /** เด็คตั้งต้น: id ของการ์ด → จำนวนใบ */
-  starterDeck: Record<string, number>;
+  /** Mana at the start of each fight. */
+  startMana: number;
   /** ข้อความอธิบายกลไกเฉพาะตัว */
   passiveName: string;
   passiveDesc: string;
@@ -34,87 +31,44 @@ export type CharacterClass = {
 export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
   shaman: {
     id: 'shaman',
+    startHp: CLASS_RESOURCES.shaman.hp,
+    startMana: CLASS_RESOURCES.shaman.startMana,
     name: 'หมอผี',
     title: 'ผู้สาปและผู้แก้สาป',
-    desc: 'เสกคาถาสาปก่อนปักเข็มให้แรงขึ้น หรือใช้พิษและกุมารช่วยกัดเลือด ต้องเผื่อพลังงานตั้งรับ',
-    cardTag: 'shaman',
-    startHp: 50,
-    startEnergy: 3,
-    startHandSize: 5,
-    starterDeck: {
-      bamboo_dart: 3,
-      cooling_cloth: 3,
-      curse_chant: 1,
-      cursed_needle: 1,
-      meditation: 1,
-      direct_poison_spell: 1,
-    },
+    desc: 'สะสมมานาแล้วร่ายคาถาสาปและพิษ เข็มปักแรงขึ้นเมื่อผีติดคำสาป',
     passiveName: 'ครูพักลักจำ',
-    passiveDesc: 'เทิร์นแรกของทุกไฟต์ได้พลังงานเพิ่ม 1',
+    passiveDesc: 'เริ่มทุกไฟต์ได้มานาเพิ่ม 1',
   },
 
   warrior: {
     id: 'warrior',
+    startHp: CLASS_RESOURCES.warrior.hp,
+    startMana: CLASS_RESOURCES.warrior.startMana,
     name: 'นักรบวัด',
     title: 'ผู้ยืนหยัด',
-    desc: 'ตั้งรับแล้วสวน หรือสะสมแรงให้ทุกหมัดของมวยไทยหนักขึ้น เลือดหนาแต่ต้องเลือกจังหวะใช้พลังงาน',
-    cardTag: 'warrior',
-    startHp: 66,
-    startEnergy: 3,
-    startHandSize: 5,
-    starterDeck: {
-      temple_blade: 3,
-      muay_stance: 3,
-      ward_riposte: 1,
-      threefold_strike: 1,
-      parry_step: 1,
-      thunder_clap: 1,
-      fighter_breath: 1,
-    },
+    desc: 'การ์ดโจมตีฟรีเยอะที่สุด ตั้งรับแล้วสวน สะสมแรงให้ทุกหมัดหนักขึ้น และใช้อุปกรณ์',
     passiveName: 'ยืนเฝ้าประตู',
     passiveDesc: 'เริ่มทุกไฟต์ด้วยการ์ดป้องกัน 6',
   },
 
   nun: {
     id: 'nun',
+    startHp: CLASS_RESOURCES.nun.hp,
+    startMana: CLASS_RESOURCES.nun.startMana,
     name: 'แม่ชี',
     title: 'ผู้ถือศีล',
-    desc: 'สวดมนต์ตั้งเกราะก่อนหมุนธรรมจักรให้แรงขึ้น เลือกจังหวะรักษาและล้างพิษ ศีลห้าใช้ได้ครั้งเดียวต่อไฟต์',
-    cardTag: 'nun',
-    startHp: 50,
-    startEnergy: 3,
-    startHandSize: 6,
-    starterDeck: {
-      chant_sutra: 2,
-      five_precepts: 1,
-      dharma_wheel: 3,
-      holy_water: 1,
-      sprinkle_water: 1,
-      loving_kindness: 1,
-      alms_offering: 1,
-      dispel_ill: 1,
-    },
+    desc: 'บทสวดที่ยิ่งรอยิ่งแรง เลือกว่าจะรอกี่เทิร์น ตั้งเกราะแล้วหมุนธรรมจักร',
     passiveName: 'อานิสงส์',
     passiveDesc: 'ฟื้นพลังชีวิต 6 ทุกครั้งที่ชนะไฟต์',
   },
 
   medium: {
     id: 'medium',
+    startHp: CLASS_RESOURCES.medium.hp,
+    startMana: CLASS_RESOURCES.medium.startMana,
     name: 'คนทรง',
     title: 'ผู้เชิญวิญญาณ',
-    desc: 'วางพิษแล้วซ้ำแผล ต้องแบ่งพลังงานระหว่างตั้งรับกับตั้งพิธี',
-    cardTag: 'medium',
-    startHp: 46,
-    startEnergy: 3,
-    startHandSize: 5,
-    starterDeck: {
-      whisper_ear: 2,
-      poison_echo: 1,
-      yantra_cloth: 3,
-      spirit_pact: 1,
-      set_altar: 1,
-      phrai_oil: 1,
-    },
+    desc: 'ยืมท่าที่ผีเพิ่งใช้มาเป็นของตัวเอง วางพิษแล้วซ้ำแผล',
     passiveName: 'ผีติดตาม',
     passiveDesc: 'เริ่มทุกไฟต์ด้วยการ์ดป้องกัน 4',
   },
@@ -126,15 +80,13 @@ export function getClass(id?: ClassId): CharacterClass {
   return CHARACTER_CLASSES[id ?? 'shaman'] ?? CHARACTER_CLASSES.shaman;
 }
 
-/** สร้างเด็คตั้งต้นของคลาสจากคลังการ์ดทั้งหมด */
-export function buildStarterDeck(cls: CharacterClass, allCards: CardData[]): CardData[] {
-  const byId = new Map(allCards.map(c => [c.id, c]));
+/** Starter deck: every card of the class pool with a `starter` count in the card data. */
+export function buildStarterDeck(cls: CharacterClass, allCards: (CardData & { starter?: number })[]): CardData[] {
   const deck: CardData[] = [];
-
-  for (const [cardId, count] of Object.entries(cls.starterDeck)) {
-    const card = byId.get(cardId);
-    if (!card) continue; // การ์ดหาย — ข้ามไปแทนที่จะพังทั้งรัน
-    for (let i = 0; i < count; i++) deck.push(JSON.parse(JSON.stringify(card)));
+  for (const card of allCards) {
+    if (card.class !== cls.id || !card.starter) continue;
+    const { starter, ...rest } = card;
+    for (let i = 0; i < starter; i++) deck.push(JSON.parse(JSON.stringify(rest)));
   }
   return deck;
 }
@@ -148,7 +100,7 @@ export function applyClassCombatStart(s: GameState): void {
 
   switch (cls.id) {
     case 'shaman':
-      s.player.energy = (s.player.energy ?? 0) + 1;
+      s.player.mana += 1;
       break;
 
     case 'warrior':
@@ -157,7 +109,7 @@ export function applyClassCombatStart(s: GameState): void {
 
     case 'medium':
       // Interim until the borrow-cards redesign: a small opening guard.
-      s.player.block = (s.player.block ?? 0) + 4;
+      s.player.block = (s.player.block ?? 0) + 6;
       break;
 
     case 'nun':

@@ -91,7 +91,7 @@ function playRun(seed: string, opts: {
 
     if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [
-      { id: 'kill', name: 'kill', type: 'attack', cost: 0, dmg: 9999, instanceId: 'kill1' },
+      { id: 'kill', name: 'kill', type: 'attack', fx: { dmg: 9999 }, instanceId: 'kill1' },
     ];
     go({ type: 'PlayCard', index: 0 });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);

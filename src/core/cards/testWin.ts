@@ -10,8 +10,8 @@ export function dealTestWinCard(s: GameState): void {
   if ([...s.piles.hand, ...s.piles.draw, ...s.piles.discard, ...s.piles.exhaust].some(c => c.id === TEST_WIN_CARD_ID)) return;
   const card: CardData = {
     id: TEST_WIN_CARD_ID, instanceId: `${TEST_WIN_CARD_ID}:${s.fightCount ?? 0}`,
-    name: 'พระประธาน', type: 'skill', cost: 0, rarity: 'Legendary', exhaust: true,
-    desc: 'การ์ดทดสอบ · ชนะการต่อสู้นี้ทันที รวมถึงบอส แล้วรับรางวัลตามปกติ',
+    name: 'พระประธาน', type: 'action', ap: 0, fx: {}, rarity: 'Legendary', exhaust: true,
+    flavor: 'การ์ดทดสอบ · ชนะการต่อสู้นี้ทันที รวมถึงบอส แล้วรับรางวัลตามปกติ',
     tags: ['test-only'],
   };
   // An extra first-hand card: never replaces a normal class starter card.

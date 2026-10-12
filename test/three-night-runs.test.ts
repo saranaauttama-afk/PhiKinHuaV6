@@ -27,7 +27,7 @@ function step(d:ReturnType<typeof driver>){
   const other=offers.findIndex((o,i)=>o&&!p.resolved[i]);
   d.go(ix>=0?{type:'ChooseOffer',index:ix}:offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});
  }else if(d.s.phase==='combat'){
-  d.s.piles.hand=[{id:'structural-test',name:'test',type:'attack',cost:0,dmg:99999}];d.go({type:'PlayCard',index:0});
+  d.s.piles.hand=[{id:'structural-test',name:'test',type:'attack',fx:{dmg:99999}}];d.go({type:'PlayCard',index:0});
  }else if(d.s.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}
  else if(d.s.phase==='reward')d.go({type:'SkipCardReward'});
  else if(d.s.phase==='levelup')d.go(d.s.levelUp?.dawnHandChoice?{type:'ChooseLevelUpOption',option:'A'}:{type:'SkipLevelUp'});
@@ -58,9 +58,9 @@ describe('three-night continuous runs',()=>{
    }expect(services).toBe(8);expect(stories).toBe(3);
   }
  });
- it('chapter completion retains deck upgrades, blessings, equipment, level, XP, money and cumulative metrics; heals only 12%',()=>{
+ it('chapter completion retains deck upgrades, blessings, level, XP, money and cumulative metrics; heals only 12%',()=>{
   const d=driver();for(let guard=0;guard<500&&!(d.s.phase==='victory'&&d.s.enemy?.id===campaignBoss(d.s).id);guard++)step(d);expect(d.s.phase).toBe('victory');
-  d.s.masterDeck[0]={...d.s.masterDeck[0],upgradeLevel:2};d.s.player.hp=9;d.s.player.gold=777;d.s.equipped!.push({id:'test-charm',name:'test',rarity:'Common',slotCost:1} as any);
+  d.s.masterDeck[0]={...d.s.masterDeck[0],star:3};d.s.player.hp=9;d.s.player.gold=777;
   const before=structuredClone(d.s);d.go({type:'CompleteNode'});
   expect(d.s.campaign!.night).toBe(2);expect(d.s.chapter!.id).toBe('run_night_2_open');expect(d.s.runSummary).toBeUndefined();expect(d.s.masterDeck).toEqual(before.masterDeck);expect(d.s.blessings).toEqual(before.blessings);expect(d.s.equipped).toEqual(before.equipped);expect(d.s.player.gold).toBe(777);expect(d.s.player.level).toBe(before.player.level);expect(d.s.player.exp).toBe(before.player.exp);expect(d.s.player.hp).toBe(9+Math.ceil(before.player.maxHp*.12));expect(d.s.runMetrics).toEqual(before.runMetrics);expect(d.s.fightCount).toBe(8);expect(summarize(toSave(d.s,d.r))).toMatchObject({night:2,difficulty:1,totalFights:30,fight:9});
   d.restore();expect(d.s.chapter!.id).toBe('run_night_2_open');const stable=structuredClone(d.s);d.go({type:'CompleteNode'});expect(d.s).toEqual(stable);

@@ -3,38 +3,16 @@ import type { Command, GameState } from '../../types';
 import {canRemoveCard} from '../shared';
 import type { RNG } from '../../rng';
 import { rollShopStock } from '../../shop';
-import { getClass } from '../../classes';
 import { applyRemoveCard, rollGamble, rollTreasure } from '../../events';
-import { START_ENERGY } from '../../balance/core';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
-import { SHOP_STOCK_SIZE, SHOP_POWER_BIAS } from '../../balance/weights';
+import { SHOP_STOCK_SIZE } from '../../balance/weights';
 import { upgradeCard, canUpgrade, upgradeLevelOf, grantBlessing } from '../shared';
 import { loseRun } from './runEnd';
-// ===== Fallback stock (ใช้เมื่อ rollShopStock พัง/ยังไม่พร้อม) =====
-import { int } from '../../rng';
-const cardsBase = require('../../../data/packs/base/cards.json'); // top-level ให้ Metro bundle
-function fallbackShopStock(r: RNG, size: number) {
-  const arr: any[] = Array.isArray(cardsBase) ? cardsBase : [];
-  const pool = arr.filter((c) => c && (c.inShop === true || typeof c.cost === 'number'));
-  const items: { card: any; price: number }[] = [];
-  let rr = r;
-  const bag = pool.slice();
-  for (let k = 0; k < size && bag.length > 0; k++) {
-    const ro = int(rr, 0, bag.length - 1);
-    rr = ro.rng;
-    const pick = bag.splice(ro.value, 1)[0];
-    const price = Math.max(
-      10,
-      (pick.cost ?? 0) * 20 +
-        (pick.dmg ?? 0) * 2 +
-        (pick.block ?? 0) * 2 +
-        (pick.draw ?? 0) * 10 +
-        (pick.energyGain ?? 0) * 25
-    );
-    items.push({ card: pick, price });
-  }
-  return { rng: rr, items };
+/** Shop stock for the player's class. `only` narrows the pool (equipment shops). */
+function stockFor(s: GameState, r: RNG, size: number, only?: (c: import('../../types').CardData) => boolean) {
+  const out = rollShopStock(r, size, 1, s.classId, only);
+  return { rng: out.rng, items: out.items };
 }
 
 export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopReroll' }>, r: RNG) {
@@ -44,35 +22,8 @@ export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopRer
     return { state: s, rng: r };
   }
   s.player.gold -= SHOP_REROLL_COST;
-  try {
-    const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS, getClass(s.classId).cardTag);
-    r = out.rng;
-    s.shopStock = out.items.map((item:import('../../types').ShopItem)=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
-  } catch {
-    const fb = fallbackShopStock(r, SHOP_STOCK_SIZE);
-    r = fb.rng;
-    s.shopStock = fb.items.map(item=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
-    s.log.push('Shop: reroll fallback stock.');
-  }
+  { const out = stockFor(s, r, SHOP_STOCK_SIZE, s.shopKind === 'equipment' ? c => c.type === 'equipment' : undefined); r = out.rng; s.shopStock = out.items; }
   s.log.push(`Shop: rerolled (-${SHOP_REROLL_COST}g)`);
-  return { state: s, rng: r };
-}
-
-export function qaOpenShopHere(s: GameState, _cmd: Extract<Command, { type: 'QA_OpenShopHere' }>, r: RNG) {
-  try {
-    const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, SHOP_STOCK_SIZE, SHOP_POWER_BIAS, getClass(s.classId).cardTag);
-    r = out.rng;
-    s.shopStock = out.items.map((item:import('../../types').ShopItem)=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
-  } catch {
-    const fb = fallbackShopStock(r, SHOP_STOCK_SIZE);
-    r = fb.rng;
-    s.shopStock = fb.items.map(item=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
-    s.log.push('QA: fallback shop stock.');
-  }
-  s.phase = 'shop';
-  s.shopKind = 'card';
   return { state: s, rng: r };
 }
 
@@ -243,21 +194,11 @@ export function eventTreasureOpen(s: GameState, _cmd: Extract<Command, { type: '
 
 // === Openers used by map_pages ==============================================
 export function openShopCard(s: GameState, r: RNG): { state: GameState; rng: RNG } {
-  try {
-    const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 3, SHOP_POWER_BIAS, getClass(s.classId).cardTag); // Limit to 3 cards
-    r = out.rng;
-    s.shopStock = out.items.map((item:import('../../types').ShopItem)=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
-  } catch {
-    const fb = fallbackShopStock(r, 3); // Limit to 3 cards
-    r = fb.rng;
-    s.shopStock = fb.items.map(item=>s.pages?.adventure?{...item,price:Math.max(25,Math.round(item.price*.65))}:item);
-    s.log.push('Shop(card): fallback stock.');
-  }
+  const out = stockFor(s, r, 3); r = out.rng;
+  s.shopStock = out.items;
   s.shopKind = 'card';
-  s.shopBoughtItems = []; // Reset bought items tracker
+  s.shopBoughtItems = [];
   s.phase = 'shop';
-  s.log.push(`Shop(card): ${s.shopStock?.length ?? 0} items`);
   return { state: s, rng: r };
 }
 
@@ -278,38 +219,14 @@ export function openShopUpgrade(s: GameState, r: RNG): { state: GameState; rng: 
   return { state: s, rng: r };
 }
 
+/** Equipment shop: equipment cards for the deck. */
 export function openShopEquipment(s: GameState, r: RNG): { state: GameState; rng: RNG } {
-  // สร้าง equipment shop stock (limit to 3 items)
-  const equipmentBase = require('../../../data/packs/base/equipment.json');
-  const arr: any[] = Array.isArray(equipmentBase) ? equipmentBase : [];
-  const pool = arr.filter((e) => e && e.slotCost >= 0);
-  
-  const items: { equipment: any; price: number }[] = [];
-  let rr = r;
-  const bag = pool.slice();
-  
-  for (let k = 0; k < Math.min(3, bag.length); k++) {
-    const ro = int(rr, 0, bag.length - 1);
-    rr = ro.rng;
-    const pick = bag.splice(ro.value, 1)[0];
-    
-    // ราคาตาม rarity
-    const rarityPrice: { [key: string]: number } = {
-      'Common': 80,
-      'Uncommon': 120,
-      'Rare': 180,
-      'Legendary': 250
-    };
-    const price = rarityPrice[pick.rarity] || 100;
-    items.push({ equipment: pick, price });
-  }
-  
-  s.shopStock = items as any;
+  const out = stockFor(s, r, 3, c => c.type === 'equipment'); r = out.rng;
+  s.shopStock = out.items;
   s.shopKind = 'equipment';
-  s.shopBoughtItems = []; // Reset bought items tracker
+  s.shopBoughtItems = [];
   s.phase = 'shop';
-  s.log.push(`Shop(equipment): ${items.length} items`);
-  return { state: s, rng: rr };
+  return { state: s, rng: r };
 }
 
 export function doHealingShrineUse(s: GameState, _cmd: Extract<Command, { type: 'DoHealingShrineUse' }>, r: RNG) {
@@ -415,42 +332,18 @@ export function useWell(s: GameState, _cmd: Extract<Command, { type: 'UseWell' }
 
 export function openTreasureChest(s: GameState, r: RNG): { state: GameState; rng: RNG } {
   // Generate 2 random cards for treasure chest
-  try {
-    const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 2, 1.3, getClass(s.classId).cardTag); // 2 cards with slight power bias
-    r = out.rng;
-    s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
-    s.shopKind = 'treasure';
-    s.phase = 'shop';
-  } catch {
-    // Fallback if rollShopStock fails
-    const fb = fallbackShopStock(r, 2);
-    r = fb.rng;
-    s.shopStock = fb.items.map(item => ({ ...item, price: 0 })); // Set price to 0 (free)
-    s.shopKind = 'treasure';
-    s.phase = 'shop';
-  }
+  { const out = stockFor(s, r, 2); r = out.rng; s.shopStock = out.items.map(item => ({ ...item, price: 0 })); }
+  s.shopKind = 'treasure';
+  s.phase = 'shop';
   s.log.push('Event: treasure chest opened');
   return { state: s, rng: r };
 }
 
 export function openSingleTreasure(s: GameState, r: RNG): { state: GameState; rng: RNG } {
   // Generate 1 random card for single treasure
-  try {
-    const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 1, 1.3, getClass(s.classId).cardTag); // 1 card with slight power bias
-    r = out.rng;
-    s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
-    s.shopKind = 'treasure_single';
-    s.phase = 'shop';
-  } catch {
-    // Fallback if rollShopStock fails
-    const fb = fallbackShopStock(r, 1);
-    r = fb.rng;
-    s.shopStock = fb.items.map(item => ({ ...item, price: 0 })); // Set price to 0 (free)
-    s.shopKind = 'treasure_single';
-    s.phase = 'shop';
-  }
+  { const out = stockFor(s, r, 1); r = out.rng; s.shopStock = out.items.map(item => ({ ...item, price: 0 })); }
+  s.shopKind = 'treasure_single';
+  s.phase = 'shop';
   s.log.push('Event: single treasure opened');
   return { state: s, rng: r };
 }
@@ -560,17 +453,7 @@ export function randomizeSingleTreasure(s: GameState, _cmd: Extract<Command, { t
   }
   
   // Generate new card
-  try {
-    const { rollShopStock } = require('../../shop');
-    const out = rollShopStock(r, 1, 1.3, getClass(s.classId).cardTag); // 1 card with slight power bias
-    r = out.rng;
-    s.shopStock = out.items.map((item: any) => ({ ...item, price: 0 })); // Set price to 0 (free)
-  } catch {
-    // Fallback if rollShopStock fails
-    const fb = fallbackShopStock(r, 1);
-    r = fb.rng;
-    s.shopStock = fb.items.map(item => ({ ...item, price: 0 })); // Set price to 0 (free)
-  }
+  { const out = stockFor(s, r, 1); r = out.rng; s.shopStock = out.items.map(item => ({ ...item, price: 0 })); }
   
   // Mark as randomized (can only use once)
   (s as any)._singleTreasureRandomized = true;
@@ -590,32 +473,4 @@ export function randomizeSingleTreasure(s: GameState, _cmd: Extract<Command, { t
   return { state: s, rng: r };
 }
 
-export function takeShopEquipment(s: GameState, cmd: Extract<Command, { type: 'TakeShopEquipment' }>, r: RNG) {
-  if (s.phase !== 'shop' || s.shopKind !== 'equipment' || !s.shopStock) return { state: s, rng: r };
-  const i = cmd.index;
-  const item = s.shopStock[i];
-  if (!item) return { state: s, rng: r };
-  if (!('equipment' in item)) return { state: s, rng: r }; // Only handle equipment items
-  if (s.player.gold < item.price) {
-    s.log.push('Equipment Shop: Not enough gold');
-    return { state: s, rng: r };
-  }
-  
-  // เพิ่ม equipment เข้า inventory (ยังไม่ equip)
-  s.player.gold -= item.price;
-  s.equipment = s.equipment || [];
-  s.equipment.push(JSON.parse(JSON.stringify(item.equipment)));
-  
-  // Track bought item for shop persistence
-  s.shopBoughtItems = s.shopBoughtItems || [];
-  s.shopBoughtItems.push(JSON.parse(JSON.stringify(item)));
-  
-  s.shopStock.splice(i, 1);
-  s.log.push(`Equipment Shop: bought ${item.equipment.name} for ${item.price}g`);
-  
-  if (s.pages) {
-    s.pages._shopUsed = true;
-  }
-  return { state: s, rng: r };
-}
 // ============================================================================

@@ -36,7 +36,7 @@ function reachLevelUp(seed = 'lvl'): GameState {
   s.enemy!.hp = 1;
   if (s.enemy) s.enemy.statusEffects = [];
   s.piles.hand = [
-    { id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 99, instanceId: 'k1' },
+    { id: 'k', name: 'k', type: 'attack', fx: { dmg: 99 }, instanceId: 'k1' },
   ];
   return step(s, { type: 'PlayCard', index: 0 }, seed);
 }
@@ -100,8 +100,6 @@ describe('เลือกรางวัล', () => {
     s = step(s, { type: 'ChooseLevelUpOption', option: opt, index: 0 });
 
     if (bucket === 'max_hp')          expect(s.player.maxHp).toBeGreaterThan(before.maxHp);
-    if (bucket === 'max_energy')      expect(s.player.maxEnergy).toBeGreaterThan(before.maxEnergy!);
-    if (bucket === 'max_hand')        expect(s.player.maxHandSize).toBeGreaterThan(before.maxHandSize!);
     if (bucket === 'equipment_slot')  expect(s.equipmentSlotsMax).toBeGreaterThan(0);
   });
 });
@@ -122,7 +120,7 @@ describe('explicit level reward results',()=>{
   const before=s.masterDeck.map(c=>({...c}));
   s=step(s,{type:'ChooseLevelUpOption',option:'A',index:1});
   expect(s.masterDeck[0]).toEqual(before[0]);
-  expect(s.masterDeck[1].upgradeLevel).toBe(1);
+  expect(s.masterDeck[1].star).toBe(2);
   expect(s.levelUp?.result?.text).toContain(s.masterDeck[1].name);
  });
  it('adds 8 max HP and heals 8 with an explicit before/after result',()=>{

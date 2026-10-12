@@ -8,12 +8,8 @@ import {applyEnemyBattleRule} from './enemyRules';
 export type Night=import('./threeNight').RunNight;
 export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficulty;completedNights:number;unlocks:Array<'card'|'blessing'>;bossAwakened?:boolean};
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};
-export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>={
- warrior:{id:'night_warrior_blessing',name:'ครูลานวัด',rarity:'Rare',desc:'สกิลใบแรกแต่ละเทิร์นได้ป้องกันเพิ่ม 3'},
- shaman:{id:'night_shaman_blessing',name:'ครูคุ้มคาถา',rarity:'Rare',desc:'การ์ดใส่สถานะใบแรกแต่ละเทิร์นได้ป้องกันเพิ่ม 3'},
- nun:{id:'night_nun_blessing',name:'แสงบุญ',rarity:'Rare',desc:'ต้นเทิร์น: เลือดต่ำกว่าครึ่งฟื้น 2 มิฉะนั้นได้ป้องกัน 2'},
- medium:{id:'night_medium_blessing',name:'หิ้งบรรพบุรุษ',rarity:'Rare',desc:'ต้นเทิร์นได้ป้องกัน 2'},
-};
+/** The class blessing a fifth-night clear can unlock. */
+export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>=Object.fromEntries((['warrior','shaman','nun','medium'] as ClassId[]).map(id=>[id,require('../pack').classBlessing(id)])) as Record<ClassId,BlessingDef>;
 export function configureNightEnemy(s:GameState):void{
  if(!s.campaign||!s.enemy)return;
  const d=difficultyOf(s);
