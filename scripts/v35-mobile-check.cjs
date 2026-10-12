@@ -30,7 +30,7 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
     const played=after.history[2];await p.getByTestId('history-'+played.seq).click();await p.getByText('ผลที่เกิดขึ้น',{exact:true}).waitFor();await p.getByText(played.card.name,{exact:true}).waitFor();for(const line of played.results)await p.getByText(line,{exact:true}).waitFor();await p.getByRole('button',{name:'ปิดประวัติ',exact:true}).click();
     await p.getByRole('button',{name:'พักการต่อสู้',exact:true}).click();await p.getByRole('button',{name:'กลับเมนูหลัก',exact:true}).click();await p.getByRole('button',{name:/^เล่นต่อ/}).waitFor();
     const persisted=await p.evaluate(()=>JSON.parse(localStorage.getItem('phikinhua_autosave')));assert.deepEqual(persisted.state.cardHistory,after.history);assert.equal(persisted.state.enemyPiles.hand.length,1);
-    await p.reload();await p.getByRole('button',{name:/^เล่นต่อ/}).click();await p.getByRole('button',{name:'จบเทิร์น',exact:true}).waitFor();const restored=await metrics();assert.deepEqual(restored.history,after.history);assert.equal(restored.enemyHand,1);
+    await p.goto('http://127.0.0.1:8136/');await p.getByRole('button',{name:/^เล่นต่อ/}).click();await p.getByRole('button',{name:'จบเทิร์น',exact:true}).waitFor();const restored=await metrics();assert.deepEqual(restored.history,after.history);assert.equal(restored.enemyHand,1);
     reports.push({viewport,reduced,check:'draw, reveal, retained hand, combined history, QA card and cold resume',result:'passed'});await ctx.close();
    }
    const ctx=await browser.newContext({viewport}),p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));const save=JSON.parse(fs.readFileSync(root+'/v35-map.json','utf8'));
