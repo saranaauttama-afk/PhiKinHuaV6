@@ -26,6 +26,14 @@ import {needsVictoryIntro} from './postBattleFlow';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
+import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
+import { bossRule } from '../src/core/campaign/bossRules';
+
+function bossRelicView(s: import('../src/core/types').GameState) {
+  const r = s.fight?.relic, rule = bossRule(r?.bossId);
+  if (!r || !rule || r.bossId !== s.enemy?.id) return undefined;
+  return { name: rule.relic, durability: Math.max(0, r.durability), text: rule.text, flavor: rule.flavor, broken: r.broken, stolen: r.stolen.length };
+}
 import CardRewardOverlay from './components/battle/CardRewardOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
 import StatusStrip, {type BattleBadge} from './components/battle/StatusStrip';
@@ -317,7 +325,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea rage={{startTurn:rageActive(gameState)?RAGE.startTurn:RAGE.backstopTurn,perTurn:RAGE.perTurn}}
+        <MonsterArea relic={bossRelicView(gameState)} rage={{startTurn:rageActive(gameState)?RAGE.startTurn:RAGE.backstopTurn,perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
@@ -432,6 +440,11 @@ export default function BattlePage() {
             onPick={wait => handlePlayCard(playerHand[prayerAt], prayerAt, wait)}
             onCancel={() => setPrayerAt(null)}
           />
+        )}
+
+        {/* ผีพูดก่อนรางวัล: คำตอบเพิ่มความกล้าหรือบุญ */}
+        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'talk' && gameState.ghostTalk && (
+          <GhostTalkOverlay state={gameState} onAnswer={choice => dispatch({ type: 'AnswerGhostTalk', choice })} />
         )}
 
         {/* หลังรับทราบชัยชนะ จึงแสดงตัวเลือกเลเวลอัปที่ engine เตรียมไว้ */}

@@ -51,7 +51,7 @@ export const ENEMY_RULES: Record<EnemyKind, { handSize: number; drawPerTurn: num
 
 /** Ghost HP before night and difficulty scaling. Normal ghosts add `perTier` per tier (T1–T5). */
 export const ENEMY_HP = {
-  normal: 28, perTier: 2, elite: 48, boss: 78, ultimateBoss: 125,
+  normal: 28, perTier: 2, elite: 48, boss: 78, ultimateBoss: 105,
   /** Multiplier for nights 1–3. */
   night: [1, 1.28, 1.58],
   /** Extra HP per difficulty level above 1. */
@@ -89,3 +89,17 @@ export const CLASS_PASSIVES: Record<ClassId, import('../types').Passive & {
 
 /** Level-up: full heal, more max HP, then one of three rewards. */
 export const LEVEL_UP = { maxHp: 8, skipGold: 25 } as const;
+
+/**
+ * ความกล้า / บุญ. Dialogues after some wins move one of them by 1 (capped at `max`).
+ * Reaching `threshold` grants that side's blessing once. At the end of night 3 they pick
+ * the final boss; both at `threshold` on a veteran run reveals the secret boss.
+ */
+export const ALIGNMENT = {
+  max: 6,
+  threshold: 4,
+  /** Dialogues per night at most (elites, the night's boss, and the first win over each ghost). */
+  talksPerNight: 4,
+  courageGold: 10,
+  meritHeal: 5,
+} as const;

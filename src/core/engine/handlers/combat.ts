@@ -36,6 +36,7 @@ function mimicGhostCard(s: GameState, def: import('../../pack_enemy_cards').Enem
 export function settleCombat(s: GameState, r: RNG): RNG {
   if (s.phase !== 'combat') return r;
   require('../../campaign/nights').awakenNightBoss(s);
+  if (s.enemy && s.enemy.hp <= 0 && !s.combatVictoryLock && require('../../campaign/bossRules').tryBossRevive(s)) return r;
   if (isDefeat(s)) {
     loseRun(s);
   } else if (isVictory(s) && !s.combatVictoryLock) {
@@ -56,6 +57,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     countCardPlayed(s);
     s.piles.exhaust.push(s.piles.hand.splice(idx, 1)[0]);
     s.enemy.hp = 0;
+    if (s.fight?.relic) s.fight.relic.broken = true; // the test card wins outright, no revive
     s.log.push('พระประธาน: ชนะการต่อสู้ทันที (ทดสอบ)');
     r = settleCombat(s, r);
     return { state: s, rng: r };
@@ -147,6 +149,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     s.enemy.block = 0;
     if (s.fight) s.fight.ghostTurns += 1;
     require('../../campaign/nights').applyRage(s);
+    require('../../campaign/bossRules').applyBossRule(s);
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
     if(s.phase!=='combat')return {state:s,rng:r};

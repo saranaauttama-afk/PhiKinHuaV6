@@ -27,7 +27,9 @@ function playRun(seed: string, classId: string, take: boolean) {
   const clearRewards = () => {
     let g = 0;
     while (g++ < 10) {
+      if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
       if (s.phase === 'levelup') { go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any); continue; }
+      if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
       if (s.phase === 'reward') {
         go(take ? { type: 'ChooseCardReward', index: 0 } : { type: 'SkipCardReward' });
         continue;
@@ -156,6 +158,7 @@ describe('การ์ดรางวัล — พฤติกรรมขอ�
     if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     // คืนฟังก์ชันอ่านค่า ไม่ใช่ตัว state — `applyCommand` โคลนก้อนใหม่ทุกครั้ง
     // ถ้าคืนตัวมันไป เทสต์จะถือ snapshot เก่าและผ่านโดยไม่ได้ตรวจอะไรเลย

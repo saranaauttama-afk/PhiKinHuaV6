@@ -29,6 +29,7 @@ function step(d:ReturnType<typeof driver>){
  }else if(d.s.phase==='combat'){
   d.s.piles.hand=[{id:'structural-test',name:'test',type:'attack',fx:{dmg:99999}}];d.go({type:'PlayCard',index:0});
  }else if(d.s.phase==='event'){d.go({type:'ChooseEventOption',index:0});d.go({type:'CompleteNode'});}
+ else if(d.s.phase==='talk')d.go({type:'AnswerGhostTalk',choice:'leave'});
  else if(d.s.phase==='reward')d.go({type:'SkipCardReward'});
  else if(d.s.phase==='levelup')d.go({type:'SkipLevelUp'});
  else if(d.s.phase==='victory')d.go({type:'CompleteNode'});

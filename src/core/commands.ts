@@ -86,6 +86,7 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   s.cardHistory = []; s.cardHistorySeq = 0;
   s.equipped = []; s.prayers = []; s.traps = [];
   s.fight = { hpLost: 0, ghostTurns: 0 };
+  require('./campaign/bossRules').initBossRelic(s);
   require('./skills').tickSkillCooldowns(s);
   s.player.block = 0;
   s.player.ap = s.player.maxAp;

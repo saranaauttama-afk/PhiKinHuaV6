@@ -78,6 +78,7 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   const gold = s.pages?.adventure?(offer?.kind==='boss'?60:elite?28:18):goldForMonster(tier);
 
   s.player.exp += gained;
+  require('../campaign/alignment').queueGhostTalk(s);
   s.player.gold = (s.player.gold || 0) + gold;
 
   const goldResult = { amount: gold };
@@ -121,6 +122,10 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
  * VictoryOverlay กลืนไปทั้ง phase
  */
 export function advanceAfterVictory(s: GameState): void {
+  if (s.ghostTalk) {
+    s.phase = 'talk';
+    return;
+  }
   if (s.levelUp && !s.levelUp.consumed) {
     s.phase = 'levelup';
     s.log.push('Level Up!');

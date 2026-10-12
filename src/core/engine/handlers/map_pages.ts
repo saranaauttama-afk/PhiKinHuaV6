@@ -38,6 +38,7 @@ function completeAdventure(s:GameState,r:RNG){
     s.campaign!.completedNights=s.campaign!.night;
     if(s.campaign!.night<3){
      s.campaign!.night=(s.campaign!.night+1) as 2|3;
+     s.campaign!.talksThisNight=0;
      const healed=Math.min(s.player.maxHp-s.player.hp,Math.ceil(s.player.maxHp*.12));s.player.hp+=healed;
      s.log.push(`ฟ้าสาง คืนหัวสำเร็จ · พักฟื้น ${healed} · ออกตามรอยคืนที่ ${s.campaign!.night}`);
      s.phase='map';s.levelUp=null;s.cardReward=undefined;s.combatVictoryLock=false;
@@ -47,7 +48,7 @@ function completeAdventure(s:GameState,r:RNG){
     }
    }
    if(offer.bossType==='final'&&ultimateRequired(s)){revealUltimate(s);fireChapter(s,{kind:'secret'});}
-   else {a.boss='done';mp.current.resolved[ix]=true;mp._activeOfferIndex=undefined;winRun(s,offer.bossType==='secret');}
+   else {a.boss='done';mp.current.resolved[ix]=true;mp._activeOfferIndex=undefined;winRun(s,offer.bossType==='secret'||offer.enemyId===require('../../campaign/bosses').ULTIMATE_BOSS.id);}
    return {state:s,rng:r};
   }
   s.phase='map';settleAdventureSlot(s,ix);return {state:s,rng:r};

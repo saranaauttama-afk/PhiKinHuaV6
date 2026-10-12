@@ -111,7 +111,14 @@ function chooseFightSkill(s:GameState):Command|undefined{
 function activeOffer(s:GameState){const ix=s.pages?._activeOfferIndex;return ix!=null?s.pages?.current?.offers[ix]:undefined;}
 function fightKind(s:GameState):FightKind{const o=activeOffer(s);return o?.kind==='boss'?'boss':o?.kind==='monster'&&o.tier==='elite'?'elite':'normal';}
 
-export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{tactical?:boolean;observe?:(s:GameState,r:RNG)=>void}={}):RunRecord{
+/** How the pilot answers ghost dialogues; 'auto' picks one of the three from the seed. */
+export type AlignPolicy='courage'|'merit'|'even'|'auto';
+function alignChoice(s:GameState,policy:Exclude<AlignPolicy,'auto'>):'courage'|'merit'{
+ if(policy!=='even')return policy;
+ return (s.campaign?.courage??0)<=(s.campaign?.merit??0)?'courage':'merit';
+}
+
+export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{tactical?:boolean;observe?:(s:GameState,r:RNG)=>void;align?:AlignPolicy;veteran?:boolean}={}):RunRecord{
  const tactical=opts.tactical??true;
  let s=baseNewState(seed),r=makeRng(seed),steps=0,stalled=false;
  const fights:FightRecord[]=[];let open:FightRecord|undefined;
@@ -127,7 +134,8 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   }
   opts.observe?.(s,r);
  };
- go({type:'NewRun',seed,classId,difficulty});
+ const align=opts.align&&opts.align!=='auto'?opts.align:(['courage','merit','even'] as const)[[...seed].reduce((n,ch)=>n+ch.charCodeAt(0),0)%3];
+ go({type:'NewRun',seed,classId,difficulty,veteran:opts.veteran});
  while(!s.runSummary&&steps<9000){
   if(s.chapter){go({type:'SkipChapter'});continue;}
   if(s.phase==='starter'){const i=s.starter!.choices.findIndex(b=>b.id==='spirit_energy'||b.id==='herbal_wisdom'||b.id==='bamboo_dart_power');go({type:'ChooseStarterBlessing',index:Math.max(0,i)});continue;}
@@ -144,6 +152,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    if(s.turn>60){stalled=true;break;}
    continue;
   }
+  if(s.phase==='talk'){go({type:'AnswerGhostTalk',choice:alignChoice(s,align)});continue;}
   if(s.phase==='levelup'){go(chooseLevelUp(s));continue;}
   if(s.phase==='reward'){
    const ranked=(s.cardReward?.choices??[]).map((c,i)=>({i,c,v:cardValue(c)})).sort((a,b)=>b.v-a.v);

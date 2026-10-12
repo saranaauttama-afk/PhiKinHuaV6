@@ -101,7 +101,7 @@ export const useGame = create<Store>((set, get) => ({
     const progress=useJournal.getState();
     if(progress.error||progress.saving||!Number.isInteger(difficulty)||difficulty<1||difficulty>unlockedDifficulty(progress.journal,classId))return false;
     clearTimeout(autoSaveTimer);await autoSavePending;await clearAutoSave();
-    const result=applyCommand(makeEmptyState(),{type:'NewRun',seed,discoveryId:discoveryId(),classId,difficulty,unlocks:progress.journal.classes[classId].unlocks},makeRng(seed));
+    const result=applyCommand(makeEmptyState(),{type:'NewRun',seed,discoveryId:discoveryId(),classId,difficulty,unlocks:progress.journal.classes[classId].unlocks,veteran:Object.values(progress.journal.classes).some(c=>c.highestDifficulty>=1)},makeRng(seed));
     set({state:result.state,rng:result.rng});void useArchive.getState().observe(result.state).catch(()=>{});return true;
   },
 

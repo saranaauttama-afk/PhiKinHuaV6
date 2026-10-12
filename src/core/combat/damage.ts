@@ -170,6 +170,8 @@ export function dealDamage(
   });
   if (died) emit(state, { t: 'Died', who: to });
 
+  // A player hit that lands chips the boss's relic.
+  if (from === 'player' && to === 'enemy' && isAttack && modified > 0) require('../campaign/bossRules').chipBossRelic(state);
   // ใจเพชร reads the HP lost this fight.
   if (to === 'player' && state.fight) state.fight.hpLost += targetState.hp < hpBefore ? hpBefore - targetState.hp : 0;
   // แผ่เมตตา: heal part of the damage dealt to the ghost.

@@ -51,10 +51,12 @@ function playToEnd(seed: string): GameState {
     if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') {
       go({ type: 'SkipLevelUp' });
     }
     go({ type: 'CompleteNode' });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
     skipChapters();
   }

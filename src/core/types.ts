@@ -93,6 +93,8 @@ export type DeckPiles = {
 export type Phase =
   | 'start' | 'menu' | 'map' | 'combat' | 'victory' | 'defeat'
   | 'event' | 'shop' | 'levelup' | 'starter'
+  /** After-fight dialogue (ความกล้า / บุญ). */
+  | 'talk'
   /** ชนะไฟต์แล้ว กำลังเลือกการ์ดรางวัล (ดู `cards/reward.ts`) */
   | 'reward'
   | 'run_complete'; // จบรันแล้ว (ชนะบอสสุดท้าย) — แสดงจอสรุป
@@ -121,7 +123,20 @@ export type FightState = {
   extraTurn?: boolean;
   /** Medium passive already copied a ghost card this fight. */
   mimicUsed?: boolean;
+  /** The boss's relic: its rule works until enough hits break it. */
+  relic?: BossRelicState;
 };
+
+export type BossRelicState = {
+  bossId: string;
+  durability: number;
+  broken: boolean;
+  reviveUsed?: boolean;
+  /** Cards the relic took from hand; they return when it breaks or the fight ends. */
+  stolen: CardData[];
+};
+
+export type AlignmentChoice = 'courage' | 'merit' | 'leave';
 
 export type PlayerState = {
   hp: number; maxHp: number; block: number; gold: number;
@@ -390,6 +405,8 @@ export type GameState = {
   skills?: Record<string, number>;
   /** ต่อรองเจ้าที่: percent of the price paid for the next shop purchase. */
   shopPricePct?: number;
+  /** A dialogue waiting after a win. */
+  ghostTalk?: { ghostId: string };
   fight?: FightState;
 
   /** การ์ดรางวัลที่รอให้เลือกหลังชนะไฟต์ — ดู `cards/reward.ts` */
@@ -406,7 +423,10 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'> }
+  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'>;
+      /** Has beaten a final boss before (journal); needed for the secret boss. */
+      veteran?: boolean }
+  | { type: 'AnswerGhostTalk'; choice: AlignmentChoice }
   | { type: 'ChooseStarterBlessing'; index: number }
   | { type: 'CompleteNode' }
 

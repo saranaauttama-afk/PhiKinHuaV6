@@ -7,7 +7,16 @@ import {applyEnemyBattleRule} from './enemyRules';
 import {ENEMY_HP,ENEMY_RULES,RAGE} from '../balance/notfm';
 
 export type Night=import('./threeNight').RunNight;
-export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficulty;completedNights:number;unlocks:Array<'card'|'blessing'>;bossAwakened?:boolean};
+export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficulty;completedNights:number;unlocks:Array<'card'|'blessing'>;bossAwakened?:boolean;
+ /** ความกล้า / บุญ, 0–ALIGNMENT.max. */
+ courage?:number;merit?:number;
+ /** Blessings already granted for reaching the threshold. */
+ alignmentRewards?:Array<'courage'|'merit'>;
+ /** Ghosts already talked to this run, and dialogues held this night. */
+ talked?:string[];talksThisNight?:number;
+ veteran?:boolean;
+ /** The night-3 boss, fixed when its slot appears. */
+ finalBossId?:string};
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};
 /** The class blessing a fifth-night clear can unlock. */
 export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>=Object.fromEntries((['warrior','shaman','nun','medium'] as ClassId[]).map(id=>[id,require('../pack').classBlessing(id)])) as Record<ClassId,BlessingDef>;

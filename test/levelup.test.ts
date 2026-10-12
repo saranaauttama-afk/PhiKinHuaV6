@@ -39,7 +39,9 @@ function reachLevelUp(seed = 'lvl'): GameState {
   s.piles.hand = [
     { id: 'k', name: 'k', type: 'attack', fx: { dmg: 99 }, instanceId: 'k1' },
   ];
-  return step(s, { type: 'PlayCard', index: 0 }, seed);
+  s = step(s, { type: 'PlayCard', index: 0 }, seed);
+  if (s.phase === 'talk') s = step(s, { type: 'AnswerGhostTalk', choice: 'leave' }, seed);
+  return s;
 }
 
 describe('เลเวลอัป: ฟื้นเต็ม + ชีวิตสูงสุด + เลือก 1 จาก 3', () => {

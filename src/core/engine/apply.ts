@@ -18,6 +18,7 @@ import * as story from './handlers/story';
 import * as chapter from './handlers/chapter';
 import * as cardReward from './handlers/cardReward';
 import * as skills from './handlers/skills';
+import * as talk from './handlers/talk';
 
 type Handler<T extends Command['type']> =
   (s: GameState, cmd: Extract<Command, { type: T }>, r: RNG) => { state: GameState; rng: RNG };
@@ -48,6 +49,9 @@ const H: { [K in Command['type']]?: Handler<K> } = {
 
   // Class skills
   UseSkill: skills.useSkill,
+
+  // ความกล้า / บุญ
+  AnswerGhostTalk: talk.answer,
 
   // การ์ดรางวัลหลังชนะไฟต์
   ChooseCardReward: cardReward.chooseCardReward,

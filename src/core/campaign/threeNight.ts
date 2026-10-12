@@ -1,5 +1,5 @@
 import type {GameState} from '../types';
-import {NIGHT_BOSSES} from './bosses';
+import {NIGHT_BOSSES,ULTIMATE_BOSS} from './bosses';
 
 export type Difficulty=1|2|3|4|5;
 export type RunNight=1|2|3;
@@ -21,9 +21,14 @@ export function campaignFightTotal(s:Partial<GameState>):number{return runFightT
 export function runEliteQuota(night:number,difficulty:number):number{
  return (difficulty===1?[0,1,2]:difficulty===2?[1,2,2]:difficulty===3?[1,2,3]:difficulty===4?[1,3,3]:[2,3,3])[night-1];
 }
-/** Two local guardians, then the sorcerer; higher tiers rotate existing art/decks. */
+/** Nights 1 and 2 have fixed bosses; night 3's comes from ความกล้า / บุญ and is fixed once its slot appears. */
 export function campaignBoss(s:Partial<GameState>){
- const n=s.campaign?.night??1,d=difficultyOf(s);
- return NIGHT_BOSSES[n===1?0:n===2?(d>=3?2:1):(d>=4?3:4)];
+ const n=s.campaign?.night??1;
+ if(n===1)return NIGHT_BOSSES[0];
+ if(n===2)return NIGHT_BOSSES[1];
+ const fixed=s.campaign?.finalBossId;
+ if(fixed)return [...NIGHT_BOSSES,ULTIMATE_BOSS].find(b=>b.id===fixed)!;
+ // At difficulty 5 the secret boss already follows the night-3 boss.
+ return require('./alignment').alignmentBoss(s,difficultyOf(s)!==5);
 }
 export function ultimateRequired(s:Partial<GameState>):boolean{return s.campaign?.night===3&&difficultyOf(s)===5;}

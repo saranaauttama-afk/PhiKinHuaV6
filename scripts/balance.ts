@@ -9,7 +9,7 @@
 // The pilot reads only the public board; treat win rates as relative, not human.
 import fs from 'node:fs';
 import path from 'node:path';
-import {playRun,type RunRecord,type FightKind} from './pilot';
+import {playRun,type RunRecord,type FightKind,type AlignPolicy} from './pilot';
 import {ALL_CLASS_IDS,type ClassId} from '../src/core/classes';
 import type {Difficulty} from '../src/core/campaign/threeNight';
 
@@ -23,6 +23,10 @@ const difficulties=arg('difficulty','1,3,5').split(',').map(Number) as Difficult
 const tactical=arg('policy','tactical')!=='random';
 const out=arg('out','');
 const seedPrefix=arg('seed','balance');
+/** Dialogue answers: courage | merit | even | auto (seed picks, so all three final bosses appear). */
+const align=arg('align','auto') as AlignPolicy;
+/** Treat runs as veteran (needed for the secret boss). */
+const veteran=process.argv.includes('--veteran');
 
 const pct=(n:number,d:number)=>d?Math.round(n/d*100)+'%':'-';
 const mean=(xs:number[])=>xs.length?+(xs.reduce((a,b)=>a+b,0)/xs.length).toFixed(1):0;
@@ -34,7 +38,7 @@ const all:RunRecord[]=[];
 const rows:Array<Record<string,unknown>>=[];
 const started=Date.now();
 for(const cls of classes)for(const difficulty of difficulties){
- const batch=Array.from({length:runs},(_,i)=>playRun(`${seedPrefix}-${cls}-${difficulty}-${i}`,cls,difficulty,{tactical}));
+ const batch=Array.from({length:runs},(_,i)=>playRun(`${seedPrefix}-${cls}-${difficulty}-${i}`,cls,difficulty,{tactical,align,veteran}));
  all.push(...batch);
  const fights=batch.flatMap(r=>r.fights);
  const byKind=(k:FightKind)=>fights.filter(f=>f.kind===k);

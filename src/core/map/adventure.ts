@@ -53,7 +53,8 @@ function checkGate(s:GameState){
  if(a.boss==='locked'&&a.storyDone&&a.fightsWon===routeFightQuota(s)){
   const ix=a.slotIds.findIndex(id=>id===null);
   if(ix<0)return;
-  a.boss='night';a.slotIds[ix]='night-boss';p.offers[ix]={kind:'boss',bossType:'final',enemyId:campaignBoss(s).id};p.resolved[ix]=false;
+  const boss=campaignBoss(s);if(s.campaign?.night===3)s.campaign.finalBossId=boss.id;
+  a.boss='night';a.slotIds[ix]='night-boss';p.offers[ix]={kind:'boss',bossType:'final',enemyId:boss.id};p.resolved[ix]=false;
  }
 }
 /** Completion settles only its own slot. Discard commands cannot delete ghosts. */

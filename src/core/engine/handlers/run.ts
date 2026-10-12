@@ -18,7 +18,7 @@ export function newRun(
   s = baseNewState(cmd.seed);
   // Every run is the three-night campaign. Difficulty defaults to the first tier.
   const difficulty=cmd.difficulty&&Number.isInteger(cmd.difficulty)&&cmd.difficulty>=1&&cmd.difficulty<=5?cmd.difficulty:1;
-  s.campaign={night:1,difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])]};
+  s.campaign={night:1,difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])],courage:0,merit:0,talked:[],talksThisNight:0,veteran:!!cmd.veteran};
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };

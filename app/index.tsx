@@ -70,7 +70,7 @@ export default function Home() {
   }, [state.phase,state.chapter,state.runSummary,journalOpen,nightClass,pickingClass,returnToMainMenu]);
 
   useEffect(() => {
-    if (['combat','victory','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
+    if (['combat','victory','talk','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
   },[state.phase,state.enemy?.id,state.chapter]);
 
   const page   = state.pages?.current;
