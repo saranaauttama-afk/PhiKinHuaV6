@@ -1,0 +1,51 @@
+{
+  "sourceSha": "1f7cd983a9a7efacf79252ce568604e938ef47f5",
+  "sourceTree": "510f3055445114dec4f8b977e23a9e8cf735480a",
+  "preservedAICommits": [
+    "f1f053f5eacdbf854460d2423eb7551aab86db7c",
+    "7455b3a9f6a04f7d9492d7a34480be69cc155b04"
+  ],
+  "pr": "https://github.com/saranaauttama-afk/PhiKinHuaV6/pull/15",
+  "ci": "https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38380455411",
+  "verify": "success",
+  "tests": 542,
+  "testFiles": 39,
+  "mobileChecks": 44,
+  "verificationArtifact": 11802444784,
+  "apk": "success",
+  "native": "success",
+  "balance": "zero stalls; difficulties 3–5 remain below bot targets; human acceptance open",
+  "apkVersion": "1.0.42",
+  "apkVersionCode": 43,
+  "apkArtifact": 11804361808,
+  "apkAuditArtifact": 11804775755,
+  "nativeChecks": 12,
+  "nativeApi": 36,
+  "nativeArtifact": 11804855503,
+  "apkBytes": 119091389,
+  "apkSha256": "994d35fd51597bc1094d9b6220bfc551ac3dfd701ce22c9e57997732a740ada8",
+  "apkUrl": "https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38380455411/artifacts/11804361808",
+  "signature": "V2 verified; debug certificate",
+  "zipalign": "Verification successful",
+  "contentScan": {
+    "files": 94,
+    "findings": 0,
+    "scope": "changed publication text; not a guarantee for all formats"
+  },
+  "ciJobs": {
+    "verify": 115239260431,
+    "android": 115241116685,
+    "native": 115247399153
+  },
+  "reuseRule": "Final evidence-only commit changes docs only; game/config/workflows/scripts must be byte-identical to sourceSha.",
+  "pending": [
+    "B08: difficulty 3–5 balance and human pacing acceptance",
+    "Physical Android device / complete human run acceptance",
+    "New milestone cards for difficulty 1–4 remain separate design backlog per preserved audit"
+  ],
+  "finalDocumentationScan": {
+    "files": 98,
+    "findings": 0,
+    "scope": "same scoped pattern scan including final documentation"
+  }
+}
