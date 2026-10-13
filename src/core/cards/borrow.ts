@@ -22,7 +22,7 @@ let serial = 0;
 /** Copies of the last `n` enemy cards go to hand. They are free and leave the fight once used. */
 export function borrowEnemyCards(s: GameState, n: number): number {
   let added = 0;
-  for (const id of lastEnemyCards(s, n)) {
+  for (const id of lastEnemyCards(s, n+require('./passives').ruleModifier(s,'borrowBonus'))) {
     const def = enemyCardById(id);
     if (!def || s.piles.hand.length >= s.player.handMax) continue;
     const card = cardFromEnemy(def, true);

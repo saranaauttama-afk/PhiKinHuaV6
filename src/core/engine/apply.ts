@@ -18,6 +18,7 @@ import * as story from './handlers/story';
 import * as chapter from './handlers/chapter';
 import * as cardReward from './handlers/cardReward';
 import * as skills from './handlers/skills';
+import * as talk from './handlers/talk';
 
 type Handler<T extends Command['type']> =
   (s: GameState, cmd: Extract<Command, { type: T }>, r: RNG) => { state: GameState; rng: RNG };
@@ -35,6 +36,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   EnemyPlayCard: combat.enemyPlayCard,
   StartMonsterTurn: combat.startMonsterTurn,
   EndTurn: combat.endTurn,
+  DiscardForTurnEnd: combat.discardForTurnEnd,
   ResolveEnemyTurn: combat.resolveEnemyTurn,
   StartPlayerTurn: combat.startPlayerTurnHandler,
 
@@ -49,6 +51,9 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   // Class skills
   UseSkill: skills.useSkill,
 
+  // ความกล้า / บุญ
+  AnswerGhostTalk: talk.answer,
+
   // การ์ดรางวัลหลังชนะไฟต์
   ChooseCardReward: cardReward.chooseCardReward,
   SkipCardReward: cardReward.skipCardReward,
@@ -56,11 +61,14 @@ const H: { [K in Command['type']]?: Handler<K> } = {
   // UI
   OpenDeck: ui.openDeck,
   CloseDeck: ui.closeDeck,
+  SetEquipmentLoadout: ui.setEquipmentLoadout,
+  ChooseHandReward: cardReward.chooseHandReward,
 
   // Shops & Events
   // TakeReward: se.takeReward, // (เลิกใช้: reward-on-victory ถูกตัด)
   TakeShop: se.takeShop,
   ShopReroll: se.shopReroll,
+  TakeShopBlessing: se.takeShopBlessing,
   DoBonfireHeal: se.doBonfireHeal,
   EventChooseBlessing: se.eventChooseBlessing,
   EventRemoveCard: se.eventRemoveCard,
@@ -93,6 +101,7 @@ const H: { [K in Command['type']]?: Handler<K> } = {
 
 export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
   const s = cloneForReducer(state);
+  require('../cards/equipment').normalizeLoadout(s);
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
   // event เป็นผลของ "คำสั่งนี้" เท่านั้น — เคลียร์ของคำสั่งก่อนหน้าทิ้งทุกครั้ง
@@ -106,6 +115,7 @@ export function applyCommand(state: GameState, cmd: Command, rng: RNG) {
     if(cmd.type==='PlayCard' && historyBefore && (out.state.turnFlags?.cardsPlayed??0)>(state.turnFlags?.cardsPlayed??0)){
       recordCardHistory(out.state,'player',state.piles.hand[cmd.index],historyBefore,0,undefined,historyCost);
     }
+    require('../cards/equipment').normalizeLoadout(out.state);
     captureRewardReceipt(state,out.state,cmd);trackRun(state,out.state,cmd);trackDiscovery(state,out.state,cmd);return out;}
   return { state: s, rng };
 }

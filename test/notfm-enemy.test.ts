@@ -15,7 +15,7 @@ import { THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
 import { ghostRule, ghostRuleIds } from '../src/core/campaign/enemyRules';
 import { applyRage, rageActive, rageStacks } from '../src/core/campaign/nights';
 import { RAGE, ENEMY_RULES } from '../src/core/balance/notfm';
-import { NIGHT_ENEMY_DECKS, NIGHT_AWAKENED_DECKS } from '../src/core/campaign/enemyDecks';
+import { NIGHT_ENEMY_DECKS } from '../src/core/campaign/enemyDecks';
 import { ghostTierLabel } from '../app/components/offerDisplay';
 
 const statusIds = new Set(Object.keys(STATUS_EFFECTS_REGISTRY));
@@ -26,7 +26,7 @@ describe('ข้อมูลการ์ดผี', () => {
   const cards = allEnemyCards();
 
   it('ทุกใบในเด็คผีมีอยู่จริง และไม่มีใบที่ไม่ได้ใช้ค้างอยู่', () => {
-    const used = new Set([...Object.values(NIGHT_ENEMY_DECKS), ...Object.values(NIGHT_AWAKENED_DECKS)].flat());
+    const used = new Set(Object.values(NIGHT_ENEMY_DECKS).flat());
     for (const id of used) expect(enemyCardById(id), id).toBeDefined();
     expect(cards.filter(c => !used.has(c.id)).map(c => c.id)).toEqual([]);
   });
@@ -100,16 +100,16 @@ describe('โกรธ', () => {
     expect(rageActive(at(1, 3, 3))).toBe(true);
   });
 
-  it('เริ่มเทิร์น 2 และเพิ่ม 1 ทุกเทิร์น', () => {
-    expect(rageStacks(at(2, 1, 1))).toBe(0);
+  it('เริ่มที่ RAGE.startTurn และเพิ่ม 1 ทุกเทิร์น', () => {
+    expect(rageStacks(at(2, 1, RAGE.startTurn - 1))).toBe(0);
     expect(rageStacks(at(2, 1, RAGE.startTurn))).toBe(1);
-    expect(rageStacks(at(2, 1, 4))).toBe(3);
+    expect(rageStacks(at(2, 1, RAGE.startTurn + 2))).toBe(3);
   });
 
   it('ทุกหมัดของผีแรงขึ้นตามชั้นโกรธ ผ่านเทิร์นผีจริง', () => {
     const { state: s } = makeCombatState({ playerHp: 50, enemyHp: 80 });
     s.campaign = { night: 2, difficulty: 1, completedNights: 1, unlocks: [] };
-    s.turn = 3;
+    s.turn = RAGE.startTurn + 1;
     const out = runEnemyCards(s, [HIT6]);
     expect(out.enemy!.statusEffects?.find(e => e.id === 'rage')?.stacks).toBe(2);
     expect(out.player.hp).toBe(50 - 6 - 2);

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { applyCommand } from '../src/core/reducer';
 import { makeRng } from '../src/core/rng';
+import { rollLevelOffers } from '../src/core/engine/shared';
 import type { Command, GameState } from '../src/core/types';
 import { LEVEL_UP } from '../src/core/balance/notfm';
 
@@ -39,7 +40,11 @@ function reachLevelUp(seed = 'lvl'): GameState {
   s.piles.hand = [
     { id: 'k', name: 'k', type: 'attack', fx: { dmg: 99 }, instanceId: 'k1' },
   ];
-  return step(s, { type: 'PlayCard', index: 0 }, seed);
+  s = step(s, { type: 'PlayCard', index: 0 }, seed);
+  if (s.phase === 'talk') s = step(s, { type: 'AnswerGhostTalk', choice: 'leave' }, seed);
+  // The two offers are rolled; tests that pick a classic reward open all of them.
+  if (s.levelUp && !s.levelUp.consumed) s.levelUp.offers = ['card', 'upgrade', 'remove', 'slot', 'retain'];
+  return s;
 }
 
 describe('เลเวลอัป: ฟื้นเต็ม + ชีวิตสูงสุด + เลือก 1 จาก 3', () => {
@@ -75,6 +80,41 @@ describe('เลเวลอัป: ฟื้นเต็ม + ชีวิต�
     s = step(s, { type: 'ChooseLevelUpOption', option: 'upgrade', index: 1 });
     expect(s.masterDeck[0]).toEqual(before[0]);
     expect(s.masterDeck[1].star).toBe(2);
+    // Upgrade grants LEVEL_UP.upgrades picks; only upgrades are allowed until they run out.
+    expect(s.phase).toBe('levelup');
+    const n = s.masterDeck.length;
+    s = step(s, { type: 'ChooseLevelUpOption', option: 'remove', index: 0 });
+    expect(s.masterDeck).toHaveLength(n);
+    s = step(s, { type: 'ChooseLevelUpOption', option: 'upgrade', index: 0 });
+    expect(s.masterDeck[0].star).toBe(2);
+    expect(s.levelUp?.consumed).toBe(true);
+  });
+
+  it('ช่องอุปกรณ์ / เก็บการ์ด +1', () => {
+    let s = reachLevelUp();
+    const slots = s.equipmentSlotsMax!;
+    s = step(s, { type: 'ChooseLevelUpOption', option: 'slot', index: 0 });
+    expect(s.equipmentSlotsMax).toBe(slots + 1);
+    let t = reachLevelUp('lvl2');
+    const keep = t.player.retain!;
+    t = step(t, { type: 'ChooseLevelUpOption', option: 'retain', index: 0 });
+    expect(t.player.retain).toBe(keep + 1);
+  });
+
+  it('สุ่มรางวัลมา 2 อย่างที่ไม่ซ้ำกัน และเลือกอย่างที่ไม่ได้เสนอไม่ได้', () => {
+    for (const seed of ['o1', 'o2', 'o3', 'o4', 'o5']) {
+      let s = reachLevelUp(seed);
+      s.levelUp!.offers = undefined;
+      const out = rollLevelOffers(s, makeRng(seed));
+      expect(out.list).toHaveLength(2);
+      expect(new Set(out.list).size).toBe(2);
+      s.levelUp!.offers = out.list;
+      const missing = (['card', 'upgrade', 'remove', 'slot', 'retain'] as const).find(o => !out.list.includes(o))!;
+      const before = JSON.stringify(s.masterDeck);
+      s = step(s, { type: 'ChooseLevelUpOption', option: missing, index: 0 });
+      expect(s.levelUp?.consumed).toBeFalsy();
+      expect(JSON.stringify(s.masterDeck)).toBe(before);
+    }
   });
 
   it('สละการ์ด → ใบนั้นออกจากสำรับ', () => {

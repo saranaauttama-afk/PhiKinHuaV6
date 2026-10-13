@@ -26,7 +26,7 @@ describe('archive catalog and real discoveries',()=>{
   const r=run();const visible=r.s.pages!.current!.offers.filter(o=>o?.kind==='monster');expect(Object.keys(r.s.discovery!.ghosts)).toHaveLength(visible.length);
   expect(Object.keys(r.s.discovery!.cards).length).toBeGreaterThan(0);
   const id=Object.keys(r.s.discovery!.ghosts)[0],p=mergeDiscovery(emptyArchive(),r.s.discovery!);
-  const fight=r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster');r.step({type:'ChooseOffer',index:fight});r.s.enemy!.statusEffects=[];r.s.piles.hand=[{id:'k',name:'k',type:'attack',fx:{dmg:9999}} as any];r.step({type:'PlayCard',index:0});for(let g=0;g<20&&r.s.phase!=='map';g++)r.step(r.s.phase==='levelup'?({type:'SkipLevelUp'}):r.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});const next=mergeDiscovery(p,r.s.discovery!);
+  const fight=r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster');r.step({type:'ChooseOffer',index:fight});r.s.enemy!.statusEffects=[];r.s.piles.hand=[{id:'k',name:'k',type:'attack',fx:{dmg:9999}} as any];r.step({type:'PlayCard',index:0});for(let g=0;g<20&&r.s.phase!=='map';g++)r.step(r.s.phase==='talk'?{type:'AnswerGhostTalk',choice:'leave'}:r.s.phase==='levelup'?({type:'SkipLevelUp'}):r.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});const next=mergeDiscovery(p,r.s.discovery!);
   expect(archiveProgress(next).ghosts[id].seen).toBe(1);expect(Object.keys(r.s.discovery!.ghosts).length).toBeGreaterThan(1);
  });
  it('viewing or leaving a shop does not discover its stock; buying records only the acquired card',()=>{

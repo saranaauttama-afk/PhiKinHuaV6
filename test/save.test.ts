@@ -42,9 +42,11 @@ function runInProgress(seed = 'save', classId: any = 'warrior'): GameState {
     if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go(({ type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     go({ type: 'CompleteNode' });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go(({ type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
   }
@@ -234,7 +236,8 @@ describe('เซฟอัตโนมัติ — ห้ามเซฟตอ�
     let guard = 0;
     while (guard++ < 10) {
       const p = t.get().phase;
-      if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
+      if (p === 'talk') t.go({ type: 'AnswerGhostTalk', choice: 'leave' });
+      else if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
       else if (p === 'reward') t.go({ type: 'ChooseCardReward', index: 0 });
       else break;
 
@@ -254,7 +257,8 @@ describe('เซฟอัตโนมัติ — ห้ามเซฟตอ�
     let guard = 0;
     while (guard++ < 10) {
       const p = t.get().phase;
-      if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
+      if (p === 'talk') t.go({ type: 'AnswerGhostTalk', choice: 'leave' });
+      else if (p === 'levelup') t.go({ type: 'SkipLevelUp' });
       else if (p === 'reward') t.go({ type: 'ChooseCardReward', index: 0 });
       else break;
     }

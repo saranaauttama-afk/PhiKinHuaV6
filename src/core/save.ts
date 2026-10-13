@@ -42,7 +42,7 @@ export const SAVE_VERSION = 3;
  */
 export const AUTO_SAVE_COMMANDS = [
   'CompleteNode', 'ChooseOffer', 'DeleteShopFromMap', 'DismissOffer',
-  'ChooseStarterBlessing',
+  'ChooseStarterBlessing', 'SetEquipmentLoadout', 'ChooseHandReward',
   'TakeShop', 'TakeShopEquipment', 'ShopRemoveBuy', 'ShopUpgradeBuy',
   'TakeTreasureCard', 'TakeSingleTreasureCard',
   'UseWell', 'UseHealingShrine',

@@ -26,6 +26,7 @@ export const ART_SOURCES: Record<string, any> = {
  'encounter/shop_remove':ENCOUNTER_OBJECTS.shop_remove,
  'encounter/well':ENCOUNTER_OBJECTS.well,
  'encounter/healing_shrine':ENCOUNTER_OBJECTS.healing_shrine,
+ 'encounter/blessing':ENCOUNTER_OBJECTS.blessing,
  'encounter/treasure':ENCOUNTER_OBJECTS.treasure,
  'encounter/treasure_single':ENCOUNTER_OBJECTS.treasure_single,
  'encounter/next_event':ENCOUNTER_OBJECTS.next_event,

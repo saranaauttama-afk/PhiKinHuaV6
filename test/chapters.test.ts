@@ -94,9 +94,11 @@ function playRun(seed: string, opts: {
       { id: 'kill', name: 'kill', type: 'attack', fx: { dmg: 9999 }, instanceId: 'kill1' },
     ];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     go({ type: 'CompleteNode' });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     closeChapter();

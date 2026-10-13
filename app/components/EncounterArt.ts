@@ -7,6 +7,7 @@ export const ENCOUNTER_OBJECTS={
  treasure_single:require('../../assets/encounters/thai-v29/treasure-single.webp'),
  well:require('../../assets/encounters/enWell.png'),
  healing_shrine:require('../../assets/ui/blessing-shrine-object.png'),
+ blessing:require('../../assets/ui/blessing-amulet.png'),
  shop_upgrade:require('../../assets/encounters/thai-v29/upgrade-altar.webp'),
  shop_remove:require('../../assets/ui/remove-torn-card-b17.webp'),
  story_event:require('../../assets/ui/trail-rest.png'),

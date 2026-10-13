@@ -1,3 +1,4 @@
+import {timeSummary} from '../../src/core/campaign/playTime';
 import {isThreeNight,campaignFightTotal,difficultyOf} from '../../src/core/campaign/threeNight';
 import React from 'react';
 import {View,Text,Image} from 'react-native';
@@ -18,7 +19,7 @@ export default function RunCompleteScreen({state,onNewRun,onMainMenu,onJournal}:
     <Row label="ศึกที่ผ่าน" value={s.fights+' / '+campaignFightTotal(state)}/>
     <Row label="เลเวล · เบี้ยที่เหลือ" value={s.level+' · '+s.gold}/>
     <Row label="สำรับตอนจบ" value={state.masterDeck.length+' ใบ'}/>
-    {s.metrics&&<><Row label="ใช้การ์ดทั้งหมด" value={s.metrics.cardsPlayed+' ครั้ง'}/><Row label="เทิร์น" value={s.metrics.turns+' ครั้ง'}/><Row label="เพิ่ม · สละ · ปลุกเสก" value={s.metrics.added+' · '+s.metrics.removed+' · '+s.metrics.upgraded}/></>}
+    {s.metrics&&<><Row label="ใช้การ์ดทั้งหมด" value={s.metrics.cardsPlayed+' ครั้ง'}/><Text style={{fontFamily:font.ui,fontSize:12,lineHeight:20,color:paper.ink}}>{timeSummary(s.metrics.activeMs)}</Text><Row label="เทิร์น" value={s.metrics.turns+' ครั้ง'}/><Row label="เพิ่ม · สละ · ปลุกเสก" value={s.metrics.added+' · '+s.metrics.removed+' · '+s.metrics.upgraded}/></>}
    </View>
   </RitualSurface>
   {state.campaign&&s.won&&<Text style={{fontFamily:font.ui,fontSize:13,lineHeight:22,textAlign:'center',color:palette.moon}}>{isThreeNight(state)?difficultyOf(state)<5?'ผ่านระดับ '+difficultyOf(state)+' แล้ว · เล่นระดับที่ปลดไว้ซ้ำได้ หรือเปิดระดับ '+(difficultyOf(state)+1)+' ของอาชีพนี้เมื่อชนะครั้งแรก':'ปลดวิชาประจำอาชีพได้ในสมุดบันทึก':state.campaign.night<5?'เปิดคืนที่ '+(state.campaign.night+1)+' สำหรับอาชีพนี้แล้ว':'เลือกวิชาประจำอาชีพได้ในสมุดผ่านคืน'}</Text>}

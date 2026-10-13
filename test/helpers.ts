@@ -114,6 +114,8 @@ export function resolveRewardIfAny(
   go: (c: Command) => void,
   take = false
 ): void {
+  if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
+  if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
   if (s.phase !== 'reward' || !s.cardReward) return;
   go(take ? { type: 'ChooseCardReward', index: 0 } : { type: 'SkipCardReward' });
 }

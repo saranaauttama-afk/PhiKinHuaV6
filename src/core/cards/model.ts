@@ -39,7 +39,7 @@ export function cardFx(s: GameState, card: CardData): Fx {
 export function cardCost(s: GameState, card: CardData): { ap: number; mana: number } {
   const effect = s.player?.statusEffects?.find(e => e.id === 'corruption');
   const corruption = effect ? (effect.stacks ?? 1) : 0;
-  const ap = card.ap ? card.ap + corruption : 0;
+  const ap = (card.ap ? card.ap + corruption : 0)+(card.type==='prayer'?require('./passives').ruleModifier(s,'prayerAp'):0);
   let mana = card.mana ? card.mana + corruption : 0;
   if (card.type === 'spell' && mana) {
     // Shaman passive: the first spell each turn is cheaper.

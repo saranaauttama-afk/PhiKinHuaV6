@@ -1,4 +1,5 @@
-import {rageActive} from '../src/core/campaign/nights';
+import {fightBadges} from '../src/core/combat/fightBadges';
+import {rageStartTurn} from '../src/core/campaign/nights';
 import {RAGE} from '../src/core/balance/notfm';
 import {ghostLore} from '../src/core/monsters/folklore';
 import {battleScene} from './scenePresentation';
@@ -26,6 +27,16 @@ import {needsVictoryIntro} from './postBattleFlow';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
+import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
+import TurnEndDiscard from './components/battle/TurnEndDiscard';
+import { retainLimit, turnEndExcess } from '../src/core/engine/handlers/combat';
+import { bossRule } from '../src/core/campaign/bossRules';
+
+function bossRelicView(s: import('../src/core/types').GameState) {
+  const r = s.fight?.relic, rule = bossRule(r?.bossId);
+  if (!r || !rule || r.bossId !== s.enemy?.id) return undefined;
+  return { name: rule.relic, durability: Math.max(0, r.durability), text: rule.text, flavor: rule.flavor, broken: r.broken, stolen: r.stolen.length };
+}
 import CardRewardOverlay from './components/battle/CardRewardOverlay';
 import PileView, { type PileId } from './components/battle/PileView';
 import StatusStrip, {type BattleBadge} from './components/battle/StatusStrip';
@@ -72,6 +83,7 @@ export default function BattlePage() {
   const [celebratedFight,setCelebratedFight] = React.useState(-1);
   const gameState = useGame((s) => s.state);
   const dispatch  = useGame((s) => s.dispatch);
+  React.useEffect(()=>{useGame.getState().setPlayPaused(paused||mainMenu);return ()=>useGame.getState().setPlayPaused(false);},[paused,mainMenu]);
   const { monsterId, monsterName } = useLocalSearchParams();
   // หน้านี้ใช้ฟอนต์เหมือนหน้าอื่นแต่เดิมไม่เคยโหลดเอง — รอดมาเพราะปกติผู้เล่น
   // เดินผ่านหน้าแผนที่ก่อนเสมอ แต่ expo-router เปิดตรงเข้าหน้านี้ได้
@@ -80,6 +92,11 @@ export default function BattlePage() {
   const [presentation, setPresentation] = React.useState<CombatFrame | null>(null);
   const player = presentation?.player ?? gameState.player;
   const enemy = presentation?.enemy ?? gameState.enemy;
+  // Face-down ghost cards keep their places while the ghost plays: a played card leaves a gap
+  // instead of the rest sliding together (playtest 13 Oct). `remaining` maps hand index → slot.
+  const handSlotsRef = React.useRef<{ total: number; remaining: number[] }>({ total: 0, remaining: [] });
+  const heldCount = enemy?.handCount ?? 0;
+  if (heldCount !== handSlotsRef.current.remaining.length) handSlotsRef.current = { total: heldCount, remaining: Array.from({ length: heldCount }, (_, i) => i) };
   const bootstrapped = React.useRef(false);
   const turnLocked = React.useRef(false);
 
@@ -210,9 +227,13 @@ export default function BattlePage() {
     }
   };
 
+  const [discardNeed, setDiscardNeed] = React.useState(0);
   const handleEndTurn = () => {
     if (turnLocked.current || phase !== 'player' || gameState.phase !== 'combat') return;
     setPrayerAt(null);
+    // Over the retain limit: the player picks what to discard first (NOTFM).
+    const need = turnEndExcess(gameState);
+    if (need > 0) { setDiscardNeed(need); return; }
     startEnemyTurn();
   };
 
@@ -254,10 +275,15 @@ export default function BattlePage() {
 
     switch (currentEvent.t) {
       case 'EnemyCardRevealed': {
+        // The frame already left this card out of the hand; take its slot out of the map too.
+        const slots = handSlotsRef.current, k = currentEvent.handIndex ?? 0;
+        const before = slots.remaining.length === (currentEvent.frame?.enemy?.handCount ?? -1) + 1 ? slots.remaining : Array.from({ length: (currentEvent.frame?.enemy?.handCount ?? 0) + 1 }, (_, i) => i);
+        const slot = before[k] ?? k, total = Math.max(slots.total, before.length);
+        handSlotsRef.current = { total, remaining: before.filter((_, i) => i !== k) };
         setEnemyHandCards([{
           key:`${gameState.turn}-${timeline.played.length}`,
           card:{id:currentEvent.cardId,ownerId:currentEvent.ownerId,name:currentEvent.name,damage:currentEvent.dmg,block:currentEvent.block,cost:currentEvent.cost,hits:currentEvent.hits,desc:currentEvent.desc},
-          cardIndex:currentEvent.handIndex??0,totalCards:(currentEvent.frame?.enemy?.handCount??0)+1,delay:0,playing:true,
+          cardIndex:slot,totalCards:total,delay:0,playing:true,
         }]);
         break;
       }
@@ -286,6 +312,7 @@ export default function BattlePage() {
   }, [currentEvent]);
 
   const badges:BattleBadge[]=[
+    ...fightBadges(gameState),
     ...(gameState.fight?.copyNext?[{id:'skill:copy',name:'ครูสอนมวย',symbol:'check',neutral:true,detail:'การ์ดใบถัดไปที่เล่นได้สำเนาเข้ามือ'}]:[]),
     ...(gameState.fight?.nextSpellMult?[{id:'skill:spell',name:'ปลุกเสก',symbol:'spell_charging',neutral:true,detail:`คาถาใบถัดไปได้ผล ×${gameState.fight.nextSpellMult}`}]:[]),
     ...(gameState.fight?.halfDamage?[{id:'skill:half',name:'สำรวมจิต',symbol:'block',neutral:true,detail:'รับดาเมจจากผีครึ่งเดียวจนถึงเทิร์นหน้า'}]:[]),
@@ -317,12 +344,13 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea rage={{startTurn:rageActive(gameState)?RAGE.startTurn:RAGE.backstopTurn,perTurn:RAGE.perTurn}}
+        <MonsterArea relic={bossRelicView(gameState)} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
           monsterName={monsterName}
-          enemy={enemy ?? null}
+          enemy={enemy?{...enemy,drawPerTurn:gameState.enemyDrawPerTurn,maxRetained:gameState.enemyMaxRetained}:null}
+          handSlots={handSlotsRef.current}
           turnLabel={`เทิร์น ${gameState.turn} · ${phase==='enemy'?'ตาผี':'ตาเรา'}`}
         />
 
@@ -404,6 +432,7 @@ export default function BattlePage() {
           maxAp={player.maxAp}
           mana={player.mana}
           block={player.block}
+          handCount={gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length} handMax={player.handMax} retain={retainLimit(gameState)} drawPerTurn={player.drawPerTurn} opening={require('../src/core/cards/hand').openingHandSize(gameState)}
           drawCount={drawCount}
           onEndTurn={handleEndTurn}
           onOpenPiles={() => setOpenPile('draw')}
@@ -426,12 +455,24 @@ export default function BattlePage() {
           onClose={() => setOpenPile(null)}
         />
 
+        {discardNeed > 0 && gameState.phase === 'combat' && (
+          <TurnEndDiscard hand={gameState.piles.hand} need={discardNeed} retain={retainLimit(gameState)}
+            onCancel={() => setDiscardNeed(0)}
+            onConfirm={indices => { dispatch({ type: 'DiscardForTurnEnd', indices }); setDiscardNeed(0); startEnemyTurn(); }} />
+        )}
+
         {prayerAt != null && playerHand[prayerAt]?.type === 'prayer' && (
           <PrayerWaitPicker
             card={playerHand[prayerAt]}
+            multBonus={gameState.blessings.reduce((n,b)=>n+(b.rules?.prayerMult??0),0)}
             onPick={wait => handlePlayCard(playerHand[prayerAt], prayerAt, wait)}
             onCancel={() => setPrayerAt(null)}
           />
+        )}
+
+        {/* ผีพูดก่อนรางวัล: คำตอบเพิ่มความกล้าหรือบุญ */}
+        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'talk' && gameState.ghostTalk && (
+          <GhostTalkOverlay state={gameState} onAnswer={choice => dispatch({ type: 'AnswerGhostTalk', choice })} />
         )}
 
         {/* หลังรับทราบชัยชนะ จึงแสดงตัวเลือกเลเวลอัปที่ engine เตรียมไว้ */}
@@ -451,6 +492,7 @@ export default function BattlePage() {
           <CardRewardOverlay
             notice={gameState.levelUp?.result?.fight===(gameState.fightCount??0)?gameState.levelUp.result.text:undefined}
             choices={gameState.cardReward.choices}
+            growth={gameState.cardReward.growth} onGrowth={option=>dispatch({type:'ChooseHandReward',option})}
             deck={gameState.masterDeck ?? []}
             onChoose={(index) => dispatch({ type: 'ChooseCardReward', index })}
             onSkip={() => dispatch({ type: 'SkipCardReward' })}
@@ -476,7 +518,7 @@ export default function BattlePage() {
         {!timeline.isPlaying && !presentation && gameState.phase === 'defeat' && (
           <DefeatOverlay onHome={() => router.replace('/')} />
         )}
-        {Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1'&&<Text testID="v33-battle-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({hand:gameState.piles.hand.map(c=>c.id),discard:gameState.piles.discard.length,normalHand:gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length,cap:gameState.player.handMax,draw:gameState.player.drawPerTurn,turn:gameState.turn,phase:gameState.phase,enemyHand:gameState.enemyPiles?.hand.length??0,presentedEnemyHand:enemy?.handCount??0,history:gameState.cardHistory,uiPhase:phase})}</Text>}
+        {Platform.OS==='web'&&process.env.EXPO_PUBLIC_UI_REVIEW==='1'&&<Text testID="v33-battle-state" pointerEvents="none" style={{position:'absolute',opacity:0,width:1,height:1}}>{JSON.stringify({hand:gameState.piles.hand.map(c=>c.id),discard:gameState.piles.discard.length,normalHand:gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length,cap:gameState.player.handMax,draw:gameState.player.drawPerTurn,turn:gameState.turn,phase:gameState.phase,enemyHand:gameState.enemyPiles?.hand.length??0,presentedEnemyHand:enemy?.handCount??0,history:gameState.cardHistory,uiPhase:phase,equipped:gameState.equipped,prayers:gameState.prayers,activeMs:gameState.runMetrics?.activeMs})}</Text>}
         <Modal visible={paused} transparent animationType="fade" onRequestClose={()=>settingsOpen?setSettingsOpen(false):setPaused(false)}>
           <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:24,justifyContent:'center'}}>
             <RitualSurface kind="quietSlate" style={{padding:24,gap:14}}>

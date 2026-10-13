@@ -1,3 +1,4 @@
+import {choiceLocked,getStoryEvent} from '../src/core/events/story';
 // scripts/pilot.ts — automated player for balance runs.
 //
 // Plays one full three-night run with real commands only (no QA card, no state edits),
@@ -12,7 +13,9 @@ import {canUpgrade,canRemoveCard} from '../src/core/engine/shared';
 import {skillsFor,skillBlock,possessionCards} from '../src/core/skills';
 import {cardFromEnemy} from '../src/core/cards/borrow';
 import {enemyCardById} from '../src/core/pack_enemy_cards';
-import {shopPrice} from '../src/core/engine/handlers/shops_events';
+import {shopPrice,upgradePrice,removePrice} from '../src/core/engine/handlers/shops_events';
+import {levelOffers} from '../src/core/engine/handlers/level';
+import {turnEndExcess} from '../src/core/engine/handlers/combat';
 import {isCriticalOffer} from '../src/core/map/adventure';
 import type {ClassId} from '../src/core/classes';
 import type {Difficulty} from '../src/core/campaign/threeNight';
@@ -20,7 +23,9 @@ import type {Command,CardData,Fx,GameState} from '../src/core/types';
 
 export type FightKind='normal'|'elite'|'boss';
 export type FightRecord={night:number;index:number;enemyId:string;kind:FightKind;turns:number;hpBefore:number;hpAfter:number;maxHp:number;won:boolean};
-export type RunRecord={seed:string;classId:ClassId;difficulty:Difficulty;won:boolean;stalled:boolean;nightReached:number;fights:FightRecord[];deck:number;level:number;gold:number;turns:number;plays:number};
+export type RunRecord={seed:string;classId:ClassId;difficulty:Difficulty;won:boolean;stalled:boolean;nightReached:number;fights:FightRecord[];deck:number;level:number;gold:number;turns:number;plays:number;
+ /** Permanent upgrades bought (boon id → count) and blessings held at the end. */
+ blessings?:number;goldEarned?:number;goldSpent?:number};
 
 const fxValue=(fx:Fx)=>(fx.dmg??0)*(fx.hits??1)+(fx.block??0)*.6+(fx.draw??0)*4+(fx.mana??0)*2+(fx.heal??0)*.6+(fx.status??[]).reduce((n,e)=>n+e.stacks*2.5,0)+(fx.borrow??0)*5;
 /** Rough worth per resource spent; used for rewards, shop and removal. */
@@ -67,13 +72,22 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
 
 /** Level-up: a strong card while the deck is small, else a star on the best card, else trim. */
 function chooseLevelUp(s:GameState):Command{
+ const offers=levelOffers(s),has=(o:string)=>offers.includes(o as any);
  const cards=(s.levelUp?.cards??[]).map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>b.v-a.v);
  const up=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v);
  const low=s.masterDeck.map((c,i)=>({i,v:c.type==='curse'?-99:cardValue(c),ok:canRemoveCard(c,s.masterDeck.length)})).filter(x=>x.ok).sort((a,b)=>a.v-b.v);
- if(cards[0]&&(s.masterDeck.length<14||cards[0].v>=12))return {type:'ChooseLevelUpOption',option:'card',index:cards[0].i};
- if(low[0]&&(low[0].v<0||s.masterDeck.length>16))return {type:'ChooseLevelUpOption',option:'remove',index:low[0].i};
- if(up[0])return {type:'ChooseLevelUpOption',option:'upgrade',index:up[0].i};
- if(cards[0])return {type:'ChooseLevelUpOption',option:'card',index:cards[0].i};
+ if(s.levelUp?.upgradesLeft!=null)return up[0]?{type:'ChooseLevelUpOption',option:'upgrade',index:up[0].i}:{type:'SkipLevelUp'};
+ if(has('draw')&&s.player.drawPerTurn<3)return {type:'ChooseLevelUpOption',option:'draw',index:0};
+ if(has('mana')&&s.player.startMana<6&&s.masterDeck.some(c=>c.type==='spell'))return {type:'ChooseLevelUpOption',option:'mana',index:0};
+ if(has('ap')&&s.player.maxAp<3)return {type:'ChooseLevelUpOption',option:'ap',index:0};
+ if(has('retain')&&(s.player.retain??3)<4)return {type:'ChooseLevelUpOption',option:'retain',index:0};
+ if(has('card')&&cards[0]&&(s.masterDeck.length<14||cards[0].v>=12))return {type:'ChooseLevelUpOption',option:'card',index:cards[0].i};
+ if(has('remove')&&low[0]&&(low[0].v<0||s.masterDeck.length>16))return {type:'ChooseLevelUpOption',option:'remove',index:low[0].i};
+ if(has('upgrade')&&up[0])return {type:'ChooseLevelUpOption',option:'upgrade',index:up[0].i};
+ if(has('slot')&&s.masterDeck.filter(c=>c.type==='equipment').length>=2)return {type:'ChooseLevelUpOption',option:'slot',index:0};
+ if(has('card')&&cards[0])return {type:'ChooseLevelUpOption',option:'card',index:cards[0].i};
+ if(has('retain'))return {type:'ChooseLevelUpOption',option:'retain',index:0};
+ if(has('slot'))return {type:'ChooseLevelUpOption',option:'slot',index:0};
  return {type:'SkipLevelUp'};
 }
 
@@ -111,13 +125,21 @@ function chooseFightSkill(s:GameState):Command|undefined{
 function activeOffer(s:GameState){const ix=s.pages?._activeOfferIndex;return ix!=null?s.pages?.current?.offers[ix]:undefined;}
 function fightKind(s:GameState):FightKind{const o=activeOffer(s);return o?.kind==='boss'?'boss':o?.kind==='monster'&&o.tier==='elite'?'elite':'normal';}
 
-export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{tactical?:boolean;observe?:(s:GameState,r:RNG)=>void}={}):RunRecord{
+/** How the pilot answers ghost dialogues; 'auto' picks one of the three from the seed. */
+export type AlignPolicy='courage'|'merit'|'even'|'auto';
+function alignChoice(s:GameState,policy:Exclude<AlignPolicy,'auto'>):'courage'|'merit'{
+ if(policy!=='even')return policy;
+ return (s.campaign?.courage??0)<=(s.campaign?.merit??0)?'courage':'merit';
+}
+
+export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{tactical?:boolean;observe?:(s:GameState,r:RNG)=>void;align?:AlignPolicy;veteran?:boolean;blessingTier?:number;milestoneLevel?:number}={}):RunRecord{
  const tactical=opts.tactical??true;
- let s=baseNewState(seed),r=makeRng(seed),steps=0,stalled=false;
+ let s=baseNewState(seed),r=makeRng(seed),steps=0,stalled=false,earned=0,spent=0;
  const fights:FightRecord[]=[];let open:FightRecord|undefined;
  const go=(cmd:Command)=>{
-  const before=s.phase;
+  const before=s.phase,goldBefore=s.player.gold??0;
   const out=applyCommand(s,cmd,r);s=out.state;r=out.rng;steps++;
+  const delta=(s.player.gold??0)-goldBefore;if(delta>0)earned+=delta;else spent-=delta;
   if(before!=='combat'&&s.phase==='combat'&&s.enemy){
    open={night:s.campaign?.night??1,index:(s.fightCount??0)+1,enemyId:s.enemy.id,kind:fightKind(s),turns:0,hpBefore:s.player.hp,hpAfter:s.player.hp,maxHp:s.player.maxHp,won:false};
   }
@@ -127,7 +149,8 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   }
   opts.observe?.(s,r);
  };
- go({type:'NewRun',seed,classId,difficulty});
+ const align=opts.align&&opts.align!=='auto'?opts.align:(['courage','merit','even'] as const)[[...seed].reduce((n,ch)=>n+ch.charCodeAt(0),0)%3];
+ go({type:'NewRun',seed,classId,difficulty,veteran:opts.veteran,blessingTier:opts.blessingTier??0,milestoneLevel:opts.milestoneLevel??0});
  while(!s.runSummary&&steps<9000){
   if(s.chapter){go({type:'SkipChapter'});continue;}
   if(s.phase==='starter'){const i=s.starter!.choices.findIndex(b=>b.id==='spirit_energy'||b.id==='herbal_wisdom'||b.id==='bamboo_dart_power');go({type:'ChooseStarterBlessing',index:Math.max(0,i)});continue;}
@@ -139,13 +162,20 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
     if(s.phase==='combat'&&cardsPlayedThisTurn(s)===before){stalled=true;break;}
    }
    if(s.phase!=='combat')continue;
+   // Over the retain limit: drop the least valuable cards (spells waiting on mana stay).
+   const need=turnEndExcess(s);
+   if(need>0){const rank=s.piles.hand.map((c,i)=>({i,v:c.type==='curse'?99:cardValue(c)})).filter(x=>s.piles.hand[x.i].type!=='curse').sort((a,b)=>a.v-b.v);go({type:'DiscardForTurnEnd',indices:rank.slice(0,need).map(x=>x.i)});}
    go({type:'ResolveEnemyTurn'});
    if(s.phase==='combat')go({type:'StartPlayerTurn'});
    if(s.turn>60){stalled=true;break;}
    continue;
   }
+  if(s.phase==='talk'){go({type:'AnswerGhostTalk',choice:alignChoice(s,align)});continue;}
   if(s.phase==='levelup'){go(chooseLevelUp(s));continue;}
   if(s.phase==='reward'){
+   const growth=s.cardReward?.growth??[];
+   if(growth.includes('draw')&&s.player.drawPerTurn<3){go({type:'ChooseHandReward',option:'draw'});continue;}
+   if(growth.includes('retain')&&(s.player.retain??2)<3){go({type:'ChooseHandReward',option:'retain'});continue;}
    const ranked=(s.cardReward?.choices??[]).map((c,i)=>({i,c,v:cardValue(c)})).sort((a,b)=>b.v-a.v);
    const best=ranked[0];const pick=best&&(s.masterDeck.length<16||best.v>=12);
    go(pick?{type:'ChooseCardReward',index:best.i}:{type:'SkipCardReward'});continue;
@@ -156,29 +186,39 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    const p=s.pages.current!,a=s.pages.adventure,offers=p.offers;
    const open=(i:number)=>!!offers[i]&&!p.resolved[i];
    const prep=offers.findIndex((o,i)=>open(i)&&!a.usedIds.includes(a.slotIds[i]!)&&(o.kind==='treasure'||o.kind==='treasure_single'||o.kind==='story_event'||
-    o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75||o.kind==='shop_card'&&s.player.gold>=40||o.kind==='shop_equipment'&&s.player.gold>=40||
-    o.kind==='shop_upgrade'&&s.player.gold>=40||o.kind==='shop_remove'&&s.masterDeck.length>8&&s.player.gold>=40));
+    o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75||o.kind==='shop_card'&&s.player.gold>=30||o.kind==='shop_equipment'&&s.player.gold>=40||
+    o.kind==='blessing'||o.kind==='shop_upgrade'||o.kind==='shop_remove'&&s.masterDeck.length>8));
    const ix=prep>=0?prep:offers.findIndex((o,i)=>open(i)&&isCriticalOffer(o));
    const other=offers.findIndex((_,i)=>open(i));
    if(ix<0&&other<0){stalled=true;break;}
-   go(ix>=0?{type:'ChooseOffer',index:ix}:offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});
+   const equipmentIndices=s.masterDeck.map((c,i)=>({c,i})).filter(x=>x.c.type==='equipment').sort((a,b)=>cardValue(b.c)-cardValue(a.c)).slice(0,s.equipmentSlotsMax??1).map(x=>x.i);
+   go(ix>=0?{type:'ChooseOffer',index:ix,equipmentIndices}:offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});
    continue;
   }
   if(s.phase==='shop'&&s.pages?.adventure){
-   const slot=s.pages._activeOfferIndex;
+   const slot=s.pages._activeOfferIndex,slotId=slot!=null?s.pages.adventure.slotIds[slot]:undefined;
    if(s.shopKind==='well')go({type:'UseWell'});
    if(s.shopKind==='healing')go({type:'UseHealingShrine'});
    if((s.shopKind==='treasure'||s.shopKind==='treasure_single')&&s.shopStock?.length)go({type:s.shopKind==='treasure'?'TakeTreasureCard':'TakeSingleTreasureCard',index:0});
-   if(s.shopKind==='upgrade'){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'ShopUpgradeBuy',index:rank[0].i});}
-   if(s.shopKind==='remove'&&s.masterDeck.length>8){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);go({type:'ShopRemoveBuy',index:rank[0].i});}
-   if(s.shopKind==='card'||s.shopKind==='equipment'){const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&shopPrice(s,it.price)<=s.player.gold?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);if(rank[0])go({type:'TakeShop',index:rank[0].i});}
+   if(s.shopKind==='blessing'&&s.blessingStock?.length)go({type:'TakeShopBlessing',index:0});
+   // Spend down to a small reserve: the first upgrade/removal is free, more cost gold.
+   const reserve=60;
+   if(s.shopKind==='upgrade')for(let k=0;k<4;k++){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v);const price=upgradePrice(s);if(!rank[0]||(price>0&&price>s.player.gold-reserve))break;go({type:'ShopUpgradeBuy',index:rank[0].i});}
+   if(s.shopKind==='remove')for(let k=0;k<3&&s.masterDeck.length>(k?12:8);k++){const rank=s.masterDeck.map((c,i)=>({i,v:cardValue(c)})).sort((a,b)=>a.v-b.v);const price=removePrice(s);if(price>0&&price>s.player.gold-reserve)break;go({type:'ShopRemoveBuy',index:rank[0].i});}
+   if(s.shopKind==='card'||s.shopKind==='equipment')for(let k=0;k<2;k++){
+    // The best affordable card; a second one only while the deck is small and gold stays above the reserve.
+    const rank=(s.shopStock??[]).flatMap((it,i)=>'card' in it&&it.card&&shopPrice(s,it.price)<=s.player.gold-(k?reserve:0)?[{i,v:cardValue(it.card)}]:[]).sort((a,b)=>b.v-a.v);
+    if(!rank[0]||(k&&s.masterDeck.length>=16))break;go({type:'TakeShop',index:rank[0].i});
+   }
    if(s.phase==='shop')go({type:'CompleteNode'});
-   if((s.phase as string)==='map'&&slot!=null&&!s.pages.current!.resolved[slot])go({type:'DeleteShopFromMap',index:slot});
+   // An unused stop stays on the board; the pilot clears it so the night moves on.
+   if((s.phase as string)==='map'&&slot!=null&&s.pages.adventure!.slotIds[slot]===slotId&&!s.pages.current!.resolved[slot])go({type:'DeleteShopFromMap',index:slot});
    continue;
   }
-  if(s.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});continue;}
+  if(s.phase==='event'){const ev=getStoryEvent(s.story!.eventId,s);const index=ev?.choices.findIndex(c=>!choiceLocked(s,c))??-1;if(index<0){stalled=true;break;}go({type:'ChooseEventOption',index});go({type:'CompleteNode'});continue;}
   stalled=true;break;
  }
  if(!s.runSummary)stalled=true;
- return {seed,classId,difficulty,won:!!s.runSummary?.won,stalled,nightReached:s.campaign?.night??1,fights,deck:s.masterDeck.length,level:s.player.level,gold:s.player.gold,turns:s.runMetrics?.turns??0,plays:s.runMetrics?.cardsPlayed??0};
+ return {seed,classId,difficulty,won:!!s.runSummary?.won,stalled,nightReached:s.campaign?.night??1,fights,deck:s.masterDeck.length,level:s.player.level,gold:s.player.gold,turns:s.runMetrics?.turns??0,plays:s.runMetrics?.cardsPlayed??0,
+blessings:s.blessings?.length??0,goldEarned:earned,goldSpent:spent};
 }

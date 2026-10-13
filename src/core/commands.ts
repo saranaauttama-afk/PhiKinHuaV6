@@ -7,7 +7,6 @@ import { shuffle, type RNG } from './rng';
 import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
 import { dealDamage, gainBlock, heal } from './combat/damage';
 
-let _instanceCounter = 0;
 
 // NOTE: We keep state updates pure by working on shallow copies of containers.
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -20,7 +19,7 @@ export function baseNewState(seed: string): GameState {
     player: {
       hp: START_HP, maxHp: START_HP, block: 0,
       ap: CARD_RULES.apPerTurn, maxAp: CARD_RULES.apPerTurn, mana: 0, startMana: 0,
-      openingDraw: CARD_RULES.openingDraw, drawPerTurn: CARD_RULES.drawPerTurn, handMax: CARD_RULES.handMax,
+      openingDraw: CARD_RULES.openingDraw, drawPerTurn: CARD_RULES.drawPerTurn, handMax: CARD_RULES.handMax, retain: CARD_RULES.retain,
       gold: START_GOLD, level: 1, exp: 0, expToNext: nextExpForLevel(1),
     },
     enemy: undefined,
@@ -51,10 +50,9 @@ export function buildAndShuffleDeck(_state: GameState, _rng: RNG): { state: Game
   let state = _state;
   let rng = _rng;
   const source = state.masterDeck?.length ? state.masterDeck : START_DECK;
-  const out = shuffle(rng, source);
-  _instanceCounter = 0;
+  const out = shuffle(rng, source.map((c,i)=>({...c,instanceId:`${c.id}__${i+1}`})));
   state.piles = {
-    draw: out.array.map(c => ({ ...c, instanceId: `${c.id}__${++_instanceCounter}` })),
+    draw: out.array,
     hand: [], discard: [], exhaust: [],
   };
   rng = out.rng;
@@ -71,7 +69,7 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   processStatusEffectsOnTurnStart('player', state);
   rng = require('./cards/play').resolvePrayers(state, rng);
   if (state.phase !== 'combat') return { state, rng };
-  ({ state, rng } = drawCards(state, rng, state.player.drawPerTurn));
+  ({ state, rng } = drawCards(state, rng, Math.max(1,state.player.drawPerTurn)));
   rng = require('./cards/passives').runTriggers(state, 'turnStart', rng);
   require('./cards/testWin').dealTestWinCard(state);
   return { state, rng };
@@ -86,12 +84,15 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   s.cardHistory = []; s.cardHistorySeq = 0;
   s.equipped = []; s.prayers = []; s.traps = [];
   s.fight = { hpLost: 0, ghostTurns: 0 };
+  require('./campaign/bossRules').initBossRelic(s);
   require('./skills').tickSkillCooldowns(s);
   s.player.block = 0;
   s.player.ap = s.player.maxAp;
   s.player.mana = s.player.startMana;
   require('./cards/mechanics').resetCardsPlayed(s);
-  ({ state: s, rng } = drawCards(s, rng, s.player.openingDraw));
+  rng = require('./cards/equipment').prepareEquipment(s,rng);
+  const opening=require('./cards/hand').openingHandSize(s);
+  ({ state: s, rng } = drawCards(s, rng, opening));
   rng = require('./cards/passives').runTriggers(s, 'battleStart', rng);
   require('./cards/testWin').dealTestWinCard(s);
   return rng;

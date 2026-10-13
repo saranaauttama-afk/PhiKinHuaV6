@@ -5,10 +5,8 @@ import { STATUS_EFFECTS_REGISTRY } from '../combat/status-effects/registry';
 import { conditionText } from './mechanics';
 import { starFx } from './model';
 
-export const TYPE_LABEL: Record<CardType, string> = {
-  attack: 'โจมตี', action: 'Action', spell: 'คาถา', equipment: 'อุปกรณ์',
-  mana: 'มานา', prayer: 'สวดภาวนา', counter: 'ตอบโต้', curse: 'คำสาป',
-};
+export {CARD_TYPE_LABELS as TYPE_LABEL} from './typesRegistry';
+import {CARD_TYPE_LABELS as TYPE_LABEL} from './typesRegistry';
 
 const statusName = (id: string) => STATUS_EFFECTS_REGISTRY[id as keyof typeof STATUS_EFFECTS_REGISTRY]?.name ?? id;
 
@@ -33,7 +31,7 @@ export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
 const COUNTER_WHEN = { enemy_attack: 'เมื่อผีโจมตี', enemy_skill: 'เมื่อผีใช้วิชา', enemy_any: 'เมื่อผีเล่นการ์ด' } as const;
 const TRIGGER_WHEN: Record<Trigger['on'], string> = {
   battleStart: 'เริ่มไฟต์', equip: 'เมื่อสวม', turnStart: 'ต้นเทิร์น', turnEnd: 'ท้ายเทิร์น',
-  play: 'เมื่อเล่น', prayerDone: 'เมื่อบทสวดสำเร็จ',
+  discard:'เมื่อทิ้งท้ายเทิร์น', play: 'เมื่อเล่น', prayerDone: 'เมื่อบทสวดสำเร็จ',
 };
 
 export function passiveText(p: Passive): string[] {
