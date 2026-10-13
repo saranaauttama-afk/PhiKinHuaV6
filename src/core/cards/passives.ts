@@ -3,7 +3,7 @@ import type { CardType, GameState, Passive, Trigger, TriggerOn } from '../types'
 import type { RNG } from '../rng';
 import { applyFx } from './fx';
 import { conditionMet } from './mechanics';
-import { CLASS_PASSIVES } from '../balance/notfm';
+import { BARGAIN_RULE_LIMITS, CLASS_PASSIVES } from '../balance/notfm';
 
 type Source = { key: string; name: string; passive: Passive };
 
@@ -14,6 +14,24 @@ function sources(s: GameState): Source[] {
   for (const b of s.blessings ?? []) if (b.triggers) out.push({ key: 'b:' + b.id, name: b.name, passive: b });
   for (const c of s.equipped ?? []) if (c.equip) out.push({ key: 'e:' + (c.instanceId ?? c.id), name: c.name, passive: c.equip });
   return out;
+}
+
+type RuleKey = keyof NonNullable<import('../types').BlessingDef['rules']>;
+/**
+ * Bargain rules (พรแลกเปลี่ยน: แพนโดรา + พรเหตุการณ์) never stack on the same rule.
+ * Why: two prayer-cost bargains made every prayer cost 3 AP against 2 AP per turn, which
+ * locked the nun out of her own class cards. Offers are filtered by `bargainConflicts`;
+ * the clamp (BARGAIN_RULE_LIMITS in balance/notfm.ts) is the backstop for saves made before that filter existed.
+ */
+export function ruleModifier(s:GameState,key:RuleKey):number {
+ const sum=(s.blessings??[]).reduce((n,b)=>n+(b.rules?.[key]??0),0);
+ const lim=(BARGAIN_RULE_LIMITS as Partial<Record<RuleKey, readonly [number, number]>>)[key];
+ return lim?Math.max(lim[0],Math.min(lim[1],sum)):sum;
+}
+/** True when `b` changes a rule that an owned bargain already changes . */
+export function bargainConflicts(owned:import('../types').BlessingDef[],b:import('../types').BlessingDef|undefined):boolean {
+ const keys=Object.keys(b?.rules??{});
+ return keys.length>0&&owned.some(o=>keys.some(k=>o.rules&&k in o.rules));
 }
 
 /** Flat damage added to each hit of an attack card. */

@@ -49,7 +49,7 @@ export function playCard(s: GameState, index: number, rng: RNG, wait = 1): { rng
       break;
     case 'prayer': {
       const turns = Math.max(1, Math.min(PRAYER_MULT.length, Math.floor(wait)));
-      (s.prayers ??= []).push({ card, turnsLeft: turns, mult: PRAYER_MULT[turns - 1] });
+      (s.prayers ??= []).push({ card, turnsLeft: turns, mult: PRAYER_MULT[turns - 1]+require('./passives').ruleModifier(s,'prayerMult') });
       s.log.push(`สวด ${card.name} รอ ${turns} เทิร์น`);
       break;
     }
@@ -62,6 +62,7 @@ export function playCard(s: GameState, index: number, rng: RNG, wait = 1): { rng
       rng = applyFx(s, fx, { sourceId: card.id, type: card.type, mult }, rng);
     }
   }
+  if(card.borrowed){const loss=require('./passives').ruleModifier(s,'borrowHpCost');if(loss>0){const hpLoss=Math.min(s.player.hp,loss);s.player.hp-=hpLoss;require('../combat/damage').emit(s,{t:'Damage',target:'player',raw:loss,modified:loss,blocked:0,hpLoss,died:s.player.hp<=0,sourceKind:'blessing'});}}
   rng = runTriggers(s, 'play', rng, card.type);
   copyPlayedCard(s, card);
   return { rng, played: true };

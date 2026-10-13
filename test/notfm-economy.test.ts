@@ -14,7 +14,7 @@ import { markedUp, removePrice, upgradePrice, wellHeal, shrineCost, healAmount }
 function run(difficulty: Difficulty = 1, seed = 'eco') {
   let s = baseNewState(seed), r = makeRng(seed);
   const go = (c: Command) => { ({ state: s, rng: r } = applyCommand(s, c, r)); };
-  go({ type: 'NewRun', seed, classId: 'warrior', difficulty }); go({ type: 'SkipChapter' }); go({ type: 'ChooseStarterBlessing', index: 0 });
+  go({ type: 'NewRun', seed, classId: 'warrior', difficulty }); go({ type: 'SkipChapter' }); go({ type: 'ChooseStarterBlessing', index: Math.max(0,s.starter!.choices.findIndex(b=>!b.onGain)) });
   return { go, get s() { return s; } };
 }
 /** Open the night's stop of `kind` straight from the adventure deck. */
@@ -114,7 +114,7 @@ describe('ระดับความยาก', () => {
     expect(d.s.player.gold).toBe(999 - Math.ceil(price * 1.25));
   });
 
-  it('ระดับ 5 คืนที่ 3 จั่วต่อเทิร์นน้อยลง 1', () => {
+  it('จั่วต่อเทิร์นไม่ถูกลดตอนเข้าคืนที่ 3 (กฎระดับ 5 เปลี่ยนเป็นไม่มีโบนัสเปิดศึก)', () => {
     for (const difficulty of [4, 5] as const) {
       const d = run(difficulty, 'draw-cut-' + difficulty);
       const draw = d.s.player.drawPerTurn;
@@ -137,7 +137,7 @@ describe('ระดับความยาก', () => {
         if (d.s.chapter) d.go({ type: 'SkipChapter' });
       }
       expect(d.s.campaign!.night).toBe(3);
-      expect(d.s.player.drawPerTurn).toBe(difficulty >= DIFFICULTY.drawCutFrom ? draw - 1 : draw);
+      expect(d.s.player.drawPerTurn).toBe(draw);
     }
   });
 });

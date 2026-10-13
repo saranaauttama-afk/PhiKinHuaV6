@@ -18,7 +18,7 @@ export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficult
  /** Nights cleared across all runs when this run began: unlocks แพนโดรา blessings. */
  blessingTier?:number;
  /** The night-3 boss, fixed when its slot appears. */
- finalBossId?:string};
+ finalBossId?:string;milestoneLevel?:number;eventByNight?:Record<string,string>};
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};
 /** The class blessing a fifth-night clear can unlock. */
 export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>=Object.fromEntries((['warrior','shaman','nun','medium'] as ClassId[]).map(id=>[id,require('../pack').classBlessing(id)])) as Record<ClassId,BlessingDef>;
@@ -41,10 +41,15 @@ export function configureNightEnemy(s:GameState):void{
 export function rageActive(s:Partial<GameState>):boolean{
  return !!s.campaign&&s.campaign.night>=RAGE.fromNight(difficultyOf(s));
 }
+/** Ghost turn on which rage begins; level 4+ starts it `DIFFICULTY.rageEarlyBy` turn(s) sooner. */
+export function rageStartTurn(s:Partial<GameState>):number{
+ if(!rageActive(s as GameState))return RAGE.backstopTurn;
+ return RAGE.startTurn-(difficultyOf(s)>=DIFFICULTY.rageEarlyFrom?DIFFICULTY.rageEarlyBy:0);
+}
 /** Rage stacks for the ghost's current turn (0 before `RAGE.startTurn`). Counts ghost turns, not player turns. */
 export function rageStacks(s:Partial<GameState>):number{
  const ghostTurn=s.fight?.ghostTurns??s.turn??1;
- const start=rageActive(s)?RAGE.startTurn:RAGE.backstopTurn;
+ const start=rageStartTurn(s);
  return Math.max(0,(ghostTurn-start+1)*RAGE.perTurn);
 }
 /** Start of the ghost's turn: rage rises to match how long the fight has lasted. */

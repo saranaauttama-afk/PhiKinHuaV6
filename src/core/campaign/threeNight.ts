@@ -6,10 +6,10 @@ export type RunNight=1|2|3;
 /** Each level adds one rule to the ones below (numbers in DIFFICULTY, balance/notfm.ts). */
 export const DIFFICULTY_RULES=[
  {level:1,name:'เงาแรก',desc:'สามคืนต่อเนื่อง · ตั้งแต่คืนที่ 2 ผีโกรธขึ้นทุกเทิร์นที่ไฟต์ยืด'},
- {level:2,name:'วิญญาณตื่น',desc:'+ เลือดผีเพิ่ม 20%'},
+ {level:2,name:'วิญญาณตื่น',desc:'+ เลือดผีเพิ่ม 15%'},
  {level:3,name:'คืนอาถรรพ์',desc:'+ ผีโกรธตั้งแต่คืนแรก'},
- {level:4,name:'คำสาปลึก',desc:'+ ของในร้านแพงขึ้น 25% · บ่อน้ำและศาลฟื้นเลือดครึ่งเดียว'},
- {level:5,name:'ผีกินหัว',desc:'+ คืนที่ 3 จั่วต่อเทิร์นน้อยลง 1 · คืนสุดท้ายต้องปราบผีกินหัวตัวจริง'},
+ {level:4,name:'คำสาปลึก',desc:'+ ผีโกรธเร็วขึ้น 1 เทิร์น · ของในร้านแพงขึ้น 25% · บ่อน้ำและศาลฟื้นเลือดครึ่งเดียว'},
+ {level:5,name:'ผีกินหัว',desc:'+ เปิดศึกไม่ได้การ์ดโบนัส +1 · คืนสุดท้ายต้องปราบผีกินหัวตัวจริง'},
 ] as const;
 /** Every run is the three-night campaign; kept as a guard for states before NewRun. */
 export function isThreeNight(s:Partial<GameState>):boolean{return !!s.campaign;}

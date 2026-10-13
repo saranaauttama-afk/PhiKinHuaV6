@@ -1,5 +1,7 @@
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
+import {AppState,Platform} from 'react-native';
+import {useGame} from '../src/store/gameStore';
 import { Stack } from 'expo-router';
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -8,6 +10,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   React.useEffect(()=>{void useGameSettings.getState().hydrate();},[]);
+  React.useEffect(()=>{
+    const active=()=>useGame.getState().setForeground(AppState.currentState==='active'&&(Platform.OS!=='web'||!document.hidden));
+    active();const sub=AppState.addEventListener('change',active);
+    if(Platform.OS==='web')document.addEventListener('visibilitychange',active);
+    const timer=setInterval(()=>useGame.getState().flushPlayTime(),1000);
+    return ()=>{clearInterval(timer);sub.remove();if(Platform.OS==='web')document.removeEventListener('visibilitychange',active);};
+  },[]);
   return (
     // `react-native-safe-area-context` อยู่ใน package.json มาตั้งแต่ต้นแต่ไม่เคย
     // ถูกใช้ — ทุกหน้าจึงเดาระยะขอบบนเป็น `paddingTop: 56` เท่ากันหมด

@@ -1,0 +1,24 @@
+{
+  "api": 36,
+  "syntheticFixtures": false,
+  "checks": [
+    "นักรบวัด: starter selection shows effect",
+    "นักรบวัด: bag tabs and empty equipment slots",
+    "นักรบวัด: real combat hand details and class skill artwork/details",
+    "หมอผี: starter selection shows effect",
+    "หมอผี: bag tabs and empty equipment slots",
+    "หมอผี: real combat hand details and class skill artwork/details",
+    "แม่ชี: starter selection shows effect",
+    "แม่ชี: bag tabs and empty equipment slots",
+    "แม่ชี: real combat hand details and class skill artwork/details",
+    "คนทรง: starter selection shows effect",
+    "คนทรง: bag tabs and empty equipment slots",
+    "คนทรง: real combat hand details and class skill artwork/details"
+  ],
+  "sourceSha": "1f7cd983a9a7efacf79252ce568604e938ef47f5",
+  "run": "https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38380455411",
+  "artifactId": 11804855503,
+  "conclusion": "success",
+  "checksPassed": 12,
+  "visualReview": "Representative starter, bag, blessing list, hand modal, combat and skill screenshots inspected; not a physical-device/full-run acceptance test."
+}

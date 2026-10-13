@@ -8,7 +8,7 @@ import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
  * สุ่มการ์ดรางวัล 3 ใบ — กรองเฉพาะการ์ดของคลาสที่เล่นอยู่
  * ถ้าไม่กรอง นักรบจะได้การ์ดหมอผีเป็นรางวัล ซึ่งทำให้ตัวตนของคลาสจางหมด
  */
-export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./classes').ClassId) {
+export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./classes').ClassId,milestoneLevel=0) {
   let r = rng;
   
   // ปรับน้ำหนักตาม level
@@ -40,7 +40,7 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./cl
     const rarityRoll = next(r);
     r = rarityRoll.rng;
     const roll = rarityRoll.value * 100;
-    const forClass = (list: CardData[]) => list.filter(c => !c.class || c.class === classId);
+    const forClass = (list: CardData[]) => list.filter(c => (c.unlockAt??0)<=milestoneLevel&&(!c.class || c.class === classId));
     const POOL = {
       Common:    forClass(BY_RARITY.Common),
       Uncommon:  forClass(BY_RARITY.Uncommon),
@@ -92,7 +92,10 @@ export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2, tier
     ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary,
     ...(tier == null ? [] : require('./pack').PANDORA_BLESSINGS.filter((b: BlessingDef) => (b.unlock ?? 0) <= tier)),
   ].filter(b => !owned.includes(b.id));
+  // A bargain is not offered if an owned bargain already changes the same rule (no stacking).
+  const ownedDefs = owned.map(id => require('./pack').blessingById(id) ?? require('./events/story').EVENT_PACTS[id]).filter(Boolean);
+  const offerable = pool.filter(b => !require('./cards/passives').bargainConflicts(ownedDefs, b));
 
-  const sh = shuffle(r, pool); r = sh.rng;
+  const sh = shuffle(r, offerable); r = sh.rng;
   return { rng: r, list: sh.array.slice(0, Math.min(count, sh.array.length)).map(b => ({ ...b })) };
 }

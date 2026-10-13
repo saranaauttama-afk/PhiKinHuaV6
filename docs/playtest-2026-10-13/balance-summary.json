@@ -1,0 +1,907 @@
+{
+  "baselineSha": "7455b3a9f6a04f7d9492d7a34480be69cc155b04",
+  "sourceSha": "4ee9db22840c9037525fcf8d1ee2fba7178f5f04",
+  "seed": "feedback",
+  "runsEach": 400,
+  "policy": "tactical",
+  "syntheticBotEvidence": true,
+  "humanBalanceAcceptance": false,
+  "baseline": [
+    {
+      "class": "warrior",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 20,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 2.99
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 2.7
+        },
+        "3": {
+          "fights": 220,
+          "meanTurns": 2.61
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 18,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 3.01
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 3.39
+        },
+        "3": {
+          "fights": 209,
+          "meanTurns": 3.12
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 18,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 4.91
+        },
+        "2": {
+          "fights": 214,
+          "meanTurns": 4.76
+        },
+        "3": {
+          "fights": 198,
+          "meanTurns": 4.33
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 16,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 2.21
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 2.92
+        },
+        "3": {
+          "fights": 198,
+          "meanTurns": 3.1
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 20,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 3.47
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 3.42
+        },
+        "3": {
+          "fights": 220,
+          "meanTurns": 3.05
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 16,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 3.59
+        },
+        "2": {
+          "fights": 213,
+          "meanTurns": 4.11
+        },
+        "3": {
+          "fights": 186,
+          "meanTurns": 3.55
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 18,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 148,
+          "meanTurns": 5.14
+        },
+        "2": {
+          "fights": 198,
+          "meanTurns": 4.9
+        },
+        "3": {
+          "fights": 198,
+          "meanTurns": 4.72
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 18,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 2.74
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 4.05
+        },
+        "3": {
+          "fights": 199,
+          "meanTurns": 3.82
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 14,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 3.59
+        },
+        "2": {
+          "fights": 158,
+          "meanTurns": 3.74
+        },
+        "3": {
+          "fights": 154,
+          "meanTurns": 3.35
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 15,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 150,
+          "meanTurns": 3.61
+        },
+        "2": {
+          "fights": 176,
+          "meanTurns": 4.08
+        },
+        "3": {
+          "fights": 165,
+          "meanTurns": 3.5
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 15,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 153,
+          "meanTurns": 5.26
+        },
+        "2": {
+          "fights": 176,
+          "meanTurns": 4.97
+        },
+        "3": {
+          "fights": 165,
+          "meanTurns": 4.67
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 13,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 2.88
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 3.78
+        },
+        "3": {
+          "fights": 187,
+          "meanTurns": 3.71
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 14,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 154,
+          "meanTurns": 3.52
+        },
+        "2": {
+          "fights": 155,
+          "meanTurns": 3.41
+        },
+        "3": {
+          "fights": 154,
+          "meanTurns": 3.34
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 12,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 154,
+          "meanTurns": 3.72
+        },
+        "2": {
+          "fights": 154,
+          "meanTurns": 3.66
+        },
+        "3": {
+          "fights": 132,
+          "meanTurns": 3.37
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 13,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 131,
+          "meanTurns": 5.0
+        },
+        "2": {
+          "fights": 143,
+          "meanTurns": 4.64
+        },
+        "3": {
+          "fights": 143,
+          "meanTurns": 4.62
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 13,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 155,
+          "meanTurns": 2.8
+        },
+        "2": {
+          "fights": 169,
+          "meanTurns": 3.38
+        },
+        "3": {
+          "fights": 143,
+          "meanTurns": 3.4
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 9,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 149,
+          "meanTurns": 3.49
+        },
+        "2": {
+          "fights": 176,
+          "meanTurns": 3.32
+        },
+        "3": {
+          "fights": 180,
+          "meanTurns": 3.77
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 9,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 155,
+          "meanTurns": 3.41
+        },
+        "2": {
+          "fights": 187,
+          "meanTurns": 3.52
+        },
+        "3": {
+          "fights": 167,
+          "meanTurns": 4.2
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 10,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 149,
+          "meanTurns": 5.02
+        },
+        "2": {
+          "fights": 178,
+          "meanTurns": 5.68
+        },
+        "3": {
+          "fights": 147,
+          "meanTurns": 5.63
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 6,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 2.79
+        },
+        "2": {
+          "fights": 191,
+          "meanTurns": 3.58
+        },
+        "3": {
+          "fights": 181,
+          "meanTurns": 4.72
+        }
+      }
+    }
+  ],
+  "current": [
+    {
+      "class": "warrior",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 19,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 4.27
+        },
+        "2": {
+          "fights": 213,
+          "meanTurns": 3.84
+        },
+        "3": {
+          "fights": 209,
+          "meanTurns": 3.33
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 20,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 4.22
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 3.73
+        },
+        "3": {
+          "fights": 220,
+          "meanTurns": 3.26
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 17,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 150,
+          "meanTurns": 6.56
+        },
+        "2": {
+          "fights": 187,
+          "meanTurns": 5.21
+        },
+        "3": {
+          "fights": 187,
+          "meanTurns": 4.78
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 1,
+      "runs": 20,
+      "wins": 18,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 160,
+          "meanTurns": 3.29
+        },
+        "2": {
+          "fights": 220,
+          "meanTurns": 3.59
+        },
+        "3": {
+          "fights": 198,
+          "meanTurns": 3.55
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 18,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 154,
+          "meanTurns": 4.79
+        },
+        "2": {
+          "fights": 203,
+          "meanTurns": 4.26
+        },
+        "3": {
+          "fights": 198,
+          "meanTurns": 3.58
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 16,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 150,
+          "meanTurns": 4.89
+        },
+        "2": {
+          "fights": 198,
+          "meanTurns": 4.43
+        },
+        "3": {
+          "fights": 198,
+          "meanTurns": 4.08
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 19,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 154,
+          "meanTurns": 6.25
+        },
+        "2": {
+          "fights": 209,
+          "meanTurns": 5.18
+        },
+        "3": {
+          "fights": 209,
+          "meanTurns": 4.89
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 2,
+      "runs": 20,
+      "wins": 17,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 154,
+          "meanTurns": 3.69
+        },
+        "2": {
+          "fights": 202,
+          "meanTurns": 3.83
+        },
+        "3": {
+          "fights": 198,
+          "meanTurns": 3.9
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 6,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 121,
+          "meanTurns": 4.66
+        },
+        "2": {
+          "fights": 66,
+          "meanTurns": 3.68
+        },
+        "3": {
+          "fights": 66,
+          "meanTurns": 3.23
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 10,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 144,
+          "meanTurns": 4.74
+        },
+        "2": {
+          "fights": 132,
+          "meanTurns": 3.99
+        },
+        "3": {
+          "fights": 121,
+          "meanTurns": 3.74
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 14,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 137,
+          "meanTurns": 6.04
+        },
+        "2": {
+          "fights": 154,
+          "meanTurns": 5.36
+        },
+        "3": {
+          "fights": 154,
+          "meanTurns": 4.75
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 3,
+      "runs": 20,
+      "wins": 15,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 148,
+          "meanTurns": 3.9
+        },
+        "2": {
+          "fights": 176,
+          "meanTurns": 4.17
+        },
+        "3": {
+          "fights": 176,
+          "meanTurns": 4.01
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 8,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 130,
+          "meanTurns": 4.81
+        },
+        "2": {
+          "fights": 88,
+          "meanTurns": 3.45
+        },
+        "3": {
+          "fights": 88,
+          "meanTurns": 2.94
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 5,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 128,
+          "meanTurns": 5.05
+        },
+        "2": {
+          "fights": 66,
+          "meanTurns": 4.53
+        },
+        "3": {
+          "fights": 55,
+          "meanTurns": 4.07
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 6,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 98,
+          "meanTurns": 6.01
+        },
+        "2": {
+          "fights": 66,
+          "meanTurns": 5.23
+        },
+        "3": {
+          "fights": 66,
+          "meanTurns": 4.92
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 4,
+      "runs": 20,
+      "wins": 9,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 145,
+          "meanTurns": 3.69
+        },
+        "2": {
+          "fights": 132,
+          "meanTurns": 3.92
+        },
+        "3": {
+          "fights": 132,
+          "meanTurns": 4.39
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 2,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 128,
+          "meanTurns": 4.36
+        },
+        "2": {
+          "fights": 99,
+          "meanTurns": 4.45
+        },
+        "3": {
+          "fights": 98,
+          "meanTurns": 5.03
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 1,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 112,
+          "meanTurns": 4.73
+        },
+        "2": {
+          "fights": 77,
+          "meanTurns": 4.06
+        },
+        "3": {
+          "fights": 72,
+          "meanTurns": 4.83
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 4,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 117,
+          "meanTurns": 5.9
+        },
+        "2": {
+          "fights": 77,
+          "meanTurns": 5.17
+        },
+        "3": {
+          "fights": 83,
+          "meanTurns": 6.47
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 5,
+      "runs": 20,
+      "wins": 1,
+      "stalls": 0,
+      "nights": {
+        "1": {
+          "fights": 154,
+          "meanTurns": 3.64
+        },
+        "2": {
+          "fights": 129,
+          "meanTurns": 3.87
+        },
+        "3": {
+          "fights": 127,
+          "meanTurns": 5.0
+        }
+      }
+    }
+  ],
+  "rawHashes": {
+    "/tmp/feedback-baseline.json": "e49f76f1db6312cce1f9581149942eed9856a14826ef37f43a35772f1c3d585e",
+    "/tmp/feedback-final-balance.json": "76da3ca6da0041c0bbc5d831a0c960949f17e37ebb878c4005edc534f3d88bc5"
+  },
+  "warriorCardDiagnostic": {
+    "controlledScenario": true,
+    "enemyHP": 100,
+    "enemyArmor": 0,
+    "blessings": [],
+    "result": [
+      {
+        "card": "threefold_strike",
+        "star": 1,
+        "useWarCry": false,
+        "damage": 9
+      },
+      {
+        "card": "threefold_strike",
+        "star": 1,
+        "useWarCry": true,
+        "damage": 12
+      },
+      {
+        "card": "threefold_strike",
+        "star": 2,
+        "useWarCry": false,
+        "damage": 15
+      },
+      {
+        "card": "threefold_strike",
+        "star": 2,
+        "useWarCry": true,
+        "damage": 18
+      },
+      {
+        "card": "threefold_strike",
+        "star": 3,
+        "useWarCry": false,
+        "damage": 18
+      },
+      {
+        "card": "threefold_strike",
+        "star": 3,
+        "useWarCry": true,
+        "damage": 21
+      }
+    ]
+  },
+  "currentGameSourceSha": "1f7cd983a9a7efacf79252ce568604e938ef47f5",
+  "balanceSourceReuseEvidence": {
+    "comparedAgainst": "4ee9db22840c9037525fcf8d1ee2fba7178f5f04",
+    "changedCoreDataPaths": [],
+    "scope": "Subsequent changes affect bag/map presentation, verification and APK version. The simulated engine/data/pilot remain byte-identical."
+  }
+}

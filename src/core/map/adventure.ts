@@ -41,6 +41,7 @@ export function startAdventure(s:GameState,r:RNG):RNG {
  const kinds:PageOffer[]=[];
  for(let i=0;i<fights.length;i++){kinds.push(fights[i]);services.forEach((o,k)=>{if(after[k]===i+1)kinds.push(o);});if(i===2)kinds.push({kind:'next_event'});}
  const deck=kinds.map((offer,i)=>{const id=`adventure-${night}-${i}`;return {id,offer:'shopId' in offer?{...offer,shopId:id}:offer};});
+ r=require('../events/story').rollNightStory(s,r);
  s.pages={pageIndex:0,adventure:{version:5,deck,cursor:0,slotIds:[null,null,null],pendingIds:[],deferredIds:[],resolvedIds:[],skippedIds:[],storyDone:false,fightsWon:0,boss:'locked',boardIndex:0,usedIds:[],serviceStates:{}},current:{offers:[],resolved:[]}};
  for(let ix=0;ix<3;ix++)fillSlot(s,ix);
  return r;

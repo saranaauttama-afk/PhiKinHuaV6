@@ -1,3 +1,6 @@
+import {Modal,Pressable} from 'react-native';
+import StatIcon from '../StatIcon';
+import {QuietButton} from '../QuietChrome';
 import React, { useImperativeHandle } from 'react';
 import { View, Text, Image, ImageSourcePropType } from 'react-native';
 import Animated, {
@@ -38,7 +41,7 @@ type Props = {
   handSlots?:{total:number;remaining:number[]};
   enemy?: {
     hp: number; maxHp: number; name: string;
-    handCount?:number; ap?: number; block?: number; maxAp?: number; handSize?: number;
+    handCount?:number; ap?: number; block?: number; maxAp?: number; handSize?: number; drawPerTurn?:number; maxRetained?:number;
     statusEffects?: StatusEffect[];
   } | null;
 };
@@ -123,7 +126,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       <View style={{flexDirection:'row',gap:actors.length>1?4:12,alignItems:'center',minHeight:24}}>
        <EnemyStatItem icon="energy" label="" value={`${actor.ap??actor.maxAp??0}`}/>
        <EnemyStatItem icon="block" label="" value={`${actor.block??0}`}/>
-       <EnemyStatItem icon="deck" label="" value={`${actor.handCount??actor.handSize??0}`}/>
+       <EnemyStatItem icon="hand" label="" value={`${actor.handCount??0}/${actor.handSize??0}`} detail={`ไพ่ในมือ ${actor.handCount??0} ใบ · ถือได้สูงสุด ${actor.handSize??0} ใบ\nจั่วต่อเทิร์น ${enemy?.drawPerTurn??0} ใบ · เก็บข้ามเทิร์น ${enemy?.maxRetained??0} ใบ`}/>
       </View>
      </RitualSurface>
       <View testID={`enemy-extras-${index}`} style={{height:layout.enemyExtrasHeight,flexDirection:'row',gap:4,alignItems:'center'}}>
@@ -135,11 +138,12 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   </View>;
 });
 
-function EnemyStatItem({ icon, label, value }: { icon: InkSymbol; label: string; value: string }) {
-  return <View accessible accessibilityLabel={`${icon==='block'?'เกราะ':icon==='energy'?'พลัง':'การ์ดในมือ'} ${value}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-    <InkIcon name={icon} size={20} color={chalk} />
+function EnemyStatItem({ icon, label, value,detail }: { icon: InkSymbol; label: string; value: string;detail?:string }) {
+  const [open,setOpen]=React.useState(false);
+  return <><Pressable onPress={()=>setOpen(true)} accessible accessibilityRole="button" accessibilityLabel={`${icon==='block'?'เกราะ':icon==='energy'?'พลัง':'การ์ดในมือ'} ${value}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+    <StatIcon name={icon} size={20} />
     <Text style={{ color: chalk, fontSize: 11, fontFamily: 'Prompt_600SemiBold' }}>{label} {value}</Text>
-  </View>;
+  </Pressable><Modal visible={open} transparent animationType="fade" onRequestClose={()=>setOpen(false)}><View style={{flex:1,justifyContent:'center',padding:24,backgroundColor:palette.scrimHeavy}}><RitualSurface kind="quietSlate" style={{padding:22,gap:14}}><Text style={{fontFamily:'Prompt_600SemiBold',color:chalk,fontSize:15}}>{detail??`${icon==='energy'?'แต้มของผี':'เกราะของผี'} ${value}`}</Text><QuietButton label="ปิด" onPress={()=>setOpen(false)}/></RitualSurface></View></Modal></>;
 }
 
 export default MonsterArea;

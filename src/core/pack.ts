@@ -27,8 +27,8 @@ export function cardById(id: string): CardData | undefined {
 }
 
 /** Cards a class can find in rewards and shops: the neutral pool plus its own pool. */
-export function poolFor(classId?: ClassId): CardData[] {
-  return ALL_CARDS.filter(c => !c.locked && (!c.class || c.class === classId));
+export function poolFor(classId?: ClassId,milestoneLevel=0): CardData[] {
+  return ALL_CARDS.filter(c => !c.locked && (c.unlockAt??0)<=milestoneLevel && (!c.class || c.class === classId));
 }
 
 const OFFERED = ALL_CARDS.filter(c => !c.locked);

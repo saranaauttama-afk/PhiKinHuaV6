@@ -12,7 +12,7 @@ import { upgradeCard, canUpgrade, upgradeLevelOf, grantBlessing } from '../share
 import { loseRun } from './runEnd';
 /** Shop stock for the player's class. `only` narrows the pool (equipment shops). */
 function stockFor(s: GameState, r: RNG, size: number, only?: (c: import('../../types').CardData) => boolean) {
-  const out = rollShopStock(r, size, 1, s.classId, only);
+  const out = rollShopStock(r, size, s.campaign?.night ?? 1, s.classId, only,s.campaign?.milestoneLevel??0);
   return { rng: out.rng, items: out.items };
 }
 

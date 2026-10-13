@@ -1,6 +1,7 @@
 import React from 'react';
 import {View,Text,ImageBackground,Image,Pressable,ScrollView,useWindowDimensions} from 'react-native';
 import type {BlessingDef,GameState} from '../../src/core/types';
+import {describeBlessing} from '../../src/core/cards/describe';
 import CandleSelection from './CandleSelection';
 import RitualSurface from './RitualSurface';
 import {GameButton} from './Panel';
@@ -20,7 +21,7 @@ export default function StarterBlessingScreen({choices,onPick,state}:{choices:Bl
      <Image accessible={false} source={objectSource(b)} resizeMode="contain" style={{width:'100%',height:Math.min(105,(width-64)/choices.length)}}/>
      <Text style={{fontFamily:font.heading,fontSize:13,lineHeight:20,color:palette.moon,textAlign:'center'}}>{b.name}</Text>
     </View></CandleSelection></Pressable>)}</View>
-    <Text style={{fontFamily:font.ui,color:palette.moon,fontSize:14,lineHeight:23,minHeight:69,textAlign:'center'}}>{chosen?.desc??'แตะพรเพื่ออ่านรายละเอียด'}</Text>
+    <Text style={{fontFamily:font.ui,color:palette.moon,fontSize:14,lineHeight:23,minHeight:69,textAlign:'center'}}>{chosen?describeBlessing(chosen):'แตะพรเพื่ออ่านรายละเอียด'}</Text>
     <GameButton label="ยืนยันพร" disabled={selected===null} onPress={()=>selected!==null&&onPick(selected)}/>
    </RitualSurface>
   </ScrollView>

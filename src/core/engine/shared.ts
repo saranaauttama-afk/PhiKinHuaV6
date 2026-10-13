@@ -49,8 +49,8 @@ export function applyBlessingGain(s: GameState, b: BlessingDef): void {
   p.hp = Math.max(1, Math.min(p.maxHp, p.hp));
   if (g.gold) p.gold = (p.gold ?? 0) + g.gold;
   if (g.ap) { p.maxAp += g.ap; p.ap = p.maxAp; }
-  if (g.draw) p.drawPerTurn += g.draw;
-  if (g.retain) p.retain = (p.retain ?? 0) + g.retain;
+  if (g.draw) p.drawPerTurn = g.draw>0?Math.max(p.drawPerTurn,Math.min(LEVEL_UP.caps.draw,p.drawPerTurn+g.draw)):Math.max(1,p.drawPerTurn+g.draw);
+  if (g.retain) p.retain = g.retain>0?Math.max(p.retain??CARD_RULES.retain,Math.min(LEVEL_UP.caps.retain,(p.retain ?? CARD_RULES.retain) + g.retain)):Math.max(0,(p.retain??CARD_RULES.retain)+g.retain);
   if (g.startMana) p.startMana = (p.startMana ?? 0) + g.startMana;
   if (g.slot) s.equipmentSlotsMax = (s.equipmentSlotsMax ?? 1) + g.slot;
 }
@@ -59,13 +59,16 @@ export function applyBlessingGain(s: GameState, b: BlessingDef): void {
 export function rollLevelOffers(s: GameState, r: RNG): { rng: RNG; list: import('../types').LevelOption[] } {
   const { int } = require('../rng');
   const usable: Record<import('../types').LevelOption, boolean> = {
+    ap:s.player.maxAp<LEVEL_UP.caps.ap,
+    mana:s.player.startMana<LEVEL_UP.caps.mana,
+    draw:s.player.drawPerTurn<LEVEL_UP.caps.draw,
     card: true,
     upgrade: s.masterDeck.some(canUpgrade),
     remove: s.masterDeck.some(c => canRemoveCard(c, s.masterDeck.length)),
     slot: (s.equipmentSlotsMax ?? 1) < LEVEL_UP.caps.slot,
     retain: (s.player.retain ?? CARD_RULES.retain) < LEVEL_UP.caps.retain,
   };
-  let pool = (Object.keys(LEVEL_UP.weights) as import('../types').LevelOption[]).filter(o => usable[o]);
+  let pool = (Object.keys(LEVEL_UP.weights) as import('../types').LevelOption[]).filter(o => usable[o] && LEVEL_UP.weights[o]>0);
   const list: import('../types').LevelOption[] = [];
   while (list.length < LEVEL_UP.offers && pool.length) {
     const total = pool.reduce((n, o) => n + LEVEL_UP.weights[o], 0);
@@ -142,7 +145,7 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
     s.player.maxHp += LEVEL_UP.maxHp;
     s.player.hp = s.player.maxHp;
     if (!s.levelUp || s.levelUp.consumed) {
-      const rolled = rollThreeCards(r, s.player.level, s.classId); r = rolled.rng;
+      const rolled = rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0); r = rolled.rng;
       const offers = rollLevelOffers(s, r); r = offers.rng;
       s.levelUp = { cards: rolled.list, offers: offers.list, consumed: false };
     } else {

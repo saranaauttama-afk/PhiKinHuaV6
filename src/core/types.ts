@@ -4,7 +4,7 @@
 import type { StatusEffect } from './types_extended';
 
 /** A passive (blessing or equipped card) reacts to these moments of a fight. */
-export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayerDone';
+export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayerDone'|'discard';
 export type Trigger={on:TriggerOn;type?:CardType;once?:'turn';when?:import('./cards/mechanics').CardCondition;fx:Fx};
 /** Always-on modifiers plus triggers, shared by blessings and equipment cards. */
 export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number};
@@ -17,6 +17,7 @@ export type BlessingDef = Passive & {
   /** Nights cleared across all runs (journal) before it can be offered. */
   unlock?: number;
   onGain?: BlessingGain;
+  rules?: {openingDraw?:number;retain?:number;prayerAp?:number;prayerMult?:number;borrowBonus?:number;borrowHpCost?:number};
   flavor?: string;
 };
 
@@ -42,6 +43,8 @@ export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negat
 export type CardData = {
   id: string;
   instanceId?: string;
+  /** Stable owned copy; survives upgrades and deck reorder/removal. */
+  ownedId?: string;
   name: string;
   type: CardType;
   rarity?: Rarity;
@@ -69,6 +72,7 @@ export type CardData = {
   copied?: boolean;
   /** Only offered after the class unlocks it in the journal. */
   locked?: boolean;
+  unlockAt?: number;
   unremovable?: boolean;
   flavor?: string;
   tags?: string[];
@@ -108,7 +112,7 @@ export type Phase =
   | 'run_complete'; // จบรันแล้ว (ชนะบอสสุดท้าย) — แสดงจอสรุป
 
 /** Level-up rewards: a new card, a star on a deck card, or removing a deck card. */
-export type LevelOption = 'card' | 'upgrade' | 'remove' | 'slot' | 'retain';
+export type LevelOption = 'card' | 'upgrade' | 'remove' | 'slot' | 'retain' | 'ap' | 'mana' | 'draw';
 
 /** Per-fight state for skills and passives; reset when a fight starts. */
 export type FightState = {
@@ -133,6 +137,9 @@ export type FightState = {
   mimicUsed?: boolean;
   /** The boss's relic: its rule works until enough hits break it. */
   relic?: BossRelicState;
+  /** Effect draws used on turn `fxDrawTurn` (CARD_RULES.fxDrawPerTurn). */
+  fxDrawTurn?: number;
+  fxDrawn?: number;
 };
 
 export type BossRelicState = {
@@ -266,6 +273,11 @@ export type GameState = {
   /** คลาสที่ผู้เล่นเลือกไว้ตอนเริ่มรัน — กำหนดเด็ค ค่าสถานะ และพรติดตัว */
   classId?: import('./classes').ClassId;
   campaign?: import('./campaign/nights').CampaignRun;
+  /** Owned deck positions selected before this fight; never copies. */
+  preEquipment?:number[];
+  equipmentLoadout?: string[];
+  ownedCardSeq?: number;
+  eventMemory?:Record<string,number>;
   runMetrics?: import('./campaign/metrics').RunMetrics;
   discovery?: import('./archive/progress').DiscoveryRun;
 
@@ -439,7 +451,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'>; blessingTier?: number;
+  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'>; blessingTier?: number; milestoneLevel?:number;
       /** Has beaten a final boss before (journal); needed for the secret boss. */
       veteran?: boolean }
   | { type: 'AnswerGhostTalk'; choice: AlignmentChoice }
@@ -470,6 +482,8 @@ export type Command =
   | { type: 'SkipCardReward' }
 
   // UI
+  | { type: 'SetEquipmentLoadout'; indices: number[] }
+  | { type: 'ChooseHandReward'; option: 'retain' | 'draw' }
   | { type: 'OpenDeck' }
   | { type: 'CloseDeck' }
 
@@ -508,7 +522,7 @@ export type Command =
   | { type: 'UseHealingShrine' }
 
   // Pages
-  | { type: 'ChooseOffer'; index: number }
+  | { type: 'ChooseOffer'; index: number; equipmentIndices?:number[] }
   | { type: 'DismissOffer'; index: number }
   
   // Shop Management
