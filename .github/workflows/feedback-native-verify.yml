@@ -1,0 +1,76 @@
+name: Feedback native verification of existing APK
+on:
+  push:
+    branches: ['work/notfm-phase7-research']
+    paths: ['scripts/android-feedback-smoke.py', '.github/workflows/feedback-native-verify.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  APK_SOURCE_SHA: 7ff425de625cf0df45b62e399dc429ca4d1844c5
+  APK_SOURCE_RUN: '38376366915'
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove game files unchanged from the APK source
+        run: |
+          python - <<'PY'
+          import os,subprocess
+          paths=subprocess.check_output(['git','diff','--name-only',os.environ['APK_SOURCE_SHA'],'HEAD'],text=True).splitlines()
+          allowed={'scripts/android-feedback-smoke.py','.github/workflows/android-notfm.yml','.github/workflows/feedback-native-verify.yml'}
+          assert all(p in allowed or p.startswith('docs/') for p in paths),paths
+          print('Application, core, data, assets, package and APK version unchanged from exact source',os.environ['APK_SOURCE_SHA'])
+          PY
+      - name: Wait for source APK and audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 80); do
+            names=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$APK_SOURCE_RUN/artifacts" --jq '.artifacts[].name')
+            if echo "$names" | grep -Fxq 'PhiKinHua-NOTFM-APK' && echo "$names" | grep -Fxq 'NOTFM-APK-audit'; then exit 0; fi
+            sleep 15
+          done
+          echo 'Source APK not available within twenty minutes'; exit 1
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-NOTFM-APK
+          run-id: ${{ env.APK_SOURCE_RUN }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: NOTFM-APK-audit
+          run-id: ${{ env.APK_SOURCE_RUN }}
+          github-token: ${{ github.token }}
+          path: apk-source-audit
+      - name: Verify APK identity and checksum
+        run: |
+          test "$(cat apk-source-audit/source-commit.txt)" = "$APK_SOURCE_SHA"
+          sha256sum --check apk-source-audit/sha256.txt
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-NOTFM-v1.0.41.apk
+            python scripts/android-feedback-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: feedback-corrected-native
+          path: |
+            feedback-native-audit/
+            apk-source-audit/

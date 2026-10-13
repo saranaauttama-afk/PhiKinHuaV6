@@ -9,6 +9,7 @@ export type PageOffer =
   | { kind: 'shop_upgrade'; shopId: string; phase: 1 | 2 }
   | { kind: 'well'; shopId: string }
   | { kind: 'healing_shrine'; shopId: string }
+  | { kind: 'blessing'; shopId: string }
   | { kind: 'treasure'; shopId: string }
   | { kind: 'treasure_single'; shopId: string }
   | { kind: 'story_event'; shopId: string; eventId: string }
@@ -31,5 +32,5 @@ export function initPageMap(): MapStatePages {
 /** Non-combat stops: can be passed by without fighting. */
 export function isRestOfferKind(kind: PageOffer['kind']): boolean {
   return kind.startsWith('shop_') || kind === 'well' || kind === 'healing_shrine' ||
-    kind === 'treasure' || kind === 'treasure_single' || kind === 'story_event';
+    kind === 'treasure' || kind === 'treasure_single' || kind === 'story_event' || kind === 'blessing';
 }

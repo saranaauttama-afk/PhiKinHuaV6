@@ -42,7 +42,7 @@ export const SAVE_VERSION = 3;
  */
 export const AUTO_SAVE_COMMANDS = [
   'CompleteNode', 'ChooseOffer', 'DeleteShopFromMap', 'DismissOffer',
-  'ChooseStarterBlessing',
+  'ChooseStarterBlessing', 'SetEquipmentLoadout', 'ChooseHandReward',
   'TakeShop', 'TakeShopEquipment', 'ShopRemoveBuy', 'ShopUpgradeBuy',
   'TakeTreasureCard', 'TakeSingleTreasureCard',
   'UseWell', 'UseHealingShrine',
@@ -56,7 +56,7 @@ export const AUTO_SAVE_COMMANDS = [
  */
 const DROP_ON_SAVE = [
   'enemy', 'enemyIntent', 'enemyPiles', 'playerPiles', 'enemyIntentCardId', 'traps', 'combo',
-  'piles', 'pendingEvents', 'cardHistory', 'cardHistorySeq', 'turnFlags', 'levelUp', 'cardReward', 'starter',
+  'piles', 'pendingEvents', 'cardHistory', 'cardHistorySeq', 'turnFlags', 'levelUp', 'cardReward', 'starter', 'fight',
   'shopKind', 'shopStock', 'shopBoughtItems', 'currentShopId',
   'event', 'deckOpen', 'combatVictoryLock', 'equipmentTempSlots',
   // บทที่ค้างอ่านอยู่เป็นของหน้าจอ ไม่ใช่ความคืบหน้า — `chaptersSeen` ต่างหากที่เก็บ
@@ -152,7 +152,7 @@ export function fromSave(data: SaveData): GameState {
     chapter: undefined,
     deckOpen: false,
     combatVictoryLock: false,
-    player: { ...s.player, block: 0, energy: s.player.maxEnergy },
+    player: { ...s.player, block: 0, ap: s.player.maxAp },
     log: [...(s.log ?? []), 'โหลดการเดินทางที่ค้างไว้'],
   };
 }

@@ -27,7 +27,9 @@ function playRun(seed: string, classId: string, take: boolean) {
   const clearRewards = () => {
     let g = 0;
     while (g++ < 10) {
+      if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
       if (s.phase === 'levelup') { go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any); continue; }
+      if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
       if (s.phase === 'reward') {
         go(take ? { type: 'ChooseCardReward', index: 0 } : { type: 'SkipCardReward' });
         continue;
@@ -64,7 +66,7 @@ function playRun(seed: string, classId: string, take: boolean) {
     // ฆ่าให้จบในทีเดียว — เทสต์นี้วัดรางวัล ไม่ได้วัดการต่อสู้
     if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [
-      { id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' },
+      { id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' },
     ];
     go({ type: 'PlayCard', index: 0 });
 
@@ -105,8 +107,9 @@ describe('การ์ดรางวัล — สำรับโตจริ�
       for (const seed of SEEDS) {
         const skipped = playRun(seed, classId, false);
         const taken = playRun(seed, classId, true);
+        // เหตุการณ์เล่าเรื่องคืนละ 1 ครั้ง แต่ละครั้งให้ได้ถึง 2 ใบ (การ์ด + คำสาป) จึงยอมได้ไม่เกิน 4
         expect(skipped.endDeck - skipped.startDeck, `${seed} โตไปถึง ${skipped.endDeck}`)
-          .toBeLessThanOrEqual(3);
+          .toBeLessThanOrEqual(4);
         expect(taken.endDeck, seed).toBeGreaterThan(skipped.endDeck + 3);
       }
     });
@@ -129,15 +132,8 @@ describe('การ์ดรางวัล — สำรับโตจริ�
 describe('การ์ดรางวัล — การ์ดที่ได้ตรงคลาส', () => {
   for (const classId of Object.keys(CHARACTER_CLASSES)) {
     it(`${classId} ไม่ได้การ์ดของคลาสอื่นติดมา`, () => {
-      const tag = CHARACTER_CLASSES[classId as keyof typeof CHARACTER_CLASSES].cardTag;
-      const otherTags = Object.values(CHARACTER_CLASSES)
-        .map(c => c.cardTag)
-        .filter(t => t !== tag);
-
       const out = playRun('r-c', classId, true);
-      const foreign = out.state.masterDeck.filter(
-        c => otherTags.some(t => (c.tags ?? []).includes(t))
-      );
+      const foreign = out.state.masterDeck.filter(c => c.class && c.class !== classId);
       expect(foreign.map(c => c.id)).toEqual([]);
     });
   }
@@ -161,8 +157,9 @@ describe('การ์ดรางวัล — พฤติกรรมขอ�
     s.pages.current.offers[i] = { ...s.pages.current.offers[i], tier: 'elite' };
     go({ type: 'ChooseOffer', index: i });
     if (s.enemy) s.enemy.statusEffects = [];
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     // คืนฟังก์ชันอ่านค่า ไม่ใช่ตัว state — `applyCommand` โคลนก้อนใหม่ทุกครั้ง
     // ถ้าคืนตัวมันไป เทสต์จะถือ snapshot เก่าและผ่านโดยไม่ได้ตรวจอะไรเลย

@@ -109,7 +109,10 @@ export function computeModifiedDamage(
     dmg = dmg * VULNERABLE_MULTIPLIER;
   }
 
-  if (rules.defenderMods && to === 'player' && state.blessings?.some(b=>b.id==='luang_pu_protection')) dmg-=1;
+  // Armor from blessings and equipment cards reduces each hit on the player.
+  if (rules.defenderMods && to === 'player' && from === 'enemy') dmg -= require('../cards/passives').armor(state);
+  // สำรวมจิต: ghost hits are halved until the next player turn.
+  if (rules.defenderMods && to === 'player' && from === 'enemy' && state.fight?.halfDamage) dmg = dmg * (100 - require('../skills').skillParam('composure', 'damagePct')) / 100;
   return Math.max(0, Math.round(dmg));
 }
 
@@ -167,18 +170,13 @@ export function dealDamage(
   });
   if (died) emit(state, { t: 'Died', who: to });
 
-  // ★ ของประจำกายที่ทำงานตอนโดน/ทำดาเมจ (หนามสะท้อน, ลดดาเมจที่รับ)
-  //
-  // hook นี้มีมาตั้งแต่ต้นแต่ **ไม่เคยมีใครเรียก** — `luang_pu_amulet` (Rare)
-  // จึงเป็นของที่ผู้เล่นซื้อมาแล้วไม่เกิดอะไรขึ้นเลย
-  //
-  // ส่ง `hpLoss` ไม่ใช่ `modified`: ของพวกนี้พูดถึงดาเมจที่เข้าตัวจริง
-  // กัน block ไว้ได้หมด = ไม่มีอะไรให้สะท้อนหรือให้ลด
-  //
-  // ดาเมจที่มาจากของประจำกายเองไม่ยิง hook ซ้ำ — กันวนไม่รู้จบระหว่างของสองชิ้น
-  if (sourceKind !== 'equipment' && hpLoss > 0) {
-    const { runEquipmentDamageDealt } = require('../equipmentRuntime');
-    runEquipmentDamageDealt(state, { amount: hpLoss, side: from, target: to });
+  // A player hit that lands chips the boss's relic.
+  if (from === 'player' && to === 'enemy' && isAttack && modified > 0) require('../campaign/bossRules').chipBossRelic(state);
+  // ใจเพชร reads the HP lost this fight.
+  if (to === 'player' && state.fight) state.fight.hpLost += targetState.hp < hpBefore ? hpBefore - targetState.hp : 0;
+  // แผ่เมตตา: heal part of the damage dealt to the ghost.
+  if (from === 'player' && to === 'enemy' && hpLoss > 0 && state.fight?.lifestealUntil != null && (state.turn ?? 0) <= state.fight.lifestealUntil && state.player.hp > 0) {
+    heal(state, 'player', Math.floor(hpLoss * require('../skills').skillParam('metta', 'healPct') / 100));
   }
 
   const thorns=targetState.statusEffects?.find(e=>e.id==='thorns');

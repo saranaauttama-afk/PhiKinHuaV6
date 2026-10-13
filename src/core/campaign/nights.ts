@@ -1,19 +1,27 @@
 import {difficultyOf} from './threeNight';
 import type {ClassId} from '../classes';
 import type {BlessingDef,GameState} from '../types';
-import {NIGHT_ENEMY_DECKS,NIGHT_AWAKENED_DECKS } from './enemyDecks';
+import {NIGHT_ENEMY_DECKS} from './enemyDecks';
 import {applyStatusEffect} from '../statusEffectsRuntime';
 import {applyEnemyBattleRule} from './enemyRules';
+import {DIFFICULTY,ENEMY_HP,ENEMY_RULES,RAGE} from '../balance/notfm';
 
 export type Night=import('./threeNight').RunNight;
-export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficulty;completedNights:number;unlocks:Array<'card'|'blessing'>;bossAwakened?:boolean};
+export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficulty;completedNights:number;unlocks:Array<'card'|'blessing'>;
+ /** ความกล้า / บุญ, 0–ALIGNMENT.max. */
+ courage?:number;merit?:number;
+ /** Blessings already granted for reaching the threshold. */
+ alignmentRewards?:Array<'courage'|'merit'>;
+ /** Ghosts already talked to this run, and dialogues held this night. */
+ talked?:string[];talksThisNight?:number;
+ veteran?:boolean;
+ /** Nights cleared across all runs when this run began: unlocks แพนโดรา blessings. */
+ blessingTier?:number;
+ /** The night-3 boss, fixed when its slot appears. */
+ finalBossId?:string;milestoneLevel?:number;eventByNight?:Record<string,string>};
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};
-export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>={
- warrior:{id:'night_warrior_blessing',name:'ครูลานวัด',rarity:'Rare',desc:'สกิลใบแรกแต่ละเทิร์นได้ป้องกันเพิ่ม 3'},
- shaman:{id:'night_shaman_blessing',name:'ครูคุ้มคาถา',rarity:'Rare',desc:'การ์ดใส่สถานะใบแรกแต่ละเทิร์นได้ป้องกันเพิ่ม 3'},
- nun:{id:'night_nun_blessing',name:'แสงบุญ',rarity:'Rare',desc:'ต้นเทิร์น: เลือดต่ำกว่าครึ่งฟื้น 2 มิฉะนั้นได้ป้องกัน 2'},
- medium:{id:'night_medium_blessing',name:'หิ้งบรรพบุรุษ',rarity:'Rare',desc:'ต้นเทิร์นได้ป้องกัน 2'},
-};
+/** The class blessing a fifth-night clear can unlock. */
+export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>=Object.fromEntries((['warrior','shaman','nun','medium'] as ClassId[]).map(id=>[id,require('../pack').classBlessing(id)])) as Record<ClassId,BlessingDef>;
 export function configureNightEnemy(s:GameState):void{
  if(!s.campaign||!s.enemy)return;
  const d=difficultyOf(s);
@@ -21,39 +29,38 @@ export function configureNightEnemy(s:GameState):void{
  const offer=s.pages?.current?.offers[s.pages?._activeOfferIndex??-1];
  const boss=offer?.kind==='boss';
  const elite=offer?.kind==='monster'&&offer.tier==='elite';
- const baseHp=boss?(s.enemy.id==='phi-kin-hua'?125:78):elite?48:28+Math.max(0,Math.min(5,Number(monster?.tier.slice(1))||1))*2;
- const chapterScale=[1,1.28,1.58][s.campaign.night-1];
- s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*chapterScale*(1+(d-1)*.05));
- const budget=boss||elite?3:2;
- const handSize=boss?7:elite?6:4;
- s.enemy.maxEnergy=budget;s.enemy.handSize=handSize;
- if(NIGHT_ENEMY_DECKS[s.enemy.id])s.enemy.ai!.deck={lists:[{id:s.enemy.id,weight:1,cards:NIGHT_ENEMY_DECKS[s.enemy.id]}]};
- const deck=s.enemy.ai!.deck!;deck.maxEnergy=budget;deck.handSize=handSize;
- s.campaign.bossAwakened=false;
- if(d>=3||(d>=2&&(elite||boss)))applyStatusEffect('enemy',s,'strength',99,1);
- if(d>=4&&(boss||elite))s.enemy.block=6;
+ const tier=Math.max(1,Math.min(5,Number(monster?.tier.slice(1))||1));
+ const baseHp=boss?(s.enemy.id==='phi-kin-hua'?ENEMY_HP.ultimateBoss:ENEMY_HP.boss):elite?ENEMY_HP.elite:ENEMY_HP.normal+tier*ENEMY_HP.perTier;
+ s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*(boss?ENEMY_HP.bossNight:ENEMY_HP.night)[s.campaign.night-1]*(d>=DIFFICULTY.hpFrom?1+DIFFICULTY.hpPct/100:1));
+ const rules=ENEMY_RULES[boss?'boss':elite?'elite':'normal'];
+ s.enemy.maxAp=rules.ap;s.enemy.handSize=rules.handSize;
+ if(NIGHT_ENEMY_DECKS[s.enemy.id])s.enemy.deck=[...NIGHT_ENEMY_DECKS[s.enemy.id]];
  applyEnemyBattleRule(s);
 }
-export function awakenNightBoss(s:GameState):void{
- if(!s.campaign||s.campaign.bossAwakened||!s.enemy||s.enemy.hp<=0||s.enemy.hp>s.enemy.maxHp*.5)return;
- const monster=require('../monsters/thai-ghosts').getMonsterById(s.enemy.id);
- if(!monster?.tier.includes('Boss')||adventureRoute(s)||difficultyOf(s)<3)return;
- s.campaign.bossAwakened=true;
- if(difficultyOf(s)>=4)applyStatusEffect('enemy',s,'strength',99,1);
- const phaseDeck=NIGHT_AWAKENED_DECKS[s.enemy.id];
- if(phaseDeck){
-  const regular=NIGHT_ENEMY_DECKS[s.enemy.id],swaps=new Map(regular.map((id,i)=>[id,phaseDeck[i]]));
-  const piles=(s as any).enemyPiles;
-  if(piles)for(const key of ['draw','hand','discard'])piles[key]=piles[key].map((id:string)=>swaps.get(id)??id);
-  s.enemy.ai!.deck!.lists=[{id:s.enemy.id+'-awakened',weight:1,cards:phaseDeck}];
- }
- require('../combat/damage').gainBlock(s,'enemy',8);
- if(difficultyOf(s)===5){s.enemy.maxEnergy=(s.enemy.maxEnergy??5)+1;const deck=s.enemy.ai!.deck!;deck.maxEnergy=s.enemy.maxEnergy;(s as any).enemyMaxEnergy=s.enemy.maxEnergy;}
- s.log.push('บอสตื่น: เปลี่ยนท่า เกราะ +8'+(difficultyOf(s)>=4?' แข็งแกร่ง +1':'')+(difficultyOf(s)===5?' พลังงาน +1':''));
+/** Whether rage is on for this fight: from night `RAGE.fromNight(difficulty)`. */
+export function rageActive(s:Partial<GameState>):boolean{
+ return !!s.campaign&&s.campaign.night>=RAGE.fromNight(difficultyOf(s));
 }
-export function nightEscalation(s:GameState):{every:number;strength:number}|undefined{
- if(!s.campaign)return;
- return {every:difficultyOf(s)>=3?3:4,strength:1};
+/** Ghost turn on which rage begins; level 4+ starts it `DIFFICULTY.rageEarlyBy` turn(s) sooner. */
+export function rageStartTurn(s:Partial<GameState>):number{
+ if(!rageActive(s as GameState))return RAGE.backstopTurn;
+ return RAGE.startTurn-(difficultyOf(s)>=DIFFICULTY.rageEarlyFrom?DIFFICULTY.rageEarlyBy:0);
+}
+/** Rage stacks for the ghost's current turn (0 before `RAGE.startTurn`). Counts ghost turns, not player turns. */
+export function rageStacks(s:Partial<GameState>):number{
+ const ghostTurn=s.fight?.ghostTurns??s.turn??1;
+ const start=rageStartTurn(s);
+ return Math.max(0,(ghostTurn-start+1)*RAGE.perTurn);
+}
+/** Start of the ghost's turn: rage rises to match how long the fight has lasted. */
+export function applyRage(s:GameState):void{
+ if(!s.enemy)return;
+ const n=rageStacks(s);if(!n)return;
+ const list=s.enemy.statusEffects??=[];
+ const old=list.find(e=>e.id==='rage');
+ if(old){if((old.stacks??0)>=n)return;old.stacks=n;old.duration=99;}
+ else applyStatusEffect('enemy',s,'rage',99,n);
+ s.log.push(`ผีโกรธ ${n}: ทุกหมัดแรงขึ้น ${n}`);
 }
 
 function adventureRoute(s:GameState){const ix=s.pages?._activeOfferIndex;return ix!=null&&s.pages?.adventure&&s.pages.current?.offers[ix]?.kind==='monster';}

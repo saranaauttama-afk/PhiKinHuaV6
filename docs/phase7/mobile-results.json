@@ -1,0 +1,238 @@
+{
+  "syntheticFixtures": true,
+  "checks": [
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20276.100000000006,
+      "pausedCombatMs": 20276.100000000006,
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20304,
+      "pausedCombatMs": 20304,
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20319.300000000017,
+      "pausedCombatMs": 20319.300000000017,
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20370.600000000006,
+      "pausedCombatMs": 20370.600000000006,
+      "result": "passed"
+    }
+  ],
+  "errors": []
+}

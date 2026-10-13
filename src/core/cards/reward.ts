@@ -23,6 +23,7 @@ import { ultimateRequired } from '../campaign/threeNight';
 export type CardReward = {
   /** การ์ดที่เสนอให้เลือก */
   choices: CardData[];
+  growth?: Array<'retain'|'draw'>;
 };
 
 /** จำนวนใบที่เสนอให้เลือกต่อไฟต์ */
@@ -42,9 +43,16 @@ export function rollCardReward(s: GameState, r: RNG): RNG {
   if (active?.kind === 'boss' && (active.bossType === 'secret' || (s.campaign?.night === 3 && !ultimateRequired(s)))) return r;
 
   const out = (s.campaign ? rollNightCards(s,r) : undefined) 
-    ?? rollThreeCards(r, s.player.level, getClass(s.classId).cardTag);
+    ?? rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0);
   if (out.list.length > 0) {
     s.cardReward = { choices: out.list };
+    // Hand/draw growth is rare and mid-run: only the night-2 boss (LEVEL_UP.growthNight) offers it.
+    if(active?.kind==='boss'&&s.campaign?.night===require('../balance/notfm').LEVEL_UP.growthNight){
+      const caps=require('../balance/notfm').LEVEL_UP.caps;
+      s.cardReward.growth=[];
+      if((s.player.retain??2)<caps.retain)s.cardReward.growth.push('retain');
+      if(s.player.drawPerTurn<caps.draw)s.cardReward.growth.push('draw');
+    }
   }
   return out.rng;
 }

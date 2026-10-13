@@ -1,1632 +1,1478 @@
 [
-  {
-    "id": "temple_blade",
-    "name": "ฟันดาบวัด",
-    "type": "attack",
-    "cost": 1,
-    "dmg": 7,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ฟันดาบวัด โจมตี 7"
+ {
+  "id": "temple_blade",
+  "name": "ฟันดาบวัด",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5
   },
-  {
-    "id": "muay_stance",
-    "name": "ตั้งท่ามวย",
-    "type": "skill",
-    "cost": 1,
-    "block": 8,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ตั้งท่ามวย ป้องกัน 8"
+  "starter": 4,
+  "flavor": "ดาบที่ใช้ฝึกในลานวัด"
+ },
+ {
+  "id": "ward_riposte",
+  "name": "ยันต์รับแล้วสวน",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5
   },
-  {
-    "id": "flying_knee",
-    "name": "เข่าลอย",
-    "type": "attack",
-    "cost": 2,
-    "dmg": 15,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "warrior"
-    ],
-    "desc": "กระโดดเข่าลอยเข้าใส่ สร้างความเสียหาย 15"
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 6
+   },
+   "bonus": {
+    "dmg": 7
+   }
   },
-  {
-    "id": "parry_step",
-    "name": "ปัดป้อง",
-    "type": "skill",
-    "cost": 1,
-    "block": 5,
-    "draw": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "draw",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ปัดหมัดแล้วก้าวออก Block 5 และจั่ว 1 ใบ"
+  "starter": 1,
+  "flavor": "ต้องตั้งรับก่อนถึงสวนได้"
+ },
+ {
+  "id": "muay_stance",
+  "name": "ตั้งท่ามวย",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "ap": 1,
+  "fx": {
+   "block": 7
   },
-  {
-    "id": "thunder_clap",
-    "name": "ตบมือลั่น",
-    "type": "attack",
-    "cost": 1,
-    "dmg": 5,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "weaken",
-      "thai",
-      "warrior"
-    ],
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "weakness",
-      "duration": 2,
-      "value": 1
-    },
-    "desc": "ตบมือดังลั่นทำให้ศัตรูเสียจังหวะ เสียหาย 5 และติดอ่อนแอ 2 เทิร์น"
-  },
-  {
-    "id": "stand_firm",
-    "name": "ยืนหยัด",
-    "type": "skill",
-    "cost": 2,
-    "block": 16,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ปักหลักไม่ถอย Block 16"
-  },
-  {
-    "id": "fighter_breath",
-    "name": "ลมหายใจนักสู้",
-    "type": "skill",
-    "cost": 0,
-    "energyGain": 1,
-    "draw": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "energy",
-      "draw",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ได้พลังงาน 1 และจั่ว 1 ใบ ใช้ได้ครั้งเดียวต่อไฟต์",
-    "exhaust": true
-  },
-  {
-    "id": "iron_will",
-    "name": "ใจเหล็ก",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "statusEffect": {
-      "target": "player",
-      "effect": "strength",
-      "duration": 99,
-      "value": 2
-    },
-    "tags": [
-      "status",
-      "thai",
-      "warrior"
-    ],
-    "desc": "รวบรวมใจ ได้พลังโจมตี +2 ตลอดไฟต์"
-  },
-  {
-    "id": "chant_sutra",
-    "name": "สวดมนต์",
-    "type": "skill",
-    "cost": 1,
-    "block": 7,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "nun"
-    ],
-    "desc": "สวดบทป้องกัน Block 7"
-  },
-  {
-    "id": "holy_water",
-    "name": "น้ำมนต์",
-    "type": "skill",
-    "cost": 1,
-    "heal": 5,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "heal",
-      "thai",
-      "nun"
-    ],
-    "desc": "พรมน้ำมนต์ ฟื้นพลังชีวิต 5"
-  },
-  {
-    "id": "loving_kindness",
-    "name": "แผ่เมตตา",
-    "type": "skill",
-    "cost": 1,
-    "block": 4,
-    "heal": 4,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "heal",
-      "block",
-      "thai",
-      "nun"
-    ],
-    "desc": "แผ่เมตตาให้สรรพสัตว์ Block 4 และฟื้น 4"
-  },
-  {
-    "id": "merit_shield",
-    "name": "บุญคุ้มครอง",
-    "type": "skill",
-    "cost": 2,
-    "block": 14,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "nun"
-    ],
-    "desc": "บุญเก่าคุ้มกาย Block 14"
-  },
-  {
-    "id": "dispel_ill",
-    "name": "ปัดเป่า",
-    "type": "skill",
-    "cost": 0,
-    "draw": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "draw",
-      "cleanse",
-      "thai",
-      "nun"
-    ],
-    "desc": "ปัดเป่าสถานะลบทั้งหมดออกจากตัวเอง · ใช้แล้วหายไปจากไฟต์นี้",
-    "cleanseDebuffs": true,
-    "exhaust": true
-  },
-  {
-    "id": "alms_offering",
-    "name": "สังฆทาน",
-    "type": "skill",
-    "cost": 1,
-    "energyGain": 1,
-    "heal": 4,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "energy",
-      "heal",
-      "thai",
-      "nun"
-    ],
-    "desc": "รับบิณฑบาต ฟื้นพลังชีวิต 4 ต้องเลือกระหว่างรักษากับโจมตี"
-  },
-  {
-    "id": "dharma_wheel",
-    "name": "ธรรมจักร",
-    "type": "attack",
-    "cost": 1,
-    "dmg": 7,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "nun"
-    ],
-    "desc": "โจมตี 7 ถ้ามีป้องกันอย่างน้อย 7 โจมตีเพิ่ม 5",
-    "conditional": {
-      "when": {
-        "kind": "player_block_at_least",
-        "value": 7
-      },
-      "bonus": {
-        "dmg": 5
-      }
+  "starter": 3,
+  "flavor": "ตั้งการ์ดแบบมวยวัด"
+ },
+ {
+  "id": "war_cry",
+  "name": "โห่ลั่นลานวัด",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
     }
+   ]
   },
-  {
-    "id": "five_precepts",
-    "name": "ศีลห้า",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "statusEffect": {
-      "target": "player",
-      "effect": "regeneration",
-      "duration": 3,
-      "value": 2
-    },
-    "tags": [
-      "status",
-      "heal",
-      "thai",
-      "nun"
-    ],
-    "desc": "ฟื้นพลังชีวิต 2 ต่อเทิร์น นาน 3 เทิร์น (ใช้แล้วหายไปจากไฟต์นี้)",
-    "exhaust": true
+  "starter": 1,
+  "flavor": "โห่จนเสียงก้องกุฏิ"
+ },
+ {
+  "id": "threefold_strike",
+  "name": "เข่าครูมวย",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 3,
+   "hits": 3
   },
-  {
-    "id": "house_guardian",
-    "name": "ผีเฝ้าเรือน",
-    "type": "skill",
-    "cost": 2,
-    "block": 6,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "medium"
-    ],
-    "desc": "ผีเฝ้าเรือนคุ้มกัน ได้ป้องกัน 6"
+  "starter": 1,
+  "flavor": "เข่าสามทีติด แรงที่สะสมเข้าทุกหมัด"
+ },
+ {
+  "id": "triple_knee",
+  "name": "เข่าสามชั้น",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4,
+   "hits": 3
   },
-  {
-    "id": "whisper_ear",
-    "name": "เสียงกระซิบ",
-    "type": "attack",
-    "cost": 1,
-    "dmg": 5,
-    "draw": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "draw",
-      "thai",
-      "medium"
-    ],
-    "desc": "โจมตี 5 และจั่ว 1 ใบ ใช้พลังงาน 1"
-  },
-  {
-    "id": "set_altar",
-    "name": "ตั้งหิ้ง",
-    "type": "skill",
-    "cost": 0,
-    "energyGain": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "energy",
-      "thai",
-      "medium"
-    ],
-    "desc": "ได้พลังงาน 1 ใช้ได้ครั้งเดียวต่อไฟต์ (ใช้แล้วหายไปจากไฟต์นี้)",
-    "exhaust": true
-  },
-  {
-    "id": "yantra_cloth",
-    "name": "ผ้ายันต์",
-    "type": "skill",
-    "cost": 1,
-    "block": 8,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "medium"
-    ],
-    "desc": "คลี่ผ้ายันต์บังกาย Block 8"
-  },
-  {
-    "id": "spirit_possess",
-    "name": "ให้ผีเข้า",
-    "type": "attack",
-    "cost": 2,
-    "dmg": 13,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "medium"
-    ],
-    "desc": "ปล่อยให้วิญญาณเข้าสิงชั่วครู่ สร้างความเสียหาย 13"
-  },
-  {
-    "id": "phrai_oil",
-    "name": "น้ำมันพราย",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "poison",
-      "duration": 4,
-      "value": 3
-    },
-    "tags": [
-      "status",
-      "poison",
-      "thai",
-      "medium"
-    ],
-    "desc": "ป้ายน้ำมันพราย ศัตรูติดพิษ 3 ต่อเทิร์น นาน 4 เทิร์น"
-  },
-  {
-    "id": "dust_jab",
-    "name": "ต่อยฝุ่นตลบ",
-    "type": "attack",
-    "cost": 0,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ต่อยแบบไม่ตั้งท่า ฝุ่นลานวัดฟุ้งขึ้นมา สร้างความเสียหาย 4",
-    "dmg": 4
-  },
-  {
-    "id": "elbow_return",
-    "name": "ศอกกลับ",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "vulnerable",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ปล่อยให้มันเข้ามาก่อนแล้วศอกกลับ เสียหาย 6 และศัตรูเปราะบาง 2",
-    "dmg": 6,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "vulnerable",
-      "duration": 2,
-      "value": 2
+  "flavor": "ยกเข่าทีละชั้น"
+ },
+ {
+  "id": "elbow_return",
+  "name": "ศอกกลับ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "shin_block",
-    "name": "ปิดแข้ง",
-    "type": "skill",
-    "cost": 0,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ยกแข้งรับไว้เฉยๆ ไม่สวย แต่ได้ Block 5",
-    "block": 5
-  },
-  {
-    "id": "war_cry",
-    "name": "โห่ลั่นลานวัด",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "strength",
-      "thai",
-      "warrior"
-    ],
-    "desc": "โห่จนเสียงก้องกุฏิ ได้ Block 6 และแข็งแกร่งขึ้น 1 ตลอดไฟต์",
-    "block": 6,
-    "statusEffect": {
-      "target": "player",
-      "effect": "strength",
-      "duration": 99,
-      "value": 1
+  "flavor": "ปล่อยให้มันเข้ามาก่อนแล้วศอกกลับ"
+ },
+ {
+  "id": "thunder_clap",
+  "name": "ตบมือลั่น",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "long_spear",
-    "name": "แทงหอกยาว",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "weaken",
-      "thai",
-      "warrior"
-    ],
-    "desc": "หอกยาวกว่าที่มันคิด เสียหาย 12 และศัตรูอ่อนแอ 2",
-    "dmg": 12,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "weakness",
-      "duration": 2,
-      "value": 2
+  "flavor": "ตบมือดังจนผีเสียจังหวะ"
+ },
+ {
+  "id": "shin_block",
+  "name": "ปิดแข้ง",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "ap": 1,
+  "fx": {
+   "block": 5,
+   "draw": 1
+  },
+  "flavor": "ยกแข้งรับไว้เฉยๆ"
+ },
+ {
+  "id": "flying_knee",
+  "name": "เข่าลอย",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 11
+  },
+  "flavor": "กระโดดเข่าลอยเข้าใส่"
+ },
+ {
+  "id": "long_spear",
+  "name": "แทงหอกยาว",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 8,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "gate_watch",
-    "name": "ยืนเฝ้าประตูโบสถ์",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "draw",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ยืนตรงที่ที่ต้องยืน ได้ Block 12 และจั่ว 1 ใบ",
-    "block": 12,
-    "draw": 1
+  "flavor": "หอกยาวกว่าที่มันคิด"
+ },
+ {
+  "id": "death_throes",
+  "name": "ดิ้นตาย",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6
   },
-  {
-    "id": "equipment_iron_bracer",
-    "name": "ติดตั้งกำไลเหล็ก",
-    "type": "equipment",
-    "cost": 0,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "equipment",
-      "defense",
-      "thai",
-      "warrior"
-    ],
-    "desc": "สวมกำไลเหล็กของครูดาบ ยิ่งเลือดน้อยยิ่งยืนแน่น",
-    "equipmentId": "iron_bracer",
-    "slotCost": 1
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 12
+   }
   },
-  {
-    "id": "karma_cut",
-    "name": "ดาบตัดกรรม",
-    "type": "attack",
-    "cost": 3,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ฟันครั้งเดียวให้จบเรื่อง สร้างความเสียหาย 26",
-    "dmg": 26
+  "flavor": "ยิ่งใกล้ตายยิ่งแรง"
+ },
+ {
+  "id": "stand_firm",
+  "name": "ยืนหยัด",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "ap": 2,
+  "fx": {
+   "block": 15
   },
-  {
-    "id": "hold_the_line",
-    "name": "ยันจนตัวตาย",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "block",
-      "heal",
-      "exhaust",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ปักหลักไม่ถอย ได้ Block 20 และฟื้น 8 — ทำได้ครั้งเดียวต่อไฟต์",
-    "block": 20,
-    "heal": 8,
-    "exhaust": true
+  "flavor": "ปักหลักไม่ถอย"
+ },
+ {
+  "id": "gate_watch",
+  "name": "ยืนเฝ้าประตูโบสถ์",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "ap": 1,
+  "fx": {
+   "block": 8,
+   "draw": 1
   },
-  {
-    "id": "equipment_war_drum",
-    "name": "ติดตั้งกลองศึกประจำกาย",
-    "type": "equipment",
-    "cost": 0,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "equipment",
-      "strength",
-      "thai",
-      "warrior"
-    ],
-    "desc": "สะพายกลองศึกไว้กับตัว เสียงมันลั่นตั้งแต่ก่อนเริ่ม",
-    "equipmentId": "war_drum_gear",
-    "slotCost": 1
-  },
-  {
-    "id": "ancestor_blade",
-    "name": "ดาบบรรพบุรุษ",
-    "type": "attack",
-    "cost": 3,
-    "rarity": "Legendary",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "strength",
-      "exhaust",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ดาบที่ส่งต่อกันมาเจ็ดชั่วคน เสียหาย 18 และแข็งแกร่ง 3 ตลอดไฟต์ — ชักได้ครั้งเดียว",
-    "dmg": 18,
-    "exhaust": true,
-    "statusEffect": {
-      "target": "player",
-      "effect": "strength",
-      "duration": 99,
-      "value": 3
+  "flavor": "ยืนตรงที่ที่ต้องยืน"
+ },
+ {
+  "id": "iron_will",
+  "name": "ใจเหล็ก",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
     }
+   ]
   },
-  {
-    "id": "call_ancient_warrior",
-    "name": "เรียกวิญญาณนักรบเก่า",
-    "type": "skill",
-    "cost": 3,
-    "rarity": "Legendary",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "warrior"
-    ],
-    "desc": "คนที่ตายในสนามรบเดิมยืนบังให้ ได้ป้องกัน 10",
-    "block": 10
+  "exhaust": true,
+  "flavor": "รวบรวมใจ ทุกหมัดหนักขึ้นจนจบไฟต์"
+ },
+ {
+  "id": "bamboo_spike",
+  "name": "ขวากไผ่",
+  "type": "counter",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 10
   },
-  {
-    "id": "morning_alms",
-    "name": "บิณฑบาตเช้า",
-    "type": "skill",
-    "cost": 0,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "heal",
-      "thai",
-      "nun"
-    ],
-    "desc": "ออกบิณฑบาตตั้งแต่ฟ้ายังไม่สาง ได้ Block 3 และฟื้น 3",
-    "block": 3,
-    "heal": 3
+  "counter": {
+   "trigger": "enemy_any"
   },
-  {
-    "id": "count_beads",
-    "name": "นับลูกประคำ",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "draw",
-      "thai",
-      "nun"
-    ],
-    "desc": "นับไปทีละเม็ดจนใจนิ่ง จั่วการ์ด 2 ใบ",
-    "draw": 2
+  "flavor": "ผีที่ขยับเข้ามาโดนขวาก"
+ },
+ {
+  "id": "war_drum_trap",
+  "name": "กลองศึกลั่น",
+  "type": "counter",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "block": 6
   },
-  {
-    "id": "sprinkle_water",
-    "name": "พรมน้ำมนต์",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "weaken",
-      "thai",
-      "nun"
-    ],
-    "desc": "พรมใส่ตรงๆ เสียหาย 6 และศัตรูอ่อนแอ 2",
-    "dmg": 6,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "weakness",
-      "duration": 2,
-      "value": 2
-    }
+  "counter": {
+   "trigger": "enemy_skill"
   },
-  {
-    "id": "candle_vigil",
-    "name": "จุดเทียนเฝ้าศพ",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "regen",
-      "thai",
-      "nun"
-    ],
-    "desc": "จุดเทียนนั่งเฝ้าทั้งคืน ได้ Block 5 และฟื้นฟูต่อเนื่อง 2 สามเทิร์น",
-    "block": 5,
-    "statusEffect": {
-      "target": "player",
-      "effect": "regeneration",
-      "duration": 3,
-      "value": 2
-    }
-  },
-  {
-    "id": "mantra_wall",
-    "name": "กำแพงบทสวด",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "draw",
-      "thai",
-      "nun"
-    ],
-    "desc": "สวดจนเสียงเป็นกำแพง ได้ Block 11 และจั่ว 1 ใบ",
-    "block": 11,
-    "draw": 1
-  },
-  {
-    "id": "karma_returns",
-    "name": "กรรมสนอง",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "heal",
-      "thai",
-      "nun"
-    ],
-    "desc": "สิ่งที่มันทำไว้ย้อนกลับเข้าตัวมันเอง เสียหาย 11 และเราฟื้น 5",
-    "dmg": 11,
-    "heal": 5
-  },
-  {
-    "id": "equipment_alms_bowl",
-    "name": "ติดตั้งบาตรพระ",
-    "type": "equipment",
-    "cost": 0,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "equipment",
-      "heal",
-      "thai",
-      "nun"
-    ],
-    "desc": "อุ้มบาตรไว้ตลอดทาง บุญที่รับมาก็มากขึ้นตาม",
-    "equipmentId": "alms_bowl",
-    "slotCost": 1
-  },
-  {
-    "id": "great_merit",
-    "name": "มหากุศล",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "heal",
-      "regen",
-      "exhaust",
-      "thai",
-      "nun"
-    ],
-    "desc": "บุญใหญ่ที่สะสมมาทั้งชีวิต ฟื้น 20 และฟื้นฟูต่อเนื่อง 5 ห้าเทิร์น — ครั้งเดียวต่อไฟต์",
-    "heal": 20,
-    "exhaust": true,
-    "statusEffect": {
-      "target": "player",
-      "effect": "regeneration",
-      "duration": 5,
-      "value": 5
-    }
-  },
-  {
-    "id": "dharma_verdict",
-    "name": "ธรรมพิพากษา",
-    "type": "attack",
-    "cost": 3,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "vulnerable",
-      "thai",
-      "nun"
-    ],
-    "desc": "ตัดสินตามที่มันก่อไว้ เสียหาย 20 และเปราะบาง 3",
-    "dmg": 20,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "vulnerable",
-      "duration": 3,
-      "value": 3
-    }
-  },
-  {
-    "id": "equipment_white_robe",
-    "name": "ติดตั้งผ้าขาวห่ม",
-    "type": "equipment",
-    "cost": 0,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "equipment",
-      "regen",
-      "thai",
-      "nun"
-    ],
-    "desc": "ห่มผ้าขาวที่ผ่านพิธีมาแล้ว แผลปิดเองได้ทั้งไฟต์",
-    "equipmentId": "white_robe",
-    "slotCost": 1
-  },
-  {
-    "id": "nirvana_moment",
-    "name": "ชั่วขณะสงบ",
-    "type": "skill",
-    "cost": 3,
-    "rarity": "Legendary",
-    "inShop": true,
-    "tags": [
-      "block",
-      "regen",
-      "exhaust",
-      "thai",
-      "nun"
-    ],
-    "desc": "ชั่วขณะที่ไม่กลัวอะไรเลย ได้ Block 25 และฟื้นฟูต่อเนื่อง 8 แปดเทิร์น — ครั้งเดียวต่อไฟต์",
-    "block": 25,
-    "exhaust": true,
-    "statusEffect": {
-      "target": "player",
-      "effect": "regeneration",
-      "duration": 8,
-      "value": 8
-    }
-  },
-  {
-    "id": "boundless_compassion",
-    "name": "เมตตาไม่มีประมาณ",
-    "type": "skill",
-    "cost": 3,
-    "rarity": "Legendary",
-    "inShop": true,
-    "tags": [
-      "heal",
-      "thai",
-      "nun"
-    ],
-    "desc": "แผ่ไปจนถึงสิ่งที่ไม่มีใครแผ่ให้ ฟื้น 12",
-    "heal": 12
-  },
-  {
-    "id": "incense_smoke",
-    "name": "ควันธูปคลุ้ง",
-    "type": "skill",
-    "cost": 0,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "thai",
-      "medium"
-    ],
-    "desc": "จุดธูปทั้งกำจนควันบังตัว ได้ Block 4",
-    "block": 4
-  },
-  {
-    "id": "knock_call",
-    "name": "เคาะเรียกวิญญาณ",
-    "type": "attack",
-    "cost": 0,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "medium"
-    ],
-    "desc": "เคาะสามที มีอะไรตอบกลับมา สร้างความเสียหาย 5",
-    "dmg": 5
-  },
-  {
-    "id": "offering_tray",
-    "name": "ถาดเครื่องเซ่น",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "heal",
-      "energy",
-      "thai",
-      "medium"
-    ],
-    "desc": "ฟื้นชีวิต 5 ใช้พลังงาน 1",
-    "heal": 5,
-    "energyGain": 0
-  },
-  {
-    "id": "ghost_hand",
-    "name": "ผีจับมือ",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "draw",
-      "thai",
-      "medium"
-    ],
-    "desc": "มีมือเย็นๆ มาจับแล้วนำทาง เสียหาย 7 และจั่ว 1 ใบ",
-    "dmg": 7,
-    "draw": 1
-  },
-  {
-    "id": "whisper_curse",
-    "name": "กระซิบสาป",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "curse",
-      "thai",
-      "medium"
-    ],
-    "desc": "กระซิบชื่อมันเบาๆ เสียหาย 6 และติดคำสาป 3 ชั้น",
-    "dmg": 6,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "curse",
-      "duration": 3,
-      "value": 3
-    }
-  },
-  {
-    "id": "mass_possession",
-    "name": "ผีเข้าหมู่",
-    "type": "attack",
-    "cost": 3,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "thai",
-      "medium"
-    ],
-    "desc": "ปล่อยให้เข้ามาพร้อมกันทั้งหมด สร้างความเสียหาย 22",
-    "dmg": 22
-  },
-  {
-    "id": "equipment_ghost_mirror",
-    "name": "ติดตั้งกระจกผี",
-    "type": "equipment",
-    "cost": 0,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "equipment",
-      "reflect",
-      "thai",
-      "medium"
-    ],
-    "desc": "แขวนกระจกบานที่ไม่ควรมองไว้กับตัว ใครตีเราจะเห็นหน้าตัวเอง",
-    "equipmentId": "ghost_mirror",
-    "slotCost": 1
-  },
-  {
-    "id": "thousand_whispers",
-    "name": "พันเสียงกระซิบ",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Legendary",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "draw",
-      "energy",
-      "exhaust",
-      "thai",
-      "medium"
-    ],
-    "desc": "ทุกเสียงพูดพร้อมกันจนหูอื้อ เสียหาย 15 จั่ว 3 ใบ และได้พลังงาน 2 — ครั้งเดียวต่อไฟต์",
-    "dmg": 15,
-    "draw": 3,
-    "energyGain": 2,
-    "exhaust": true
-  },
-  {
-    "id": "full_body_trance",
-    "name": "เข้าทรงเต็มร่าง",
-    "type": "skill",
-    "cost": 3,
-    "rarity": "Legendary",
-    "inShop": true,
-    "tags": [
-      "block",
-      "strength",
-      "thai",
-      "medium"
-    ],
-    "desc": "ยกร่างให้มันทั้งตัว ได้ Block 8 แข็งแกร่ง 2 ตลอดไฟต์",
-    "block": 8,
-    "statusEffect": {
-      "target": "player",
-      "effect": "strength",
-      "duration": 99,
-      "value": 2
-    }
-  },
-  {
-    "id": "triple_knee",
-    "name": "เข่าสามชั้น",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "multihit",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ยกเข่าสามที ทีละ 4 — เกราะกินได้ทีละหมัด และแรงที่สะสมไว้เข้าทุกหมัด",
-    "dmg": 4,
-    "hits": 3
-  },
-  {
-    "id": "bamboo_volley",
-    "name": "ปาไผ่รัว",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "multihit",
-      "thai",
-      "shaman"
-    ],
-    "desc": "ขว้างไผ่ทีละดุ้นสี่ครั้ง ทีละ 3",
-    "dmg": 3,
-    "hits": 4
-  },
-  {
-    "id": "thousand_needles",
-    "name": "เข็มพันเล่ม",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "multihit",
-      "poison",
-      "thai",
-      "medium"
-    ],
-    "desc": "ปักเข็มห้าครั้ง ทีละ 4 และศัตรูติดพิษ 3",
-    "dmg": 4,
-    "hits": 5,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "poison",
-      "duration": 4,
-      "value": 3
-    }
-  },
-  {
-    "id": "prayer_rain",
-    "name": "ฝนบทสวด",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "multihit",
-      "thai",
-      "nun"
-    ],
-    "desc": "สวดรัวเป็นสายฝน โดนหกครั้ง ทีละ 3",
-    "dmg": 3,
-    "hits": 6
-  },
-  {
-    "id": "shadow_flurry",
-    "name": "เงาซัดรัว",
-    "type": "attack",
-    "cost": 3,
-    "rarity": "Legendary",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "multihit",
-      "strength",
-      "thai",
-      "warrior"
-    ],
-    "desc": "แปดหมัดติด ทีละ 5 — ยิ่งแข็งแกร่งยิ่งต่างกันมาก",
-    "dmg": 5,
-    "hits": 8
-  },
-  {
-    "id": "death_throes",
-    "name": "ดิ้นตาย",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "conditional",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ยิ่งใกล้ตายยิ่งแรง โจมตี 8 — ถ้าเลือดเหลือไม่ถึงครึ่ง โจมตี 20",
-    "dmg": 8,
-    "conditional": {
-      "when": {
-        "kind": "player_hp_below",
-        "value": 50
-      },
-      "bonus": {
-        "dmg": 12
-      }
-    }
-  },
-  {
-    "id": "counter_punch",
-    "name": "สวนหมัด",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "conditional",
-      "thai",
-      "warrior"
-    ],
-    "desc": "โจมตี 6 ถ้ามีป้องกันอย่างน้อย 10 โจมตี 2 ครั้ง",
-    "dmg": 6,
-    "conditional": {
-      "when": {
-        "kind": "player_block_at_least",
-        "value": 10
-      },
-      "bonus": {
-        "hits": 1
-      }
-    }
-  },
-  {
-    "id": "salt_in_wound",
-    "name": "ซ้ำเติมแผล",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "conditional",
-      "poison",
-      "thai",
-      "medium"
-    ],
-    "desc": "โจมตี 5 — ถ้าศัตรูติดพิษอยู่แล้ว โจมตี 14",
-    "dmg": 5,
-    "conditional": {
-      "when": {
-        "kind": "enemy_has_status",
-        "statusId": "poison"
-      },
-      "bonus": {
-        "dmg": 9
-      }
-    }
-  },
-  {
-    "id": "all_or_nothing",
-    "name": "หมดหน้าตัก",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "conditional",
-      "thai",
-      "shaman"
-    ],
-    "desc": "โจมตี 10 — ถ้าไม่มีการ์ดอื่นเหลือในมือแล้ว โจมตี 30 และจั่ว 2 ใบ",
-    "dmg": 10,
-    "conditional": {
-      "when": {
-        "kind": "hand_empty"
-      },
-      "bonus": {
-        "dmg": 20,
-        "draw": 2
-      }
-    }
-  },
-  {
-    "id": "last_rite",
-    "name": "สวดส่งวิญญาณ",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "heal",
-      "conditional",
-      "thai",
-      "nun"
-    ],
-    "desc": "ได้ Block 6 — ถ้าเลือดเหลือไม่ถึง 40% ฟื้นอีก 12",
-    "block": 6,
-    "conditional": {
-      "when": {
-        "kind": "player_hp_below",
-        "value": 40
-      },
-      "bonus": {
-        "heal": 12
-      }
-    }
-  },
-  {
-    "id": "lean_deck",
-    "name": "สำรับคม",
-    "type": "skill",
-    "cost": 0,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "draw",
-      "energy",
-      "conditional",
-      "thai",
-      "medium"
-    ],
-    "desc": "จั่ว 1 ใบ — ถ้าสำรับเหลือไม่เกิน 15 ใบ จั่วอีก 2 และได้พลังงาน 1",
-    "draw": 1,
-    "conditional": {
-      "when": {
-        "kind": "deck_at_most",
-        "value": 15
-      },
-      "bonus": {
-        "draw": 2,
-        "energyGain": 1
-      }
-    },
-    "exhaust": true
-  },
-  {
-    "id": "yantra_in_hand",
-    "name": "ยันต์ในมือ",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "block",
-      "held",
-      "thai",
-      "shaman"
-    ],
-    "desc": "ปล่อยได้ Block 12 — หรือถือไว้เฉยๆ ก็ได้ Block 4 ทุกท้ายเทิร์น",
-    "block": 12,
-    "whileHeld": {
-      "block": 4
-    }
-  },
-  {
-    "id": "wrist_thread",
-    "name": "ด้ายผูกข้อมือ",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "heal",
-      "held",
-      "thai",
-      "nun"
-    ],
-    "desc": "ปล่อยฟื้น 10 — หรือถือไว้ก็ฟื้น 3 ทุกท้ายเทิร์น",
-    "heal": 10,
-    "whileHeld": {
-      "heal": 3
-    }
-  },
-  {
-    "id": "held_charm",
-    "name": "เครื่องรางกำไว้",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "strength",
-      "held",
-      "thai",
-      "warrior"
-    ],
-    "desc": "ปล่อยได้ Block 14 และแข็งแกร่ง 2 — หรือกำไว้ก็ได้ Block 3 ทุกท้ายเทิร์น",
-    "block": 14,
-    "whileHeld": {
+  "flavor": "ผีที่ตั้งท่าจะถูกเสียงกลองขัด"
+ },
+ {
+  "id": "equipment_iron_bracer",
+  "name": "กำไลเหล็ก",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "turnStart",
+     "fx": {
       "block": 3
+     }
+    }
+   ]
+  },
+  "flavor": "กำไลของครูดาบ"
+ },
+ {
+  "id": "equipment_war_drum",
+  "name": "กลองศึกประจำกาย",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "equip",
+     "fx": {
+      "status": [
+       {
+        "id": "strength",
+        "stacks": 2,
+        "turns": 99,
+        "to": "self"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "flavor": "เสียงกลองลั่นตั้งแต่ก่อนเริ่ม"
+ },
+ {
+  "id": "karma_cut",
+  "name": "ดาบตัดกรรม",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "dmg": 22
+  },
+  "exhaust": true,
+  "flavor": "ฟันครั้งเดียวให้จบเรื่อง"
+ },
+ {
+  "id": "hold_the_line",
+  "name": "ยันจนตัวตาย",
+  "type": "action",
+  "rarity": "Rare",
+  "class": "warrior",
+  "ap": 2,
+  "fx": {
+   "block": 20,
+   "heal": 6
+  },
+  "exhaust": true,
+  "flavor": "ทำได้ครั้งเดียวต่อไฟต์"
+ },
+ {
+  "id": "night_guardian_cut",
+  "name": "มีดครูห้าคืน",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "hits": 2
+  },
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 8
+   },
+   "bonus": {
+    "dmg": 4
+   }
+  },
+  "locked": true,
+  "flavor": "มีดที่ครูมอบให้หลังผ่านคืนที่ห้า"
+ },
+ {
+  "id": "shadow_flurry",
+  "name": "เงาซัดรัว",
+  "type": "attack",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {
+   "dmg": 3,
+   "hits": 6
+  },
+  "flavor": "หกหมัดติด ยิ่งแข็งแกร่งยิ่งต่างกันมาก"
+ },
+ {
+  "id": "ancestor_blade",
+  "name": "ดาบบรรพบุรุษ",
+  "type": "attack",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {
+   "dmg": 12,
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  },
+  "exhaust": true,
+  "flavor": "ดาบที่ส่งต่อกันมาเจ็ดชั่วคน"
+ },
+ {
+  "id": "bamboo_dart",
+  "name": "ปาไผ่เผา",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 6
+  },
+  "starter": 3,
+  "flavor": "ไผ่เผาไฟปลายแหลม"
+ },
+ {
+  "id": "cursed_needle",
+  "name": "เสกเข็มปัก",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 5
+  },
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "curse"
+   },
+   "bonus": {
+    "dmg": 6
+   }
+  },
+  "starter": 1,
+  "flavor": "เข็มที่ปักตรงรอยคำสาป"
+ },
+ {
+  "id": "cooling_cloth",
+  "name": "ผ้าเย็น",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "ap": 1,
+  "fx": {
+   "block": 7
+  },
+  "starter": 3,
+  "flavor": "ตั้งรับด้วยผ้าเย็น"
+ },
+ {
+  "id": "direct_poison_spell",
+  "name": "เสกพิษตรง",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "mana": 3,
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "คาถาพิษเข้าเลือดโดยตรง"
+ },
+ {
+  "id": "meditation",
+  "name": "นั่งสมาธิ",
+  "type": "mana",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "mana": 3
+  },
+  "starter": 1,
+  "flavor": "ใจนิ่งพลังก็มา"
+ },
+ {
+  "id": "curse_chant",
+  "name": "เสกคาถาสาป",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "mana": 2,
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
     },
-    "statusEffect": {
-      "target": "player",
-      "effect": "strength",
-      "duration": 99,
-      "value": 2
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "spirit_lamp",
-    "name": "ตะเกียงผี",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "heal",
-      "held",
-      "regen",
-      "thai",
-      "medium"
-    ],
-    "desc": "ฟื้น 4 และฟื้นฟู 2 นาน 3 เทิร์น หรือถือไว้ได้ฟื้นฟู 1 ท้ายเทิร์น",
-    "heal": 4,
-    "whileHeld": {
-      "status": {
-        "effect": "regeneration",
-        "duration": 2,
-        "value": 1
-      }
+  "starter": 2,
+  "flavor": "คำสาปทำให้ผีเจ็บทุกครั้งที่โดน และมือไม้อ่อนแรง"
+ },
+ {
+  "id": "bamboo_volley",
+  "name": "ปาไผ่รัว",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 2,
+   "hits": 4
+  },
+  "flavor": "ขว้างไผ่ทีละดุ้น"
+ },
+ {
+  "id": "yantra_in_hand",
+  "name": "ยันต์ในมือ",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "ap": 1,
+  "fx": {
+   "block": 11
+  },
+  "whileHeld": {
+   "block": 3
+  },
+  "flavor": "ปล่อยได้ป้องกันเต็ม ถือไว้ก็ยังกันให้"
+ },
+ {
+  "id": "yantra_snare",
+  "name": "ยันต์ดัก",
+  "type": "counter",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 6,
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  },
+  "counter": {
+   "trigger": "enemy_attack"
+  },
+  "flavor": "ยันต์ลุกเป็นไฟเมื่อผีเข้ามาตี"
+ },
+ {
+  "id": "ghost_possession",
+  "name": "ทรงผี",
+  "type": "mana",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "mana": 4,
+   "draw": 1
+  },
+  "limit": "turn",
+  "flavor": "ผีเข้าร่างพาพลังมาด้วย"
+ },
+ {
+  "id": "withering_hex",
+  "name": "คาถาเหี่ยวแห้ง",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "mana": 3,
+  "fx": {
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     },
-    "statusEffect": {
-      "target": "player",
-      "effect": "regeneration",
-      "duration": 3,
-      "value": 2
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "flowing_chant",
-    "name": "คาถาไหลลื่น",
-    "type": "attack",
-    "cost": 3,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "cheapen",
-      "thai",
-      "shaman"
-    ],
-    "desc": "โจมตี 16 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 0",
-    "dmg": 16,
-    "costRule": {
-      "kind": "per_card_played",
-      "step": 1,
-      "min": 0
+  "flavor": "ผีอ่อนแรงและเปราะบางพร้อมกัน"
+ },
+ {
+  "id": "flowing_chant",
+  "name": "คาถาไหลลื่น",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "mana": 4,
+  "fx": {
+   "dmg": 14
+  },
+  "flavor": "คาถาไหลออกมาไม่ขาดสาย"
+ },
+ {
+  "id": "salt_hex",
+  "name": "เกลือเสกคาถา",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "mana": 3,
+  "fx": {
+   "block": 10,
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 1,
+     "turns": 3,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "gathering_merit",
-    "name": "บุญสะสม",
-    "type": "skill",
-    "cost": 3,
-    "rarity": "Uncommon",
-    "inShop": true,
-    "tags": [
-      "block",
-      "heal",
-      "cheapen",
-      "thai",
-      "nun"
-    ],
-    "desc": "ได้ Block 12 และฟื้น 6 — ค่าร่ายลด 1 ต่อการ์ดที่เล่นไปแล้วเทิร์นนี้ ต่ำสุด 1",
-    "block": 12,
-    "heal": 6,
-    "costRule": {
-      "kind": "per_card_played",
-      "step": 1,
-      "min": 1
+  "flavor": "เกลือเสกกันตัวและสาปผีไปพร้อมกัน"
+ },
+ {
+  "id": "phi_tai_hong",
+  "name": "ผีตายโหง",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "shaman",
+  "mana": 4,
+  "fx": {
+   "dmg": 12
+  },
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 12
+   }
+  },
+  "flavor": "เรียกผีตายโหงมาแก้แค้น"
+ },
+ {
+  "id": "all_or_nothing",
+  "name": "หมดหน้าตัก",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "dmg": 8
+  },
+  "limit": "turn",
+  "conditional": {
+   "when": {
+    "kind": "hand_empty"
+   },
+   "bonus": {
+    "dmg": 14,
+    "draw": 2
+   }
+  },
+  "flavor": "ทุ่มทุกอย่างที่มีในมือ"
+ },
+ {
+  "id": "night_hex_knot",
+  "name": "เงื่อนคาถาห้าคืน",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "shaman",
+  "mana": 2,
+  "fx": {
+   "dmg": 5,
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "war_momentum",
-    "name": "ได้จังหวะ",
-    "type": "attack",
-    "cost": 4,
-    "rarity": "Rare",
-    "inShop": true,
-    "tags": [
-      "attack",
-      "multihit",
-      "cheapen",
-      "thai",
-      "warrior"
-    ],
-    "desc": "โจมตี 5 สามครั้ง ค่าร่ายลด 1 ต่อใบที่เล่นแล้ว ต่ำสุด 1",
-    "dmg": 5,
-    "hits": 3,
-    "costRule": {
-      "kind": "per_card_played",
-      "step": 1,
-      "min": 1
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 7
+   }
+  },
+  "locked": true,
+  "flavor": "เงื่อนคาถาที่ผูกไว้ห้าคืน"
+ },
+ {
+  "id": "equipment_shaman_staff",
+  "name": "ไม้เท้าหมอผี",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "play",
+     "type": "spell",
+     "once": "turn",
+     "fx": {
+      "mana": 2
+     }
     }
+   ]
   },
-  {
-    "id": "ward_riposte",
-    "name": "ยันต์รับแล้วสวน",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "thai",
-      "warrior",
-      "build"
-    ],
-    "desc": "โจมตี 5 ถ้ามีป้องกันอย่างน้อย 8 โจมตี 14 ต้องตั้งรับก่อน",
-    "dmg": 5,
-    "conditional": {
-      "when": {
-        "kind": "player_block_at_least",
-        "value": 8
-      },
-      "bonus": {
-        "dmg": 9
-      }
+  "flavor": "คาถาใบแรกแต่ละเทิร์นคืนมานา"
+ },
+ {
+  "id": "equipment_nang_tani_skull",
+  "name": "กะโหลกนางตานี",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "turnStart",
+     "fx": {
+      "mana": 1
+     }
     }
+   ]
   },
-  {
-    "id": "last_stand_cut",
-    "name": "ดาบสุดแรง",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "thai",
-      "warrior",
-      "build"
-    ],
-    "desc": "โจมตี 10 ถ้าชีวิตต่ำกว่าครึ่ง โจมตี 24",
-    "dmg": 10,
-    "conditional": {
-      "when": {
-        "kind": "player_hp_below",
-        "value": 50
-      },
-      "bonus": {
-        "dmg": 14
-      }
+  "flavor": "มันกระซิบคาถาให้ทุกเช้า"
+ },
+ {
+  "id": "black_magic",
+  "name": "อาถรรพ์ดำ",
+  "type": "spell",
+  "rarity": "Legendary",
+  "class": "shaman",
+  "mana": 6,
+  "fx": {
+   "dmg": 32
+  },
+  "exhaust": true,
+  "flavor": "ของต้องห้ามที่ใช้ได้ครั้งเดียว"
+ },
+ {
+  "id": "herbal_ritual",
+  "name": "พิธีสมุนไพรเก้าทัพ",
+  "type": "spell",
+  "rarity": "Legendary",
+  "class": "shaman",
+  "mana": 4,
+  "fx": {
+   "heal": 12,
+   "status": [
+    {
+     "id": "regeneration",
+     "stacks": 3,
+     "turns": 4,
+     "to": "self"
     }
+   ]
   },
-  {
-    "id": "threefold_strike",
-    "name": "เข่าครูมวย",
-    "type": "attack",
-    "cost": 2,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "thai",
-      "warrior",
-      "build"
-    ],
-    "desc": "โจมตี 3 สามครั้ง และได้แข็งแกร่ง 1 ตลอดไฟต์ แรงที่สะสมบวกทุกครั้ง",
-    "dmg": 3,
-    "hits": 3,
-    "statusEffect": {
-      "target": "player",
-      "effect": "strength",
-      "duration": 99,
-      "value": 1
+  "exhaust": true,
+  "flavor": "สมุนไพรเก้าชนิดต้มในหม้อดิน"
+ },
+ {
+  "id": "dharma_wheel",
+  "name": "ธรรมจักร",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "nun",
+  "fx": {
+   "dmg": 6
+  },
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 6
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "starter": 4,
+  "flavor": "จักรหมุนแรงขึ้นเมื่อใจนิ่ง"
+ },
+ {
+  "id": "sprinkle_water",
+  "name": "พรมน้ำมนต์",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "nun",
+  "fx": {
+   "dmg": 5,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "spirit_pact",
-    "name": "สัญญาคู่กาย",
-    "type": "skill",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "thai",
-      "medium",
-      "build"
-    ],
-    "desc": "จั่ว 1 ได้พลังงาน 1 ใช้ได้ครั้งเดียวต่อไฟต์",
-    "draw": 1,
-    "exhaust": true,
-    "energyGain": 1
+  "starter": 1,
+  "flavor": "พรมใส่ตรงๆ"
+ },
+ {
+  "id": "chant_sutra",
+  "name": "สวดมนต์",
+  "type": "action",
+  "rarity": "Common",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "block": 7
   },
-  {
-    "id": "poison_echo",
-    "name": "พรายซ้ำพิษ",
-    "type": "attack",
-    "cost": 1,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "thai",
-      "medium",
-      "build"
-    ],
-    "desc": "โจมตี 6 ถ้าศัตรูติดพิษ จั่ว 2 ใบและได้ป้องกัน 5",
-    "dmg": 6,
-    "conditional": {
-      "when": {
-        "kind": "enemy_has_status",
-        "statusId": "poison"
-      },
-      "bonus": {
-        "draw": 2,
-        "block": 5
-      }
+  "starter": 3,
+  "flavor": "สวดบทป้องกัน"
+ },
+ {
+  "id": "holy_water",
+  "name": "น้ำมนต์",
+  "type": "prayer",
+  "rarity": "Common",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "heal": 4
+  },
+  "starter": 1,
+  "flavor": "รอให้น้ำมนต์ซึม ยิ่งรอยิ่งได้ผล"
+ },
+ {
+  "id": "candle_vigil",
+  "name": "จุดเทียนเฝ้าศพ",
+  "type": "prayer",
+  "rarity": "Common",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "จุดเทียนนั่งเฝ้าทั้งคืน"
+ },
+ {
+  "id": "loving_kindness",
+  "name": "แผ่เมตตา",
+  "type": "action",
+  "rarity": "Common",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "block": 5,
+   "heal": 3
+  },
+  "flavor": "แผ่เมตตาให้สรรพสัตว์"
+ },
+ {
+  "id": "morning_alms",
+  "name": "บิณฑบาตเช้า",
+  "type": "action",
+  "rarity": "Common",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "draw": 1
+  },
+  "flavor": "ออกบิณฑบาตตั้งแต่ฟ้ายังไม่สาง"
+ },
+ {
+  "id": "count_beads",
+  "name": "นับลูกประคำ",
+  "type": "prayer",
+  "rarity": "Common",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "draw": 1
+  },
+  "flavor": "นับไปทีละเม็ดจนใจนิ่ง"
+ },
+ {
+  "id": "sacred_thread",
+  "name": "ด้ายสายสิญจน์",
+  "type": "counter",
+  "rarity": "Common",
+  "class": "nun",
+  "fx": {
+   "block": 4
+  },
+  "counter": {
+   "trigger": "enemy_attack",
+   "negate": true,
+   "turns": 2
+  },
+  "flavor": "ด้ายพันไว้ ท่านั้นไม่ออก"
+ },
+ {
+  "id": "mantra_wall",
+  "name": "กำแพงบทสวด",
+  "type": "prayer",
+  "rarity": "Uncommon",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "block": 8
+  },
+  "flavor": "สวดจนเสียงเป็นกำแพง"
+ },
+ {
+  "id": "prayer_rain",
+  "name": "ฝนบทสวด",
+  "type": "prayer",
+  "rarity": "Uncommon",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "dmg": 3,
+   "hits": 3
+  },
+  "flavor": "สวดรัวเป็นสายฝน"
+ },
+ {
+  "id": "karma_returns",
+  "name": "กรรมสนอง",
+  "type": "prayer",
+  "rarity": "Common",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "dmg": 7,
+   "heal": 3
+  },
+  "starter": 1,
+  "flavor": "สิ่งที่มันทำไว้ย้อนกลับเข้าตัว"
+ },
+ {
+  "id": "last_rite",
+  "name": "สวดส่งวิญญาณ",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "block": 6
+  },
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 10
+   }
+  },
+  "flavor": "สวดให้ทั้งผีและตัวเอง"
+ },
+ {
+  "id": "wrist_thread",
+  "name": "ด้ายผูกข้อมือ",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "heal": 8
+  },
+  "whileHeld": {
+   "heal": 2
+  },
+  "flavor": "ปล่อยได้ฟื้นเต็ม ถือไว้ก็ฟื้นทีละน้อย"
+ },
+ {
+  "id": "salt_circle_trap",
+  "name": "วงเกลือดัก",
+  "type": "counter",
+  "rarity": "Uncommon",
+  "class": "nun",
+  "fx": {
+   "block": 5,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
     }
+   ]
   },
-  {
-    "id": "ancestor_council",
-    "name": "วงบรรพชน",
-    "type": "skill",
-    "cost": 2,
-    "rarity": "Common",
-    "inShop": true,
-    "tags": [
-      "thai",
-      "medium",
-      "build"
-    ],
-    "desc": "ป้องกัน 9 จั่ว 1 ใช้ได้ครั้งเดียวต่อไฟต์",
-    "block": 9,
-    "exhaust": true,
-    "draw": 1
+  "counter": {
+   "trigger": "enemy_skill"
   },
-  {
-    "id": "night_guardian_cut",
-    "name": "มีดครูห้าคืน",
-    "type": "attack",
-    "cost": 2,
-    "dmg": 7,
-    "hits": 2,
-    "conditional": {
-      "when": {
-        "kind": "player_block_at_least",
-        "value": 8
-      },
-      "bonus": {
-        "dmg": 3
-      }
+  "flavor": "ผีที่ตั้งท่าจะเสียสมาธิ"
+ },
+ {
+  "id": "equipment_alms_bowl",
+  "name": "บาตรพระ",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "nun",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "prayerDone",
+     "fx": {
+      "heal": 3
+     }
+    }
+   ]
+  },
+  "flavor": "บทสวดที่ครบรอบทุกบทฟื้นใจให้"
+ },
+ {
+  "id": "equipment_white_robe",
+  "name": "ผ้าขาวห่ม",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "nun",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "equip",
+     "fx": {
+      "status": [
+       {
+        "id": "regeneration",
+        "stacks": 2,
+        "turns": 99,
+        "to": "self"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "flavor": "ผ้าขาวที่ผ่านพิธีแล้ว"
+ },
+ {
+  "id": "great_merit",
+  "name": "มหากุศล",
+  "type": "prayer",
+  "rarity": "Rare",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "heal": 8,
+   "block": 4
+  },
+  "exhaust": true,
+  "flavor": "บุญใหญ่ที่สะสมมาทั้งชีวิต"
+ },
+ {
+  "id": "dharma_verdict",
+  "name": "ธรรมพิพากษา",
+  "type": "prayer",
+  "rarity": "Rare",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "dmg": 9,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "ตัดสินตามที่มันก่อไว้"
+ },
+ {
+  "id": "night_lotus_wheel",
+  "name": "จักรบัวห้าคืน",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "nun",
+  "fx": {
+   "dmg": 6,
+   "block": 4
+  },
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "locked": true,
+  "flavor": "จักรบัวที่หมุนมาห้าคืน"
+ },
+ {
+  "id": "nirvana_moment",
+  "name": "ชั่วขณะสงบ",
+  "type": "action",
+  "rarity": "Legendary",
+  "class": "nun",
+  "ap": 2,
+  "fx": {
+   "block": 18,
+   "status": [
+    {
+     "id": "regeneration",
+     "stacks": 3,
+     "turns": 4,
+     "to": "self"
+    }
+   ]
+  },
+  "exhaust": true,
+  "flavor": "ชั่วขณะที่ไม่กลัวอะไรเลย"
+ },
+ {
+  "id": "boundless_compassion",
+  "name": "เมตตาไม่มีประมาณ",
+  "type": "prayer",
+  "rarity": "Legendary",
+  "class": "nun",
+  "ap": 1,
+  "fx": {
+   "heal": 7,
+   "cleanse": true
+  },
+  "exhaust": true,
+  "flavor": "แผ่ไปจนถึงสิ่งที่ไม่มีใครแผ่ให้"
+ },
+ {
+  "id": "whisper_ear",
+  "name": "เสียงกระซิบ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "medium",
+  "fx": {
+   "dmg": 6
+  },
+  "starter": 4,
+  "flavor": "เสียงกระซิบบอกว่าต้องตีตรงไหน"
+ },
+ {
+  "id": "salt_in_wound",
+  "name": "ซ้ำเติมแผล",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "medium",
+  "fx": {
+   "dmg": 4
+  },
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 6
+   }
+  },
+  "starter": 1,
+  "flavor": "ซ้ำตรงที่พิษกัด"
+ },
+ {
+  "id": "yantra_cloth",
+  "name": "ผ้ายันต์",
+  "type": "action",
+  "rarity": "Common",
+  "class": "medium",
+  "ap": 1,
+  "fx": {
+   "block": 9
+  },
+  "whileHeld": {
+   "block": 2
+  },
+  "starter": 2,
+  "flavor": "คลี่ผ้ายันต์บังกาย"
+ },
+ {
+  "id": "phrai_oil",
+  "name": "น้ำมันพราย",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "medium",
+  "mana": 2,
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  },
+  "starter": 2,
+  "flavor": "ป้ายน้ำมันพรายใส่ผี"
+ },
+ {
+  "id": "borrow_breath",
+  "name": "ยืมลมผี",
+  "type": "action",
+  "rarity": "Common",
+  "class": "medium",
+  "ap": 1,
+  "fx": {
+   "block": 7,
+   "borrow": 1
+  },
+  "starter": 1,
+  "flavor": "เลียนท่าที่ผีเพิ่งใช้ ได้สำเนาเข้ามือ"
+ },
+ {
+  "id": "ghost_hand",
+  "name": "ผีจับมือ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "medium",
+  "fx": {
+   "dmg": 4,
+   "draw": 1
+  },
+  "limit": "turn",
+  "flavor": "มือเย็นๆ มาจับแล้วนำทาง"
+ },
+ {
+  "id": "poison_echo",
+  "name": "พรายซ้ำพิษ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "medium",
+  "fx": {
+   "dmg": 5
+  },
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "block": 5
+   }
+  },
+  "flavor": "พิษกระซิบตอบกลับ"
+ },
+ {
+  "id": "incense_smoke",
+  "name": "ควันธูปคลุ้ง",
+  "type": "mana",
+  "rarity": "Common",
+  "class": "medium",
+  "fx": {
+   "mana": 2,
+   "block": 3
+  },
+  "flavor": "จุดธูปทั้งกำจนควันบังตัว"
+ },
+ {
+  "id": "set_altar",
+  "name": "ตั้งหิ้ง",
+  "type": "mana",
+  "rarity": "Common",
+  "class": "medium",
+  "fx": {
+   "mana": 3
+  },
+  "flavor": "ตั้งหิ้งเชิญครู"
+ },
+ {
+  "id": "offering_tray",
+  "name": "ถาดเครื่องเซ่น",
+  "type": "action",
+  "rarity": "Common",
+  "class": "medium",
+  "ap": 1,
+  "fx": {
+   "heal": 5,
+   "mana": 2
+  },
+  "flavor": "เซ่นแล้วผีก็ตอบแทน"
+ },
+ {
+  "id": "whisper_curse",
+  "name": "กระซิบสาป",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "medium",
+  "mana": 2,
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "กระซิบชื่อมันเบาๆ"
+ },
+ {
+  "id": "spirit_possess",
+  "name": "ให้ผีเข้า",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "medium",
+  "ap": 1,
+  "fx": {
+   "borrow": 2
+  },
+  "flavor": "ยอมให้ผีเข้า ได้สำเนาสองท่าล่าสุด"
+ },
+ {
+  "id": "spirit_pact",
+  "name": "สัญญาคู่กาย",
+  "type": "mana",
+  "rarity": "Uncommon",
+  "class": "medium",
+  "fx": {
+   "mana": 2,
+   "draw": 1
+  },
+  "limit": "turn",
+  "flavor": "สัญญากับวิญญาณที่ตามมา"
+ },
+ {
+  "id": "house_guardian",
+  "name": "ผีเฝ้าเรือน",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "medium",
+  "ap": 2,
+  "fx": {
+   "block": 10,
+   "status": [
+    {
+     "id": "thorns",
+     "stacks": 2,
+     "turns": 3,
+     "to": "self"
+    }
+   ]
+  },
+  "flavor": "ผีเฝ้าเรือนคุ้มกัน"
+ },
+ {
+  "id": "grave_soil",
+  "name": "ดินหน้าหลุม",
+  "type": "counter",
+  "rarity": "Rare",
+  "class": "medium",
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
     },
-    "desc": "โจมตี 7 สองครั้ง ถ้ามีป้องกัน 8 ขึ้นไป โจมตีครั้งละ 10",
-    "tags": [
-      "warrior",
-      "thai",
-      "attack"
-    ],
-    "rarity": "Rare",
-    "inRewards": false,
-    "inShop": false
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
   },
-  {
-    "id": "night_hex_knot",
-    "name": "เงื่อนคาถาห้าคืน",
-    "type": "attack",
-    "cost": 1,
-    "dmg": 5,
-    "statusEffect": {
-      "target": "enemy",
-      "effect": "poison",
-      "duration": 3,
-      "value": 2
-    },
-    "conditional": {
-      "when": {
-        "kind": "enemy_has_status",
-        "statusId": "poison"
-      },
-      "bonus": {
-        "dmg": 7
-      }
-    },
-    "desc": "โจมตี 5 ใส่พิษ 2 นาน 3 เทิร์น ถ้ามีพิษอยู่ก่อน โจมตี 12",
-    "tags": [
-      "shaman",
-      "thai",
-      "attack",
-      "poison"
-    ],
-    "rarity": "Rare",
-    "inRewards": false,
-    "inShop": false
+  "counter": {
+   "trigger": "enemy_any",
+   "turns": 3
   },
-  {
-    "id": "night_lotus_wheel",
-    "name": "จักรบัวห้าคืน",
-    "type": "attack",
-    "cost": 1,
-    "dmg": 6,
-    "block": 5,
-    "conditional": {
-      "when": {
-        "kind": "player_hp_below",
-        "value": 50
-      },
-      "bonus": {
-        "heal": 4
-      }
-    },
-    "desc": "โจมตี 6 ป้องกัน 5 ถ้าเลือดต่ำกว่าครึ่ง ฟื้น 4",
-    "tags": [
-      "nun",
-      "thai",
-      "attack",
-      "block"
-    ],
-    "rarity": "Rare",
-    "inRewards": false,
-    "inShop": false
+  "flavor": "ดินจากหน้าหลุมศพ"
+ },
+ {
+  "id": "mirror_ward",
+  "name": "กระจกเงาสะท้อน",
+  "type": "counter",
+  "rarity": "Rare",
+  "class": "medium",
+  "fx": {
+   "dmg": 8
   },
-  {
-    "id": "night_ancestor_pact",
-    "name": "สัญญาห้าคืน",
-    "type": "attack",
-    "cost": 1,
-    "dmg": 8,
-    "desc": "โจมตี 8 จั่ว 1",
-    "tags": [
-      "medium",
-      "thai",
-      "attack",
-      "spirit"
-    ],
-    "rarity": "Rare",
-    "inRewards": false,
-    "inShop": false,
-    "draw": 1
-  }
+  "counter": {
+   "trigger": "enemy_attack",
+   "negate": true
+  },
+  "flavor": "ท่าโจมตีถัดไปของผีสะท้อนกลับ"
+ },
+ {
+  "id": "thousand_needles",
+  "name": "เข็มพันเล่ม",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "medium",
+  "mana": 4,
+  "fx": {
+   "dmg": 3,
+   "hits": 4,
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "ปักเข็มทีละเล่ม"
+ },
+ {
+  "id": "night_ancestor_pact",
+  "name": "สัญญาห้าคืน",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "medium",
+  "mana": 2,
+  "fx": {
+   "dmg": 6,
+   "borrow": 1
+  },
+  "locked": true,
+  "flavor": "บรรพชนยืมท่าผีมาให้"
+ },
+ {
+  "id": "equipment_ghost_mirror",
+  "name": "กระจกผี",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "medium",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "equip",
+     "fx": {
+      "status": [
+       {
+        "id": "thorns",
+        "stacks": 2,
+        "turns": 99,
+        "to": "self"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "flavor": "ใครตีเราจะเห็นหน้าตัวเอง"
+ },
+ {
+  "id": "mass_possession",
+  "name": "ผีเข้าหมู่",
+  "type": "action",
+  "rarity": "Legendary",
+  "class": "medium",
+  "ap": 1,
+  "fx": {
+   "borrow": 3,
+   "mana": 3
+  },
+  "exhaust": true,
+  "flavor": "ปล่อยให้เข้ามาพร้อมกันทั้งหมด"
+ },
+ {
+  "id": "thousand_whispers",
+  "name": "พันเสียงกระซิบ",
+  "type": "attack",
+  "rarity": "Legendary",
+  "class": "medium",
+  "fx": {
+   "dmg": 10,
+   "draw": 3
+  },
+  "exhaust": true,
+  "flavor": "ทุกเสียงพูดพร้อมกันจนหูอื้อ"
+ }
 ]

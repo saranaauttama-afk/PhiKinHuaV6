@@ -2,6 +2,7 @@ import React from 'react';
 import {Image} from 'react-native';
 /** Reuse the illustrated Thai subjects behind the corresponding effect. */
 export const STATUS_ART:Record<string,any>={
+ equipment:require('../../../assets/cards/thai-v24/equipment_iron_bracer.webp'),
  fear:require('../../../assets/cards/thai-v24/curse_dread.webp'),
  poison:require('../../../assets/cards/thai-v24/fused_needle_powder.webp'),
  curse:require('../../../assets/cards/thai-v24/curse_whisper.webp'),

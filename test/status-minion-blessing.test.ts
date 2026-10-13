@@ -49,15 +49,14 @@ function playToEnd(seed: string): GameState {
     go({ type: 'ChooseOffer', index: i });
     if (s.phase !== 'combat') break;
     if (s.enemy) s.enemy.statusEffects = [];
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') {
-      const lu = s.levelUp?.choice;
-      if (lu?.optionA === 'blessing') go({ type: 'ChooseLevelUpOption', option: 'A', index: 0 });
-      else if (lu?.optionB === 'blessing') go({ type: 'ChooseLevelUpOption', option: 'B', index: 0 });
-      else go({ type: 'SkipLevelUp' });
+      go({ type: 'SkipLevelUp' });
     }
     go({ type: 'CompleteNode' });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
     skipChapters();
   }
@@ -154,7 +153,7 @@ describe('ยุบระบบสถานะสองชุดให้เห�
 
     const { state, rng } = makeCombatState({
       hand: [{ ...card, instanceId: 'p1' } as CardData],
-      playerEnergy: 3,
+      playerMana: 3,
     });
     const out = applyCommand(state, { type: 'PlayCard', index: 0 }, rng).state;
 

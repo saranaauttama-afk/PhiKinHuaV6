@@ -32,12 +32,13 @@ describe('พระประธาน test APK card', () => {
           expect(s.piles.hand.filter(c => c.id === TEST_WIN_CARD_ID)).toHaveLength(1);
           const restored = fromSave(toBattleSave(s, r));
           expect(restored?.piles.hand[0].id).toBe(TEST_WIN_CARD_ID);
-          s.player.energy = 0; s.enemy!.block = 99999;
+          s.player.ap = 0; s.enemy!.block = 99999;
           const hp = s.player.hp;
           go({ type: 'PlayCard', index: 0 }); wins++;
-          expect(s.enemy!.hp).toBe(0); expect(s.player.hp).toBe(hp);
+          expect(s.enemy!.hp).toBe(0); expect(s.player.hp).toBeGreaterThanOrEqual(hp); // a level-up may heal
           expect(s.combatVictoryLock).toBe(true);
-        } else if (s.phase === 'levelup') go(s.levelUp?.dawnHandChoice?{type:'ChooseLevelUpOption',option:'A'}:{ type: 'SkipLevelUp' });
+        } else if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
+        else if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
         else if (s.phase === 'reward') go({ type: 'SkipCardReward' });
         else if (s.phase === 'victory') go({ type: 'CompleteNode' });
         else throw new Error(s.phase);

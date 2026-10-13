@@ -1,5 +1,6 @@
 import type {CardData,Command,GameState} from '../types';
 import {GHOST_CATALOG} from './catalog';
+import {TYPE_LABEL} from '../cards/describe';
 
 export type DiscoveryRun={id:string;night:number;ghostNights?:Record<string,{first:number;last:number}>;cardNights?:Record<string,{first:number;last:number}>;ghosts:Record<string,{seen:true;won:boolean}>;cards:Record<string,CardData>};
 export type ArchiveProfile={version:1;runs:Record<string,DiscoveryRun>};
@@ -21,7 +22,7 @@ export function trackDiscovery(before:GameState,after:GameState,cmd?:Command):vo
  if(after.enemy)see(after.enemy.id);
  after.defeatedEnemyIds?.forEach(id=>{if(!run.ghosts[id]?.won)see(id,true);});
  if(before.enemy&&(after.fightCount??0)>(before.fightCount??0))see(before.enemy.id,true);
- const owned=[...(after.masterDeck??[]),...(after.equipped??[]).flatMap(e=>e.sourceCard?[e.sourceCard]:[]),...Object.values(after.piles??{}).flat()];
+ const owned=[...(after.masterDeck??[]),...(after.equipped??[]),...Object.values(after.piles??{}).flat()];
  owned.forEach(card=>{
   if(!card?.id||run.cards[card.id])return;
   note('cardNights',card.id);
@@ -54,7 +55,7 @@ export function parseArchive(raw:string):ArchiveProfile{
   if(!r||r.id!==id||!Number.isInteger(r.night)||r.night<1||r.night>5||!r.ghosts||!r.cards||typeof r.ghosts!=='object'||typeof r.cards!=='object'||Array.isArray(r.ghosts)||Array.isArray(r.cards))throw Error('Invalid discovery run');
   for(const key of ['ghostNights','cardNights'] as const)if(r[key]){if(typeof r[key]!=='object'||Array.isArray(r[key]))throw Error('Invalid discovery nights');for(const [entry,n] of Object.entries(r[key]!))if(!(key==='ghostNights'?r.ghosts[entry]:r.cards[entry])||!Number.isInteger(n.first)||!Number.isInteger(n.last)||n.first<1||n.last>5||n.first>n.last)throw Error('Invalid discovery nights');}
   for(const [gid,g] of Object.entries(r.ghosts))if(!ghostIds.has(gid)||g?.seen!==true||typeof g.won!=='boolean')throw Error('Invalid ghost discovery');
-  for(const [cid,c] of Object.entries(r.cards))if(!c||c.id!==cid||typeof c.name!=='string'||!['attack','skill','trap','equipment','curse','power'].includes(c.type))throw Error('Invalid card discovery');
+  for(const [cid,c] of Object.entries(r.cards))if(!c||c.id!==cid||typeof c.name!=='string'||!Object.keys(TYPE_LABEL).includes(c.type))throw Error('Invalid card discovery');
  }
  return p;
 }

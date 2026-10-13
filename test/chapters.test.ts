@@ -77,7 +77,7 @@ function playRun(seed: string, opts: {
       s.player.block=0;s.player.statusEffects=[];s.blessings=[];s.equipped=[];s.minions=[];
       s.enemy.hp = 9999;
       s.piles.hand = [];
-      s.enemyPiles={draw:[],hand:['claw'],discard:[]};
+      s.enemyPiles={draw:[],hand:['pisaj_fai_v29_signature'],discard:[]};
       s.enemyIntent=undefined;
       go({ type: 'EndTurn' });
       go({ type: 'ResolveEnemyTurn' });
@@ -91,12 +91,14 @@ function playRun(seed: string, opts: {
 
     if (s.enemy) s.enemy.statusEffects = [];
     s.piles.hand = [
-      { id: 'kill', name: 'kill', type: 'attack', cost: 0, dmg: 9999, instanceId: 'kill1' },
+      { id: 'kill', name: 'kill', type: 'attack', fx: { dmg: 9999 }, instanceId: 'kill1' },
     ];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     go({ type: 'CompleteNode' });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go((s.levelUp?.dawnHandChoice ? { type: 'ChooseLevelUpOption', option: 'A' } : { type: 'SkipLevelUp' }) as any);
     resolveRewardIfAny(s, go);
     closeChapter();

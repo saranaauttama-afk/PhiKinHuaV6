@@ -108,7 +108,7 @@ function baseState(over: Partial<GameState['player']> = {}): GameState {
   return {
     classId: 'shaman',
     player: { hp: 40, maxHp: 50, gold: 50, level: 3, ...over },
-    masterDeck: [{ id: 'a', name: 'ก', type: 'skill', cost: 0 }],
+    masterDeck: [{ id: 'a', name: 'ก', type: 'action', ap: 0, fx: {} }],
     blessings: [],
     log: [],
   } as unknown as GameState;
