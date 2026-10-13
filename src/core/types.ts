@@ -43,6 +43,8 @@ export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negat
 export type CardData = {
   id: string;
   instanceId?: string;
+  /** Stable owned copy; survives upgrades and deck reorder/removal. */
+  ownedId?: string;
   name: string;
   type: CardType;
   rarity?: Rarity;
@@ -270,6 +272,8 @@ export type GameState = {
   campaign?: import('./campaign/nights').CampaignRun;
   /** Owned deck positions selected before this fight; never copies. */
   preEquipment?:number[];
+  equipmentLoadout?: string[];
+  ownedCardSeq?: number;
   eventMemory?:Record<string,number>;
   runMetrics?: import('./campaign/metrics').RunMetrics;
   discovery?: import('./archive/progress').DiscoveryRun;
@@ -475,6 +479,8 @@ export type Command =
   | { type: 'SkipCardReward' }
 
   // UI
+  | { type: 'SetEquipmentLoadout'; indices: number[] }
+  | { type: 'ChooseHandReward'; option: 'retain' | 'draw' }
   | { type: 'OpenDeck' }
   | { type: 'CloseDeck' }
 

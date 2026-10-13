@@ -137,7 +137,7 @@ describe('ระดับความยาก', () => {
         if (d.s.chapter) d.go({ type: 'SkipChapter' });
       }
       expect(d.s.campaign!.night).toBe(3);
-      expect(d.s.player.drawPerTurn).toBe(difficulty >= DIFFICULTY.drawCutFrom ? draw - 1 : draw);
+      expect(d.s.player.drawPerTurn).toBe(difficulty >= DIFFICULTY.drawCutFrom ? Math.max(DIFFICULTY.drawFloor,draw - 1) : draw);
     }
   });
 });

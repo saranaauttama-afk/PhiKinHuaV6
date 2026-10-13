@@ -40,7 +40,7 @@ function completeAdventure(s:GameState,r:RNG){
      s.campaign!.night=(s.campaign!.night+1) as 2|3;
      s.campaign!.talksThisNight=0;
      // DIFFICULTY.drawCutFrom: night 3 draws one card fewer per turn.
-     if(s.campaign!.night===3&&s.campaign!.difficulty>=require('../../balance/notfm').DIFFICULTY.drawCutFrom){s.player.drawPerTurn=Math.max(1,s.player.drawPerTurn-1);s.log.push('คืนที่ 3: จั่วต่อเทิร์น −1');}
+     if(s.campaign!.night===3&&s.campaign!.difficulty>=require('../../balance/notfm').DIFFICULTY.drawCutFrom){const before=s.player.drawPerTurn;s.player.drawPerTurn=Math.min(before,Math.max(require('../../balance/notfm').DIFFICULTY.drawFloor,s.player.drawPerTurn-1));if(s.player.drawPerTurn<before)s.log.push('คืนที่ 3: จั่วต่อเทิร์น −1');}
      const healed=Math.min(s.player.maxHp-s.player.hp,Math.ceil(s.player.maxHp*.12));s.player.hp+=healed;
      s.log.push(`ฟ้าสาง คืนหัวสำเร็จ · พักฟื้น ${healed} · ออกตามรอยคืนที่ ${s.campaign!.night}`);
      s.phase='map';s.levelUp=null;s.cardReward=undefined;s.combatVictoryLock=false;
@@ -126,8 +126,11 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
   switch (offer.kind) {
     case 'monster':
     case 'boss':
-      if(!require('../../cards/equipment').validEquipmentSelection(s,cmd.equipmentIndices??[]))return {state:s,rng};
-      s.preEquipment=[...(cmd.equipmentIndices??[])];
+      const eq=require('../../cards/equipment');
+      const picks=cmd.equipmentIndices??eq.loadoutIndices(s);
+      if(!eq.validEquipmentSelection(s,picks))return {state:s,rng};
+      s.equipmentLoadout=picks.map((i:number)=>s.masterDeck[i].ownedId!);
+      s.preEquipment=[...picks];
       return startCombat(s, offer, ix, rng);
 
     case 'shop_card': {

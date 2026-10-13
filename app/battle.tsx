@@ -349,7 +349,7 @@ export default function BattlePage() {
           ref={monsterRef}
           monsterId={monsterId}
           monsterName={monsterName}
-          enemy={enemy ?? null}
+          enemy={enemy?{...enemy,drawPerTurn:gameState.enemyDrawPerTurn,maxRetained:gameState.enemyMaxRetained}:null}
           handSlots={handSlotsRef.current}
           turnLabel={`เทิร์น ${gameState.turn} · ${phase==='enemy'?'ตาผี':'ตาเรา'}`}
         />
@@ -432,6 +432,7 @@ export default function BattlePage() {
           maxAp={player.maxAp}
           mana={player.mana}
           block={player.block}
+          handCount={gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length} handMax={player.handMax} retain={retainLimit(gameState)} drawPerTurn={player.drawPerTurn} opening={require('../src/core/cards/hand').openingHandSize(gameState)}
           drawCount={drawCount}
           onEndTurn={handleEndTurn}
           onOpenPiles={() => setOpenPile('draw')}
@@ -491,6 +492,7 @@ export default function BattlePage() {
           <CardRewardOverlay
             notice={gameState.levelUp?.result?.fight===(gameState.fightCount??0)?gameState.levelUp.result.text:undefined}
             choices={gameState.cardReward.choices}
+            growth={gameState.cardReward.growth} onGrowth={option=>dispatch({type:'ChooseHandReward',option})}
             deck={gameState.masterDeck ?? []}
             onChoose={(index) => dispatch({ type: 'ChooseCardReward', index })}
             onSkip={() => dispatch({ type: 'SkipCardReward' })}

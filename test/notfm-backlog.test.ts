@@ -136,8 +136,8 @@ describe('เก็บการ์ดข้ามเทิร์น', () => {
     // Wrong count is refused.
     let out = applyCommand(s, { type: 'DiscardForTurnEnd', indices: [0] }, rng).state;
     expect(out.piles.hand).toHaveLength(6);
-    out = applyCommand(out, { type: 'DiscardForTurnEnd', indices: [0, 2, 4] }, rng).state;
-    expect(out.piles.hand.map(c => c.id)).toEqual(['h1', 'h3', 'h5']);
+    out = applyCommand(out, { type: 'DiscardForTurnEnd', indices: [0, 2, 4, 5] }, rng).state;
+    expect(out.piles.hand.map(c => c.id)).toEqual(['h1', 'h3']);
     expect(turnEndExcess(out)).toBe(0);
   });
 

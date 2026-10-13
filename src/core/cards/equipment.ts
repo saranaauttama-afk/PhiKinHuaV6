@@ -14,3 +14,20 @@ export function prepareEquipment(s:GameState,r:RNG):RNG{
  }
  return r;
 }
+
+/** Assign identities once; never use deck positions as persistent ownership. */
+export function normalizeLoadout(s:GameState):void{
+ s.masterDeck=s.masterDeck??[];
+ s.ownedCardSeq=Math.max(0,s.ownedCardSeq??0);
+ const reserved=new Set(s.masterDeck.map(c=>c.ownedId).filter(Boolean));
+ const seen=new Set<string>();
+ for(const c of s.masterDeck){
+  if(!c.ownedId||seen.has(c.ownedId)){do{c.ownedId=`owned-${++s.ownedCardSeq!}`;}while(reserved.has(c.ownedId)||seen.has(c.ownedId));}
+  seen.add(c.ownedId);
+ }
+ const valid=new Set(s.masterDeck.filter(c=>c.type==='equipment').map(c=>c.ownedId!));
+ s.equipmentLoadout=[...new Set(s.equipmentLoadout??[])].filter(id=>valid.has(id)).slice(0,s.equipmentSlotsMax??1);
+}
+export function loadoutIndices(s:GameState):number[]{
+ return (s.equipmentLoadout??[]).map(id=>s.masterDeck.findIndex(c=>c.ownedId===id&&c.type==='equipment')).filter(i=>i>=0).slice(0,s.equipmentSlotsMax??1);
+}

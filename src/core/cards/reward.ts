@@ -23,6 +23,7 @@ import { ultimateRequired } from '../campaign/threeNight';
 export type CardReward = {
   /** การ์ดที่เสนอให้เลือก */
   choices: CardData[];
+  growth?: Array<'retain'|'draw'>;
 };
 
 /** จำนวนใบที่เสนอให้เลือกต่อไฟต์ */
@@ -45,6 +46,12 @@ export function rollCardReward(s: GameState, r: RNG): RNG {
     ?? rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0);
   if (out.list.length > 0) {
     s.cardReward = { choices: out.list };
+    if(active?.kind==='boss'&&(s.campaign?.night??3)<3){
+      const caps=require('../balance/notfm').LEVEL_UP.caps;
+      s.cardReward.growth=[];
+      if((s.player.retain??2)<caps.retain)s.cardReward.growth.push('retain');
+      if(s.player.drawPerTurn<caps.draw)s.cardReward.growth.push('draw');
+    }
   }
   return out.rng;
 }

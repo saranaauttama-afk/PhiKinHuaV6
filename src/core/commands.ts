@@ -91,7 +91,7 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   s.player.mana = s.player.startMana;
   require('./cards/mechanics').resetCardsPlayed(s);
   rng = require('./cards/equipment').prepareEquipment(s,rng);
-  const opening=Math.max(1,s.player.openingDraw+require('./cards/passives').ruleModifier(s,'openingDraw'));
+  const opening=require('./cards/hand').openingHandSize(s);
   ({ state: s, rng } = drawCards(s, rng, opening));
   rng = require('./cards/passives').runTriggers(s, 'battleStart', rng);
   require('./cards/testWin').dealTestWinCard(s);

@@ -5,13 +5,13 @@ import type { ClassId } from '../classes';
 
 export const CARD_RULES = {
   /** Cards drawn when a fight starts. */
-  openingDraw: 4,
+  openingDraw: 2,
   /** Cards drawn at the start of each later player turn. */
   drawPerTurn: 2,
   /** Hard cap on cards held during a turn; draws past it stay in the draw pile. */
   handMax: 10,
   /** Cards kept past the end of a turn; above it the player picks cards to discard (NOTFM). */
-  retain: 3,
+  retain: 2,
   /** Action points restored each player turn. */
   apPerTurn: 2,
   /** Equipment cards that can be in play at once; a new one replaces the oldest. */
@@ -101,8 +101,8 @@ export const NIGHT_EXP = { normal: [12, 18, 24], elite: [20, 30, 40], boss: [30,
  */
 export const LEVEL_UP = {
   maxHp: 8, skipGold: 25, offers: 2, upgrades: 2,
-  weights: { card: 3, upgrade: 3, remove: 2, slot: 1, retain: 2, ap:1, mana:2, draw:1 },
-  caps: { slot: 3, retain: 6, ap:3, mana:10, draw:4 },
+  weights: { card: 3, upgrade: 3, remove: 2, slot: 1, retain: 0, ap:1, mana:2, draw:0 },
+  caps: { slot: 3, retain: 4, ap:3, mana:10, draw:4 },
 } as const;
 
 /**
@@ -157,6 +157,8 @@ export const DIFFICULTY = {
   rageEarlyFrom: 4, rageEarlyBy: 1,
   /** From this level the player draws one card fewer per turn on night 3. */
   drawCutFrom: 5,
+  /** Keep a playable baseline when growth is moved to rare boss rewards. */
+  drawFloor: 2,
 } as const;
 
 /**

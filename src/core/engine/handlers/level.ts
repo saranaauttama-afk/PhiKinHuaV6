@@ -22,7 +22,7 @@ export function levelOptionValid(s: GameState, option: LevelOption, index: numbe
   if(option==='mana')return s.player.startMana<LEVEL_UP.caps.mana;
   if(option==='draw')return s.player.drawPerTurn<LEVEL_UP.caps.draw;
   if(option==='slot')return (s.equipmentSlotsMax??1)<LEVEL_UP.caps.slot;
-  if(option==='retain')return (s.player.retain??3)<LEVEL_UP.caps.retain;
+  if(option==='retain')return (s.player.retain??CARD_RULES.retain)<LEVEL_UP.caps.retain;
   const card = s.masterDeck[index];
   if (!card) return false;
   return option === 'upgrade' ? canUpgrade(card) : canRemoveCard(card, s.masterDeck.length);

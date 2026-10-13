@@ -173,6 +173,9 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   if(s.phase==='talk'){go({type:'AnswerGhostTalk',choice:alignChoice(s,align)});continue;}
   if(s.phase==='levelup'){go(chooseLevelUp(s));continue;}
   if(s.phase==='reward'){
+   const growth=s.cardReward?.growth??[];
+   if(growth.includes('draw')&&s.player.drawPerTurn<3){go({type:'ChooseHandReward',option:'draw'});continue;}
+   if(growth.includes('retain')&&(s.player.retain??2)<3){go({type:'ChooseHandReward',option:'retain'});continue;}
    const ranked=(s.cardReward?.choices??[]).map((c,i)=>({i,c,v:cardValue(c)})).sort((a,b)=>b.v-a.v);
    const best=ranked[0];const pick=best&&(s.masterDeck.length<16||best.v>=12);
    go(pick?{type:'ChooseCardReward',index:best.i}:{type:'SkipCardReward'});continue;

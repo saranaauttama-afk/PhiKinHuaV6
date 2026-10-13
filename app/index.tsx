@@ -51,7 +51,7 @@ export default function Home() {
   const [archiveOpen,setArchiveOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
   const [equipmentOffer,setEquipmentOffer]=useState<number|null>(null);
-  const [blessingsOpen, setBlessingsOpen] = useState(false);
+  const [bagTab,setBagTab]=useState<'deck'|'blessings'>('deck');
 
   const [fontsLoaded] = useAppFonts();
   const pad = useScreenPadding();
@@ -178,7 +178,7 @@ export default function Home() {
       <SceneArrival instant={state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex} sceneKey={`${location.key}:board-${state.pages?.adventure?.boardIndex}`} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
 
-          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
+          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices appearanceKey={`${state.phase}:${state.fightCount??0}`} offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
           {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool
@@ -190,8 +190,8 @@ export default function Home() {
 
           <PlayerStatusBar
             state={state}
-            onOpenDeck={() => dispatch({ type: 'OpenDeck' })}
-            onOpenBlessings={() => setBlessingsOpen(true)}
+            onOpenDeck={() => {setBagTab('deck');dispatch({ type: 'OpenDeck' });}}
+            onOpenBlessings={() => {setBagTab('blessings');dispatch({type:'OpenDeck'});}}
             onUseSkill={(id, index) => dispatch({ type: 'UseSkill', id, index })}
           />
 
@@ -204,14 +204,9 @@ export default function Home() {
       {/* สำรับเป็นจอทับเต็มจอ วางนอก Scrim เพื่อให้อยู่เหนือทุกอย่าง
           เดิมวางเป็นบล็อกไหลอยู่ในคอลัมน์กลางแผนที่ จึงล้นออกนอกจอ */}
       {equipmentOffer!==null&&<EquipmentPicker state={state} onCancel={()=>setEquipmentOffer(null)} onConfirm={equipmentIndices=>{const index=equipmentOffer;setEquipmentOffer(null);dispatch({type:'ChooseOffer',index,equipmentIndices});}}/>}
-      <DeckView state={state} dispatch={dispatch} />
+      <DeckView state={state} dispatch={dispatch} initialTab={bagTab} />
 
-      {blessingsOpen && (
-        <BlessingView
-          blessings={state.blessings}
-          onClose={() => setBlessingsOpen(false)}
-        />
-      )}
+
 
     </View>
   );
