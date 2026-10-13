@@ -14,24 +14,27 @@ A Thai-ghost-themed deck-building roguelike, mobile app (Expo/React Native). Str
 - **nativewind (Tailwind for RN)** + some raw `StyleSheet` — mixed usage, not fully migrated
 - **moti / react-native-reanimated** for animation
 - Fonts: `Prompt` (Thai-friendly UI font) and `Chakra Petch`, loaded via `@expo-google-fonts/*`. There's also a bundled Thai font `THSarabun` in `assets/fonts/` (license file present — DIP&SIPA font, check terms before shipping)
-- No test framework configured. No lint config found at root — check before assuming `eslint`/`prettier` conventions.
+- Tests: vitest (`npx vitest run`). No lint config found at root — check before assuming `eslint`/`prettier` conventions.
 
 Run locally: `npm install && npx expo start` (`--web` / `--android` / `--ios` variants in `package.json` scripts).
 
-## NOTFM rebuild (current work)
+## Branches and current work
 
-The game was rebuilt toward Night of the Full Moon in six phases (PR #9–#14, branches `work/notfm-rebuild` → `work/notfm-phase6`, never merged to `main`). **Read `docs/HANDOFF-notfm-rebuild.md` first**: it covers every system, balance numbers, commands, the APK workflow and the open backlog. The owner wants design changes discussed before code is changed.
+**`main` is the source of truth** (since 13 Oct 2026). The whole NOTFM rebuild stack — PR #9–#15 (rebuild, phases 2–7, playtest backlog B01–B08) and PR #17 (tuning before store, APK 1.0.43 / versionCode 44) — was merged into `main` via PR #18. The `work/notfm-*`, `work/tuning-before-store` and older `work/*` / `art/*` branches are history; don't base new work on them.
 
-Phase 7 (`work/notfm-phase7-research`, PR #15 → `work/notfm-phase6`) closes the research gaps. **Before changing any game rule or number, read `docs/phase7/DESIGN-DECISIONS.md`** — it records the owner's design intent, what was deliberately cut (combos, minions, fusion), and the reason behind each Phase 6–7 decision. Then `docs/phase7/HANDOFF.md` for what/where. Research: `docs/research/notfm/`.
+- New work: branch from `main` (`work/<topic>`), open a PR into `main`.
+- CI: `.github/workflows/android-notfm.yml` runs on push to `main` and on PRs into `main` — typecheck + tests + web smoke (`verify`), signed APK (`android`), Android emulator smoke (`native`). Bump `version` / `versionCode` in `app.json` **and** the matching strings in that workflow for every APK delivery.
+- Current goal (owner, Oct 2026): tune the existing systems to be fun and challenging and release to the store; **no new systems before launch** (card-system expansion, 4th equipment slot are deferred).
+- The owner wants game-design changes discussed and agreed before code changes; agreed-but-unimplemented ideas go to a backlog first; write the reason for every design change into the docs.
 
-## Branches (older, before the NOTFM rebuild)
+Read before changing any game rule or number:
+1. `docs/phase7/DESIGN-DECISIONS.md` — design intent, what was cut (combos, minions, fusion), balance targets (§2.4) and the reason behind each Phase 6–7 and tuning decision (§2.6).
+2. Latest handoff: `docs/tuning-2026-10-13/HANDOFF.md` (before it: `docs/playtest-2026-10-13/HANDOFF.md`, `docs/phase7/HANDOFF.md`, `docs/HANDOFF-notfm-rebuild.md`).
+3. Research: `docs/research/notfm/`.
 
-- `main` — oldest, has `PATCH_NOTES.md`, `PHASE4_INTEGRATION_SUMMARY.md`, `TESTING_CHECKLIST.md` (not present on newer branches)
-- `monster` — Thai Ghost Monster System introduction
-- `updateUI` — battle system UI pass
-- `animationComplete` / `updateBattle` — **most recent work**, identical HEAD commit ("Improve battle feedback and timing system"). This is what's currently checked out in the local clone at `/workspace/phikinhuav6`.
+Balance sim: `npm run balance -- --runs 40 --difficulty 1,2,3,4,5 --seed tune` (bot win rates; not a substitute for human play). Tests: `npx tsc --noEmit` and `npx vitest run`.
 
-There is no branch that's clearly "current source of truth" beyond "most recently touched" — confirm with the user before assuming `animationComplete` supersedes `main` for anything not related to battle feedback/timing.
+Note: much of the Architecture section below predates the NOTFM rebuild (e.g. minions, combos, adaptive AI were removed). Trust the code and the handoff docs over it.
 
 ## Architecture
 
@@ -73,11 +76,11 @@ So mechanically the game is fairly far along (full combat loop, map generation, 
 - `App.tsx` at repo root is unused Expo boilerplate — don't confuse it with `app/index.tsx`.
 - `src/ui/appState.ts` is empty (0 lines) — likely an abandoned refactor.
 - Mixed Thai/English in code comments, card data, and doc files — this is the existing convention, not a mistake to "fix".
-- No CI, no lint/test scripts wired up in `package.json` — verify changes manually via `expo start --web` or on-device.
+- CI is `.github/workflows/android-notfm.yml` (see Branches). Still play on a real phone before calling balance or feel done.
 
 ## Working conventions for this repo
 
 - Keep card/monster/event flavor text in Thai; keep code identifiers in English, matching existing style.
 - Game balance numbers live in `src/core/balance*` — don't hardcode tuning values inline in components or reducers.
 - New game actions should go through the `Command`/`applyCommand` pattern, not ad-hoc state mutation in components.
-- This repo was added to the current session read/write-capable but has no pre-assigned branch/PR convention from the user — confirm branch name and whether to commit/push before making changes, same as any other repo.
+- Branch/PR convention: `work/<topic>` from `main`, PR into `main` (see Branches).
