@@ -5,15 +5,30 @@ import type { ClassId } from '../classes';
 
 export const CARD_RULES = {
   /** Cards drawn when a fight starts. */
-  openingDraw: 4,
+  openingDraw: 2,
   /** Cards drawn at the start of each later player turn. */
   drawPerTurn: 2,
-  /** Draws stop while the hand holds this many cards. */
-  handMax: 7,
+  /** Hard cap on cards held during a turn; draws past it stay in the draw pile. */
+  handMax: 10,
+  /** Cards kept past the end of a turn; above it the player picks cards to discard (NOTFM). */
+  retain: 2,
   /** Action points restored each player turn. */
   apPerTurn: 2,
   /** Equipment cards that can be in play at once; a new one replaces the oldest. */
   equipmentSlots: 1,
+  /**
+   * Extra cards on the first turn of every fight: opening hand = max hand (`retain`) + this.
+   * Why: with 2 AP and only 2 cards, turn 1 often had no real choice and night 1 became the
+   * main wall in simulation. Only the opening is eased; later turns stay at hand 2 / draw 2.
+   * Removed at difficulty `DIFFICULTY.noOpeningBonusFrom`.
+   */
+  openingBonus: 1,
+  /**
+   * Cards drawn by card, blessing and equipment effects per player turn (turn draw, opening
+   * draw and class skills are not counted). Why: "do X + draw 1" and free draw cards let a
+   * player bypass the small NOTFM hand; one global limit also covers future cards.
+   */
+  fxDrawPerTurn: 2,
 } as const;
 
 /** Star 1–3. Numbers scale by `mult`; status stacks gain `statusBonus`. Card data may override. */
@@ -31,7 +46,7 @@ export const CLASS_RESOURCES: Record<ClassId, { hp: number; startMana: number }>
   warrior: { hp: 60, startMana: 0 },
   shaman: { hp: 60, startMana: 4 },
   nun: { hp: 56, startMana: 0 },
-  medium: { hp: 58, startMana: 4 },
+  medium: { hp: 60, startMana: 6 },
 };
 
 /** Shop card prices by rarity (equipment cards included). */
@@ -51,11 +66,16 @@ export const ENEMY_RULES: Record<EnemyKind, { handSize: number; drawPerTurn: num
 
 /** Ghost HP before night and difficulty scaling. Normal ghosts add `perTier` per tier (T1–T5). */
 export const ENEMY_HP = {
-  normal: 28, perTier: 2, elite: 48, boss: 78, ultimateBoss: 105,
+  normal: 28, perTier: 2, elite: 48, boss: 72, ultimateBoss: 105,
   /** Multiplier for nights 1–3. */
-  night: [1, 1.28, 1.58],
-  /** Extra HP per difficulty level above 1. */
-  perDifficulty: 0.05,
+  night: [0.9, 1.45, 2.4],
+  /**
+   * Night bosses use their own multipliers: the night-1 boss is the first wall, kept short.
+   * Tuning 13 Oct 2026 (was night 1/1.8/2.6, boss .85/2/2.9): hand/draw growth now comes only
+   * after the night-2 boss, shops are smaller and effect draws are capped, so the player is
+   * weaker in nights 1–2; HP was lowered most there. See docs/tuning-2026-10-13/HANDOFF.md.
+   */
+  bossNight: [0.75, 1.6, 2.7],
 } as const;
 
 /**
@@ -63,9 +83,9 @@ export const ENEMY_HP = {
  * has lasted. It starts on night `fromNight(difficulty)`, so long fights cost more.
  */
 export const RAGE = {
-  startTurn: 2,
+  startTurn: 3,
   perTurn: 1,
-  fromNight: (difficulty: number) => (difficulty >= 3 ? 1 : 2),
+  fromNight: (difficulty: number) => (difficulty >= 3 ? 1 : 2), // DIFFICULTY.rageNight1From
   /** Before rage starts for the night, it still starts at this turn, so no fight is endless. */
   backstopTurn: 10,
 } as const;
@@ -87,8 +107,24 @@ export const CLASS_PASSIVES: Record<ClassId, import('../types').Passive & {
   medium: { name: 'ผีติดตาม', triggers: [], copyFirstGhostCard: true },
 };
 
-/** Level-up: full heal, more max HP, then one of three rewards. */
-export const LEVEL_UP = { maxHp: 8, skipGold: 25 } as const;
+/**
+ * EXP per win on the three-night route, by night (1–3). Later ghosts give more, so level-ups
+ * keep coming about every 3–4 fights (see NEXT_EXP_TABLE in balance/progression.ts).
+ */
+export const NIGHT_EXP = { normal: [12, 18, 24], elite: [20, 30, 40], boss: [30, 45, 60] } as const;
+
+/**
+ * Level-up: full heal, more max HP, then pick one of two rewards rolled from `weights`
+ * (NOTFM). 'upgrade' upgrades `upgrades` cards; 'slot' and 'retain' stop at their caps.
+ */
+export const LEVEL_UP = {
+  maxHp: 8, skipGold: 25, offers: 2, upgrades: 2,
+  weights: { card: 3, upgrade: 3, remove: 2, slot: 1, retain: 0, ap:1, mana:2, draw:0 },
+  /** Draw stops at 3: with 2–3 AP a turn, a 4th card a turn is rarely playable and removes choices. */
+  caps: { slot: 3, retain: 4, ap:3, mana:10, draw:3 },
+  /** Only this night's boss offers +1 hand or +1 draw instead of a card (growth is rare and mid-run). */
+  growthNight: 2,
+} as const;
 
 /**
  * ความกล้า / บุญ. Dialogues after some wins move one of them by 1 (capped at `max`).
@@ -102,4 +138,66 @@ export const ALIGNMENT = {
   talksPerNight: 4,
   courageGold: 10,
   meritHeal: 5,
+} as const;
+
+/**
+ * Economy. Every night guarantees one each of: shop, blacksmith (upgrade), ศาลาลืมเลือน
+ * (remove), blessing, story and healing, plus a chest with `chestChance`. The first upgrade
+ * or removal at each stop is free; later ones cost the flat price.
+ */
+export const ECONOMY = {
+  startGold: 50,
+  /** Gold per win. Normal ghosts get GOLD_BY_TIER (balance/progression.ts) × `normalPct`%. */
+  gold: { normalPct: 50, elite: 25, boss: 40 },
+  removePrice: 40,
+  upgradePrice: 40,
+  /** Free upgrades / removals at each blacksmith / ศาลาลืมเลือน. */
+  freePerStop: 1,
+  rerollPrice: 20,
+  /** Card shop stock: `cards` from the class pool plus `equipment` equipment cards. */
+  shopStock: { cards: 2, equipment: 1 },
+  /**
+   * Shop rarity weights per night (1–3). Night 1 sells no Rare/Legendary, Legendary only on
+   * night 3, so a strong card can't be bought early and carry the whole run.
+   */
+  shopRarity: [
+    { Common: 65, Uncommon: 35, Rare: 0, Legendary: 0 },
+    { Common: 50, Uncommon: 35, Rare: 15, Legendary: 0 },
+    { Common: 40, Uncommon: 35, Rare: 20, Legendary: 5 },
+  ],
+  blessingChoices: 3,
+  chestChance: 0.5,
+  well: { heal: 10, uses: 2 },
+  shrine: { price: 25, step: 10, uses: 3 },
+} as const;
+
+/** Difficulty 1–5: each level adds one rule on top of the ones below it. */
+export const DIFFICULTY = {
+  /** From this level rage starts on night 1 (below it, night 2). */
+  rageNight1From: 3,
+  /** From this level ghosts have `hpPct` more HP. */
+  hpFrom: 2, hpPct: 15,
+  /** From this level gold prices rise by `markupPct` and healing stops heal half. */
+  priceFrom: 4, markupPct: 25,
+  /**
+   * From this level rage starts `rageEarlyBy` ghost turns sooner (RAGE.startTurn 3 → 2).
+   * Why: the old level-4 rule (prices/healing) barely changed fights, so level 4 played easier
+   * than level 3 in simulation. Rage pressure punishes slow, stalling turns rather than adding HP.
+   */
+  rageEarlyFrom: 4, rageEarlyBy: 1,
+  /**
+   * From this level fights open without CARD_RULES.openingBonus. Replaces the old level-5
+   * "night 3 draws −1", which no longer did anything once draw starts at its floor of 2.
+   */
+  noOpeningBonusFrom: 5,
+} as const;
+
+/**
+ * Total limits on bargain rules (`BlessingDef.rules`) however many bargains are owned.
+ * Offers already refuse a bargain that touches a rule the player has (bargainConflicts);
+ * these clamps protect older saves. prayerAp is capped at +1 so a prayer (base 1 AP)
+ * never costs more than the 2 AP a turn gives.
+ */
+export const BARGAIN_RULE_LIMITS = {
+  prayerAp: [0, 1], prayerMult: [0, 1], openingDraw: [-1, 0], retain: [-3, 2], borrowBonus: [0, 1], borrowHpCost: [0, 2],
 } as const;

@@ -55,17 +55,33 @@ function completeAdventure(s:GameState,r:RNG){
  }
  if(s.phase==='shop'){
   rememberAdventureService(s);
+  // A stop with nothing left is spent and makes room for the next page; anything else stays
+  // until the player closes it from the board (backlog 13 Oct: see stopSpent).
+  const spent=stopSpent(s);
   if(s.currentShopId&&s.shopKind){
    const {addShopToRegistry,updateShopInRegistry}=require('../../shopRegistry');
    if(s.shopRegistry?.some(sh=>sh.id===s.currentShopId))updateShopInRegistry(s,s.currentShopId,s.shopStock??[],s.shopBoughtItems??[]);
    else addShopToRegistry(s,s.shopKind,s.shopStock??[],s.shopBoughtItems??[],s.currentShopId);
   }
   s.shopKind=undefined;s.shopStock=undefined;s.currentShopId=undefined;s.shopBoughtItems=undefined;s.phase='map';
+  if(spent)settleAdventureSlot(s,ix);
   mp._activeOfferIndex=undefined;
   return {state:s,rng:r};
  }
  if(s.phase==='event'&&s.story?.result!=null){s.story=undefined;s.event=undefined;s.phase='map';settleAdventureSlot(s,ix);}
  return {state:s,rng:r};
+}
+
+/** Whether the open stop has nothing left: sold out, all uses gone, or its one reward taken. */
+function stopSpent(s:GameState):boolean{
+ const {ECONOMY}=require('../../balance/notfm');
+ switch(s.shopKind){
+  case 'card':case 'equipment':case 'treasure':case 'treasure_single':return !(s.shopStock?.length);
+  case 'blessing':return !(s.blessingStock?.length);
+  case 'well':return ((s as any).mysticalWell?.timesUsed??0)>=ECONOMY.well.uses;
+  case 'healing':return ((s as any).healingShrine?.timesUsed??0)>=ECONOMY.shrine.uses;
+  default:return false; // upgrade / remove stay until closed
+ }
 }
 
 /** One entry point for every fight on the board, normal or boss. */
@@ -108,6 +124,11 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
   switch (offer.kind) {
     case 'monster':
     case 'boss':
+      const eq=require('../../cards/equipment');
+      const picks=cmd.equipmentIndices??eq.loadoutIndices(s);
+      if(!eq.validEquipmentSelection(s,picks))return {state:s,rng};
+      s.equipmentLoadout=picks.map((i:number)=>s.masterDeck[i].ownedId!);
+      s.preEquipment=[...picks];
       return startCombat(s, offer, ix, rng);
 
     case 'shop_card': {
@@ -365,6 +386,14 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       
         mp._activeOfferIndex = ix; mp._shopUsed = false;
           s.log.push(`ChooseOffer → new single treasure (${offer.shopId})`);
+      return { state: s, rng };
+    }
+
+    case 'blessing': {
+      const out = ShopEv.openBlessingStop(s, rng);
+      s = out.state; rng = out.rng;
+      s.currentShopId = offer.shopId;
+      mp._activeOfferIndex = ix; mp._shopUsed = false;
       return { state: s, rng };
     }
 

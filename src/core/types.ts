@@ -4,12 +4,21 @@
 import type { StatusEffect } from './types_extended';
 
 /** A passive (blessing or equipped card) reacts to these moments of a fight. */
-export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayerDone';
+export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayerDone'|'discard';
 export type Trigger={on:TriggerOn;type?:CardType;once?:'turn';when?:import('./cards/mechanics').CardCondition;fx:Fx};
 /** Always-on modifiers plus triggers, shared by blessings and equipment cards. */
 export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number};
+/** One-time changes when a blessing is gained (แพนโดรา: a gain paid for with a cost). */
+export type BlessingGain = { hp?: number; maxHp?: number; gold?: number; ap?: number; draw?: number; retain?: number; startMana?: number; slot?: number };
 export type BlessingDef = Passive & {
   id: string; name: string; rarity?: Rarity; desc?: string; class?: import('./classes').ClassId;
+  /** แพนโดรา: strong, with a price. */
+  pandora?: boolean;
+  /** Nights cleared across all runs (journal) before it can be offered. */
+  unlock?: number;
+  onGain?: BlessingGain;
+  rules?: {openingDraw?:number;retain?:number;prayerAp?:number;prayerMult?:number;borrowBonus?:number;borrowHpCost?:number};
+  flavor?: string;
 };
 
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Legendary';
@@ -34,6 +43,8 @@ export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negat
 export type CardData = {
   id: string;
   instanceId?: string;
+  /** Stable owned copy; survives upgrades and deck reorder/removal. */
+  ownedId?: string;
   name: string;
   type: CardType;
   rarity?: Rarity;
@@ -61,6 +72,7 @@ export type CardData = {
   copied?: boolean;
   /** Only offered after the class unlocks it in the journal. */
   locked?: boolean;
+  unlockAt?: number;
   unremovable?: boolean;
   flavor?: string;
   tags?: string[];
@@ -100,7 +112,7 @@ export type Phase =
   | 'run_complete'; // จบรันแล้ว (ชนะบอสสุดท้าย) — แสดงจอสรุป
 
 /** Level-up rewards: a new card, a star on a deck card, or removing a deck card. */
-export type LevelOption = 'card' | 'upgrade' | 'remove';
+export type LevelOption = 'card' | 'upgrade' | 'remove' | 'slot' | 'retain' | 'ap' | 'mana' | 'draw';
 
 /** Per-fight state for skills and passives; reset when a fight starts. */
 export type FightState = {
@@ -125,6 +137,9 @@ export type FightState = {
   mimicUsed?: boolean;
   /** The boss's relic: its rule works until enough hits break it. */
   relic?: BossRelicState;
+  /** Effect draws used on turn `fxDrawTurn` (CARD_RULES.fxDrawPerTurn). */
+  fxDrawTurn?: number;
+  fxDrawn?: number;
 };
 
 export type BossRelicState = {
@@ -146,6 +161,8 @@ export type PlayerState = {
   /** Mana carries over between turns of a fight; reset to `startMana` each fight. */
   mana: number; startMana: number;
   openingDraw: number; drawPerTurn: number; handMax: number;
+  /** Cards kept in hand past the end of a turn; the rest are discarded by the player's choice. */
+  retain?: number;
   // Status Effects System
   statusEffects?: StatusEffect[];
 };
@@ -170,7 +187,7 @@ export type EventState =
 export type ShopItem = 
   | { card: CardData; price: number }
   | { equipment: any; price: number };
-export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single';
+export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single' | 'blessing';
 
 export type ShopState = 'unused' | 'visited' | 'completed';
 
@@ -256,6 +273,11 @@ export type GameState = {
   /** คลาสที่ผู้เล่นเลือกไว้ตอนเริ่มรัน — กำหนดเด็ค ค่าสถานะ และพรติดตัว */
   classId?: import('./classes').ClassId;
   campaign?: import('./campaign/nights').CampaignRun;
+  /** Owned deck positions selected before this fight; never copies. */
+  preEquipment?:number[];
+  equipmentLoadout?: string[];
+  ownedCardSeq?: number;
+  eventMemory?:Record<string,number>;
   runMetrics?: import('./campaign/metrics').RunMetrics;
   discovery?: import('./archive/progress').DiscoveryRun;
 
@@ -397,6 +419,10 @@ export type GameState = {
   levelUp?: {
     /** Three card offers for the 'card' option. */
     cards: CardData[];
+    /** The two rewards offered this level (NOTFM: pick one of two). Missing on old saves: all three classic ones. */
+    offers?: LevelOption[];
+    /** 'upgrade' grants this many upgrades; the reward ends when they are used or nothing can be upgraded. */
+    upgradesLeft?: number;
     consumed?: boolean;
     result?: { fight: number; text: string };
   } | null;
@@ -407,6 +433,8 @@ export type GameState = {
   shopPricePct?: number;
   /** A dialogue waiting after a win. */
   ghostTalk?: { ghostId: string };
+  /** Blessings offered at the night's blessing stop; emptied once one is taken. */
+  blessingStock?: BlessingDef[];
   fight?: FightState;
 
   /** การ์ดรางวัลที่รอให้เลือกหลังชนะไฟต์ — ดู `cards/reward.ts` */
@@ -423,7 +451,7 @@ export type GameState = {
 export type Command =
   // Run / Flow
   | { type: 'EnterMenu' }
-  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'>;
+  | { type: 'NewRun'; seed: string; discoveryId?:string; classId?: import('./classes').ClassId; difficulty?:import('./campaign/threeNight').Difficulty; unlocks?: Array<'card'|'blessing'>; blessingTier?: number; milestoneLevel?:number;
       /** Has beaten a final boss before (journal); needed for the secret boss. */
       veteran?: boolean }
   | { type: 'AnswerGhostTalk'; choice: AlignmentChoice }
@@ -437,6 +465,7 @@ export type Command =
   | { type: 'EnemyPlayCard'; cardIndex: number }
   | { type: 'StartMonsterTurn' }
   | { type: 'EndTurn' }
+  | { type: 'DiscardForTurnEnd'; indices: number[] }
   /** ทำเทิร์นศัตรูจบในทีเดียว แล้วคายผลออกมาทาง state.pendingEvents */
   | { type: 'ResolveEnemyTurn' }
   | { type: 'StartPlayerTurn' }
@@ -453,12 +482,15 @@ export type Command =
   | { type: 'SkipCardReward' }
 
   // UI
+  | { type: 'SetEquipmentLoadout'; indices: number[] }
+  | { type: 'ChooseHandReward'; option: 'retain' | 'draw' }
   | { type: 'OpenDeck' }
   | { type: 'CloseDeck' }
 
   // Shop (card)
   | { type: 'TakeShop'; index: number }
   | { type: 'ShopReroll' }
+  | { type: 'TakeShopBlessing'; index: number }
 
   // Shop (remove/upgrade)
   | { type: 'ShopRemoveBuy'; index: number }
@@ -490,7 +522,7 @@ export type Command =
   | { type: 'UseHealingShrine' }
 
   // Pages
-  | { type: 'ChooseOffer'; index: number }
+  | { type: 'ChooseOffer'; index: number; equipmentIndices?:number[] }
   | { type: 'DismissOffer'; index: number }
   
   // Shop Management

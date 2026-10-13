@@ -10,7 +10,6 @@ import {fromSave,toSave,isPlayableSave,summarize} from '../src/core/save';
 import {emptyJournal,recordRun,parseJournal,unlockedDifficulty,claimUnlock} from '../src/core/campaign/journal';
 import {makeRunRecord} from '../src/core/campaign/metrics';
 import {ULTIMATE_BOSS} from '../src/core/campaign/bosses';
-import {awakenNightBoss} from '../src/core/campaign/nights';
 import {archiveProgress,emptyArchive,mergeDiscovery,parseArchive} from '../src/core/archive/progress';
 import {mapSceneStage} from '../app/scenePresentation';
 function driver(difficulty:Difficulty=1,classId:ClassId='warrior',seed=`three-${difficulty}-${classId}`){
@@ -49,15 +48,18 @@ describe('three-night continuous runs',()=>{
   }
   expect(ghosts).toHaveLength(27);expect(new Set(ghosts).size).toBe(27);expect(d.s.runSummary?.won).toBe(true);expect(d.s.fightCount).toBe(runFightTotal(level));expect(d.s.campaign!.night).toBe(3);expect(d.s.campaign!.completedNights).toBe(3);expect(quotas).toEqual([7,10,10]);expect(bosses).toHaveLength(level===5?4:3);expect(bosses.includes(ULTIMATE_BOSS.id)).toBe(level===5);expect(d.s.runSummary!.beatSecretBoss).toBe(level===5);expect(stages.every((n,i)=>i===0||n>=stages[i-1])).toBe(true);expect(isPlayableSave(toSave(d.s,d.r))).toBe(false);
  });
- it('services total eight, mandatory story three, guaranteed opening card shop and chapter elite quotas across seeds',()=>{
+ it('every night guarantees shop, blessing, story, upgrade, healing and removal, with at most one chest',()=>{
+  let chestTotal=0;
   for(const difficulty of [1,2,3,4,5] as const)for(let seed=0;seed<40;seed++){
    const d=driver(difficulty,'warrior','quota-'+seed);let services=0,stories=0;
    for(const night of [1,2,3] as const){d.s.campaign!.night=night;d.s.campaign!.completedNights=night-1;startAdventure(d.s,d.r);
     const deck=d.s.pages!.adventure!.deck,monsters=deck.filter(e=>e.offer.kind==='monster');expect(monsters).toHaveLength(night===1?7:10);expect(new Set(monsters.map(e=>(e.offer as any).enemyId)).size).toBe(monsters.length);expect(monsters.filter(e=>(e.offer as any).tier==='elite')).toHaveLength(runEliteQuota(night,difficulty));expect(deck.filter(e=>e.offer.kind==='story_event')).toHaveLength(1);stories++;
-    const optional=deck.filter(e=>e.offer.kind!=='monster'&&e.offer.kind!=='story_event'&&e.offer.kind!=='next_event');services+=optional.length;expect(optional.filter(e=>['shop_card','shop_equipment'].includes(e.offer.kind))).toHaveLength(1);expect(optional.filter(e=>['well','healing_shrine'].includes(e.offer.kind))).toHaveLength(1);if(night===1)expect(optional.some(e=>e.offer.kind==='shop_card')).toBe(true);
+    const optional=deck.filter(e=>e.offer.kind!=='monster'&&e.offer.kind!=='story_event'&&e.offer.kind!=='next_event');const chests=optional.filter(e=>['treasure','treasure_single'].includes(e.offer.kind)).length;services+=chests;expect(chests).toBeLessThanOrEqual(1);for(const kind of ['shop_card','blessing','shop_upgrade','shop_remove'])expect(optional.filter(e=>e.offer.kind===kind),kind).toHaveLength(1);expect(optional.filter(e=>['well','healing_shrine'].includes(e.offer.kind))).toHaveLength(1);expect(optional).toHaveLength(5+chests);
     expect(deck.filter(e=>e.offer.kind==='next_event')).toHaveLength(1);expect(validAdventure(d.s)).toBe(true);
-   }expect(services).toBe(8);expect(stories).toBe(3);
+   }chestTotal+=services;expect(stories).toBe(3);
   }
+  // chests appear on roughly half the nights (ECONOMY.chestChance)
+  expect(chestTotal/600).toBeGreaterThan(.35);expect(chestTotal/600).toBeLessThan(.65);
  });
  it('chapter completion retains deck upgrades, blessings, level, XP, money and cumulative metrics; heals only 12%',()=>{
   const d=driver();for(let guard=0;guard<500&&!(d.s.phase==='victory'&&d.s.enemy?.id===campaignBoss(d.s).id);guard++)step(d);expect(d.s.phase).toBe('victory');
@@ -72,9 +74,6 @@ describe('three-night continuous runs',()=>{
   j=recordRun(j,r);expect(unlockedDifficulty(j,'warrior')).toBe(2);expect(unlockedDifficulty(j,'shaman')).toBe(1);expect(recordRun(j,r)).toBe(j);
   for(const difficulty of [2,3,4,5] as const)j=recordRun(j,makeRunRecord(finish(driver(difficulty)),'2026-10-10')!);
   expect(j.classes.warrior.highestDifficulty).toBe(5);expect(j.classes.warrior.difficultyFiveWins).toBe(1);j=claimUnlock(j,'warrior','card');expect(j.classes.warrior.unlocks).toEqual(['card']);expect(claimUnlock(j,'warrior','blessing')).toBe(j);expect(parseJournal(JSON.stringify(j))).toEqual(j);
- });
- it('low tiers never awaken bosses; tiers 3–5 swap live cards once, tier 5 adds energy and persists it',()=>{
-  for(const difficulty of [1,2,3,4,5] as const){const d=driver(difficulty);for(let guard=0;guard<500&&d.s.pages!.adventure!.boss!=='night';guard++)step(d);expect(d.s.pages!.adventure!.boss).toBe('night');d.go({type:'ChooseOffer',index:d.s.pages!.current!.offers.findIndex(o=>o?.kind==='boss')});if(d.s.chapter)d.go({type:'SkipChapter'});d.s.enemy!.hp=Math.floor(d.s.enemy!.maxHp/2);const ap=d.s.enemy!.maxAp;awakenNightBoss(d.s);expect(!!d.s.campaign!.bossAwakened).toBe(difficulty>=3);expect(d.s.enemy!.maxAp).toBe(ap!+Number(difficulty===5));const expected=structuredClone(d.s.enemy);awakenNightBoss(d.s);expect(d.s.enemy).toEqual(expected);d.restore();expect(d.s.enemy).toEqual(expected);}
  });
  it('archive counts a three-night run once and retains actual reveal night across cold loads',()=>{
   const d=driver(5);finish(d);const run=d.s.discovery!,profile=mergeDiscovery(emptyArchive(),run);expect(mergeDiscovery(profile,run)).toBe(profile);expect(parseArchive(JSON.stringify(profile))).toEqual(profile);const all=archiveProgress(profile);expect(all.ghosts[ULTIMATE_BOSS.id]).toMatchObject({seen:1,won:1,firstNight:3,lastNight:3});expect(Object.keys(all.ghosts).length).toBeGreaterThan(10);

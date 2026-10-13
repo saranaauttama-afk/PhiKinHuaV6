@@ -51,8 +51,11 @@ describe('ข้อมูลกฎบอส', () => {
 });
 
 describe('กฎบอสทำงานต้นเทิร์นผี', () => {
-  it('ตะเกียงหนอง: ผู้เล่นอ่อนแอทุกเทิร์น', () => {
-    const s = bossFight('night-head-collector');
+  it('ตะเกียงหนอง: ผู้เล่นอ่อนแอทุก 2 เทิร์น', () => {
+    const s = bossFight('night-head-collector', 1);
+    applyBossRule(s);
+    expect(status(s.player, 'weakness')).toBeUndefined();
+    s.fight!.ghostTurns = 2;
     applyBossRule(s);
     expect(status(s.player, 'weakness')).toBeTruthy();
   });

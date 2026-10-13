@@ -61,16 +61,19 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
     }
 
     case 'shop_card':
-      return { ...base, type: 'shop_card', name: 'ร้านค้าการ์ด', description: 'ซื้อการ์ดใหม่เพื่อเสริมสำรับ' };
+      return { ...base, type: 'shop_card', name: 'ร้านค้า', description: 'ซื้อการ์ด อุปกรณ์ และพลังถาวร' };
+
+    case 'blessing':
+      return { ...base, type: 'blessing', name: 'ศาลพร', description: 'รับพรติดตัว เลือก 1 จาก 3' };
 
     case 'shop_equipment':
       return { ...base, type: 'shop_equipment', name: 'ร้านเครื่องราง', description: 'ซื้อเครื่องรางติดตัว' };
 
     case 'shop_remove':
-      return { ...base, type: 'shop_remove', name: 'สละการ์ด', description: 'ถอดการ์ดที่ไม่ต้องการออกจากสำรับ' };
+      return { ...base, type: 'shop_remove', name: 'ศาลาลืมเลือน', description: 'สละการ์ดออกจากสำรับ ใบแรกฟรี' };
 
     case 'shop_upgrade':
-      return { ...base, type: 'shop_upgrade', name: 'ปลุกเสกการ์ด', description: 'อัปเกรดการ์ดที่มีอยู่ให้แรงขึ้น' };
+      return { ...base, type: 'shop_upgrade', name: 'ช่างปลุกเสก', description: 'เพิ่มดาวการ์ด ใบแรกฟรี' };
 
     case 'well':
       return { ...base, type: 'well', name: 'บ่อน้ำลึกลับ', description: 'ดื่มน้ำจากบ่อ ฟื้นพลังชีวิต' };

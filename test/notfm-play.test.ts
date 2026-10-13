@@ -81,17 +81,17 @@ describe('ค่าร่าย', () => {
 });
 
 describe('การจั่ว', () => {
-  it('เริ่มไฟต์จั่ว 4 แต่ละเทิร์นจั่ว 2', () => {
+  it('เริ่มไฟต์จั่วตามมือสูงสุด + โบนัสเปิดศึก แต่ละเทิร์นจั่ว 2', () => {
     const s = fight([]);
     s.masterDeck = Array.from({ length: 12 }, (_, i) => attackCard(1, { id: `a${i}` }));
     beginPlayerFight(s, rng);
-    expect(s.piles.hand).toHaveLength(CARD_RULES.openingDraw);
+    expect(s.piles.hand).toHaveLength(CARD_RULES.retain + CARD_RULES.openingBonus);
     startPlayerTurn(s, rng);
-    expect(s.piles.hand).toHaveLength(CARD_RULES.openingDraw + CARD_RULES.drawPerTurn);
+    expect(s.piles.hand).toHaveLength(CARD_RULES.retain + CARD_RULES.openingBonus + CARD_RULES.drawPerTurn);
   });
 
-  it('มือเต็ม 7 แล้วหยุดจั่ว ไพ่ยังอยู่ในกองจั่ว', () => {
-    const s = fight(Array.from({ length: 6 }, (_, i) => attackCard(1, { id: `h${i}` })));
+  it('มือเต็มขีดสูงสุดแล้วหยุดจั่ว ไพ่ยังอยู่ในกองจั่ว', () => {
+    const s = fight(Array.from({ length: CARD_RULES.handMax - 1 }, (_, i) => attackCard(1, { id: `h${i}` })));
     s.piles.draw = Array.from({ length: 5 }, (_, i) => attackCard(1, { id: `d${i}` }));
     startPlayerTurn(s, rng);
     expect(s.piles.hand).toHaveLength(CARD_RULES.handMax);

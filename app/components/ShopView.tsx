@@ -22,15 +22,16 @@ import React from 'react';
 import { BackHandler, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import RewardReceiptView from './RewardReceiptView';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
-import { removeCostForCount, upgradeCostForCount } from '../../src/core/balance/economy';
+import { SHOP_REROLL_COST } from '../../src/core/balance/economy';
+import { ECONOMY } from '../../src/core/balance/notfm';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import {QuietButton} from './QuietChrome';
 import DeckCard,{CardGlyphArt,CardFace} from './DeckCard';
 import {canRemoveCard} from '../../src/core/engine/shared';
 import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
-import {describeCard} from '../../src/core/cards/describe';
-import {shopPrice} from '../../src/core/engine/handlers/shops_events';
+import {describeCard,describeBlessing} from '../../src/core/cards/describe';
+import {shopPrice,markedUp,removePrice,upgradePrice,shrineCost,wellHeal,healAmount} from '../../src/core/engine/handlers/shops_events';
 
 function Panel({title,children}:{title:string;children:React.ReactNode}) {
   return <RitualSurface kind="quietSlate" style={{padding:22,gap:10,width:'100%',minWidth:0}}>
@@ -103,7 +104,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   const deck = state.masterDeck ?? [];
   const stock = state.shopStock ?? [];
 
-  const cardShop = (title = 'ร้านขายคาถา') => {
+  const cardShop = (title = 'ร้านค้า') => {
     const item=selected===null?undefined:stock[selected];const card=item?cardOf(item):undefined;
     return <Panel title={title}>
       <Lead>แตะการ์ดเพื่ออ่าน แล้วกดยืนยันซื้อ · ยังไม่เสียเบี้ยจนกว่าจะยืนยัน</Lead><Money state={state}/>
@@ -112,30 +113,28 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         <View><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/></View>
         <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {shopPrice(state,it.price)} เบี้ย{shopPrice(state,it.price)<it.price?` (จาก ${it.price})`:''}</Text>
       </View>;})}</View>
-      <QuietButton label="ขอดูของชุดใหม่ (50 เบี้ย)" disabled={(state.player.gold??0)<50} onPress={()=>{setSelected(null);dispatch({type:'ShopReroll'});}}/>
+      <QuietButton label={`ขอดูของชุดใหม่ (${markedUp(state,SHOP_REROLL_COST)} เบี้ย)`} disabled={(state.player.gold??0)<markedUp(state,SHOP_REROLL_COST)} onPress={()=>{setSelected(null);dispatch({type:'ShopReroll'});}}/>
     </Panel>;
   };
 
   const removeShop = () => {
-    const cost=removeCostForCount(state.runCounters?.removeShopCount??0);
-    const card=selected===null?undefined:deck[selected];
-    return <Panel title="สละการ์ด"><Lead>เลือกและอ่านการ์ดก่อนยืนยันสละ</Lead><Money state={state}/>
+    const cost=removePrice(state);
+    return <Panel title="ศาลาลืมเลือน"><Lead>เลือกและอ่านการ์ดก่อนยืนยันสละ · ใบแรกฟรี ใบต่อไป {markedUp(state,ECONOMY.removePrice)} เบี้ย</Lead><Money state={state}/>
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{fontFamily:font.ui,color:palette.moon}}>{notice}</Text>}
       <UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} remove price={()=>cost} disabledConfirm={(state.player.gold??0)<cost} onConfirm={index=>{if(!canRemoveCard(deck[index],deck.length)||(state.player.gold??0)<cost)return;const name=deck[index].name;dispatch({type:'ShopRemoveBuy',index});setSelected(null);setNotice(`สละ ${name} แล้ว`);}}/>
     </Panel>;
   };
 
   const upgradeShop = () => {
-    const count=state.runCounters?.upgradeShopCount??0;
     const card=selected===null?undefined:deck[selected];
-    const price=card?upgradeCostForCount(count+upgradeLevelOf(card)):0;
+    const price=upgradePrice(state);
     const available=!!card&&canUpgrade(card)&&(state.player.gold??0)>=price;
-    return <Panel title="ปลุกเสกการ์ด">
-      <Lead>เลือกหนึ่งใบ ดูผลหลังปลุกเสก แล้วกดยืนยัน</Lead>
+    return <Panel title="ช่างปลุกเสก">
+      <Lead>เลือกหนึ่งใบ ดูผลหลังปลุกเสก แล้วกดยืนยัน · ใบแรกฟรี ใบต่อไป {markedUp(state,ECONOMY.upgradePrice)} เบี้ย</Lead>
       <Money state={state}/>
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{fontFamily:font.ui,color:palette.moon,fontSize:14,lineHeight:24}}>{notice}</Text>}
-      <UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} price={c=>upgradeCostForCount(count+upgradeLevelOf(c))} disabledConfirm={!available} onConfirm={index=>{
-        const target=deck[index];const cost=upgradeCostForCount(count+upgradeLevelOf(target));
+      <UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} price={()=>price} disabledConfirm={!available} onConfirm={index=>{
+        const target=deck[index];const cost=price;
         if(!canUpgrade(target)||(state.player.gold??0)<cost)return;
         const next=upgradeCard(target);dispatch({type:'ShopUpgradeBuy',index});
         setNotice(`ปลุกเสกสำเร็จ · ${next.name}\n${upgradeSummary(next)}`);setSelected(null);
@@ -147,9 +146,9 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   const healingShrine = () => {
     // เงื่อนไขเดิมทุกข้อ ไม่ได้เปลี่ยนตัวเลข
     const used = (state as any).healingShrine?.timesUsed ?? 0;
-    const cost = 25 + used * 10;
-    const maxUses = 3;
-    const missing = state.player.maxHp - state.player.hp;
+    const cost = shrineCost(state);
+    const maxUses = ECONOMY.shrine.uses;
+    const missing = healAmount(state, state.player.maxHp - state.player.hp);
     const canUse = used < maxUses && (state.player.gold ?? 0) >= cost && missing > 0;
 
     return (
@@ -164,7 +163,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           <QuietButton
             label={`ขอพร ${cost} เบี้ย (ฟื้น ${missing})`}
             primary
-            onPress={() => {dispatch({ type: 'UseHealingShrine' });setNotice(`พักฟื้นแล้ว · ชีวิต ${state.player.maxHp}/${state.player.maxHp}`);}}
+            onPress={() => {dispatch({ type: 'UseHealingShrine' });setNotice(`พักฟื้นแล้ว · ชีวิต +${missing}`);}}
           />
         ) : (
           <Unavailable
@@ -181,7 +180,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
 
   const well = () => {
     const used = (state as any).mysticalWell?.timesUsed ?? 0;
-    const maxUses = 2;
+    const maxUses = ECONOMY.well.uses;
     const canUse = used < maxUses && state.player.hp < state.player.maxHp;
 
     return (
@@ -193,7 +192,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
 
         {canUse ? (
           <QuietButton
-            label="ตักขึ้นมาดื่ม (ฟื้น 10 · ไม่เสียเบี้ย)"
+            label={`ตักขึ้นมาดื่ม (ฟื้น ${wellHeal(state)} · ไม่เสียเบี้ย)`}
             primary
             onPress={() => dispatch({ type: 'UseWell' })}
           />
@@ -226,6 +225,21 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     </Panel>;
   };
 
+  const blessingStop = () => {
+    const list=state.blessingStock??[];const pick=selected===null?undefined:list[selected];
+    return <Panel title="ศาลพร">
+      <Lead>ศาลเพียงตาหลังเก่า ธูปสามดอกยังไม่มอด · เลือกรับพรได้หนึ่งอย่าง</Lead>
+      {list.length?<View style={{gap:8}}>{list.map((b,i)=><Pressable key={b.id} testID={`blessing-stop-${i}`} accessibilityRole="button" accessibilityLabel={b.name} accessibilityState={{selected:selected===i}} onPress={()=>setSelected(i)}>
+        <RitualSurface kind="quietSlate" style={{padding:12,gap:4,borderWidth:selected===i?1:0,borderColor:palette.moon,opacity:selected!==null&&selected!==i?.7:1}}>
+          <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:15}}>{b.name}</Text>
+          <Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:21}}>{describeBlessing(b)}</Text>
+        </RitualSurface>
+      </Pressable>)}
+      <QuietButton testID="blessing-stop-take" label={pick?`รับ ${pick.name}`:'เลือกพรก่อน'} primary disabled={!pick} onPress={()=>{if(selected===null)return;dispatch({type:'TakeShopBlessing',index:selected});setNotice(`ได้พร ${pick!.name}`);setSelected(null);}}/>
+      </View>:<Unavailable text={notice||'รับพรจากศาลนี้แล้ว'}/>}
+    </Panel>;
+  };
+
   const background=visitedScene(state).source;
   const object=shopObject(kind);
   const purchaseItem=(kind==='card'||kind==='equipment')&&selected!==null?stock[selected]:undefined;
@@ -245,6 +259,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {kind === 'well'            && well()}
           {kind === 'treasure'        && treasure()}
           {kind === 'treasure_single' && treasure(true)}
+          {kind === 'blessing'        && blessingStop()}
         </ScrollView>
         {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,padding:14,gap:6,maxHeight:220}}>
          <Text numberOfLines={2} style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>ยืนยันซื้อ {purchaseCard.name}</Text>

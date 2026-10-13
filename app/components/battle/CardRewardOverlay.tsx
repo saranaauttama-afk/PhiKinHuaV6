@@ -7,8 +7,8 @@ import RitualSurface from '../RitualSurface';
 import {QuietButton} from '../QuietChrome';
 import PostBattleSurface from './PostBattleSurface';
 import {font,palette,paper} from '../../theme';
-type Props={notice?:string;choices:CardData[];deck:CardData[];onChoose:(index:number)=>void;onSkip:()=>void};
-export default function CardRewardOverlay({choices,deck,onChoose,onSkip,notice}:Props){
+type Props={notice?:string;choices:CardData[];deck:CardData[];onChoose:(index:number)=>void;onSkip:()=>void;growth?:Array<'retain'|'draw'>;onGrowth?:(option:'retain'|'draw')=>void};
+export default function CardRewardOverlay({choices,deck,onChoose,onSkip,notice,growth,onGrowth}:Props){
  const [selected,setSelected]=React.useState<number|null>(null);const {width}=useWindowDimensions();
  const cardWidth=Math.min(132,(width-56)/3);const card=selected===null?null:choices[selected];
  const owned=(id:string)=>deck.filter(c=>c.id===id).length;
@@ -28,6 +28,10 @@ export default function CardRewardOverlay({choices,deck,onChoose,onSkip,notice}:
   {card&&<RitualSurface kind="occupationPage" style={{padding:20,marginTop:18}}>
    <CardRow card={card} plain/>
    <QuietButton label={`รับ ${card.name}`} primary onPress={()=>selected!==null&&onChoose(selected)}/>
+  </RitualSurface>}
+  {!!growth?.length&&<RitualSurface kind="quietSlate" style={{padding:16,marginTop:14,gap:8}}>
+   <Text style={{fontFamily:font.ui,color:palette.moon}}>รางวัลบอส · เลือกพัฒนาแทนการรับการ์ด</Text>
+   {growth.map(o=><QuietButton key={o} testID={`boss-growth-${o}`} label={o==='draw'?'จั่วต่อเทิร์น +1':'มือสูงสุด +1 · เปิดศึกได้เพิ่ม 1 ใบ'} onPress={()=>onGrowth?.(o)}/>)}
   </RitualSurface>}
   <QuietButton label="ไม่เอาสักใบ" onPress={onSkip} style={{marginTop:22}}/>
   <Text style={{color:palette.text,fontFamily:font.ui,fontSize:11,textAlign:'center',marginTop:10}}>สำรับเล็กคือสำรับที่จั่วเจอใบที่ต้องการบ่อยกว่า</Text>
