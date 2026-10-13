@@ -53,7 +53,7 @@ The mobile tests use synthetic checkpoints to exercise all card types and queued
 - Physical Android installation/playtest is separate from signature/package/alignment validation and responsive browser coverage.
 - Tutorial G11 and optional talent/nightmare systems were not among the user's nine requirements and are not added.
 
-## Delivery blocked at Git authentication
+## Original Git authentication blocker (resolved)
 
 Implementation commit: `d5a7ae556428717fc0839445bf2ad97d0defdcee` (local).
 
@@ -63,6 +63,22 @@ The authorized command `git push origin HEAD:refs/heads/work/notfm-phase7-resear
 fatal: could not read Username for 'https://github.com': No such device or address
 ```
 
-No push succeeded, no PR was created, and the workflow could not be started on this implementation. No alternate write channel was used. Git credentials must be made available to this workspace before continuing the authorized publication. Mobile results, CI results and an APK for this implementation are still pending.
+At that checkpoint no push succeeded and no PR/workflow was started. The user later explicitly authorized the existing GitHub connector/API for this missing-credential case. Publication then succeeded; the original local commits remain preserved on `archive/phase7-local-original-aeb407c`. No force push or merge was performed.
 
-Final local verification before delivery: TypeScript exit 0; 38 test files / 532 tests passed; web export completed; 400 Phase 7 balance runs plus 96 additional unlock/alignment runs completed without stalls. The local hashes identify the tested code/data/scripts. Responsive mobile tests were prepared but have no successful execution result in this environment.
+Final local verification before delivery: TypeScript exit 0; 38 test files / 532 tests passed; web export completed; 400 Phase 7 balance runs plus 96 additional unlock/alignment runs completed without stalls. The local hashes identify the tested code/data/scripts. The mobile tests were subsequently executed successfully in GitHub Actions using the runner’s installed Chrome; settled screenshots were downloaded and inspected.
+
+## Confirmed delivery
+
+- Verified source commit: `c039ab4af604f1692dfdf865a4e0a2b5a6fdc972`.
+- [PR #15](https://github.com/saranaauttama-afk/PhiKinHuaV6/pull/15): `work/notfm-phase7-research` → `work/notfm-phase6`, open and unmerged.
+- [CI run 38351594300](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38351594300): verify and android jobs both **success**.
+- TypeScript, 38 test files / 532 tests, web export and 28 mobile browser checks passed. Four viewports: 320×568, 360×640, 393×852 and 412×915.
+- Mobile timer recorded about 20.3 seconds of active combat in each synthetic fixture; the counter remained exactly equal throughout the pause check. The helper regression also checks background and resume gaps. See `mobile-results.json`.
+- [Signed APK 1.0.38 / versionCode 39](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38351594300/artifacts/11791723073), ZIP containing `PhiKinHua-NOTFM-v1.0.38.apk`.
+- [APK audit](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38351594300/artifacts/11791867457): signing verification, package/version, alignment, source SHA and APK SHA-256. Downloaded APK hash independently matched the workflow audit.
+
+APK SHA-256: `de0aeaa2bba492df7a98127c5d8ad44e54d15c52439d8ec5023753ca5068841f`.
+
+The final delivery-evidence commit changes documentation only. The verified game, data, package configuration and browser test script remain unchanged from `c039ab4`; `local-source-hashes.json` identifies those files. CI is reused only on that evidence. `DELIVERY.json` contains machine-readable source/run/artifact references without account metadata or download credentials.
+
+No implementation/build item remains blocked. Physical-device installation/playtest and median human run time near 60 minutes remain product-validation work, not claims established by simulation or responsive browser checks.
