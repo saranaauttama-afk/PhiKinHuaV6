@@ -32,3 +32,7 @@ if(!back.state.piles.hand.some(c=>c.type==='attack')){
  const card=back.state.piles.draw.splice(at,1)[0];back.state.piles.draw.push(back.state.piles.hand.pop()!);back.state.piles.hand.push(card);
 }
 fs.writeFileSync(`${dir}/phase7-return.json`,JSON.stringify({...toBattleSave(back.state,back.rng),feedbackAnimation:true}));
+
+const cost=fresh('warrior');const pact=PANDORA_BLESSINGS.find(b=>b.rules?.retain===-3)!;
+cost.state.blessings=[structuredClone(pact)];
+fs.writeFileSync(`${dir}/phase7-hand-cost.json`,JSON.stringify(toSave(cost.state,cost.rng)));

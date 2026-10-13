@@ -6,6 +6,7 @@ import { CHARACTER_CLASSES } from '../../src/core/classes';
 import { artSource } from './Art';
 import RitualSurface from './RitualSurface';
 import QuietPlayerHud,{HudStat} from './QuietPlayerHud';
+import {retainLimit} from '../../src/core/engine/handlers/combat';
 import {CARD_RULES} from '../../src/core/balance/notfm';
 import {openingHandSize} from '../../src/core/cards/hand';
 import InkIcon from './InkIcon';
@@ -29,7 +30,7 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings, on
   const [detailsOpen, setDetailsOpen] = React.useState(false);
   const health = Math.max(0, Math.min(1, p.hp / Math.max(1, p.maxHp)));
   return <>
-    <QuietPlayerHud classId={state.classId} hp={p.hp} maxHp={p.maxHp} onPortrait={()=>setDetailsOpen(true)} extras={<><HudStat icon="hand" text={`มือ ${p.retain??CARD_RULES.retain}`} label="มือสูงสุดท้ายเทิร์น" onPress={()=>setDetailsOpen(true)}/><HudStat icon="deck" text={`จั่ว ${p.drawPerTurn}`} label="จั่วต่อเทิร์น" onPress={()=>setDetailsOpen(true)}/></>}
+    <QuietPlayerHud classId={state.classId} hp={p.hp} maxHp={p.maxHp} onPortrait={()=>setDetailsOpen(true)} extras={<><HudStat icon="hand" text={`มือ ${retainLimit(state)}`} label="มือสูงสุดท้ายเทิร์น" onPress={()=>setDetailsOpen(true)}/><HudStat icon="deck" text={`จั่ว ${p.drawPerTurn}`} label="จั่วต่อเทิร์น" onPress={()=>setDetailsOpen(true)}/></>}
      stats={<><HudStat icon="gold" text={`${p.gold??0}`} label="เบี้ย"/><HudStat icon="deck" text={`${state.masterDeck?.length??0}`} onPress={onOpenDeck} label={`สำรับ ${state.masterDeck?.length??0}`}/><HudStat icon="blessing" text={`${state.blessings?.length??0}`} onPress={onOpenBlessings} label={`พร ${state.blessings?.length??0}`}/>{state.campaign&&<HudStat icon="lantern" text={`${state.campaign.courage??0}·${state.campaign.merit??0}`} onPress={()=>setDetailsOpen(true)} label={`ความกล้า ${state.campaign.courage??0} บุญ ${state.campaign.merit??0}`}/>}{mapSkill&&<HudStat icon={mapSkillStatus!.ready?'lantern':'rest'} text={mapSkillStatus!.ready?'A':`${state.skills?.[mapSkill.id]??0}`} onPress={()=>setSkillOpen(mapSkill.id)} label={`สกิล ${mapSkill.name} · ${mapSkillStatus!.label}`}/>}</>}/>
     {onUseSkill&&<SkillSheet state={state} id={skillOpen} onClose={()=>setSkillOpen(null)} onUse={onUseSkill}/>}
     <Modal visible={detailsOpen} transparent animationType="fade" onRequestClose={() => setDetailsOpen(false)}>
@@ -39,7 +40,7 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings, on
           <Text style={styles.detailText}>{character.name} · เลเวล {p.level}</Text>
           <Text style={styles.detailText}>พลังชีวิต {p.hp}/{p.maxHp}</Text>
           <Text style={styles.detailText}>แต้ม {p.maxAp} · มานาตั้งต้น {p.startMana}</Text>
-          <Text style={styles.detailText}>มือสูงสุดท้ายเทิร์น {p.retain??CARD_RULES.retain} · จั่วต่อเทิร์น {p.drawPerTurn}</Text>
+          <Text style={styles.detailText}>มือสูงสุดท้ายเทิร์น {retainLimit(state)} · จั่วต่อเทิร์น {p.drawPerTurn}</Text>
           <Text style={styles.detailText}>เปิดศึก {openingHandSize(state)} ใบ · ถือระหว่างเล่นไม่เกิน {p.handMax} ใบ</Text>
           <Text style={styles.detailText}>EXP {p.exp}/{p.expToNext}</Text>
           {state.campaign&&<View style={{marginTop:8}}><AlignmentMeter campaign={state.campaign} ink/></View>}

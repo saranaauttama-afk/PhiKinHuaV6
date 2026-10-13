@@ -2,7 +2,7 @@ name: NOTFM rebuild APK
 on:
   push:
     branches: ['work/notfm-phase6', 'work/notfm-phase7-research']
-    paths-ignore: ['**/*.md', 'docs/playtest-2026-10-13/*.json', 'scripts/android-feedback-smoke.py', '.github/workflows/feedback-native-verify.yml', '.github/workflows/android-notfm.yml']
+    paths-ignore: ['**/*.md', 'docs/playtest-2026-10-13/*.json', 'scripts/android-feedback-smoke.py', '.github/workflows/feedback-native-verify.yml']
   workflow_dispatch:
 concurrency:
   group: notfm-apk-${{ github.ref }}
@@ -69,14 +69,14 @@ jobs:
           "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
-          grep "package: name='com.phikinhua.episode' versionCode='42' versionName='1.0.41'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-NOTFM-v1.0.41.apk
-          sha256sum PhiKinHua-NOTFM-v1.0.41.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='43' versionName='1.0.42'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-NOTFM-v1.0.42.apk
+          sha256sum PhiKinHua-NOTFM-v1.0.42.apk > apk-audit/sha256.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-NOTFM-APK
-          path: PhiKinHua-NOTFM-v1.0.41.apk
+          path: PhiKinHua-NOTFM-v1.0.42.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -106,7 +106,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-NOTFM-v1.0.41.apk
+            adb install PhiKinHua-NOTFM-v1.0.42.apk
             python scripts/android-feedback-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
