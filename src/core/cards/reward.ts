@@ -46,7 +46,8 @@ export function rollCardReward(s: GameState, r: RNG): RNG {
     ?? rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0);
   if (out.list.length > 0) {
     s.cardReward = { choices: out.list };
-    if(active?.kind==='boss'&&(s.campaign?.night??3)<3){
+    // Hand/draw growth is rare and mid-run: only the night-2 boss (LEVEL_UP.growthNight) offers it.
+    if(active?.kind==='boss'&&s.campaign?.night===require('../balance/notfm').LEVEL_UP.growthNight){
       const caps=require('../balance/notfm').LEVEL_UP.caps;
       s.cardReward.growth=[];
       if((s.player.retain??2)<caps.retain)s.cardReward.growth.push('retain');

@@ -1,3 +1,4 @@
+import {openingHandSize} from '../src/core/cards/hand';
 import {describe,it,expect} from 'vitest';
 import {baseNewState,startPlayerTurn} from '../src/core/commands';
 import {applyCommand} from '../src/core/reducer';
@@ -54,7 +55,7 @@ describe('v32 reported regressions',()=>{
   }throw Error('Chest was never reached');
  });
  it('opening draw is independent from energy and cap; turn draw only adds the requested amount',()=>{
-  const d=driver();d.go({type:'ChooseOffer',index:0});expect(d.s.piles.hand.filter(c=>c.id!=='qa_phra_prathan')).toHaveLength(d.s.player.openingDraw);expect(d.s.player.handMax).toBe(CARD_RULES.handMax);
+  const d=driver();d.go({type:'ChooseOffer',index:0});expect(d.s.piles.hand.filter(c=>c.id!=='qa_phra_prathan')).toHaveLength(openingHandSize(d.s));expect(d.s.player.handMax).toBe(CARD_RULES.handMax);
   d.s.piles.hand=[];d.s.piles.draw=d.s.masterDeck.map(c=>({...c}));startPlayerTurn(d.s,d.r);expect(d.s.piles.hand.filter(c=>c.id!=='qa_phra_prathan')).toHaveLength(d.s.player.drawPerTurn);
  });
  it('receipts use actual granted copies, preserve upgrades/losses and never mutate inventory',()=>{

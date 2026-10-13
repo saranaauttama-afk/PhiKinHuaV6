@@ -17,7 +17,9 @@ export function rollShopStock(
   rng: RNG, count = 6, act = 1, classId?: ClassId, only?: (c: CardData) => boolean,milestoneLevel=0,
 ): { rng: RNG; items: ShopItem[] } {
   let r = rng;
-  const weights: Record<Rarity, number> = { Common: 55, Uncommon: 30, Rare: 13, Legendary: 2 };
+  // Rarity opens up by night (ECONOMY.shopRarity): strong cards can't be bought on night 1.
+  const byNight = require('./balance/notfm').ECONOMY.shopRarity;
+  const weights: Record<Rarity, number> = byNight[Math.min(byNight.length, Math.max(1, act)) - 1];
   const total = weights.Common + weights.Uncommon + weights.Rare + weights.Legendary;
   const pool = poolFor(classId,milestoneLevel).filter(c => c.type !== 'curse' && (!only || only(c)));
   const taken = new Set<string>();
@@ -32,7 +34,9 @@ export function rollShopStock(
     const roll = int(r, 1, total); r = roll.rng;
     let v = roll.value;
     const rar: Rarity = (v -= weights.Common) <= 0 ? 'Common' : (v -= weights.Uncommon) <= 0 ? 'Uncommon' : (v -= weights.Rare) <= 0 ? 'Rare' : 'Legendary';
-    const card = pick(rar) ?? pick('Uncommon') ?? pick('Common') ?? pick('Rare') ?? pick('Legendary');
+    const allowed = (['Uncommon', 'Common', 'Rare', 'Legendary'] as Rarity[]).filter(x => weights[x] > 0);
+    let card = pick(rar);
+    for (const x of allowed) card = card ?? pick(x);
     if (!card) break;
     taken.add(card.id);
     out.push({ card: JSON.parse(JSON.stringify(card)), price: priceForCard(card, act) });

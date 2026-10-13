@@ -107,8 +107,9 @@ describe('การ์ดรางวัล — สำรับโตจริ�
       for (const seed of SEEDS) {
         const skipped = playRun(seed, classId, false);
         const taken = playRun(seed, classId, true);
+        // เหตุการณ์เล่าเรื่องคืนละ 1 ครั้ง แต่ละครั้งให้ได้ถึง 2 ใบ (การ์ด + คำสาป) จึงยอมได้ไม่เกิน 4
         expect(skipped.endDeck - skipped.startDeck, `${seed} โตไปถึง ${skipped.endDeck}`)
-          .toBeLessThanOrEqual(3);
+          .toBeLessThanOrEqual(4);
         expect(taken.endDeck, seed).toBeGreaterThan(skipped.endDeck + 3);
       }
     });

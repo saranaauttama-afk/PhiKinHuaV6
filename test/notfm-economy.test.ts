@@ -114,7 +114,7 @@ describe('ระดับความยาก', () => {
     expect(d.s.player.gold).toBe(999 - Math.ceil(price * 1.25));
   });
 
-  it('ระดับ 5 คืนที่ 3 จั่วต่อเทิร์นน้อยลง 1', () => {
+  it('จั่วต่อเทิร์นไม่ถูกลดตอนเข้าคืนที่ 3 (กฎระดับ 5 เปลี่ยนเป็นไม่มีโบนัสเปิดศึก)', () => {
     for (const difficulty of [4, 5] as const) {
       const d = run(difficulty, 'draw-cut-' + difficulty);
       const draw = d.s.player.drawPerTurn;
@@ -137,7 +137,7 @@ describe('ระดับความยาก', () => {
         if (d.s.chapter) d.go({ type: 'SkipChapter' });
       }
       expect(d.s.campaign!.night).toBe(3);
-      expect(d.s.player.drawPerTurn).toBe(difficulty >= DIFFICULTY.drawCutFrom ? Math.max(DIFFICULTY.drawFloor,draw - 1) : draw);
+      expect(d.s.player.drawPerTurn).toBe(draw);
     }
   });
 });

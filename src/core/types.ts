@@ -137,6 +137,9 @@ export type FightState = {
   mimicUsed?: boolean;
   /** The boss's relic: its rule works until enough hits break it. */
   relic?: BossRelicState;
+  /** Effect draws used on turn `fxDrawTurn` (CARD_RULES.fxDrawPerTurn). */
+  fxDrawTurn?: number;
+  fxDrawn?: number;
 };
 
 export type BossRelicState = {
