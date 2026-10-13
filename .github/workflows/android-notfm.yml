@@ -1,7 +1,7 @@
 name: NOTFM rebuild APK
 on:
   push:
-    branches: ['work/notfm-phase6']
+    branches: ['work/notfm-phase6', 'work/notfm-phase7-research']
     paths-ignore: ['**/*.md']
   workflow_dispatch:
 permissions:
@@ -19,6 +19,21 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm test -- --maxWorkers=2 --testTimeout=60000 --silent
+      - name: Export mobile web verification build
+        run: CI=1 EXPO_PUBLIC_UI_REVIEW=1 npx expo export --platform web --output-dir /tmp/phikinhua-phase7-web
+      - name: Mobile browser tests with runner's installed Chrome
+        run: |
+          npm install --no-save playwright@1.62.1
+          npx vite-node --config vitest.config.ts scripts/phase7-fixtures.ts
+          PHIKINHUA_CHROMIUM_PATH=$(command -v google-chrome) node scripts/phase7-mobile-check.cjs
+      - name: Simulate class/difficulty smoke matrix
+        run: npm run balance -- --runs 3 --difficulty 1,3,5 --out phase7-audit/ci-balance.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: NOTFM-Phase7-verification
+          path: phase7-audit/
+          if-no-files-found: warn
   android:
     needs: verify
     runs-on: ubuntu-latest
@@ -47,14 +62,14 @@ jobs:
           "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
-          grep "package: name='com.phikinhua.episode' versionCode='38' versionName='1.0.37'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-NOTFM-v1.0.37.apk
-          sha256sum PhiKinHua-NOTFM-v1.0.37.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='39' versionName='1.0.38'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-NOTFM-v1.0.38.apk
+          sha256sum PhiKinHua-NOTFM-v1.0.38.apk > apk-audit/sha256.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-NOTFM-APK
-          path: PhiKinHua-NOTFM-v1.0.37.apk
+          path: PhiKinHua-NOTFM-v1.0.38.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4

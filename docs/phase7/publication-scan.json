@@ -1,0 +1,6 @@
+{
+  "base": "bce58b93333e02e9ca214c0468e59bd5d89fada1",
+  "filesReviewed": 66,
+  "scope": "Changed and untracked publishable files; key filenames, private keys, GitHub/OpenAI/AWS token patterns, email-like text. Not a guarantee against every secret format.",
+  "findings": []
+}

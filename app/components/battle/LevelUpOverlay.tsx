@@ -16,6 +16,9 @@ import CardRow from '../CardRow';
 import { font, palette } from '../../theme';
 
 const OPTIONS: Array<{ id: LevelOption; title: string; detail: string }> = [
+  {id:'ap',title:'แต้มวิชา',detail:'แต้มต่อเทิร์น +1 (สูงสุด 3)'},
+  {id:'mana',title:'มานาตั้งต้น',detail:'มานาเปิดไฟต์ +2 (สูงสุด 10)'},
+  {id:'draw',title:'ฝึกจั่ว',detail:'จั่วต่อเทิร์น +1 (สูงสุด 4)'},
   { id: 'card', title: 'การ์ดใหม่', detail: 'เลือก 1 ใบจาก 3 ใบเข้าสำรับ' },
   { id: 'upgrade', title: 'ปลุกเสก', detail: `เพิ่มดาวการ์ด ${LEVEL_UP.upgrades} ครั้ง` },
   { id: 'remove', title: 'สละการ์ด', detail: 'ถอดการ์ด 1 ใบออกจากสำรับ' },
@@ -47,7 +50,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
   const detail = (o: (typeof OPTIONS)[number]) =>
     o.id === 'slot' ? `${o.detail} (${state.equipmentSlotsMax ?? CARD_RULES.equipmentSlots} → ${(state.equipmentSlotsMax ?? CARD_RULES.equipmentSlots) + 1})`
       : o.id === 'retain' ? `${o.detail} (${state.player.retain ?? CARD_RULES.retain} → ${(state.player.retain ?? CARD_RULES.retain) + 1})` : o.detail;
-  const next = (o: LevelOption) => (o === 'slot' || o === 'retain') ? onChoose(o, 0) : setPending(o);
+  const next = (o: LevelOption) => (['slot','retain','ap','mana','draw'].includes(o)) ? onChoose(o, 0) : setPending(o);
   const back = () => { setPending(null); setIndex(null); };
   const cardWidth = Math.min(132, (width - 56) / 3);
 

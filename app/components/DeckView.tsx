@@ -11,16 +11,7 @@ import {QuietHeader,QuietButton} from './QuietChrome';
 import { font, radius, size, space, layer, palette, surface } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 
-/** ชื่อชนิดการ์ดเป็นภาษาไทย — เดิมเอาค่า type ดิบมาต่อกับคำว่า "Cards" */
-const TYPE_LABEL: Record<string, string> = {
-  attack: 'การ์ดโจมตี',
-  skill: 'การ์ดวิชา',
-  trap: 'การ์ดดัก',
-  equipment: 'เครื่องราง',
-  curse: 'คำสาป',
-};
-// คำสาปอยู่ท้ายสุด — มันคือของที่อยากถอนออก ไม่ใช่ของที่อยากดู
-const TYPE_ORDER = ['attack', 'skill', 'trap', 'equipment', 'curse'] as const;
+import {CARD_TYPE_LABELS as TYPE_LABEL,CARD_TYPE_ORDER as TYPE_ORDER} from '../../src/core/cards/typesRegistry';
 
 type Props = {
   state: GameState;

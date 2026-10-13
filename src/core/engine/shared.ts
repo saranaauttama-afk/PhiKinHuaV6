@@ -59,6 +59,9 @@ export function applyBlessingGain(s: GameState, b: BlessingDef): void {
 export function rollLevelOffers(s: GameState, r: RNG): { rng: RNG; list: import('../types').LevelOption[] } {
   const { int } = require('../rng');
   const usable: Record<import('../types').LevelOption, boolean> = {
+    ap:s.player.maxAp<LEVEL_UP.caps.ap,
+    mana:s.player.startMana<LEVEL_UP.caps.mana,
+    draw:s.player.drawPerTurn<LEVEL_UP.caps.draw,
     card: true,
     upgrade: s.masterDeck.some(canUpgrade),
     remove: s.masterDeck.some(c => canRemoveCard(c, s.masterDeck.length)),
@@ -142,7 +145,7 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
     s.player.maxHp += LEVEL_UP.maxHp;
     s.player.hp = s.player.maxHp;
     if (!s.levelUp || s.levelUp.consumed) {
-      const rolled = rollThreeCards(r, s.player.level, s.classId); r = rolled.rng;
+      const rolled = rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0); r = rolled.rng;
       const offers = rollLevelOffers(s, r); r = offers.rng;
       s.levelUp = { cards: rolled.list, offers: offers.list, consumed: false };
     } else {

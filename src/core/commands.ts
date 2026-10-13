@@ -7,7 +7,6 @@ import { shuffle, type RNG } from './rng';
 import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
 import { dealDamage, gainBlock, heal } from './combat/damage';
 
-let _instanceCounter = 0;
 
 // NOTE: We keep state updates pure by working on shallow copies of containers.
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -51,10 +50,9 @@ export function buildAndShuffleDeck(_state: GameState, _rng: RNG): { state: Game
   let state = _state;
   let rng = _rng;
   const source = state.masterDeck?.length ? state.masterDeck : START_DECK;
-  const out = shuffle(rng, source);
-  _instanceCounter = 0;
+  const out = shuffle(rng, source.map((c,i)=>({...c,instanceId:`${c.id}__${i+1}`})));
   state.piles = {
-    draw: out.array.map(c => ({ ...c, instanceId: `${c.id}__${++_instanceCounter}` })),
+    draw: out.array,
     hand: [], discard: [], exhaust: [],
   };
   rng = out.rng;
@@ -71,7 +69,7 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   processStatusEffectsOnTurnStart('player', state);
   rng = require('./cards/play').resolvePrayers(state, rng);
   if (state.phase !== 'combat') return { state, rng };
-  ({ state, rng } = drawCards(state, rng, state.player.drawPerTurn));
+  ({ state, rng } = drawCards(state, rng, Math.max(1,state.player.drawPerTurn)));
   rng = require('./cards/passives').runTriggers(state, 'turnStart', rng);
   require('./cards/testWin').dealTestWinCard(state);
   return { state, rng };
@@ -92,7 +90,9 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   s.player.ap = s.player.maxAp;
   s.player.mana = s.player.startMana;
   require('./cards/mechanics').resetCardsPlayed(s);
-  ({ state: s, rng } = drawCards(s, rng, s.player.openingDraw));
+  rng = require('./cards/equipment').prepareEquipment(s,rng);
+  const opening=Math.max(1,s.player.openingDraw+require('./cards/passives').ruleModifier(s,'openingDraw'));
+  ({ state: s, rng } = drawCards(s, rng, opening));
   rng = require('./cards/passives').runTriggers(s, 'battleStart', rng);
   require('./cards/testWin').dealTestWinCard(s);
   return rng;

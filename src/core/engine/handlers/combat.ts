@@ -79,20 +79,21 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
  */
 /** Cards kept past the end of a turn (NOTFM). */
 export function retainLimit(s: GameState): number {
-  return s.player.retain ?? require('../../balance/notfm').CARD_RULES.retain;
+  return Math.max(0,(s.player.retain ?? require('../../balance/notfm').CARD_RULES.retain)+require('../../cards/passives').ruleModifier(s,'retain'));
 }
 /** How many cards must be discarded before the turn can end. */
 export function turnEndExcess(s: GameState): number {
   return Math.max(0, s.piles.hand.filter(c => c.type !== 'curse').length - retainLimit(s));
 }
-function enforceRetain(s: GameState) {
+function enforceRetain(s: GameState): boolean {
   const over = turnEndExcess(s);
-  if (!over) return;
+  if (!over) return false;
   const keep = s.piles.hand.filter(c => c.type === 'curse'), rest = s.piles.hand.filter(c => c.type !== 'curse');
   const dropped = rest.splice(rest.length - over, over);
   s.piles.hand = [...rest, ...keep];
   s.piles.discard.push(...dropped);
   s.log.push(`มือเกิน ${retainLimit(s)} ใบ: ทิ้ง ${dropped.map(c => c.name).join(', ')}`);
+  return true;
 }
 
 /** The player's picks to get down to the retain limit at the end of the turn. */
@@ -104,6 +105,7 @@ export function discardForTurnEnd(s: GameState, cmd: Extract<Command, { type: 'D
   s.piles.hand = s.piles.hand.filter((_, i) => !picks.includes(i));
   s.piles.discard.push(...dropped);
   s.log.push(`ทิ้งท้ายเทิร์น: ${dropped.map(c => c.name).join(', ')}`);
+  if(dropped.length)r=runTriggers(s,'discard',r);
   return { state: s, rng: r };
 }
 
@@ -155,7 +157,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   // Curses go first, then the hand is cut to the retain limit (the player picked with
   // DiscardForTurnEnd; anything still over is dropped newest first).
   discardCurses(s);
-  enforceRetain(s);
+  if(enforceRetain(s))r=runTriggers(s,'discard',r);
   // การ์ดที่ยังค้างอยู่ในมือทำงานก่อนเทิร์นศัตรู — ทั้งหมดของกลไกนี้คือ
   // "ถือไว้แล้วมันกันให้" ถ้าไปทำงานหลังโดนตีแล้วก็ไม่มีความหมาย
   applyHeldEffects(s);

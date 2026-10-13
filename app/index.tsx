@@ -1,3 +1,4 @@
+import EquipmentPicker from './components/EquipmentPicker';
 // app/index.tsx — Clean version for redesign
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -49,6 +50,7 @@ export default function Home() {
   const [journalOpen,setJournalOpen]=useState(false);
   const [archiveOpen,setArchiveOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
+  const [equipmentOffer,setEquipmentOffer]=useState<number|null>(null);
   const [blessingsOpen, setBlessingsOpen] = useState(false);
 
   const [fontsLoaded] = useAppFonts();
@@ -78,6 +80,7 @@ export default function Home() {
 
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
+    if((offer.kind==='monster'||offer.kind==='boss')&&state.masterDeck.some(c=>c.type==='equipment')){setEquipmentOffer(index);return;}
     dispatch({ type: 'ChooseOffer', index });
 
     // Restored and newly entered fights share the combat redirect above.
@@ -200,6 +203,7 @@ export default function Home() {
 
       {/* สำรับเป็นจอทับเต็มจอ วางนอก Scrim เพื่อให้อยู่เหนือทุกอย่าง
           เดิมวางเป็นบล็อกไหลอยู่ในคอลัมน์กลางแผนที่ จึงล้นออกนอกจอ */}
+      {equipmentOffer!==null&&<EquipmentPicker state={state} onCancel={()=>setEquipmentOffer(null)} onConfirm={equipmentIndices=>{const index=equipmentOffer;setEquipmentOffer(null);dispatch({type:'ChooseOffer',index,equipmentIndices});}}/>}
       <DeckView state={state} dispatch={dispatch} />
 
       {blessingsOpen && (

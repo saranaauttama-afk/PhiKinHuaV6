@@ -14,12 +14,12 @@ export function priceForCard(c: CardData, _act = 1): number {
  * Stock without repeats, weighted by rarity. `only` narrows the pool (e.g. equipment shops).
  */
 export function rollShopStock(
-  rng: RNG, count = 6, act = 1, classId?: ClassId, only?: (c: CardData) => boolean,
+  rng: RNG, count = 6, act = 1, classId?: ClassId, only?: (c: CardData) => boolean,milestoneLevel=0,
 ): { rng: RNG; items: ShopItem[] } {
   let r = rng;
   const weights: Record<Rarity, number> = { Common: 55, Uncommon: 30, Rare: 13, Legendary: 2 };
   const total = weights.Common + weights.Uncommon + weights.Rare + weights.Legendary;
-  const pool = poolFor(classId).filter(c => c.type !== 'curse' && (!only || only(c)));
+  const pool = poolFor(classId,milestoneLevel).filter(c => c.type !== 'curse' && (!only || only(c)));
   const taken = new Set<string>();
   const out: ShopItem[] = [];
   const pick = (rar: Rarity): CardData | undefined => {

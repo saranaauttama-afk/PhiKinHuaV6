@@ -18,7 +18,11 @@ export function levelOptionValid(s: GameState, option: LevelOption, index: numbe
   if (s.levelUp.upgradesLeft != null && option !== 'upgrade') return false;
   if (!levelOffers(s).includes(option)) return false;
   if (option === 'card') return index >= 0 && index < s.levelUp.cards.length;
-  if (option === 'slot' || option === 'retain') return true;
+  if(option==='ap')return s.player.maxAp<LEVEL_UP.caps.ap;
+  if(option==='mana')return s.player.startMana<LEVEL_UP.caps.mana;
+  if(option==='draw')return s.player.drawPerTurn<LEVEL_UP.caps.draw;
+  if(option==='slot')return (s.equipmentSlotsMax??1)<LEVEL_UP.caps.slot;
+  if(option==='retain')return (s.player.retain??3)<LEVEL_UP.caps.retain;
   const card = s.masterDeck[index];
   if (!card) return false;
   return option === 'upgrade' ? canUpgrade(card) : canRemoveCard(card, s.masterDeck.length);
@@ -51,6 +55,9 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
     s.runCounters = s.runCounters ?? ({ removed: 0 } as any);
     (s.runCounters as any).removed = ((s.runCounters as any).removed ?? 0) + 1;
     finish(s, `สละ ${gone.name} ออกจากสำรับ`);
+  } else if(cmd.option==='ap'){s.player.maxAp++;s.player.ap=s.player.maxAp;finish(s,`แต้มต่อเทิร์น +1 (${s.player.maxAp})`);
+  } else if(cmd.option==='mana'){s.player.startMana=Math.min(LEVEL_UP.caps.mana,s.player.startMana+2);finish(s,`มานาตั้งต้น +2 (${s.player.startMana})`);
+  } else if(cmd.option==='draw'){s.player.drawPerTurn++;finish(s,`จั่วต่อเทิร์น +1 (${s.player.drawPerTurn})`);
   } else if (cmd.option === 'slot') {
     s.equipmentSlotsMax = (s.equipmentSlotsMax ?? CARD_RULES.equipmentSlots) + 1;
     finish(s, `ช่องอุปกรณ์ +1 (${s.equipmentSlotsMax})`);

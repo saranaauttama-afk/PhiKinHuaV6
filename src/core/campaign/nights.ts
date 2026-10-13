@@ -18,7 +18,7 @@ export type CampaignRun={night:Night;difficulty:import('./threeNight').Difficult
  /** Nights cleared across all runs when this run began: unlocks แพนโดรา blessings. */
  blessingTier?:number;
  /** The night-3 boss, fixed when its slot appears. */
- finalBossId?:string};
+ finalBossId?:string;milestoneLevel?:number;eventByNight?:Record<string,string>};
 export const SPECIAL_CARD_IDS:Record<ClassId,string>={warrior:'night_guardian_cut',shaman:'night_hex_knot',nun:'night_lotus_wheel',medium:'night_ancestor_pact'};
 /** The class blessing a fifth-night clear can unlock. */
 export const SPECIAL_BLESSINGS:Record<ClassId,BlessingDef>=Object.fromEntries((['warrior','shaman','nun','medium'] as ClassId[]).map(id=>[id,require('../pack').classBlessing(id)])) as Record<ClassId,BlessingDef>;

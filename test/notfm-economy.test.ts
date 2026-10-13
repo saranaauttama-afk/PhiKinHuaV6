@@ -14,7 +14,7 @@ import { markedUp, removePrice, upgradePrice, wellHeal, shrineCost, healAmount }
 function run(difficulty: Difficulty = 1, seed = 'eco') {
   let s = baseNewState(seed), r = makeRng(seed);
   const go = (c: Command) => { ({ state: s, rng: r } = applyCommand(s, c, r)); };
-  go({ type: 'NewRun', seed, classId: 'warrior', difficulty }); go({ type: 'SkipChapter' }); go({ type: 'ChooseStarterBlessing', index: 0 });
+  go({ type: 'NewRun', seed, classId: 'warrior', difficulty }); go({ type: 'SkipChapter' }); go({ type: 'ChooseStarterBlessing', index: Math.max(0,s.starter!.choices.findIndex(b=>!b.onGain)) });
   return { go, get s() { return s; } };
 }
 /** Open the night's stop of `kind` straight from the adventure deck. */

@@ -16,6 +16,10 @@ function sources(s: GameState): Source[] {
   return out;
 }
 
+export function ruleModifier(s:GameState,key:keyof NonNullable<import('../types').BlessingDef['rules']>):number {
+ return (s.blessings??[]).reduce((n,b)=>n+(b.rules?.[key]??0),0);
+}
+
 /** Flat damage added to each hit of an attack card. */
 export function attackBonus(s: GameState): number {
   return sources(s).reduce((n, x) => n + (x.passive.attackBonus ?? 0), 0);

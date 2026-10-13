@@ -26,6 +26,7 @@ const seedPrefix=arg('seed','balance');
 /** Dialogue answers: courage | merit | even | auto (seed picks, so all three final bosses appear). */
 const align=arg('align','auto') as AlignPolicy;
 /** Treat runs as veteran (needed for the secret boss). */
+const blessingTier=Number(arg('tier','0')),milestoneLevel=Number(arg('milestones','0'));
 const veteran=process.argv.includes('--veteran');
 
 const pct=(n:number,d:number)=>d?Math.round(n/d*100)+'%':'-';
@@ -38,7 +39,7 @@ const all:RunRecord[]=[];
 const rows:Array<Record<string,unknown>>=[];
 const started=Date.now();
 for(const cls of classes)for(const difficulty of difficulties){
- const batch=Array.from({length:runs},(_,i)=>playRun(`${seedPrefix}-${cls}-${difficulty}-${i}`,cls,difficulty,{tactical,align,veteran}));
+ const batch=Array.from({length:runs},(_,i)=>playRun(`${seedPrefix}-${cls}-${difficulty}-${i}`,cls,difficulty,{tactical,align,veteran,blessingTier,milestoneLevel}));
  all.push(...batch);
  const fights=batch.flatMap(r=>r.fights);
  const byKind=(k:FightKind)=>fights.filter(f=>f.kind===k);
@@ -65,6 +66,6 @@ log(cols.map(([k,w])=>pad(k==='difficulty'?'d':k,w)).join(' '));
 for(const row of rows)log(cols.map(([k,w])=>pad(row[k],w)).join(' '));
 if(out){
  fs.mkdirSync(path.dirname(path.resolve(out)),{recursive:true});
- fs.writeFileSync(out,JSON.stringify({runsPerCell:runs,policy:tactical?'tactical':'random',seedPrefix,rows,runs:all},null,1)+'\n');
+ fs.writeFileSync(out,JSON.stringify({runsPerCell:runs,policy:tactical?'tactical':'random',seedPrefix,blessingTier,milestoneLevel,align,veteran,rows,runs:all},null,1)+'\n');
  log('wrote '+out);
 }

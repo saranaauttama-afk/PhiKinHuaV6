@@ -8,7 +8,7 @@ import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
  * สุ่มการ์ดรางวัล 3 ใบ — กรองเฉพาะการ์ดของคลาสที่เล่นอยู่
  * ถ้าไม่กรอง นักรบจะได้การ์ดหมอผีเป็นรางวัล ซึ่งทำให้ตัวตนของคลาสจางหมด
  */
-export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./classes').ClassId) {
+export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./classes').ClassId,milestoneLevel=0) {
   let r = rng;
   
   // ปรับน้ำหนักตาม level
@@ -40,7 +40,7 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./cl
     const rarityRoll = next(r);
     r = rarityRoll.rng;
     const roll = rarityRoll.value * 100;
-    const forClass = (list: CardData[]) => list.filter(c => !c.class || c.class === classId);
+    const forClass = (list: CardData[]) => list.filter(c => (c.unlockAt??0)<=milestoneLevel&&(!c.class || c.class === classId));
     const POOL = {
       Common:    forClass(BY_RARITY.Common),
       Uncommon:  forClass(BY_RARITY.Uncommon),

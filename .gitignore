@@ -67,3 +67,6 @@ apk-audit/
 *.apk
 
 __pycache__/
+
+# Phase 7 Actions verification output
+phase7-audit/

@@ -1,4 +1,8 @@
 // app/store/gameStore.ts - Shared game store
+import {PlayClock} from '../core/campaign/playTime';
+const playClock=new PlayClock();
+const monotonicNow=()=>performance.now();
+
 import { create } from 'zustand';
 import {useJournal} from './journalStore';
 import {useArchive} from './archiveStore';
@@ -43,6 +47,9 @@ type Store = {
   suspendBattle: () => Promise<void>;
   getSaveSlots: () => Promise<SaveSlotInfo[]>;
   autoSaveEnabled: boolean;
+  flushPlayTime:()=>void;
+  setPlayPaused:(paused:boolean)=>void;
+  setForeground:(active:boolean)=>void;
 };
 
 /**
@@ -61,8 +68,12 @@ export const useGame = create<Store>((set, get) => ({
   state: makeEmptyState(),
   rng: makeRng('demo-001'),
   autoSaveEnabled: true,
+  flushPlayTime:()=>set({state:playClock.flush(get().state,monotonicNow())}),
+  setPlayPaused:paused=>set({state:playClock.setPaused(get().state,paused,monotonicNow())}),
+  setForeground:active=>set({state:playClock.setForeground(get().state,active,monotonicNow())}),
 
   dispatch: (cmd: Command) => {
+    get().flushPlayTime();
     const { state, rng } = get();
     const result = applyCommand(state, cmd, rng);
     set({ state: result.state, rng: result.rng });
@@ -101,11 +112,13 @@ export const useGame = create<Store>((set, get) => ({
     const progress=useJournal.getState();
     if(progress.error||progress.saving||!Number.isInteger(difficulty)||difficulty<1||difficulty>unlockedDifficulty(progress.journal,classId))return false;
     clearTimeout(autoSaveTimer);await autoSavePending;await clearAutoSave();
-    const result=applyCommand(makeEmptyState(),{type:'NewRun',seed,discoveryId:discoveryId(),classId,difficulty,unlocks:progress.journal.classes[classId].unlocks,veteran:Object.values(progress.journal.classes).some(c=>c.highestDifficulty>=1),blessingTier:progress.journal.history.reduce((n,h)=>n+(h.completedNights??0),0)},makeRng(seed));
+    const result=applyCommand(makeEmptyState(),{type:'NewRun',seed,discoveryId:discoveryId(),classId,difficulty,unlocks:progress.journal.classes[classId].unlocks,veteran:Object.values(progress.journal.classes).some(c=>c.highestDifficulty>=1),blessingTier:progress.journal.totalCompletedNights,milestoneLevel:progress.journal.classes[classId].highestDifficulty},makeRng(seed));
+    playClock.reset(monotonicNow());
     set({state:result.state,rng:result.rng});void useArchive.getState().observe(result.state).catch(()=>{});return true;
   },
 
   saveToSlot: async (slot: number) => {
+    get().flushPlayTime();
     const { state,rng } = get();
     await saveGame(state, slot,rng);
   },
@@ -114,6 +127,7 @@ export const useGame = create<Store>((set, get) => ({
     const loaded = await loadGameSnapshot(slot);
     if (loaded.state) {
       trackDiscovery(loaded.state,loaded.state);void useArchive.getState().observe(loaded.state).catch(()=>{});
+      playClock.reset(monotonicNow());
       set({ state: loaded.state, rng:loaded.rng??makeRng(loaded.state.seed || 'demo-fallback') });
     }
   },
@@ -121,6 +135,7 @@ export const useGame = create<Store>((set, get) => ({
   suspendBattle: async () => {
     clearTimeout(autoSaveTimer);
     await autoSavePending;
+    get().flushPlayTime();
     const {state,rng}=get();
     await useArchive.getState().observe(state);
     await saveBattle(state,rng);
@@ -132,6 +147,7 @@ export const useGame = create<Store>((set, get) => ({
       const loaded = await loadGameSnapshot(-1);
       if (!loaded.state?.pages?.adventure) return false;
       trackDiscovery(loaded.state,loaded.state);void useArchive.getState().observe(loaded.state).catch(()=>{});
+      playClock.reset(monotonicNow());
       set({ state: loaded.state, rng: loaded.rng ?? makeRng(loaded.state.seed || 'demo-fallback') });
       return true;
     } catch {

@@ -1,3 +1,4 @@
+import {choiceLocked,getStoryEvent} from '../src/core/events/story';
 // scripts/pilot.ts — automated player for balance runs.
 //
 // Plays one full three-night run with real commands only (no QA card, no state edits),
@@ -76,6 +77,9 @@ function chooseLevelUp(s:GameState):Command{
  const up=s.masterDeck.map((c,i)=>({i,v:cardValue(c),ok:canUpgrade(c)})).filter(x=>x.ok).sort((a,b)=>b.v-a.v);
  const low=s.masterDeck.map((c,i)=>({i,v:c.type==='curse'?-99:cardValue(c),ok:canRemoveCard(c,s.masterDeck.length)})).filter(x=>x.ok).sort((a,b)=>a.v-b.v);
  if(s.levelUp?.upgradesLeft!=null)return up[0]?{type:'ChooseLevelUpOption',option:'upgrade',index:up[0].i}:{type:'SkipLevelUp'};
+ if(has('draw')&&s.player.drawPerTurn<3)return {type:'ChooseLevelUpOption',option:'draw',index:0};
+ if(has('mana')&&s.player.startMana<6&&s.masterDeck.some(c=>c.type==='spell'))return {type:'ChooseLevelUpOption',option:'mana',index:0};
+ if(has('ap')&&s.player.maxAp<3)return {type:'ChooseLevelUpOption',option:'ap',index:0};
  if(has('retain')&&(s.player.retain??3)<4)return {type:'ChooseLevelUpOption',option:'retain',index:0};
  if(has('card')&&cards[0]&&(s.masterDeck.length<14||cards[0].v>=12))return {type:'ChooseLevelUpOption',option:'card',index:cards[0].i};
  if(has('remove')&&low[0]&&(low[0].v<0||s.masterDeck.length>16))return {type:'ChooseLevelUpOption',option:'remove',index:low[0].i};
@@ -128,7 +132,7 @@ function alignChoice(s:GameState,policy:Exclude<AlignPolicy,'auto'>):'courage'|'
  return (s.campaign?.courage??0)<=(s.campaign?.merit??0)?'courage':'merit';
 }
 
-export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{tactical?:boolean;observe?:(s:GameState,r:RNG)=>void;align?:AlignPolicy;veteran?:boolean}={}):RunRecord{
+export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{tactical?:boolean;observe?:(s:GameState,r:RNG)=>void;align?:AlignPolicy;veteran?:boolean;blessingTier?:number;milestoneLevel?:number}={}):RunRecord{
  const tactical=opts.tactical??true;
  let s=baseNewState(seed),r=makeRng(seed),steps=0,stalled=false,earned=0,spent=0;
  const fights:FightRecord[]=[];let open:FightRecord|undefined;
@@ -146,7 +150,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   opts.observe?.(s,r);
  };
  const align=opts.align&&opts.align!=='auto'?opts.align:(['courage','merit','even'] as const)[[...seed].reduce((n,ch)=>n+ch.charCodeAt(0),0)%3];
- go({type:'NewRun',seed,classId,difficulty,veteran:opts.veteran});
+ go({type:'NewRun',seed,classId,difficulty,veteran:opts.veteran,blessingTier:opts.blessingTier??0,milestoneLevel:opts.milestoneLevel??0});
  while(!s.runSummary&&steps<9000){
   if(s.chapter){go({type:'SkipChapter'});continue;}
   if(s.phase==='starter'){const i=s.starter!.choices.findIndex(b=>b.id==='spirit_energy'||b.id==='herbal_wisdom'||b.id==='bamboo_dart_power');go({type:'ChooseStarterBlessing',index:Math.max(0,i)});continue;}
@@ -184,7 +188,8 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    const ix=prep>=0?prep:offers.findIndex((o,i)=>open(i)&&isCriticalOffer(o));
    const other=offers.findIndex((_,i)=>open(i));
    if(ix<0&&other<0){stalled=true;break;}
-   go(ix>=0?{type:'ChooseOffer',index:ix}:offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});
+   const equipmentIndices=s.masterDeck.map((c,i)=>({c,i})).filter(x=>x.c.type==='equipment').sort((a,b)=>cardValue(b.c)-cardValue(a.c)).slice(0,s.equipmentSlotsMax??1).map(x=>x.i);
+   go(ix>=0?{type:'ChooseOffer',index:ix,equipmentIndices}:offers[other]?.kind==='next_event'?{type:'ChooseOffer',index:other}:{type:'DeleteShopFromMap',index:other});
    continue;
   }
   if(s.phase==='shop'&&s.pages?.adventure){
@@ -207,7 +212,7 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
    if((s.phase as string)==='map'&&slot!=null&&s.pages.adventure!.slotIds[slot]===slotId&&!s.pages.current!.resolved[slot])go({type:'DeleteShopFromMap',index:slot});
    continue;
   }
-  if(s.phase==='event'){go({type:'ChooseEventOption',index:0});go({type:'CompleteNode'});continue;}
+  if(s.phase==='event'){const ev=getStoryEvent(s.story!.eventId,s);const index=ev?.choices.findIndex(c=>!choiceLocked(s,c))??-1;if(index<0){stalled=true;break;}go({type:'ChooseEventOption',index});go({type:'CompleteNode'});continue;}
   stalled=true;break;
  }
  if(!s.runSummary)stalled=true;

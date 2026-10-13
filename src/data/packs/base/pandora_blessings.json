@@ -1,9 +1,169 @@
 [
- {"id":"pandora_dead_pact","name":"สัญญาคนตาย","rarity":"Rare","pandora":true,"unlock":0,"triggers":[],"onGain":{"hp":-15,"maxHp":15},"desc":"ชีวิตตอนนี้ −15 · ชีวิตสูงสุด +15","flavor":"ลงชื่อไว้กับคนที่ตายไปแล้ว"},
- {"id":"pandora_gambler_purse","name":"ถุงเงินผีพนัน","rarity":"Rare","pandora":true,"unlock":0,"triggers":[],"onGain":{"gold":100,"maxHp":-10},"desc":"ได้ 100 เบี้ย · ชีวิตสูงสุด −10","flavor":"เบี้ยในถุงยังอุ่นมือคนตาย"},
- {"id":"pandora_heavy_bag","name":"ย่ามหนักอึ้ง","rarity":"Rare","pandora":true,"unlock":2,"triggers":[],"onGain":{"draw":1,"maxHp":-8},"desc":"จั่วต่อเทิร์น +1 · ชีวิตสูงสุด −8","flavor":"ย่ามใบนี้มีของเพิ่มขึ้นเองทุกคืน"},
- {"id":"pandora_open_palm","name":"มือแบไม่หวง","rarity":"Rare","pandora":true,"unlock":2,"triggers":[],"onGain":{"retain":2,"maxHp":-6},"desc":"เก็บการ์ดข้ามเทิร์น +2 · ชีวิตสูงสุด −6","flavor":"ถือไว้ได้มาก แต่ก็หลุดมือง่าย"},
- {"id":"pandora_doom_power","name":"พลังหายนะ","rarity":"Rare","pandora":true,"unlock":4,"triggers":[],"onGain":{"startMana":4,"maxHp":-6},"desc":"มานาตั้งต้น +4 · ชีวิตสูงสุด −6","flavor":"ยืมกำลังจากสิ่งที่ไม่ควรยืม"},
- {"id":"pandora_twin_blades","name":"สองมือสองดาบ","rarity":"Rare","pandora":true,"unlock":4,"triggers":[],"onGain":{"slot":1,"maxHp":-8},"desc":"ช่องอุปกรณ์ +1 · ชีวิตสูงสุด −8","flavor":"ถือของได้มากกว่าที่ร่างจะรับไหว"},
- {"id":"pandora_phrai_pact","name":"สัญญาผีพราย","rarity":"Legendary","pandora":true,"unlock":6,"triggers":[],"onGain":{"ap":1,"maxHp":-12},"desc":"แต้มต่อเทิร์น +1 · ชีวิตสูงสุด −12","flavor":"ผีพรายให้แรงเท่าที่เอาลมหายใจไป"}
+  {
+    "id": "pandora_dead_pact",
+    "name": "สัญญาคนตาย",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 0,
+    "triggers": [],
+    "onGain": {
+      "hp": -15,
+      "maxHp": 15
+    },
+    "desc": "ชีวิตตอนนี้ −15 · ชีวิตสูงสุด +15",
+    "flavor": "ลงชื่อไว้กับคนที่ตายไปแล้ว"
+  },
+  {
+    "id": "pandora_gambler_purse",
+    "name": "ถุงเงินผีพนัน",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 0,
+    "triggers": [],
+    "onGain": {
+      "gold": 100,
+      "maxHp": -10
+    },
+    "desc": "ได้ 100 เบี้ย · ชีวิตสูงสุด −10",
+    "flavor": "เบี้ยในถุงยังอุ่นมือคนตาย"
+  },
+  {
+    "id": "pandora_heavy_bag",
+    "name": "ย่ามหนักอึ้ง",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 2,
+    "triggers": [],
+    "onGain": {
+      "draw": 1,
+      "maxHp": -8
+    },
+    "desc": "จั่วต่อเทิร์น +1 · ชีวิตสูงสุด −8",
+    "flavor": "ย่ามใบนี้มีของเพิ่มขึ้นเองทุกคืน"
+  },
+  {
+    "id": "pandora_open_palm",
+    "name": "มือแบไม่หวง",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 2,
+    "triggers": [],
+    "onGain": {
+      "retain": 2,
+      "maxHp": -6
+    },
+    "desc": "เก็บการ์ดข้ามเทิร์น +2 · ชีวิตสูงสุด −6",
+    "flavor": "ถือไว้ได้มาก แต่ก็หลุดมือง่าย"
+  },
+  {
+    "id": "pandora_doom_power",
+    "name": "พลังหายนะ",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 4,
+    "triggers": [],
+    "onGain": {
+      "startMana": 4,
+      "maxHp": -6
+    },
+    "desc": "มานาตั้งต้น +4 · ชีวิตสูงสุด −6",
+    "flavor": "ยืมกำลังจากสิ่งที่ไม่ควรยืม"
+  },
+  {
+    "id": "pandora_twin_blades",
+    "name": "สองมือสองดาบ",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 4,
+    "triggers": [],
+    "onGain": {
+      "slot": 1,
+      "maxHp": -8
+    },
+    "desc": "ช่องอุปกรณ์ +1 · ชีวิตสูงสุด −8",
+    "flavor": "ถือของได้มากกว่าที่ร่างจะรับไหว"
+  },
+  {
+    "id": "pandora_phrai_pact",
+    "name": "สัญญาผีพราย",
+    "rarity": "Legendary",
+    "pandora": true,
+    "unlock": 6,
+    "triggers": [],
+    "onGain": {
+      "ap": 1,
+      "maxHp": -12
+    },
+    "desc": "แต้มต่อเทิร์น +1 · ชีวิตสูงสุด −12",
+    "flavor": "ผีพรายให้แรงเท่าที่เอาลมหายใจไป"
+  },
+  {
+    "id": "pandora_scattered_incense",
+    "name": "ธูปหลุดมือ",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 0,
+    "rules": {
+      "retain": -3
+    },
+    "triggers": [
+      {
+        "on": "discard",
+        "once": "turn",
+        "fx": {
+          "mana": 2,
+          "block": 4
+        }
+      }
+    ],
+    "desc": "ทิ้งการ์ดท้ายเทิร์น: มานา +2 และเกราะ +4 (ครั้งเดียวต่อเทิร์น) · ข้อเสีย: เก็บข้ามเทิร์น −3 ใบ"
+  },
+  {
+    "id": "pandora_iron_shrine",
+    "name": "ศาลเหล็ก",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 2,
+    "onGain": {
+      "slot": 1
+    },
+    "rules": {
+      "openingDraw": -1
+    },
+    "triggers": [
+      {
+        "on": "turnStart",
+        "fx": {
+          "block": 3
+        }
+      }
+    ],
+    "desc": "ช่องอุปกรณ์ +1 · ได้เกราะ +3 ต้นเทิร์น · ข้อเสีย: จั่วเปิดไฟต์ −1 ใบ"
+  },
+  {
+    "id": "pandora_long_vow",
+    "name": "คำสัตย์ยาวนาน",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 2,
+    "rules": {
+      "prayerAp": 1,
+      "prayerMult": 1
+    },
+    "triggers": [],
+    "desc": "บทสวดทุกใบได้ตัวคูณเพิ่ม +1 · ข้อเสีย: บทสวดใช้แต้มเพิ่ม 1 ทุกครั้ง"
+  },
+  {
+    "id": "pandora_borrowed_breath",
+    "name": "ลมหายใจยืม",
+    "rarity": "Rare",
+    "pandora": true,
+    "unlock": 4,
+    "rules": {
+      "borrowBonus": 1,
+      "borrowHpCost": 2
+    },
+    "triggers": [],
+    "desc": "การ์ดยืมได้สำเนาผีเพิ่ม 1 ใบเมื่อมีประวัติพอ · ข้อเสีย: ใช้สำเนาทุกใบเสียชีวิต 2 (อาจตายได้)"
+  }
 ]

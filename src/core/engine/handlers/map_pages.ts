@@ -126,6 +126,8 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
   switch (offer.kind) {
     case 'monster':
     case 'boss':
+      if(!require('../../cards/equipment').validEquipmentSelection(s,cmd.equipmentIndices??[]))return {state:s,rng};
+      s.preEquipment=[...(cmd.equipmentIndices??[])];
       return startCombat(s, offer, ix, rng);
 
     case 'shop_card': {

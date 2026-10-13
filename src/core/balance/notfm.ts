@@ -33,7 +33,7 @@ export const CLASS_RESOURCES: Record<ClassId, { hp: number; startMana: number }>
   warrior: { hp: 60, startMana: 0 },
   shaman: { hp: 60, startMana: 4 },
   nun: { hp: 56, startMana: 0 },
-  medium: { hp: 58, startMana: 4 },
+  medium: { hp: 60, startMana: 6 },
 };
 
 /** Shop card prices by rarity (equipment cards included). */
@@ -101,8 +101,8 @@ export const NIGHT_EXP = { normal: [12, 18, 24], elite: [20, 30, 40], boss: [30,
  */
 export const LEVEL_UP = {
   maxHp: 8, skipGold: 25, offers: 2, upgrades: 2,
-  weights: { card: 3, upgrade: 3, remove: 2, slot: 1, retain: 2 },
-  caps: { slot: 3, retain: 6 },
+  weights: { card: 3, upgrade: 3, remove: 2, slot: 1, retain: 2, ap:1, mana:2, draw:1 },
+  caps: { slot: 3, retain: 6, ap:3, mana:10, draw:4 },
 } as const;
 
 /**

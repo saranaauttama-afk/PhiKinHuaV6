@@ -67,10 +67,12 @@ describe('พรแพนโดรา', () => {
   it('ทุกพรมีทั้งของที่ได้และราคาที่ต้องจ่าย', () => {
     expect(PANDORA_BLESSINGS.length).toBeGreaterThanOrEqual(6);
     for (const b of PANDORA_BLESSINGS) {
-      const g = b.onGain!;
+      const g = b.onGain??{};
       const gains = (['gold', 'ap', 'draw', 'retain', 'startMana', 'slot'] as const).some(k => (g[k] ?? 0) > 0) || (g.maxHp ?? 0) > 0;
       const costs = (g.maxHp ?? 0) < 0 || (g.hp ?? 0) < 0;
-      expect(gains && costs, b.id).toBe(true);
+      const ongoingGain=!!(b.triggers.length||(b.rules?.prayerMult??0)>0||(b.rules?.borrowBonus??0)>0);
+      const ongoingCost=!!((b.rules?.openingDraw??0)<0||(b.rules?.retain??0)<0||(b.rules?.prayerAp??0)>0||(b.rules?.borrowHpCost??0)>0);
+      expect((gains||ongoingGain)&&(costs||ongoingCost), b.id).toBe(true);
       expect(b.desc, b.id).toBeTruthy();
     }
   });
