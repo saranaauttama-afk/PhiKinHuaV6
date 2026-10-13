@@ -1,0 +1,48 @@
+{
+  "published_source": "c039ab4af604f1692dfdf865a4e0a2b5a6fdc972",
+  "published_tree": "7d48fcfb2715bf7d3e262754f2297a51e1cda347",
+  "original_local_source": "d5a7ae556428717fc0839445bf2ad97d0defdcee",
+  "original_local_documentation": "aeb407c04edccc525aa47b9265592e70fa704be2",
+  "original_local_commits_preserved_on": "archive/phase7-local-original-aeb407c",
+  "pr": "https://github.com/saranaauttama-afk/PhiKinHuaV6/pull/15",
+  "ci": "https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38351594300",
+  "mobile_artifact": 11790953199,
+  "mobile_artifact_sha256": "9025a9504862545068739e35320d730091e67f30c02d30809b317d73689c1333",
+  "mobile_script_sha256": "a6dbcc05a418635df6c3f649388b19fb28f41e483241f5c0fbe26228eb489ece",
+  "verification": {
+    "typescript": "passed",
+    "test_files": 38,
+    "tests_passed": 532,
+    "web_export": "passed",
+    "mobile_checks_passed": 28,
+    "balance_runs": 400,
+    "additional_unlock_alignment_runs": 96,
+    "stalls": 0
+  },
+  "apk_status": "success",
+  "remaining": [
+    "Physical Android install/playtest",
+    "Median human active run duration against 60-minute goal"
+  ],
+  "ci_status": "success",
+  "apk": {
+    "source": "c039ab4af604f1692dfdf865a4e0a2b5a6fdc972",
+    "apk_sha256": "de0aeaa2bba492df7a98127c5d8ad44e54d15c52439d8ec5023753ca5068841f",
+    "apk_bytes": 119076465,
+    "package": "package: name='com.phikinhua.episode' versionCode='39' versionName='1.0.38' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+    "signature": [
+      "Verifies",
+      "Verified using v1 scheme (JAR signing): false",
+      "Verified using v2 scheme (APK Signature Scheme v2): true",
+      "Verified using v3 scheme (APK Signature Scheme v3): false",
+      "Verified using v3.1 scheme (APK Signature Scheme v3.1): false",
+      "Verified using v3.2 scheme (APK Signature Scheme v3.2): false",
+      "Verified using v4 scheme (APK Signature Scheme v4): false"
+    ],
+    "zipalign": "Verification successful",
+    "artifact_id": 11791723073,
+    "artifact_url": "https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38351594300/artifacts/11791723073",
+    "audit_artifact_id": 11791867457,
+    "audit_artifact_url": "https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38351594300/artifacts/11791867457"
+  }
+}

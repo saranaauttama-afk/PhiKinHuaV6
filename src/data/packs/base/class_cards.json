@@ -6,7 +6,7 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "dmg": 6
+   "dmg": 5
   },
   "starter": 4,
   "flavor": "ดาบที่ใช้ฝึกในลานวัด"
@@ -1183,7 +1183,7 @@
   "class": "medium",
   "mana": 2,
   "fx": {
-   "dmg": 3,
+   "dmg": 4,
    "status": [
     {
      "id": "poison",
@@ -1204,7 +1204,7 @@
   "class": "medium",
   "ap": 1,
   "fx": {
-   "block": 5,
+   "block": 7,
    "borrow": 1
   },
   "starter": 1,

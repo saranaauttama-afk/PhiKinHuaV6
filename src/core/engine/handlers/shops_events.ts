@@ -6,24 +6,69 @@ import { rollShopStock } from '../../shop';
 import { applyRemoveCard, rollGamble, rollTreasure } from '../../events';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
-import { SHOP_STOCK_SIZE } from '../../balance/weights';
+import { DIFFICULTY, ECONOMY } from '../../balance/notfm';
+import { rollTwoBlessings } from '../../level';
 import { upgradeCard, canUpgrade, upgradeLevelOf, grantBlessing } from '../shared';
 import { loseRun } from './runEnd';
 /** Shop stock for the player's class. `only` narrows the pool (equipment shops). */
 function stockFor(s: GameState, r: RNG, size: number, only?: (c: import('../../types').CardData) => boolean) {
-  const out = rollShopStock(r, size, 1, s.classId, only);
+  const out = rollShopStock(r, size, s.campaign?.night ?? 1, s.classId, only,s.campaign?.milestoneLevel??0);
   return { rng: out.rng, items: out.items };
+}
+
+/** The night shop: class cards plus equipment (ECONOMY.shopStock). */
+function nightShopStock(s: GameState, r: RNG) {
+  const cards = stockFor(s, r, ECONOMY.shopStock.cards, c => c.type !== 'equipment'); r = cards.rng;
+  const gear = stockFor(s, r, ECONOMY.shopStock.equipment, c => c.type === 'equipment'); r = gear.rng;
+  return { rng: r, items: [...cards.items, ...gear.items] };
+}
+
+/** Difficulty markup on any gold price (DIFFICULTY.priceFrom). */
+export function markedUp(s: Partial<GameState>, price: number): number {
+  return (s.campaign?.difficulty ?? 1) >= DIFFICULTY.priceFrom ? Math.ceil(price * (100 + DIFFICULTY.markupPct) / 100) : price;
+}
+
+/** Healing stops heal half from DIFFICULTY.priceFrom. */
+export function healAmount(s: Partial<GameState>, amount: number): number {
+  return (s.campaign?.difficulty ?? 1) >= DIFFICULTY.priceFrom ? Math.ceil(amount / 2) : amount;
+}
+
+/** Upgrades or removals already done at the stop that is open now. */
+export function stopUses(s: Partial<GameState>): number { return s.shopBoughtItems?.length ?? 0; }
+export function removePrice(s: Partial<GameState>): number { return markedUp(s, removeCostForCount(stopUses(s))); }
+export function upgradePrice(s: Partial<GameState>): number { return markedUp(s, upgradeCostForCount(stopUses(s))); }
+
+/** The night's blessing stop: pick one of ECONOMY.blessingChoices. */
+export function openBlessingStop(s: GameState, r: RNG): { state: GameState; rng: RNG } {
+  const out = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), ECONOMY.blessingChoices, s.campaign?.blessingTier ?? 0); r = out.rng;
+  s.blessingStock = out.list;
+  s.shopKind = 'blessing';
+  s.shopBoughtItems = [];
+  s.phase = 'shop';
+  return { state: s, rng: r };
+}
+
+export function takeShopBlessing(s: GameState, cmd: Extract<Command, { type: 'TakeShopBlessing' }>, r: RNG) {
+  if (s.phase !== 'shop' || s.shopKind !== 'blessing' || !s.blessingStock?.[cmd.index]) return { state: s, rng: r };
+  const pick = s.blessingStock[cmd.index];
+  grantBlessing(s, JSON.parse(JSON.stringify(pick)));
+  s.blessingStock = [];
+  s.log.push(`ศาลพร: รับ ${pick.name}`);
+  if (s.pages) { s.pages._shopUsed = true; require('../../map/adventure').rememberAdventureService(s); }
+  return { state: s, rng: r };
 }
 
 export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopReroll' }>, r: RNG) {
   if (s.phase !== 'shop') return { state: s, rng: r };
-  if ((s.player.gold ?? 0) < SHOP_REROLL_COST) {
+  if (s.shopKind !== 'card' && s.shopKind !== 'equipment') return { state: s, rng: r };
+  const cost = markedUp(s, SHOP_REROLL_COST);
+  if ((s.player.gold ?? 0) < cost) {
     s.log.push('Shop: Not enough gold to reroll');
     return { state: s, rng: r };
   }
-  s.player.gold -= SHOP_REROLL_COST;
-  { const out = stockFor(s, r, SHOP_STOCK_SIZE, s.shopKind === 'equipment' ? c => c.type === 'equipment' : undefined); r = out.rng; s.shopStock = out.items; }
-  s.log.push(`Shop: rerolled (-${SHOP_REROLL_COST}g)`);
+  s.player.gold -= cost;
+  { const out = s.shopKind === 'equipment' ? stockFor(s, r, 3, c => c.type === 'equipment') : nightShopStock(s, r); r = out.rng; s.shopStock = out.items; }
+  s.log.push(`Shop: rerolled (-${cost}g)`);
   return { state: s, rng: r };
 }
 
@@ -38,17 +83,25 @@ export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopRer
 //   return { state: s, rng: r };
 // }
 
+/** Price after the difficulty markup and ต่อรองเจ้าที่ (the next purchase only). */
+export function shopPrice(s: GameState, price: number): number {
+  const p = markedUp(s, price);
+  return s.shopPricePct != null ? Math.ceil(p * s.shopPricePct / 100) : p;
+}
+
 export function takeShop(s: GameState, cmd: Extract<Command, { type: 'TakeShop' }>, r: RNG) {
-  if (s.phase !== 'shop' || s.shopKind!=='card' || !s.shopStock) return { state: s, rng: r };
+  if (s.phase !== 'shop' || (s.shopKind !== 'card' && s.shopKind !== 'equipment') || !s.shopStock) return { state: s, rng: r };
   const i = cmd.index;
   const item = s.shopStock[i];
   if (!item) return { state: s, rng: r };
   if (!('card' in item)) return { state: s, rng: r }; // Only handle card items
-  if (s.player.gold < item.price) {
+  const price = shopPrice(s, item.price);
+  if (s.player.gold < price) {
     s.log.push('Shop: Not enough gold');
     return { state: s, rng: r };
   }
-  s.player.gold -= item.price;
+  s.player.gold -= price;
+  s.shopPricePct = undefined;
   s.masterDeck.push(JSON.parse(JSON.stringify(item.card)));
   
   // Track bought item for shop persistence
@@ -67,7 +120,7 @@ export function takeShop(s: GameState, cmd: Extract<Command, { type: 'TakeShop' 
 export function shopRemoveBuy(s: GameState, cmd: Extract<Command, { type: 'ShopRemoveBuy' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'remove') return { state: s, rng: r };
   const count = (s.runCounters?.removeShopCount ?? 0);
-  const price = removeCostForCount(count);
+  const price = removePrice(s);
   if ((s.player.gold ?? 0) < price) {
     s.log.push(`Remove shop: Not enough gold (${price}g).`);
     return { state: s, rng: r };
@@ -79,6 +132,7 @@ export function shopRemoveBuy(s: GameState, cmd: Extract<Command, { type: 'ShopR
   s.masterDeck.splice(i, 1);
   s.runCounters = s.runCounters || ({} as any);
   (s.runCounters as any).removeShopCount = count + 1;
+  s.shopBoughtItems = [...(s.shopBoughtItems ?? []), { card: { id: 'remove', name: 'สละการ์ด' } as any, price }];
   s.log.push(`Remove shop: removed card #${i} (-${price}g).`);
   if (s.pages) s.pages._shopUsed = true;
   return { state: s, rng: r };
@@ -118,7 +172,7 @@ export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'Shop
   // ราคาคิดจากทั้งจำนวนครั้งที่ใช้ร้าน **และขั้นของใบนั้น** — ปั้นใบเดียวให้สุด
   // จึงแพงกว่าไล่ปลุกหลายใบขั้นละหนึ่ง ซึ่งเป็นการแลกที่ควรรู้สึกได้
   const count = (s.runCounters?.upgradeShopCount ?? 0);
-  const price = upgradeCostForCount(count + upgradeLevelOf(s.masterDeck[i]));
+  const price = upgradePrice(s);
   if ((s.player.gold ?? 0) < price) {
     s.log.push(`เบี้ยไม่พอ (ต้องการ ${price})`);
     return { state: s, rng: r };
@@ -128,6 +182,7 @@ export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'Shop
   s.masterDeck[i] = upgradeCard(s.masterDeck[i]);
   s.runCounters = s.runCounters || ({} as any);
   (s.runCounters as any).upgradeShopCount = count + 1;
+  s.shopBoughtItems = [...(s.shopBoughtItems ?? []), { card: { id: 'upgrade', name: 'ปลุกเสก' } as any, price }];
   s.log.push(`Upgrade shop: upgraded card #${i} (-${price}g).`);
   if (s.pages) s.pages._shopUsed = true;
   return { state: s, rng: r };
@@ -194,7 +249,7 @@ export function eventTreasureOpen(s: GameState, _cmd: Extract<Command, { type: '
 
 // === Openers used by map_pages ==============================================
 export function openShopCard(s: GameState, r: RNG): { state: GameState; rng: RNG } {
-  const out = stockFor(s, r, 3); r = out.rng;
+  const out = nightShopStock(s, r); r = out.rng;
   s.shopStock = out.items;
   s.shopKind = 'card';
   s.shopBoughtItems = [];
@@ -207,7 +262,7 @@ export function openShopRemove(s: GameState, r: RNG): { state: GameState; rng: R
   s.shopBoughtItems = []; // Reset bought items tracker
   s.phase = 'shop';
   // ไม่จำเป็นต้องคำนวณราคา ณ จุดเปิดร้าน เพราะ UI อาจอ่านจาก removeCostForCount ตอนกดซื้อ
-  s.log.push(`Shop(remove): cost now = ${removeCostForCount(s.runCounters?.removeShopCount ?? 0)}g`);
+  s.log.push(`Shop(remove): cost now = ${removePrice(s)}g`);
   return { state: s, rng: r };
 }
 
@@ -215,7 +270,7 @@ export function openShopUpgrade(s: GameState, r: RNG): { state: GameState; rng: 
   s.shopKind = 'upgrade';
   s.shopBoughtItems = []; // Reset bought items tracker
   s.phase = 'shop';
-  s.log.push(`Shop(upgrade): cost now = ${upgradeCostForCount(s.runCounters?.upgradeShopCount ?? 0)}g`);
+  s.log.push(`Shop(upgrade): cost now = ${upgradePrice(s)}g`);
   return { state: s, rng: r };
 }
 
@@ -253,8 +308,8 @@ export function useHealingShrine(s: GameState, _cmd: Extract<Command, { type: 'U
   if (s.phase !== 'shop' || s.shopKind !== 'healing') return { state: s, rng: r };
   
   const healCount = (s as any).healingShrine?.timesUsed ?? 0;
-  const healCost = 25 + (healCount * 10);
-  const maxUses = 3;
+  const healCost = shrineCost(s);
+  const maxUses = ECONOMY.shrine.uses;
   
   // Check if can use
   if (healCount >= maxUses) {
@@ -274,8 +329,8 @@ export function useHealingShrine(s: GameState, _cmd: Extract<Command, { type: 'U
   
   // Use healing shrine
   s.player.gold -= healCost;
-  const healAmount = s.player.maxHp - s.player.hp; // Full heal
-  s.player.hp = s.player.maxHp;
+  const healed = healAmount(s, s.player.maxHp - s.player.hp); // full heal, half from DIFFICULTY.priceFrom
+  s.player.hp += healed;
   
   // Track usage
   if (!(s as any).healingShrine) {
@@ -288,16 +343,21 @@ export function useHealingShrine(s: GameState, _cmd: Extract<Command, { type: 'U
   if (!s.shopBoughtItems) s.shopBoughtItems = [];
   s.shopBoughtItems.push({ card: { id: 'healing', name: 'Full Heal' } as any, price: healCost });
   
-  s.log.push(`Healing Shrine: used (+${healAmount} HP, -${healCost}g). Uses: ${(s as any).healingShrine.timesUsed}/${maxUses}`);
+  s.log.push(`Healing Shrine: used (+${healed} HP, -${healCost}g). Uses: ${(s as any).healingShrine.timesUsed}/${maxUses}`);
   return { state: s, rng: r };
 }
+
+export function shrineCost(s: Partial<GameState>): number {
+  return markedUp(s, ECONOMY.shrine.price + ((s as any).healingShrine?.timesUsed ?? 0) * ECONOMY.shrine.step);
+}
+export function wellHeal(s: Partial<GameState>): number { return healAmount(s, ECONOMY.well.heal); }
 
 export function useWell(s: GameState, _cmd: Extract<Command, { type: 'UseWell' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'well') return { state: s, rng: r };
   
   const wellCount = (s as any).mysticalWell?.timesUsed ?? 0;
-  const maxUses = 2; // Free uses only
-  const healAmount = 10; // Fixed heal amount
+  const maxUses = ECONOMY.well.uses;
+  const heal = wellHeal(s);
   
   // Check if can use
   if (wellCount >= maxUses) {
@@ -311,7 +371,7 @@ export function useWell(s: GameState, _cmd: Extract<Command, { type: 'UseWell' }
   }
   
   // Use well for FREE
-  const actualHeal = Math.min(healAmount, s.player.maxHp - s.player.hp);
+  const actualHeal = Math.min(heal, s.player.maxHp - s.player.hp);
   s.player.hp += actualHeal;
   
   // Track usage

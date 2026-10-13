@@ -68,6 +68,7 @@ const ENCOUNTERS: ArtSlot[] = [
   { id: 'encounter/shop_remove',     label: 'สละการ์ด',       file: 'ui/remove-torn-card-b17.webp',       size: [200, 200], brief: 'กองไฟเผากระดาษยันต์ สื่อถึงการทิ้งการ์ด', group: 'encounter' },
   { id: 'encounter/shop_upgrade',    label: 'ปลุกเสกการ์ด',   file: 'encounters/thai-v29/upgrade-altar.webp',      size: [200, 200], brief: 'โต๊ะพิธี ธูปเทียน สื่อถึงการปลุกเสก', group: 'encounter' },
   { id: 'encounter/well',            label: 'บ่อน้ำลึกลับ',   file: 'encounters/enWell.png',         size: [200, 200], brief: 'บ่อน้ำหินเก่า มีแสงเรืองจากก้นบ่อ', group: 'encounter' },
+  { id: 'encounter/blessing',        label: 'ศาลพร',          file: 'ui/blessing-amulet.png',              size: [200, 200], brief: 'ศาลเพียงตาหลังเก่า ธูปสามดอกยังไม่มอด', group: 'encounter' },
   { id: 'encounter/healing_shrine',  label: 'ศาลพักใจ',       file: 'ui/blessing-shrine-object.png',       size: [200, 200], brief: 'ศาลพระภูมิเล็กๆ มีผ้าแพรและธูปจุดค้างอยู่', group: 'encounter' },
   { id: 'encounter/treasure',        label: 'หีบสมบัติ',      file: 'encounters/enTreasureOpenMini.png', size: [200, 200], brief: 'หีบไม้เก่าเปิดอยู่ มีแสงลอดออกมา', group: 'encounter' },
   { id: 'encounter/treasure_single', label: 'สมบัติชิ้นเดียว', file: 'encounters/thai-v29/treasure-single.webp',    size: [200, 200], brief: 'ห่อผ้าเล็กๆ วางบนตอไม้ มีของชิ้นเดียวข้างใน', group: 'encounter' },

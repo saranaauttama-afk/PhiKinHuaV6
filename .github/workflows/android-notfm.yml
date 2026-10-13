@@ -1,0 +1,115 @@
+name: NOTFM rebuild APK
+on:
+  push:
+    branches: ['work/notfm-phase6', 'work/notfm-phase7-research', 'work/tuning-before-store']
+    paths-ignore: ['**/*.md', 'docs/playtest-2026-10-13/*.json', 'scripts/android-feedback-smoke.py', '.github/workflows/feedback-native-verify.yml']
+  workflow_dispatch:
+concurrency:
+  group: notfm-apk-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test -- --maxWorkers=2 --testTimeout=60000 --silent
+      - name: Export mobile web verification build
+        run: CI=1 EXPO_PUBLIC_UI_REVIEW=1 npx expo export --platform web --output-dir /tmp/phikinhua-phase7-web
+      - name: Mobile browser tests with runner's installed Chrome
+        run: |
+          npm install --no-save playwright@1.62.1
+          npx vite-node --config vitest.config.ts scripts/phase7-fixtures.ts
+          PHIKINHUA_CHROMIUM_PATH=$(command -v google-chrome) node scripts/phase7-mobile-check.cjs
+      - name: Simulate class/difficulty smoke matrix
+        run: npm run balance -- --runs 3 --difficulty 1,3,5 --out phase7-audit/ci-balance.json
+      - name: Publication content scan
+        run: python scripts/phase7-release-audit.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: NOTFM-Phase7-verification
+          path: phase7-audit/
+          if-no-files-found: warn
+  android:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - run: CI=1 npx expo prebuild --platform android
+      - name: Build release APK (normal play, no QA win card)
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
+      - name: Verify signing, package and alignment
+        run: |
+          mkdir -p apk-audit
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
+          "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
+          grep "package: name='com.phikinhua.episode' versionCode='44' versionName='1.0.43'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-NOTFM-v1.0.43.apk
+          sha256sum PhiKinHua-NOTFM-v1.0.43.apk > apk-audit/sha256.txt
+          git rev-parse HEAD > apk-audit/source-commit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhiKinHua-NOTFM-APK
+          path: PhiKinHua-NOTFM-v1.0.43.apk
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NOTFM-APK-audit
+          path: apk-audit/
+
+  native:
+    needs: android
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-NOTFM-APK
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-NOTFM-v1.0.43.apk
+            python scripts/android-feedback-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: NOTFM-feedback-native
+          path: feedback-native-audit/

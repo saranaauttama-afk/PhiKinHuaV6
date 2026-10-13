@@ -126,6 +126,16 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     }
   },
 
+  rage: {
+    id: 'rage',
+    name: 'โกรธ',
+    description: 'ทุกหมัดแรงขึ้นตามจำนวนชั้น และเพิ่มขึ้นทุกเทิร์นจนจบไฟต์',
+    defaultDuration: 99,
+    stackable: true,
+    maxStacks: 99,
+    tags: ['buff', 'damage_boost'],
+  },
+
   strength: {
     id: 'strength',
     name: 'ความแข็งแกร่ง',

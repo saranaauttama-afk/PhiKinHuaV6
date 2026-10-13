@@ -1,0 +1,378 @@
+{
+  "syntheticFixtures": true,
+  "checks": [
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "bag tabs show live blessing costs; prepared owned equipment persists after reload",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "hand draw retain details and class skill picture opens correct sheet",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20322.399999999965,
+      "pausedCombatMs": 20322.399999999965,
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "normal-card victory returns to surviving pages; opening/closing bag does not replay fade or reroll",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "check": "map hand limit reflects ongoing negative blessing rule rather than base value",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "bag tabs show live blessing costs; prepared owned equipment persists after reload",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "hand draw retain details and class skill picture opens correct sheet",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20304.100000000035,
+      "pausedCombatMs": 20304.100000000035,
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "normal-card victory returns to surviving pages; opening/closing bag does not replay fade or reroll",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "check": "map hand limit reflects ongoing negative blessing rule rather than base value",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "bag tabs show live blessing costs; prepared owned equipment persists after reload",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "hand draw retain details and class skill picture opens correct sheet",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20404.70000000007,
+      "pausedCombatMs": 20404.70000000007,
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "normal-card victory returns to surviving pages; opening/closing bag does not replay fade or reroll",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "check": "map hand limit reflects ongoing negative blessing rule rather than base value",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "warrior starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "shaman starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "nun starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "medium starter 10 visible",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "bag tabs show live blessing costs; prepared owned equipment persists after reload",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "hand draw retain details and class skill picture opens correct sheet",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "8 types and owned pre-equipment",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "archive filter offers all eight current types",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "prayer 3/2/1/resolved, detail, pause exclusion, saved equipment",
+      "activeCombatMs": 20392.400000000023,
+      "pausedCombatMs": 20392.400000000023,
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "normal-card victory returns to surviving pages; opening/closing bag does not replay fade or reroll",
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "check": "map hand limit reflects ongoing negative blessing rule rather than base value",
+      "result": "passed"
+    }
+  ],
+  "errors": [],
+  "sourceSha": "1f7cd983a9a7efacf79252ce568604e938ef47f5",
+  "workflowRun": 38380455411,
+  "verificationArtifact": 11802444784,
+  "visualInspection": {
+    "widths": [
+      320,
+      360,
+      393,
+      412
+    ],
+    "scope": "Final-source 320px bag, blessing, negative-hand detail and returned-page captures inspected. Bag/blessing wide layouts and other unchanged component layouts were also checked in the preceding source; all final responsive interactions reran in CI."
+  }
+}

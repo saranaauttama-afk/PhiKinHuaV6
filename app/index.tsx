@@ -1,3 +1,4 @@
+import EquipmentPicker from './components/EquipmentPicker';
 // app/index.tsx — Clean version for redesign
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -49,7 +50,8 @@ export default function Home() {
   const [journalOpen,setJournalOpen]=useState(false);
   const [archiveOpen,setArchiveOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
-  const [blessingsOpen, setBlessingsOpen] = useState(false);
+  const [equipmentOffer,setEquipmentOffer]=useState<number|null>(null);
+  const [bagTab,setBagTab]=useState<'deck'|'blessings'>('deck');
 
   const [fontsLoaded] = useAppFonts();
   const pad = useScreenPadding();
@@ -70,7 +72,7 @@ export default function Home() {
   }, [state.phase,state.chapter,state.runSummary,journalOpen,nightClass,pickingClass,returnToMainMenu]);
 
   useEffect(() => {
-    if (['combat','victory','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
+    if (['combat','victory','talk','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
   },[state.phase,state.enemy?.id,state.chapter]);
 
   const page   = state.pages?.current;
@@ -78,6 +80,7 @@ export default function Home() {
 
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
+    if((offer.kind==='monster'||offer.kind==='boss')&&state.masterDeck.some(c=>c.type==='equipment')){setEquipmentOffer(index);return;}
     dispatch({ type: 'ChooseOffer', index });
 
     // Restored and newly entered fights share the combat redirect above.
@@ -175,7 +178,7 @@ export default function Home() {
       <SceneArrival instant={state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex} sceneKey={`${location.key}:board-${state.pages?.adventure?.boardIndex}`} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
 
-          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
+          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices appearanceKey={`${state.phase}:${state.fightCount??0}`} offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
           {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool
@@ -187,8 +190,9 @@ export default function Home() {
 
           <PlayerStatusBar
             state={state}
-            onOpenDeck={() => dispatch({ type: 'OpenDeck' })}
-            onOpenBlessings={() => setBlessingsOpen(true)}
+            onOpenDeck={() => {setBagTab('deck');dispatch({ type: 'OpenDeck' });}}
+            onOpenBlessings={() => {setBagTab('blessings');dispatch({type:'OpenDeck'});}}
+            onUseSkill={(id, index) => dispatch({ type: 'UseSkill', id, index })}
           />
 
         </Scrim>
@@ -199,14 +203,10 @@ export default function Home() {
 
       {/* สำรับเป็นจอทับเต็มจอ วางนอก Scrim เพื่อให้อยู่เหนือทุกอย่าง
           เดิมวางเป็นบล็อกไหลอยู่ในคอลัมน์กลางแผนที่ จึงล้นออกนอกจอ */}
-      <DeckView state={state} dispatch={dispatch} />
+      {equipmentOffer!==null&&<EquipmentPicker state={state} onCancel={()=>setEquipmentOffer(null)} onConfirm={equipmentIndices=>{const index=equipmentOffer;setEquipmentOffer(null);dispatch({type:'ChooseOffer',index,equipmentIndices});}}/>}
+      <DeckView state={state} dispatch={dispatch} initialTab={bagTab} />
 
-      {blessingsOpen && (
-        <BlessingView
-          blessings={state.blessings}
-          onClose={() => setBlessingsOpen(false)}
-        />
-      )}
+
 
     </View>
   );

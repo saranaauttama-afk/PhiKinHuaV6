@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  Easing,
   withSequence,
   withDelay,
   cancelAnimation,
@@ -53,7 +54,7 @@ export default function Card({
   const [isHovered, setIsHovered] = useState(false);
   const reducedMotion=useGameSettings(s=>s.reducedMotion);
   const entrance=useSharedValue(reducedMotion?1:0);
-  React.useEffect(()=>{entrance.value=reducedMotion?1:withDelay(animationDelay,withTiming(1,{duration:420}));},[reducedMotion]);
+  React.useEffect(()=>{entrance.value=reducedMotion?1:withDelay(animationDelay,withTiming(1,{duration:380,easing:Easing.out(Easing.cubic)}));},[reducedMotion]);
 
   const updateHoverState = (hovered: boolean) => {
     setIsHovered(hovered);
@@ -155,12 +156,14 @@ export default function Card({
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: shakeX.value - 24*(1-entrance.value) },
-      { translateY: translateY.value + dragOffsetY.value + 26*(1-entrance.value) },
-      { rotate: `${-6*(1-entrance.value)}deg` },
-      { scale: scale.value },
+      // Drawn cards slide up from the draw pile (bottom-left) into place.
+      { translateX: shakeX.value - 150*(1-entrance.value) },
+      { translateY: translateY.value + dragOffsetY.value + 110*(1-entrance.value) },
+      { rotate: `${-12*(1-entrance.value)}deg` },
+      { scale: scale.value*(.6+.4*entrance.value) },
     ],
-    opacity: opacity.value,
+    // Never fully hidden: a live card stays readable even if the timing is skipped.
+    opacity: opacity.value*(.25+.75*entrance.value),
   }));
 
   return (

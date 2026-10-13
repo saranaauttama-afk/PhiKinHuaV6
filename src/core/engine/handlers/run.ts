@@ -18,13 +18,15 @@ export function newRun(
   s = baseNewState(cmd.seed);
   // Every run is the three-night campaign. Difficulty defaults to the first tier.
   const difficulty=cmd.difficulty&&Number.isInteger(cmd.difficulty)&&cmd.difficulty>=1&&cmd.difficulty<=5?cmd.difficulty:1;
-  s.campaign={night:1,difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])]};
+  s.campaign={night:1,difficulty,completedNights:0,unlocks:[...new Set(cmd.unlocks??[])],courage:0,merit:0,talked:[],talksThisNight:0,veteran:!!cmd.veteran,blessingTier:Math.max(0,Math.floor(cmd.blessingTier??0)),milestoneLevel:Math.max(0,Math.min(4,Math.floor(cmd.milestoneLevel??0)))};
   s.blessings = s.blessings ?? [];
   s.turnFlags = s.turnFlags ?? { blessingOnce: {} };
   s.runCounters = { removed: 0, removeShopCount: 0, upgradeShopCount: 0 };
 
   const cls = getClass(cmd.classId);
   s.classId = cls.id;
+  require('../../skills').initSkills(s);
+  s.shopPricePct = undefined;
   s.player.maxHp = s.player.hp = cls.startHp;
   s.player.startMana = cls.startMana;
   s.equipmentSlotsMax = CARD_RULES.equipmentSlots;
@@ -37,7 +39,7 @@ export function newRun(
 
   // Starter blessing
   s.levelUp = null;
-  const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id)); r = bb.rng;
+  const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), 2, s.campaign?.blessingTier ?? 0); r = bb.rng;
   if(s.campaign?.unlocks.includes('blessing'))bb.list.push(require('../../pack').classBlessing(cls.id));
   s.starter = { choices: bb.list, consumed: false };
   s.phase = 'starter';

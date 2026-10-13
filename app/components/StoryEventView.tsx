@@ -22,7 +22,7 @@ export default function StoryEventView({state,dispatch}:{state:GameState;dispatc
     <SceneArrival instant source={location.source} sceneKey={location.key}>
       <ScrollView contentContainerStyle={{flexGrow:1,justifyContent:'flex-end',paddingHorizontal:16,paddingTop:pad.top+(decided?24:240),paddingBottom:pad.bottom+20}}>
         <RitualSurface kind="quietSlate" style={{paddingHorizontal:18,paddingVertical:20,gap:14}}>
-          <Image testID="story-object" accessible={false} source={storyObject(story.eventId)} resizeMode="contain" style={{width:'100%',height:decided?56:100}}/>
+          <Image testID="story-object" accessible={false} source={storyObject(ev.id)} resizeMode="contain" style={{width:'100%',height:decided?56:100}}/>
           <Text accessibilityRole="header" style={{fontFamily:font.heading,color:palette.moon,fontSize:24}}>{ev.title}</Text>
           {decided&&<RewardReceiptView receipt={state.rewardReceipt}/>}
           <Text style={{fontFamily:font.ui,color:palette.text,fontSize:14,lineHeight:24}}>{decided?story.result:ev.text}</Text>
@@ -35,7 +35,7 @@ export default function StoryEventView({state,dispatch}:{state:GameState;dispatc
               <CandleSelection selected={selected===i} dim={selected!==null&&selected!==i}><RitualSurface kind="quietSlate" style={{minHeight:choiceHeight,flexDirection:'row',gap:12,alignItems:'center',paddingHorizontal:18,paddingVertical:12}}>
                 <Image accessible={false} source={image} resizeMode="contain" style={{width:42,height:50}}/>
                 <View onLayout={e=>setChoiceHeight(h=>Math.max(h,e.nativeEvent.layout.height+24))} style={{flex:1}}>
-                  <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:15,lineHeight:23}}>{parts[0]}</Text>
+                  <Text style={{fontFamily:font.heading,color:palette.moon,fontSize:15,lineHeight:23}}>{parts[0]}{state.eventMemory?.[ev.id]===i?' · เคยเลือก':''}</Text>
                   {parts.length>1&&<Text style={{fontFamily:font.ui,color:c.branches?palette.bloodLit:palette.text,fontSize:13,lineHeight:21,marginTop:3}}>{parts.slice(1).join(' · ')}</Text>}
                   {c.preview&&<Text style={{fontFamily:font.ui,color:palette.text,fontSize:12,lineHeight:20,marginTop:4}}>{c.preview}</Text>}
                   {locked&&<Text style={{fontFamily:font.ui,color:palette.bloodLit,fontSize:12,lineHeight:20}}>{locked}</Text>}

@@ -465,6 +465,8 @@ export function modifyDamageForStatusEffects(state: GameState, baseDamage: numbe
       const stacks = getStatusEffectStacks('enemy', state, 'strength');
       modifiedDamage += stacks;
     }
+    // Rage: the longer the fight, the harder each hit.
+    modifiedDamage += getStatusEffectStacks('enemy', state, 'rage');
     
     if (hasStatusEffect('enemy', state, 'weakness')) {
       const stacks = getStatusEffectStacks('enemy', state, 'weakness');

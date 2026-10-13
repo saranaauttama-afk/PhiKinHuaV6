@@ -148,7 +148,7 @@ export default function EnemyHandCard({
       {/* Front face */}
       <Animated.View style={frontStyle}>
         {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:4}}>
-          <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:18}}>พลัง {card.cost??1}</Text>
+          <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:18}}>{card.cost?`${card.cost} แต้ม`:'ฟรี'}</Text>
           {ownerId?<Image testID="enemy-card-owner-art" accessible={false} source={artSource(`monster/${ownerId}`)} resizeMode="contain" style={{width:68,height:68}}/>:<CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'action',fx:{}}} size={68}/>}
           <Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.heading,fontSize:22,textAlign:'center'}}>{card.name}</Text>
           {card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:22}}>โจมตี {card.damage}{(card.hits??1)>1?` ×${card.hits}`:''}</Text>}

@@ -1,6 +1,5 @@
 // Commands — pure helpers used by reducer
-// baseNewState, buildAndShuffleDeck, drawCards, startPlayerTurn, isVictory/isDefeat, endEnemyTurn
-// isVictory/isDefeat, endEnemyTurn
+// baseNewState, buildAndShuffleDeck, drawCards, startPlayerTurn, beginPlayerFight, isVictory/isDefeat, startCombat
 import type { CardData, GameState } from './types';
 import { START_DECK, START_GOLD, START_HP, nextExpForLevel } from './balance';
 import { CARD_RULES } from './balance/notfm';
@@ -8,7 +7,6 @@ import { shuffle, type RNG } from './rng';
 import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
 import { dealDamage, gainBlock, heal } from './combat/damage';
 
-let _instanceCounter = 0;
 
 // NOTE: We keep state updates pure by working on shallow copies of containers.
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -21,7 +19,7 @@ export function baseNewState(seed: string): GameState {
     player: {
       hp: START_HP, maxHp: START_HP, block: 0,
       ap: CARD_RULES.apPerTurn, maxAp: CARD_RULES.apPerTurn, mana: 0, startMana: 0,
-      openingDraw: CARD_RULES.openingDraw, drawPerTurn: CARD_RULES.drawPerTurn, handMax: CARD_RULES.handMax,
+      openingDraw: CARD_RULES.openingDraw, drawPerTurn: CARD_RULES.drawPerTurn, handMax: CARD_RULES.handMax, retain: CARD_RULES.retain,
       gold: START_GOLD, level: 1, exp: 0, expToNext: nextExpForLevel(1),
     },
     enemy: undefined,
@@ -52,10 +50,9 @@ export function buildAndShuffleDeck(_state: GameState, _rng: RNG): { state: Game
   let state = _state;
   let rng = _rng;
   const source = state.masterDeck?.length ? state.masterDeck : START_DECK;
-  const out = shuffle(rng, source);
-  _instanceCounter = 0;
+  const out = shuffle(rng, source.map((c,i)=>({...c,instanceId:`${c.id}__${i+1}`})));
   state.piles = {
-    draw: out.array.map(c => ({ ...c, instanceId: `${c.id}__${++_instanceCounter}` })),
+    draw: out.array,
     hand: [], discard: [], exhaust: [],
   };
   rng = out.rng;
@@ -67,10 +64,12 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   require('./cards/mechanics').resetCardsPlayed(state);
   state.player.ap = state.player.maxAp;
   state.player.block = 0;
+  // สำรวมจิต lasts until the start of the next player turn.
+  if (state.fight) state.fight.halfDamage = false;
   processStatusEffectsOnTurnStart('player', state);
   rng = require('./cards/play').resolvePrayers(state, rng);
   if (state.phase !== 'combat') return { state, rng };
-  ({ state, rng } = drawCards(state, rng, state.player.drawPerTurn));
+  ({ state, rng } = drawCards(state, rng, Math.max(1,state.player.drawPerTurn)));
   rng = require('./cards/passives').runTriggers(state, 'turnStart', rng);
   require('./cards/testWin').dealTestWinCard(state);
   return { state, rng };
@@ -84,13 +83,17 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   ({ state: s, rng } = buildAndShuffleDeck(s, rng));
   s.cardHistory = []; s.cardHistorySeq = 0;
   s.equipped = []; s.prayers = []; s.traps = [];
+  s.fight = { hpLost: 0, ghostTurns: 0 };
+  require('./campaign/bossRules').initBossRelic(s);
+  require('./skills').tickSkillCooldowns(s);
   s.player.block = 0;
   s.player.ap = s.player.maxAp;
   s.player.mana = s.player.startMana;
   require('./cards/mechanics').resetCardsPlayed(s);
-  ({ state: s, rng } = drawCards(s, rng, s.player.openingDraw));
+  rng = require('./cards/equipment').prepareEquipment(s,rng);
+  const opening=require('./cards/hand').openingHandSize(s);
+  ({ state: s, rng } = drawCards(s, rng, opening));
   rng = require('./cards/passives').runTriggers(s, 'battleStart', rng);
-  require('./classes').applyClassCombatStart(s);
   require('./cards/testWin').dealTestWinCard(s);
   return rng;
 }
@@ -101,26 +104,6 @@ export function isVictory(state: GameState): boolean {
 
 export function isDefeat(state: GameState): boolean {
   return state.player.hp <= 0;
-}
-
-export function endPlayerTurn(state: GameState) {
-  // Process status effects at end of player turn (poison, regeneration, etc.)
-  const { processStatusEffectsOnTurnEnd } = require('./statusEffectsRuntime');
-  processStatusEffectsOnTurnEnd('player', state);
-  processStatusEffectsOnTurnEnd('enemy', state);
-}
-
-export function endEnemyTurn(state: GameState) {
-  // ★ Process all advanced systems before enemy turn
-  const { processEnemyTurnBehaviors } = require('./enemyBehaviorRuntime');  
-  
-  // (Environment system removed)
-  
-  processEnemyTurnBehaviors(state);
-  
-  // Run standard enemy turn
-  const { runEnemyTurn } = require('./engine/handlers/enemy');
-  runEnemyTurn(state);
 }
 
 // ===== START COMBAT =====
@@ -144,31 +127,13 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG): RNG
     return;
   }
 
-  const deck=require('./monsters/monster-decks').deckForMonster(monsterData);
-  // Initialize combat state
   state.phase = 'combat';
   state.cardHistory = []; state.cardHistorySeq = 0;
   state.enemy = {
-    id: monsterData.id,
-    name: monsterData.name,
-    hp: monsterData.hp,
-    maxHp: monsterData.hp,
-    dmg: 5, // Default damage
-    block: 0,
-    ai: {
-      cycle: ['attack', 'defend'],
-      index: 0,
-      deck
-    },
-    intentCardId: null,
-    maxEnergy: deck.maxEnergy,
-    handSize: deck.handSize,
-    statusEffects: []
+    id: monsterData.id, name: monsterData.name, hp: monsterData.hp, maxHp: monsterData.hp, block: 0,
+    deck: require('./monsters/monster-decks').deckForMonster(monsterData), statusEffects: [],
   };
-
-  // Initialize enemy deck and hand
   state.enemyPiles = { draw: [], hand: [], discard: [] };
-  state.enemyEnergy = 0;
 
   if (rng) {
     const enemyHandlers = require('./engine/handlers/enemy');

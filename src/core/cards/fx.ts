@@ -58,6 +58,22 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
     applyStatusEffect(target, s, e.id, e.turns, e.stacks);
   }
   if (eff.borrow) require('./borrow').borrowEnemyCards(s, eff.borrow);
-  if (eff.draw) rng = drawCards(s, rng, eff.draw);
+  if (eff.draw) rng = drawCards(s, rng, fxDrawAllowance(s, eff.draw));
   return rng;
+}
+
+/**
+ * Effect draws left this player turn (CARD_RULES.fxDrawPerTurn). Counts what was asked for,
+ * so a draw that finds an empty pile still uses the allowance. Outside a fight: no limit.
+ */
+export function fxDrawAllowance(s: GameState, want: number): number {
+  const f = s.fight;
+  if (!f) return want;
+  const turn = s.turn ?? 1;
+  if (f.fxDrawTurn !== turn) { f.fxDrawTurn = turn; f.fxDrawn = 0; }
+  const { CARD_RULES } = require('../balance/notfm');
+  const n = Math.max(0, Math.min(want, CARD_RULES.fxDrawPerTurn - (f.fxDrawn ?? 0)));
+  f.fxDrawn = (f.fxDrawn ?? 0) + n;
+  if (n < want) s.log.push(`จั่วจากการ์ดเต็มแล้วเทิร์นนี้ (สูงสุด ${CARD_RULES.fxDrawPerTurn})`);
+  return n;
 }

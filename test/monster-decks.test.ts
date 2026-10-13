@@ -6,6 +6,7 @@ import type { PageOffer } from '../src/core/map/pages';
 import { THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
 import { deckForMonster, monstersWithoutDeck } from '../src/core/monsters/monster-decks';
 import { enemyCardById } from '../src/core/pack_enemy_cards';
+import { ENEMY_RULES } from '../src/core/balance/notfm';
 
 /**
  * ผีแต่ละตนต้องมีเด็คของตัวเอง
@@ -43,19 +44,16 @@ describe('การจับคู่เด็ค', () => {
 
   it('การ์ดที่อ้างถึงมีอยู่จริงในกองการ์ดศัตรู', () => {
     for (const m of ALL_MONSTERS) {
-      const owners = deckForMonster(m).pool.allowOwners;
-      expect(owners.length).toBeGreaterThan(0);
+      const deck = deckForMonster(m);
+      expect(deck.length, m.id).toBeGreaterThan(0);
+      for (const id of deck) expect(enemyCardById(id), `${m.id} → ${id}`).toBeDefined();
     }
   });
 
-  it('tier สูงกว่าได้พลังงานและมือไม่น้อยกว่า tier ต่ำ', () => {
-    const t1 = deckForMonster(THAI_GHOST_POOLS.T1[0]);
-    const t5 = deckForMonster(THAI_GHOST_POOLS.T5[0]);
-    const boss = deckForMonster(THAI_GHOST_POOLS.BossFinal[0]);
-
-    expect(t5.maxEnergy).toBe(t1.maxEnergy); // v34 normals stay at two energy; identity comes from effects.
-    expect(boss.maxEnergy).toBeGreaterThanOrEqual(t5.maxEnergy);
-    expect(boss.handSize).toBeGreaterThanOrEqual(t1.handSize);
+  it('บอสกับผีชั้นสูงมีแต้มและมือไม่น้อยกว่าผีธรรมดา', () => {
+    expect(ENEMY_RULES.elite.ap).toBeGreaterThanOrEqual(ENEMY_RULES.normal.ap);
+    expect(ENEMY_RULES.boss.ap).toBeGreaterThanOrEqual(ENEMY_RULES.elite.ap);
+    expect(ENEMY_RULES.boss.handSize).toBeGreaterThanOrEqual(ENEMY_RULES.normal.handSize);
   });
 });
 
@@ -71,12 +69,10 @@ describe('เด็คที่สร้างจริงตอนเข้า�
   it('การ์ดในเด็คมาจากกลุ่มที่จับคู่ไว้เท่านั้น', () => {
     for (const id of ['phi-krasue', 'phi-pop', 'phi-nang-ram', 'ngu-phi-sang']) {
       const monster = ALL_MONSTERS.find(m => m.id === id)!;
-      const allowed = deckForMonster(monster).pool.allowOwners;
-
+      const allowed = deckForMonster(monster);
       for (const cardId of deckOf(id)) {
-        const card = enemyCardById(cardId);
-        expect(card, `ไม่พบการ์ด ${cardId}`).toBeDefined();
-        expect(allowed).toContain(card!.owner ?? 'global');
+        expect(enemyCardById(cardId), `ไม่พบการ์ด ${cardId}`).toBeDefined();
+        expect(allowed).toContain(cardId);
       }
     }
   });
@@ -103,12 +99,8 @@ describe('เด็คที่สร้างจริงตอนเข้า�
     const draw: string[] = s.enemyPiles?.draw ?? [];
     expect(draw.length).toBeGreaterThan(0);
 
-    const allowed = deckForMonster(
-      ALL_MONSTERS.find(m => m.id === 'phaya-nak')!
-    ).pool.allowOwners;
-    for (const cardId of draw) {
-      expect(allowed).toContain(enemyCardById(cardId)!.owner ?? 'global');
-    }
+    const allowed = deckForMonster(ALL_MONSTERS.find(m => m.id === 'phaya-nak')!);
+    for (const cardId of draw) expect(allowed).toContain(cardId);
   });
 
   it('เด็คซ้ำได้ตาม seed', () => {

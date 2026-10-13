@@ -5,14 +5,14 @@ import { STATUS_EFFECTS_REGISTRY } from '../combat/status-effects/registry';
 import { conditionText } from './mechanics';
 import { starFx } from './model';
 
-export const TYPE_LABEL: Record<CardType, string> = {
-  attack: 'โจมตี', action: 'Action', spell: 'คาถา', equipment: 'อุปกรณ์',
-  mana: 'มานา', prayer: 'สวดภาวนา', counter: 'ตอบโต้', curse: 'คำสาป',
-};
+export {CARD_TYPE_LABELS as TYPE_LABEL} from './typesRegistry';
+import {CARD_TYPE_LABELS as TYPE_LABEL} from './typesRegistry';
 
 const statusName = (id: string) => STATUS_EFFECTS_REGISTRY[id as keyof typeof STATUS_EFFECTS_REGISTRY]?.name ?? id;
 
-export function fxText(fx: Fx): string[] {
+/** Effect text. `side` is who owns the effect: 'enemy' words it from the ghost's side. */
+export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
+  const self = side === 'player' ? 'เรา' : 'ผี', other = side === 'player' ? 'ผี' : 'เรา';
   const out: string[] = [];
   if (fx.dmg) out.push(`โจมตี ${fx.dmg}${(fx.hits ?? 1) > 1 ? ` ×${fx.hits}` : ''}`);
   if (fx.block) out.push(`เกราะ ${fx.block}`);
@@ -20,7 +20,7 @@ export function fxText(fx: Fx): string[] {
   if (fx.mana) out.push(`มานา +${fx.mana}`);
   if (fx.ap) out.push(`แต้ม +${fx.ap}`);
   for (const e of fx.status ?? []) {
-    out.push(`${e.to === 'self' ? 'เรา' : 'ผี'}ติด${statusName(e.id)} ${e.stacks}${e.turns < 99 ? ` (${e.turns} เทิร์น)` : ''}`);
+    out.push(`${e.to === 'self' ? self : other}ติด${statusName(e.id)} ${e.stacks}${e.turns < 99 ? ` (${e.turns} เทิร์น)` : ''}`);
   }
   if (fx.cleanse) out.push('ล้างสถานะลบ');
   if (fx.borrow) out.push(fx.borrow === 1 ? 'ยืมการ์ดล่าสุดของผี' : `ยืมการ์ด ${fx.borrow} ใบล่าสุดของผี`);
@@ -31,7 +31,7 @@ export function fxText(fx: Fx): string[] {
 const COUNTER_WHEN = { enemy_attack: 'เมื่อผีโจมตี', enemy_skill: 'เมื่อผีใช้วิชา', enemy_any: 'เมื่อผีเล่นการ์ด' } as const;
 const TRIGGER_WHEN: Record<Trigger['on'], string> = {
   battleStart: 'เริ่มไฟต์', equip: 'เมื่อสวม', turnStart: 'ต้นเทิร์น', turnEnd: 'ท้ายเทิร์น',
-  play: 'เมื่อเล่น', prayerDone: 'เมื่อบทสวดสำเร็จ',
+  discard:'เมื่อทิ้งท้ายเทิร์น', play: 'เมื่อเล่น', prayerDone: 'เมื่อบทสวดสำเร็จ',
 };
 
 export function passiveText(p: Passive): string[] {
@@ -46,7 +46,7 @@ export function passiveText(p: Passive): string[] {
 }
 
 /** Full rules text for a card at its current star. */
-export function describeCard(card: CardData): string {
+export function describeCard(card: CardData, side: 'player' | 'enemy' = 'player'): string {
   if (card.id === 'qa_phra_prathan') return 'ทดสอบ · ชนะผีทันที';
   if (card.type === 'curse') return 'เล่นไม่ได้ · ทิ้งเองท้ายเทิร์น';
   const parts: string[] = [];
@@ -58,8 +58,10 @@ export function describeCard(card: CardData): string {
   }
   if (card.type === 'prayer') lead = 'รอ 1–3 เทิร์น ผล ×1/×2/×3: ';
   if (card.type === 'equipment' && card.equip) parts.push(...passiveText(card.equip));
-  parts.push(...fxText(fx));
-  if (card.conditional) parts.push(`${conditionText(card.conditional.when)} +${fxText(card.conditional.bonus).join(' · ')}`);
+  parts.push(...fxText(fx, side));
+  if (card.conditional) parts.push(`${conditionText(card.conditional.when, side)} +${fxText(card.conditional.bonus, side).join(' · ')}`);
+  const curse = (card as { curseCard?: string }).curseCard;
+  if (curse) parts.push(`ใส่${require('../pack').curseById(curse)?.name ?? 'คำสาป'}ในกองทิ้งของเรา`);
   if (card.whileHeld) parts.push(`ถือไว้ท้ายเทิร์น: ${fxText(card.whileHeld).join(' · ')}`);
   if (card.counter?.turns) parts.push(`อยู่ ${card.counter.turns} เทิร์น`);
   if (card.limit === 'turn') parts.push('เทิร์นละครั้ง');

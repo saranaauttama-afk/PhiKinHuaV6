@@ -1,0 +1,129 @@
+[
+ {
+  "id": "rune_weapon",
+  "class": "warrior",
+  "slot": "A",
+  "name": "ลงยันต์อาวุธ",
+  "cd": 5,
+  "params": {},
+  "text": "เพิ่มดาวการ์ด 1 ใบในสำรับ"
+ },
+ {
+  "id": "muay_teacher",
+  "class": "warrior",
+  "slot": "B",
+  "name": "ครูสอนมวย",
+  "cd": 2,
+  "params": {},
+  "text": "การ์ดใบถัดไปที่เล่นได้สำเนาเข้ามือ สำเนาใช้แล้วนำออก"
+ },
+ {
+  "id": "diamond_heart",
+  "class": "warrior",
+  "slot": "C",
+  "name": "ใจเพชร",
+  "cd": 3,
+  "params": {},
+  "text": "ได้เกราะเท่าเลือดที่เสียไปในไฟต์นี้"
+ },
+ {
+  "id": "bargain",
+  "class": "shaman",
+  "slot": "A",
+  "name": "ต่อรองเจ้าที่",
+  "cd": 6,
+  "params": {
+   "pricePct": 50
+  },
+  "text": "ของชิ้นถัดไปที่ซื้อในร้านลดครึ่งราคา"
+ },
+ {
+  "id": "composure",
+  "class": "shaman",
+  "slot": "B",
+  "name": "สำรวมจิต",
+  "cd": 2,
+  "params": {
+   "manaPct": 50,
+   "damagePct": 50
+  },
+  "text": "เทิร์นนี้คาถาใช้มานาครึ่งเดียว และรับดาเมจจากผีครึ่งเดียวจนถึงเทิร์นหน้า"
+ },
+ {
+  "id": "consecrate",
+  "class": "shaman",
+  "slot": "C",
+  "name": "ปลุกเสก",
+  "cd": 4,
+  "params": {
+   "draw": 2,
+   "mult": 2
+  },
+  "text": "จั่ว 2 ใบ คาถาใบถัดไปได้ผลสองเท่า"
+ },
+ {
+  "id": "pray_change",
+  "class": "nun",
+  "slot": "A",
+  "name": "อธิษฐาน",
+  "cd": 6,
+  "params": {},
+  "text": "เปลี่ยนการ์ด 1 ใบในสำรับเป็นการ์ดแม่ชีแบบสุ่ม"
+ },
+ {
+  "id": "metta",
+  "class": "nun",
+  "slot": "B",
+  "name": "แผ่เมตตา",
+  "cd": 2,
+  "params": {
+   "healPct": 50,
+   "turns": 2
+  },
+  "text": "2 เทิร์น ฟื้นเลือดครึ่งหนึ่งของดาเมจที่ทำกับผี"
+ },
+ {
+  "id": "samadhi",
+  "class": "nun",
+  "slot": "C",
+  "name": "เข้าสมาธิ",
+  "cd": 4,
+  "params": {},
+  "text": "ได้เทิร์นเพิ่ม 1 เทิร์น (ผีไม่ได้เล่น) และบทสวดทุกบทนับรอบเพิ่ม 1 ทันที"
+ },
+ {
+  "id": "ask_ancestors",
+  "class": "medium",
+  "slot": "A",
+  "name": "ถามบรรพบุรุษ",
+  "cd": 6,
+  "params": {
+   "maxHp": 3,
+   "startMana": 2
+  },
+  "text": "เลือกถาวร: ชีวิตสูงสุด +3 หรือมานาเริ่มไฟต์ +2"
+ },
+ {
+  "id": "ghost_strength",
+  "class": "medium",
+  "slot": "B",
+  "name": "ยืมแรงผี",
+  "cd": 2,
+  "params": {
+   "hpCost": 2,
+   "draw": 2
+  },
+  "text": "เสียเลือด 2 แล้วจั่ว 2 ใบ"
+ },
+ {
+  "id": "possession",
+  "class": "medium",
+  "slot": "C",
+  "name": "ประทับทรง",
+  "cd": 4,
+  "params": {
+   "history": 6
+  },
+  "text": "เล่นสำเนาการ์ดผี 1 ใบจาก 6 ใบล่าสุดฟรี แล้วพิษบนผีทำงานทันที"
+ }
+]

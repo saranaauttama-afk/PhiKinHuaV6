@@ -9,7 +9,7 @@ export function rollNightCards(s:GameState,rng:RNG):{list:CardData[];rng:RNG}{
  const cls=getClass(s.classId);let r=rng;
  const fight=s.fightCount??0;
  const rarities: Array<keyof typeof BY_RARITY>=fight<3?['Common','Uncommon']:fight<7?['Common','Uncommon','Rare']:['Uncommon','Rare','Legendary'];
- const allowed=new Set(poolFor(cls.id).map(c=>c.id));
+ const allowed=new Set(poolFor(cls.id,s.campaign?.milestoneLevel??0).map(c=>c.id));
  const pool=rarities.flatMap(k=>BY_RARITY[k]).filter(c=>allowed.has(c.id));
  if(s.campaign?.unlocks.includes('card')){const special=cardById(SPECIAL_CARD_IDS[cls.id]);if(special)pool.push(special);}
  // Lanes: damage, survival, engine (draw, mana, statuses, equipment, counters).
