@@ -27,12 +27,18 @@ try:
   tap('^ยืนยันพร$');find('^สำรับ 10$');time.sleep(4)
   tap('^สำรับ 10$');find('ช่องสวมอุปกรณ์');find('ยังไม่มีอุปกรณ์ในสำรับ');shot(cls+'-bag')
   tap('^พร \\(');assert any('พร' in label(n) for n in nodes());shot(cls+'-blessings');tap('^ปิด$');checks.append(cls+': bag tabs and empty equipment slots')
-  ns=nodes();ghost=next(n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and ' · ต่อสู้' in label(n));x1,y1,x2,y2=map(int,re.findall(r'\d+',ghost.attrib['bounds']));adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2));tap('^เผชิญหน้า · ')
+  deadline=time.monotonic()+30
+  while time.monotonic()<deadline:
+   ns=nodes();ghost=next((n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and re.search(r' · (ผีระดับ|ผีชั้นสูง|ผีธรรมดา|บอส)',label(n))),None)
+   if ghost is not None:break
+   time.sleep(.4)
+  else:raise AssertionError('No ghost page control: '+str([label(n) for n in ns]))
+  x1,y1,x2,y2=map(int,re.findall(r'\d+',ghost.attrib['bounds']));adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2));tap('^เผชิญหน้า · ')
   find('^จบเทิร์น$');assert not any('พระประธาน' in label(n) for n in nodes());tap('^ในมือ \\d+ · มือสูงสุด');find('จั่วต่อเทิร์น');find('กองจั่ว');shot(cls+'-hand-detail');tap('^ปิด$')
   tap('^สกิล ');find('พักสกิล');shot(cls+'-skill');tap('^ปิด$');shot(cls+'-battle');checks.append(cls+': real combat hand details and class skill artwork/details')
  print('PASS',len(checks),'native checks',flush=True)
 except Exception as e:
- checks.append({'failed':str(e)});shot('failure');raise
+ checks.append({'failed':type(e).__name__+': '+str(e)});shot('failure');raise
 finally:
  (out/'results.json').write_text(json.dumps({'api':36,'syntheticFixtures':False,'checks':checks},ensure_ascii=False,indent=2))
  (out/'logcat.txt').write_text(adb('logcat','-d'))

@@ -2,7 +2,7 @@ name: NOTFM rebuild APK
 on:
   push:
     branches: ['work/notfm-phase6', 'work/notfm-phase7-research']
-    paths-ignore: ['**/*.md']
+    paths-ignore: ['**/*.md', 'docs/playtest-2026-10-13/*.json', 'scripts/android-feedback-smoke.py', '.github/workflows/feedback-native-verify.yml', '.github/workflows/android-notfm.yml']
   workflow_dispatch:
 concurrency:
   group: notfm-apk-${{ github.ref }}
