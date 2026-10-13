@@ -49,4 +49,6 @@ Reproduce: `npm run balance -- --runs 40 --difficulty 1,2,3,4,5 --seed tune`.
 
 `npx tsc --noEmit` clean; `npx vitest run` 40 files / 548 tests pass. New: `test/tuning-before-store.test.ts`. Updated for the new opening hand / growth night / level-5 rule: `backlog-v32`, `notfm-play`, `phase7`, `playtest-backlog`, `notfm-economy`. `card-reward` "skip every card" tolerance 3 → 4: the extra card comes from story events (each can give a card and a curse), not from fight rewards.
 
-Not done here: browser/native smoke and APK build (run by CI on push), physical-device play.
+CI [run 38402227074](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38402227074) on `e6bb253`: **verify, android and native all succeeded**. [APK 1.0.43 / code44](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38402227074/artifacts/11816932792) (installs over 1.0.42). The APK workflow now also builds on `work/tuning-before-store`.
+
+Not done: physical-device play and balance sign-off by the owner.
