@@ -43,7 +43,7 @@ The mobile tests use synthetic checkpoints to exercise all card types and queued
 - Local web export: completed. Local mobile execution could not start because Chromium was absent. The installer received HTML saying `Site Unavailable / Unable to access this site.` instead of an archive. No alternate URL or proxy was attempted. Mobile execution belongs to the independently requested GitHub workflow and uses its already-installed Chrome.
 - Fresh Phase 6 baseline: 400 seeded tactical bot runs, 20/class/difficulty. Zero stalls. Raw output: `phase6-baseline.json`.
 - Phase 7 full simulation: 400 seeded runs; zero stalls. Additional tier/milestone/alignment matrix: 96 runs; zero stalls. See `BALANCE.md` and raw JSON.
-- Scoped publication scan: 61 changed/new files checked, zero findings; reviewed content is game code/data, supplied research and synthetic test evidence. See `publication-scan.json`.
+- Scoped publication scan: 66 changed/new files checked, zero findings; reviewed content is game code/data, supplied research and synthetic test evidence. See `publication-scan.json`.
 - CI/mobile/APK results: recorded separately after completion; do not infer a pass from the implementation table.
 
 ## Remaining product validation
@@ -52,3 +52,17 @@ The mobile tests use synthetic checkpoints to exercise all card types and queued
 - Measure median human active run duration against the 60-minute goal using the new timer; simulation runtime is not player runtime.
 - Physical Android installation/playtest is separate from signature/package/alignment validation and responsive browser coverage.
 - Tutorial G11 and optional talent/nightmare systems were not among the user's nine requirements and are not added.
+
+## Delivery blocked at Git authentication
+
+Implementation commit: `d5a7ae556428717fc0839445bf2ad97d0defdcee` (local).
+
+The authorized command `git push origin HEAD:refs/heads/work/notfm-phase7-research` failed with exit 128:
+
+```
+fatal: could not read Username for 'https://github.com': No such device or address
+```
+
+No push succeeded, no PR was created, and the workflow could not be started on this implementation. No alternate write channel was used. Git credentials must be made available to this workspace before continuing the authorized publication. Mobile results, CI results and an APK for this implementation are still pending.
+
+Final local verification before delivery: TypeScript exit 0; 38 test files / 532 tests passed; web export completed; 400 Phase 7 balance runs plus 96 additional unlock/alignment runs completed without stalls. The local hashes identify the tested code/data/scripts. Responsive mobile tests were prepared but have no successful execution result in this environment.
