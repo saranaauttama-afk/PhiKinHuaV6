@@ -1,5 +1,12 @@
 # Phase 7 — NOTFM gap completion
 
+> **Post-audit update (13 Oct 2026, 1.0.39 / versionCode 40).** Read `DESIGN-DECISIONS.md` first: it
+> records why each rule and number is the way it is. Changes after the audit: bargain blessings no
+> longer stack on the same rule (fixed nun prayers costing 3 AP), the 16 existing class cards are
+> no longer milestone-locked, level 4+ starts rage one ghost turn sooner, research docs moved back
+> to `docs/research/notfm/`, raw simulation JSON removed. Current numbers: `BALANCE.md`.
+> The table below describes the original Phase 7 delivery; items 7–8 are superseded where noted there.
+
 Base: `work/notfm-phase6` / `bce58b93333e02e9ca214c0468e59bd5d89fada1`.
 Working branch: `work/notfm-phase7-research`. PR target: `work/notfm-phase6`.
 No merge to main and no force push. Android test release: 1.0.38 / versionCode 39.
@@ -41,7 +48,7 @@ The mobile tests use synthetic checkpoints to exercise all card types and queued
 - Local TypeScript: exit 0.
 - Local tests: 38 files / 532 tests passed.
 - Local web export: completed. Local mobile execution could not start because Chromium was absent. The installer received HTML saying `Site Unavailable / Unable to access this site.` instead of an archive. No alternate URL or proxy was attempted. Mobile execution belongs to the independently requested GitHub workflow and uses its already-installed Chrome.
-- Fresh Phase 6 baseline: 400 seeded tactical bot runs, 20/class/difficulty. Zero stalls. Raw output: `phase6-baseline.json`.
+- Fresh Phase 6 baseline: 400 seeded tactical bot runs, 20/class/difficulty. Zero stalls. (Raw JSON later removed from the repo.)
 - Phase 7 full simulation: 400 seeded runs; zero stalls. Additional tier/milestone/alignment matrix: 96 runs; zero stalls. See `BALANCE.md` and raw JSON.
 - Scoped publication scan: 66 changed/new files checked, zero findings; reviewed content is game code/data, supplied research and synthetic test evidence. See `publication-scan.json`.
 - CI/mobile/APK results: recorded separately after completion; do not infer a pass from the implementation table.

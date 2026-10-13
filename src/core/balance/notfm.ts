@@ -149,6 +149,22 @@ export const DIFFICULTY = {
   hpFrom: 2, hpPct: 20,
   /** From this level gold prices rise by `markupPct` and healing stops heal half. */
   priceFrom: 4, markupPct: 25,
+  /**
+   * From this level rage starts `rageEarlyBy` ghost turns sooner (RAGE.startTurn 3 → 2).
+   * Why: the old level-4 rule (prices/healing) barely changed fights, so level 4 played easier
+   * than level 3 in simulation. Rage pressure punishes slow, stalling turns rather than adding HP.
+   */
+  rageEarlyFrom: 4, rageEarlyBy: 1,
   /** From this level the player draws one card fewer per turn on night 3. */
   drawCutFrom: 5,
+} as const;
+
+/**
+ * Total limits on bargain rules (`BlessingDef.rules`) however many bargains are owned.
+ * Offers already refuse a bargain that touches a rule the player has (bargainConflicts);
+ * these clamps protect older saves. prayerAp is capped at +1 so a prayer (base 1 AP)
+ * never costs more than the 2 AP a turn gives.
+ */
+export const BARGAIN_RULE_LIMITS = {
+  prayerAp: [0, 1], prayerMult: [0, 1], openingDraw: [-1, 0], retain: [-3, 2], borrowBonus: [0, 1], borrowHpCost: [0, 2],
 } as const;

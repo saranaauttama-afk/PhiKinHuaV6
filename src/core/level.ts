@@ -92,7 +92,10 @@ export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2, tier
     ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary,
     ...(tier == null ? [] : require('./pack').PANDORA_BLESSINGS.filter((b: BlessingDef) => (b.unlock ?? 0) <= tier)),
   ].filter(b => !owned.includes(b.id));
+  // A bargain is not offered if an owned bargain already changes the same rule (no stacking).
+  const ownedDefs = owned.map(id => require('./pack').blessingById(id) ?? require('./events/story').EVENT_PACTS[id]).filter(Boolean);
+  const offerable = pool.filter(b => !require('./cards/passives').bargainConflicts(ownedDefs, b));
 
-  const sh = shuffle(r, pool); r = sh.rng;
+  const sh = shuffle(r, offerable); r = sh.rng;
   return { rng: r, list: sh.array.slice(0, Math.min(count, sh.array.length)).map(b => ({ ...b })) };
 }

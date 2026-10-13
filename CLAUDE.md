@@ -22,6 +22,8 @@ Run locally: `npm install && npx expo start` (`--web` / `--android` / `--ios` va
 
 The game was rebuilt toward Night of the Full Moon in six phases (PR #9–#14, branches `work/notfm-rebuild` → `work/notfm-phase6`, never merged to `main`). **Read `docs/HANDOFF-notfm-rebuild.md` first**: it covers every system, balance numbers, commands, the APK workflow and the open backlog. The owner wants design changes discussed before code is changed.
 
+Phase 7 (`work/notfm-phase7-research`, PR #15 → `work/notfm-phase6`) closes the research gaps. **Before changing any game rule or number, read `docs/phase7/DESIGN-DECISIONS.md`** — it records the owner's design intent, what was deliberately cut (combos, minions, fusion), and the reason behind each Phase 6–7 decision. Then `docs/phase7/HANDOFF.md` for what/where. Research: `docs/research/notfm/`.
+
 ## Branches (older, before the NOTFM rebuild)
 
 - `main` — oldest, has `PATCH_NOTES.md`, `PHASE4_INTEGRATION_SUMMARY.md`, `TESTING_CHECKLIST.md` (not present on newer branches)

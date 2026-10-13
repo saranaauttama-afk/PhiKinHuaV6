@@ -18,10 +18,11 @@ import {fromSave,toBattleSave,toSave,isPlayableSave} from '../src/core/save';
 import {emptyJournal,parseJournal,recordRun} from '../src/core/campaign/journal';
 import {makeRunRecord} from '../src/core/campaign/metrics';
 import {PlayClock,timeSummary} from '../src/core/campaign/playTime';
-import {rollThreeCards} from '../src/core/level';
+import {rollThreeCards,rollTwoBlessings} from '../src/core/level';
 import {rollShopStock} from '../src/core/shop';
 import {rollNightCards} from '../src/core/campaign/rewards';
 import {makeCombatState,attackCard} from './helpers';
+import {rageStartTurn} from '../src/core/campaign/nights';
 function run(seed='p7',classId:typeof ALL_CLASS_IDS[number]='warrior',tier=0){
  let s=baseNewState(seed),r=makeRng(seed);
  const go=(cmd:Command)=>{({state:s,rng:r}=applyCommand(s,cmd,r));};
@@ -102,13 +103,26 @@ describe('Phase 7 Pandora rules and resource growth',()=>{
   expect(d.s.player[option==='ap'?'maxAp':option==='mana'?'startMana':'drawPerTurn']).toBe(option==='mana'?2:3);
   const s=d.s;s.player.maxAp=3;s.player.startMana=10;s.player.drawPerTurn=4;for(let i=0;i<25;i++)expect(rollLevelOffers(s,makeRng('caps'+i)).list).not.toContain(option);
  });
- it('milestone 1–4 adds exactly four owned-class options without increasing starter power',()=>{
-  for(const cls of ALL_CLASS_IDS){const initial=poolFor(cls);for(let n=1;n<=4;n++){const pool=poolFor(cls,n);expect(pool.length).toBe(initial.length+n);expect(pool.every(c=>!c.class||c.class===cls)).toBe(true);}
-   for(let seed=0;seed<40;seed++){
-    const d=run('unlock'+seed,cls);const lists=[rollThreeCards(d.r,8,cls).list,rollNightCards(d.s,d.r).list,rollShopStock(d.r,20,1,cls).items.flatMap(i=>'card'in i?[i.card]:[])];
-    expect(lists.flat().some(c=>c.unlockAt)).toBe(false);
-   }
-  }
+ it('no existing card is milestone-gated: new players keep the full Phase 6 class pool',()=>{
+  // Milestones must add choices, never withhold cards that were already in the game.
+  expect(ALL_CARDS.filter(c=>c.unlockAt)).toHaveLength(0);
+  for(const cls of ALL_CLASS_IDS)expect(poolFor(cls,0).length).toBe(poolFor(cls,4).length);
+ });
+ it('level 4+ starts rage one ghost turn sooner; level 3 keeps turn 3',()=>{
+  const d=run();d.s.campaign!.night=2;
+  d.s.campaign!.difficulty=3;expect(rageStartTurn(d.s)).toBe(3);
+  d.s.campaign!.difficulty=4;expect(rageStartTurn(d.s)).toBe(2);
+  d.s.campaign!.difficulty=5;expect(rageStartTurn(d.s)).toBe(2);
+ });
+ it('prayer-cost bargains never stack: offers, event pacts and old saves all stay at +1 AP',()=>{
+  const {state:s}=makeCombatState({hand:[cardById('karma_returns')!],playerAp:2,enemyHp:999});
+  grantBlessing(s,pandora('pandora_long_vow'));
+  const bell=STORY_EVENTS.flatMap(e=>e.choices).find(c=>c.effects?.some(x=>x.kind==='pact'&&x.id==='event_bell_vow'))!;
+  expect(choiceLocked(s,bell)).toBeTruthy();
+  for(let i=0;i<40;i++)expect(rollTwoBlessings(makeRng('nostack'+i),s.blessings!.map(b=>b.id),30,99).list.some(b=>b.rules?.prayerAp)).toBe(false);
+  // A save from before the filter can hold both; the clamp keeps the prayer playable.
+  s.blessings!.push({id:'event_bell_vow',name:'x',desc:'',triggers:[],rules:{prayerMult:1,prayerAp:1}} as any);
+  expect(cardCost(s,s.piles.hand[0]).ap).toBe(2);
  });
 });
 describe('Phase 7 active play clock',()=>{

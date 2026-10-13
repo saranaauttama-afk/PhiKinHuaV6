@@ -81,6 +81,10 @@ export const EVENT_PACTS:Record<string,import('../types').BlessingDef>={
 
 /** เลือกทางนี้ได้ไหม — คืนเหตุผลไว้ให้ UI บอกผู้เล่นว่าทำไมยังกดไม่ได้ */
 export function choiceLocked(s: GameState, choice: EventChoice): string | null {
+  // พรเหตุการณ์ห้ามซ้อนกฎกับพรแลกเปลี่ยนที่ถืออยู่ (เหตุผลอยู่ใน cards/passives.ts ruleModifier)
+  for (const eff of choice.effects ?? []) {
+    if (eff.kind === 'pact' && require('../cards/passives').bargainConflicts(s.blessings ?? [], EVENT_PACTS[eff.id])) return 'มีพรที่เปลี่ยนกฎเดียวกันอยู่แล้ว';
+  }
   for (const req of choice.requires ?? []) {
     switch (req.kind) {
       case 'gold':

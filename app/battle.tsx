@@ -1,5 +1,5 @@
 import {fightBadges} from '../src/core/combat/fightBadges';
-import {rageActive} from '../src/core/campaign/nights';
+import {rageStartTurn} from '../src/core/campaign/nights';
 import {RAGE} from '../src/core/balance/notfm';
 import {ghostLore} from '../src/core/monsters/folklore';
 import {battleScene} from './scenePresentation';
@@ -344,7 +344,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea relic={bossRelicView(gameState)} rage={{startTurn:rageActive(gameState)?RAGE.startTurn:RAGE.backstopTurn,perTurn:RAGE.perTurn}}
+        <MonsterArea relic={bossRelicView(gameState)} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}

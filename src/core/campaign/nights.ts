@@ -41,10 +41,15 @@ export function configureNightEnemy(s:GameState):void{
 export function rageActive(s:Partial<GameState>):boolean{
  return !!s.campaign&&s.campaign.night>=RAGE.fromNight(difficultyOf(s));
 }
+/** Ghost turn on which rage begins; level 4+ starts it `DIFFICULTY.rageEarlyBy` turn(s) sooner. */
+export function rageStartTurn(s:Partial<GameState>):number{
+ if(!rageActive(s as GameState))return RAGE.backstopTurn;
+ return RAGE.startTurn-(difficultyOf(s)>=DIFFICULTY.rageEarlyFrom?DIFFICULTY.rageEarlyBy:0);
+}
 /** Rage stacks for the ghost's current turn (0 before `RAGE.startTurn`). Counts ghost turns, not player turns. */
 export function rageStacks(s:Partial<GameState>):number{
  const ghostTurn=s.fight?.ghostTurns??s.turn??1;
- const start=rageActive(s)?RAGE.startTurn:RAGE.backstopTurn;
+ const start=rageStartTurn(s);
  return Math.max(0,(ghostTurn-start+1)*RAGE.perTurn);
 }
 /** Start of the ghost's turn: rage rises to match how long the fight has lasted. */

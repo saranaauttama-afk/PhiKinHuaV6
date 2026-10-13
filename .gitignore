@@ -70,3 +70,7 @@ __pycache__/
 
 # Phase 7 Actions verification output
 phase7-audit/
+
+# Balance simulation output (regenerate with npm run balance -- --out ...)
+phase7-audit/
+reports/
