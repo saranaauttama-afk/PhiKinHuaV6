@@ -1,8 +1,14 @@
+> Current test build: **v1.0.35 / Android code 36** on `work/enemy-hand-v34`. Shows actual retained enemy cards above each owner HUD, removes the battle animation skip button, animates player draws, and keeps the last six played cards from both sides with inspectable actual results and combat-save persistence. Shop return preserves its page/stock; the explicit X destroys it. Encounter actions use parchment art. The test APK restores พระประธาน in every new fight’s opening hand for all four classes, with zero cost even under corruption. v34 balance, v33 independent draw/retention and explicit Combo Removal are preserved.
+>
+> [APK v1.0.35](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38205493810/artifacts/11727144118) · [Passing source CI](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38205493810) · [v35 handoff](docs/HANDOFF-backlog-v35.md). 962 tests, 12 mobile checks across four viewport sizes, byte-identical v34 balance across 160 runs, signed APK audit and nine Android API36 checks passed. Human playtesting precedes later balance tuning; audio and Closed Beta remain separate. Older notes below are historical.
+
+> v1.0.33 work branch: independent hand/draw balance and complete explicit combo removal. New runs start at draw 2 / retain 2, with an independent first-guardian choice to reach 3. Existing v32 artwork, battle layout, three nights and five difficulty tiers are preserved. No APK/main merge for this task. See [v33 handoff](docs/HANDOFF-hand-balance-v33.md). Older release notes below are historical.
+
 > v1.0.32 backlog implementation: fixed three-page batches, persistent service pages, unique three-night ghosts, opening hand/draw separation and full-body battle layout. See [v32 handoff](docs/HANDOFF-backlog-v32.md) for exact behavior, compatibility and validation limits. Start a new run for adventure v5; old saves retain their page rules.
 
 # ผีกินหัว — สามคืนตามหัว
 
-## Current branch: v1.0.32 / Android code 33
+## Historical delivery: v1.0.32 / Android code 33
 
 `work/battle-fullbody-v32` implements the reported backlog with fixed three-page batches, persistent shops/services until their own X, 27 distinct route ghosts across three nights, two first-night build directions per class, actual reward receipts, fixed shop confirmations, completion-only combo notices and compact full-body battle layout. New runs start with two normal cards and two energy, draw three per turn, and retain up to six; these values are independent. Start a new run for adventure v5; legacy saves retain their old rules. All 796 unit tests, TypeScript and 152 mobile interaction checks passed. [APK v1.0.32/code33](https://github.com/saranaauttama-afk/PhiKinHuaV6/actions/runs/38097114925/artifacts/11686082633) is built and passed package/signing/16KB audit in CI 38097114925. API36 native verification is still running; corrected UI verification passed in CI 38097344790 without changing application code. See [v32 handoff](docs/HANDOFF-backlog-v32.md) for build links and acceptance limits. Human pacing/fun, additional unspecified bugs, audio and Closed Beta remain open.
 

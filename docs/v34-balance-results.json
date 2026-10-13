@@ -1,0 +1,1468 @@
+{
+  "runsPerCell": 8,
+  "seedPattern": "v34-paired-{class}-{index}",
+  "policy": "existing public-board pilot; real full three-night progression; no QA card",
+  "limitations": "Automated policy is not a human win-rate estimate. Duration is measured in turns, not wall-clock minutes. Damage excludes heals, includes player-turn end damage in enemy-turn event batch.",
+  "rows": [
+    {
+      "class": "warrior",
+      "difficulty": 1,
+      "runs": 8,
+      "wins": 5,
+      "winRate": 0.63,
+      "stalled": 0,
+      "meanFights": 22.75,
+      "meanRunTurns": 79.88,
+      "enemyTurns": 457,
+      "cardsPerTurn": 1.55,
+      "retainedPerTurn": 1.51,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 1.45,
+      "peakDamagePerEnemyTurn": 28,
+      "earlyPeakDamage": 17,
+      "largestSpikes": [
+        {
+          "enemy": "night-bell-keeper",
+          "night": 2,
+          "turn": 5,
+          "loss": 28,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_bell_keeper_v29_strike",
+            "night_bell_keeper_v29_double"
+          ],
+          "strength": 2
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 6,
+          "loss": 18,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 1
+        },
+        {
+          "enemy": "night-bell-keeper",
+          "night": 2,
+          "turn": 2,
+          "loss": 18,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_bell_keeper_v29_execution"
+          ],
+          "strength": 0
+        }
+      ],
+      "meanDamagePerRun": 82.75,
+      "boss": {
+        "encounters": 19,
+        "wins": 16,
+        "meanTurns": 6.42,
+        "meanDamagePerEnemyTurn": 4.08,
+        "peakDamage": 28
+      },
+      "combat": {
+        "normal": {
+          "count": 150,
+          "meanTurns": 2.99
+        },
+        "elite": {
+          "count": 16,
+          "meanTurns": 4.31
+        },
+        "boss": {
+          "count": 19,
+          "meanTurns": 6.42
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 2,
+      "runs": 8,
+      "wins": 2,
+      "winRate": 0.25,
+      "stalled": 0,
+      "meanFights": 12.75,
+      "meanRunTurns": 46.88,
+      "enemyTurns": 273,
+      "cardsPerTurn": 1.53,
+      "retainedPerTurn": 1.49,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.4,
+      "peakDamagePerEnemyTurn": 26,
+      "earlyPeakDamage": 26,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 3,
+          "loss": 26,
+          "playerMaxHp": 74,
+          "cards": [
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 1
+        },
+        {
+          "enemy": "krahang",
+          "night": 1,
+          "turn": 5,
+          "loss": 25,
+          "playerMaxHp": 66,
+          "cards": [
+            "krahang_v29_signature",
+            "krahang_v29_signature_support"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 2,
+          "loss": 21,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 1
+        }
+      ],
+      "meanDamagePerRun": 81.75,
+      "boss": {
+        "encounters": 12,
+        "wins": 6,
+        "meanTurns": 4.33,
+        "meanDamagePerEnemyTurn": 6.43,
+        "peakDamage": 26
+      },
+      "combat": {
+        "normal": {
+          "count": 80,
+          "meanTurns": 3.23
+        },
+        "elite": {
+          "count": 16,
+          "meanTurns": 4.06
+        },
+        "boss": {
+          "count": 12,
+          "meanTurns": 4.33
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 3,
+      "runs": 8,
+      "wins": 2,
+      "winRate": 0.25,
+      "stalled": 0,
+      "meanFights": 12.5,
+      "meanRunTurns": 48.38,
+      "enemyTurns": 287,
+      "cardsPerTurn": 1.52,
+      "retainedPerTurn": 1.54,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 1.84,
+      "peakDamagePerEnemyTurn": 27,
+      "earlyPeakDamage": 22,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 4,
+          "loss": 27,
+          "playerMaxHp": 74,
+          "cards": [
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 2
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 3,
+          "loss": 22,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_head_collector_v29_execution"
+          ],
+          "strength": 2
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 22,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 2
+        }
+      ],
+      "meanDamagePerRun": 66.13,
+      "boss": {
+        "encounters": 10,
+        "wins": 6,
+        "meanTurns": 5.1,
+        "meanDamagePerEnemyTurn": 4.24,
+        "peakDamage": 27
+      },
+      "combat": {
+        "normal": {
+          "count": 78,
+          "meanTurns": 3.36
+        },
+        "elite": {
+          "count": 18,
+          "meanTurns": 4.11
+        },
+        "boss": {
+          "count": 10,
+          "meanTurns": 5.1
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 4,
+      "runs": 8,
+      "wins": 2,
+      "winRate": 0.25,
+      "stalled": 0,
+      "meanFights": 12.38,
+      "meanRunTurns": 46.75,
+      "enemyTurns": 275,
+      "cardsPerTurn": 1.53,
+      "retainedPerTurn": 1.5,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.04,
+      "peakDamagePerEnemyTurn": 31,
+      "earlyPeakDamage": 19,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 4,
+          "loss": 31,
+          "playerMaxHp": 74,
+          "cards": [
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "krahang",
+          "night": 1,
+          "turn": 4,
+          "loss": 21,
+          "playerMaxHp": 82,
+          "cards": [
+            "krahang_v29_strike",
+            "krahang_v29_signature"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "krahang",
+          "night": 1,
+          "turn": 3,
+          "loss": 19,
+          "playerMaxHp": 74,
+          "cards": [
+            "krahang_v29_signature_support",
+            "krahang_v29_signature"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 70,
+      "boss": {
+        "encounters": 10,
+        "wins": 6,
+        "meanTurns": 4.6,
+        "meanDamagePerEnemyTurn": 4.38,
+        "peakDamage": 31
+      },
+      "combat": {
+        "normal": {
+          "count": 76,
+          "meanTurns": 3.34
+        },
+        "elite": {
+          "count": 19,
+          "meanTurns": 3.89
+        },
+        "boss": {
+          "count": 10,
+          "meanTurns": 4.6
+        }
+      }
+    },
+    {
+      "class": "warrior",
+      "difficulty": 5,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 7.63,
+      "meanRunTurns": 34.5,
+      "enemyTurns": 214,
+      "cardsPerTurn": 1.6,
+      "retainedPerTurn": 1.61,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 3.49,
+      "peakDamagePerEnemyTurn": 26,
+      "earlyPeakDamage": 26,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 3,
+          "loss": 26,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_head_collector_v29_defense",
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 4
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 25,
+          "playerMaxHp": 82,
+          "cards": [
+            "night_head_collector_v29_execution"
+          ],
+          "strength": 4
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 4,
+          "loss": 24,
+          "playerMaxHp": 82,
+          "cards": [
+            "night_head_collector_v29_boundary",
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 4
+        }
+      ],
+      "meanDamagePerRun": 93.25,
+      "boss": {
+        "encounters": 5,
+        "wins": 1,
+        "meanTurns": 5,
+        "meanDamagePerEnemyTurn": 11.43,
+        "peakDamage": 26
+      },
+      "combat": {
+        "normal": {
+          "count": 47,
+          "meanTurns": 3.57
+        },
+        "elite": {
+          "count": 17,
+          "meanTurns": 4.88
+        },
+        "boss": {
+          "count": 5,
+          "meanTurns": 5
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 1,
+      "runs": 8,
+      "wins": 3,
+      "winRate": 0.38,
+      "stalled": 0,
+      "meanFights": 15.63,
+      "meanRunTurns": 61.38,
+      "enemyTurns": 389,
+      "cardsPerTurn": 1.44,
+      "retainedPerTurn": 1.59,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.08,
+      "peakDamagePerEnemyTurn": 22,
+      "earlyPeakDamage": 14,
+      "largestSpikes": [
+        {
+          "enemy": "night-bell-keeper",
+          "night": 2,
+          "turn": 6,
+          "loss": 22,
+          "playerMaxHp": 74,
+          "cards": [
+            "night_bell_keeper_v29_double",
+            "night_bell_keeper_v29_strike"
+          ],
+          "strength": 1
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 20,
+          "playerMaxHp": 58,
+          "cards": [
+            "night_head_collector_v29_signature_support",
+            "night_head_collector_v29_double"
+          ],
+          "strength": 2
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 4,
+          "loss": 17,
+          "playerMaxHp": 50,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 1
+        }
+      ],
+      "meanDamagePerRun": 101.25,
+      "boss": {
+        "encounters": 14,
+        "wins": 9,
+        "meanTurns": 6.21,
+        "meanDamagePerEnemyTurn": 5.79,
+        "peakDamage": 22
+      },
+      "combat": {
+        "normal": {
+          "count": 107,
+          "meanTurns": 3.46
+        },
+        "elite": {
+          "count": 9,
+          "meanTurns": 4.11
+        },
+        "boss": {
+          "count": 14,
+          "meanTurns": 6.21
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 2,
+      "runs": 8,
+      "wins": 1,
+      "winRate": 0.13,
+      "stalled": 0,
+      "meanFights": 9.5,
+      "meanRunTurns": 37.38,
+      "enemyTurns": 239,
+      "cardsPerTurn": 1.47,
+      "retainedPerTurn": 1.5,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.74,
+      "peakDamagePerEnemyTurn": 27,
+      "earlyPeakDamage": 14,
+      "largestSpikes": [
+        {
+          "enemy": "krahang",
+          "night": 1,
+          "turn": 5,
+          "loss": 27,
+          "playerMaxHp": 66,
+          "cards": [
+            "krahang_v29_signature",
+            "krahang_v29_signature_support"
+          ],
+          "strength": 4
+        },
+        {
+          "enemy": "krahang",
+          "night": 1,
+          "turn": 5,
+          "loss": 23,
+          "playerMaxHp": 58,
+          "cards": [
+            "krahang_v29_pierce",
+            "krahang_v29_signature_support"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "phi-tai-hong",
+          "night": 1,
+          "turn": 5,
+          "loss": 15,
+          "playerMaxHp": 58,
+          "cards": [
+            "phi_tai_hong_v29_signature",
+            "phi_tai_hong_v29_strike"
+          ],
+          "strength": 4
+        }
+      ],
+      "meanDamagePerRun": 82,
+      "boss": {
+        "encounters": 8,
+        "wins": 3,
+        "meanTurns": 3.5,
+        "meanDamagePerEnemyTurn": 6.77,
+        "peakDamage": 15
+      },
+      "combat": {
+        "normal": {
+          "count": 64,
+          "meanTurns": 3.55
+        },
+        "elite": {
+          "count": 11,
+          "meanTurns": 4.09
+        },
+        "boss": {
+          "count": 8,
+          "meanTurns": 3.5
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 3,
+      "runs": 8,
+      "wins": 1,
+      "winRate": 0.13,
+      "stalled": 0,
+      "meanFights": 8.38,
+      "meanRunTurns": 39.25,
+      "enemyTurns": 259,
+      "cardsPerTurn": 1.5,
+      "retainedPerTurn": 1.55,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 3.07,
+      "peakDamagePerEnemyTurn": 21,
+      "earlyPeakDamage": 19,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 21,
+          "playerMaxHp": 58,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_awakened_strike"
+          ],
+          "strength": 2
+        },
+        {
+          "enemy": "night-headless-king",
+          "night": 3,
+          "turn": 5,
+          "loss": 21,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_headless_king_v29_awakened_strike",
+            "night_headless_king_v29_strike"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 20,
+          "playerMaxHp": 50,
+          "cards": [
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 99.25,
+      "boss": {
+        "encounters": 6,
+        "wins": 3,
+        "meanTurns": 5.17,
+        "meanDamagePerEnemyTurn": 7.31,
+        "peakDamage": 21
+      },
+      "combat": {
+        "normal": {
+          "count": 58,
+          "meanTurns": 4.02
+        },
+        "elite": {
+          "count": 10,
+          "meanTurns": 5
+        },
+        "boss": {
+          "count": 6,
+          "meanTurns": 5.17
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 4,
+      "runs": 8,
+      "wins": 1,
+      "winRate": 0.13,
+      "stalled": 0,
+      "meanFights": 8.13,
+      "meanRunTurns": 41.38,
+      "enemyTurns": 281,
+      "cardsPerTurn": 1.52,
+      "retainedPerTurn": 1.58,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 3.04,
+      "peakDamagePerEnemyTurn": 28,
+      "earlyPeakDamage": 19,
+      "largestSpikes": [
+        {
+          "enemy": "night-cave-mother",
+          "night": 3,
+          "turn": 7,
+          "loss": 28,
+          "playerMaxHp": 58,
+          "cards": [
+            "night_cave_mother_v29_defense",
+            "night_cave_mother_v29_strike",
+            "night_cave_mother_v29_strike"
+          ],
+          "strength": 4
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 24,
+          "playerMaxHp": 58,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_awakened_strike"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 20,
+          "playerMaxHp": 50,
+          "cards": [
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 106.88,
+      "boss": {
+        "encounters": 5,
+        "wins": 3,
+        "meanTurns": 6.6,
+        "meanDamagePerEnemyTurn": 8.07,
+        "peakDamage": 28
+      },
+      "combat": {
+        "normal": {
+          "count": 56,
+          "meanTurns": 4.34
+        },
+        "elite": {
+          "count": 11,
+          "meanTurns": 5
+        },
+        "boss": {
+          "count": 5,
+          "meanTurns": 6.6
+        }
+      }
+    },
+    {
+      "class": "shaman",
+      "difficulty": 5,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 4.25,
+      "meanRunTurns": 24.63,
+      "enemyTurns": 170,
+      "cardsPerTurn": 1.47,
+      "retainedPerTurn": 1.59,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 3.35,
+      "peakDamagePerEnemyTurn": 17,
+      "earlyPeakDamage": 12,
+      "largestSpikes": [
+        {
+          "enemy": "ngu-phi-sang",
+          "night": 1,
+          "turn": 4,
+          "loss": 17,
+          "playerMaxHp": 58,
+          "cards": [
+            "ngu_phi_sang_v29_strike",
+            "ngu_phi_sang_v29_double"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "phi-pong-kang",
+          "night": 1,
+          "turn": 4,
+          "loss": 16,
+          "playerMaxHp": 58,
+          "cards": [
+            "phi_pong_kang_v29_strike",
+            "phi_pong_kang_v29_signature_support"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 71.25,
+      "boss": {
+        "encounters": 1,
+        "wins": 0,
+        "meanTurns": 3,
+        "meanDamagePerEnemyTurn": 8.33,
+        "peakDamage": 9
+      },
+      "combat": {
+        "normal": {
+          "count": 34,
+          "meanTurns": 4.53
+        },
+        "elite": {
+          "count": 7,
+          "meanTurns": 5.71
+        },
+        "boss": {
+          "count": 1,
+          "meanTurns": 3
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 1,
+      "runs": 8,
+      "wins": 3,
+      "winRate": 0.38,
+      "stalled": 0,
+      "meanFights": 14,
+      "meanRunTurns": 123.25,
+      "enemyTurns": 874,
+      "cardsPerTurn": 1.49,
+      "retainedPerTurn": 1.77,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.41,
+      "peakDamagePerEnemyTurn": 26,
+      "earlyPeakDamage": 20,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 14,
+          "loss": 26,
+          "playerMaxHp": 58,
+          "cards": [
+            "night_head_collector_v29_signature_support",
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 4
+        },
+        {
+          "enemy": "phi-pop",
+          "night": 1,
+          "turn": 23,
+          "loss": 24,
+          "playerMaxHp": 50,
+          "cards": [
+            "phi_pop_v29_double"
+          ],
+          "strength": 10
+        },
+        {
+          "enemy": "phi-pop",
+          "night": 1,
+          "turn": 25,
+          "loss": 22,
+          "playerMaxHp": 50,
+          "cards": [
+            "phi_pop_v29_double"
+          ],
+          "strength": 10
+        }
+      ],
+      "meanDamagePerRun": 263.38,
+      "boss": {
+        "encounters": 12,
+        "wins": 9,
+        "meanTurns": 14.08,
+        "meanDamagePerEnemyTurn": 5.79,
+        "peakDamage": 26
+      },
+      "combat": {
+        "normal": {
+          "count": 96,
+          "meanTurns": 7.74
+        },
+        "elite": {
+          "count": 9,
+          "meanTurns": 8.22
+        },
+        "boss": {
+          "count": 12,
+          "meanTurns": 14.08
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 2,
+      "runs": 8,
+      "wins": 4,
+      "winRate": 0.5,
+      "stalled": 0,
+      "meanFights": 16.75,
+      "meanRunTurns": 116.38,
+      "enemyTurns": 797,
+      "cardsPerTurn": 1.5,
+      "retainedPerTurn": 1.72,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.7,
+      "peakDamagePerEnemyTurn": 28,
+      "earlyPeakDamage": 15,
+      "largestSpikes": [
+        {
+          "enemy": "phi-pa",
+          "night": 1,
+          "turn": 12,
+          "loss": 28,
+          "playerMaxHp": 50,
+          "cards": [
+            "phi_pa_v29_signature",
+            "phi_pa_v29_strike"
+          ],
+          "strength": 6
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 7,
+          "loss": 25,
+          "playerMaxHp": 66,
+          "cards": [
+            "night_head_collector_v29_pierce",
+            "night_head_collector_v29_signature_support"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "phi-pop",
+          "night": 1,
+          "turn": 23,
+          "loss": 24,
+          "playerMaxHp": 50,
+          "cards": [
+            "phi_pop_v29_double"
+          ],
+          "strength": 10
+        }
+      ],
+      "meanDamagePerRun": 268.88,
+      "boss": {
+        "encounters": 13,
+        "wins": 12,
+        "meanTurns": 8.69,
+        "meanDamagePerEnemyTurn": 5.64,
+        "peakDamage": 25
+      },
+      "combat": {
+        "normal": {
+          "count": 103,
+          "meanTurns": 6.51
+        },
+        "elite": {
+          "count": 22,
+          "meanTurns": 6.68
+        },
+        "boss": {
+          "count": 13,
+          "meanTurns": 8.69
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 3,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 4.5,
+      "meanRunTurns": 60.75,
+      "enemyTurns": 450,
+      "cardsPerTurn": 1.44,
+      "retainedPerTurn": 1.81,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 4.21,
+      "peakDamagePerEnemyTurn": 27,
+      "earlyPeakDamage": 20,
+      "largestSpikes": [
+        {
+          "enemy": "kuman-thong",
+          "night": 1,
+          "turn": 16,
+          "loss": 27,
+          "playerMaxHp": 50,
+          "cards": [
+            "kuman_thong_v29_strike",
+            "kuman_thong_v29_double"
+          ],
+          "strength": 7
+        },
+        {
+          "enemy": "kuman-thong",
+          "night": 1,
+          "turn": 13,
+          "loss": 24,
+          "playerMaxHp": 50,
+          "cards": [
+            "kuman_thong_v29_double",
+            "kuman_thong_v29_strike"
+          ],
+          "strength": 6
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 4,
+          "loss": 22,
+          "playerMaxHp": 58,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_double"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 236.63,
+      "boss": {
+        "encounters": 4,
+        "wins": 0,
+        "meanTurns": 6.75,
+        "meanDamagePerEnemyTurn": 10.56,
+        "peakDamage": 22
+      },
+      "combat": {
+        "normal": {
+          "count": 35,
+          "meanTurns": 11.14
+        },
+        "elite": {
+          "count": 5,
+          "meanTurns": 13.8
+        },
+        "boss": {
+          "count": 4,
+          "meanTurns": 6.75
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 4,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 2.88,
+      "meanRunTurns": 50.25,
+      "enemyTurns": 379,
+      "cardsPerTurn": 1.39,
+      "retainedPerTurn": 1.8,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 4.38,
+      "peakDamagePerEnemyTurn": 38,
+      "earlyPeakDamage": 12,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 10,
+          "loss": 38,
+          "playerMaxHp": 58,
+          "cards": [
+            "night_head_collector_v29_awakened_strike",
+            "night_head_collector_v29_signature_support"
+          ],
+          "strength": 6
+        },
+        {
+          "enemy": "kuman-thong",
+          "night": 1,
+          "turn": 16,
+          "loss": 21,
+          "playerMaxHp": 50,
+          "cards": [
+            "kuman_thong_v29_pierce",
+            "kuman_thong_v29_strike"
+          ],
+          "strength": 8
+        },
+        {
+          "enemy": "phi-pop",
+          "night": 1,
+          "turn": 14,
+          "loss": 20,
+          "playerMaxHp": 50,
+          "cards": [
+            "phi_pop_v29_double"
+          ],
+          "strength": 8
+        }
+      ],
+      "meanDamagePerRun": 207.38,
+      "boss": {
+        "encounters": 2,
+        "wins": 0,
+        "meanTurns": 9.5,
+        "meanDamagePerEnemyTurn": 11,
+        "peakDamage": 38
+      },
+      "combat": {
+        "normal": {
+          "count": 26,
+          "meanTurns": 13.19
+        },
+        "elite": {
+          "count": 3,
+          "meanTurns": 13.33
+        },
+        "boss": {
+          "count": 2,
+          "meanTurns": 9.5
+        }
+      }
+    },
+    {
+      "class": "nun",
+      "difficulty": 5,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 4.13,
+      "meanRunTurns": 50.38,
+      "enemyTurns": 370,
+      "cardsPerTurn": 1.43,
+      "retainedPerTurn": 1.78,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 4.62,
+      "peakDamagePerEnemyTurn": 35,
+      "earlyPeakDamage": 24,
+      "largestSpikes": [
+        {
+          "enemy": "phi-pong-kang",
+          "night": 1,
+          "turn": 8,
+          "loss": 35,
+          "playerMaxHp": 58,
+          "cards": [
+            "phi_pong_kang_v29_signature_support",
+            "phi_pong_kang_v29_signature"
+          ],
+          "strength": 5
+        },
+        {
+          "enemy": "phi-pong-kang",
+          "night": 1,
+          "turn": 8,
+          "loss": 29,
+          "playerMaxHp": 50,
+          "cards": [
+            "phi_pong_kang_v29_strike",
+            "phi_pong_kang_v34_payoff"
+          ],
+          "strength": 5
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 3,
+          "loss": 24,
+          "playerMaxHp": 50,
+          "cards": [
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_ward"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 213.75,
+      "boss": {
+        "encounters": 1,
+        "wins": 0,
+        "meanTurns": 7,
+        "meanDamagePerEnemyTurn": 11.29,
+        "peakDamage": 24
+      },
+      "combat": {
+        "normal": {
+          "count": 33,
+          "meanTurns": 9.85
+        },
+        "elite": {
+          "count": 7,
+          "meanTurns": 10.14
+        },
+        "boss": {
+          "count": 1,
+          "meanTurns": 7
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 1,
+      "runs": 8,
+      "wins": 4,
+      "winRate": 0.5,
+      "stalled": 0,
+      "meanFights": 17.88,
+      "meanRunTurns": 50.5,
+      "enemyTurns": 333,
+      "cardsPerTurn": 1.44,
+      "retainedPerTurn": 1.43,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 1.7,
+      "peakDamagePerEnemyTurn": 19,
+      "earlyPeakDamage": 14,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 19,
+          "playerMaxHp": 54,
+          "cards": [
+            "night_head_collector_v29_signature",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 2
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 6,
+          "loss": 17,
+          "playerMaxHp": 46,
+          "cards": [
+            "night_head_collector_v29_pierce",
+            "night_head_collector_v29_signature_support"
+          ],
+          "strength": 2
+        }
+      ],
+      "meanDamagePerRun": 70.63,
+      "boss": {
+        "encounters": 15,
+        "wins": 12,
+        "meanTurns": 4.47,
+        "meanDamagePerEnemyTurn": 5.05,
+        "peakDamage": 19
+      },
+      "combat": {
+        "normal": {
+          "count": 119,
+          "meanTurns": 2.94
+        },
+        "elite": {
+          "count": 12,
+          "meanTurns": 3.58
+        },
+        "boss": {
+          "count": 15,
+          "meanTurns": 4.47
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 2,
+      "runs": 8,
+      "wins": 1,
+      "winRate": 0.13,
+      "stalled": 0,
+      "meanFights": 11.88,
+      "meanRunTurns": 34.5,
+      "enemyTurns": 225,
+      "cardsPerTurn": 1.49,
+      "retainedPerTurn": 1.39,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.41,
+      "peakDamagePerEnemyTurn": 27,
+      "earlyPeakDamage": 27,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 3,
+          "loss": 27,
+          "playerMaxHp": 46,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 1
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 22,
+          "playerMaxHp": 46,
+          "cards": [
+            "night_head_collector_v29_pierce",
+            "night_head_collector_v29_signature_support"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 5,
+          "loss": 20,
+          "playerMaxHp": 62,
+          "cards": [
+            "night_head_collector_v29_pierce",
+            "night_head_collector_v29_signature_support"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 67.88,
+      "boss": {
+        "encounters": 10,
+        "wins": 5,
+        "meanTurns": 3.2,
+        "meanDamagePerEnemyTurn": 7.75,
+        "peakDamage": 27
+      },
+      "combat": {
+        "normal": {
+          "count": 76,
+          "meanTurns": 3.03
+        },
+        "elite": {
+          "count": 15,
+          "meanTurns": 3.4
+        },
+        "boss": {
+          "count": 10,
+          "meanTurns": 3.2
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 3,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 5.25,
+      "meanRunTurns": 19.5,
+      "enemyTurns": 135,
+      "cardsPerTurn": 1.48,
+      "retainedPerTurn": 1.33,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.56,
+      "peakDamagePerEnemyTurn": 27,
+      "earlyPeakDamage": 27,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 3,
+          "loss": 27,
+          "playerMaxHp": 46,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 1
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 4,
+          "loss": 18,
+          "playerMaxHp": 62,
+          "cards": [
+            "night_head_collector_v29_pierce",
+            "night_head_collector_v29_strike"
+          ],
+          "strength": 3
+        },
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 2,
+          "loss": 17,
+          "playerMaxHp": 62,
+          "cards": [
+            "night_head_collector_v29_double",
+            "night_head_collector_v29_signature_support"
+          ],
+          "strength": 2
+        }
+      ],
+      "meanDamagePerRun": 43.13,
+      "boss": {
+        "encounters": 3,
+        "wins": 0,
+        "meanTurns": 3.33,
+        "meanDamagePerEnemyTurn": 11.3,
+        "peakDamage": 27
+      },
+      "combat": {
+        "normal": {
+          "count": 40,
+          "meanTurns": 3.6
+        },
+        "elite": {
+          "count": 4,
+          "meanTurns": 4.25
+        },
+        "boss": {
+          "count": 3,
+          "meanTurns": 3.33
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 4,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 5.25,
+      "meanRunTurns": 21.38,
+      "enemyTurns": 151,
+      "cardsPerTurn": 1.5,
+      "retainedPerTurn": 1.34,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.28,
+      "peakDamagePerEnemyTurn": 27,
+      "earlyPeakDamage": 27,
+      "largestSpikes": [
+        {
+          "enemy": "night-head-collector",
+          "night": 1,
+          "turn": 3,
+          "loss": 27,
+          "playerMaxHp": 46,
+          "cards": [
+            "night_head_collector_v29_strike",
+            "night_head_collector_v29_signature"
+          ],
+          "strength": 2
+        },
+        {
+          "enemy": "phi-pa",
+          "night": 1,
+          "turn": 4,
+          "loss": 18,
+          "playerMaxHp": 46,
+          "cards": [
+            "phi_pa_v29_signature",
+            "phi_pa_v29_strike"
+          ],
+          "strength": 3
+        }
+      ],
+      "meanDamagePerRun": 43.13,
+      "boss": {
+        "encounters": 3,
+        "wins": 0,
+        "meanTurns": 3,
+        "meanDamagePerEnemyTurn": 8.11,
+        "peakDamage": 27
+      },
+      "combat": {
+        "normal": {
+          "count": 41,
+          "meanTurns": 3.88
+        },
+        "elite": {
+          "count": 4,
+          "meanTurns": 5
+        },
+        "boss": {
+          "count": 3,
+          "meanTurns": 3
+        }
+      }
+    },
+    {
+      "class": "medium",
+      "difficulty": 5,
+      "runs": 8,
+      "wins": 0,
+      "winRate": 0,
+      "stalled": 0,
+      "meanFights": 4,
+      "meanRunTurns": 16.75,
+      "enemyTurns": 115,
+      "cardsPerTurn": 1.35,
+      "retainedPerTurn": 1.42,
+      "idleTurns": 0,
+      "meanDamagePerEnemyTurn": 2.37,
+      "peakDamagePerEnemyTurn": 14,
+      "earlyPeakDamage": 10,
+      "largestSpikes": [],
+      "meanDamagePerRun": 34,
+      "boss": {
+        "encounters": 1,
+        "wins": 0,
+        "meanTurns": 4,
+        "meanDamagePerEnemyTurn": 6.5,
+        "peakDamage": 14
+      },
+      "combat": {
+        "normal": {
+          "count": 33,
+          "meanTurns": 3.85
+        },
+        "elite": {
+          "count": 2,
+          "meanTurns": 4
+        },
+        "boss": {
+          "count": 1,
+          "meanTurns": 4
+        }
+      }
+    }
+  ]
+}

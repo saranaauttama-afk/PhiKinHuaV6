@@ -8,7 +8,7 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-import {enemyLane} from '../../battleGeometry';
+import {enemyLane,enemyHandGeometry} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
 import {font,layer} from '../../theme';
 import {paper} from '../Paper';
@@ -25,7 +25,7 @@ const SLOT_W      = 40;
 const PHASE_ENTER = 450;
 const PHASE_FLIP  = 250;
 const PHASE_RISE  = 250;
-const PHASE_HOLD  = 1100;
+const PHASE_HOLD  = 1400;
 const PHASE_EXIT  = 160;
 
 export const ENEMY_PLAY_TOTAL      = PHASE_FLIP + PHASE_RISE + PHASE_HOLD + PHASE_EXIT;
@@ -54,19 +54,19 @@ export default function EnemyHandCard({
   const layout = useBattleLayout();
 
   const lane=enemyLane(layout,ownerIndex,ownerCount);
-  const peakScale=Math.min(lane.cardW/CARD_W,lane.cardH/CARD_H)/1.12;
-  const slotStep=Math.min(18,lane.cardW/Math.max(1,totalCards));
+  const peakScale=Math.min(.92,(lane.hudWidth-16)/CARD_W,(layout.hudTop-layout.monsterTop-8)/CARD_H);
+  const slotStep=enemyHandGeometry(layout,totalCards,ownerIndex,ownerCount).step;
   const slotCenterX=lane.cardX-(totalCards-1)*slotStep/2+cardIndex*slotStep;
   const idlePosX=slotCenterX-CARD_W/2;
-  const idlePosY=lane.cardY-CARD_H/2;
+  const idlePosY=layout.enemyHandCenterY-CARD_H/2;
   const centerX=lane.cardX-CARD_W/2;
-  const centerY=lane.cardY-CARD_H/2;
+  const centerY=layout.hudTop-8-CARD_H*peakScale/2-CARD_H/2;
 
   // The native owner anchor is always valid, even before a worklet runs or
   // with reduced motion. Only local offsets animate; never animate top/left.
-  const posX    = useSharedValue(0);
-  const posY    = useSharedValue(-24);
-  const scale   = useSharedValue(Math.min(.20,peakScale*.65));
+  const posX    = useSharedValue(idlePosX-centerX);
+  const posY    = useSharedValue(idlePosY-centerY);
+  const scale   = useSharedValue(Math.min(.12,peakScale*.65));
   const opacity = useSharedValue(0);
   const flip    = useSharedValue(0);
 
@@ -98,7 +98,7 @@ export default function EnemyHandCard({
     );
 
     scale.value = withSequence(
-      withTiming(Math.min(.20,peakScale*.65), { duration: PHASE_FLIP }),
+      withTiming(Math.min(.12,peakScale*.65), { duration: PHASE_FLIP }),
       withTiming(peakScale,  { duration: PHASE_RISE, easing: easeBack }),
       withTiming(peakScale,  { duration: PHASE_HOLD }),
       withTiming(peakScale*1.12,{ duration: PHASE_EXIT, easing: easeOut }),
@@ -148,8 +148,8 @@ export default function EnemyHandCard({
       {/* Front face */}
       <Animated.View style={frontStyle}>
         {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:4}}>
-          <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:18}}>พลัง {card.cost??1}</Text>
-          {ownerId?<Image testID="enemy-card-owner-art" accessible={false} source={artSource(`monster/${ownerId}`)} resizeMode="contain" style={{width:68,height:68}}/>:<CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'skill',cost:card.cost??1}} size={68}/>}
+          <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:18}}>{card.cost?`${card.cost} แต้ม`:'ฟรี'}</Text>
+          {ownerId?<Image testID="enemy-card-owner-art" accessible={false} source={artSource(`monster/${ownerId}`)} resizeMode="contain" style={{width:68,height:68}}/>:<CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'action',fx:{}}} size={68}/>}
           <Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.heading,fontSize:22,textAlign:'center'}}>{card.name}</Text>
           {card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:22}}>โจมตี {card.damage}{(card.hits??1)>1?` ×${card.hits}`:''}</Text>}
           {card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:21}}>ป้องกัน {card.block}</Text>}

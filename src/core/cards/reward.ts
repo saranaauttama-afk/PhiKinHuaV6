@@ -16,14 +16,14 @@
 import type { CardData, GameState } from '../types';
 import type { RNG } from '../rng';
 import { rollThreeCards } from '../level';
-import { rollChapterCards } from './chapterRewards';
 import { getClass } from '../classes';
 import { rollNightCards } from '../campaign/rewards';
-import { FINAL_BOSS_FIGHT } from '../map/pages';
+import { ultimateRequired } from '../campaign/threeNight';
 
 export type CardReward = {
   /** การ์ดที่เสนอให้เลือก */
   choices: CardData[];
+  growth?: Array<'retain'|'draw'>;
 };
 
 /** จำนวนใบที่เสนอให้เลือกต่อไฟต์ */
@@ -38,12 +38,21 @@ export const REWARD_CHOICE_COUNT = 3;
 export function rollCardReward(s: GameState, r: RNG): RNG {
   // บอสสุดท้ายไม่ต้องมีการ์ดให้เลือก — รันจบตรงนั้น การ์ดที่หยิบมาไม่มีที่ใช้
   // และการเอาหน้าเลือกของมาคั่นก่อนจอสรุปทำให้จังหวะจบเรื่องสะดุด
-  if ((s.fightCount ?? 0) >= FINAL_BOSS_FIGHT) return r;
+  // (เดิมเช็ค fightCount >= 15 จากโหมดเก่า ทำให้รันสามคืนไม่ได้การ์ดเลยหลังศึกที่ 15)
+  const active = s.pages?.current?.offers[s.pages?._activeOfferIndex ?? -1];
+  if (active?.kind === 'boss' && (active.bossType === 'secret' || (s.campaign?.night === 3 && !ultimateRequired(s)))) return r;
 
-  const out = (s.campaign ? rollNightCards(s,r) : undefined) ?? (s.runMode === 'episode' ? rollChapterCards(getClass(s.classId).id, r) : undefined)
-    ?? rollThreeCards(r, s.player.level, getClass(s.classId).cardTag);
+  const out = (s.campaign ? rollNightCards(s,r) : undefined) 
+    ?? rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0);
   if (out.list.length > 0) {
     s.cardReward = { choices: out.list };
+    // Hand/draw growth is rare and mid-run: only the night-2 boss (LEVEL_UP.growthNight) offers it.
+    if(active?.kind==='boss'&&s.campaign?.night===require('../balance/notfm').LEVEL_UP.growthNight){
+      const caps=require('../balance/notfm').LEVEL_UP.caps;
+      s.cardReward.growth=[];
+      if((s.player.retain??2)<caps.retain)s.cardReward.growth.push('retain');
+      if(s.player.drawPerTurn<caps.draw)s.cardReward.growth.push('draw');
+    }
   }
   return out.rng;
 }

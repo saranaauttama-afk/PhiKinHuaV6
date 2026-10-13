@@ -1,0 +1,40 @@
+name: v33 web and balance verification (no APK)
+on:
+  push:
+    branches: ['work/hand-balance-v33']
+    paths-ignore: ['**/*.md', 'docs/*pilot*.json', 'docs/*verification*.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test -- --maxWorkers=2 --testTimeout=60000
+      - run: npm install --no-save --package-lock=false playwright@1.62.1
+      - run: npx playwright install --with-deps chromium
+      - name: Export web preview only
+        run: EXPO_PUBLIC_UI_REVIEW=1 EXPO_PUBLIC_TEST_WIN_CARD=1 npx expo export --platform web --output-dir /tmp/phikinhua-backlog-web
+      - run: npx vite-node --config vitest.config.ts scripts/backlog-fixtures.ts
+      - run: EXPO_PUBLIC_TEST_WIN_CARD=1 npx vite-node --config vitest.config.ts scripts/v33-fixtures.ts
+      - run: node scripts/v33-mobile-check.cjs
+      - run: node scripts/backlog-mobile-check.cjs
+      - run: node scripts/adventure-mobile-check.cjs
+      - run: node scripts/archive-mobile-check.cjs
+      - run: node scripts/final-tuning-mobile-check.cjs
+      - run: node scripts/three-night-mobile-check.cjs
+      - name: Simulate all classes and five tiers without QA card
+        run: RUN_PILOT_RUNS=8 npx vite-node --config vitest.config.ts scripts/three-night-pilot.ts > backlog-audit/v33-pilot.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v33-web-verification
+          path: backlog-audit/

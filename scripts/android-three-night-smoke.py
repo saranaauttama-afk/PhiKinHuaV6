@@ -63,10 +63,15 @@ try:
                     assert battles==19,(difficulty,battles,'night 3 starts after 19 fights');night=3
                 tap(r'^(ข้ามบทนี้|เดินทางต่อ)$');continue
             if available(ns,r'^รับรางวัล$') is not None: tap(r'^รับรางวัล$'); battles+=1; continue
+            if 'ผ่านคืนแรก · เลือกพัฒนาวิชา' in text:
+                assert available(ns,r'^ข้ามไปก่อน$') is None,'v33 dawn choice is mandatory'
+                tap(r'^จั่วเพิ่ม$'); tap(r'^เพิ่มจำนวนจั่ว$')
+                record('v33 mandatory dawn draw choice resolves'); continue
             if available(ns,r'^ข้ามไปก่อน$') is not None: tap(r'^ข้ามไปก่อน$'); continue
             if available(ns,r'^ไม่เอาสักใบ$') is not None: tap(r'^ไม่เอาสักใบ$'); continue
             card=available(ns,r'^การ์ด .*พระประธาน')
             if card is not None:
+                assert not re.search(r'คอมโบ|combo',text,re.I),'Explicit combo UI must be absent'
                 assert 'ที่มา' not in text and not re.search(r'คืน \d+ · ศึก ',text),'Battle header/lore must stay removed'
                 if not resumed:
                     initial=hand(ns); tap(r'^พักการต่อสู้$'); tap(r'^กลับเมนูหลัก$'); tap(r'^เล่นต่อ'); tap(r'^พักการต่อสู้$'); tap(r'^กลับเมนูหลัก$')

@@ -15,7 +15,7 @@ import {
 } from './status-effects';
 
 export function combatFrame(state: GameState) {
-  return JSON.parse(JSON.stringify({ player: state.player, enemy: state.enemy, minions: state.minions ?? [] }));
+  return JSON.parse(JSON.stringify({ player: state.player, enemy: state.enemy, historySeq: state.cardHistorySeq ?? 0 }));
 }
 
 /** ปล่อย event ให้ view เอาไปเล่นเป็นอนิเมชั่น (ดู CombatEvent ใน types.ts) */
@@ -27,9 +27,7 @@ export type Side = 'player' | 'enemy';
 
 export type DamageSource =
   | { kind: 'card'; cardId: string }
-  | { kind: 'combo'; comboId: string }
   | { kind: 'status'; effectId: string }
-  | { kind: 'minion'; minionId: string; ignoresBlock?: boolean }
   | { kind: 'equipment'; equipmentId: string }
   | { kind: 'blessing'; blessingId:string }
   | { kind: 'event' };
@@ -37,16 +35,11 @@ export type DamageSource =
 /**
  * กฎของดาเมจแต่ละชนิด — ที่มาของดาเมจเป็นตัวกำหนดกฎเอง ไม่ต้องส่ง flag เพิ่ม
  *
- * - card / combo: ดาเมจต่อสู้เต็มรูปแบบ ผ่านทุกอย่าง
- *   (combo เกิดจากการเล่นการ์ดของผู้เล่น = พลังของผู้เล่น จึงคิดเหมือนการ์ด)
+ * - card: ดาเมจต่อสู้เต็มรูปแบบ ผ่านทุกอย่าง
  *
  * - status (poison ฯลฯ): ทะลุ block และไม่โดน modifier ใดๆ
  *   block คือการปัดป้องหมัดที่กำลังมา แต่พิษอยู่ในตัวแล้ว — เป็นธรรมเนียมของแนวนี้
  *   และ DoT ที่ stack ได้ต้องคาดเดาได้ ไม่ใช่คูณซ้อนกับ buff จนบานปลาย
- *
- * - minion: โดน block ตามปกติ (เว้นแต่ ability ระบุ ignoresBlock)
- *   ผู้รับที่ติด vulnerable กินเพิ่ม แต่ *ไม่* สืบทอด strength ของผู้เรียก
- *   เพราะ minion เป็นคนละตัวกับผู้เรียก มีพลังของตัวเอง
  *
  * - event: ดาเมจเชิงเนื้อเรื่อง ไม่ใช่การต่อสู้ → ทะลุทุกอย่าง
  */
@@ -59,12 +52,9 @@ type DamageRules = {
 function rulesFor(source: DamageSource): DamageRules {
   switch (source.kind) {
     case 'card':
-    case 'combo':
       return { useBlock: true, attackerMods: true, defenderMods: true };
-    case 'minion':
-      return { useBlock: !source.ignoresBlock, attackerMods: false, defenderMods: true };
     // equipment (หนามสะท้อน ฯลฯ): โดน block ตามปกติ แต่ไม่สืบทอด buff ของผู้สวม
-    // ด้วยเหตุผลเดียวกับ minion — แรงมาจากตัวของ ไม่ใช่จากคนถือ
+    // — แรงมาจากตัวของ ไม่ใช่จากคนถือ
     case 'equipment':
     case 'blessing':
       return { useBlock: true, attackerMods: false, defenderMods: true };
@@ -108,15 +98,6 @@ export function computeModifiedDamage(
   // 1) ฝั่งผู้ตี — ฟังก์ชันนี้อ่าน status ของ "ผู้ตี" จาก flag ตัวที่สอง
   if (rules.attackerMods) {
     dmg = modifyDamageForStatusEffects(state, dmg, from === 'player');
-
-    // 2) adaptive AI — ใช้กับดาเมจผู้เล่นเท่านั้นในรูปแบบ inverse
-    if (from === 'player') {
-      const { getAdaptiveDamageMultiplier } = require('../adaptiveAI');
-      const mult = getAdaptiveDamageMultiplier(state);
-      if (Number.isFinite(mult) && mult > 0) {
-        dmg = dmg * (1 / mult);
-      }
-    }
   }
 
   // Curse adds a flat point per stack for every damage source.
@@ -128,7 +109,10 @@ export function computeModifiedDamage(
     dmg = dmg * VULNERABLE_MULTIPLIER;
   }
 
-  if (rules.defenderMods && to === 'player' && state.blessings?.some(b=>b.id==='luang_pu_protection')) dmg-=1;
+  // Armor from blessings and equipment cards reduces each hit on the player.
+  if (rules.defenderMods && to === 'player' && from === 'enemy') dmg -= require('../cards/passives').armor(state);
+  // สำรวมจิต: ghost hits are halved until the next player turn.
+  if (rules.defenderMods && to === 'player' && from === 'enemy' && state.fight?.halfDamage) dmg = dmg * (100 - require('../skills').skillParam('composure', 'damagePct')) / 100;
   return Math.max(0, Math.round(dmg));
 }
 
@@ -163,7 +147,7 @@ export function dealDamage(
   const rules = rulesFor(args.source);
   let modified = computeModifiedDamage(state, { from, to, raw, source: args.source });
 
-  const isAttack=sourceKind==='card'||sourceKind==='combo'||sourceKind==='minion';
+  const isAttack=sourceKind==='card';
   const dodge=targetState.statusEffects?.find(e=>e.id==='dodge');
   if(isAttack&&modified>0&&dodge){modified=0;dodge.stacks=(dodge.stacks??1)-1;if(dodge.stacks<=0)targetState.statusEffects=targetState.statusEffects!.filter(e=>e!==dodge);}
   // 4) block ดูดซับ (ดาเมจบางชนิดทะลุ block — ดู rulesFor)
@@ -186,18 +170,13 @@ export function dealDamage(
   });
   if (died) emit(state, { t: 'Died', who: to });
 
-  // ★ ของประจำกายที่ทำงานตอนโดน/ทำดาเมจ (หนามสะท้อน, ลดดาเมจที่รับ)
-  //
-  // hook นี้มีมาตั้งแต่ต้นแต่ **ไม่เคยมีใครเรียก** — `luang_pu_amulet` (Rare)
-  // จึงเป็นของที่ผู้เล่นซื้อมาแล้วไม่เกิดอะไรขึ้นเลย
-  //
-  // ส่ง `hpLoss` ไม่ใช่ `modified`: ของพวกนี้พูดถึงดาเมจที่เข้าตัวจริง
-  // กัน block ไว้ได้หมด = ไม่มีอะไรให้สะท้อนหรือให้ลด
-  //
-  // ดาเมจที่มาจากของประจำกายเองไม่ยิง hook ซ้ำ — กันวนไม่รู้จบระหว่างของสองชิ้น
-  if (sourceKind !== 'equipment' && hpLoss > 0) {
-    const { runEquipmentDamageDealt } = require('../equipmentRuntime');
-    runEquipmentDamageDealt(state, { amount: hpLoss, side: from, target: to });
+  // A player hit that lands chips the boss's relic.
+  if (from === 'player' && to === 'enemy' && isAttack && modified > 0) require('../campaign/bossRules').chipBossRelic(state);
+  // ใจเพชร reads the HP lost this fight.
+  if (to === 'player' && state.fight) state.fight.hpLost += targetState.hp < hpBefore ? hpBefore - targetState.hp : 0;
+  // แผ่เมตตา: heal part of the damage dealt to the ghost.
+  if (from === 'player' && to === 'enemy' && hpLoss > 0 && state.fight?.lifestealUntil != null && (state.turn ?? 0) <= state.fight.lifestealUntil && state.player.hp > 0) {
+    heal(state, 'player', Math.floor(hpLoss * require('../skills').skillParam('metta', 'healPct') / 100));
   }
 
   const thorns=targetState.statusEffects?.find(e=>e.id==='thorns');

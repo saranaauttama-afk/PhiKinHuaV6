@@ -1,0 +1,77 @@
+name: v35 Native Verification of Existing APK
+on:
+  push:
+    branches: ['work/enemy-hand-v34']
+    paths: ['scripts/android-v35-smoke.py', '.github/workflows/v35-native-verify.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  APK_SOURCE_SHA: 77da4e7a646087f977a62f2ca8e88e9569a306a0
+  APK_SOURCE_RUN: '38205493810'
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Prove the corrected harness leaves application code unchanged
+        run: |
+          git fetch --no-tags --depth=1 origin "$APK_SOURCE_SHA"
+          python - <<'PY'
+          import os,subprocess
+          changed=subprocess.check_output(['git','diff','--name-only',os.environ['APK_SOURCE_SHA'],'HEAD'],text=True).splitlines()
+          allowed={'scripts/android-v35-smoke.py','.github/workflows/v35-native-verify.yml','.github/workflows/android-v34.yml'}
+          assert all(p in allowed or p.endswith('.md') for p in changed),changed
+          print('Only verification/workflow documentation changed; APK application source is unchanged.')
+          PY
+      - name: Wait for the already-running source APK and audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 60); do
+            names=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$APK_SOURCE_RUN/artifacts" --jq '.artifacts[].name')
+            if echo "$names" | grep -Fxq 'PhiKinHua-v35-APK' && echo "$names" | grep -Fxq 'v34-APK-audit'; then exit 0; fi
+            sleep 15
+          done
+          echo 'Source APK/audit not ready within fifteen minutes'; exit 1
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhiKinHua-v35-APK
+          run-id: ${{ env.APK_SOURCE_RUN }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: v34-APK-audit
+          path: apk-source-audit
+          run-id: ${{ env.APK_SOURCE_RUN }}
+          github-token: ${{ github.token }}
+      - name: Verify exact source commit and APK checksum
+        run: |
+          test "$(cat apk-source-audit/source-commit.txt)" = "$APK_SOURCE_SHA"
+          sha256sum --check apk-source-audit/sha256.txt
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install PhiKinHua-Backlog-v1.0.35.apk
+            python scripts/android-v35-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v35-corrected-native-smoke
+          path: |
+            v35-native-audit/
+            apk-source-audit/

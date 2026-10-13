@@ -1,104 +1,29 @@
-// src/core/engine/handlers/map_pages.ts
+// src/core/engine/handlers/map_pages.ts — the three-slot adventure board.
 import type { Command, GameState } from '../../types';
 import type { RNG } from '../../rng';
 import * as ShopEv from './shops_events';
-
-import {
-  initPageMap,
-  rollPageOffers,
-  consumeToken,
-  isRestOfferKind,
-  type MapStatePages,
-  type PageOffer,
-} from '../../map/pages';
-
-import { pickEnemy } from '../../pack';
-import { buildAndShuffleDeck, drawUpTo, startPlayerTurn } from '../../commands';
-import { PAGE_FORCE_SPLIT_AT, PAGE_MIN_BEFORE_SPLIT, SECRET_BOSS_HP_RATIO } from '../../balance/weights';
-import { resetBlessingTurnFlags, runBlessingsTurnHook } from '../../blessingRuntime';
-import { START_ENERGY } from '../../balance/core';
+import type { PageOffer } from '../../map/pages';
+import { beginPlayerFight } from '../../commands';
 import { buildAndShuffleEnemyDeck } from './enemy';
-import { runEquipmentOnEquip } from '../../equipmentRuntime';
 import { deckForMonster } from '../../monsters/monster-decks';
-import { applyClassCombatStart } from '../../classes';
-import { getEquipmentById } from '../../pack';
-import {
-  usesJourney, enterNode, advanceJourney, unlockSecretBossRows, leaveRestRow,
-} from '../../map/journeySync';
-import { onRestRow, refillRestSlot, spendRestToken } from '../../map/restPage';
 import { fireChapter } from '../../story/chapters';
-import { EPISODE } from '../../balance/episode';
 import { planEnemyIntent } from '../../combat/intent';
 import { winRun } from './runEnd';
-import { resetCombos } from '../../combat/combos';
-import { resetTraps } from '../../combat/traps';
-import {isThreeNight,ultimateRequired} from '../../campaign/threeNight';
-import {startAdventure,settleAdventureSlot,nextIntersection,revealUltimate,isCriticalOffer,usesThreePageBoard,rememberAdventureService,restoreAdventureService,useIntersectionPage} from '../../map/adventure';
+import { ultimateRequired } from '../../campaign/threeNight';
+import { startAdventure, settleAdventureSlot, revealUltimate, rememberAdventureService, restoreAdventureService, useIntersectionPage } from '../../map/adventure';
 
 
-// Helper: refresh single slot with a new offer (respect pools/duplicates)
-export function replaceSingleOffer(mp: MapStatePages, rng: RNG, s: GameState, slotIndex: number) {
-  if(mp.adventure)return {rng};
-  const ro = rollPageOffers(mp, rng, s); rng = ro.rng;
-  const current = (mp.current?.offers ?? []) as PageOffer[];
-  const otherKinds = current.map((o, i) => i !== slotIndex ? (o && (o as any).kind) : undefined);
-  let pick: PageOffer | undefined;
-  for (const o of ro.offers) {
-    if (!otherKinds.includes((o as any).kind)) { pick = o; break; }
-  }
-  if (!pick) pick = ro.offers[0];
-  if (mp.current) {
-    (mp.current.offers as any[])[slotIndex] = pick as any;
-    (mp.current.resolved as any[])[slotIndex] = false;
-  }
-  return { rng };
-}
-
-
-
-// ถอดเครื่องรางชั่วคราวออกหลังจบคอมแบต
-function removeTemporaryEquipment(s: GameState) {
-  if (!s.equipped) return;
-
-  const permanent = s.equipped.filter(eq => !eq.temporary);
-  const removed = s.equipped.length - permanent.length;
-  s.equipped = permanent;
-
-  if (removed > 0) s.log.push(`ถอดเครื่องรางชั่วคราว ${removed} ชิ้น`);
-}
-
-// -------------------------------------------------
-// Helpers
-// -------------------------------------------------
-function ensurePages(s: GameState, r: RNG): { rng: RNG; mp: MapStatePages } {
-  if (!s.pages) {
-    const out = initPageMap(r);
-    s.mapMode = 'pages';
-    s.pages = out.map;
-    return { rng: out.rng, mp: s.pages };
-  }
-  
-  // Ensure deletedShops exists for existing saves
-  if (!s.pages.deletedShops) {
-    s.pages.deletedShops = [];
-  }
-  
-  return { rng: r, mp: s.pages };
-}
-
-/**
- * ล้างสเตตที่เหลือจากคอมแบตก่อนกลับสู่หน้าแผนที่
- * ใช้ร่วมกันทั้งคอมแบตปกติและบอส — เดิมทางบอสไม่ได้ล้าง ทำให้ศัตรูที่ตายแล้ว
- * ติดไปกับ state ต่อ
- */
+/** ล้างสเตตที่เหลือจากคอมแบตก่อนกลับสู่แผนที่ */
 function clearCombatState(s: GameState) {
   s.enemy = undefined;
   (s as any).enemyPiles = undefined;
   (s as any).playerPiles = undefined;
-  (s as any).enemyIntentCardId = null;
   s.player.block = 0;
   s.player.statusEffects = [];
-  s.player.energy = s.player.maxEnergy ?? START_ENERGY;
+  s.player.ap = s.player.maxAp;
+  s.equipped = [];
+  s.prayers = [];
+  s.traps = [];
 }
 
 function completeAdventure(s:GameState,r:RNG){
@@ -107,12 +32,13 @@ function completeAdventure(s:GameState,r:RNG){
  const offer=mp.current.offers[ix];if(!offer)return {state:s,rng:r};
  if(s.phase==='victory'&&(offer.kind==='monster'||offer.kind==='boss')){
   s.defeatedEnemyIds=[...(s.defeatedEnemyIds??[]),offer.enemyId];
-  removeTemporaryEquipment(s);s.equipmentTempSlots=0;clearCombatState(s);
+  clearCombatState(s);
   if(offer.kind==='boss'){
-   if(offer.bossType==='final'&&isThreeNight(s)){
+   if(offer.bossType==='final'){
     s.campaign!.completedNights=s.campaign!.night;
     if(s.campaign!.night<3){
      s.campaign!.night=(s.campaign!.night+1) as 2|3;
+     s.campaign!.talksThisNight=0;
      const healed=Math.min(s.player.maxHp-s.player.hp,Math.ceil(s.player.maxHp*.12));s.player.hp+=healed;
      s.log.push(`ฟ้าสาง คืนหัวสำเร็จ · พักฟื้น ${healed} · ออกตามรอยคืนที่ ${s.campaign!.night}`);
      s.phase='map';s.levelUp=null;s.cardReward=undefined;s.combatVictoryLock=false;
@@ -122,272 +48,88 @@ function completeAdventure(s:GameState,r:RNG){
     }
    }
    if(offer.bossType==='final'&&ultimateRequired(s)){revealUltimate(s);fireChapter(s,{kind:'secret'});}
-   else {a.boss='done';mp.current.resolved[ix]=true;mp._activeOfferIndex=undefined;winRun(s,offer.bossType==='secret');}
+   else {a.boss='done';mp.current.resolved[ix]=true;mp._activeOfferIndex=undefined;winRun(s,offer.bossType==='secret'||offer.enemyId===require('../../campaign/bosses').ULTIMATE_BOSS.id);}
    return {state:s,rng:r};
   }
   s.phase='map';settleAdventureSlot(s,ix);return {state:s,rng:r};
  }
  if(s.phase==='shop'){
   rememberAdventureService(s);
-  const used=mp._shopUsed||!!s.shopBoughtItems?.length||(s.shopKind==='fusion'&&(s.fusionAltar?.timesUsed??0)>0);
+  // A stop with nothing left is spent and makes room for the next page; anything else stays
+  // until the player closes it from the board (backlog 13 Oct: see stopSpent).
+  const spent=stopSpent(s);
   if(s.currentShopId&&s.shopKind){
    const {addShopToRegistry,updateShopInRegistry}=require('../../shopRegistry');
    if(s.shopRegistry?.some(sh=>sh.id===s.currentShopId))updateShopInRegistry(s,s.currentShopId,s.shopStock??[],s.shopBoughtItems??[]);
    else addShopToRegistry(s,s.shopKind,s.shopStock??[],s.shopBoughtItems??[],s.currentShopId);
   }
   s.shopKind=undefined;s.shopStock=undefined;s.currentShopId=undefined;s.shopBoughtItems=undefined;s.phase='map';
-  if(used&&!usesThreePageBoard(s))settleAdventureSlot(s,ix);else mp._activeOfferIndex=undefined;
+  if(spent)settleAdventureSlot(s,ix);
+  mp._activeOfferIndex=undefined;
   return {state:s,rng:r};
  }
  if(s.phase==='event'&&s.story?.result!=null){s.story=undefined;s.event=undefined;s.phase='map';settleAdventureSlot(s,ix);}
  return {state:s,rng:r};
 }
 
-function formatOffer(o: PageOffer): string {
-  return o.kind === 'monster' ? `monster:${o.tier}` : o.kind;
+/** Whether the open stop has nothing left: sold out, all uses gone, or its one reward taken. */
+function stopSpent(s:GameState):boolean{
+ const {ECONOMY}=require('../../balance/notfm');
+ switch(s.shopKind){
+  case 'card':case 'equipment':case 'treasure':case 'treasure_single':return !(s.shopStock?.length);
+  case 'blessing':return !(s.blessingStock?.length);
+  case 'well':return ((s as any).mysticalWell?.timesUsed??0)>=ECONOMY.well.uses;
+  case 'healing':return ((s as any).healingShrine?.timesUsed??0)>=ECONOMY.shrine.uses;
+  default:return false; // upgrade / remove stay until closed
+ }
 }
 
-function openPageInternal(s: GameState, mp: MapStatePages, r: RNG) {
-  const out = rollPageOffers(mp, r, s);
-  r = out.rng;
-  const offers: PageOffer[] = out.offers as PageOffer[];
-  mp.current = { offers, resolved: offers.map(() => false) };
-  mp._activeOfferIndex = undefined;
+/** One entry point for every fight on the board, normal or boss. */
+function startCombat(s:GameState,offer:Extract<PageOffer,{kind:'monster'|'boss'}>,ix:number,rng:RNG){
+  const mp=s.pages!;
+  const { getMonsterById } = require('../../monsters/thai-ghosts');
+  const monster = getMonsterById(offer.enemyId);
+  if (!monster) { s.log.push(`❌ Monster ${offer.enemyId} not found`); return { state: s, rng }; }
+  mp._activeOfferIndex = ix;
   mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-  s.phase = 'map';
-  (s as any).nodePhase = 'map_ready';
-  s.log.push(
-    `Page ${mp.pageIndex + 1}/${mp.totalPages}: ${offers
-      .map((o: PageOffer) => formatOffer(o))
-      .join(', ')}`
-  );
-  return { state: s, rng: r };
+  s.phase = 'combat';
+  (s as any).nodePhase = 'in_combat';
+  s.turn = 1;
+  s.combatVictoryLock = false;
+  s.enemyPiles = undefined;
+  s.player.block = 0;
+  s.enemy = { id: monster.id, name: monster.name, hp: monster.hp, maxHp: monster.hp, block: 0, deck: deckForMonster(monster) };
+  require('../../campaign/nights').configureNightEnemy(s);
+  ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
+  rng = beginPlayerFight(s, rng);
+  planEnemyIntent(s);
+  s.log.push(`ChooseOffer → combat (${offer.kind === 'boss' ? 'boss' : offer.tier}) vs ${s.enemy?.id}`);
+  return { state: s, rng };
 }
 
 // -------------------------------------------------
 // Commands
 // -------------------------------------------------
-export function qaInitPages(s: GameState, _cmd: Extract<Command, { type: 'QA_InitPages' }>, r: RNG) {
-  if(s.pages?.adventure)return {state:s,rng:r};
-  const got = ensurePages(s, r);
-  let { rng, mp } = got;
-  mp.pageIndex = 0;
-  return openPageInternal(s, mp, rng);
-}
-
-export function open(s: GameState, _cmd: Extract<Command, { type: 'OpenPage' }>, r: RNG) {
-  if(s.pages?.adventure)return {state:s,rng:r};
-  const got = ensurePages(s, r);
-  let { rng, mp } = got;
-  // ถ้ายังเคลียร์หน้าเดิมไม่ครบ อย่า roll ใหม่
-  if (mp.current && !mp.current.resolved.every(Boolean)) {
-    return { state: s, rng };
-  }
-  return openPageInternal(s, mp, rng);
-}
-
-export function qaPrintPage(s: GameState, _cmd: Extract<Command, { type: 'QA_PrintPage' }>, r: RNG) {
-  const got = ensurePages(s, r);
-  const { rng, mp } = got;
-  if (!mp.current) return { state: s, rng };
-  const offers: PageOffer[] = mp.current.offers as PageOffer[];
-  const { resolved } = mp.current;
-  s.log.push(
-    offers
-      .map((o: PageOffer, i: number) => `${i}:${formatOffer(o)}${resolved[i] ? '✓' : ''}`)
-      .join(' | ')
-  );
-  return { state: s, rng };
-}
-
 export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer' }>, r: RNG) {
-  if(s.pages?.adventure&&(s.phase!=='map'||s.chapter))return {state:s,rng:r};
-  const got = ensurePages(s, r);
-  let { rng, mp } = got;
-
-  if (!mp.current) return { state: s, rng };
+  const mp = s.pages;
+  let rng = r;
+  if (!mp?.adventure || !mp.current || s.phase !== 'map' || s.chapter) return { state: s, rng };
   const ix = cmd.index;
-  const offers: PageOffer[] = mp.current.offers as PageOffer[];
-  const offer: PageOffer | undefined = offers[ix];
+  const offer: PageOffer | undefined = mp.current.offers[ix];
   if (!offer || mp.current.resolved[ix]) return { state: s, rng };
   s.rewardReceipt=undefined;
-  if(usesThreePageBoard(s))mp.adventure!.enteredBoard=mp.adventure!.boardIndex;
+  mp.adventure.enteredBoard=mp.adventure.boardIndex;
   if(restoreAdventureService(s,offer,ix))return {state:s,rng};
 
-  // แผนที่แบบเดินทาง: เลือกช่องไหน = เดินไปยืนที่โหนดนั้น เดินแล้วเดินกลับไม่ได้
-  if (usesJourney(s)) enterNode(s, ix);
-
   switch (offer.kind) {
-    case 'monster': {
-      mp._activeOfferIndex=ix;
-      // เริ่มคอมแบต (normal/elite)
-      s.phase = 'combat';
-      (s as any).nodePhase = 'in_combat';
-      s.turn = 1;
-      // PATCH: กัน PlayCard ไม่ทำงานเพราะ lock ค้างจากไฟต์ก่อน
-      s.combatVictoryLock = false;
-      // เคลียร์สเตตคอมแบตก่อนทุกครั้ง (ป้องกันหลงเหลือจากไฟต์ก่อน)
-      (s as any).enemyPiles = undefined;
-      (s as any).playerPiles = undefined;
-      (s as any).enemyIntentCardId = null;
-      s.player.block = 0;
-      s.player.energy = s.player.maxEnergy ?? START_ENERGY;
-      
-      // Set temporary equipment slots during combat  
-      s.equipmentTempSlots = 5; // Allow 5 additional equipment during combat
-
-      // ใช้ศัตรูที่กำหนดไว้ใน offer แทนการ random
-      const { getMonsterById } = require('../../monsters/thai-ghosts');
-      const thaiMonster = getMonsterById(offer.enemyId);
-      if (!thaiMonster) {
-        s.log.push(`❌ Monster ${offer.enemyId} not found`);
-        return { state: s, rng };
-      }
-      
-      // สร้าง EnemyState จาก Thai monster data
-      // เด็คมาจาก monster-decks.ts — เดิม hardcode ['claw','guard'] ให้ทุกตัว
-      // ทำให้ผี 31 ตนเล่นเหมือนกันหมด ต่างกันแค่ HP
-      const deck = deckForMonster(thaiMonster);
-      s.enemy = {
-        id: thaiMonster.id,
-        name: thaiMonster.name,
-        hp: thaiMonster.hp,
-        maxHp: thaiMonster.hp,
-        dmg: Math.floor(thaiMonster.hp / 5),
-        block: 0,
-        ai: { cycle: ['claw', 'guard'], index: 0, deck },
-        maxEnergy: deck.maxEnergy,
-        handSize: deck.handSize,
-        intentCardId: null,
-      };
-      if (s.runMode === 'episode') {
-        const hp = (s.fightCount ?? 0) === 0 ? EPISODE.firstHp : EPISODE.secondHp;
-        s.enemy.hp = s.enemy.maxHp = hp;
-        const energy = (s.fightCount ?? 0) === 0 ? EPISODE.firstEnergy : EPISODE.secondEnergy;
-        s.enemy.maxEnergy = deck.maxEnergy = energy;
-        s.enemy.handSize = deck.handSize = energy+1;
-      }
-      if (s.runMode === 'episode' && offer.enemyId === 'phi-pong-kang') {
-        s.enemy.hp = s.enemy.maxHp = EPISODE.finaleHp;
-        s.enemy.maxEnergy = EPISODE.finaleEnergy;
-        s.enemy.handSize = 5;
-        deck.handSize = 5;
-        deck.maxEnergy = EPISODE.finaleEnergy;
-        s.enemy.name = 'โป่งค่างเฝ้าบ้านร้าง';
-      }
-      require('../../campaign/nights').configureNightEnemy(s);
-      ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
-      // ไม่ประกาศท่าล่วงหน้าแล้ว — ศัตรูเลือกไพ่ตอนถึงตาของตัวเอง
-      // พรติดตัวของคลาสที่ทำงานตอนเริ่มไฟต์
-      applyClassCombatStart(s);
-      
-      // Initialize enemy behaviors and minions
-      const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
-      initializeEnemyBehaviors(s);
-      // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
-      // คอมโบเริ่มนับใหม่ทุกไฟต์ — เดิมไม่มีใครล้าง คอมโบที่ติดไปแล้วจึงติดค้าง
-      // ทั้งรัน และความคืบหน้าค้างจากไฟต์ก่อนทำให้ติดคอมโบด้วยการ์ดใบเดียว
-      resetCombos(s);
-      resetTraps(s);
-      
-      // ตั้ง intent แสดงล่วงหน้า (ไพ่บนสุดของ draw)
-      (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
-
-      // สร้างเด็คผู้เล่น + จั่วมือแรก
-      ({ state: s, rng } = buildAndShuffleDeck(s, rng));
-      ({ state: s, rng } = drawUpTo(s, rng, s.player.openingDraw??s.player.maxHandSize));
-
-      // ★ Equipment: battle-start hook (NOTM-style)
-      runEquipmentOnEquip(s); // Player equipment
-      runEquipmentOnEquip(s, 'enemy'); // Enemy equipment
-
-      // start-of-turn blessing hooks
-      resetBlessingTurnFlags(s);
-      runBlessingsTurnHook(s, 'on_turn_start');
-
-      if (s.runMode === 'episode'||s.campaign) planEnemyIntent(s);
-      mp._activeOfferIndex = ix;
-      mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-      s.log.push(`ChooseOffer → combat (${offer.tier}) vs ${s.enemy?.id ?? s.enemy?.name ?? 'Enemy'}`);
-      require('../../cards/testWin').dealTestWinCard(s);
-      return { state: s, rng };
-    }
-
-    case 'boss': {
-      mp._activeOfferIndex=ix;
-      s.phase = 'combat';
-      (s as any).nodePhase = 'in_combat';
-      s.turn = 1;
-      // PATCH: กัน PlayCard ไม่ทำงานเพราะ lock ค้างจากไฟต์ก่อน
-      s.combatVictoryLock = false;
-      (s as any).enemyPiles = undefined;
-      (s as any).playerPiles = undefined;
-      (s as any).enemyIntentCardId = null;
-      s.player.block = 0;
-      s.player.energy = s.player.maxEnergy ?? START_ENERGY;
-      
-      // Set temporary equipment slots during combat  
-      s.equipmentTempSlots = 5; // Allow 5 additional equipment during combat
-
-      // ใช้บอสที่กำหนดไว้ใน offer แทนการ random
-      const { getMonsterById } = require('../../monsters/thai-ghosts');
-      const thaiBoss = getMonsterById(offer.enemyId);
-      if (!thaiBoss) {
-        s.log.push(`❌ Boss ${offer.enemyId} not found`);
-        return { state: s, rng };
-      }
-      
-      // สร้าง EnemyState จาก Thai boss data — เด็คตามตัวเช่นเดียวกับผีทั่วไป
-      const bossDeck = deckForMonster(thaiBoss);
-      s.enemy = {
-        id: thaiBoss.id,
-        name: thaiBoss.name,
-        hp: thaiBoss.hp,
-        maxHp: thaiBoss.hp,
-        dmg: Math.floor(thaiBoss.hp / 4), // บอสแรงกว่า
-        block: 0,
-        ai: { cycle: ['claw', 'guard', 'spell'], index: 0, deck: bossDeck },
-        maxEnergy: bossDeck.maxEnergy,
-        handSize: bossDeck.handSize,
-        intentCardId: null,
-      };
-      require('../../campaign/nights').configureNightEnemy(s);
-      ({ state: s, rng } = buildAndShuffleEnemyDeck(s, rng));
-      // ไม่ประกาศท่าล่วงหน้าแล้ว — ศัตรูเลือกไพ่ตอนถึงตาของตัวเอง
-      // พรติดตัวของคลาสที่ทำงานตอนเริ่มไฟต์
-      applyClassCombatStart(s);
-      
-      // Initialize boss behaviors and minions
-      const { initializeEnemyBehaviors } = require('../../enemyBehaviorRuntime');
-      initializeEnemyBehaviors(s);
-      // ผีที่เรียกมาถูกล้างตอนจบไฟต์ก่อนหน้าแล้ว (ดู clearAllMinions ใน combat.ts)
-      // คอมโบเริ่มนับใหม่ทุกไฟต์ — เดิมไม่มีใครล้าง คอมโบที่ติดไปแล้วจึงติดค้าง
-      // ทั้งรัน และความคืบหน้าค้างจากไฟต์ก่อนทำให้ติดคอมโบด้วยการ์ดใบเดียว
-      resetCombos(s);
-      resetTraps(s);
-      
-      (s as any).enemyIntentCardId = (s as any).enemyPiles?.draw?.[0] ?? null;
-
-      ({ state: s, rng } = buildAndShuffleDeck(s, rng));
-      ({ state: s, rng } = drawUpTo(s, rng, s.player.openingDraw??s.player.maxHandSize));
-
-      // ★ Equipment: battle-start hook (NOTM-style)
-      runEquipmentOnEquip(s); // Player equipment
-      runEquipmentOnEquip(s, 'enemy'); // Enemy equipment      
-
-      resetBlessingTurnFlags(s);
-      runBlessingsTurnHook(s, 'on_turn_start');
-
-      if (s.runMode === 'episode'||s.campaign) planEnemyIntent(s);
-      mp._activeOfferIndex = ix;
-      mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-      s.log.push('ChooseOffer → combat (boss)');
-      require('../../cards/testWin').dealTestWinCard(s);
-      return { state: s, rng };
-    }
+    case 'monster':
+    case 'boss':
+      const eq=require('../../cards/equipment');
+      const picks=cmd.equipmentIndices??eq.loadoutIndices(s);
+      if(!eq.validEquipmentSelection(s,picks))return {state:s,rng};
+      s.equipmentLoadout=picks.map((i:number)=>s.masterDeck[i].ownedId!);
+      s.preEquipment=[...picks];
+      return startCombat(s, offer, ix, rng);
 
     case 'shop_card': {
       console.log('🛒 Shop_card handler debug:', {
@@ -412,7 +154,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Set current shop ID for saving
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_card (${existingShop.inventory.length} items)`);
         return { state: s, rng };
       }
@@ -426,7 +167,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s = out.state; rng = out.rng;
       s.currentShopId = offer.shopId; // Track current shop ID
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_card (${offer.shopId})`);
       return { state: s, rng };
     }
@@ -442,7 +182,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Track current shop ID
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_remove (${offer.shopId})`);
         return { state: s, rng };
       }
@@ -456,7 +195,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s = out.state; rng = out.rng;
       s.currentShopId = offer.shopId; // Track current shop ID
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_remove (${offer.shopId})`);
       return { state: s, rng };
     }
@@ -472,7 +210,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Track current shop ID
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_upgrade (${offer.shopId})`);
         return { state: s, rng };
       }
@@ -486,7 +223,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s = out.state; rng = out.rng;
       s.currentShopId = offer.shopId; // Track current shop ID
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_upgrade (${offer.shopId})`);
       return { state: s, rng };
     }
@@ -503,7 +239,6 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Track current shop ID
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
         s.log.push(`ChooseOffer → existing shop_equipment (${existingShop.inventory.length} items)`);
         return { state: s, rng };
       }
@@ -515,11 +250,9 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       }
       const out = ShopEv.openShopEquipment(s, rng);
       s = out.state; rng = out.rng;
-      if(s.pages?.adventure)s.shopStock=s.shopStock?.map(item=>({...item,price:Math.max(30,Math.round(item.price*.65))}));
-      if (s.runMode === 'episode') s.shopStock = s.shopStock?.map(item => ({...item,price:Math.max(15,Math.round(item.price / 4))}));
+      s.shopStock=s.shopStock?.map(item=>({...item,price:Math.max(30,Math.round(item.price*.65))}));
       s.currentShopId = offer.shopId; // Track current shop ID
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-  (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
       s.log.push(`ChooseOffer → new shop_equipment (${offer.shopId})`);
   return { state: s, rng };
     }
@@ -535,8 +268,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Track current well ID
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-        (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-        s.log.push(`ChooseOffer → existing well (${offer.shopId})`);
+              s.log.push(`ChooseOffer → existing well (${offer.shopId})`);
         return { state: s, rng };
       }
       
@@ -546,8 +278,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s.currentShopId = offer.shopId; // Track current well ID
       s.phase = 'shop';
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-      (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-      s.log.push(`ChooseOffer → new well (${offer.shopId})`);
+          s.log.push(`ChooseOffer → new well (${offer.shopId})`);
       return { state: s, rng };
     }
 
@@ -562,8 +293,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Track current shrine ID
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-        (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-        s.log.push(`ChooseOffer → existing healing_shrine (${offer.shopId})`);
+              s.log.push(`ChooseOffer → existing healing_shrine (${offer.shopId})`);
         return { state: s, rng };
       }
       
@@ -573,8 +303,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       s.currentShopId = offer.shopId; // Track current shrine ID
       s.phase = 'shop';
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-      (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-      s.log.push(`ChooseOffer → new healing_shrine (${offer.shopId})`);
+          s.log.push(`ChooseOffer → new healing_shrine (${offer.shopId})`);
       return { state: s, rng };
     }
 
@@ -590,8 +319,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Track current treasure ID
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-        (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-        s.log.push(`ChooseOffer → existing treasure (${offer.shopId})`);
+              s.log.push(`ChooseOffer → existing treasure (${offer.shopId})`);
         return { state: s, rng };
       }
       
@@ -616,8 +344,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       });
       
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-      (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-      s.log.push(`ChooseOffer → new treasure chest (${offer.shopId})`);
+          s.log.push(`ChooseOffer → new treasure chest (${offer.shopId})`);
       return { state: s, rng };
     }
 
@@ -633,8 +360,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
         s.currentShopId = offer.shopId; // Track current treasure ID
         s.phase = 'shop';
           mp._activeOfferIndex = ix; mp._shopUsed = false;
-        (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-        s.log.push(`ChooseOffer → existing single treasure (${offer.shopId})`);
+              s.log.push(`ChooseOffer → existing single treasure (${offer.shopId})`);
         return { state: s, rng };
       }
       
@@ -659,8 +385,15 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       });
       
         mp._activeOfferIndex = ix; mp._shopUsed = false;
-      (s.pages as any)._resolvesOnPage = 0; // reset page resolves counter
-      s.log.push(`ChooseOffer → new single treasure (${offer.shopId})`);
+          s.log.push(`ChooseOffer → new single treasure (${offer.shopId})`);
+      return { state: s, rng };
+    }
+
+    case 'blessing': {
+      const out = ShopEv.openBlessingStop(s, rng);
+      s = out.state; rng = out.rng;
+      s.currentShopId = offer.shopId;
+      mp._activeOfferIndex = ix; mp._shopUsed = false;
       return { state: s, rng };
     }
 
@@ -676,497 +409,34 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
       return { state: s, rng };
     }
 
-    case 'fusion_altar': {
-      // แท่นผสานไม่มีของขาย ไม่ต้องสุ่มสต็อก — แค่เปิดหน้าให้เลือกการ์ดสองใบ
-      s.shopKind = 'fusion';
-      s.shopStock = undefined;
-      s.shopBoughtItems = [];
-      s.currentShopId = offer.shopId;
-      // นับใหม่ทุกแท่น — แท่นละหนึ่งครั้ง
-      s.fusionAltar = { timesUsed: 0 };
-      s.phase = 'shop';
-        mp._activeOfferIndex = ix; mp._shopUsed = false;
-      s.log.push(`ChooseOffer → แท่นผสาน (${offer.shopId})`);
-      return { state: s, rng };
-    }
 
-    case 'next_event': {
-      if(usesThreePageBoard(s)){useIntersectionPage(s,ix);return {state:s,rng};}
-      // ใช้ token แล้วข้ามหน้าเลย
-      consumeToken(mp, offer);
-      mp.current.resolved[ix] = true;
-      s.log.push('ChooseOffer → next_event (proceed)');
-      return proceed(s, { type: 'Proceed' } as any, rng);
-    }
+    case 'next_event':
+      useIntersectionPage(s, ix);
+      return { state: s, rng };
 
     default:
       return { state: s, rng };
   }
 }
 
+/** Services can be passed by; ghosts, bosses and the night story cannot. */
 export function dismiss(s: GameState, cmd: Extract<Command, { type: 'DismissOffer' }>, r: RNG) {
-  if(s.pages?.adventure){if(s.phase==='map'&&!s.chapter)settleAdventureSlot(s,cmd.index,true);return {state:s,rng:r};}
-  const got = ensurePages(s, r);
-  const { rng, mp } = got;
-  if (!mp.current) return { state: s, rng };
-
-  // บนเส้นทางไม่มีการ "ปัดทิ้ง" — ต้องเลือกทางใดทางหนึ่งเสมอ
-  if (usesJourney(s)) return { state: s, rng };
-
-  const ix = cmd.index;
-  const offer: PageOffer | undefined = (mp.current.offers as PageOffer[])[ix];
-  if (!offer || mp.current.resolved[ix]) return { state: s, rng };
-
-  mp.current.resolved[ix] = true;
-  consumeToken(mp, offer);
-  s.log.push(`DismissOffer: ${formatOffer(offer)}`);
-  return { state: s, rng };
-}
-
-export function proceed(s: GameState, _cmd: Extract<Command, { type: 'Proceed' }>, r: RNG) {
-  if(s.pages?.adventure){nextIntersection(s);return {state:s,rng:r};}
-  if (['combat','levelup','reward','defeat'].includes(s.phase)) return {state:s,rng:r};
-  const got = ensurePages(s, r);
-  let { rng, mp } = got;
-
-  // บนเส้นทาง ปุ่มนี้มีความหมายเฉพาะที่ชั้นพัก — ชั้นสู้เดินต่อเองเมื่อจบไฟต์
-  if (usesJourney(s)) {
-    s.phase = 'map';
-    (s as any).nodePhase = 'map_ready';
-    if (onRestRow(s)) leaveRestRow(s);
-    else advanceJourney(s);
-    return { state: s, rng };
-  }
-
-  if (mp.pageIndex + 1 >= mp.totalPages) {
-    s.log.push('Proceed: already at last page');
-    return { state: s, rng };
-  }
-  mp.pageIndex += 1;
-  mp.current = undefined;
-  return open(s, { type: 'OpenPage' } as any, rng);
+  if(s.pages?.adventure&&s.phase==='map'&&!s.chapter)settleAdventureSlot(s,cmd.index,true);
+  return {state:s,rng:r};
 }
 
 export function completeNode(s: GameState, _cmd: Extract<Command, { type: 'CompleteNode' }>, r: RNG) {
-  if(s.pages?.adventure)return completeAdventure(s,r);
-  if (['combat','levelup','reward','defeat'].includes(s.phase)) return {state:s,rng:r};
-  const got = ensurePages(s, r);
-  let { rng, mp } = got;
-
-  if (!mp.current) return { state: s, rng };
-  const ix = mp._activeOfferIndex;
-  const onJourney = usesJourney(s);
-
-  if (ix != null && (mp.current.offers as PageOffer[])[ix]) {
-    const offer: PageOffer = (mp.current.offers as PageOffer[])[ix] as PageOffer;
-
-    if (s.phase === 'victory') {
-      // จบคอมแบต → resolve + consume token
-      mp.current.resolved[ix] = true;
-      consumeToken(mp, offer);
-
-      // จำผีที่ปราบแล้ว เพื่อไม่ให้โผล่บนแผนที่อีก (ดู replaceDefeatedMonsters)
-      if (offer.kind === 'monster' || offer.kind === 'boss') {
-        s.defeatedEnemyIds = [...(s.defeatedEnemyIds ?? []), offer.enemyId];
-      }
-
-      if (s.runMode === 'episode' && (s.fightCount ?? 0) >= EPISODE.fights) {
-        s.equipmentTempSlots = 0;
-        removeTemporaryEquipment(s);
-        clearCombatState(s);
-        winRun(s, false);
-        s.chapter = { id: 'episode_end', paragraph: 0 };
-        return { state: s, rng };
-      }
-
-      if (offer.kind === 'boss') {
-        s.equipmentTempSlots = 0;
-        removeTemporaryEquipment(s);
-        mp._activeOfferIndex = undefined;
-        mp._shopUsed = false;
-        clearCombatState(s);
-
-        // บอสกลาง — จบภาคแรก แล้วเดินทางต่อ ไม่ใช่จบรัน
-        if (offer.bossType === 'mid') {
-          s.log.push('ชนะบอสกลาง เดินทางต่อสู่ภาคสอง');
-          // เดิมบอกแค่ผ่าน log ซึ่งไม่มีจอไหนแสดง — ผ่านบอสกลางแล้วก็แค่เจอ
-          // แผนที่หน้าใหม่ ไม่รู้เลยว่าเพิ่งจบครึ่งแรกของเรื่องไป
-          fireChapter(s, { kind: 'mid_boss' });
-          return proceed(s, { type: 'Proceed' } as any, rng);
-        }
-
-        // บอสสุดท้าย — ถ้าเลือดเหลือมากพอ ปลดล็อคศึกลับต่อท้าย
-        if (offer.bossType === 'final') {
-          const hpRatio = s.player.hp / Math.max(1, s.player.maxHp);
-          if (s.campaign?.night===5 || (!s.campaign && hpRatio >= SECRET_BOSS_HP_RATIO)) {
-            s.secretBossUnlocked = true;
-            s.log.push(s.campaign?.night===5?'เจ้าไร้เศียรล้มแล้ว แต่ผีกินหัวตัวจริงยังรออยู่':'เลือดยังเหลือเฟือ… มีบางอย่างรออยู่ข้างหน้า');
-            // จุดพลิกที่สำคัญที่สุดของรัน แต่เดิมสื่อสารผ่าน log บรรทัดเดียว
-            fireChapter(s, { kind: 'secret' });
-            // เส้นทางถูกวางไว้ล่วงหน้าถึงบอสสุดท้ายเท่านั้น — ต่อชั้นศึกลับตอนนี้
-            // เพื่อไม่ให้ผู้เล่นเห็นมันรออยู่บนแผนที่ตั้งแต่ยังไม่ปลดล็อค
-            if (onJourney) rng = unlockSecretBossRows(s, rng);
-            return proceed(s, { type: 'Proceed' } as any, rng);
-          }
-        }
-
-        // จบรัน (บอสสุดท้ายโดยไม่ปลดล็อคศึกลับ หรือชนะศึกลับแล้ว)
-        winRun(s, offer.bossType === 'secret');
-        s.log.push('จบการเดินทาง');
-        return { state: s, rng };
-      }
-
-      // คอมแบตธรรมดา → กลับหน้า map
-      s.phase = 'map';
-      (s as any).nodePhase = 'map_ready';
-      clearCombatState(s);
-
-      // Clear temporary equipment slots
-      s.equipmentTempSlots = 0;
-
-      // Remove temporary equipment after combat
-      removeTemporaryEquipment(s);
-    }
-    else if (s.phase === 'shop') {
-      // Leave Shop - save to registry for persistence using static shop ID
-      console.log('🛒 Leave shop debug:', {
-        currentShopId: s.currentShopId,
-        shopUsed: mp._shopUsed,
-        shopKind: s.shopKind,
-        stockCount: s.shopStock?.length || 0,
-        boughtCount: s.shopBoughtItems?.length || 0
-      });
-      
-      if (s.currentShopId && s.shopKind) {
-        const existingShop = s.shopRegistry?.find(shop => shop.id === s.currentShopId);
-        const { addShopToRegistry, updateShopInRegistry } = require('../../shopRegistry');
-        const boughtItems = s.shopBoughtItems || [];
-        
-        if (existingShop) {
-          // Update existing shop (always save existing shops, even if not used this visit)
-          if (s.shopKind === 'card' || s.shopKind === 'equipment') {
-            console.log('🛒 Before update - Registry inventory:', existingShop.inventory.map(item => ('card' in item ? (item.card as any)?.name : undefined)));
-            console.log('🛒 Before update - Current stock:', s.shopStock?.map(item => ('card' in item ? (item.card as any)?.name : undefined)));
-            updateShopInRegistry(s, s.currentShopId, s.shopStock, boughtItems);
-            console.log('🛒 After update - Registry inventory:', existingShop.inventory.map(item => ('card' in item ? (item.card as any)?.name : undefined)));
-          } else if (s.shopKind === 'treasure') {
-            // Treasure chest: save current stock to registry (for persistence)
-            updateShopInRegistry(s, s.currentShopId, s.shopStock, boughtItems);
-            console.log('🛒 Updated treasure chest in registry');
-          } else if (s.shopKind === 'treasure_single') {
-            // Single treasure: save current stock to registry (for persistence)
-            updateShopInRegistry(s, s.currentShopId, s.shopStock, boughtItems);
-            console.log('🛒 Updated single treasure in registry');
-          } else {
-            // Remove/Upgrade/Healing/Well shops: just update usage counters
-            updateShopInRegistry(s, s.currentShopId, [], boughtItems);
-            console.log(`🛒 Updated ${s.shopKind} shop counters in registry`);
-          }
-          console.log('🛒 Updated existing shop in registry');
-        } else {
-          // Add new shop to registry (always save new shops for persistence)
-          const stockToSave = (s.shopKind === 'card' || s.shopKind === 'equipment' || s.shopKind === 'treasure' || s.shopKind === 'treasure_single') ? s.shopStock : [];
-          addShopToRegistry(s, s.shopKind as any, stockToSave, boughtItems, s.currentShopId);
-          console.log(`🛒 Added new ${s.shopKind} shop to registry`);
-        }
-      } else {
-        console.log('🛒 Shop not saved to registry (missing data)');
-      }
-      
-      // Check if shop stock exhausted - if so, mark as resolved and refresh slot
-      const stockExhausted = (() => {
-        if (s.shopKind === 'card' || s.shopKind === 'equipment') {
-          // Card/Equipment shops: exhausted when no stock left
-          return !s.shopStock || s.shopStock.length === 0;
-        } else if (s.shopKind === 'remove') {
-          // Remove shop: exhausted when no cards to remove
-          return !s.masterDeck || s.masterDeck.length === 0;
-        } else if (s.shopKind === 'upgrade') {
-          // Upgrade shop: exhausted when no cards to upgrade
-          return !s.masterDeck || s.masterDeck.length === 0;
-        } else if (s.shopKind === 'healing') {
-          // Healing shrine: exhausted when max uses reached or player at full HP permanently
-          const healCount = (s as any).healingShrine?.timesUsed ?? 0;
-          const maxUses = 3;
-          return healCount >= maxUses;
-        } else if (s.shopKind === 'well') {
-          // Mystical well: exhausted when max uses reached
-          const wellCount = (s as any).mysticalWell?.timesUsed ?? 0;
-          const maxUses = 2;
-          return wellCount >= maxUses;
-        } else if (s.shopKind === 'treasure') {
-          // Treasure chest: exhausted when no cards left
-          return !s.shopStock || s.shopStock.length === 0;
-        } else if (s.shopKind === 'treasure_single') {
-          // Single treasure: exhausted when no cards left
-          return !s.shopStock || s.shopStock.length === 0;
-        }
-        return false; // Unknown shop kind - don't refresh
-      })();
-      
-      // บนเส้นทาง หนึ่งโหนดคือหนึ่งครั้งที่แวะ — ออกจากร้านแล้วเดินต่อเสมอ
-      // (ถาดเดิมปล่อยให้ร้านค้างไว้จนของหมด เพราะช่องถูกสุ่มใหม่ได้เรื่อยๆ)
-      if (onJourney || stockExhausted) {
-        mp.current.resolved[ix] = true;
-        consumeToken(mp, offer);
-      }
-      
-      s.shopStock = undefined;
-      s.shopKind = undefined;
-      s.shopBoughtItems = undefined; // Clear bought items tracker
-      s.currentShopId = undefined; // Clear current shop ID
-      s.phase = 'map';
-    }
-    else if (s.phase === 'event') {
-      // เหตุการณ์เล่าเรื่องต้องเลือกทางก่อน ถึงจะเดินต่อได้
-      // ไม่งั้นกดออกเลยก็ข้ามผลของเหตุการณ์ไปได้ทั้งดุ้น
-      if (s.story && s.story.result == null) {
-        return { state: s, rng };
-      }
-
-      // well: ต้องใช้หรือกดปิดให้ถูก flag ถึง resolve; event ชนิดอื่น resolve ได้ตรง ๆ
-      const ok =
-        onJourney ||
-        (s.event?.type === 'well' && ((s.event.used ?? false) || (s.event.dismissed ?? false))) ||
-        (s.event?.type && s.event.type !== 'well');
-
-      if (ok) {
-        mp.current.resolved[ix] = true;
-        consumeToken(mp, offer);
-      }
-      s.event = undefined;
-      s.story = undefined;
-      s.phase = 'map';
-    }
-
-    // === Page flow enhancement ===
-    // เมื่อจบ encounter ที่ไม่ใช่ boss/next_event → รีเฟรชช่องทันที (เฉพาะที่ resolved จริงๆ)
-    // บนเส้นทางไม่มีการรีเฟรช — จบโหนดแล้วเปิดชั้นถัดไปแทน
-    if (onJourney) {
-      if (ix != null && mp.current?.resolved[ix]) {
-        const done: PageOffer = (mp.current.offers as PageOffer[])[ix] as PageOffer;
-        mp._activeOfferIndex = undefined;
-        mp._shopUsed = false;
-
-        // ชั้นพัก: เคลียร์ช่องหนึ่งแล้วมีของใหม่ขึ้นแทน ยังไม่เดินต่อ
-        // (ดู `map/restPage.ts` — เดินต่อเมื่อผู้เล่นกดเอง)
-        if (done && isRestOfferKind(done.kind) && onRestRow(s)) {
-          spendRestToken(s, done);
-          rng = refillRestSlot(s, ix, rng);
-          return { state: s, rng };
-        }
-
-        advanceJourney(s);
-      }
-      return { state: s, rng };
-    }
-
-    if (ix != null && mp.current && (mp.current.offers as PageOffer[])[ix] && mp.current.resolved[ix]) {
-      const offer: PageOffer = (mp.current.offers as PageOffer[])[ix] as PageOffer;
-      if (offer.kind !== 'boss' && offer.kind !== 'next_event') {
-        // Don't refresh persistent shop slots that exist in registry
-        const isRegistryShop = 'shopId' in offer && s.shopRegistry?.some(shop => shop.id === offer.shopId);
-        if (isRegistryShop) {
-          console.log(`🛒 Skipping refresh for persistent shop: ${offer.shopId}`);
-        } else {
-          (s.pages as any)._resolvesOnPage = ((s.pages as any)._resolvesOnPage ?? 0) + 1;
-          if (((s.pages as any)._resolvesOnPage ?? 0) < PAGE_FORCE_SPLIT_AT) {
-            const rep = replaceSingleOffer(mp, rng, s, ix);
-            rng = rep.rng;
-            s.log.push(`↻ Slot #${ix} refreshed (resolvesOnPage=${(s.pages as any)._resolvesOnPage})`);
-          } else {
-            (mp.current.offers as any[])[ix] = { kind: 'next_event' } as any;
-            (mp.current.resolved as any[])[ix] = false;
-            (s.pages as any)._resolvesOnPage = 0;
-            s.log.push('⚑ Forced next_event (PAGE_FORCE_SPLIT_AT reached)');
-          }
-        }
-      }
-    }
-
-    // reset flags
-    mp._activeOfferIndex = undefined;
-    mp._shopUsed = false;
-  }
-// เคลียร์ครบ 3 ช่อง → ไปหน้าถัดไป auto
-  if (onJourney) return { state: s, rng };
-  if (s.pages?.current?.resolved.every(Boolean)) {
-    return proceed(s, { type: 'Proceed' } as any, rng);
-  }
-  return { state: s, rng };
+  if(!s.pages?.adventure)return {state:s,rng:r};
+  return completeAdventure(s,r);
 }
 
 export function deleteShopFromMap(s: GameState, cmd: Extract<Command, { type: 'DeleteShopFromMap' }>, rng: RNG) {
-  if(s.pages?.adventure){if(s.phase==='map'&&!s.chapter&&cmd.index!=null)settleAdventureSlot(s,cmd.index,true);return {state:s,rng};}
-  if (s.mapMode !== 'pages' || !s.pages) {
-    return { state: s, rng };
-  }
-
-  const mp = s.pages;
-  const ix = cmd.index;
-  
-  if (ix === undefined || !mp.current?.offers[ix]) {
-    return { state: s, rng };
-  }
-
-  const offer = mp.current.offers[ix] as PageOffer;
-
-  // ข้ามได้เฉพาะโหนดพัก — โหนดสู้กับบอสข้ามไม่ได้
-  if (!isRestOfferKind(offer.kind)) {
-    return { state: s, rng };
-  }
-
-  // Track deleted shop for sequential logic
-  if ('shopId' in offer && offer.shopId) {
-    // Ensure deletedShops exists (fallback for existing saves)
-    if (!mp.deletedShops) {
-      mp.deletedShops = [];
-    }
-    if (!mp.deletedShops.includes(offer.shopId)) {
-      mp.deletedShops.push(offer.shopId);
-    }
-    console.log('🗑️ Added shop to deleted list from map:', offer.shopId);
-    
-    // Remove from registry if exists
-    if (s.shopRegistry) {
-      const shopIndex = s.shopRegistry.findIndex(shop => shop.id === offer.shopId);
-      if (shopIndex >= 0) {
-        s.shopRegistry.splice(shopIndex, 1);
-        console.log('🗑️ Removed shop from registry (map):', offer.shopId);
-      }
-    }
-  }
-
-  // Delete shop from map - resolve + refresh slot
-  mp.current.resolved[ix] = true;
-  consumeToken(mp, offer);
-  s.log.push('🗑️ Shop deleted from map');
-
-  // บนเส้นทางไม่มีการรีเฟรชช่อง — ลบร้านคือเลือกที่จะข้ามโหนดนั้นแล้วเดินต่อ
-  if (usesJourney(s)) {
-    enterNode(s, ix);
-    mp._activeOfferIndex = undefined;
-    mp._shopUsed = false;
-    advanceJourney(s);
-    return { state: s, rng };
-  }
-
-  // Refresh slot with new encounter (same as monster completion)
-  const refreshResult = replaceSingleOffer(mp, rng, s, ix);
-  rng = refreshResult.rng;
-  
-  s.log.push(`🆕 Slot #${ix} refreshed after map shop deletion`);
-  console.log('🔄 Refreshed slot after map shop deletion:', mp.current?.offers[ix]);
-
-  return { state: s, rng };
+  if(s.pages?.adventure&&s.phase==='map'&&!s.chapter&&cmd.index!=null)settleAdventureSlot(s,cmd.index,true);
+  return {state:s,rng};
 }
 
 export function deleteShop(s: GameState, _cmd: Extract<Command, { type: 'DeleteShop' }>, rng: RNG) {
-  if(s.pages?.adventure){
-    const ix=s.pages._activeOfferIndex;
-    if(s.phase==='shop'&&ix!=null){s.shopStock=undefined;s.shopKind=undefined;s.currentShopId=undefined;s.shopBoughtItems=undefined;s.phase='map';settleAdventureSlot(s,ix,true);}
-    return {state:s,rng};
-  }
-  if (s.phase !== 'shop' || s.mapMode !== 'pages' || !s.pages) {
-    return { state: s, rng };
-  }
-
-  const mp = s.pages;
-  const ix = mp._activeOfferIndex;
-  
-  if (ix === undefined || !mp.current?.offers[ix]) {
-    return { state: s, rng };
-  }
-
-  const offer = mp.current.offers[ix] as PageOffer;
-
-  // Track deleted shop for sequential logic
-  if ('shopId' in offer && offer.shopId) {
-    // Ensure deletedShops exists (fallback for existing saves)
-    if (!mp.deletedShops) {
-      mp.deletedShops = [];
-    }
-    if (!mp.deletedShops.includes(offer.shopId)) {
-      mp.deletedShops.push(offer.shopId);
-    }
-    console.log('🗑️ Added shop to deleted list:', offer.shopId);
-    
-    // Remove from registry if exists
-    if (s.shopRegistry) {
-      const shopIndex = s.shopRegistry.findIndex(shop => shop.id === offer.shopId);
-      if (shopIndex >= 0) {
-        s.shopRegistry.splice(shopIndex, 1);
-        console.log('🗑️ Removed shop from registry:', offer.shopId);
-      }
-    }
-  }
-
-  // Delete shop - resolve ทันที
-  mp.current.resolved[ix] = true;
-  consumeToken(mp, offer);
-  
-  s.shopStock = undefined;
-  s.shopKind = undefined;
-  s.currentShopId = undefined;
-  s.shopBoughtItems = undefined;
-  s.phase = 'map';
-  s.log.push('🗑️ Shop deleted permanently');
-
-  // reset flags
-  mp._activeOfferIndex = undefined;
-  mp._shopUsed = false;
-
-  // บนเส้นทาง: ลบร้านแล้วเดินต่อ ไม่มีช่องให้รีเฟรช
-  if (usesJourney(s)) {
-    advanceJourney(s);
-    return { state: s, rng };
-  }
-
-  // ตาม game rule: ลบร้านแล้ว → Refresh slot ทันที (เหมือนตอนสู้มอนสเตอร์จบ)
-  const refreshResult = replaceSingleOffer(mp, rng, s, ix);
-  rng = refreshResult.rng;
-  
-  s.log.push(`🆕 Slot #${ix} refreshed after shop deletion`);
-  console.log('🔄 Refreshed slot after shop deletion:', mp.current?.offers[ix]);
-
-  return { state: s, rng };
-}
-
-/**
- * ตรวจสอบว่าสามารถไปหน้าถัดไปได้หรือไม่
- * เงื่อนไข:
- * 1. Combat ต้องเสร็จ (resolved = true)  
- * 2. Shop/Event ไม่บังคับ แต่ถ้ายังไม่ resolved ก็ยังไปไม่ได้
- */
-function canProceedToNextMap(s: GameState): boolean {
-  if (s.mapMode !== 'pages' || !s.pages?.current) return false;
-  
-  const mp = s.pages;
-  const offers = mp.current!.offers;
-  const resolved = mp.current!.resolved;
-  
-  let hasCombat = false;
-  let combatCompleted = false;
-  
-  for (let i = 0; i < offers.length; i++) {
-    const offer = offers[i];
-    const isResolved = resolved[i];
-    
-    if (offer.kind === 'monster') {
-      hasCombat = true;
-      if (isResolved) {
-        combatCompleted = true;
-      }
-    }
-  }
-  
-  // Must have combat and complete it
-  if (hasCombat && !combatCompleted) {
-    return false;
-  }
-  
-  // Combat completed - check if we can proceed
-  // All resolved = proceed (traditional way)
-  // OR Combat done + no mandatory unresolved slots = proceed 
-  return resolved.every(Boolean);
+  const ix=s.pages?._activeOfferIndex;
+  if(s.pages?.adventure&&s.phase==='shop'&&ix!=null){s.shopStock=undefined;s.shopKind=undefined;s.currentShopId=undefined;s.shopBoughtItems=undefined;s.phase='map';settleAdventureSlot(s,ix,true);}
+  return {state:s,rng};
 }

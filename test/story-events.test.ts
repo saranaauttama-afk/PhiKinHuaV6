@@ -7,7 +7,6 @@ import {
   STORY_EVENTS, getStoryEvent, choiceLocked, applyChoice, applyEffect,
   type EventEffect, type StoryEvent,
 } from '../src/core/events/story';
-import { buildJourney } from '../src/core/map/journey';
 import { ALL_CARDS } from '../src/core/pack';
 import { ALL_CLASS_IDS } from '../src/core/classes';
 
@@ -109,7 +108,7 @@ function baseState(over: Partial<GameState['player']> = {}): GameState {
   return {
     classId: 'shaman',
     player: { hp: 40, maxHp: 50, gold: 50, level: 3, ...over },
-    masterDeck: [{ id: 'a', name: 'ก', type: 'skill', cost: 0 }],
+    masterDeck: [{ id: 'a', name: 'ก', type: 'action', ap: 0, fx: {} }],
     blessings: [],
     log: [],
   } as unknown as GameState;
@@ -251,133 +250,3 @@ class AtEvent {
 
 const firstEventId = STORY_EVENTS[0].id;
 
-describe('เหตุการณ์บนเส้นทาง', () => {
-  it('เข้าโหนดแล้วเข้าสู่หน้าเหตุการณ์ ยังไม่มีผลลัพธ์', () => {
-    const t = new AtEvent(firstEventId);
-    expect(t.state.phase).toBe('event');
-    expect(t.state.story?.eventId).toBe(firstEventId);
-    expect(t.state.story?.result).toBeUndefined();
-  });
-
-  it('เลือกทางแล้วได้ข้อความผลลัพธ์', () => {
-    const t = new AtEvent(firstEventId);
-    t.go({ type: 'ChooseEventOption', index: 0 });
-
-    expect(t.state.story.result).toBeTruthy();
-    expect(t.state.story.chosenIndex).toBe(0);
-  });
-
-  it('ยังไม่เลือกทาง ปิดโหนดไม่ได้ — ข้ามผลของเหตุการณ์ไปเฉยๆ ไม่ได้', () => {
-    const t = new AtEvent(firstEventId);
-    t.go({ type: 'CompleteNode' });
-
-    expect(t.state.phase).toBe('event');
-    expect(t.state.story?.eventId).toBe(firstEventId);
-  });
-
-  it('เลือกแล้วปิดโหนดได้ และเดินต่อชั้นถัดไป', () => {
-    const t = new AtEvent(firstEventId);
-    const stoodAt = t.state.journey.currentId;
-
-    t.go({ type: 'ChooseEventOption', index: 0 });
-    t.go({ type: 'CompleteNode' });
-
-    expect(t.state.phase).toBe('map');
-    expect(t.state.story).toBeUndefined();
-    expect(t.state.pages.current.offers).toEqual(
-      t.state.journey.nodes[stoodAt].next.map((id: string) => t.state.journey.nodes[id].offer)
-    );
-  });
-
-  it('เลือกซ้ำไม่ได้ — กดรัวแล้วรับผลหลายรอบไม่ได้', () => {
-    const t = new AtEvent('roadside_shrine');
-    // ทางที่สอง: หยิบเหรียญ ได้ทอง เสียเลือด
-    t.go({ type: 'ChooseEventOption', index: 1 });
-    const goldAfter = t.state.player.gold;
-    const hpAfter = t.state.player.hp;
-
-    t.go({ type: 'ChooseEventOption', index: 1 });
-    t.go({ type: 'ChooseEventOption', index: 0 });
-
-    expect(t.state.player.gold).toBe(goldAfter);
-    expect(t.state.player.hp).toBe(hpAfter);
-  });
-
-  it('เลือกทางที่ล็อกอยู่ไม่ได้ และเหตุการณ์ยังค้างให้เลือกใหม่', () => {
-    const t = new AtEvent('roadside_shrine');
-    t.state.player.gold = 0;   // ทางแรกต้องมีทอง 15
-
-    t.go({ type: 'ChooseEventOption', index: 0 });
-
-    expect(t.state.story.result).toBeUndefined();
-    expect(t.state.player.gold).toBe(0);
-  });
-
-  it('ผลของเหตุการณ์เปลี่ยนสถานะผู้เล่นจริง', () => {
-    const t = new AtEvent('roadside_shrine');
-    const before = { gold: t.state.player.gold, hp: t.state.player.hp };
-
-    t.go({ type: 'ChooseEventOption', index: 1 }); // หยิบเหรียญ: +45 ทอง, -7 เลือด
-
-    expect(t.state.player.gold).toBe(before.gold + 45);
-    expect(t.state.player.hp).toBe(before.hp - 7);
-  });
-
-  it('ทางที่ล็อกด้วยคลาส เปิดให้เฉพาะคลาสนั้น', () => {
-    const asShaman = new AtEvent('old_woman_rice');
-    const asNun = new AtEvent('old_woman_rice');
-    asNun.state.classId = 'nun';
-
-    const ev = getStoryEvent('old_woman_rice')!;
-    const nunOnly = ev.choices.findIndex(c =>
-      (c.requires ?? []).some(r => r.kind === 'class' && r.classId === 'nun')
-    );
-    expect(nunOnly, 'เหตุการณ์นี้ควรมีทางเฉพาะแม่ชี').toBeGreaterThanOrEqual(0);
-
-    expect(choiceLocked(asShaman.state, ev.choices[nunOnly])).not.toBeNull();
-    expect(choiceLocked(asNun.state, ev.choices[nunOnly])).toBeNull();
-  });
-
-  it('ทุกเหตุการณ์เดินผ่านได้จริงด้วยทางที่ไม่มีเงื่อนไข', () => {
-    for (const ev of STORY_EVENTS) {
-      const t = new AtEvent(ev.id, `walk-${ev.id}`);
-      const free = ev.choices.findIndex(c => (c.requires ?? []).length === 0);
-
-      t.go({ type: 'ChooseEventOption', index: free });
-      t.go({ type: 'CompleteNode' });
-
-      expect(t.state.phase, `${ev.id} ปิดโหนดไม่ลง`).toBe('map');
-    }
-  });
-});
-
-describe('เหตุการณ์บนแผนที่จริง', () => {
-  it('รันหนึ่งเจอเหตุการณ์หลายครั้ง', () => {
-    const { journey } = buildJourney(makeRng('story-map'));
-    const events = Object.values(journey.nodes)
-      .filter(n => n.offer.kind === 'story_event');
-    expect(events.length).toBeGreaterThanOrEqual(3);
-  });
-
-  it('เหตุการณ์ไม่ซ้ำกันภายในรันเดียว', () => {
-    for (const seed of ['sm-1', 'sm-2', 'sm-3', 'sm-4']) {
-      const { journey } = buildJourney(makeRng(seed));
-      const ids = Object.values(journey.nodes)
-        .filter(n => n.offer.kind === 'story_event')
-        .map(n => (n.offer as any).eventId as string);
-
-      // มีเหตุการณ์ในคลังมากกว่าจำนวนโหนดที่โผล่ได้ จึงไม่ควรซ้ำเลย
-      expect(new Set(ids).size, `seed ${seed}`).toBe(ids.length);
-    }
-  });
-
-  it('ทุกโหนดเหตุการณ์อ้าง id ที่มีอยู่จริง', () => {
-    for (const seed of ['sm-1', 'sm-2', 'sm-3', 'sm-4', 'sm-5']) {
-      const { journey } = buildJourney(makeRng(seed));
-      for (const n of Object.values(journey.nodes)) {
-        if (n.offer.kind !== 'story_event') continue;
-        expect(getStoryEvent(n.offer.eventId), `${seed}: ${n.offer.eventId}`).toBeDefined();
-      }
-    }
-  });
-});

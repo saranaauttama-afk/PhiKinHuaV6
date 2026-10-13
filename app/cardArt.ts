@@ -16,6 +16,12 @@ export const CARD_ART_SOURCES: Record<string, import('react-native').ImageSource
  'curse_rot': require('../assets/cards/thai-v24/curse_rot.webp'),
  'curse_bad_omen': require('../assets/cards/thai-v24/curse_bad_omen.webp'),
  'curse_dread': require('../assets/cards/thai-v24/curse_dread.webp'),
+ // Interim art for phase-2 cards until the new card art lands.
+ 'offering_candle': require('../assets/cards/thai-v24/spirit_lamp.webp'),
+ 'withering_hex': require('../assets/monsters/thai-v24/nang-tanee.webp'),
+ 'salt_hex': require('../assets/cards/thai-v24/dispel_ill.webp'),
+ 'herbal_ritual': require('../assets/cards/thai-v24/gathering_merit.webp'),
+ 'borrow_breath': require('../assets/cards/invite_spirit-v2.webp'),
  'qa_phra_prathan': require('../assets/cards/thai-v24/qa_phra_prathan.webp'),
  'night_head_collector_strike':require('../assets/monsters/thai-v24/night-head-collector.webp'),
  'night_head_collector_ward':require('../assets/monsters/thai-v24/night-head-collector.webp'),

@@ -1,22 +1,13 @@
-// src/core/combat/intent.ts — ศัตรูตัดสินใจล่วงหน้าว่าเทิร์นหน้าจะทำอะไร
-//
-// เดิมศัตรูจั่วการ์ดตอนถึงเทิร์นตัวเองแล้วเปิดคว่ำทีละใบ ผู้เล่นจึงไม่มีทางรู้ว่า
-// กำลังจะโดนอะไร → ตัดสินใจว่า "เทิร์นนี้ควรตีหรือควรตั้งการ์ด" ไม่ได้เลย
-// กลายเป็นเกมเดา ไม่ใช่เกมวางแผน
-//
-// ตอนนี้ศัตรูเลือกไพ่ที่จะเล่นตั้งแต่จบเทิร์นก่อนหน้า เก็บไว้ใน state.enemyIntent
-// แล้ว UI เอาไปแสดงระหว่างเทิร์นผู้เล่น พอถึงเทิร์นศัตรูก็เล่นตามนั้นเป๊ะ
-
 import type { EnemyIntent, GameState } from '../types';
 import { enemyCardById } from '../pack_enemy_cards';
 import { computeModifiedDamage } from './damage';
-import {chooseEnemyCards} from './enemyPlan';
+import {chooseEnemyCardIndexes} from './enemyPlan';
+import { cardFx } from './enemyCardEffects';
+import { hitsOf } from '../cards/mechanics';
 
-/**
- * เลือกไพ่ที่ศัตรูจะเล่นเทิร์นหน้า จากมือที่จั่วไว้แล้ว โดยดูพลังงานที่มี
- * ไม่แตะ HP หรือ block ของใครทั้งนั้น — แค่วางแผน
- */
-export function planEnemyIntent(s: GameState): void {
+/** Hidden in-turn decision only. Old preparation calls neither draw nor publish future cards. */
+export function planEnemyIntent(s: GameState,duringEnemyTurn=false): void {
+  if(!duringEnemyTurn){s.enemyIntent=undefined;return;}
   const piles = (s as any).enemyPiles as
     | { draw: string[]; hand: string[]; discard: string[] }
     | undefined;
@@ -30,35 +21,24 @@ export function planEnemyIntent(s: GameState): void {
   const { enemyDrawUpToHand } = require('../engine/handlers/enemy');
   enemyDrawUpToHand(s);
 
-  let energy = s.enemy.maxEnergy ?? 2;
   const cardIds: string[] = [];
   let damage = 0;
   let block = 0;
 
-  const chosen=(s.runMode==='episode'||s.campaign)?chooseEnemyCards(s,piles.hand,energy):piles.hand;
-  for (const id of chosen) {
+  const handIndexes = chooseEnemyCardIndexes(s, piles.hand, s.enemy.ap ?? 0);
+  for (const id of handIndexes.map(i => piles.hand[i])) {
     const def = enemyCardById(id);
     if (!def) continue;
-
-    const cost = typeof def.energyCost === 'number' ? def.energyCost : 1;
-    if (cost > energy) continue;
-    energy -= cost;
     cardIds.push(id);
-
-    if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-      // ใช้สูตรเดียวกับดาเมจจริง ไม่งั้นเลขที่โชว์จะไม่ตรงกับที่โดน
-      damage += (def.hits ?? 1) * computeModifiedDamage(s, {
-        from: 'enemy',
-        to: 'player',
-        raw: def.dmg!,
-        source: { kind: 'card', cardId: def.id },
-      });
-    }
-    if ((def.block ?? 0) > 0) block += def.block!;
+    const f = cardFx(s, def);
+    // Same formula as the real hit, so the shown number is what lands.
+    if (f.dmg) damage += hitsOf(f) * computeModifiedDamage(s, { from: 'enemy', to: 'player', raw: f.dmg, source: { kind: 'card', cardId: def.id } });
+    if (f.block) block += f.block;
   }
 
   s.enemyIntent = {
     cardIds,
+    handIndexes,
     damage,
     block,
     kind:
@@ -75,8 +55,7 @@ export function refreshIntentEstimate(s: GameState): void {
   if (!s.enemyIntent) return;
   s.enemyIntent.damage = s.enemyIntent.cardIds.reduce((sum, id) => {
     const c = enemyCardById(id);
-    return sum + (c?.type === 'attack' && c.dmg ? (c.hits ?? 1) * computeModifiedDamage(s, {
-      from: 'enemy', to: 'player', raw: c.dmg, source: { kind: 'card', cardId: id },
-    }) : 0);
+    const f = c ? cardFx(s, c) : {};
+    return sum + (f.dmg ? hitsOf(f) * computeModifiedDamage(s, { from: 'enemy', to: 'player', raw: f.dmg, source: { kind: 'card', cardId: id } }) : 0);
   }, 0);
 }

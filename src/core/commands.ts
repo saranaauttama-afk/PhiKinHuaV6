@@ -1,15 +1,12 @@
 // Commands — pure helpers used by reducer
-// baseNewState, buildAndShuffleDeck, drawUpTo, startPlayerTurn, applyCardEffect,
-// isVictory/isDefeat, endEnemyTurn
+// baseNewState, buildAndShuffleDeck, drawCards, startPlayerTurn, beginPlayerFight, isVictory/isDefeat, startCombat
 import type { CardData, GameState } from './types';
-import { HAND_SIZE, START_ENERGY, START_DECK, START_GOLD, START_HP, nextExpForLevel } from './balance';
+import { START_DECK, START_GOLD, START_HP, nextExpForLevel } from './balance';
+import { CARD_RULES } from './balance/notfm';
 import { shuffle, type RNG } from './rng';
-import { resetBlessingTurnFlags } from './blessingRuntime';
-import { resetEquipmentTurnFlags, runEquipmentTurnHook } from './equipmentRuntime';
 import { THAI_GHOST_POOLS, type ThaiGhostData } from './monsters/thai-ghosts';
 import { dealDamage, gainBlock, heal } from './combat/damage';
 
-let _instanceCounter = 0;
 
 // NOTE: We keep state updates pure by working on shallow copies of containers.
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -21,9 +18,9 @@ export function baseNewState(seed: string): GameState {
     turn: 0,
     player: {
       hp: START_HP, maxHp: START_HP, block: 0,
-      energy: START_ENERGY, gold: START_GOLD,
-      level: 1, exp: 0, expToNext: nextExpForLevel(1),
-      maxEnergy: START_ENERGY, maxHandSize: HAND_SIZE,
+      ap: CARD_RULES.apPerTurn, maxAp: CARD_RULES.apPerTurn, mana: 0, startMana: 0,
+      openingDraw: CARD_RULES.openingDraw, drawPerTurn: CARD_RULES.drawPerTurn, handMax: CARD_RULES.handMax, retain: CARD_RULES.retain,
+      gold: START_GOLD, level: 1, exp: 0, expToNext: nextExpForLevel(1),
     },
     enemy: undefined,
     fightCount: 0, // Track fights for boss encounters
@@ -44,64 +41,18 @@ export function baseNewState(seed: string): GameState {
   };
 }
 
-function moveCard(from: CardData[], to: CardData[], idx: number) {
-  const [c] = from.splice(idx, 1);
-  to.push(c);
-}
-
-function maybeRefillDraw(state: GameState, rng: RNG): { state: GameState; rng: RNG } {
-  if (state.piles.draw.length === 0 && state.piles.discard.length > 0) {
-    const out = shuffle(rng, state.piles.discard);
-    state.piles.draw = out.array;
-    state.piles.discard = [];
-    return { state, rng: out.rng };
-  }
-  return { state, rng };
-}
-
-// จั่ว 1 ใบแบบปลอดภัย (ไม่มีไพ่ให้จั่ว -> คืน drew=false)
-function drawOne(s: GameState, rng: RNG): { state: GameState; rng: RNG; drew: boolean } {
-  let r = rng;
-  if (s.piles.draw.length === 0) {
-    if (s.piles.discard.length === 0) {
-      return { state: s, rng: r, drew: false };
-    }
-    const sh = shuffle(r, s.piles.discard);
-    r = sh.rng;
-    s.piles.draw = sh.array;
-    s.piles.discard = [];
-  }
-  const c = s.piles.draw.shift();
-  if (!c) return { state: s, rng: r, drew: false };
-  s.piles.hand.push(c);
-  return { state: s, rng: r, drew: true };
-}
-
-export function drawUpTo(s: GameState, rng: RNG, targetHandSize = HAND_SIZE): { state: GameState; rng: RNG } {
-  let r = rng;
-  let guard = 0;              // ฝากันลูปผิดพลาด
-  const GUARD_MAX = 200;
-  const startHand = s.piles.hand.length;
-  while (s.piles.hand.length < targetHandSize && guard++ < GUARD_MAX) {
-    const res = drawOne(s, r);
-    r = res.rng;
-    if (!res.drew) break;     // ไม่มีไพ่ให้จั่ว -> ออกทันที
-  }
-  const endHand = s.piles.hand.length;
-  if (targetHandSize > 3) { // Only log when trying to draw more than default
-    s.log.push(`Drew ${endHand - startHand} cards (${startHand}→${endHand}, target:${targetHandSize})`);
-  }
-  return { state: s, rng: r };
+/** Draw `n` cards, stopping at the hand limit. */
+export function drawCards(s: GameState, rng: RNG, n: number): { state: GameState; rng: RNG } {
+  return { state: s, rng: require('./cards/fx').drawCards(s, rng, n) };
 }
 
 export function buildAndShuffleDeck(_state: GameState, _rng: RNG): { state: GameState; rng: RNG } {
   let state = _state;
   let rng = _rng;
   const source = state.masterDeck?.length ? state.masterDeck : START_DECK;
-  const out = shuffle(rng, source);
-  _instanceCounter = 0;
+  const out = shuffle(rng, source.map((c,i)=>({...c,instanceId:`${c.id}__${i+1}`})));
   state.piles = {
-    draw: out.array.map(c => ({ ...c, instanceId: `${c.id}__${++_instanceCounter}` })),
+    draw: out.array,
     hand: [], discard: [], exhaust: [],
   };
   rng = out.rng;
@@ -109,176 +60,42 @@ export function buildAndShuffleDeck(_state: GameState, _rng: RNG): { state: Game
 }
 
 export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState; rng: RNG } {
-  // resetEquipmentTurnFlags(state);
-  // state.player.energy = state.player.maxEnergy ?? START_ENERGY;
-  // state.player.block = 0;
-  // resetBlessingTurnFlags(state); // ✅ ให้พรแบบ once-per-turn ยิงได้ใหม่
-  // return drawUpTo(state,rng ,state.player.maxHandSize ?? HAND_SIZE);
-  // Import systems
   const { processStatusEffectsOnTurnStart } = require('./statusEffectsRuntime');
-  const { processPlayerTurnMinions } = require('./minionRuntime');
-
-  // ★ รีเซ็ต once-per-turn ของอุปกรณ์สำหรับเทิร์นใหม่นี้
-  resetEquipmentTurnFlags(state);
-  // การ์ดค่าร่ายลื่นนับจากศูนย์ใหม่ทุกเทิร์น
   require('./cards/mechanics').resetCardsPlayed(state);
-
-  // ขั้นตอนพื้นฐาน
-  state.player.energy = state.player.maxEnergy ?? START_ENERGY;
+  state.player.ap = state.player.maxAp;
   state.player.block = 0;
-
-  // Process status effects at start of turn
+  // สำรวมจิต lasts until the start of the next player turn.
+  if (state.fight) state.fight.halfDamage = false;
   processStatusEffectsOnTurnStart('player', state);
-
-  // จั่วเพิ่ม maxHandSize ใบ (ไม่ใช่จั่วถึง maxHandSize) — card ค้างมือได้สะสม
-  const drawTarget = state.piles.hand.length + (state.player.drawPerTurn ?? state.player.maxHandSize ?? HAND_SIZE);
-  const out = drawUpTo(state, rng, drawTarget);
-  state = out.state; rng = out.rng;
-
-  // ★ ยิง on_turn_start (ฝั่งผู้เล่น)
-  runEquipmentTurnHook(state, 'on_turn_start', 'player');
-
-  // Process player minions actions
-  processPlayerTurnMinions(state);
-
-  // เดิม: ให้พร reset ที่อื่นด้วย แต่ถ้าจะคงไว้ตรงนี้ก็ได้
-  resetBlessingTurnFlags(state);
-
+  rng = require('./cards/play').resolvePrayers(state, rng);
+  if (state.phase !== 'combat') return { state, rng };
+  ({ state, rng } = drawCards(state, rng, Math.max(1,state.player.drawPerTurn)));
+  rng = require('./cards/passives').runTriggers(state, 'turnStart', rng);
   require('./cards/testWin').dealTestWinCard(state);
-  return { state, rng };  
+  return { state, rng };
 }
 
-export function applyCardEffect(state: GameState, idxInHand: number) {
-  const card = state.piles.hand[idxInHand];
-  if (!card) return;
-  
-  state.log.push(`🎴 Playing ${card.name} (${card.id})`);
-
-  // Import all advanced systems
-  const { canPlayAttackCards } = require('./statusEffectsRuntime');
-  const { onPlayerCardPlayed } = require('./adaptiveAI');
-  const { applyComboCardModifiers, onCardPlayed: onCardPlayedForCombos } = require('./combat/combos');
-  const { getClass } = require('./classes');
-
-  // Check if attack cards can be played (entangle check)
-  if (card.type === 'attack' && !canPlayAttackCards(state)) {
-    state.log.push(`Cannot play attack cards while entangled`);
-    return;
-  }
-
-  // ★ Apply combo system modifiers first
-  //   เงื่อนไขคิดหลังคอมโบ เพราะคอมโบเปลี่ยนตัวเลขบนการ์ด แต่เงื่อนไขอ่าน
-  //   **สภาพสนาม** ซึ่งยังไม่เปลี่ยนจนกว่าจะลงผลจริง
-  const { withConditional, hitsOf } = require('./cards/mechanics');
-  const modifiedCard = withConditional(state, applyComboCardModifiers(state, card));
-
-  // หมายเหตุ: energy ถูกหักไปแล้วโดย combat handler
-
-  // Effect - Damage (ผ่าน dealDamage ที่เดียว — ดู src/core/combat/damage.ts)
-  //
-  // การ์ดหลายหมัดตี **ทีละหมัดแยกกัน** ไม่ใช่คูณแล้วตีทีเดียว — นั่นคือทั้งหมด
-  // ของกลไกนี้ block ดูดทีละหมัด strength บวกทุกหมัด vulnerable คูณทุกหมัด
-  const hits = hitsOf(modifiedCard);
-  if (modifiedCard.dmg && state.enemy) {
-    for (let h = 0; h < hits; h++) {
-      if (!state.enemy || state.enemy.hp <= 0) break;  // ตายแล้วไม่ต้องตีต่อ
-
-      const result = dealDamage(state, {
-        from: 'player',
-        to: 'enemy',
-        raw: modifiedCard.dmg,
-        source: { kind: 'card', cardId: card.id },
-      });
-
-      const tag = hits > 1 ? ` (หมัดที่ ${h + 1}/${hits})` : '';
-      if (result.blocked > 0) {
-        state.log.push(
-          `💥 ${result.modified} damage vs ${result.blocked} block → ${result.hpLoss} HP lost, ${state.enemy.block} block remaining${tag}`
-        );
-      } else {
-        state.log.push(`💥 ${result.modified} damage dealt → ${result.hpLoss} HP lost${tag}`);
-      }
-
-      if (result.modified !== result.raw) {
-        state.log.push(`Damage modified: ${result.raw} → ${result.modified}`);
-      }
-    }
-  }
-
-  // Block effect
-  if (modifiedCard.block) {
-    gainBlock(state, 'player', modifiedCard.block);
-  }
-
-  // ฟื้นพลังชีวิต — เดิมไม่มีการรองรับเลย การ์ดสายฟื้นฟูจึงไม่ทำอะไร
-  if (modifiedCard.heal && modifiedCard.heal > 0) {
-    const healed = heal(state, 'player', modifiedCard.heal);
-    if (healed > 0) state.log.push(`ฟื้นพลังชีวิต ${healed}`);
-  }
-  
-  // ✅ รองรับการ์ดที่ให้พลังงาน (เช่น Focus: energyGain = 1)
-  if (modifiedCard.energyGain && modifiedCard.energyGain > 0) {
-    state.player.energy += modifiedCard.energyGain;
-    state.log.push(`Gained +${modifiedCard.energyGain} energy`);
-  }
-  
-  try {
-    // ✅ รองรับการเรียก minion
-    if (modifiedCard.summonMinion) {
-      const { summonMinion } = require('./minionRuntime');
-
-      // ตรวจสอบ minionTarget สำหรับ status effects
-      const minionTarget = (modifiedCard as any).minionTarget;
-      let owner = 'player'; // Default owner
-
-      if (minionTarget === 'enemy') {
-        // สำหรับ status effects ที่กระทบศัตรู - minion จะมี owner เป็น 'enemy'
-        owner = 'enemy';
-      }
-
-      summonMinion(state, modifiedCard.summonMinion, owner as 'player' | 'enemy', 1);
-    }
-
-    // ✅ Special minion effects for specific cards
-    if (card.id === 'hell_gate') {
-      const { summonMinion } = require('./minionRuntime');
-      summonMinion(state, 'demon_minion', 'player', 2);
-    }
-  } catch (error) {
-    state.log.push(`Error in minion summoning: ${error}`);
-  }
-
-  // ✅ Status Effect cards (direct application)
-  if ((modifiedCard as any).statusEffect) {
-    const statusConfig = (modifiedCard as any).statusEffect;
-
-    try {
-      const { applyStatusEffect } = require('./statusEffectsRuntime');
-      const targetType = statusConfig.target; // 'enemy' or 'player'
-      
-      applyStatusEffect(
-        targetType,
-        state, 
-        statusConfig.effect,    // e.g., 'poison'
-        statusConfig.duration,  // e.g., 4
-        statusConfig.value      // e.g., 3 stacks
-      );
-      
-      state.log.push(`✨ ${card.name} applies ${statusConfig.effect} (${statusConfig.value} stacks) to ${targetType}`);
-    } catch (error) {
-      state.log.push(`Error applying status effect: ${error}`);
-    }
-  }
-  
-  // ★ Trigger combo system after card effects
-  onCardPlayedForCombos(state, modifiedCard, getClass(state.classId).cardTag);
-  
-  // ★ AI learning from player card usage
-  onPlayerCardPlayed(state, modifiedCard);
-  
-  if(modifiedCard.cleanseDebuffs)require('./statusEffectsRuntime').clearAllStatusEffects('player',state,'debuff');
-  // draw will be handled by reducer after moving the card
-  return modifiedCard;
+/**
+ * Set up the player's side of a new fight: fresh piles, resources, opening hand,
+ * blessings' battle-start triggers and the class passive. Enemy must already exist.
+ */
+export function beginPlayerFight(s: GameState, rng: RNG): RNG {
+  ({ state: s, rng } = buildAndShuffleDeck(s, rng));
+  s.cardHistory = []; s.cardHistorySeq = 0;
+  s.equipped = []; s.prayers = []; s.traps = [];
+  s.fight = { hpLost: 0, ghostTurns: 0 };
+  require('./campaign/bossRules').initBossRelic(s);
+  require('./skills').tickSkillCooldowns(s);
+  s.player.block = 0;
+  s.player.ap = s.player.maxAp;
+  s.player.mana = s.player.startMana;
+  require('./cards/mechanics').resetCardsPlayed(s);
+  rng = require('./cards/equipment').prepareEquipment(s,rng);
+  const opening=require('./cards/hand').openingHandSize(s);
+  ({ state: s, rng } = drawCards(s, rng, opening));
+  rng = require('./cards/passives').runTriggers(s, 'battleStart', rng);
+  require('./cards/testWin').dealTestWinCard(s);
+  return rng;
 }
 
 export function isVictory(state: GameState): boolean {
@@ -289,43 +106,8 @@ export function isDefeat(state: GameState): boolean {
   return state.player.hp <= 0;
 }
 
-export function endPlayerTurn(state: GameState) {
-  // Process status effects at end of player turn (poison, regeneration, etc.)
-  const { processStatusEffectsOnTurnEnd } = require('./statusEffectsRuntime');
-  processStatusEffectsOnTurnEnd('player', state);
-  processStatusEffectsOnTurnEnd('enemy', state);
-}
-
-export function endEnemyTurn(state: GameState) {
-  // ★ Process all advanced systems before enemy turn
-  const { processEnemyTurnBehaviors } = require('./enemyBehaviorRuntime');  
-  const { expireCombos } = require('./combat/combos');
-  const { onPlayerTurnEnd } = require('./adaptiveAI');
-  
-  // Process combos and AI learning
-  expireCombos(state);
-  onPlayerTurnEnd(state, { energyUsed: 0, blockGained: state.player.block });
-  
-  // (Environment system removed)
-  
-  // Process enemy minions and behaviors (check if function exists)
-  try {
-    const { processEnemyTurnMinions } = require('./minionRuntime');
-    if (typeof processEnemyTurnMinions === 'function') {
-      processEnemyTurnMinions(state);
-    }
-    processEnemyTurnBehaviors(state);
-  } catch (e) {
-    // Minion/behavior system not available, skip
-  }
-  
-  // Run standard enemy turn
-  const { runEnemyTurn } = require('./engine/handlers/enemy');
-  runEnemyTurn(state);
-}
-
 // ===== START COMBAT =====
-export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
+export function startCombat(state: GameState, monsterId: string, rng?: RNG): RNG | undefined {
   // Find monster from Thai ghost pools
   const allMonsters = [
     ...THAI_GHOST_POOLS.T1,
@@ -345,76 +127,20 @@ export function startCombat(state: GameState, monsterId: string, rng?: RNG) {
     return;
   }
 
-  // Map monster to card deck owner
-  function getCardOwnerForMonster(monsterId: string): string[] {
-    // Map specific monsters to their card deck owners
-    const monsterDeckMap: Record<string, string[]> = {
-      'phi-krasue': ['global', 'phi-krasue'],
-      'phi-pop': ['global', 'phi_pop'],
-      'nang-tanee': ['global', 'spirit'],
-      'phi-nang-ram': ['global', 'spirit'],
-      'phi-pong-kang': ['global', 'spirit'],
-      // Add more monster-deck mappings as needed
-    };
-
-    // Return specific deck or fallback to global
-    return monsterDeckMap[monsterId] || ['global'];
-  }
-
-  // Initialize combat state
   state.phase = 'combat';
+  state.cardHistory = []; state.cardHistorySeq = 0;
   state.enemy = {
-    id: monsterData.id,
-    name: monsterData.name,
-    hp: monsterData.hp,
-    maxHp: monsterData.hp,
-    dmg: 5, // Default damage
-    block: 0,
-    ai: {
-      cycle: ['attack', 'defend'],
-      index: 0,
-      // Add deck configuration for monster-specific cards
-      deck: monsterId === 'phi-krasue'
-        ? {
-            // For phi-krasue: Use specific list to avoid duplicate IDs
-            lists: [{
-              id: 'phi-krasue-deck',
-              weight: 1,
-              cards: ['krasue_claw', 'krasue_guard', 'krasue_swipe'] // Only 3 unique cards
-            }],
-            handSize: 3,
-            maxEnergy: 3
-          }
-        : {
-            // For other monsters: Use pool system
-            pool: {
-              allowOwners: getCardOwnerForMonster(monsterId),
-              minAttack: 1,
-              minBlock: 1
-            },
-            handSize: 2,
-            maxEnergy: 2
-          }
-    },
-    intentCardId: null,
-    maxEnergy: 3,
-    handSize: 0,
-    equipped: [],
-    statusEffects: []
+    id: monsterData.id, name: monsterData.name, hp: monsterData.hp, maxHp: monsterData.hp, block: 0,
+    deck: require('./monsters/monster-decks').deckForMonster(monsterData), statusEffects: [],
   };
-
-  // Initialize enemy deck and hand
   state.enemyPiles = { draw: [], hand: [], discard: [] };
-  state.enemyEnergy = 0;
 
-  // Build player deck (only if RNG provided)
   if (rng) {
-    buildAndShuffleDeck(state, rng);
-    // Build enemy deck but DON'T draw initial hand yet (let EndTurn handle it)
     const enemyHandlers = require('./engine/handlers/enemy');
-    const result = enemyHandlers.buildAndShuffleEnemyDeck(state, rng);
-    rng = result.rng;
+    rng = enemyHandlers.buildAndShuffleEnemyDeck(state, rng).rng;
+    rng = beginPlayerFight(state, rng!);
   }
 
   state.log.push(`เริ่มต่อสู้กับ ${monsterData.name} (HP: ${monsterData.hp})`);
+  return rng;
 }

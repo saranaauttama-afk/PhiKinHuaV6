@@ -5,11 +5,6 @@ import type { Command, GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
 import { getTierForFight, getRandomMonsterFromTier } from '../src/core/monsters/thai-ghosts';
 import { rollThreeCards } from '../src/core/level';
-import {
-  getCurrentAdaptation,
-  learnFromPlayerAction,
-  resetAILearning,
-} from '../src/core/adaptiveAI';
 
 /**
  * Phase 5 — seed เดียวกันต้องได้รันเดียวกันทุกครั้ง
@@ -33,6 +28,8 @@ function playRun(seed: string, cmds: Command[]): GameState {
 const START: Command[] = [
   { type: 'NewRun', seed: 'determinism' },
   { type: 'ChooseStarterBlessing', index: 0 },
+  { type: 'SkipChapter' },
+  { type: 'SkipChapter' },
 ];
 
 const offerKinds = (s: GameState) =>
@@ -51,6 +48,8 @@ describe('การสร้างแผนที่ซ้ำได้ตาม 
       const s = playRun(seed, [
         { type: 'NewRun', seed },
         { type: 'ChooseStarterBlessing', index: 0 },
+        { type: 'SkipChapter' },
+        { type: 'SkipChapter' },
       ]);
       seen.add(offerKinds(s).join('|'));
     }
@@ -60,16 +59,15 @@ describe('การสร้างแผนที่ซ้ำได้ตาม 
   it('รันยาวหลายหน้าแล้วยังตรงกันทุกขั้น', () => {
     const longRun: Command[] = [
       ...START,
+      { type: 'DismissOffer', index: 1 },
       { type: 'DismissOffer', index: 2 },
-      { type: 'Proceed' },
-      { type: 'Proceed' },
     ];
     const a = playRun('determinism', longRun);
     const b = playRun('determinism', longRun);
 
     expect(offerKinds(a)).toEqual(offerKinds(b));
     expect(a.pages?.pageIndex).toBe(b.pages?.pageIndex);
-    expect(JSON.stringify(a.pages?.pools)).toBe(JSON.stringify(b.pages?.pools));
+    expect(JSON.stringify(a.pages?.adventure)).toBe(JSON.stringify(b.pages?.adventure));
   });
 });
 
@@ -113,69 +111,13 @@ describe('รางวัลเลเวลอัปซ้ำได้ตาม 
   });
 });
 
-describe('สถานะ AI ผูกกับ state ไม่ใช่ตัวแปรระดับโมดูล', () => {
-  /** ดันให้ AI ปรับความยากขึ้น: ผู้เล่นเลือดต่ำ + ศัตรูเลือดเต็ม → damageMultiplier 0.9 */
-  function makeAIAdapt(s: GameState) {
-    s.player.hp = Math.floor(s.player.maxHp * 0.1);
-    s.enemy = { id: 'x', name: 'x', hp: 100, maxHp: 100, dmg: 1, block: 0 } as any;
-    learnFromPlayerAction(s, 'turn_end', { energyUsed: 0, blockGained: 0 });
-    return s;
-  }
-
-  it('รันใหม่ไม่รับค่าความยากที่ค้างจากรันก่อน', () => {
-    // รันแรก — ดันให้ AI ปรับตัวจนตัวคูณเปลี่ยนไปจากค่าเริ่มต้น
-    const first = makeAIAdapt(
-      playRun('ai-a', [
-        { type: 'NewRun', seed: 'ai-a' },
-        { type: 'ChooseStarterBlessing', index: 0 },
-      ])
-    );
-    expect(getCurrentAdaptation(first).damageMultiplier).not.toBe(1.0);
-
-    // รันใหม่ต้องเริ่มที่ค่าเริ่มต้นเสมอ
-    // (เดิมตัวแปรอยู่ระดับโมดูล ค่านี้จะค้างข้ามรันใน session เดียวกัน)
-    const second = playRun('ai-b', [
-      { type: 'NewRun', seed: 'ai-b' },
-      { type: 'ChooseStarterBlessing', index: 0 },
-    ]);
-    expect(getCurrentAdaptation(second).damageMultiplier).toBe(1.0);
-  });
-
-  it('สองรันที่เล่นพร้อมกันไม่กวนสถานะ AI ของกันและกัน', () => {
-    const a = makeAIAdapt(
-      playRun('par-a', [
-        { type: 'NewRun', seed: 'par-a' },
-        { type: 'ChooseStarterBlessing', index: 0 },
-      ])
-    );
-    const b = playRun('par-b', [
-      { type: 'NewRun', seed: 'par-b' },
-      { type: 'ChooseStarterBlessing', index: 0 },
-    ]);
-
-    expect(getCurrentAdaptation(a).damageMultiplier).not.toBe(1.0);
-    expect(getCurrentAdaptation(b).damageMultiplier).toBe(1.0);
-  });
-
-  it('resetAILearning ล้างตัวคูณความยากกลับเป็นค่าเริ่มต้นจริง', () => {
-    const s = makeAIAdapt(
-      playRun('reset', [
-        { type: 'NewRun', seed: 'reset' },
-        { type: 'ChooseStarterBlessing', index: 0 },
-      ])
-    );
-    expect(getCurrentAdaptation(s).damageMultiplier).not.toBe(1.0);
-
-    resetAILearning(s);
-    expect(getCurrentAdaptation(s).damageMultiplier).toBe(1.0);
-  });
-});
-
 describe('การต่อสู้ซ้ำได้ตาม seed', () => {
   function fightOnce(seed: string) {
     let s = playRun(seed, [
       { type: 'NewRun', seed },
       { type: 'ChooseStarterBlessing', index: 0 },
+      { type: 'SkipChapter' },
+      { type: 'SkipChapter' },
     ]);
     const idx = (s.pages!.current!.offers as PageOffer[]).findIndex(
       o => o.kind === 'monster' || o.kind === 'boss'

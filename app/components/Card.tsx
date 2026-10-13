@@ -6,11 +6,13 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  Easing,
   withSequence,
   withDelay,
   cancelAnimation,
   runOnJS
 } from 'react-native-reanimated';
+import {useGameSettings} from './Settings';
 import type { CardData } from '../../src/core/types';
 import { palette, surface, tint, layer, font } from '../theme';
 import {paper} from './Paper';
@@ -19,6 +21,7 @@ import RitualSurface from './RitualSurface';
 import CardBadges from './CardBadges';
 import { CardGlyphArt } from './DeckCard';
 import { cardSummary } from '../cardPresentation';
+import { costLabel } from '../../src/core/cards/describe';
 
 interface CardProps {
   card: CardData;
@@ -30,9 +33,9 @@ interface CardProps {
   onDragPlay?: () => void;
   onHoverChange?: (isHovered: boolean) => void;
   isPlayed?: boolean;
-  animationDelay?: number; // Compatibility prop: dealt cards now appear immediately.
+  animationDelay?: number; // Stagger only newly mounted physical copies.
   /** ค่าร่ายจริง ณ ตอนนี้ — การ์ดบางใบถูกลงตามจำนวนใบที่เล่นไปแล้วในเทิร์น */
-  costNow?: number;
+  costNow?: { ap: number; mana: number };
 }
 
 export default function Card({
@@ -45,9 +48,13 @@ export default function Card({
   onDragPlay,
   onHoverChange,
   isPlayed = false,
+  animationDelay = 0,
   costNow,
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const reducedMotion=useGameSettings(s=>s.reducedMotion);
+  const entrance=useSharedValue(reducedMotion?1:0);
+  React.useEffect(()=>{entrance.value=reducedMotion?1:withDelay(animationDelay,withTiming(1,{duration:380,easing:Easing.out(Easing.cubic)}));},[reducedMotion]);
 
   const updateHoverState = (hovered: boolean) => {
     setIsHovered(hovered);
@@ -149,16 +156,19 @@ export default function Card({
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: shakeX.value },
-      { translateY: translateY.value + dragOffsetY.value },
-      { scale: scale.value },
+      // Drawn cards slide up from the draw pile (bottom-left) into place.
+      { translateX: shakeX.value - 150*(1-entrance.value) },
+      { translateY: translateY.value + dragOffsetY.value + 110*(1-entrance.value) },
+      { rotate: `${-12*(1-entrance.value)}deg` },
+      { scale: scale.value*(.6+.4*entrance.value) },
     ],
-    opacity: opacity.value,
+    // Never fully hidden: a live card stays readable even if the timing is skipped.
+    opacity: opacity.value*(.25+.75*entrance.value),
   }));
 
   return (
     <GestureDetector gesture={isPlayed ? Gesture.Tap() : composedGesture}>
-      <Animated.View accessible accessibilityRole="button" accessibilityLabel={`การ์ด ${card.name} พลัง ${costNow ?? card.cost}`} style={[
+      <Animated.View testID={`hand-card-${card.instanceId??card.id}`} accessible accessibilityRole="button" accessibilityLabel={`การ์ด ${card.name} ${costLabel(card, costNow)}`} style={[
         {
           width,
           height,

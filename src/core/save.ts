@@ -1,3 +1,4 @@
+import {initializeEnemyHand} from './combat/enemyHand';
 import {campaignFightTotal} from './campaign/threeNight';
 // src/core/save.ts — เซฟ/โหลดแบบไม่ทำ IO (ชั้นนอกค่อยเขียนลง storage)
 //
@@ -21,7 +22,8 @@ import type { RNG } from './rng';
 import {validAdventure} from './map/adventure';
 import {parseArchive} from './archive/progress';
 
-export const SAVE_VERSION = 2;
+/** 3 = NOTFM rebuild. Every earlier save is unplayable and ignored. */
+export const SAVE_VERSION = 3;
 
 /**
  * คำสั่งที่ควรเซฟอัตโนมัติหลังทำ — จุดที่ "ความคืบหน้าเปลี่ยนจริง"
@@ -39,13 +41,13 @@ export const SAVE_VERSION = 2;
  * ช่วงเวลานั้นพอดี — `CompleteNode` ตามมาติดๆ อยู่แล้ว เสียแค่การกดหนึ่งครั้ง
  */
 export const AUTO_SAVE_COMMANDS = [
-  'CompleteNode', 'ChooseOffer', 'Proceed', 'DeleteShopFromMap', 'DismissOffer',
-  'ChooseStarterBlessing',
+  'CompleteNode', 'ChooseOffer', 'DeleteShopFromMap', 'DismissOffer',
+  'ChooseStarterBlessing', 'SetEquipmentLoadout', 'ChooseHandReward',
   'TakeShop', 'TakeShopEquipment', 'ShopRemoveBuy', 'ShopUpgradeBuy',
   'TakeTreasureCard', 'TakeSingleTreasureCard',
   'UseWell', 'UseHealingShrine',
   'EventChooseBlessing',
-  'ChooseEventOption', 'FuseCards',
+  'ChooseEventOption',
 ] as const;
 
 /**
@@ -53,16 +55,16 @@ export const AUTO_SAVE_COMMANDS = [
  * โหลดกลับมาผู้เล่นจะยืนอยู่บนแผนที่เสมอ ไม่ใช่กลางไฟต์
  */
 const DROP_ON_SAVE = [
-  'enemy', 'enemyIntent', 'enemyPiles', 'playerPiles', 'enemyIntentCardId', 'minions', 'traps', 'combo',
-  'piles', 'pendingEvents', 'turnFlags', 'levelUp', 'cardReward', 'starter',
+  'enemy', 'enemyIntent', 'enemyPiles', 'playerPiles', 'enemyIntentCardId', 'traps', 'combo',
+  'piles', 'pendingEvents', 'cardHistory', 'cardHistorySeq', 'turnFlags', 'levelUp', 'cardReward', 'starter', 'fight',
   'shopKind', 'shopStock', 'shopBoughtItems', 'currentShopId',
   'event', 'deckOpen', 'combatVictoryLock', 'equipmentTempSlots',
   // บทที่ค้างอ่านอยู่เป็นของหน้าจอ ไม่ใช่ความคืบหน้า — `chaptersSeen` ต่างหากที่เก็บ
   'chapter',
 ] as const;
 
-export type SaveV2 = {
-  version: 2;
+export type SaveData = {
+  version: 3;
   /** Explicit settled player-turn snapshot; legacy map checkpoints remain unchanged. */
   battleRng?: RNG;
   mapRng?: RNG;
@@ -83,7 +85,7 @@ export type SaveSummary = {
   level: number;
 };
 
-export function toSave(s: GameState,rng?:RNG): SaveV2 {
+export function toSave(s: GameState,rng?:RNG): SaveData {
   if(s.pages?.adventure){
     if(!rng||!Number.isInteger(rng.s))throw Error('ต้องมี RNG เพื่อบันทึกการเดินทาง B17');
     if(s.phase==='combat'){if(!rng)throw Error('Combat RNG required');return toBattleSave(s,rng);}
@@ -100,7 +102,7 @@ export function toSave(s: GameState,rng?:RNG): SaveV2 {
   return { version: SAVE_VERSION, state: copy };
 }
 
-export function toBattleSave(s: GameState, rng: RNG): SaveV2 {
+export function toBattleSave(s: GameState, rng: RNG): SaveData {
   if (s.phase !== 'combat' || !s.enemy || s.runSummary) throw new Error('Battle is not resumable');
   const state: GameState = JSON.parse(JSON.stringify(s));
   state.pendingEvents = [];
@@ -108,12 +110,13 @@ export function toBattleSave(s: GameState, rng: RNG): SaveV2 {
   return {version: SAVE_VERSION, state, battleRng: {...rng}};
 }
 
-export function fromSave(data: SaveV2): GameState {
+export function fromSave(data: SaveData): GameState {
   if (data.version !== SAVE_VERSION) {
     throw new Error(`เซฟเวอร์ชัน ${data.version} ใช้กับเกมเวอร์ชันนี้ไม่ได้`);
   }
 
   const s = data.state as GameState;
+  if(s.phase==='combat'&&s.enemy)initializeEnemyHand(s);
   if(s.discovery)parseArchive(JSON.stringify({version:1,runs:{[s.discovery.id]:s.discovery}}));
   if(s.pages?.adventure){
     if(!validAdventure(s))throw Error('ข้อมูลทางแยกเสียหาย เริ่มการเดินทางใหม่ได้โดยยังเก็บสมุดบันทึกและของปลดล็อกไว้');
@@ -134,9 +137,7 @@ export function fromSave(data: SaveV2): GameState {
     turn: 0,
     enemy: undefined,
     enemyIntent: undefined,
-    minions: [],
     traps: [],
-    combo: undefined,
     pendingEvents: [],
     piles: { draw: [], hand: [], discard: [], exhaust: [] },
     turnFlags: { blessingOnce: {}, equipmentOnce: {} },
@@ -151,7 +152,7 @@ export function fromSave(data: SaveV2): GameState {
     chapter: undefined,
     deckOpen: false,
     combatVictoryLock: false,
-    player: { ...s.player, block: 0, energy: s.player.maxEnergy },
+    player: { ...s.player, block: 0, ap: s.player.maxAp },
     log: [...(s.log ?? []), 'โหลดการเดินทางที่ค้างไว้'],
   };
 }
@@ -162,13 +163,13 @@ export function fromSave(data: SaveV2): GameState {
  * เช็คตรงนี้แทนที่จะให้ผู้เล่นกดแล้วไปเจอจอเปล่า — เซฟจากก่อนมีระบบเส้นทาง
  * จะไม่มี `journey` และเล่นต่อไม่ได้
  */
-export function isPlayableSave(data: unknown): data is SaveV2 {
+export function isPlayableSave(data: unknown): data is SaveData {
   if (!data || typeof data !== 'object') return false;
   const d = data as any;
   if (d.version !== SAVE_VERSION) return false;
   if (!d.state || typeof d.state !== 'object') return false;
-  if(d.state.pages?.adventure){if(!validAdventure(d.state))return false;const rng=d.state.phase==='combat'?d.battleRng:d.mapRng;if(!rng||!Number.isInteger(rng.s))return false;}
-  else if (!d.state.journey || !d.state.journey.rows?.length) return false;
+  if(!d.state.pages?.adventure||!validAdventure(d.state))return false;
+  {const rng=d.state.phase==='combat'?d.battleRng:d.mapRng;if(!rng||!Number.isInteger(rng.s))return false;}
   if (d.state.phase === 'run_complete') return false;   // รันนี้จบไปแล้ว
   // `toSave` บังคับ phase เป็น 'map' เสมอ เช็ค phase อย่างเดียวจึงไม่พอ:
   // เซฟที่เขียนตอนจบรัน (ชนะหรือแพ้) จะดูเหมือนเซฟกลางทาง แล้วปุ่ม "เดินทางต่อ"
@@ -177,15 +178,14 @@ export function isPlayableSave(data: unknown): data is SaveV2 {
   return true;
 }
 
-export function summarize(data: SaveV2): SaveSummary {
+export function summarize(data: SaveData): SaveSummary {
   const s = data.state;
-  const plans = s.journey?.plans ?? [];
   return {
     classId: s.classId,
     night:s.campaign?.night,
     difficulty:s.campaign?.difficulty,
-    fight: Math.min((s.fightCount ?? 0) + 1,s.pages?.adventure?campaignFightTotal(s):plans.filter(p => p.kind !== 'rest').length || 15),
-    totalFights: s.pages?.adventure?campaignFightTotal(s):plans.filter(p => p.kind !== 'rest').length || 15,
+    fight: Math.min((s.fightCount ?? 0) + 1,campaignFightTotal(s)),
+    totalFights: campaignFightTotal(s),
     hp: s.player?.hp ?? 0,
     maxHp: s.player?.maxHp ?? 0,
     gold: s.player?.gold ?? 0,
