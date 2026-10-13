@@ -22,3 +22,13 @@ f.go({type:'ChooseOffer',index:0,equipmentIndices:[3]});f.state.enemy!.hp=f.stat
 const prayer=f.state.piles.hand.findIndex(c=>c.type==='prayer');if(prayer<0){const ix=f.state.piles.draw.findIndex(c=>c.type==='prayer');f.state.piles.hand.push(f.state.piles.draw.splice(ix,1)[0]);}
 f.go({type:'PlayCard',index:f.state.piles.hand.findIndex(c=>c.type==='prayer'),wait:3});
 fs.writeFileSync(`${dir}/phase7-prayer.json`,JSON.stringify(toBattleSave(f.state,f.rng)));
+
+// Return-to-board checkpoint: one real owned attack, low enemy HP, no queued talk/level.
+const back=fresh('warrior');back.go({type:'ChooseOffer',index:0});
+back.state.enemy!.hp=1;back.state.enemy!.block=0;back.state.enemy!.statusEffects=[];
+back.state.player.exp=0;back.state.player.expToNext=999;back.state.campaign!.talksThisNight=99;
+if(!back.state.piles.hand.some(c=>c.type==='attack')){
+ const at=back.state.piles.draw.findIndex(c=>c.type==='attack');
+ const card=back.state.piles.draw.splice(at,1)[0];back.state.piles.draw.push(back.state.piles.hand.pop()!);back.state.piles.hand.push(card);
+}
+fs.writeFileSync(`${dir}/phase7-return.json`,JSON.stringify({...toBattleSave(back.state,back.rng),feedbackAnimation:true}));

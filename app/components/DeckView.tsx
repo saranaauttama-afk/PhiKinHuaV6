@@ -86,19 +86,12 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
         )}
 
 
-        {TYPE_ORDER.map(type => {
-          const list = rows.filter(r => r.card.type === type);
-          if (list.length === 0) return null;
-          const total = list.reduce((n, r) => n + r.count, 0);
-
-          return (
-            <Section key={type} title={`${TYPE_LABEL[type] ?? type} (${total} ใบ)`}>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 }}>
-                {list.map((r,i) => <DeckCard compact key={`${r.card.id}-${i}`} card={r.card} equippedCount={(state.phase==='combat'?(state.equipped??[]):loadoutIndices(state).map(i=>deck[i])).filter(c=>c.id===r.card.id&&(c.star??1)===(r.card.star??1)).length} count={r.count} onPress={() => setSelected(r)} />)}
-              </View>
-            </Section>
-          );
-        })}
+        <View style={{flexDirection:'row',flexWrap:'wrap',gap:7}}>
+         {TYPE_ORDER.map(type=>{const total=deck.filter(c=>c.type===type).length;return total?<Text key={type} style={{color:palette.moon,fontFamily:font.ui,fontSize:11}}>{TYPE_LABEL[type]} ({total} ใบ)</Text>:null})}
+        </View>
+        <View testID="bag-card-grid" style={{flexDirection:'row',flexWrap:'wrap',gap:7,rowGap:12}}>
+         {rows.map((r,i)=><DeckCard compact key={`${r.card.id}-${i}`} card={r.card} equippedCount={(state.phase==='combat'?(state.equipped??[]):loadoutIndices(state).map(i=>deck[i])).filter(c=>c.id===r.card.id&&(c.star??1)===(r.card.star??1)).length} count={r.count} onPress={()=>setSelected(r)}/>)}
+        </View>
         </>}
       </ScrollView>
       {manage&&<EquipmentPicker manage state={state} onCancel={()=>setManage(false)} onConfirm={indices=>{dispatch({type:'SetEquipmentLoadout',indices});setManage(false);}}/>}

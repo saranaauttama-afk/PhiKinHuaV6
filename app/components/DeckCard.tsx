@@ -5,7 +5,7 @@ import { CARD_ART_SOURCES, GRAY_CARD_ART_SOURCES } from '../cardArt';
 import { cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
 import { font, paper, hudPictogramColors } from '../theme';
-import {costLabel} from '../../src/core/cards/describe';
+import {costLabel,TYPE_LABEL} from '../../src/core/cards/describe';
 import {starOf} from '../../src/core/cards/model';
 import CardBadges from './CardBadges';
 import CandleSelection from './CandleSelection';
@@ -31,6 +31,7 @@ export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardDa
   <CardBadges card={card} compact={compact}/>
   <View style={styles.symbol}><CardGlyphArt card={card} size={compact?50:76}/></View>
   <Text style={[styles.name,compact&&{fontSize:11}]}>{card.name??card.id}</Text>
+  <Text style={[styles.note,{color:paper.muted}]}>{TYPE_LABEL[card.type]}</Text>
   <Text style={[styles.summary,compact&&{fontSize:10,lineHeight:16},{color:card.type==='attack'?paper.red:paper.ink}]}>{cardSummary(card)}</Text>
   {!compact&&!!card.flavor&&<Text style={styles.summary}>{card.flavor}</Text>}
   {equippedCount>0&&<Text style={styles.note}>✓ สวม {equippedCount} ใบ</Text>}
