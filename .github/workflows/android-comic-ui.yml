@@ -1,4 +1,5 @@
 name: Comic UI playtest APK
+run-name: PhiKinHua v1.0.44 UI playtest
 on:
   push:
     branches: ['work/comic-ui-unified']
