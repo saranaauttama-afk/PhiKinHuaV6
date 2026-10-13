@@ -71,7 +71,7 @@ describe('Phase 7 events and permanent progress',()=>{
   const d=run();d.s.campaign!.eventByNight={'1':'roadside_shrine'};d.s.story={eventId:'run_story_1'};d.s.phase='event';
   d.go({type:'ChooseEventOption',index:1});const gold=d.s.player.gold;d.go({type:'ChooseEventOption',index:1});expect(d.s.player.gold).toBe(gold);expect(d.s.blessings.filter(b=>b.id==='event_coin_debt')).toHaveLength(1);
   d.s.phase='combat';d.s.enemy={id:'phi-krasue',name:'ผี',hp:999,maxHp:999,block:0};d.s.blessings=d.s.blessings.filter(b=>b.id==='event_coin_debt');beginPlayerFight(d.s,d.r);
-  expect(d.s.piles.hand).toHaveLength(1);expect(d.s.player.block).toBe(3);expect(d.s.eventMemory!.roadside_shrine).toBe(1);
+  expect(d.s.piles.hand).toHaveLength(2);expect(d.s.player.block).toBe(3);expect(d.s.eventMemory!.roadside_shrine).toBe(1);
  });
  it('random removal cannot remove the final card or an unremovable card',()=>{const d=run();d.s.masterDeck=[{...attackCard(1),unremovable:true},attackCard(2)];applyEffect(d.s,{kind:'removeRandomCard'},d.r);expect(d.s.masterDeck).toHaveLength(1);applyEffect(d.s,{kind:'removeRandomCard'},d.r);expect(d.s.masterDeck).toHaveLength(1);});
  it('permanent nights do not decline after 60 failed runs, duplicate credit or reload',()=>{
@@ -90,7 +90,7 @@ describe('Phase 7 Pandora rules and resource growth',()=>{
   let out=applyCommand(s,{type:'DiscardForTurnEnd',indices:[0,1,2,3]},rng).state;expect(out.player.mana).toBe(2);expect(out.player.block).toBe(4);
   out=applyCommand(out,{type:'DiscardForTurnEnd',indices:[]},rng).state;expect(out.player.mana).toBe(2);
  });
- it('equipment pact adds slot but shrinks each opening hand',()=>{const d=run();grantBlessing(d.s,pandora('pandora_iron_shrine'));d.go({type:'ChooseOffer',index:0});expect(d.s.equipmentSlotsMax).toBe(2);expect(d.s.piles.hand).toHaveLength(1);});
+ it('equipment pact adds slot but shrinks each opening hand',()=>{const d=run();grantBlessing(d.s,pandora('pandora_iron_shrine'));d.go({type:'ChooseOffer',index:0});expect(d.s.equipmentSlotsMax).toBe(2);expect(d.s.piles.hand).toHaveLength(2);});
  it('prayer pact charges extra AP and increases every queued multiplier',()=>{
   const {state:s,rng}=makeCombatState({hand:[cardById('karma_returns')!],playerAp:1,enemyHp:999});grantBlessing(s,pandora('pandora_long_vow'));expect(cardCost(s,s.piles.hand[0]).ap).toBe(2);expect(playCard(s,0,rng,3).played).toBe(false);s.player.ap=2;playCard(s,0,rng,3);expect(s.prayers![0].mult).toBe(4);expect(s.player.ap).toBe(0);
  });
