@@ -9,6 +9,7 @@ import {
 } from '../src/core/engine/shared';
 import { starFx, starOf } from '../src/core/cards/model';
 import { upgradeCostForCount, removeCostForCount } from '../src/core/balance/economy';
+import { ECONOMY } from '../src/core/balance/notfm';
 import cardsJson from '../src/data/packs/base/cards.json';
 
 const CARDS = cardsJson as CardData[];
@@ -96,8 +97,8 @@ describe('ร้านปลุกเสก', () => {
 
   it('ทองไม่พอ = ไม่เสียทองและการ์ดไม่เปลี่ยน', () => {
     const s = shopState([attack()], 0);
-    // ครั้งแรกฟรี จึงต้องดันตัวนับให้ราคาขึ้นก่อน
-    (s as any).runCounters = { upgradeShopCount: 3 };
+    // ครั้งแรกที่จุดนี้ฟรี จึงต้องใช้ไปแล้วหนึ่งครั้งก่อน
+    (s as any).shopBoughtItems = [{ card: { id: 'upgrade' }, price: 0 }];
 
     const out = go(s, { type: 'ShopUpgradeBuy', index: 0 });
     expect(dmgOf(out.masterDeck[0])).toBe(6);
@@ -119,21 +120,20 @@ describe('ร้านปลุกเสก', () => {
     expect(dmgOf(out.masterDeck[0])).toBe(dmgAtCap);
   });
 
-  it('ปลุกขั้นสูงแพงกว่าปลุกขั้นแรก', () => {
-    const cheap = shopState([attack()], 99999);
-    const first = cheap.player.gold - go(cheap, { type: 'ShopUpgradeBuy', index: 0 }).player.gold;
-
-    let s = shopState([attack()], 99999);
+  it('ใบแรกที่จุดนี้ฟรี ใบต่อไปราคาคงที่', () => {
+    let s = shopState([attack(), attack({ id: 'b' })], 999);
     s = go(s, { type: 'ShopUpgradeBuy', index: 0 });
-    const before = s.player.gold;
-    const second = before - go(s, { type: 'ShopUpgradeBuy', index: 0 }).player.gold;
-
-    expect(second, 'ปั้นใบเดียวให้สุดควรแพงขึ้นเรื่อยๆ').toBeGreaterThan(first);
+    expect(s.player.gold).toBe(999);
+    s = go(s, { type: 'ShopUpgradeBuy', index: 1 });
+    expect(s.player.gold).toBe(999 - ECONOMY.upgradePrice);
+    s = go(s, { type: 'ShopUpgradeBuy', index: 0 });
+    expect(s.player.gold).toBe(999 - 2 * ECONOMY.upgradePrice);
   });
 
-  it('ราคาแพงขึ้นทุกครั้งที่ใช้', () => {
-    expect(upgradeCostForCount(1)).toBeGreaterThan(upgradeCostForCount(0));
-    expect(upgradeCostForCount(2)).toBeGreaterThan(upgradeCostForCount(1));
+  it('ราคาไม่ไต่ขั้น', () => {
+    expect(upgradeCostForCount(0)).toBe(0);
+    expect(upgradeCostForCount(1)).toBe(ECONOMY.upgradePrice);
+    expect(upgradeCostForCount(5)).toBe(ECONOMY.upgradePrice);
   });
 });
 
@@ -160,9 +160,13 @@ describe('ร้านสละการ์ด', () => {
     expect(out.masterDeck.map(c => c.id)).toEqual(['a', 'c']);
   });
 
-  it('ราคาแพงขึ้นทุกครั้งที่ใช้', () => {
-    expect(removeCostForCount(1)).toBeGreaterThan(removeCostForCount(0));
-    expect(removeCostForCount(2)).toBeGreaterThan(removeCostForCount(1));
+  it('ใบแรกที่จุดนี้ฟรี ใบต่อไปราคาคงที่', () => {
+    let s = shopState([attack({ id: 'a' }), attack({ id: 'b' }), attack({ id: 'c' })], 999);
+    s = go(s, { type: 'ShopRemoveBuy', index: 0 });
+    expect(s.player.gold).toBe(999);
+    s = go(s, { type: 'ShopRemoveBuy', index: 0 });
+    expect(s.player.gold).toBe(999 - ECONOMY.removePrice);
+    expect(removeCostForCount(4)).toBe(ECONOMY.removePrice);
   });
 });
 

@@ -135,7 +135,7 @@ export default function PileView({ piles, deck, open, onChangePile, onClose }: P
           </Text>
         ) : (
           <View style={{flexDirection:'row',flexWrap:'wrap',justifyContent:'space-between',rowGap:12}}>
-            {rows.map(r => <DeckCard key={r.card.id} card={r.card} count={r.count} onPress={()=>setSelected(r)}/>)}
+            {rows.map((r,i) => <DeckCard key={`${r.card.id}-${i}`} card={r.card} count={r.count} onPress={()=>setSelected(r)}/>)}
           </View>
         )}
       </ScrollView>

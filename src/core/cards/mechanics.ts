@@ -69,6 +69,7 @@ export function countCardPlayed(s: GameState, card?: CardData): void {
   s.turnFlags = s.turnFlags ?? ({ blessingOnce: {} } as GameState['turnFlags']);
   s.turnFlags.cardsPlayed = (s.turnFlags.cardsPlayed ?? 0) + 1;
   if (card?.limit === 'turn') s.turnFlags.limited = [...(s.turnFlags.limited ?? []), card.id];
+  if (card?.type === 'spell') s.turnFlags.spellsCast = (s.turnFlags.spellsCast ?? 0) + 1;
 }
 
 /** ต้นเทิร์นผู้เล่น — เริ่มนับใหม่ */
@@ -77,6 +78,7 @@ export function resetCardsPlayed(s: GameState): void {
   s.turnFlags.cardsPlayed = 0;
   s.turnFlags.limited = [];
   s.turnFlags.triggerOnce = [];
+  s.turnFlags.spellsCast = 0;
 }
 
 /** Held cards act before the enemy turn; two held copies act twice. */

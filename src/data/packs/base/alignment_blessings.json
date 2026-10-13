@@ -1,0 +1,18 @@
+[
+ {
+  "id": "courage_oath",
+  "name": "คำสาบานของคนกล้า",
+  "rarity": "Rare",
+  "triggers": [],
+  "attackBonus": 1,
+  "desc": "ความกล้าถึง 4: การ์ดโจมตีแรงขึ้น 1 ต่อครั้ง"
+ },
+ {
+  "id": "merit_aura",
+  "name": "บุญคุ้มครอง",
+  "rarity": "Rare",
+  "triggers": [],
+  "armor": 1,
+  "desc": "บุญถึง 4: รับดาเมจจากผีลดลง 1 ต่อครั้ง"
+ }
+]

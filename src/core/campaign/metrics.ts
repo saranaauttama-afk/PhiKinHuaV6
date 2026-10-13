@@ -3,6 +3,7 @@ import type {CardData,Command,GameState} from '../types';
 import {cardsPlayedThisTurn} from '../cards/mechanics';
 
 export type RunMetrics={
+ activeMs?:import('./playTime').PlayTime;
  initialDeck:number; smallestDeck:number; cardsPlayed:number; turns:number;
  added:number; removed:number; upgraded:number; damageTaken:number; playedByCard:Record<string,number>;
 };
@@ -14,7 +15,7 @@ export type RunRecord={
 export function trackRun(before:GameState,after:GameState,cmd:Command):void{
  if(cmd.type==='NewRun'){
   const n=after.masterDeck.length;
-  after.runMetrics={initialDeck:n,smallestDeck:n,cardsPlayed:0,turns:0,added:0,removed:0,upgraded:0,damageTaken:0,playedByCard:{}};
+  after.runMetrics={activeMs:{combat:0,travel:0,reward:0},initialDeck:n,smallestDeck:n,cardsPlayed:0,turns:0,added:0,removed:0,upgraded:0,damageTaken:0,playedByCard:{}};
   return;
  }
  if(!after.runMetrics||before.runSummary)return;

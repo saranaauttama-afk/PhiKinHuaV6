@@ -13,3 +13,9 @@ export function closeDeck(s: GameState, _cmd: Extract<Command, { type: 'CloseDec
   s.deckOpen = false;
   return { state: s, rng: r };
 }
+export function setEquipmentLoadout(s:GameState,cmd:Extract<Command,{type:'SetEquipmentLoadout'}>,r:RNG){
+ const {validEquipmentSelection}=require('../../cards/equipment');
+ if(['combat','victory','defeat','reward','levelup'].includes(s.phase)||!validEquipmentSelection(s,cmd.indices))return {state:s,rng:r};
+ s.equipmentLoadout=cmd.indices.map(i=>s.masterDeck[i].ownedId!);
+ return {state:s,rng:r};
+}

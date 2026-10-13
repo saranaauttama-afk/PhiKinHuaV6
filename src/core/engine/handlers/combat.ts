@@ -15,14 +15,27 @@ import { TEST_WIN_CARD_ID, testWinCardEnabled } from '../../cards/testWin';
 import { playCard } from '../../cards/play';
 import { runTriggers } from '../../cards/passives';
 import { cardFromEnemy } from '../../cards/borrow';
+import { CLASS_PASSIVES } from '../../balance/notfm';
 import { enemyCardCost } from '../../pack_enemy_cards';
 import { cardFx as enemyCardFx } from '../../combat/enemyCardEffects';
 import { describeCard } from '../../cards/describe';
 
 /** Resolve deaths from helper/status/trap effects as well as direct played cards. */
-function settleCombat(s: GameState, r: RNG): RNG {
+/** Medium passive: the first ghost card revealed each fight is copied into hand. */
+function mimicGhostCard(s: GameState, def: import('../../pack_enemy_cards').EnemyCardDef): void {
+  if (!s.classId || !CLASS_PASSIVES[s.classId].copyFirstGhostCard || !s.fight || s.fight.mimicUsed) return;
+  s.fight.mimicUsed = true;
+  if (s.piles.hand.length >= s.player.handMax) return;
+  const card = cardFromEnemy(def, true);
+  card.name = 'ยืม·' + card.name;
+  card.instanceId = `mimic__${def.id}__${s.cardHistorySeq ?? 0}`;
+  s.piles.hand.push(card);
+  s.log.push(`ผีติดตาม: ได้สำเนา ${def.name}`);
+}
+
+export function settleCombat(s: GameState, r: RNG): RNG {
   if (s.phase !== 'combat') return r;
-  require('../../campaign/nights').awakenNightBoss(s);
+  if (s.enemy && s.enemy.hp <= 0 && !s.combatVictoryLock && require('../../campaign/bossRules').tryBossRevive(s)) return r;
   if (isDefeat(s)) {
     loseRun(s);
   } else if (isVictory(s) && !s.combatVictoryLock) {
@@ -43,6 +56,7 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
     countCardPlayed(s);
     s.piles.exhaust.push(s.piles.hand.splice(idx, 1)[0]);
     s.enemy.hp = 0;
+    if (s.fight?.relic) s.fight.relic.broken = true; // the test card wins outright, no revive
     s.log.push('พระประธาน: ชนะการต่อสู้ทันที (ทดสอบ)');
     r = settleCombat(s, r);
     return { state: s, rng: r };
@@ -50,7 +64,6 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
   const out = playCard(s, idx, r, cmd.wait);
   r = out.rng;
   if (!out.played) return { state: s, rng: r };
-  require('../../campaign/nights').awakenNightBoss(s);
   r = settleCombat(s, r);
   return { state: s, rng: r };
 }
@@ -64,6 +77,38 @@ export function play(s: GameState, cmd: Extract<Command, { type: 'PlayCard' }>, 
  * (`battle.tsx` ส่ง `ResolveEnemyTurn` ทางเดียว) มีแต่เทสต์ที่ยังเรียก —
  * ซึ่งแปลว่าเทสต์กำลังตรวจเส้นทางที่เกมไม่ได้ใช้
  */
+/** Cards kept past the end of a turn (NOTFM). */
+export function retainLimit(s: GameState): number {
+  return Math.max(0,(s.player.retain ?? require('../../balance/notfm').CARD_RULES.retain)+require('../../cards/passives').ruleModifier(s,'retain'));
+}
+/** How many cards must be discarded before the turn can end. */
+export function turnEndExcess(s: GameState): number {
+  return Math.max(0, s.piles.hand.filter(c => c.type !== 'curse').length - retainLimit(s));
+}
+function enforceRetain(s: GameState): boolean {
+  const over = turnEndExcess(s);
+  if (!over) return false;
+  const keep = s.piles.hand.filter(c => c.type === 'curse'), rest = s.piles.hand.filter(c => c.type !== 'curse');
+  const dropped = rest.splice(rest.length - over, over);
+  s.piles.hand = [...rest, ...keep];
+  s.piles.discard.push(...dropped);
+  s.log.push(`มือเกิน ${retainLimit(s)} ใบ: ทิ้ง ${dropped.map(c => c.name).join(', ')}`);
+  return true;
+}
+
+/** The player's picks to get down to the retain limit at the end of the turn. */
+export function discardForTurnEnd(s: GameState, cmd: Extract<Command, { type: 'DiscardForTurnEnd' }>, r: RNG) {
+  if (s.phase !== 'combat') return { state: s, rng: r };
+  const picks = [...new Set(cmd.indices)].filter(i => Number.isInteger(i) && s.piles.hand[i]);
+  if (picks.length !== turnEndExcess(s)) return { state: s, rng: r };
+  const dropped = picks.map(i => s.piles.hand[i]);
+  s.piles.hand = s.piles.hand.filter((_, i) => !picks.includes(i));
+  s.piles.discard.push(...dropped);
+  s.log.push(`ทิ้งท้ายเทิร์น: ${dropped.map(c => c.name).join(', ')}`);
+  if(dropped.length)r=runTriggers(s,'discard',r);
+  return { state: s, rng: r };
+}
+
 export function endTurn(s: GameState, _cmd: Extract<Command, { type: 'EndTurn' }>, r: RNG) {
   return resolveEnemyTurn(s, { type: 'ResolveEnemyTurn' }, r);
 }
@@ -109,11 +154,14 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
 
   // จบเทิร์น player
   processStatusEffectsOnTurnEnd('player', s);
+  // Curses go first, then the hand is cut to the retain limit (the player picked with
+  // DiscardForTurnEnd; anything still over is dropped newest first).
+  discardCurses(s);
+  if(enforceRetain(s))r=runTriggers(s,'discard',r);
   // การ์ดที่ยังค้างอยู่ในมือทำงานก่อนเทิร์นศัตรู — ทั้งหมดของกลไกนี้คือ
   // "ถือไว้แล้วมันกันให้" ถ้าไปทำงานหลังโดนตีแล้วก็ไม่มีความหมาย
   applyHeldEffects(s);
   tickTraps(s);
-  discardCurses(s);
   r = runTriggers(s, 'turnEnd', r);
 
 
@@ -121,11 +169,20 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   r = settleCombat(s, r);
   if (s.phase !== 'combat') return { state: s, rng: r };
 
+  // เข้าสมาธิ: the player takes another turn; the ghost does not act, so rage does not rise.
+  if (s.fight?.extraTurn) {
+    s.fight.extraTurn = false;
+    s.log.push('เข้าสมาธิ: ได้เทิร์นเพิ่ม');
+    return { state: s, rng: r };
+  }
+
   // ── เทิร์นศัตรู
   if (s.enemy && (s as any).enemyPiles) {
     s.enemy.ap = s.enemy.maxAp ?? 2;
     s.enemy.block = 0;
+    if (s.fight) s.fight.ghostTurns += 1;
     require('../../campaign/nights').applyRage(s);
+    require('../../campaign/bossRules').applyBossRule(s);
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
     if(s.phase!=='combat')return {state:s,rng:r};
@@ -155,6 +212,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       if(index<0||!consumeEnemyCard(s,index))continue;
       if(original!=null)consumed.push(original);
       const shown=enemyCardFx(s,def);
+      mimicGhostCard(s,def);
       s.enemyLastPlayed.push(cardId);
       emit(s, {
         t: 'EnemyCardRevealed',

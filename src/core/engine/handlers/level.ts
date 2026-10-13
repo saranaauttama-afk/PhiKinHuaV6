@@ -1,112 +1,78 @@
-// src/core/engine/handlers/level.ts
-import type { Command, GameState } from '../../types';
-import {canRemoveCard} from '../shared';
+// src/core/engine/handlers/level.ts — level-up: pick one of the two rewards rolled for this level
+// (new card, upgrades, removal, equipment slot, retain). The full heal and the max HP increase
+// already happened when the level was gained.
+import type { Command, GameState, LevelOption } from '../../types';
 import type { RNG } from '../../rng';
-import { upgradeCard, canUpgrade, grantBlessing, advanceAfterVictory } from '../shared';
+import { CARD_RULES, LEVEL_UP } from '../../balance/notfm';
+import { canRemoveCard, canUpgrade, upgradeCard, advanceAfterVictory } from '../shared';
 
-export function chooseLevelUp(s: GameState, cmd: Extract<Command, { type: 'ChooseLevelUp' }>, r: RNG) {
-  if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed) return { state: s, rng: r };
-  
-  // Legacy support for old bucket system
-  const b = s.levelUp.bucket;
-  if (b) {
-    const idx = cmd.index ?? 0;
-    applyBucketChoice(s, b, idx);
-    s.levelUp.consumed = true;
-    advanceAfterVictory(s);
-    return { state: s, rng: r };
-  }
-  
-  return { state: s, rng: r };
+/** Rewards offered this level (old saves without `offers` keep the classic three). */
+export function levelOffers(s: GameState): LevelOption[] {
+  return s.levelUp?.offers ?? ['card', 'upgrade', 'remove'];
+}
+
+/** Whether `option` with `index` can be taken now. */
+export function levelOptionValid(s: GameState, option: LevelOption, index: number): boolean {
+  if (!s.levelUp || s.levelUp.consumed) return false;
+  // Once upgrades started, only more upgrades are allowed.
+  if (s.levelUp.upgradesLeft != null && option !== 'upgrade') return false;
+  if (!levelOffers(s).includes(option)) return false;
+  if (option === 'card') return index >= 0 && index < s.levelUp.cards.length;
+  if(option==='ap')return s.player.maxAp<LEVEL_UP.caps.ap;
+  if(option==='mana')return s.player.startMana<LEVEL_UP.caps.mana;
+  if(option==='draw')return s.player.drawPerTurn<LEVEL_UP.caps.draw;
+  if(option==='slot')return (s.equipmentSlotsMax??1)<LEVEL_UP.caps.slot;
+  if(option==='retain')return (s.player.retain??CARD_RULES.retain)<LEVEL_UP.caps.retain;
+  const card = s.masterDeck[index];
+  if (!card) return false;
+  return option === 'upgrade' ? canUpgrade(card) : canRemoveCard(card, s.masterDeck.length);
+}
+
+function finish(s: GameState, text: string) {
+  s.levelUp!.consumed = true;
+  s.levelUp!.result = { fight: s.fightCount ?? 0, text };
+  s.log.push(text);
+  advanceAfterVictory(s);
 }
 
 export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 'ChooseLevelUpOption' }>, r: RNG) {
-  if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed || !s.levelUp.choice) return { state: s, rng: r };
-  
-  const choice = s.levelUp.choice;
-  const selectedBucket = cmd.option === 'A' ? choice.optionA : choice.optionB;
-  const idx = cmd.index ?? 0;
-  
-  if ((selectedBucket==='upgrade'||selectedBucket==='remove') &&
-      (idx<0||idx>=s.masterDeck.length||(selectedBucket==='upgrade'&&!canUpgrade(s.masterDeck[idx]))||(selectedBucket==='remove'&&!canRemoveCard(s.masterDeck[idx],s.masterDeck.length)))) return {state:s,rng:r};
-  const before={hp:s.player.hp,maxHp:s.player.maxHp,slots:s.equipmentSlotsMax??1,card:s.masterDeck[idx]?.name};
-  // Store the selected option for UI display
-  choice.selectedOption = cmd.option;
-  
-  applyBucketChoice(s, selectedBucket, idx);
-  s.levelUp.consumed = true;
-  const text=selectedBucket==='max_hp'?`ชีวิตสูงสุด ${before.maxHp} → ${s.player.maxHp} · ชีวิต ${before.hp} → ${s.player.hp}`
-    :selectedBucket==='upgrade'?`ปลุกเสกสำเร็จ · ${s.masterDeck[idx]?.name}`
-    :selectedBucket==='remove'?`สละ ${before.card} ออกจากสำรับแล้ว`
-    :selectedBucket==='equipment_slot'?`ช่องเครื่องราง ${before.slots} → ${s.equipmentSlotsMax}`
-    :selectedBucket==='blessing'?`รับพร ${s.levelUp.blessingChoices?.[idx]?.name??''} แล้ว`:'รับเบี้ยเพิ่มแล้ว';
-  s.levelUp.result={fight:s.fightCount??0,text};s.log.push(text);
-
-  // เลเวลอัปเสร็จแล้ว ยังอาจมีการ์ดรางวัลรออยู่
-  advanceAfterVictory(s);
+  if (s.phase !== 'levelup' || !s.levelUp || !levelOptionValid(s, cmd.option, cmd.index)) return { state: s, rng: r };
+  const lv = s.levelUp;
+  if (cmd.option === 'card') {
+    const card = JSON.parse(JSON.stringify(lv.cards[cmd.index]));
+    s.masterDeck.push(card);
+    finish(s, `ได้การ์ด ${card.name}`);
+  } else if (cmd.option === 'upgrade') {
+    s.masterDeck[cmd.index] = upgradeCard(s.masterDeck[cmd.index]);
+    const text = `ปลุกเสก ${s.masterDeck[cmd.index].name} เป็น ${s.masterDeck[cmd.index].star} ดาว`;
+    s.log.push(text);
+    const first = lv.upgradesLeft == null;
+    lv.upgradesLeft = (lv.upgradesLeft ?? LEVEL_UP.upgrades) - 1;
+    lv.result = { fight: s.fightCount ?? 0, text: first || !lv.result ? text : `${lv.result.text} · ${text}` };
+    if (lv.upgradesLeft <= 0 || !s.masterDeck.some(canUpgrade)) finish(s, lv.result!.text);
+  } else if (cmd.option === 'remove') {
+    const [gone] = s.masterDeck.splice(cmd.index, 1);
+    s.runCounters = s.runCounters ?? ({ removed: 0 } as any);
+    (s.runCounters as any).removed = ((s.runCounters as any).removed ?? 0) + 1;
+    finish(s, `สละ ${gone.name} ออกจากสำรับ`);
+  } else if(cmd.option==='ap'){s.player.maxAp++;s.player.ap=s.player.maxAp;finish(s,`แต้มต่อเทิร์น +1 (${s.player.maxAp})`);
+  } else if(cmd.option==='mana'){s.player.startMana=Math.min(LEVEL_UP.caps.mana,s.player.startMana+2);finish(s,`มานาตั้งต้น +2 (${s.player.startMana})`);
+  } else if(cmd.option==='draw'){s.player.drawPerTurn++;finish(s,`จั่วต่อเทิร์น +1 (${s.player.drawPerTurn})`);
+  } else if (cmd.option === 'slot') {
+    s.equipmentSlotsMax = (s.equipmentSlotsMax ?? CARD_RULES.equipmentSlots) + 1;
+    finish(s, `ช่องอุปกรณ์ +1 (${s.equipmentSlotsMax})`);
+  } else {
+    s.player.retain = (s.player.retain ?? CARD_RULES.retain) + 1;
+    finish(s, `เก็บการ์ดข้ามเทิร์น +1 (${s.player.retain})`);
+  }
   return { state: s, rng: r };
 }
 
-function applyBucketChoice(s: GameState, bucket: string, idx: number) {
-  switch (bucket) {
-    case 'max_hp':
-      s.player.maxHp += 8; s.player.hp = Math.min(s.player.hp + 8, s.player.maxHp);
-      break;
-    case 'blessing': {
-      const bsel = s.levelUp?.blessingChoices?.[idx]; if (!bsel) break;
-      grantBlessing(s, bsel);
-      break;
-    }
-    case 'remove': {
-      const i = idx;
-      if (canRemoveCard(s.masterDeck[i],s.masterDeck.length)) {
-        s.masterDeck.splice(i, 1);
-        s.runCounters = s.runCounters || { removed: 0 } as any;
-        (s.runCounters as any).removed += 1;
-      }
-      break;
-    }
-    case 'upgrade': {
-      // ปลุกเสกได้ครั้งเดียวต่อใบ — ถ้าใบที่ชี้มาปลุกไปแล้ว ให้ไปใบแรกที่ยังปลุกได้
-      // รางวัลเลเวลอัปที่กดแล้วไม่มีอะไรเกิดขึ้นคือรางวัลที่หายไปเฉยๆ
-      const target = s.masterDeck[idx];
-      const i = target && canUpgrade(target) ? idx : s.masterDeck.findIndex(canUpgrade);
-      if (i >= 0 && i < s.masterDeck.length) {
-        s.masterDeck[i] = upgradeCard(s.masterDeck[i]);
-      }
-      break;
-    }
-    case 'equipment_slot':
-      s.equipmentSlotsMax = (s.equipmentSlotsMax ?? 2) + 1;
-      break;
-    case 'gold_skip':
-      s.player.gold += 50;
-      break;
-    case 'gold':
-    default:
-      s.player.gold += 25;
-      break;
-  }
-}
-
-export function cancelLevelUpChoice(s: GameState, _cmd: Extract<Command, { type: 'CancelLevelUpChoice' }>, r: RNG) {
-  if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed || !s.levelUp.choice) return { state: s, rng: r };
-  
-  // Reset the selected option to show main choices again
-  if (s.levelUp.choice) {
-    s.levelUp.choice.selectedOption = undefined;
-  }
-  
-  s.log.push('Back to level up choices');
-  return { state: s, rng: r };
-}
-
+/** Skip: gold instead; after some upgrades were used it just ends the reward. */
 export function skipLevelUp(s: GameState, _cmd: Extract<Command, { type: 'SkipLevelUp' }>, r: RNG) {
   if (s.phase !== 'levelup' || !s.levelUp || s.levelUp.consumed) return { state: s, rng: r };
-  if(s.levelUp.dawnHandChoice)return {state:s,rng:r};
-  s.player.gold += 25;
-  s.levelUp.consumed = true;
-
-  advanceAfterVictory(s);
+  if (s.levelUp.upgradesLeft != null) { finish(s, s.levelUp.result?.text ?? 'ปลุกเสกแล้ว'); return { state: s, rng: r }; }
+  s.player.gold += LEVEL_UP.skipGold;
+  finish(s, `รับเบี้ย ${LEVEL_UP.skipGold}`);
   return { state: s, rng: r };
 }
