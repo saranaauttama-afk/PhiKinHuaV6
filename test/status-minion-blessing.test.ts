@@ -4,11 +4,8 @@ import { makeRng } from '../src/core/rng';
 import type { StatusEffect } from '../src/core/types_extended';
 import type { CardData } from '../src/core/types';
 import type { BlessingDef } from '../src/core/types';
-import { THAI_MINIONS } from '../src/core/combat/minions/thai-minions';
 import { STATUS_EFFECTS_REGISTRY } from '../src/core/combat/status-effects/registry';
 import { sortForDisplay, isDebuff } from '../src/core/combat/statusDisplay';
-import { minionTemplateId, visibleMinions, minionSummary } from '../src/core/combat/minions/display';
-import { summonMinion } from '../src/core/minionRuntime';
 import { rollTwoBlessings } from '../src/core/level';
 import { grantBlessing } from '../src/core/engine/shared';
 import { BLESSINGS_BY_RARITY } from '../src/core/pack';
@@ -34,6 +31,7 @@ function playToEnd(seed: string): GameState {
   go({ type: 'NewRun', seed, classId: 'shaman' });
   skipChapters();
   go({ type: 'ChooseStarterBlessing', index: 0 });
+  while (s.chapter) go({ type: 'SkipChapter' } as any);
   skipChapters();
 
   let guard = 0;
@@ -50,15 +48,15 @@ function playToEnd(seed: string): GameState {
     }
     go({ type: 'ChooseOffer', index: i });
     if (s.phase !== 'combat') break;
-    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', cost: 0, dmg: 9999, instanceId: 'k1' }];
+    if (s.enemy) s.enemy.statusEffects = [];
+    s.piles.hand = [{ id: 'k', name: 'k', type: 'attack', fx: { dmg: 9999 }, instanceId: 'k1' }];
     go({ type: 'PlayCard', index: 0 });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') {
-      const lu = s.levelUp?.choice;
-      if (lu?.optionA === 'blessing') go({ type: 'ChooseLevelUpOption', option: 'A', index: 0 });
-      else if (lu?.optionB === 'blessing') go({ type: 'ChooseLevelUpOption', option: 'B', index: 0 });
-      else go({ type: 'SkipLevelUp' });
+      go({ type: 'SkipLevelUp' });
     }
     go({ type: 'CompleteNode' });
+    if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
     if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
     skipChapters();
   }
@@ -145,20 +143,9 @@ describe('ยุบระบบสถานะสองชุดให้เห�
    * ตัวจริง — การ์ด "เสกพิษตรง" เรียก minion พิษ ส่วน "น้ำมันพราย" ใช้สถานะพิษ
    * ทั้งที่ตัวเลขเหมือนกันเป๊ะ แถบสถานะจะเห็นแค่อันหลัง
    */
-  it('ไม่มี minion ที่เป็นสถานะปลอมเหลืออยู่แล้ว', () => {
-    for (const m of Object.values(THAI_MINIONS)) {
-      expect(m.isStatusEffect, `${m.id} ยังเป็นสถานะปลอม`).toBeFalsy();
-      expect(m.invisible, `${m.id} ยังซ่อนตัว`).toBeFalsy();
-    }
-  });
 
-  it('ไม่มีการ์ดใบไหนอ้าง minion ที่ไม่มีอยู่จริง', () => {
-    for (const c of ALL_CARDS) {
-      if (!c.summonMinion) continue;
-      expect(THAI_MINIONS[c.summonMinion], `${c.id} เรียก ${c.summonMinion} ที่ไม่มีในทะเบียน`)
-        .toBeDefined();
-    }
-  });
+
+
 
   it('เสกพิษตรงใส่สถานะพิษจริงให้ศัตรู — แถบสถานะจึงเห็นมัน', () => {
     const card = ALL_CARDS.find(c => c.id === 'direct_poison_spell');
@@ -166,81 +153,11 @@ describe('ยุบระบบสถานะสองชุดให้เห�
 
     const { state, rng } = makeCombatState({
       hand: [{ ...card, instanceId: 'p1' } as CardData],
-      playerEnergy: 3,
+      playerMana: 3,
     });
     const out = applyCommand(state, { type: 'PlayCard', index: 0 }, rng).state;
 
     expect(out.enemy?.statusEffects?.map(e => e.id)).toContain('poison');
-  });
-});
-
-describe('ผีที่เรียกมา', () => {
-  it('เล่นการ์ดแล้วผีไปโผล่ในที่ที่ UI อ่านได้', () => {
-    const card = ALL_CARDS.find(c => c.id === 'create_kuman');
-    const { state, rng } = makeCombatState({
-      hand: [{ ...card, cost: 0, instanceId: 'k1' } as CardData],
-      playerEnergy: 3,
-    });
-
-    const out = applyCommand(state, { type: 'PlayCard', index: 0 }, rng).state;
-    const mine = visibleMinions(out.minions).filter(m => m.owner === 'player');
-
-    expect(mine.length, 'เสกแล้วไม่มีผีโผล่มาเลย').toBeGreaterThan(0);
-    expect(mine[0].name).toBe('กุมารทอง');
-    expect(mine[0].duration).toBeGreaterThan(0);
-    expect(minionSummary(mine[0]).length).toBeGreaterThan(0);
-  });
-
-  /**
-   * ผีเคยอยู่ในอาร์เรย์ระดับโมดูล — **state ทุกก้อนใช้ของกลางร่วมกัน**
-   * เสกใส่ state หนึ่ง แล้ว state อีกก้อนที่ไม่เกี่ยวข้องกันเลยก็เห็นผีตัวนั้นด้วย
-   *
-   * ข้อนี้จงใจไม่เดินผ่านการเริ่มไฟต์ เพราะการเริ่มไฟต์ล้างอาร์เรย์ทิ้ง —
-   * เทสต์ที่เดินผ่านมันจะผ่านทั้งที่ของยังพัง (เขียนพลาดแบบนั้นมาแล้วรอบหนึ่ง)
-   */
-  it('ผีอยู่ใน state ของตัวเอง ไม่ใช่ของกลางที่ทุก state ใช้ร่วมกัน', () => {
-    const a = makeCombatState({ hand: [] }).state;
-    const b = makeCombatState({ hand: [] }).state;
-
-    summonMinion(a, 'kuman_spirit', 'player', 1);
-
-    expect(a.minions ?? []).toHaveLength(1);
-    expect(b.minions ?? [], 'ผีข้ามไปโผล่ใน state อื่น').toHaveLength(0);
-  });
-
-  it('ตัดชื่อแม่แบบออกจาก id ที่ต่อท้ายให้ไม่ซ้ำได้', () => {
-    expect(minionTemplateId('kuman_spirit_abc_1')).toBe('kuman_spirit');
-    expect(minionTemplateId('ghost_ally_x_2')).toBe('ghost_ally');
-    // แม่แบบที่ชื่อมีสามท่อน — ตัดด้วยขีดล่างเฉยๆ จะได้ผลผิด
-    expect(minionTemplateId('ancient_warrior_spirit_q_1')).toBe('ancient_warrior_spirit');
-  });
-
-  it('ทุกแม่แบบมีชื่อ อายุ และบอกได้ว่าทำอะไร', () => {
-    for (const m of Object.values(THAI_MINIONS)) {
-      expect(m.name.trim().length, m.id).toBeGreaterThan(0);
-      expect(m.duration, `${m.id} ไม่มีอายุ`).toBeGreaterThan(0);
-      expect(minionSummary(m).trim().length, `${m.id} ไม่บอกว่าทำอะไร`).toBeGreaterThan(0);
-    }
-  });
-
-  /**
-   * `MinionData` ไม่มีฟิลด์ `hp` — ผีที่เรียกมาคือออร่าที่มีอายุ ไม่ใช่ตัวที่ยืนสู้
-   * แต่คำอธิบายการ์ดเคยเขียนว่ากุมารมี "8 HP, โจมตี 2" ซึ่งไม่จริงทั้งคู่
-   */
-  it('การ์ดที่เรียกผีไม่สัญญาเลือดที่ระบบไม่มี', () => {
-    for (const c of ALL_CARDS) {
-      if (!c.summonMinion) continue;
-      expect(c.desc ?? '', `${c.id} ยังโฆษณา HP ของผีที่ไม่มีเลือด`).not.toMatch(/\d+\s*HP/);
-    }
-  });
-
-  it('การ์ดที่เรียกผีบอกอายุจริงของผีตัวนั้น', () => {
-    for (const c of ALL_CARDS) {
-      if (!c.summonMinion) continue;
-      const m = THAI_MINIONS[c.summonMinion];
-      expect(c.desc ?? '', `${c.id} ไม่ได้บอกว่าผีอยู่กี่เทิร์น`)
-        .toContain(`${m.duration} เทิร์น`);
-    }
   });
 });
 

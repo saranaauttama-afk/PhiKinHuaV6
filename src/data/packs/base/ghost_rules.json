@@ -1,0 +1,467 @@
+{
+ "phi-krasue": {
+  "name": "เงากระสือ",
+  "flavor": "หัวลอยหลบไปมาในความมืด",
+  "fx": {
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "phi-pop": {
+  "name": "ปอบกระหาย",
+  "flavor": "ยิ่งกินยิ่งอิ่ม",
+  "fx": {
+   "status": [
+    {
+     "id": "regeneration",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "nang-tanee": {
+  "name": "ใบกล้วยบาดมือ",
+  "flavor": "ใบตานีคมเหมือนมีด",
+  "fx": {
+   "status": [
+    {
+     "id": "thorns",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "phi-nang-ram": {
+  "name": "รำเบิกโรง",
+  "flavor": "ท่ารำสะกดให้มือไม้อ่อน",
+  "fx": {
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "phi-pong-kang": {
+  "name": "ดินโป่งพอกตัว",
+  "flavor": "ดินเค็มเกาะเป็นเกราะหนา",
+  "fx": {
+   "block": 6
+  }
+ },
+ "ngu-phi-sang": {
+  "name": "ไฟผีโพง",
+  "flavor": "ไอคาวลอยมาก่อนตัว",
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "phi-pret": {
+  "name": "แขนยาว",
+  "flavor": "แขนยาวเกินคน ฟาดถึงก่อนตั้งตัว",
+  "fx": {
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "krahang": {
+  "name": "ปีกกระด้ง",
+  "flavor": "โฉบขึ้นลงจนจับจังหวะไม่ได้",
+  "fx": {
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "kuman-thong": {
+  "name": "เถ้ากระดูก",
+  "flavor": "เถ้าติดตัวทำให้แผลเจ็บกว่าเดิม",
+  "fx": {
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 1,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "phi-tai-hong": {
+  "name": "รอยแค้น",
+  "flavor": "แค้นที่ตายโหงทำให้เราเปราะ",
+  "fx": {
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "phi-pa": {
+  "name": "ป่าทึบ",
+  "flavor": "กิ่งไม้พันกันบังตัวไว้",
+  "fx": {
+   "block": 8
+  }
+ },
+ "mae-nak": {
+  "name": "ตายทั้งกลม",
+  "flavor": "ใครแตะต้องจะเจ็บกลับ",
+  "fx": {
+   "status": [
+    {
+     "id": "thorns",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "pop-yai": {
+  "name": "ปอบเฒ่า",
+  "flavor": "กินมานานจนแผลปิดเอง",
+  "fx": {
+   "status": [
+    {
+     "id": "regeneration",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "phi-ha-ratri": {
+  "name": "แสงโขมด",
+  "flavor": "แสงไฟผีทำให้ขวัญหาย",
+  "fx": {
+   "status": [
+    {
+     "id": "fear",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "asuragaya": {
+  "name": "เกราะอสุรกาย",
+  "flavor": "ตัวใหญ่เกราะหนา",
+  "fx": {
+   "block": 10
+  }
+ },
+ "yak-wat-jaeng": {
+  "name": "ยืนเฝ้าประตู",
+  "flavor": "ยืนขวางประตูวัดไม่ขยับ",
+  "fx": {
+   "block": 6,
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "phi-phrai": {
+  "name": "พรายคืนร่าง",
+  "flavor": "น้ำในแอ่งชุบร่างคืน",
+  "fx": {
+   "status": [
+    {
+     "id": "regeneration",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "winyan-rerorn": {
+  "name": "เสียงเร่ร่อน",
+  "flavor": "เสียงในหูทำให้จับการ์ดไม่ทัน",
+  "fx": {
+   "status": [
+    {
+     "id": "draw_reduction",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "pisaj-fai": {
+  "name": "สะเก็ดไฟ",
+  "flavor": "ไฟผีลามติดตัว",
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "jao-por-pa": {
+  "name": "ดงลึก",
+  "flavor": "รากไม้รั้งแขนไว้",
+  "fx": {
+   "block": 6,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "phi-nang-yai": {
+  "name": "เงาหนังใหญ่",
+  "flavor": "เงาบนผ้าทำให้ทุกท่าหนักขึ้น",
+  "fx": {
+   "status": [
+    {
+     "id": "corruption",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "winyan-dek": {
+  "name": "เสียงเด็กหัวเราะ",
+  "flavor": "เดี๋ยวอยู่ตรงนี้ เดี๋ยวอยู่ตรงนั้น",
+  "fx": {
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "yak-dam": {
+  "name": "หมัดยักษ์ดำ",
+  "flavor": "กำปั้นหนักตั้งแต่หมัดแรก",
+  "fx": {
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "phi-mae-mai": {
+  "name": "เสียงเรียกชื่อ",
+  "flavor": "ได้ยินชื่อตัวเองแล้วใจสั่น",
+  "fx": {
+   "block": 8,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "phra-upakut": {
+  "name": "ม่านคลื่น",
+  "flavor": "คลื่นน้ำห่อตัวไว้",
+  "fx": {
+   "block": 8,
+   "status": [
+    {
+     "id": "regeneration",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "night-head-collector": {
+  "name": "สะกดในความมืด",
+  "flavor": "มือที่ยื่นมาในความมืดทำให้แรงหาย",
+  "fx": {
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "night-bell-keeper": {
+  "name": "ระฆังปลุกผี",
+  "flavor": "เสียงระฆังรบกวนสำรับ",
+  "fx": {
+   "status": [
+    {
+     "id": "draw_reduction",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "night-root-lord": {
+  "name": "รากพันกาย",
+  "flavor": "รากไทรพอกเป็นเกราะ",
+  "fx": {
+   "block": 12
+  }
+ },
+ "night-cave-mother": {
+  "name": "เสียงสะท้อนในถ้ำ",
+  "flavor": "เสียงสะท้อนชุบชีวิตไม่หยุด",
+  "fx": {
+   "status": [
+    {
+     "id": "regeneration",
+     "stacks": 3,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "night-headless-king": {
+  "name": "คมตัดคอ",
+  "flavor": "ดาบอาคมพร้อมฟันและสวน",
+  "fx": {
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    },
+    {
+     "id": "thorns",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "phaya-nak": {
+  "name": "ลมหายใจนาค",
+  "flavor": "ไอพิษลอยคลุมวังน้ำ",
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "thep-aksorn": {
+  "name": "อักษรต้องห้าม",
+  "flavor": "อักษรที่อ่านไม่ออกทำให้ทุกคาถาหนักขึ้น",
+  "fx": {
+   "status": [
+    {
+     "id": "corruption",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ "phi-kin-hua": {
+  "name": "ผู้กลืนชื่อ",
+  "flavor": "ต้นตอคำสาปไม่ยอมให้ใครเข้าใกล้",
+  "fx": {
+   "block": 10,
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ "phraya-maccurat": {
+  "name": "ตรายมทูต",
+  "flavor": "ตราที่หน้าผากทำให้เราเปราะ",
+  "fx": {
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    },
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ }
+}

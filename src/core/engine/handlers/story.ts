@@ -9,7 +9,7 @@ export function chooseEventOption(
   cmd: Extract<Command, { type: 'ChooseEventOption' }>,
   r: RNG
 ) {
-  if (!s.story) return { state: s, rng: r };
+  if (s.phase!=='event'||!s.story) return { state: s, rng: r };
 
   // เลือกได้ครั้งเดียวต่อเหตุการณ์ — กดซ้ำแล้วได้ผลอีกรอบคือช่องโหว่ที่หาเจอง่ายมาก
   if (s.story.result != null) return { state: s, rng: r };
@@ -32,6 +32,8 @@ export function chooseEventOption(
   s.log.push(`${ev.title} → ${choice.label}`);
   const out = applyChoice(s, choice, r);
 
+  s.eventMemory={...(s.eventMemory??{}),[ev.id]:cmd.index};
+  if(s.player.hp<=0)require('./runEnd').loseRun(s);
   s.story = { eventId: s.story.eventId, chosenIndex: cmd.index, result: out.text };
   return { state: s, rng: out.rng };
 }

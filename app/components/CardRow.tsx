@@ -8,8 +8,8 @@ import React from 'react';
 import InkIcon from './InkIcon';
 import { Text, View } from 'react-native';
 import type { CardData } from '../../src/core/types';
-import { isFused } from '../../src/core/cards/fusion';
-import { hitsOf, conditionLabel } from '../../src/core/cards/mechanics';
+import { costLabel, describeCard, TYPE_LABEL } from '../../src/core/cards/describe';
+import { starOf } from '../../src/core/cards/model';
 import { font, radius, size, space, tint, paper } from '../theme';
 
 /** ป้ายเล็กบอกคุณสมบัติพิเศษของใบนี้ */
@@ -39,16 +39,6 @@ function Chip({ label, tone = 'dim' }: { label: string; tone?: 'dim' | 'blood' |
   );
 }
 
-/** สรุปผลของการ์ดที่ค้างอยู่ในมือเป็นบรรทัดเดียว */
-function heldLabel(card: CardData): string {
-  const e = card.whileHeld!;
-  const parts: string[] = [];
-  if (e.block) parts.push(`กัน ${e.block}`);
-  if (e.heal) parts.push(`ฟื้น ${e.heal}`);
-  if (e.status) parts.push(`${e.status.effect} ${e.status.value}`);
-  return `ค้างอยู่ในมือท้ายเทิร์น → ${parts.join(' · ')}`;
-}
-
 type Props = {
   card: CardData;
   /** มีกี่ใบในกองนี้ — ไม่ส่งมาแปลว่าใบเดียว ไม่ต้องขึ้น ×n */
@@ -72,17 +62,17 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
       {!plain && <PaperTexture />}
       {/* ค่าร่าย — อ่านเป็นเลขเดียวโดดๆ เหมือนมุมการ์ดจริง */}
       <View style={{
-        width: 26, height: 26, borderRadius: radius.pill,
+        minWidth: 34, height: 26, paddingHorizontal: 4, borderRadius: radius.pill,
         backgroundColor: tint.moonFaint,
         borderWidth: 1, borderColor: palette.line,
         alignItems: 'center', justifyContent: 'center',
       }}>
-        <Text style={{ color: palette.moon, fontSize: size.ui, fontFamily: font.uiMed }}>
-          {card.cost ?? 0}
+        <Text style={{ color: palette.moon, fontSize: size.tiny, fontFamily: font.uiMed }}>
+          {costLabel(card)}
         </Text>
       </View>
 
-      {!plain && <InkIcon name={card.type === 'attack' ? 'attack' : card.type === 'trap' ? 'block' : 'blessing'} size={30} color={palette.blood} />}
+      {!plain && <InkIcon name={card.type === 'attack' ? 'attack' : card.type === 'counter' ? 'trap' : 'blessing'} size={30} color={palette.blood} />}
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, flexWrap: 'wrap' }}>
           <Text style={{ color: palette.text, fontSize: size.ui, fontFamily: font.uiMed }}>
@@ -93,52 +83,21 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
               ×{count}
             </Text>
           )}
-          {/* ใบที่ใช้แล้วหายคือข้อมูลที่ต้องเห็นก่อนกด ไม่ใช่หลังกด */}
-          {card.type === 'trap' && <Badge label="ตั้งดัก" />}
-          {card.type === 'curse' && <Badge label="เล่นไม่ได้" tone="blood" />}
-          {card.exhaust && card.type !== 'trap' && (
-            <Badge label={spent ? 'ใช้ไปแล้ว' : 'ใช้แล้วหาย'} tone="blood" />
-          )}
-          {card.upgraded && <Badge label="ปลุกเสกแล้ว" />}
-          {isFused(card) && <Badge label="ผสาน" />}
-          {hitsOf(card) > 1 && <Badge label={`${hitsOf(card)} หมัด`} tone="blood" />}
-          {!!card.whileHeld && <Badge label="ถือไว้ก็ทำงาน" />}
-          {!!card.costRule && <Badge label="ยิ่งร่ายยิ่งถูก" />}
+          <Badge label={TYPE_LABEL[card.type]} tone={card.type === 'curse' ? 'blood' : 'moon'} />
+          {starOf(card) > 1 && <Badge label={'★'.repeat(starOf(card))} />}
+          {spent && <Badge label="ใช้ไปแล้ว" tone="blood" />}
         </View>
 
-        <View style={{ flexDirection: 'row', gap: space.md, marginTop: 2, flexWrap: 'wrap' }}>
-          {!!card.dmg        && <Chip label={`โจมตี ${card.dmg}`} tone="blood" />}
-          {!!card.block      && <Chip label={`กัน ${card.block}`} tone="moon" />}
-          {!!card.heal       && <Chip label={`ฟื้น ${card.heal}`} tone="moon" />}
-          {!!card.energyGain && <Chip label={`พลังงาน +${card.energyGain}`} />}
-          {!!card.draw       && <Chip label={`จั่ว ${card.draw}`} />}
-        </View>
+        <Text style={{ color: palette.moonDim, fontSize: size.label, fontFamily: font.ui, marginTop: 2 }}>
+          {describeCard(card)}
+        </Text>
 
-        {/* เงื่อนไขต้องอ่านออกก่อนกด ไม่ใช่หลังกดแล้วงงว่าทำไมแรงไม่เท่าเดิม */}
-        {!!card.conditional && (
-          <Text style={{
-            color: palette.moonDim, fontSize: size.label,
-            fontFamily: font.ui, marginTop: 2,
-          }}>
-            {conditionLabel(card.conditional)}
-          </Text>
-        )}
-
-        {!!card.whileHeld && (
-          <Text style={{
-            color: palette.moonDim, fontSize: size.label,
-            fontFamily: font.ui, marginTop: 2,
-          }}>
-            {heldLabel(card)}
-          </Text>
-        )}
-
-        {!!card.desc && (
+        {!!card.flavor && (
           <Text style={{
             color: plain ? paper.ink : palette.textFaint, fontSize: size.body,
             fontFamily: font.body, marginTop: space.xs, lineHeight: 22,
           }}>
-            {card.desc}
+            {card.flavor}
           </Text>
         )}
       </View>

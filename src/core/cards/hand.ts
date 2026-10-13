@@ -1,9 +1,10 @@
-import type {CardData,GameState} from '../types';
-import {TEST_WIN_CARD_ID} from './testWin';
-/** The QA victory card occupies no normal retained-hand slot. */
-export function normalHandCount(cards:readonly Pick<CardData,'id'>[]):number {
- return cards.filter(c=>c.id!==TEST_WIN_CARD_ID).length;
+import type {GameState} from '../types';
+import {CARD_RULES,DIFFICULTY} from '../balance/notfm';
+import {ruleModifier} from './passives';
+/** Opening bonus card (CARD_RULES.openingBonus), except from DIFFICULTY.noOpeningBonusFrom. */
+export function openingBonus(s:GameState):number{
+ return (s.campaign?.difficulty??1)>=DIFFICULTY.noOpeningBonusFrom?0:CARD_RULES.openingBonus;
 }
-export function requiredDiscards(s:Pick<GameState,'piles'|'player'>):number {
- return Math.max(0,normalHandCount(s.piles.hand)-s.player.maxHandSize);
+export function openingHandSize(s:GameState):number{
+ return Math.min(s.player.handMax,Math.max(1,(s.player.retain??CARD_RULES.retain)+openingBonus(s)+ruleModifier(s,'openingDraw')));
 }

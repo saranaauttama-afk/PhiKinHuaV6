@@ -12,7 +12,8 @@ export function makeCombatState(opts: {
   hand?: CardData[];
   playerHp?: number;
   playerBlock?: number;
-  playerEnergy?: number;
+  playerAp?: number;
+  playerMana?: number;
   enemyHp?: number;
   enemyBlock?: number;
   monsterId?: string;
@@ -26,11 +27,12 @@ export function makeCombatState(opts: {
   state.player.hp = opts.playerHp ?? 50;
   state.player.maxHp = Math.max(state.player.maxHp, state.player.hp);
   state.player.block = opts.playerBlock ?? 0;
-  state.player.energy = opts.playerEnergy ?? 3;
+  state.player.ap = opts.playerAp ?? 2;
+  state.player.mana = opts.playerMana ?? 0;
 
   if (state.enemy) {
     // Controlled combat fixtures use a three-energy budget; live v34 normal encounters use two.
-    state.enemy.maxEnergy=3;
+    state.enemy.maxAp=3;
     state.enemy.hp = opts.enemyHp ?? 30;
     state.enemy.maxHp = Math.max(state.enemy.maxHp, state.enemy.hp);
     state.enemy.block = opts.enemyBlock ?? 0;
@@ -71,15 +73,31 @@ export function resolveStoryIfAny(s: GameState, go: (c: Command) => void): void 
   go({ type: 'ChooseEventOption', index: index >= 0 ? index : 0 });
 }
 
+/** Index of an unresolved fight (ghost or boss) on the adventure board, or -1. */
+export function nextFight(s: GameState): number {
+  const p = s.pages?.current;
+  if (!p) return -1;
+  return p.offers.findIndex((o, i) => !!o && !p.resolved[i] && (o.kind === 'monster' || o.kind === 'boss'));
+}
+
 /**
- * เดินออกจากชั้นพัก
- *
- * ชั้นพักไม่เดินต่อเองแล้ว — เคลียร์ช่องหนึ่งแล้วมีของใหม่ขึ้นแทน ผู้เล่น
- * (และตัวขับรัน) ต้องกดเดินต่อเอง ไม่งั้นจะวนเคลียร์ของบนชั้นเดิมไม่รู้จบ
+ * Clears one non-fight slot: visits it, then passes by if visiting did not settle it
+ * (a shop left without buying stays on the board). Returns false when no slot is left.
+ * `get` must return the live state, because each command replaces it.
  */
-export function leaveRestRow(s: GameState, go: (c: Command) => void): void {
-  if (s.phase !== 'map') return;
-  go({ type: 'Proceed' });
+export function stepService(get: () => GameState, go: (c: Command) => void): boolean {
+  const p = get().pages?.current;
+  if (get().phase !== 'map' || get().chapter || !p) return false;
+  const i = p.offers.findIndex((o, ix) => !!o && !p.resolved[ix] && o.kind !== 'monster' && o.kind !== 'boss');
+  if (i < 0) return false;
+  go({ type: 'ChooseOffer', index: i });
+  resolveStoryIfAny(get(), go);
+  go({ type: 'CompleteNode' });
+  const after = get();
+  if (after.phase === 'map' && after.pages?.current && !after.pages.current.resolved[i] && after.pages.current.offers[i]?.kind !== 'story_event') {
+    go({ type: 'DeleteShopFromMap', index: i });
+  }
+  return true;
 }
 
 /**
@@ -96,14 +114,16 @@ export function resolveRewardIfAny(
   go: (c: Command) => void,
   take = false
 ): void {
+  if (s.phase === 'talk') go({ type: 'AnswerGhostTalk', choice: 'leave' });
+  if (s.phase === 'levelup') go({ type: 'SkipLevelUp' });
   if (s.phase !== 'reward' || !s.cardReward) return;
   go(take ? { type: 'ChooseCardReward', index: 0 } : { type: 'SkipCardReward' });
 }
 
 export function attackCard(dmg: number, over: Partial<CardData> = {}): CardData {
-  return { id: 'test_attack', name: 'Test Attack', type: 'attack', cost: 0, dmg, ...over };
+  return { id: 'test_attack', name: 'Test Attack', type: 'attack', fx: { dmg }, ...over };
 }
 
 export function blockCard(block: number, over: Partial<CardData> = {}): CardData {
-  return { id: 'test_block', name: 'Test Block', type: 'skill', cost: 0, block, ...over };
+  return { id: 'test_block', name: 'Test Block', type: 'action', ap: 0, fx: { block }, ...over };
 }

@@ -2,6 +2,8 @@ import type { EnemyIntent, GameState } from '../types';
 import { enemyCardById } from '../pack_enemy_cards';
 import { computeModifiedDamage } from './damage';
 import {chooseEnemyCardIndexes} from './enemyPlan';
+import { cardFx } from './enemyCardEffects';
+import { hitsOf } from '../cards/mechanics';
 
 /** Hidden in-turn decision only. Old preparation calls neither draw nor publish future cards. */
 export function planEnemyIntent(s: GameState,duringEnemyTurn=false): void {
@@ -19,32 +21,19 @@ export function planEnemyIntent(s: GameState,duringEnemyTurn=false): void {
   const { enemyDrawUpToHand } = require('../engine/handlers/enemy');
   enemyDrawUpToHand(s);
 
-  let energy = s.enemyEnergy ?? s.enemy.maxEnergy ?? 2;
   const cardIds: string[] = [];
   let damage = 0;
   let block = 0;
 
-  const handIndexes=chooseEnemyCardIndexes(s,piles.hand,s.enemyEnergy??energy);
-  const chosen=handIndexes.map(i=>piles.hand[i]);
-  for (const id of chosen) {
+  const handIndexes = chooseEnemyCardIndexes(s, piles.hand, s.enemy.ap ?? 0);
+  for (const id of handIndexes.map(i => piles.hand[i])) {
     const def = enemyCardById(id);
     if (!def) continue;
-
-    const cost = typeof def.energyCost === 'number' ? def.energyCost : 1;
-    if (cost > energy) continue;
-    energy -= cost;
     cardIds.push(id);
-
-    if (def.type === 'attack' && (def.dmg ?? 0) > 0) {
-      // ใช้สูตรเดียวกับดาเมจจริง ไม่งั้นเลขที่โชว์จะไม่ตรงกับที่โดน
-      damage += (def.hits ?? 1) * computeModifiedDamage(s, {
-        from: 'enemy',
-        to: 'player',
-        raw: def.dmg!,
-        source: { kind: 'card', cardId: def.id },
-      });
-    }
-    if ((def.block ?? 0) > 0) block += def.block!;
+    const f = cardFx(s, def);
+    // Same formula as the real hit, so the shown number is what lands.
+    if (f.dmg) damage += hitsOf(f) * computeModifiedDamage(s, { from: 'enemy', to: 'player', raw: f.dmg, source: { kind: 'card', cardId: def.id } });
+    if (f.block) block += f.block;
   }
 
   s.enemyIntent = {
@@ -66,8 +55,7 @@ export function refreshIntentEstimate(s: GameState): void {
   if (!s.enemyIntent) return;
   s.enemyIntent.damage = s.enemyIntent.cardIds.reduce((sum, id) => {
     const c = enemyCardById(id);
-    return sum + (c?.type === 'attack' && c.dmg ? (c.hits ?? 1) * computeModifiedDamage(s, {
-      from: 'enemy', to: 'player', raw: c.dmg, source: { kind: 'card', cardId: id },
-    }) : 0);
+    const f = c ? cardFx(s, c) : {};
+    return sum + (f.dmg ? hitsOf(f) * computeModifiedDamage(s, { from: 'enemy', to: 'player', raw: f.dmg, source: { kind: 'card', cardId: id } }) : 0);
   }, 0);
 }

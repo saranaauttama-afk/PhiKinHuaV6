@@ -8,6 +8,7 @@ import {QuietButton} from '../QuietChrome';
 import {font,palette,layer} from '../../theme';
 import {paper} from '../Paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {describeCard} from '../../../src/core/cards/describe';
 
 export default function CardHistory({entries}:{entries:CardHistoryEntry[]}){
  const safe=useSafeAreaInsets();const [selected,setSelected]=React.useState<CardHistoryEntry|null>(null);
@@ -25,7 +26,7 @@ export default function CardHistory({entries}:{entries:CardHistoryEntry[]}){
     {selected&&<RitualSurface kind="occupationPage" accessibilityViewIsModal style={{padding:22,gap:12,maxHeight:'90%'}}>
      <Text style={{fontFamily:font.ui,color:paper.muted,fontSize:13}}>{selected.side==='player'?'เรา':'ผี'}ใช้ · เทิร์น {selected.turn}</Text>
      <Text accessibilityRole="header" style={{fontFamily:font.heading,color:paper.ink,fontSize:23}}>{selected.card.name}</Text>
-     <ScrollView><Text style={{fontFamily:font.body,color:paper.ink,fontSize:18,lineHeight:27}}>{selected.card.desc}</Text><Text style={{fontFamily:font.heading,color:paper.ink,fontSize:17,marginTop:12}}>ผลที่เกิดขึ้น</Text>{selected.results.map((line,i)=><Text key={i} style={{fontFamily:font.ui,color:paper.ink,fontSize:15,lineHeight:25}}>{line}</Text>)}</ScrollView>
+     <ScrollView><Text style={{fontFamily:font.body,color:paper.ink,fontSize:18,lineHeight:27}}>{describeCard(selected.card)}</Text><Text style={{fontFamily:font.heading,color:paper.ink,fontSize:17,marginTop:12}}>ผลที่เกิดขึ้น</Text>{selected.results.map((line,i)=><Text key={i} style={{fontFamily:font.ui,color:paper.ink,fontSize:15,lineHeight:25}}>{line}</Text>)}</ScrollView>
      <QuietButton label="ปิดประวัติ" primary onPress={()=>setSelected(null)}/>
     </RitualSurface>}
    </View>

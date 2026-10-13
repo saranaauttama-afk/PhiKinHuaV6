@@ -5,7 +5,6 @@ import { ART_CATALOG, ART_BY_ID, artSlot } from '../src/art/catalog';
 import { THAI_GHOST_POOLS } from '../src/core/monsters/thai-ghosts';
 import { ALL_CLASS_IDS } from '../src/core/classes';
 import { STORY_EVENTS } from '../src/core/events/story';
-import { restKinds } from '../src/core/map/journey';
 import { describeOffer } from '../app/components/offerDisplay';
 
 /**
@@ -76,7 +75,7 @@ describe('catalog ครบและไม่ขัดกันเอง', () =>
     //
     // ตอนนี้ถามจากของจริง: ชนิดโหนดพักมาจากตาราง `REST_WEIGHTS` ที่ใช้สร้าง
     // แผนที่จริงๆ เพิ่มชนิดใหม่เข้าตารางแล้วเทสต์นี้จะทวงช่องรูปให้เอง
-    const kinds = [...restKinds(), 'next_event'];
+    const kinds = ['shop_card','shop_equipment','shop_remove','shop_upgrade','well','healing_shrine','treasure','treasure_single','story_event','next_event'];
     for (const k of kinds) {
       // เหตุการณ์เล่าเรื่องใช้ช่องรูปของเรื่องนั้นๆ (`event/<id>`) ไม่ใช่ช่องรวม
       if (k === 'story_event') continue;

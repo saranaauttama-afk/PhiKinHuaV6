@@ -8,31 +8,29 @@ import {baseNewState} from '../src/core/commands';
 import {makeRng} from '../src/core/rng';
 import {toSave,fromSave} from '../src/core/save';
 import {ALL_CARDS} from '../src/core/pack';
-import {fuseCards} from '../src/core/cards/fusion';
 import type {Command} from '../src/core/types';
-function run(id='archive-a',night:1|2|3|4|5=1){
+function run(id='archive-a',difficulty:1|2|3|4|5=1){
  let rng=makeRng(id),s=baseNewState(id);
  const step=(cmd:Command)=>{const r=applyCommand(s,cmd,rng);s=r.state;rng=r.rng;return s;};
- step({type:'NewRun',seed:id,discoveryId:id,classId:'warrior',night});while(s.chapter)step({type:'SkipChapter'});step({type:'ChooseStarterBlessing',index:0});
+ step({type:'NewRun',seed:id,discoveryId:id,classId:'warrior',difficulty});while(s.chapter)step({type:'SkipChapter'});step({type:'ChooseStarterBlessing',index:0});
  return {get s(){return s;},get rng(){return rng;},step};
 }
 describe('archive catalog and real discoveries',()=>{
- it('lists all 34 unique ghosts in staged groups and 126 core identities plus 17 special entries',()=>{
-  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);expect(CORE_CARD_IDS.size).toBe(126);
-  expect(CARD_CATALOG).toHaveLength(143);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(143);
+ it('lists all 34 unique ghosts in staged groups and 106 core identities plus 4 curses and the test card',()=>{
+  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);expect(CORE_CARD_IDS.size).toBe(106);
+  expect(CARD_CATALOG).toHaveLength(111);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(111);
   expect(GHOST_CATALOG.filter(g=>g.group==='บอสแต่ละคืน').map(g=>g.night)).toEqual([1,2,3,4,5]);
   expect(GHOST_CATALOG.at(-1)?.id).toBe('phi-kin-hua');
-  expect(CARD_CATALOG.filter(c=>c.group==='สูตรผสาน').every(c=>c.card.tags?.includes('fused'))).toBe(true);
  });
  it('records only map ghosts revealed to the player, not the ten prebuilt future fights',()=>{
   const r=run();const visible=r.s.pages!.current!.offers.filter(o=>o?.kind==='monster');expect(Object.keys(r.s.discovery!.ghosts)).toHaveLength(visible.length);
   expect(Object.keys(r.s.discovery!.cards).length).toBeGreaterThan(0);
   const id=Object.keys(r.s.discovery!.ghosts)[0],p=mergeDiscovery(emptyArchive(),r.s.discovery!);
-  r.step({type:'Proceed'});const next=mergeDiscovery(p,r.s.discovery!);
+  const fight=r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster');r.step({type:'ChooseOffer',index:fight});r.s.enemy!.statusEffects=[];r.s.piles.hand=[{id:'k',name:'k',type:'attack',fx:{dmg:9999}} as any];r.step({type:'PlayCard',index:0});for(let g=0;g<20&&r.s.phase!=='map';g++)r.step(r.s.phase==='talk'?{type:'AnswerGhostTalk',choice:'leave'}:r.s.phase==='levelup'?({type:'SkipLevelUp'}):r.s.phase==='reward'?{type:'SkipCardReward'}:{type:'CompleteNode'});const next=mergeDiscovery(p,r.s.discovery!);
   expect(archiveProgress(next).ghosts[id].seen).toBe(1);expect(Object.keys(r.s.discovery!.ghosts).length).toBeGreaterThan(1);
  });
  it('viewing or leaving a shop does not discover its stock; buying records only the acquired card',()=>{
-  const r=run();r.step({type:'ChooseOffer',index:1});const stock=r.s.shopStock!;
+  const r=run();const a=r.s.pages!.adventure!,shop=a.deck.find(e=>e.offer.kind==='shop_card')!;r.s.pages!.current!.offers[1]=shop.offer;r.s.pages!.current!.resolved[1]=false;a.slotIds[1]=shop.id;r.step({type:'ChooseOffer',index:1});const stock=r.s.shopStock!;
   const unowned=stock.find(x=>'card' in x&&!r.s.discovery!.cards[x.card.id]);
   if(!unowned||!('card' in unowned))throw Error('Fixture needs unowned stock');
   expect(r.s.discovery!.cards[unowned.card.id]).toBeUndefined();r.s.player.gold=999;
@@ -47,20 +45,14 @@ describe('archive catalog and real discoveries',()=>{
   expect(mergeDiscovery(p,won.discovery!)).toBe(p);
  });
  it('checkpoint serialization retains discoveries and merging an older checkpoint cannot remove newer ones',()=>{
-  const r=run(),saved=toSave(r.s,r.rng);r.step({type:'Proceed'});const p=mergeDiscovery(emptyArchive(),r.s.discovery!);
+  const r=run(),saved=toSave(r.s,r.rng);r.step({type:'ChooseOffer',index:r.s.pages!.current!.offers.findIndex(o=>o?.kind==='monster')});const p=mergeDiscovery(emptyArchive(),r.s.discovery!);
   const loaded=fromSave(saved);expect(loaded.discovery?.id).toBe('archive-a');expect(mergeDiscovery(p,loaded.discovery!)).toBe(p);
  });
  it('new runs accumulate independently while seed, card upgrades and copies do not create extra identities',()=>{
   const a=run('a',1),b=run('b',2);let p=mergeDiscovery(emptyArchive(),a.s.discovery!);p=mergeDiscovery(p,b.s.discovery!);
   const card=a.s.masterDeck[0];expect(archiveProgress(p).cards[card.id].seen).toBe(2);
-  const count=Object.keys(a.s.discovery!.cards).length;a.s.masterDeck.push({...card,upgraded:true,upgradeLevel:2});trackDiscovery(a.s,a.s);
+  const count=Object.keys(a.s.discovery!.cards).length;a.s.masterDeck.push({...card,star:3});trackDiscovery(a.s,a.s);
   expect(Object.keys(a.s.discovery!.cards)).toHaveLength(count);
- });
- it('records received curses, named and unnamed fusion without counting generated possibilities',()=>{
-  const r=run(),a=ALL_CARDS.find(c=>c.id==='muay_stance')!,b=ALL_CARDS.find(c=>c.id==='parry_step')!;const fused=fuseCards(a,b);
-  r.s.masterDeck.push(fused);trackDiscovery(r.s,r.s);const p=archiveProgress(mergeDiscovery(emptyArchive(),r.s.discovery!));
-  expect(p.cards[fused.id]).toBeTruthy();expect(archiveCards(p.cardData).some(x=>x.card.id===fused.id)).toBe(true);
-  expect(Object.keys(p.cards).some(id=>id==='curse_whisper')).toBe(false);
  });
  it('rejects corrupt progress rather than granting discoveries',()=>{
   expect(()=>parseArchive('{"version":1}')).toThrow();

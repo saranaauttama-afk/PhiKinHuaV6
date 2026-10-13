@@ -4,9 +4,9 @@ import type { CardData } from '../../src/core/types';
 import { CARD_ART_SOURCES, GRAY_CARD_ART_SOURCES } from '../cardArt';
 import { cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
-import { font, paper } from '../theme';
-import {upgradeLevelOf} from '../../src/core/engine/shared';
-import {fusedArtParents} from '../cardArtIdentity';
+import { font, paper, hudPictogramColors } from '../theme';
+import {costLabel,TYPE_LABEL} from '../../src/core/cards/describe';
+import {starOf} from '../../src/core/cards/model';
 import CardBadges from './CardBadges';
 import CandleSelection from './CandleSelection';
 
@@ -23,26 +23,24 @@ const grayGlyphs = {
   equipment: require('../../assets/ui/card-gray/ritual-jar.webp'), curse: require('../../assets/ui/card-gray/trail-ghost.webp'),
 };
 export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardData; size?: number; muted?: boolean }) {
-  const parents=fusedArtParents(card.id);
-  if(parents.length===2&&!CARD_ART_SOURCES[card.id])return <View style={{width:size,height:size,flexDirection:'row',alignItems:'center'}}>{parents.map(id=><CardGlyphArt key={id} card={{...card,id}} size={size/2} muted={muted}/>)}</View>;
   return <Image accessible={false} source={muted ? (GRAY_CARD_ART_SOURCES[card.id] ?? grayGlyphs[cardGlyph(card)]) : (CARD_ART_SOURCES[card.id] ?? glyphs[cardGlyph(card)])} resizeMode="contain" style={{ width: size, height: size, filter:(muted?(Platform.OS==='web'?'grayscale(1)':[ {grayscale:1} ]):undefined) as any, tintColor: !muted && !CARD_ART_SOURCES[card.id] && cardGlyph(card) === 'curse' ? paper.red : undefined }} />;
 }
 /** Same paper, art, energy, level and complete ability text in deck and all shops. */
-export function CardFace({card,count}:{card:CardData;count?:number}) {
- return <RitualSurface kind="occupationPage" style={styles.card}>
-  <CardBadges card={card}/>
-  <View style={styles.symbol}><CardGlyphArt card={card}/></View>
-  <Text style={styles.name}>{card.name??card.id}</Text>
-  {upgradeLevelOf(card)>0&&<Text style={styles.note}>ปลุกเสกขั้น {upgradeLevelOf(card)}</Text>}
-  <Text style={[styles.summary,{color:card.type==='attack'?paper.red:paper.ink}]}>{cardSummary(card)}</Text>
-  {!!card.desc&&!card.upgraded&&<Text style={styles.summary}>{card.desc}</Text>}
+export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardData;count?:number;compact?:boolean;equippedCount?:number}) {
+ return <RitualSurface kind="occupationPage" style={[styles.card,compact&&{minHeight:158,paddingHorizontal:6,paddingVertical:12},card.type==='equipment'&&{borderWidth:2,borderColor:hudPictogramColors.equipment}]}>
+  <CardBadges card={card} compact={compact}/>
+  <View style={styles.symbol}><CardGlyphArt card={card} size={compact?50:76}/></View>
+  <Text style={[styles.name,compact&&{fontSize:11}]}>{card.name??card.id}</Text>
+  <Text style={[styles.note,{color:paper.muted}]}>{TYPE_LABEL[card.type]}</Text>
+  <Text style={[styles.summary,compact&&{fontSize:10,lineHeight:16},{color:card.type==='attack'?paper.red:paper.ink}]}>{cardSummary(card)}</Text>
+  {!compact&&!!card.flavor&&<Text style={styles.summary}>{card.flavor}</Text>}
+  {equippedCount>0&&<Text style={styles.note}>✓ สวม {equippedCount} ใบ</Text>}
   {count!=null&&<Text style={styles.note}>×{count} ใบ</Text>}
-  {(card.exhaust||card.type==='trap')&&<Text style={styles.note}>ใช้แล้วหายจากไฟต์</Text>}
  </RitualSurface>;
 }
-export default function DeckCard({card,count,onPress,selected=false,dim=false,fullWidth=false}:{card:CardData;count?:number;onPress:()=>void;selected?:boolean;dim?:boolean;fullWidth?:boolean}) {
- return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`พลังงาน ${card.cost??0} · ขั้น ${upgradeLevelOf(card)} · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,fullWidth&&{width:'100%'}]}>
-  <CandleSelection selected={selected} dim={dim}><CardFace card={card} count={count}/></CandleSelection>
+export default function DeckCard({card,count,onPress,selected=false,dim=false,fullWidth=false,compact=false,equippedCount=0}:{card:CardData;count?:number;onPress:()=>void;selected?:boolean;dim?:boolean;fullWidth?:boolean;compact?:boolean;equippedCount?:number}) {
+ return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${costLabel(card)} · ${starOf(card)} ดาว · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,compact&&{width:'31.5%'},fullWidth&&{width:'100%'}]}>
+  <CandleSelection selected={selected} dim={dim}><CardFace card={card} count={count} compact={compact} equippedCount={equippedCount}/></CandleSelection>
  </Pressable>;
 }
 const styles = StyleSheet.create({

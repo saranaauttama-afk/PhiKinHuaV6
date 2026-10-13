@@ -1,4 +1,5 @@
-import {V33_HAND_BALANCE} from '../../src/core/balance/core';
+import {CARD_RULES,CLASS_RESOURCES} from '../../src/core/balance/notfm';
+import {skillsFor} from '../../src/core/skills';
 import React from 'react';
 import { View, Text, Pressable, ScrollView, Image, Modal, StyleSheet, useWindowDimensions } from 'react-native';
 import { CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
@@ -63,8 +64,9 @@ export default function ClassSelectScreen({ onPick, onBack }: Props) {
               <Art slot={`class/${picked.id}`} width={portraitHeight * 2 / 3} height={portraitHeight} />
             </View>
             <Text style={styles.copy}>{picked.desc}</Text>
-            <View style={styles.stats}><Stat label="ชีวิต" value={picked.startHp} /><Stat label="พลังงาน" value={V33_HAND_BALANCE.energy} /><Stat label="เก็บข้ามเทิร์น" value={V33_HAND_BALANCE.retainedHand} /></View>
+            <View style={styles.stats}><Stat label="ชีวิต" value={picked.startHp} /><Stat label="แต้ม/เทิร์น" value={CARD_RULES.apPerTurn} /><Stat label="มานาตั้งต้น" value={CLASS_RESOURCES[picked.id].startMana} /></View>
             <Text style={styles.passive}>{picked.passiveName}</Text><Text style={styles.copy}>{picked.passiveDesc}</Text>
+            {skillsFor(picked.id).map(d=><Text key={d.id} testID={`class-skill-${d.slot}`} style={styles.copy}>สกิล {d.slot} · {d.name} (พัก {d.cd} ไฟต์): {d.text}</Text>)}
           </ScrollView>
           <View style={styles.actions}>
             <QuietButton primary label={`เลือก${picked.name} · ออกเดินทาง →`} onPress={()=>{const id=picked.id;setSelected(null);onPick(id);}}/>

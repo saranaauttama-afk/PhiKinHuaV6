@@ -5,47 +5,6 @@ import { int, shuffle } from './rng';
 import { GAMBLE_LOSE_HP, GAMBLE_WIN_GOLD, REMOVE_CAP_PER_RUN, TREASURE_MAX, TREASURE_MIN } from './balance/events';
 import { BLESSINGS_BY_RARITY } from './pack';
 
-// ===== Blessings pool (ตัวอย่างเล็ก ๆ ใช้งานได้เลย)
-const BLESSINGS: BlessingDef[] = [
-  {
-    id: 'bl_energy_first',
-    name: 'Battle Rhythm',
-    desc: 'First card each turn grants +1 energy.',
-    oncePerTurn: true,
-    rarity: 'Common',
-    on_card_played: (tc) => { tc.state.player.energy += 1; },
-  },
-  {
-    id: 'bl_start_block',
-    name: 'Guarded Start',
-    desc: '+3 Block at turn start.',
-    rarity: 'Common',
-    on_turn_start: (tc) => { tc.state.player.block += 3; },
-  },
-  {
-    id: 'bl_attack_block',
-    name: 'Counter Edge',
-    desc: 'When playing an attack, gain +2 Block.',
-    rarity: 'Uncommon',
-    on_card_played: { tag: 'attack', once_per_turn: false, effects: [ (tc) => { tc.state.player.block += 2; } ] },
-  },
-  {
-    id: 'bl_end_heal',
-    name: 'Second Wind',
-    desc: 'On turn end, heal 1.',
-    rarity: 'Uncommon',
-    on_turn_end: (tc) => { tc.state.player.hp = Math.min(tc.state.player.maxHp, tc.state.player.hp + 1); },
-  },
-  {
-    id: 'bl_big_energy_first',
-    name: 'Battle Frenzy',
-    desc: 'First card each turn grants +2 energy.',
-    rarity: 'Rare',
-    oncePerTurn: true,
-    on_card_played: (tc) => { tc.state.player.energy += 2; },
-  },
-];
-
 //const byRarity: Record<Rarity, BlessingDef[]> = {
 //  Common: BLESSINGS.filter(b => b.rarity === 'Common'),
 //  Uncommon: BLESSINGS.filter(b => b.rarity === 'Uncommon'),

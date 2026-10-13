@@ -13,7 +13,6 @@ import { THAI_GHOST_POOLS } from '../core/monsters/thai-ghosts';
 import { CHARACTER_CLASSES, ALL_CLASS_IDS } from '../core/classes';
 import { STORY_EVENTS } from '../core/events/story';
 import { STORY_CHAPTERS } from '../core/story/chapters';
-import { THAI_MINIONS } from '../core/combat/minions/thai-minions';
 
 const blessings: Array<{ id: string; name: string; desc?: string }> =
   require('../data/packs/base/blessings.json');
@@ -30,7 +29,7 @@ export type ArtSlot = {
   /** ภาพนี้ควรเป็นอะไร — ใช้ทั้งบน placeholder และเป็นโจทย์ตอนไปหา/สร้างรูป */
   brief: string;
   /** จัดกลุ่มในลิสต์ */
-  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter' | 'event' | 'chapter' | 'minion';
+  group: 'monster' | 'boss' | 'class' | 'blessing' | 'scene' | 'node' | 'encounter' | 'event' | 'chapter';
   /**
    * ไฟล์ที่มีอยู่ยังเป็นพื้นทึบ ทั้งที่ช่องนี้ต้องการพื้นโปร่ง
    *
@@ -69,11 +68,11 @@ const ENCOUNTERS: ArtSlot[] = [
   { id: 'encounter/shop_remove',     label: 'สละการ์ด',       file: 'ui/remove-torn-card-b17.webp',       size: [200, 200], brief: 'กองไฟเผากระดาษยันต์ สื่อถึงการทิ้งการ์ด', group: 'encounter' },
   { id: 'encounter/shop_upgrade',    label: 'ปลุกเสกการ์ด',   file: 'encounters/thai-v29/upgrade-altar.webp',      size: [200, 200], brief: 'โต๊ะพิธี ธูปเทียน สื่อถึงการปลุกเสก', group: 'encounter' },
   { id: 'encounter/well',            label: 'บ่อน้ำลึกลับ',   file: 'encounters/enWell.png',         size: [200, 200], brief: 'บ่อน้ำหินเก่า มีแสงเรืองจากก้นบ่อ', group: 'encounter' },
+  { id: 'encounter/blessing',        label: 'ศาลพร',          file: 'ui/blessing-amulet.png',              size: [200, 200], brief: 'ศาลเพียงตาหลังเก่า ธูปสามดอกยังไม่มอด', group: 'encounter' },
   { id: 'encounter/healing_shrine',  label: 'ศาลพักใจ',       file: 'ui/blessing-shrine-object.png',       size: [200, 200], brief: 'ศาลพระภูมิเล็กๆ มีผ้าแพรและธูปจุดค้างอยู่', group: 'encounter' },
   { id: 'encounter/treasure',        label: 'หีบสมบัติ',      file: 'encounters/enTreasureOpenMini.png', size: [200, 200], brief: 'หีบไม้เก่าเปิดอยู่ มีแสงลอดออกมา', group: 'encounter' },
   { id: 'encounter/treasure_single', label: 'สมบัติชิ้นเดียว', file: 'encounters/thai-v29/treasure-single.webp',    size: [200, 200], brief: 'ห่อผ้าเล็กๆ วางบนตอไม้ มีของชิ้นเดียวข้างใน', group: 'encounter' },
   { id: 'encounter/next_event',      label: 'ทางไปต่อ',       file: 'encounters/thai-v29/next-path.webp',         size: [200, 200], brief: 'ทางเดินลึกเข้าไปในความมืด มีรอยเท้าบนดินเปียก', group: 'encounter' },
-  { id: 'encounter/fusion_altar',    label: 'แท่นผสาน',       file: 'encounters/thai-v29/fusion-altar.webp',       size: [200, 200], brief: 'แท่นหินกลางป่า มีรอยยันต์เรืองแสง ใช้รวมการ์ดสองใบเป็นใบเดียว', group: 'encounter' },
 ];
 
 /** ไอคอนบนแถบเส้นทาง — ตอนนี้ยังเป็น emoji อยู่ */
@@ -164,25 +163,6 @@ function chapterSlots(): ArtSlot[] {
   }));
 }
 
-/**
- * ผีที่ถูกเรียกมาช่วยระหว่างไฟต์
- *
- * ตัวเล็ก อยู่ข้างตัวละครระหว่างสู้ ไม่ใช่ผีที่เราไปสู้ด้วย จึงเป็นคนละโจทย์
- * กับ `monster/*` — ตัวนี้ต้องอ่านออกในขนาดจิ๋วและต้องดูเป็นมิตร/เป็นภัย
- * ตามฝั่งของมัน
- */
-function minionSlots(): ArtSlot[] {
-  return Object.values(THAI_MINIONS).map(m => ({
-    id: `minion/${m.id}`,
-    label: m.name,
-    file: `minions/${m.id}.png`,
-    size: [256, 256] as [number, number],
-    brief: `${m.abilities.map(a => a.description).join(' · ')} — ตัวเล็กครึ่งตัว `
-      + '**PNG พื้นโปร่ง** อ่านออกตอนย่อเหลือ 34px',
-    group: 'minion' as const,
-  }));
-}
-
 /** ช่องรูปทั้งหมดที่เกมต้องการ เรียงตามกลุ่ม */
 export const ART_CATALOG: ArtSlot[] = [
   ...SCENES,
@@ -191,7 +171,6 @@ export const ART_CATALOG: ArtSlot[] = [
   ...blessingSlots(),
   ...storyEventSlots(),
   ...chapterSlots(),
-  ...minionSlots(),
   ...ENCOUNTERS,
   ...NODES,
 ];

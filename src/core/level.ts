@@ -1,191 +1,14 @@
-// Level/XP — weights & rolling for level-up rewards (buckets)
+// Level/XP — the card offers for a level-up and the blessing roller used by events.
 import type { RNG } from './rng';
 import { int, next, shuffle } from './rng';
 import type { GameState, CardData, BlessingDef } from './types';
 import { BY_RARITY, BLESSINGS_BY_RARITY } from './pack';
 
-// การ์ดใหม่ไม่ได้มาจากเลเวลอัปแล้ว — ย้ายไปเป็นรางวัลของการชนะไฟต์
-// (ดู `cards/reward.ts`) ตารางนี้จึงเหลือแต่ของที่ไม่ใช่การ์ด
-export type LevelBucket =
-  | 'max_hp' | 'max_energy' | 'max_hand' | 'draw_per_turn'
-  | 'blessing'
-  | 'remove' | 'upgrade' | 'gold'
-  | 'equipment_slot' | 'gold_skip';
-
-const BASE_BUCKET_W: Record<LevelBucket, number> = {
-  max_hp: 30, max_energy: 20, max_hand: 10, draw_per_turn:10, blessing: 12,
-  remove: 10, upgrade: 8, gold: 2, equipment_slot: 15, gold_skip: 8,
-};
-
-// ===== Choice System =====
-export type LevelChoice = {
-  optionA: LevelBucket;
-  optionB: LevelBucket;
-  contextDescription?: string;
-};
-
-// Strategic choice pairs that create meaningful decisions
-const CHOICE_PAIRS: Array<[LevelBucket, LevelBucket]> = [
-  // Power scaling choices
-  ['max_energy', 'max_hand'],         // Energy for plays vs Hand size for options
-  ['max_hp', 'equipment_slot'],       // Survivability vs Equipment power
-  
-  // Build direction choices
-  // (เดิมสองคู่นี้เป็น ['cards','blessing'] กับ ['cards','gold_skip'] —
-  //  การ์ดย้ายไปเป็นรางวัลชนะไฟต์แล้ว ที่ว่างจึงยกให้ตัวเลือกที่หายากอยู่)
-  ['blessing', 'gold_skip'],          // Passive power vs Gold for later
-  ['upgrade', 'max_hp'],              // Improve cards vs Survivability
-  
-  // Deck refinement choices
-  ['remove', 'upgrade'],              // Clean deck vs Improve cards
-  ['remove', 'gold'],                 // Free removal vs Gold for shop
-  
-  // Value choices
-  ['blessing', 'equipment_slot'],     // Passive power vs Equipment flexibility
-  ['upgrade', 'gold_skip'],           // Improve cards vs Economic advantage
-  
-  // High-risk/reward
-  ['max_energy', 'equipment_slot'],   // Raw power vs Equipment synergy
-  ['max_hand', 'blessing'],           // Card advantage vs Passive power
-];
-
-function deriveWeights(s: GameState): Record<LevelBucket, number> {
-  const w = { ...BASE_BUCKET_W };
-  // Strategic hand size boosts at key levels for card options
-  const lv = s.player?.level ?? 1;
-  if (lv === 3) w.max_hand += 15; // Early game options
-  if (lv === 6) w.max_hand += 20; // Mid game strategy expansion  
-  if (lv === 9) w.max_hand += 15; // Late game mastery
-  return w;
-}
-
-// Legacy single bucket function (kept for compatibility)
-export function rollLevelUpBucket(rng: RNG, s: GameState): { rng: RNG; bucket: LevelBucket } {
-  const w = deriveWeights(s);
-  const order: LevelBucket[] = ['max_hp','max_energy','max_hand','blessing','remove','upgrade','gold'];
-  const total = order.reduce((a,k)=>a + w[k], 0);
-  const ro = int(rng, 0, Math.max(0, total - 1));
-  let r = ro.rng;
-  let roll = ro.value;
-  let acc = 0;
-  let bucket: LevelBucket = 'gold';
-  for (const k of order) {
-    acc += w[k];
-    if (roll < acc) { bucket = k; break; }
-  }
-  return { rng: r, bucket };
-}
-
-// ===== New Choice-Based System =====
-export function rollLevelUpChoice(rng: RNG, s: GameState): { rng: RNG; choice: LevelChoice } {
-  if(s.player.handBalanceVersion===33){
-    const pairs:Array<[LevelBucket,LevelBucket]>=[['max_hp','upgrade'],['blessing','gold_skip'],['remove','upgrade'],['max_hp','equipment_slot']];
-    if(s.player.maxEnergy<5)pairs.push(['max_energy','max_hp']);
-    if((s.campaign?.night??1)>1){
-      if((s.player.drawPerTurn??2)<3)pairs.push(['draw_per_turn','blessing']);
-      if(s.player.maxHandSize<3)pairs.push(['max_hand','upgrade']);
-    }
-    const roll=int(rng,0,pairs.length-1),order=int(roll.rng,0,1);
-    const [a,b]=pairs[roll.value];return {rng:order.rng,choice:{optionA:order.value?a:b,optionB:order.value?b:a}};
-  }
-  // Filter choice pairs based on game state and level for more contextual choices
-  const level = s.player?.level ?? 1;
-  const viablePairs = getViableChoicePairs(s, level).filter(pair=>!s.campaign||((s.player.maxEnergy<5||!pair.includes('max_energy'))&&(s.player.maxHandSize<8||!pair.includes('max_hand')))).filter(pair => s.runMode !== 'episode' || (!pair.includes('equipment_slot') && (s.player.maxEnergy < 4 || !pair.includes('max_energy'))));
-  
-  // Select a weighted random choice pair
-  const pairRoll = int(rng, 0, viablePairs.length - 1);
-  let r = pairRoll.rng;
-  const selectedPair = viablePairs[pairRoll.value];
-  
-  // Randomly assign which option goes to A vs B (prevent bias)
-  const orderRoll = int(r, 0, 1);
-  r = orderRoll.rng;
-  const [first, second] = selectedPair;
-  const [optionA, optionB] = orderRoll.value === 0 ? [first, second] : [second, first];
-  
-  // Create contextual description based on level and game state
-  const contextDescription = generateChoiceContext(s, optionA, optionB);
-  
-  return {
-    rng: r,
-    choice: {
-      optionA,
-      optionB,
-      contextDescription
-    }
-  };
-}
-
-function getViableChoicePairs(s: GameState, level: number): Array<[LevelBucket, LevelBucket]> {
-  let pairs = [...CHOICE_PAIRS];
-  
-  // Early game (1-3): Focus on foundation building
-  if (level <= 3) {
-    // Prioritize basic power scaling and early game cards
-    const earlyPairs = pairs.filter(pair => {
-      const buckets = [...pair];
-      return buckets.includes('max_hp') || buckets.includes('max_energy') ||
-             buckets.includes('max_hand');
-    });
-    // Include some early game gold for shop opportunities
-    earlyPairs.push(['max_hp', 'gold'],['remove','upgrade'],['blessing','max_hand']);
-    return earlyPairs;
-  }
-  
-  // Mid game (4-7): Strategic build direction
-  if (level <= 7) {
-    // Full variety with emphasis on build shaping
-    return pairs;
-  }
-  
-  // Late game (8+): Optimization and refinement
-  // Focus on deck refinement and powerful upgrades
-  const latePairs = pairs.filter(pair => {
-    const buckets = [...pair];
-    return buckets.includes('remove') || buckets.includes('upgrade') || 
-           buckets.includes('blessing') || buckets.includes('equipment_slot');
-  });
-  // Add high-value late game choices
-  latePairs.push(['blessing', 'gold_skip'], ['upgrade', 'equipment_slot']);
-  return latePairs;
-}
-
-function generateChoiceContext(s: GameState, optionA: LevelBucket, optionB: LevelBucket): string {
-  const level = s.player?.level ?? 1;
-  const buckets = [optionA, optionB];
-  
-  // Context based on choice type and level
-  if (buckets.includes('max_hp') && buckets.includes('equipment_slot')) {
-    return level <= 3 ? "Early survival vs equipment power:" : "Durability vs versatility:";
-  }
-  
-  if (buckets.includes('remove') && buckets.includes('upgrade')) {
-    return level <= 5 ? "Clean your deck or strengthen cards:" : "Perfect your deck strategy:";
-  }
-  
-  if (buckets.includes('max_energy') && buckets.includes('max_hand')) {
-    return level <= 4 ? "Power per turn vs options per turn:" : "Action economy optimization:";
-  }
-  
-  if (buckets.includes('gold_skip')) {
-    return level <= 3 ? "Power now vs resources later:" : "Immediate gain vs strategic flexibility:";
-  }
-  
-  // Generic context based on level
-  if (level <= 3) {
-    return "Build your foundation:";
-  } else if (level <= 7) {
-    return "Shape your strategy:";
-  } else {
-    return "Optimize for victory:";
-  }
-}
-
 /**
  * สุ่มการ์ดรางวัล 3 ใบ — กรองเฉพาะการ์ดของคลาสที่เล่นอยู่
  * ถ้าไม่กรอง นักรบจะได้การ์ดหมอผีเป็นรางวัล ซึ่งทำให้ตัวตนของคลาสจางหมด
  */
-export function rollThreeCards(rng: RNG, playerLevel = 1, classTag?: string) {
+export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./classes').ClassId,milestoneLevel=0) {
   let r = rng;
   
   // ปรับน้ำหนักตาม level
@@ -217,8 +40,7 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classTag?: string) {
     const rarityRoll = next(r);
     r = rarityRoll.rng;
     const roll = rarityRoll.value * 100;
-    const forClass = (list: CardData[]) =>
-      classTag ? list.filter(c => (c.tags ?? []).includes(classTag)) : list;
+    const forClass = (list: CardData[]) => list.filter(c => (c.unlockAt??0)<=milestoneLevel&&(!c.class || c.class === classId));
     const POOL = {
       Common:    forClass(BY_RARITY.Common),
       Uncommon:  forClass(BY_RARITY.Uncommon),
@@ -259,41 +81,21 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classTag?: string) {
  *
  * @param owned id ของพรที่ถืออยู่แล้ว
  */
-export function rollTwoBlessings(rng: RNG, owned: string[] = []) {
+/**
+ * `tier` = nights cleared across all runs; แพนโดรา blessings with `unlock` <= tier join the pool
+ * (undefined: none, e.g. tests and old callers).
+ */
+export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2, tier?: number) {
   let r = rng;
   const pool: BlessingDef[] = [
     ...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon,
     ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary,
+    ...(tier == null ? [] : require('./pack').PANDORA_BLESSINGS.filter((b: BlessingDef) => (b.unlock ?? 0) <= tier)),
   ].filter(b => !owned.includes(b.id));
+  // A bargain is not offered if an owned bargain already changes the same rule (no stacking).
+  const ownedDefs = owned.map(id => require('./pack').blessingById(id) ?? require('./events/story').EVENT_PACTS[id]).filter(Boolean);
+  const offerable = pool.filter(b => !require('./cards/passives').bargainConflicts(ownedDefs, b));
 
-  const sh = shuffle(r, pool); r = sh.rng;
-  return { rng: r, list: sh.array.slice(0, Math.min(2, sh.array.length)).map(b => ({ ...b })) };
-}
-
-// ===== Choice Description System =====
-export function getBucketDisplayInfo(bucket: LevelBucket): { name: string; description: string; icon: string } {
-  switch (bucket) {
-    case 'max_hp':
-      return { name: '+8 Max HP', description: 'Survive longer encounters', icon: '❤️' };
-    case 'max_energy':
-      return { name: '+1 Max Energy', description: 'Play more cards each turn', icon: '⚡' };
-    case 'draw_per_turn':
-      return {name:'+1 Draw per Turn',description:'Draw one more card; retained hand is unchanged',icon:'🎴'};
-    case 'max_hand':
-      return { name: '+1 Hand Size', description: 'Retain one more card between turns', icon: '🎴' };
-    case 'blessing':
-      return { name: 'Choose Blessing', description: 'Permanent passive power', icon: '✨' };
-    case 'remove':
-      return { name: 'Remove Card', description: 'Purify your deck (Free)', icon: '🗑️' };
-    case 'upgrade':
-      return { name: 'Upgrade Card', description: 'Enhance existing card (Free)', icon: '⬆️' };
-    case 'equipment_slot':
-      return { name: '+1 Equipment Slot', description: 'More equipment flexibility', icon: '⚔️' };
-    case 'gold_skip':
-      return { name: '+50 Gold', description: 'Immediate buying power', icon: '💰' };
-    case 'gold':
-      return { name: '+25 Gold', description: 'Shop currency', icon: '🪙' };
-    default:
-      return { name: 'Unknown', description: 'Unknown reward', icon: '❓' };
-  }
+  const sh = shuffle(r, offerable); r = sh.rng;
+  return { rng: r, list: sh.array.slice(0, Math.min(count, sh.array.length)).map(b => ({ ...b })) };
 }

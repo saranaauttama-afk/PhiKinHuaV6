@@ -158,7 +158,7 @@ describe('state ตั้งต้นของ store ตรงกับของ
     const s = baseNewState('');
     expect(s.phase).toBe('start');
     expect(s.masterDeck).toEqual([]);
-    expect(s.journey).toBeUndefined();
+    expect(s.pages).toBeUndefined();
   });
 });
 

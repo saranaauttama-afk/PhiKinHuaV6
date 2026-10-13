@@ -9,4 +9,3 @@ export const NIGHT_BOSSES:ThaiGhostData[]=[
 ];
 export const ULTIMATE_BOSS:ThaiGhostData={id:'phi-kin-hua',name:'ผีกินหัว',hp:245,tier:'SecretBoss',description:'ผู้กลืนชื่อและศีรษะ ต้นตอคำสาปขโมยหัว'};
 export function nightFinalBoss(night:number){return NIGHT_BOSSES[Math.max(0,Math.min(4,night-1))];}
-export function nightFightTotal(night?:number){return night===5?16:15;}

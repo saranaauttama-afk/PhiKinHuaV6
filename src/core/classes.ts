@@ -7,10 +7,11 @@
 // เดิมเกมนี้มีผู้เล่นแบบเดียว เด็คตั้งต้นชุดเดียว (การ์ดทั้ง 29 ใบติดแท็ก shaman)
 // เล่นรอบสองจึงได้ประสบการณ์เกือบเหมือนเดิม
 //
-// แต่ละคลาสต่างกันสามอย่าง: ค่าสถานะตั้งต้น, เด็คตั้งต้น, และพรติดตัวหนึ่งอย่าง
-// ที่ทำงานทุกไฟต์
+// แต่ละคลาสต่างกันสี่อย่าง: ค่าสถานะตั้งต้น, เด็คตั้งต้น, passive หนึ่งอย่าง
+// (balance/notfm.ts → CLASS_PASSIVES) และสกิลสามช่อง (data/packs/base/skills.json)
 
-import type { CardData, GameState } from './types';
+import type { CardData } from './types';
+import { CLASS_PASSIVES, CLASS_RESOURCES } from './balance/notfm';
 
 export type ClassId = 'shaman' | 'warrior' | 'nun' | 'medium';
 
@@ -19,107 +20,36 @@ export type CharacterClass = {
   name: string;
   title: string;
   desc: string;
-  /** แท็กของการ์ดที่คลาสนี้เจอในร้านและรางวัล */
-  cardTag: string;
   startHp: number;
-  startEnergy: number;
-  startHandSize: number;
-  /** เด็คตั้งต้น: id ของการ์ด → จำนวนใบ */
-  starterDeck: Record<string, number>;
-  /** ข้อความอธิบายกลไกเฉพาะตัว */
+  /** Mana at the start of each fight. */
+  startMana: number;
   passiveName: string;
+  /** Generated from `CLASS_PASSIVES`, so the text always matches the numbers. */
   passiveDesc: string;
 };
 
+/** Rules text for a class passive. */
+export function classPassiveText(id: ClassId): string {
+  const p = CLASS_PASSIVES[id];
+  const lines = require('./cards/describe').passiveText(p) as string[];
+  if (p.spellDiscount) lines.push(`คาถาใบแรกของแต่ละเทิร์นใช้มานาน้อยลง ${p.spellDiscount}`);
+  if (p.copyFirstGhostCard) lines.push('การ์ดผีใบแรกที่เปิดในแต่ละไฟต์ ได้สำเนาเข้ามือ (ฟรี · นำออก)');
+  return lines.join(' · ').replace('เมื่อสวม: ', 'สวมอุปกรณ์แต่ละชิ้น: ');
+}
+
+const make = (id: ClassId, name: string, title: string, desc: string): CharacterClass => ({
+  id, name, title, desc,
+  startHp: CLASS_RESOURCES[id].hp,
+  startMana: CLASS_RESOURCES[id].startMana,
+  passiveName: CLASS_PASSIVES[id].name,
+  get passiveDesc() { return classPassiveText(id); },
+});
+
 export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
-  shaman: {
-    id: 'shaman',
-    name: 'หมอผี',
-    title: 'ผู้สาปและผู้แก้สาป',
-    desc: 'เสกคาถาสาปก่อนปักเข็มให้แรงขึ้น หรือใช้พิษและกุมารช่วยกัดเลือด ต้องเผื่อพลังงานตั้งรับ',
-    cardTag: 'shaman',
-    startHp: 50,
-    startEnergy: 3,
-    startHandSize: 5,
-    starterDeck: {
-      bamboo_dart: 3,
-      cooling_cloth: 3,
-      curse_chant: 1,
-      cursed_needle: 1,
-      meditation: 1,
-      direct_poison_spell: 1,
-      create_kuman: 1,
-    },
-    passiveName: 'ครูพักลักจำ',
-    passiveDesc: 'เทิร์นแรกของทุกไฟต์ได้พลังงานเพิ่ม 1',
-  },
-
-  warrior: {
-    id: 'warrior',
-    name: 'นักรบวัด',
-    title: 'ผู้ยืนหยัด',
-    desc: 'ตั้งรับแล้วสวน หรือสะสมแรงให้ทุกหมัดของมวยไทยหนักขึ้น เลือดหนาแต่ต้องเลือกจังหวะใช้พลังงาน',
-    cardTag: 'warrior',
-    startHp: 66,
-    startEnergy: 3,
-    startHandSize: 5,
-    starterDeck: {
-      temple_blade: 3,
-      muay_stance: 3,
-      ward_riposte: 1,
-      threefold_strike: 1,
-      parry_step: 1,
-      thunder_clap: 1,
-      fighter_breath: 1,
-    },
-    passiveName: 'ยืนเฝ้าประตู',
-    passiveDesc: 'เริ่มทุกไฟต์ด้วยการ์ดป้องกัน 6',
-  },
-
-  nun: {
-    id: 'nun',
-    name: 'แม่ชี',
-    title: 'ผู้ถือศีล',
-    desc: 'สวดมนต์ตั้งเกราะก่อนหมุนธรรมจักรให้แรงขึ้น เลือกจังหวะรักษาและล้างพิษ ศีลห้าใช้ได้ครั้งเดียวต่อไฟต์',
-    cardTag: 'nun',
-    startHp: 50,
-    startEnergy: 3,
-    startHandSize: 6,
-    starterDeck: {
-      chant_sutra: 2,
-      five_precepts: 1,
-      dharma_wheel: 3,
-      holy_water: 1,
-      sprinkle_water: 1,
-      loving_kindness: 1,
-      alms_offering: 1,
-      dispel_ill: 1,
-    },
-    passiveName: 'อานิสงส์',
-    passiveDesc: 'ฟื้นพลังชีวิต 6 ทุกครั้งที่ชนะไฟต์',
-  },
-
-  medium: {
-    id: 'medium',
-    name: 'คนทรง',
-    title: 'ผู้เชิญวิญญาณ',
-    desc: 'เลือกสะสมวิญญาณคู่กาย หรือวางพิษแล้วซ้ำแผล ต้องแบ่งพลังงานระหว่างตั้งรับกับตั้งพิธี',
-    cardTag: 'medium',
-    startHp: 46,
-    startEnergy: 3,
-    startHandSize: 5,
-    starterDeck: {
-      whisper_ear: 2,
-      poison_echo: 1,
-      yantra_cloth: 3,
-      invite_spirit: 1,
-      spirit_pact: 1,
-      set_altar: 1,
-      phrai_oil: 1,
-    },
-    passiveName: 'ผีติดตาม',
-    passiveDesc: 'เริ่มทุกไฟต์พร้อมวิญญาณคู่กาย 1 ตน',
-  },
+  shaman: make('shaman', 'หมอผี', 'ผู้สาปและผู้แก้สาป', 'สะสมมานาแล้วร่ายคาถาสาปและพิษ เข็มปักแรงขึ้นเมื่อผีติดคำสาป'),
+  warrior: make('warrior', 'นักรบวัด', 'ผู้ยืนหยัด', 'การ์ดโจมตีฟรีเยอะที่สุด ตั้งรับแล้วสวน สะสมแรงให้ทุกหมัดหนักขึ้น และใช้อุปกรณ์'),
+  nun: make('nun', 'แม่ชี', 'ผู้ถือศีล', 'บทสวดที่ยิ่งรอยิ่งแรง เลือกว่าจะรอกี่เทิร์น ตั้งเกราะแล้วหมุนธรรมจักร'),
+  medium: make('medium', 'คนทรง', 'ผู้เชิญวิญญาณ', 'ยืมท่าที่ผีเพิ่งใช้มาเป็นของตัวเอง วางพิษแล้วซ้ำแผล'),
 };
 
 export const ALL_CLASS_IDS = Object.keys(CHARACTER_CLASSES) as ClassId[];
@@ -128,54 +58,13 @@ export function getClass(id?: ClassId): CharacterClass {
   return CHARACTER_CLASSES[id ?? 'shaman'] ?? CHARACTER_CLASSES.shaman;
 }
 
-/** สร้างเด็คตั้งต้นของคลาสจากคลังการ์ดทั้งหมด */
-export function buildStarterDeck(cls: CharacterClass, allCards: CardData[]): CardData[] {
-  const byId = new Map(allCards.map(c => [c.id, c]));
+/** Starter deck: every card of the class pool with a `starter` count in the card data. */
+export function buildStarterDeck(cls: CharacterClass, allCards: (CardData & { starter?: number })[]): CardData[] {
   const deck: CardData[] = [];
-
-  for (const [cardId, count] of Object.entries(cls.starterDeck)) {
-    const card = byId.get(cardId);
-    if (!card) continue; // การ์ดหาย — ข้ามไปแทนที่จะพังทั้งรัน
-    for (let i = 0; i < count; i++) deck.push(JSON.parse(JSON.stringify(card)));
+  for (const card of allCards) {
+    if (card.class !== cls.id || !card.starter) continue;
+    const { starter, ...rest } = card;
+    for (let i = 0; i < starter; i++) deck.push(JSON.parse(JSON.stringify(rest)));
   }
   return deck;
-}
-
-/**
- * พรติดตัวของคลาส ที่ทำงานตอนเริ่มไฟต์
- * (ส่วนที่ทำงานตอนชนะไฟต์อยู่ใน applyClassVictoryPassive)
- */
-export function applyClassCombatStart(s: GameState): void {
-  const cls = getClass(s.classId);
-
-  switch (cls.id) {
-    case 'shaman':
-      s.player.energy = (s.player.energy ?? 0) + 1;
-      break;
-
-    case 'warrior':
-      s.player.block = (s.player.block ?? 0) + 6;
-      break;
-
-    case 'medium': {
-      const { summonMinion } = require('./minionRuntime');
-      summonMinion(s, 'ghost_ally', 'player', 1);
-      break;
-    }
-
-    case 'nun':
-      // อานิสงส์ทำงานตอนชนะไฟต์ ไม่ใช่ตอนเริ่ม
-      break;
-  }
-}
-
-/** พรติดตัวที่ทำงานตอนชนะไฟต์ */
-export function applyClassVictoryPassive(s: GameState): void {
-  const cls = getClass(s.classId);
-  if (cls.id !== 'nun') return;
-
-  const before = s.player.hp;
-  s.player.hp = Math.min(s.player.maxHp, before + 6);
-  const healed = s.player.hp - before;
-  if (healed > 0) s.log.push(`อานิสงส์: ฟื้นพลังชีวิต ${healed}`);
 }

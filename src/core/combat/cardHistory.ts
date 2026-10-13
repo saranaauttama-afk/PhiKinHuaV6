@@ -3,9 +3,9 @@ import {emit} from './damage';
 
 /** Presentation receipts only. Never used by AI, costs, rewards or RNG. */
 export function historySnapshot(s:GameState) {
-  return JSON.parse(JSON.stringify({player:s.player,enemy:s.enemy,hand:s.piles.hand.length,minions:s.minions??[],traps:s.traps??[],equipped:s.equipped??[]}));
+  return JSON.parse(JSON.stringify({player:s.player,enemy:s.enemy,hand:s.piles.hand.length,traps:s.traps??[],equipped:s.equipped??[]}));
 }
-export function recordCardHistory(s:GameState,side:CombatEventTarget,card:CardData,before:ReturnType<typeof historySnapshot>,eventStart:number,note?:string,costPaid=card.cost) {
+export function recordCardHistory(s:GameState,side:CombatEventTarget,card:CardData,before:ReturnType<typeof historySnapshot>,eventStart:number,note?:string,costPaid:number|{ap:number;mana:number}=0) {
   const results:string[]=[];
   const label=(target:CombatEventTarget)=>target==='player'?'เรา':'ผี';
   const events=(s.pendingEvents??[]).slice(eventStart);
@@ -30,16 +30,16 @@ export function recordCardHistory(s:GameState,side:CombatEventTarget,card:CardDa
       if(!prev||JSON.stringify(prev)!==JSON.stringify(effect))results.push(`${label(target)}: ${effect.name??effect.id} ${effect.stacks??effect.value??1}`);
     }
   }
-  const paid=Math.max(0,costPaid??0);
-  if(paid)results.push(`ใช้พลัง ${paid}`);
-  const energyGained=s.player.energy-before.player.energy+(side==='player'?paid:0);
-  if(energyGained>0)results.push(`เราได้พลัง ${energyGained}`);
+  const paid=typeof costPaid==='number'?{ap:0,mana:0,energy:Math.max(0,costPaid)}:{...costPaid,energy:0};
+  if(paid.energy)results.push(`ใช้พลัง ${paid.energy}`);
+  if(paid.ap)results.push(`ใช้แต้ม ${paid.ap}`);
+  if(paid.mana)results.push(`ใช้มานา ${paid.mana}`);
+  const manaGained=s.player.mana-before.player.mana+(side==='player'?paid.mana:0);
+  if(manaGained>0)results.push(`เราได้มานา ${manaGained}`);
   const drawn=s.piles.hand.length-before.hand+(side==='player'?1:0);
   if(drawn>0)results.push(`เราได้ไพ่ ${drawn} ใบ`);
-  const summoned=(s.minions??[]).filter(m=>!before.minions.some((old:{id:string})=>old.id===m.id));
-  for(const m of summoned)results.push(`เรียก ${m.name}`);
   if((s.traps?.length??0)>before.traps.length)results.push('ตั้งกับดัก');
-  for(const eq of s.equipped??[])if(!before.equipped.some((old:{id:string})=>old.id===eq.id))results.push(`สวม ${eq.name}`);
+  for(const eq of s.equipped??[])if(!before.equipped.some((old:{instanceId?:string})=>old.instanceId===eq.instanceId))results.push(`สวม ${eq.name}`);
   if(note)results.unshift(note);
   const entry={seq:(s.cardHistorySeq??0)+1,side,turn:s.turn,ownerId:side==='enemy'?before.enemy?.id:undefined,card:JSON.parse(JSON.stringify(card)),results:results.length?results:['ไม่มีผลเพิ่มเติมในตอนนี้']};
   s.cardHistorySeq=entry.seq;s.cardHistory=[...(s.cardHistory??[]),entry].slice(-6);

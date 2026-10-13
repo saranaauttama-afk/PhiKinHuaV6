@@ -26,7 +26,7 @@ function giveEnemyHand(state: GameState, cardIds: string[]) {
 describe('ResolveEnemyTurn ทำทั้งเทิร์นจบในทีเดียว', () => {
   it('คาย event ครบทุกใบที่ศัตรูเล่น พร้อมปิดหัวท้ายด้วย TurnEnded', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
-    giveEnemyHand(state, ['claw', 'guard']);
+    giveEnemyHand(state, ['pisaj_fai_v29_signature', 'phi_krasue_v29_ward']);
 
     const { state: out } = resolveEnemyTurn(state);
 
@@ -39,7 +39,7 @@ describe('ResolveEnemyTurn ทำทั้งเทิร์นจบในท�
 
   it('event Damage พก hpLoss จริงมาด้วย ไม่ใช่ตัวเลขบนการ์ด', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 4 });
-    giveEnemyHand(state, ['claw']); // dmg 6 เจอ block 4
+    giveEnemyHand(state, ['pisaj_fai_v29_signature']); // dmg 6 เจอ block 4
 
     const { state: out } = resolveEnemyTurn(state);
     const dmg = eventsOf(out).find(e => e.t === 'Damage')!;
@@ -53,7 +53,7 @@ describe('ResolveEnemyTurn ทำทั้งเทิร์นจบในท�
 
   it('state ถูกคำนวณจนจบทันที ไม่ต้องรออนิเมชั่น', () => {
     const { state } = makeCombatState({ playerHp: 50, playerBlock: 0 });
-    giveEnemyHand(state, ['claw', 'claw', 'claw']); // 6 × 3
+    giveEnemyHand(state, ['pisaj_fai_v29_signature', 'pisaj_fai_v29_signature', 'pisaj_fai_v29_signature']); // 6 × 3
 
     const { state: out } = resolveEnemyTurn(state);
     expect(out.player.hp).toBe(32);
@@ -63,7 +63,7 @@ describe('ResolveEnemyTurn ทำทั้งเทิร์นจบในท�
 describe('หยุดกลางคันเมื่อผู้เล่นตาย', () => {
   it('ใบที่เหลือไม่ถูกเล่นต่อ และ state ไม่ถูกแตะเพิ่ม', () => {
     const { state } = makeCombatState({ playerHp: 7, playerBlock: 0 });
-    giveEnemyHand(state, ['claw', 'claw', 'claw']); // ใบที่ 2 ฆ่าพอดี
+    giveEnemyHand(state, ['pisaj_fai_v29_signature', 'pisaj_fai_v29_signature', 'pisaj_fai_v29_signature']); // ใบที่ 2 ฆ่าพอดี
 
     const { state: out } = resolveEnemyTurn(state);
 
@@ -82,7 +82,7 @@ describe('หยุดกลางคันเมื่อผู้เล่น�
 describe('pendingEvents เป็นของคำสั่งล่าสุดเท่านั้น', () => {
   it('คำสั่งถัดไปเคลียร์ event ของคำสั่งก่อนหน้า', () => {
     const { state } = makeCombatState({ playerHp: 50 });
-    giveEnemyHand(state, ['claw']);
+    giveEnemyHand(state, ['pisaj_fai_v29_signature']);
 
     const { state: afterEnemy } = resolveEnemyTurn(state);
     expect(eventsOf(afterEnemy).length).toBeGreaterThan(0);
@@ -93,7 +93,7 @@ describe('pendingEvents เป็นของคำสั่งล่าสุ�
 
   it('view ที่ถือคิวเก่าไว้ไม่ถูกกระทบเมื่อ state เปลี่ยน', () => {
     const { state } = makeCombatState({ playerHp: 50 });
-    giveEnemyHand(state, ['claw']);
+    giveEnemyHand(state, ['pisaj_fai_v29_signature']);
 
     const { state: afterEnemy } = resolveEnemyTurn(state);
     const heldByView = eventsOf(afterEnemy);
@@ -118,7 +118,7 @@ describe('เทิร์นผู้เล่นก็คาย event ทาง
 describe('presentation frames preserve each card impact', () => {
   it('keeps the unrevealed damage out of earlier HP/block frames', () => {
     const {state} = makeCombatState({playerHp:50,playerBlock:4});
-    giveEnemyHand(state,['claw','claw']);
+    giveEnemyHand(state,['pisaj_fai_v29_signature','pisaj_fai_v29_signature']);
     const {state:out}=resolveEnemyTurn(state);
     const reveal=eventsOf(out).filter(e=>e.t==='EnemyCardRevealed');
     const damage=eventsOf(out).filter(e=>e.t==='Damage');
@@ -131,35 +131,9 @@ describe('presentation frames preserve each card impact', () => {
   });
 });
 
-it('shows a summoned helper acting before its real result, then expires it', () => {
-  const {state}=makeCombatState({playerHp:40,playerBlock:0});
-  state.minions=[{id:'kuman_spirit_test',name:'กุมารทอง',duration:3,owner:'player',abilities:[{type:'heal',trigger:'turn_start',target:'owner',value:2,description:'ฟื้นฟู'}]}];
-  const out=applyCommand(state,{type:'StartPlayerTurn'},rng()).state;
-  const acting=eventsOf(out).find(e=>e.t==='MinionActing');
-  const resolved=eventsOf(out).find(e=>e.t==='MinionResolved');
-  expect(acting?.frame?.player.hp).toBe(40);
-  expect(resolved?.frame?.player.hp).toBe(42);
-  expect(out.player.hp).toBe(42);
-});
-
-it('enemy helper acts before cards and cannot continue attacking after lethal damage',()=>{
-  const {state}=makeCombatState({playerHp:3});
-  giveEnemyHand(state,['claw']);
-  state.minions=[{id:'shadow_clone_test',name:'โคลนเงา',duration:3,owner:'enemy',abilities:[{type:'attack',trigger:'turn_start',target:'enemy',value:8,description:'จู่โจม'}]}];
-  const out=resolveEnemyTurn(state).state;
-  expect(out.phase).toBe('defeat');
-  expect(kinds(out)).toContain('MinionActing');
-  expect(kinds(out)).not.toContain('EnemyCardRevealed');
-});
 
 
-it('finishes combat when a player helper kills the ghost without another card',()=>{
-  const {state}=makeCombatState({playerHp:40,enemyHp:2});
-  state.minions=[{id:'ghost_ally_test',name:'วิญญาณเพื่อน',duration:3,owner:'player',abilities:[{type:'attack',trigger:'turn_start',target:'enemy',value:4,description:'โจมตี'}]}];
-  const out=applyCommand(state,{type:'StartPlayerTurn'},rng()).state;
-  expect(out.enemy?.hp).toBe(0);
-  expect(out.combatVictoryLock).toBe(true);
-  expect(out.phase).not.toBe('combat');
-  expect(kinds(out)).toContain('MinionActing');
-  expect(kinds(out)).toContain('Died');
-});
+
+
+
+

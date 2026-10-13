@@ -8,6 +8,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { ArmedTrap } from '../../../src/core/combat/traps';
 import { font, palette, radius, size, space, surface, tint } from '../../theme';
+import { fxText } from '../../../src/core/cards/describe';
 
 const TRIGGER_LABEL: Record<ArmedTrap['trigger'], string> = {
   enemy_attack: 'รอท่าโจมตี',
@@ -65,7 +66,7 @@ export default function TrapRow({ traps }: { traps?: ArmedTrap[] }) {
             color: palette.textDim, fontSize: size.body,
             fontFamily: font.body, lineHeight: 20, textAlign: 'center',
           }}>
-            {opened.effects.map(e => e.desc).join(' · ')}
+            {fxText(opened.fx).join(' · ') || (opened.negate ? 'ยกเลิกการ์ดผี' : '')}
           </Text>
         </View>
       )}

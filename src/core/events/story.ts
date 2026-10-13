@@ -11,7 +11,6 @@ import type { GameState } from '../types';
 import type { RNG } from '../rng';
 import { int } from '../rng';
 import type { ClassId } from '../classes';
-import {buildsForClass,grantBuildKit} from '../campaign/builds';
 
 export type EventEffect =
   /** เลือดตอนนี้ (ติดลบ = เสีย) */
@@ -28,7 +27,7 @@ export type EventEffect =
   /** ยัดการ์ดคำสาปเข้าสำรับ — ราคาที่จ่ายโดยไม่เสียเลือด */
   | { kind: 'curse'; count?: number }
   | { kind: 'blessing' }
-  | { kind: 'build';buildId:string };
+  | {kind:'pact';id:'event_coin_debt'|'event_bell_vow'}
 
 export type EventRequirement =
   | { kind: 'gold'; min: number }
@@ -54,6 +53,7 @@ export type StoryEvent = {
   /** สิ่งที่ผู้เล่นเห็นเมื่อมาถึง */
   text: string;
   choices: EventChoice[];
+  nights?:number[];affinity?:ClassId;
 };
 
 export const STORY_EVENTS: StoryEvent[] = require('../../data/packs/base/story_events.json');
@@ -62,14 +62,29 @@ export const STORY_EVENT_BY_ID: Record<string, StoryEvent> = Object.fromEntries(
   STORY_EVENTS.map(e => [e.id, e])
 );
 
-export function getStoryEvent(id: string,state?:GameState): StoryEvent | undefined {
-  const base=STORY_EVENT_BY_ID[id];
-  if(!base||state?.pages?.adventure?.version!==5||id!=='run_story_1')return base;
-  return {...base,choices:[...buildsForClass(state.classId).map(k=>({label:`เรียน ${k.name} · รับวิชาและพร${k.risk?` · เสีย ${k.risk} ชีวิต`:''}`,preview:`${k.blessing.desc} · ${k.plan}`,text:`คนเฝ้าเรือนช่วยดูแลร่างไร้หัวถึงเช้า คุณตามรอยคาถาและรับวิชา ${k.name} · ${k.plan}`,effects:[...(k.risk?[{kind:'hp' as const,amount:-k.risk}]:[]),{kind:'build' as const,buildId:k.id}],...(k.risk?{requires:[{kind:'hpRatio' as const,min:.25}]}:{})})),{label:'จดชื่อและตามรอย · รับ 20 เบี้ย',text:base.choices[0].text,effects:[{kind:'gold',amount:20}]}]};
+/** One existing story per night, class affinity doubles weight without excluding others. */
+export function rollNightStory(s:GameState,r:RNG):RNG {
+ const c=s.campaign!;const used=Object.values(c.eventByNight??{});
+ const pool=STORY_EVENTS.filter(e=>e.nights?.includes(c.night)&&!used.includes(e.id));
+ const weighted=pool.flatMap(e=>e.affinity===s.classId?[e,e]:[e]);
+ if(!weighted.length)return r;
+ const out=int(r,0,weighted.length-1);c.eventByNight={...(c.eventByNight??{}),[c.night]:weighted[out.value].id};return out.rng;
 }
+export function getStoryEvent(id:string,s?:GameState):StoryEvent|undefined {
+ const night=id.startsWith('run_story_')?id.slice(-1):undefined;
+ return STORY_EVENT_BY_ID[(night&&s?.campaign?.eventByNight?.[night])||id];
+}
+export const EVENT_PACTS:Record<string,import('../types').BlessingDef>={
+ event_coin_debt:{id:'event_coin_debt',name:'หนี้เหรียญศาล',desc:'เปิดไฟต์เกราะ +3 · จั่วเปิดไฟต์ −1',rules:{openingDraw:-1},triggers:[{on:'battleStart',fx:{block:3}}]},
+ event_bell_vow:{id:'event_bell_vow',name:'คำสัตย์ระฆัง',desc:'บทสวดตัวคูณ +1 · บทสวดใช้แต้มเพิ่ม 1',rules:{prayerMult:1,prayerAp:1},triggers:[]},
+};
 
 /** เลือกทางนี้ได้ไหม — คืนเหตุผลไว้ให้ UI บอกผู้เล่นว่าทำไมยังกดไม่ได้ */
 export function choiceLocked(s: GameState, choice: EventChoice): string | null {
+  // พรเหตุการณ์ห้ามซ้อนกฎกับพรแลกเปลี่ยนที่ถืออยู่ (เหตุผลอยู่ใน cards/passives.ts ruleModifier)
+  for (const eff of choice.effects ?? []) {
+    if (eff.kind === 'pact' && require('../cards/passives').bargainConflicts(s.blessings ?? [], EVENT_PACTS[eff.id])) return 'มีพรที่เปลี่ยนกฎเดียวกันอยู่แล้ว';
+  }
   for (const req of choice.requires ?? []) {
     switch (req.kind) {
       case 'gold':
@@ -91,7 +106,7 @@ export function choiceLocked(s: GameState, choice: EventChoice): string | null {
 /** ใช้ผลหนึ่งอย่าง — คืน rng ตัวใหม่เสมอ เพื่อให้ทั้งรันยังซ้ำได้ตาม seed */
 export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
   switch (eff.kind) {
-    case 'build':grantBuildKit(s,eff.buildId);return r;
+    case 'pact':require('../engine/shared').grantBlessing(s,EVENT_PACTS[eff.id]);return r;
     case 'hp': {
       const before = s.player.hp;
       s.player.hp = Math.max(0, Math.min(s.player.maxHp, s.player.hp + eff.amount));
@@ -127,9 +142,7 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
 
     case 'randomCard': {
       const { rollThreeCards } = require('../level');
-      const { getClass } = require('../classes');
-      const tag = getClass(s.classId).cardTag;
-      const out = rollThreeCards(r, s.player.level ?? 1, tag);
+      const out = rollThreeCards(r, s.player.level ?? 1, s.classId,s.campaign?.milestoneLevel??0);
       const pick = out.list[0];
       if (pick) {
         s.masterDeck = [...(s.masterDeck ?? []), { ...pick }];
@@ -140,9 +153,10 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
 
     case 'removeRandomCard': {
       const deck = s.masterDeck ?? [];
-      if (deck.length === 0) return r;
-      const roll = int(r, 0, deck.length - 1);
-      const [gone] = deck.splice(roll.value, 1);
+      const candidates=deck.flatMap((c,i)=>require('../engine/shared').canRemoveCard(c,deck.length)?[i]:[]);
+      if (!candidates.length) return r;
+      const roll = int(r, 0, candidates.length - 1);
+      const [gone] = deck.splice(candidates[roll.value], 1);
       s.masterDeck = deck;
       s.log.push(`${gone.name} หลุดจากสำรับ`);
       return roll.rng;
@@ -163,7 +177,7 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
     case 'blessing': {
       const { rollTwoBlessings } = require('../level');
       const { grantBlessing } = require('../engine/shared');
-      const out = rollTwoBlessings(r, (s.blessings ?? []).map(x => x.id));
+      const out = rollTwoBlessings(r, (s.blessings ?? []).map(x => x.id), 2, s.campaign?.blessingTier ?? 0);
       const b = out.list[0];
       if (b && grantBlessing(s, b)) {
         s.log.push(`ได้พร ${b.name ?? b.id}`);

@@ -2,11 +2,12 @@
 import type { GameState, CardData, BlessingDef } from '../types';
 import type { RNG } from '../rng';
 import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progression';
-import { rollLevelUpChoice, rollTwoBlessings, type LevelBucket } from '../level';
+import { rollThreeCards } from '../level';
+import { LEVEL_UP, CARD_RULES } from '../balance/notfm';
 import { rollCardReward } from '../cards/reward';
-import { hitsOf } from '../cards/mechanics';
+import { starOf } from '../cards/model';
+import { STAR_RULES } from '../balance/notfm';
 import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
-import { applyClassVictoryPassive, getClass } from '../classes';
 
 export function getCurrentNodeId(map?: any): string | undefined {
   if (!map) return undefined;
@@ -34,101 +35,71 @@ export function grantBlessing(s: GameState, b: BlessingDef): boolean {
   s.blessings = s.blessings ?? [];
   if (s.blessings.some(x => x.id === b.id)) return false;
   s.blessings.push(b);
+  applyBlessingGain(s, b);
   return true;
 }
 
-/** ปลุกเสกได้สูงสุดกี่ขั้นต่อใบ */
-export const MAX_UPGRADE_LEVEL = 3;
+/** One-time effects of a blessing (แพนโดรา). HP never drops below 1 from a blessing. */
+export function applyBlessingGain(s: GameState, b: BlessingDef): void {
+  const g = b.onGain;
+  if (!g) return;
+  const p = s.player;
+  if (g.maxHp) { p.maxHp = Math.max(1, p.maxHp + g.maxHp); if (g.maxHp > 0 && !g.hp) p.hp += g.maxHp; }
+  if (g.hp) p.hp += g.hp;
+  p.hp = Math.max(1, Math.min(p.maxHp, p.hp));
+  if (g.gold) p.gold = (p.gold ?? 0) + g.gold;
+  if (g.ap) { p.maxAp += g.ap; p.ap = p.maxAp; }
+  if (g.draw) p.drawPerTurn = g.draw>0?Math.max(p.drawPerTurn,Math.min(LEVEL_UP.caps.draw,p.drawPerTurn+g.draw)):Math.max(1,p.drawPerTurn+g.draw);
+  if (g.retain) p.retain = g.retain>0?Math.max(p.retain??CARD_RULES.retain,Math.min(LEVEL_UP.caps.retain,(p.retain ?? CARD_RULES.retain) + g.retain)):Math.max(0,(p.retain??CARD_RULES.retain)+g.retain);
+  if (g.startMana) p.startMana = (p.startMana ?? 0) + g.startMana;
+  if (g.slot) s.equipmentSlotsMax = (s.equipmentSlotsMax ?? 1) + g.slot;
+}
+
+/** Two different level-up rewards, weighted by LEVEL_UP.weights, skipping ones that cannot be used. */
+export function rollLevelOffers(s: GameState, r: RNG): { rng: RNG; list: import('../types').LevelOption[] } {
+  const { int } = require('../rng');
+  const usable: Record<import('../types').LevelOption, boolean> = {
+    ap:s.player.maxAp<LEVEL_UP.caps.ap,
+    mana:s.player.startMana<LEVEL_UP.caps.mana,
+    draw:s.player.drawPerTurn<LEVEL_UP.caps.draw,
+    card: true,
+    upgrade: s.masterDeck.some(canUpgrade),
+    remove: s.masterDeck.some(c => canRemoveCard(c, s.masterDeck.length)),
+    slot: (s.equipmentSlotsMax ?? 1) < LEVEL_UP.caps.slot,
+    retain: (s.player.retain ?? CARD_RULES.retain) < LEVEL_UP.caps.retain,
+  };
+  let pool = (Object.keys(LEVEL_UP.weights) as import('../types').LevelOption[]).filter(o => usable[o] && LEVEL_UP.weights[o]>0);
+  const list: import('../types').LevelOption[] = [];
+  while (list.length < LEVEL_UP.offers && pool.length) {
+    const total = pool.reduce((n, o) => n + LEVEL_UP.weights[o], 0);
+    const roll = int(r, 1, total); r = roll.rng;
+    let v = roll.value, pick = pool[0];
+    for (const o of pool) { v -= LEVEL_UP.weights[o]; if (v <= 0) { pick = o; break; } }
+    list.push(pick); pool = pool.filter(o => o !== pick);
+  }
+  return { rng: r, list };
+}
+
+/** Nights cleared across all runs, for แพนโดรา unlocks (set at NewRun). */
+export function blessingTier(s: Partial<GameState>): number { return s.campaign?.blessingTier ?? 0; }
+
 export function canRemoveCard(card:CardData|undefined,deckSize:number):boolean {
  return !!card&&deckSize>1&&!card.unremovable&&card.id!=='qa_phra_prathan';
 }
 
-/** ปลุกเสกไปแล้วกี่ขั้น */
+/** Upgrades raise a card from 1 to 3 stars (ช่างตีเหล็ก). */
+export const MAX_UPGRADE_LEVEL = STAR_RULES.maxStar - 1;
+/** Upgrades already applied (star − 1). */
 export function upgradeLevelOf(c: CardData): number {
-  return c.upgradeLevel ?? (c.upgraded ? 1 : 0);
+  return starOf(c) - 1;
 }
-
-/** ใบนี้ปลุกเสกได้อีกไหม */
 export function canUpgrade(c: CardData): boolean {
-  // คำสาปปลุกเสกไม่ได้ — มันไม่ได้มีไว้ใช้ตั้งแต่แรก
-  if (c.type === 'curse') return false;
-  return upgradeLevelOf(c) < MAX_UPGRADE_LEVEL;
+  return c.type !== 'curse' && !c.borrowed && starOf(c) < STAR_RULES.maxStar;
 }
-
-/** จำนวนที่บวกให้ใบที่มีตัวเลข ต่อหนึ่งขั้น */
-export const UPGRADE_BONUS = 4;
-
-/**
- * ปลุกเสกการ์ดหนึ่งใบ — สูงสุด 3 ขั้น
- *
- * ของเดิมบวก +3 dmg / +3 block ให้ทุกใบเหมือนกันหมด **ไม่จำกัดจำนวนครั้ง**
- * อัพใบเดิมสามรอบได้ชื่อ "ฟันดาบ + + +" และตัวเลขวิ่งหนีทั้งสำรับ — ทางที่ดีที่สุด
- * คือทุ่มทองใส่ใบเดียวแล้วถือยาว รอบก่อนหน้านี้จึงจำกัดไว้ครั้งเดียวต่อใบ
- * ซึ่งแก้ปัญหาแต่ตัดความรู้สึกว่า "การ์ดใบนี้คือใบที่เราปั้นมา" ทิ้งไปด้วย
- *
- * ตอนนี้อยู่ตรงกลาง: ปลุกได้ถึงขั้น 3 มีเพดานชัดเจน และ **ราคาขึ้นตามขั้นของใบนั้น**
- * (ดู `upgradeCostForCount`) ไม่ใช่ตามจำนวนครั้งที่ใช้ร้านอย่างเดียว
- *
- * สูตรแยกตามสิ่งที่ใบนั้นทำจริง:
- *   - มีตัวเลขโจมตี/กัน → บวกตัวเลขนั้น
- *   - ไม่มีตัวเลขเลย (ใบผลพิเศษ) → ลดค่าร่ายลงหนึ่ง ค่าร่ายศูนย์แล้วก็จั่วเพิ่มหนึ่ง
- *   - การ์ดดัก → บวกให้ผลที่เป็นตัวเลขของกับดัก
- *
- * **ใบที่ใช้แล้วหายยังหายเหมือนเดิม** — ใบ exhaust ทั้งหกในเกมไม่มีตัวเลขให้บวก
- * มันเป็นผลพิเศษล้วน และสองใบในนั้นคือ "ฟื้นเต็มหลอด + กันสถานะ 3 เทิร์น" กับ
- * "ฟื้น 8 และ Max HP +2 ถาวร" — ปลดข้อจำกัดให้ = ร่ายซ้ำได้ไม่จำกัด
- */
+/** One more star. Numbers follow `STAR_RULES` or the card's own star values. */
 export function upgradeCard(c: CardData): CardData {
   if (!canUpgrade(c)) return c;
-
-  const level = upgradeLevelOf(c) + 1;
-  const up: CardData = {
-    ...c,
-    name: `${stripPlus(c.name ?? c.id)} +${level}`,
-    upgraded: true,
-    upgradeLevel: level,
-  };
-
-  // การ์ดดัก: ตัวเลขอยู่ในผลของกับดัก ไม่ได้อยู่บนตัวการ์ด
-  if (up.type === 'trap' && up.trap) {
-    up.trap = {
-      ...up.trap,
-      effects: up.trap.effects.map(e =>
-        e.type === 'negate' ? e : { ...e, value: e.value + UPGRADE_BONUS }
-      ),
-    };
-    return up;
-  }
-
-  // การ์ดที่ถือไว้ก็ทำงาน — ค่าตอนค้างมือคือตัวตนของมัน ถ้าไม่ขยับด้วย
-  // การปลุกเสกจะเปลี่ยนแค่ครึ่งเดียวของสิ่งที่การ์ดใบนั้นเป็น
-  if (up.whileHeld) {
-    up.whileHeld = { ...up.whileHeld };
-    if (up.whileHeld.block) up.whileHeld.block += 1;
-    if (up.whileHeld.heal) up.whileHeld.heal += 1;
-  }
-
-  const hasNumbers = typeof up.dmg === 'number' || typeof up.block === 'number';
-  if (hasNumbers) {
-    // การ์ดหลายหมัดบวกทีละหมัด — ถ้าบวกเต็ม UPGRADE_BONUS ให้ทุกหมัด
-    // ใบ 8 หมัดจะได้ +32 ในขณะที่ใบหมัดเดียวได้ +4 จากราคาปลุกเสกเท่ากัน
-    // เฉลี่ยให้ผลรวมใกล้เคียงกัน แต่ไม่ต่ำกว่า +1 ต่อหมัด
-    const hits = hitsOf(up);
-    if (typeof up.dmg === 'number') {
-      up.dmg += hits > 1 ? Math.max(1, Math.round(UPGRADE_BONUS / hits)) : UPGRADE_BONUS;
-    }
-    if (typeof up.block === 'number') up.block += UPGRADE_BONUS;
-    return up;
-  }
-
-  if ((up.cost ?? 0) > 0) up.cost = up.cost - 1;
-  else up.draw = (up.draw ?? 0) + 1;
-  return up;
-}
-
-/** ตัด " +2" ท้ายชื่อออกก่อนเติมขั้นใหม่ ไม่งั้นชื่อจะยาวขึ้นเรื่อยๆ */
-function stripPlus(name: string): string {
-  return name.replace(/\s*\+\d+$/, '');
+  return { ...c, star: starOf(c) + 1 };
 }
 
 /** tier ของผีที่เพิ่งถูกฆ่า — อ่านจาก enemy ที่ยังอยู่ใน state ตอนชนะ */
@@ -148,14 +119,15 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
   const tier = defeatedMonsterTier(s);
   const offer=s.pages?.current?.offers[s.pages._activeOfferIndex??-1];
   const elite=offer?.kind==='monster'&&offer.tier==='elite';
-  const gained = s.pages?.adventure?(offer?.kind==='boss'?60:elite?32:18):expForMonster(tier);
-  const gold = s.pages?.adventure?(offer?.kind==='boss'?60:elite?28:18):goldForMonster(tier);
+  const {NIGHT_EXP}=require('../balance/notfm'),n=Math.max(0,Math.min(2,(s.campaign?.night??1)-1));
+  const gained = s.pages?.adventure?(offer?.kind==='boss'?NIGHT_EXP.boss[n]:elite?NIGHT_EXP.elite[n]:NIGHT_EXP.normal[n]):expForMonster(tier);
+  const {ECONOMY}=require('../balance/notfm');
+  const gold = s.pages?.adventure?(offer?.kind==='boss'?ECONOMY.gold.boss:elite?ECONOMY.gold.elite:Math.round(goldForMonster(tier)*ECONOMY.gold.normalPct/100)):goldForMonster(tier);
 
   s.player.exp += gained;
+  require('../campaign/alignment').queueGhostTalk(s);
   s.player.gold = (s.player.gold || 0) + gold;
 
-  // พรติดตัวของคลาสที่ทำงานตอนชนะไฟต์ (แม่ชีฟื้นเลือดข้ามไฟต์)
-  applyClassVictoryPassive(s);
   const goldResult = { amount: gold };
 
   // เก็บรางวัลไว้เป็นข้อมูล ไม่ใช่ให้ UI ไปแกะจากข้อความ log
@@ -169,17 +141,13 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
     s.player.level += 1;
     s.player.expToNext = nextExpForLevel(s.player.level);
 
+    // Every level: full heal and more max HP. One reward choice is offered at a time.
+    s.player.maxHp += LEVEL_UP.maxHp;
+    s.player.hp = s.player.maxHp;
     if (!s.levelUp || s.levelUp.consumed) {
-      const rolled = rollLevelUpChoice(r, s); r = rolled.rng;
-      const choice = rolled.choice;
-      let blessingChoices;
-
-      if (choice.optionA === 'blessing' || choice.optionB === 'blessing') {
-        const owned = (s.blessings ?? []).map(b => b.id);
-        const bb = rollTwoBlessings(r, owned); r = bb.rng; blessingChoices = bb.list;
-      }
-
-      s.levelUp = { choice, blessingChoices, consumed: false };
+      const rolled = rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0); r = rolled.rng;
+      const offers = rollLevelOffers(s, r); r = offers.rng;
+      s.levelUp = { cards: rolled.list, offers: offers.list, consumed: false };
     } else {
       s.log.push('LevelUp queued (multiple levels).');
     }
@@ -202,6 +170,10 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
  * VictoryOverlay กลืนไปทั้ง phase
  */
 export function advanceAfterVictory(s: GameState): void {
+  if (s.ghostTalk) {
+    s.phase = 'talk';
+    return;
+  }
   if (s.levelUp && !s.levelUp.consumed) {
     s.phase = 'levelup';
     s.log.push('Level Up!');
@@ -210,11 +182,6 @@ export function advanceAfterVictory(s: GameState): void {
   if (s.cardReward) {
     s.phase = 'reward';
     return;
-  }
-  const ix=s.pages?._activeOfferIndex,offer=ix==null?undefined:s.pages?.current?.offers[ix];
-  if(s.player.handBalanceVersion===33&&s.campaign?.night===1&&!s.player.nightOneHandReward&&offer?.kind==='boss'&&offer.bossType==='final'){
-    s.levelUp={dawnHandChoice:true,choice:{optionA:'draw_per_turn',optionB:'max_hand'},consumed:false};
-    s.phase='levelup';return;
   }
   s.phase = 'victory';
   s.log.push('Victory!');
