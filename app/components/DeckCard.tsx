@@ -27,7 +27,7 @@ export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardDat
 }
 /** Same paper, art, energy, level and complete ability text in deck and all shops. */
 export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardData;count?:number;compact?:boolean;equippedCount?:number}) {
- return <RitualSurface kind="occupationPage" style={[styles.card,compact&&{minHeight:158,paddingHorizontal:6,paddingVertical:12},card.type==='equipment'&&{borderWidth:2,borderColor:hudPictogramColors.equipment}]}>
+ return <RitualSurface kind="hideCard" style={[styles.card,compact&&{minHeight:158,paddingHorizontal:6,paddingVertical:12},card.type==='equipment'&&{borderWidth:2,borderColor:hudPictogramColors.equipment}]}>
   <CardBadges card={card} compact={compact}/>
   <View style={styles.symbol}><CardGlyphArt card={card} size={compact?50:76}/></View>
   <Text style={[styles.name,compact&&{fontSize:11}]}>{card.name??card.id}</Text>
@@ -39,7 +39,7 @@ export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardDa
  </RitualSurface>;
 }
 export default function DeckCard({card,count,onPress,selected=false,dim=false,fullWidth=false,compact=false,equippedCount=0}:{card:CardData;count?:number;onPress:()=>void;selected?:boolean;dim?:boolean;fullWidth?:boolean;compact?:boolean;equippedCount?:number}) {
- return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${costLabel(card)} · ${starOf(card)} ดาว · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,compact&&{width:'31.5%'},fullWidth&&{width:'100%'}]}>
+ return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${costLabel(card)} · ระดับ ${starOf(card)} · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,compact&&{width:'31.5%'},fullWidth&&{width:'100%'}]}>
   <CandleSelection selected={selected} dim={dim}><CardFace card={card} count={count} compact={compact} equippedCount={equippedCount}/></CandleSelection>
  </Pressable>;
 }

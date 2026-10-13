@@ -49,6 +49,7 @@ import { palette, surface, tint, layer, font } from './theme';
 import Settings from './components/Settings';
 import StartPage from './components/StartPage';
 import RitualSurface from './components/RitualSurface';
+import CloseSeal from './components/CloseSeal';
 import {QuietButton} from './components/QuietChrome';
 import {baseNewState} from '../src/core/commands';
 import {fxText} from '../src/core/cards/describe';
@@ -332,13 +333,7 @@ export default function BattlePage() {
     <View style={{ flex: 1 }}>
       <BattleBackdrop source={battleScene(gameState).source}>
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="พักการต่อสู้" onPress={openPause} style={{minWidth:44,minHeight:44,alignItems:'center',justifyContent:'center'}}>
-            <Image
-              source={require('../assets/images/btnDelete.png')}
-              style={{ width: 40, height: 40 }}
-              resizeMode="stretch"
-            />
-          </Pressable>
+          <CloseSeal label="พักการต่อสู้" onPress={openPause}/>
         </View>
 
 

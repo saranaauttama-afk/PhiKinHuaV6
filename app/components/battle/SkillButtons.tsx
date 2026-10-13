@@ -24,7 +24,7 @@ export default function SkillButtons({ state, enabled, onUse }: {
       const live = st.ready && enabled;
       return <Pressable key={d.id} testID={`skill-${d.slot}`} accessibilityRole="button"
         accessibilityLabel={`สกิล ${d.name} · ${st.label}`} onPress={() => setOpen(d.id)}
-        style={{ width: 44, height: 44, borderRadius: 5, borderWidth: 1, alignItems: 'center', justifyContent: 'center',
+        style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center',
           borderColor: live ? palette.moon : palette.line, backgroundColor: live ? tint.moonSoft : palette.scrim }}>
         <Image accessible={false} source={art[d.id]} resizeMode="contain" style={{width:30,height:30,opacity:live?1:.5}}/><Text style={{position:'absolute',bottom:0,right:2,fontSize:9,color:palette.moon}}>{live?'✓':cd>0?'':'×'}</Text>
         {cd > 0 && <View style={{ position: 'absolute', right: -4, top: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: palette.bloodDeep, alignItems: 'center', justifyContent: 'center' }}>

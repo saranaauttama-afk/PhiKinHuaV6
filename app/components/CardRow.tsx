@@ -10,6 +10,8 @@ import { Text, View } from 'react-native';
 import type { CardData } from '../../src/core/types';
 import { costLabel, describeCard, TYPE_LABEL } from '../../src/core/cards/describe';
 import { starOf } from '../../src/core/cards/model';
+import CardBadges from './CardBadges';
+import UpgradeMarks from './UpgradeMarks';
 import { font, radius, size, space, tint, paper } from '../theme';
 
 /** ป้ายเล็กบอกคุณสมบัติพิเศษของใบนี้ */
@@ -60,17 +62,7 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
       opacity: spent ? 0.45 : 1,
     }}>
       {!plain && <PaperTexture />}
-      {/* ค่าร่าย — อ่านเป็นเลขเดียวโดดๆ เหมือนมุมการ์ดจริง */}
-      <View style={{
-        minWidth: 34, height: 26, paddingHorizontal: 4, borderRadius: radius.pill,
-        backgroundColor: tint.moonFaint,
-        borderWidth: 1, borderColor: palette.line,
-        alignItems: 'center', justifyContent: 'center',
-      }}>
-        <Text style={{ color: palette.moon, fontSize: size.tiny, fontFamily: font.uiMed }}>
-          {costLabel(card)}
-        </Text>
-      </View>
+      <View style={{minWidth:42}}><CardBadges card={{...card,star:1}} compact/></View>
 
       {!plain && <InkIcon name={card.type === 'attack' ? 'attack' : card.type === 'counter' ? 'trap' : 'blessing'} size={30} color={palette.blood} />}
       <View style={{ flex: 1 }}>
@@ -84,7 +76,7 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
             </Text>
           )}
           <Badge label={TYPE_LABEL[card.type]} tone={card.type === 'curse' ? 'blood' : 'moon'} />
-          {starOf(card) > 1 && <Badge label={'★'.repeat(starOf(card))} />}
+          {starOf(card) > 1 && <UpgradeMarks level={starOf(card)}/>}
           {spent && <Badge label="ใช้ไปแล้ว" tone="blood" />}
         </View>
 
@@ -95,7 +87,7 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
         {!!card.flavor && (
           <Text style={{
             color: plain ? paper.ink : palette.textFaint, fontSize: size.body,
-            fontFamily: font.body, marginTop: space.xs, lineHeight: 22,
+            fontFamily: font.ui, marginTop: space.xs, lineHeight: 22,
           }}>
             {card.flavor}
           </Text>

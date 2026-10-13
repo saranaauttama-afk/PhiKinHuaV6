@@ -1,4 +1,5 @@
 import CardBadges from '../CardBadges';
+import DetailPanel from '../DetailPanel';
 import {starOf,cardCost,playBlock} from '../../../src/core/cards/model';
 import {pulpColors} from '../../theme';
 import React from 'react';
@@ -27,9 +28,9 @@ export default function PlayerHand({state,enabled=true,cards,playedCardIds,hover
  React.useEffect(()=>{seen.current=new Set(cards.map(c=>c.instanceId??c.id));});
  const index=cards.findIndex(c=>(c.instanceId??c.id)===selected);const preview=cards[index];const actualCost=(c:CardItem)=>cardCost(state,c as any);const blockOf=(c:CardItem)=>c.id==='qa_phra_prathan'?null:playBlock(state,c as any);const cost=preview?actualCost(preview):{ap:0,mana:0};const blocked=preview?blockOf(preview):null;
  return <View pointerEvents="box-none" style={{position:'absolute',top:0,bottom:0,left:0,right:0,zIndex:layer.control}}>
- {preview&&enabled&&<RitualSurface kind="quietSlate" style={{position:'absolute',bottom:handBottom+handHeight+6,left:12,right:12,padding:18,gap:8,zIndex:layer.overlay,maxHeight:height*.4}}>
- <View style={{flexDirection:'row',gap:12}}><CardGlyphArt card={preview as any} size={68}/><View style={{flex:1}}><Text style={{fontFamily:font.heading,color:pulpColors.bone,fontSize:17}}>{preview.name}</Text><CardBadges card={preview as any} cost={cost} ink={pulpColors.bone}/>{starOf(preview as any)>1&&<Text style={{fontFamily:font.ui,color:pulpColors.bone,fontSize:12}}>{starOf(preview as any)} ดาว</Text>}<ScrollView style={{maxHeight:height*.18}}><Text style={{fontFamily:font.body,color:pulpColors.bone,fontSize:20,lineHeight:25}}>{cardSummary(preview as any)}{preview.flavor?`\n${preview.flavor}`:null}</Text></ScrollView></View></View>
- <View style={{flexDirection:'row',gap:12}}><QuietButton label={blocked??(preview.type==='prayer'?'สวด':'ใช้การ์ด')} primary disabled={!!blocked} onPress={()=>{onPlayCard(preview,index);setSelected(null)}} style={{flex:1}}/><QuietButton label="ปิด" onPress={()=>enabled&&setSelected(null)} style={{flex:1}}/></View></RitualSurface>}
+ {preview&&enabled&&<DetailPanel title={preview.name} art={<CardGlyphArt card={preview as any} size={68}/>} badges={<CardBadges card={preview as any} cost={cost} ink={pulpColors.bone}/>} description={[cardSummary(preview as any),preview.flavor].filter(Boolean).join('\n')}
+ style={{position:'absolute',bottom:handBottom+handHeight+6,left:12,right:12,zIndex:layer.overlay,maxHeight:height*.4}}
+ actions={<View style={{flexDirection:'row',gap:12}}><QuietButton label={blocked??(preview.type==='prayer'?'สวด':'ใช้การ์ด')} primary disabled={!!blocked} onPress={()=>{onPlayCard(preview,index);setSelected(null)}} style={{flex:1}}/><QuietButton label="ปิด" onPress={()=>enabled&&setSelected(null)} style={{flex:1}}/></View>}/>}
 
  <View testID="battle-hand" style={{position:'absolute',bottom:handBottom,left:0,right:0,height:handHeight}}>
 

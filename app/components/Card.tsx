@@ -176,7 +176,7 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <CandleSelection selected={selected}><RitualSurface kind={disabled?"grayCard":"occupationPage"} style={{width:'100%',height:'100%',padding:9,paddingTop:28,paddingBottom:4}}>
+      <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} style={{width:'100%',height:'100%',padding:9,paddingTop:28,paddingBottom:4}}>
         <View style={{position:'absolute',top:4,left:6,right:7,zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact/></View>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
         <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={Math.max(18,Math.min(height*.38,height-94))} muted={disabled}/></View>
