@@ -6,13 +6,14 @@ import { makeCombatState, runEnemyCards } from './helpers';
 import { makeRng } from '../src/core/rng';
 import { applyCommand } from '../src/core/reducer';
 import { playCard } from '../src/core/cards/play';
-import { cardById, poolFor, ALL_CARDS } from '../src/core/pack';
+import { cardById, poolFor, ALL_CARDS, BLESSING_POOL, PANDORA_BLESSINGS, blessingFitsClass } from '../src/core/pack';
 import { describeCard } from '../src/core/cards/describe';
 import { FIGHTER_RULES, CLASS_PASSIVES } from '../src/core/balance/notfm';
 import { CHARACTER_CLASSES, buildStarterDeck } from '../src/core/classes';
 import { CARD_LIST_WITH_STARTERS } from '../src/core/pack';
 import { beginPlayerFight } from '../src/core/commands';
 import { rhythmOf, roundOf } from '../src/core/cards/fighter';
+import { rollLevelOffers } from '../src/core/engine/shared';
 import { resetCardsPlayed } from '../src/core/cards/mechanics';
 import { resetMinions } from '../src/core/combat/minions';
 import { dealDamage } from '../src/core/combat/damage';
@@ -47,14 +48,23 @@ describe('อาชีพ', () => {
     expect(deck.filter(x => x.id === 'jab')).toHaveLength(2);
     expect(deck.some(x => x.id === 'wai_khru')).toBe(true);
     const pool = poolFor('warrior').map(x => x.id);
-    for (const id of ['temple_blade', 'long_spear', 'ancestor_blade', 'equipment_iron_bracer']) expect(pool).not.toContain(id);
-    expect(cardById('temple_blade')?.retired).toBe(true); // old saves still load it
+    // Weapon cards of the old นักรบวัด are gone (owner: old saves need not load).
+    for (const id of ['temple_blade', 'long_spear', 'ancestor_blade', 'equipment_iron_bracer']) expect(cardById(id)).toBeUndefined();
   });
 
   it('การ์ดอาชีพครบ 52 ใบ และการ์ดโจมตีทุกใบมีท่า', () => {
-    const own = ALL_CARDS.filter(x => x.class === 'warrior' && !x.retired && !x.locked);
+    const own = ALL_CARDS.filter(x => x.class === 'warrior' && !x.locked);
     expect(own).toHaveLength(52);
     for (const x of own.filter(x => x.type === 'attack')) expect(x.move, x.id).toBeDefined();
+  });
+
+  it('ไม่มีพรหรือเลเวลอัปที่ให้แค่มานาสำหรับนักมวย', () => {
+    const bad = [...BLESSING_POOL, ...PANDORA_BLESSINGS].filter((b: any) => !blessingFitsClass(b, 'warrior')).map((b: any) => b.id);
+    expect(bad).toEqual(expect.arrayContaining(['spirit_energy', 'ritual_shield', 'pandora_doom_power']));
+    expect(blessingFitsClass(BLESSING_POOL.find((b: any) => b.id === 'spirit_energy')!, 'shaman')).toBe(true);
+    const s = fight([]);
+    s.player.startMana = 0;
+    for (let i = 0; i < 30; i++) expect(rollLevelOffers(s, makeRng('m' + i)).list).not.toContain('mana');
   });
 
   it('ร้านไม่ขายการ์ดใช้มานาให้นักมวย (ไม่มีแหล่งมานา)', () => {
@@ -316,7 +326,7 @@ describe('ติดมือ และคำอธิบาย', () => {
   });
 
   it('ทุกการ์ดนักมวยมีคำอธิบายที่ไม่ว่าง และบอกท่า', () => {
-    for (const x of ALL_CARDS.filter(x => x.class === 'warrior' && !x.retired)) {
+    for (const x of ALL_CARDS.filter(x => x.class === 'warrior')) {
       const text = describeCard(x);
       expect(text.length, x.id).toBeGreaterThan(3);
       if (x.move) expect(text, x.id).toMatch(/หมัด|เตะ|เข่า|ศอก/);

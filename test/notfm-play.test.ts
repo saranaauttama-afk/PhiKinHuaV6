@@ -172,22 +172,23 @@ describe('การ์ดตอบโต้', () => {
 
 describe('อุปกรณ์', () => {
   it('สวมแล้วผลติดตัวทำงาน ใส่ชิ้นใหม่ชิ้นเก่าถอดลงกองทิ้ง', () => {
-    const s = fight([card('equipment_prayer_beads'), card('equipment_iron_bracer'), attackCard(5)]);
+    const s = fight([card('equipment_prayer_beads'), card('equipment_cooling_cloth'), attackCard(5)]);
     play(s, 0);
     expect(s.equipped!.map(c => c.id)).toEqual(['equipment_prayer_beads']);
     play(s, 1);
     expect(s.enemy!.hp).toBe(194);
     play(s, 0);
-    expect(s.equipped!.map(c => c.id)).toEqual(['equipment_iron_bracer']);
+    expect(s.equipped!.map(c => c.id)).toEqual(['equipment_cooling_cloth']);
     expect(s.piles.discard.map(c => c.id)).toContain('equipment_prayer_beads');
+    s.player.hp = 30;
     runTriggers(s, 'turnStart', rng);
-    expect(s.player.block).toBe(3);
+    expect(s.player.hp).toBe(32);
   });
 
   it('เมื่อสวมทำงานครั้งเดียวตอนสวม', () => {
-    const s = fight([card('equipment_war_drum')]);
+    const s = fight([card('equipment_white_robe')]);
     play(s);
-    expect(s.player.statusEffects?.find(e => e.id === 'strength')?.stacks).toBe(2);
+    expect(s.player.statusEffects?.find(e => e.id === 'regeneration')?.stacks).toBe(2);
   });
 
   it('เกราะลดดาเมจผีต่อครั้ง', () => {
@@ -199,7 +200,7 @@ describe('อุปกรณ์', () => {
   });
 
   it('ช่องอุปกรณ์เพิ่มได้ จบไฟต์ล้างหมด', () => {
-    const s = fight([card('equipment_prayer_beads'), card('equipment_iron_bracer')]);
+    const s = fight([card('equipment_prayer_beads'), card('equipment_cooling_cloth')]);
     s.equipmentSlotsMax = 2;
     play(s); play(s);
     expect(s.equipped).toHaveLength(2);

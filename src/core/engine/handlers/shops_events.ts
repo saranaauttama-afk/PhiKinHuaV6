@@ -40,7 +40,7 @@ export function upgradePrice(s: Partial<GameState>): number { return markedUp(s,
 
 /** The night's blessing stop: pick one of ECONOMY.blessingChoices. */
 export function openBlessingStop(s: GameState, r: RNG): { state: GameState; rng: RNG } {
-  const out = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), ECONOMY.blessingChoices, s.campaign?.blessingTier ?? 0); r = out.rng;
+  const out = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), ECONOMY.blessingChoices, s.campaign?.blessingTier ?? 0, s.classId); r = out.rng;
   s.blessingStock = out.list;
   s.shopKind = 'blessing';
   s.shopBoughtItems = [];

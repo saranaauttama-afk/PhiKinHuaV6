@@ -12,7 +12,7 @@ import {toSave,fromSave} from '../src/core/save';
 import {rollCardReward} from '../src/core/cards/reward';
 import type {Command,GameState} from '../src/core/types';
 function run(){let s=baseNewState('feedback'),r=makeRng('feedback');const go=(c:Command)=>{({state:s,rng:r}=applyCommand(s,c,r));};go({type:'NewRun',seed:'feedback',classId:'warrior'});go({type:'SkipChapter'});go({type:'ChooseStarterBlessing',index:0});s.blessings=[];return {go,get s(){return s},get r(){return r}};}
-const eq=()=>structuredClone(cardById('equipment_iron_bracer')!);
+const eq=()=>structuredClone(cardById('equipment_cooling_cloth')!);
 describe('playtest feedback: ownership, hand and descriptions',()=>{
  it('starter blessings without desc still describe real effects',()=>{const b=BLESSING_POOL.find(b=>b.id==='meditation_peace')!;expect(b).toBeDefined();expect(describeBlessing(b)).not.toBe('');expect(describeBlessing(b)).toMatch(/ต้นเทิร์น|เกราะ|ฟื้น|มานา/);});
  it('a saved loadout follows the exact owned copy through upgrade and another card removal',()=>{const d=run();d.s.masterDeck.push(eq(),eq());d.go({type:'SetEquipmentLoadout',indices:[11]});const id=d.s.equipmentLoadout![0];expect(id).toBe(d.s.masterDeck[11].ownedId);d.s.masterDeck[11]=upgradeCard(d.s.masterDeck[11]);d.s.masterDeck.splice(0,1);normalizeLoadout(d.s);expect(loadoutIndices(d.s)).toEqual([10]);const restored=fromSave(toSave(d.s,d.r))!;expect(restored.equipmentLoadout).toEqual([id]);d.go({type:'ChooseOffer',index:0});expect(d.s.equipped?.[0].ownedId).toBe(id);expect(d.s.equipped?.[0].star).toBe(2);expect(Object.values(d.s.piles).flat().some(c=>c.ownedId===id)).toBe(false);const before=d.s.equipmentLoadout;d.go({type:'SetEquipmentLoadout',indices:[]});expect(d.s.equipmentLoadout).toEqual(before);});

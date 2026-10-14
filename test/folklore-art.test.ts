@@ -56,7 +56,7 @@ describe('player card and blessing art coverage',()=>{
    expect(used.get(file!),`${card.id} duplicates ${used.get(file!)}`).toBeUndefined();
    used.set(file!,card.id);
   }
-  expect(art.get('thunder_clap')).toContain('/thunder_clap.webp');
+  expect(art.get('muay_stance')).toContain('/muay_stance.webp');
  });
  it('base blessings and all four campaign blessings have separate artwork everywhere',()=>{
   const blessings=[...JSON.parse(read('src/data/packs/base/blessings.json')),...Object.values(SPECIAL_BLESSINGS)];

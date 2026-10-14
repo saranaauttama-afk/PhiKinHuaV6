@@ -13,10 +13,10 @@ export const GHOST_CATALOG=Object.values(THAI_GHOST_POOLS).flat().map(g=>{
 }).sort((a,b)=>GHOST_GROUPS.indexOf(a.group)-GHOST_GROUPS.indexOf(b.group)||(a.night??a.hp)-(b.night??b.hp));
 export type ArchiveCard={card:CardData;group:string;pair?:string[]};
 export const CARD_CATALOG:ArchiveCard[]=[
-...ALL_CARDS.filter(card=>!card.retired).map(card=>({card,group:card.class?CHARACTER_CLASSES[card.class].name:'ใช้ร่วมกัน'})),
+...ALL_CARDS.map(card=>({card,group:card.class?CHARACTER_CLASSES[card.class].name:'ใช้ร่วมกัน'})),
  ...CURSE_CARDS.map(card=>({card,group:'คำสาป'})),
 ];
-export const CORE_CARD_IDS=new Set(ALL_CARDS.filter(c=>!c.retired).map(c=>c.id));
+export const CORE_CARD_IDS=new Set(ALL_CARDS.map(c=>c.id));
 export function archiveCards(discovered:Record<string,CardData>):ArchiveCard[]{
  const known=new Set(CARD_CATALOG.map(x=>x.card.id));
  void known;void discovered;return [...CARD_CATALOG];

@@ -45,15 +45,31 @@ export function needsMana(c: CardData): boolean {
 }
 /** Card fits the class: own or shared, and not a mana card for a class without mana. */
 export function fitsClass(c: CardData, classId?: ClassId): boolean {
-  if (c.retired) return false;
   if (c.class && c.class !== classId) return false;
   return !!c.class || !needsMana(c) || classUsesMana(classId);
+}
+/**
+ * Whether a blessing can do anything for the class. A class without mana gets no blessing that only
+ * gives mana (พลังวิญญาณ, พลังหายนะ) or only fires on card types it never owns (โล่พิธีกรรม: spells).
+ * Why (14 Oct 2026 playtest): นักมวย was offered mana blessings and a mana level-up it could never use.
+ */
+export function blessingFitsClass(b: BlessingDef, classId?: ClassId): boolean {
+  if (!classId || classUsesMana(classId)) return true;
+  const ownTypes = new Set(poolFor(classId).map(c => c.type));
+  const useful = (b.triggers ?? []).some(t => {
+    if (t.type && !ownTypes.has(t.type)) return false;
+    return Object.keys(t.fx ?? {}).some(k => k !== 'mana' && (t.fx as any)[k] != null);
+  });
+  const gain = Object.keys(b.onGain ?? {}).some(k => k !== 'startMana' && k !== 'maxHp' && k !== 'hp');
+  const passive = !!((b as any).armor || (b as any).attackBonus || b.rules);
+  const hasAny = (b.triggers?.length ?? 0) > 0 || !!b.onGain || passive;
+  return !hasAny || useful || gain || passive || !!(b.onGain?.maxHp && b.onGain.maxHp > 0);
 }
 export function poolFor(classId?: ClassId,milestoneLevel=0): CardData[] {
   return ALL_CARDS.filter(c => !c.locked && (c.unlockAt??0)<=milestoneLevel && fitsClass(c, classId));
 }
 
-const OFFERED = ALL_CARDS.filter(c => !c.locked && !c.retired);
+const OFFERED = ALL_CARDS.filter(c => !c.locked);
 export const BY_RARITY: Record<Rarity, CardData[]> = {
   Common: OFFERED.filter(c => c.rarity === 'Common'),
   Uncommon: OFFERED.filter(c => c.rarity === 'Uncommon'),

@@ -61,7 +61,7 @@ export function rollLevelOffers(s: GameState, r: RNG): { rng: RNG; list: import(
   const { int } = require('../rng');
   const usable: Record<import('../types').LevelOption, boolean> = {
     ap:s.player.maxAp<LEVEL_UP.caps.ap,
-    mana:s.player.startMana<LEVEL_UP.caps.mana,
+    mana:s.player.startMana<LEVEL_UP.caps.mana&&require('../pack').classUsesMana(s.classId),
     draw:s.player.drawPerTurn<LEVEL_UP.caps.draw,
     card: true,
     upgrade: s.masterDeck.some(canUpgrade),

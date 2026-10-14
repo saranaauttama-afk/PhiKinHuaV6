@@ -19,7 +19,7 @@ export function levelOptionValid(s: GameState, option: LevelOption, index: numbe
   if (!levelOffers(s).includes(option)) return false;
   if (option === 'card') return index >= 0 && index < s.levelUp.cards.length;
   if(option==='ap')return s.player.maxAp<LEVEL_UP.caps.ap;
-  if(option==='mana')return s.player.startMana<LEVEL_UP.caps.mana;
+  if(option==='mana')return s.player.startMana<LEVEL_UP.caps.mana&&require('../../pack').classUsesMana(s.classId);
   if(option==='draw')return s.player.drawPerTurn<LEVEL_UP.caps.draw;
   if(option==='slot')return (s.equipmentSlotsMax??1)<LEVEL_UP.caps.slot;
   if(option==='retain')return (s.player.retain??CARD_RULES.retain)<LEVEL_UP.caps.retain;

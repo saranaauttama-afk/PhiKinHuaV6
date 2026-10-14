@@ -177,7 +177,7 @@ export function applyEffect(s: GameState, eff: EventEffect, r: RNG): RNG {
     case 'blessing': {
       const { rollTwoBlessings } = require('../level');
       const { grantBlessing } = require('../engine/shared');
-      const out = rollTwoBlessings(r, (s.blessings ?? []).map(x => x.id), 2, s.campaign?.blessingTier ?? 0);
+      const out = rollTwoBlessings(r, (s.blessings ?? []).map(x => x.id), 2, s.campaign?.blessingTier ?? 0, s.classId);
       const b = out.list[0];
       if (b && grantBlessing(s, b)) {
         s.log.push(`ได้พร ${b.name ?? b.id}`);

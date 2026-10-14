@@ -136,8 +136,6 @@ export type CardData = {
   /** Equipment uses before it wears out; `chargesLeft` counts down in a fight. */
   charges?: number;
   chargesLeft?: number;
-  /** No longer offered, in starter decks or in the archive; kept so old saves still load. */
-  retired?: boolean;
 };
 
 // Enemy

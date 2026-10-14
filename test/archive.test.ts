@@ -16,9 +16,9 @@ function run(id='archive-a',difficulty:1|2|3|4|5=1){
  return {get s(){return s;},get rng(){return rng;},step};
 }
 describe('archive catalog and real discoveries',()=>{
- it('lists all 34 unique ghosts in staged groups and every offered card plus 4 curses (no test card, no retired cards)',()=>{
-  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);const offered=ALL_CARDS.filter(c=>!c.retired);expect(CORE_CARD_IDS.size).toBe(offered.length);
-  expect(CARD_CATALOG).toHaveLength(offered.length+4);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(offered.length+4);expect(CARD_CATALOG.some(x=>x.card.id==='qa_phra_prathan'||x.card.retired)).toBe(false);
+ it('lists all 34 unique ghosts in staged groups and every offered card plus 4 curses (no test card)',()=>{
+  expect(GHOST_CATALOG).toHaveLength(34);expect(new Set(GHOST_CATALOG.map(g=>g.id)).size).toBe(34);const offered=ALL_CARDS;expect(CORE_CARD_IDS.size).toBe(offered.length);
+  expect(CARD_CATALOG).toHaveLength(offered.length+4);expect(new Set(CARD_CATALOG.map(x=>x.card.id)).size).toBe(offered.length+4);expect(CARD_CATALOG.some(x=>x.card.id==='qa_phra_prathan')).toBe(false);
   expect(GHOST_CATALOG.filter(g=>g.group==='บอสแต่ละคืน').map(g=>g.night)).toEqual([1,2,3,4,5]);
   expect(GHOST_CATALOG.at(-1)?.id).toBe('phi-kin-hua');
  });

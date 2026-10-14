@@ -39,7 +39,7 @@ export function newRun(
 
   // Starter blessing
   s.levelUp = null;
-  const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), 2, s.campaign?.blessingTier ?? 0); r = bb.rng;
+  const bb = rollTwoBlessings(r, (s.blessings ?? []).map(b => b.id), 2, s.campaign?.blessingTier ?? 0, s.classId); r = bb.rng;
   if(s.campaign?.unlocks.includes('blessing'))bb.list.push(require('../../pack').classBlessing(cls.id));
   s.starter = { choices: bb.list, consumed: false };
   s.phase = 'starter';

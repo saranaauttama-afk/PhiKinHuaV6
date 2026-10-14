@@ -13,6 +13,6 @@ state.blessings=[];state.equipped=[];state.player.hp=state.player.maxHp=500;stat
 state.enemy!.maxAp=2;state.enemy!.ap=0;state.enemyHandSize=4;state.enemyDrawPerTurn=2;state.enemyMaxRetained=2;
 state.enemyPiles={hand:['winyan_rerorn_v29_recover'],draw:['phi_krasue_v29_strike','phi_krasue_v29_strike','phi_krasue_v29_strike','phi_krasue_v29_strike'],discard:[]};state.enemyHandAges=[1];state.enemy!.handCount=1;
 const qa=state.piles.hand.find(c=>c.id==='qa_phra_prathan');if(!qa)throw Error('QA build required for fixtures');
-state.piles.hand=[qa,...Array.from({length:2},(_,i)=>({...cardById(i===0?'muay_stance':'temple_blade')!,instanceId:'v35-opening-'+i}))];
-state.piles.draw=Array.from({length:4},(_,i)=>({...cardById('temple_blade')!,instanceId:'v35-draw-'+i}));
+state.piles.hand=[qa,...Array.from({length:2},(_,i)=>({...cardById(i===0?'muay_stance':'jab')!,instanceId:'v35-opening-'+i}))];
+state.piles.draw=Array.from({length:4},(_,i)=>({...cardById('jab')!,instanceId:'v35-draw-'+i}));
 fs.writeFileSync(dir+'/v35-battle.json',JSON.stringify(toBattleSave(state,rng)));

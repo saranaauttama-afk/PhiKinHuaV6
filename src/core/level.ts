@@ -85,13 +85,13 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./cl
  * `tier` = nights cleared across all runs; แพนโดรา blessings with `unlock` <= tier join the pool
  * (undefined: none, e.g. tests and old callers).
  */
-export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2, tier?: number) {
+export function rollTwoBlessings(rng: RNG, owned: string[] = [], count = 2, tier?: number, classId?: import('./classes').ClassId) {
   let r = rng;
   const pool: BlessingDef[] = [
     ...BLESSINGS_BY_RARITY.Common, ...BLESSINGS_BY_RARITY.Uncommon,
     ...BLESSINGS_BY_RARITY.Rare, ...BLESSINGS_BY_RARITY.Legendary,
     ...(tier == null ? [] : require('./pack').PANDORA_BLESSINGS.filter((b: BlessingDef) => (b.unlock ?? 0) <= tier)),
-  ].filter(b => !owned.includes(b.id));
+  ].filter(b => !owned.includes(b.id) && require('./pack').blessingFitsClass(b, classId));
   // A bargain is not offered if an owned bargain already changes the same rule (no stacking).
   const ownedDefs = owned.map(id => require('./pack').blessingById(id) ?? require('./events/story').EVENT_PACTS[id]).filter(Boolean);
   const offerable = pool.filter(b => !require('./cards/passives').bargainConflicts(ownedDefs, b));

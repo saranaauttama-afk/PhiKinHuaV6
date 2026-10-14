@@ -4,7 +4,7 @@
 import {ALL_CARDS} from '../src/core/pack';
 import {describeCard,costLabel} from '../src/core/cards/describe';
 const log=console.log;console.log=()=>{};
-const own=ALL_CARDS.filter(c=>c.class==='warrior'&&!c.retired);
+const own=ALL_CARDS.filter(c=>c.class==='warrior');
 const TYPE:Record<string,string>={attack:'การ์ดโจมตี (ไม่ใช้แต้ม)',action:'การ์ดแอ็กชัน (ใช้แต้ม)',counter:'การ์ดตั้งรับ',equipment:'ของขลัง (อุปกรณ์)'};
 const starter=require('../src/data/packs/base/class_cards.json').reduce((m:any,c:any)=>{if(c.starter)m[c.id]=c.starter;return m;},{});
 const order=['Common','Uncommon','Rare','Legendary'];
