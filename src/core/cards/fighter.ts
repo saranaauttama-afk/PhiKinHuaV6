@@ -43,7 +43,7 @@ export function gainRhythm(s: GameState, n: number, rng: RNG): RNG {
   if (after === before) return rng;
   s.fight.rhythm = after;
   s.log.push(`จังหวะ ${after}`);
-  require('../combat/damage').emit(s, { t: 'RhythmChanged', value: after } as any);
+  require('../combat/damage').emit(s, { t: 'RhythmChanged', value: after });
   return require('./passives').runTriggers(s, 'rhythm', rng);
 }
 
@@ -78,6 +78,7 @@ export function consumeBruise(s: GameState): number {
   s.enemy.statusEffects = (s.enemy.statusEffects ?? []).filter(e => e.id !== 'bruise');
   const dmg = n * heavyPerBruise(s);
   s.log.push(`ท่าหนัก: ช้ำ ${n} → +${dmg}`);
+  require('../combat/damage').emit(s, { t: 'HeavyHit', bonus: dmg });
   return dmg;
 }
 
@@ -140,7 +141,7 @@ export function endTurnRhythm(s: GameState): void {
   if (kept) return;
   s.log.push(`ไม่ได้ออกอาวุธ จังหวะ ${s.fight.rhythm} หายหมด`);
   s.fight.rhythm = 0;
-  require('../combat/damage').emit(s, { t: 'RhythmChanged', value: 0 } as any);
+  require('../combat/damage').emit(s, { t: 'RhythmChanged', value: 0 });
 }
 
 /** Round (ยก) of a player turn number, starting at 1. */
@@ -177,6 +178,7 @@ export function resolveRipostes(s: GameState, hpBefore: number, hadDamage: boole
   for (const fx of list) {
     if (!s.enemy || s.enemy.hp <= 0) break;
     s.log.push('สวน!');
+    require('../combat/damage').emit(s, { t: 'Riposte' });
     rng = applyFx(s, fx.dmg ? { ...fx, dmg: fx.dmg + bonus } : fx, { sourceId: 'riposte' }, rng);
   }
   return rng;

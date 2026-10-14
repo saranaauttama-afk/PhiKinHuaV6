@@ -165,14 +165,18 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   r = runTriggers(s, 'turnEnd', r);
   // นักมวย: rhythm is lost on a turn with no attack; พักยก after every third turn.
   require('../../cards/fighter').endTurnRhythm(s);
+  let roundEnded = 0;
   if (require('../../cards/fighter').isRoundLastTurn(s)) {
-    s.log.push(`พักยก (จบยก ${require('../../cards/fighter').roundOf(s.turn ?? 1)})`);
+    roundEnded=require('../../cards/fighter').roundOf(s.turn ?? 1);
+    s.log.push(`พักยก (จบยก ${roundEnded})`);
     r = runTriggers(s, 'roundEnd', r);
   }
   require('../../combat/minions').tickPlayerMinions(s);
 
 
   emit(s, { t: 'TurnEnded', who: 'player' });
+  // The bell sounds after the turn closes (the batch must open with TurnEnded for the timeline).
+  if (roundEnded) emit(s, { t: 'RoundEnd', round: roundEnded });
   r = settleCombat(s, r);
   if (s.phase !== 'combat') return { state: s, rng: r };
 

@@ -4,9 +4,10 @@ import {font,palette,quietUiColors} from '../theme';
 import {useScreenPadding} from '../useScreenPadding';
 import RitualSurface from './RitualSurface';
 import CloseSeal from './CloseSeal';
+import {playSfx} from '../../src/audio/audio';
 
 export function QuietButton({label,onPress,disabled=false,primary=false,style,testID}:{label:string;onPress?:()=>void;disabled?:boolean;primary?:boolean;style?:StyleProp<ViewStyle>;testID?:string}){
- return <Pressable testID={testID} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{disabled}} disabled={disabled} onPress={onPress}
+ return <Pressable testID={testID} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{disabled}} disabled={disabled} onPress={onPress?()=>{playSfx('uiTap');onPress();}:undefined}
   style={({pressed})=>[{minHeight:48,opacity:disabled?.4:pressed?.75:1},style]}>
   <RitualSurface kind={primary?'hudPaper':'quietSlate'} style={{minHeight:48,paddingHorizontal:18,paddingVertical:13,alignItems:'center',justifyContent:'center'}}>
    <Text style={{fontFamily:font.heading,fontSize:14,color:primary?palette.ink:palette.moon,textAlign:'center'}}>{label}</Text>

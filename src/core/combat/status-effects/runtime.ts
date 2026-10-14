@@ -137,6 +137,9 @@ export function applyStatusEffect(
     }
   }
 
+  // For sound and feedback (src/audio/cues.ts); the rule result itself is already in state.
+  require('../damage').emit(state, { t: 'StatusApplied', target, effectId: statusId, stacks });
+
   return {
     success: true,
     effectApplied,

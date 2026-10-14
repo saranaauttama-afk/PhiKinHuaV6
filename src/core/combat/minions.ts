@@ -52,7 +52,7 @@ export function summonMinion(s: GameState, side: 'player' | 'enemy', id: string)
   };
   list.push(m);
   s.log.push(side === 'player' ? `เรียก ${def.name} เข้าข้างเวที` : `ผีเรียก ${def.name}`);
-  emit(s, { t: 'MinionSummoned', side, uid: m.uid, id } as any);
+  emit(s, { t: 'MinionSummoned', side, uid: m.uid, id });
   return m;
 }
 
@@ -61,7 +61,7 @@ export function damageMinion(s: GameState, m: MinionState, amount: number): numb
   if (amount <= 0 || m.hp <= 0) return 0;
   const lost = Math.min(m.hp, Math.round(amount));
   m.hp -= lost;
-  emit(s, { t: 'MinionDamaged', side: m.side, uid: m.uid, amount: lost } as any);
+  emit(s, { t: 'MinionDamaged', side: m.side, uid: m.uid, amount: lost });
   if (m.hp <= 0) {
     s.log.push(`${m.name} ล้มลง`);
     if (m.side === 'player') s.minions = (s.minions ?? []).filter(x => x !== m);

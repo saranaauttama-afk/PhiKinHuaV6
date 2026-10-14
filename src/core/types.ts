@@ -331,6 +331,16 @@ export type CombatEvent = (
   | { t: 'StatusApplied'; target: CombatEventTarget; effectId: string; stacks: number }
   | { t: 'Died'; who: CombatEventTarget }
   | { t: 'TurnEnded'; who: CombatEventTarget }
+  /** นักมวย: จังหวะ changed (value after). */
+  | { t: 'RhythmChanged'; value: number }
+  /** ท่าหนัก ate ช้ำ for `bonus` damage. */
+  | { t: 'HeavyHit'; bonus: number }
+  /** สวน fired after a fully blocked ghost attack. */
+  | { t: 'Riposte' }
+  /** พักยก: the end of round `round`. */
+  | { t: 'RoundEnd'; round: number }
+  | { t: 'MinionSummoned'; side: CombatEventTarget; uid: string; id: string }
+  | { t: 'MinionDamaged'; side: CombatEventTarget; uid: string; amount: number }
 ) & { frame?: CombatFrame };
 
 /**
