@@ -1,0 +1,58 @@
+name: Comic UI and comic UI + audio playtest APK
+run-name: PhiKinHua v1.0.48 comic UI + audio playtest
+on:
+  push:
+    branches: ['work/audio-sfx']
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+concurrency:
+  group: audio-apk-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Check TypeScript (no test suite or emulator)
+        run: npx tsc --noEmit
+      - run: CI=1 npx expo prebuild --platform android
+      - name: Build installable comic UI + audio playtest APK
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
+      - name: Audit APK package, signature and alignment
+        run: |
+          mkdir -p apk-audit
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
+          "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
+          grep "package: name='com.phikinhua.episode' versionCode='49' versionName='1.0.48'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-ComicUI-Audio-v1.0.48.apk
+          sha256sum PhiKinHua-ComicUI-Audio-v1.0.48.apk > apk-audit/sha256.txt
+          git rev-parse HEAD > apk-audit/source-commit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhiKinHua-ComicUI-Audio-v1.0.48-APK
+          path: PhiKinHua-ComicUI-Audio-v1.0.48.apk
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Audio-APK-audit
+          path: apk-audit/
+      - name: Microphone permission must stay blocked (game only plays sound)
+        run: "! grep -q \"uses-permission: name='android.permission.RECORD_AUDIO'\" apk-audit/package.txt"

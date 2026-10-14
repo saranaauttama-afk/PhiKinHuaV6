@@ -12,6 +12,10 @@ import {groupBlessings} from '../../src/core/blessing/group';
 import CardRow from './CardRow';
 import DeckCard, { CardGlyphArt } from './DeckCard';
 import RitualSurface from './RitualSurface';
+import StatIcon from './StatIcon';
+import DetailPanel from './DetailPanel';
+import CardBadges from './CardBadges';
+import {describeCard} from '../../src/core/cards/describe';
 import {QuietHeader,QuietButton} from './QuietChrome';
 import { font, radius, size, space, layer, palette, surface } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
@@ -48,7 +52,11 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
       <View style={{paddingTop:pad.top}}><QuietHeader title="สำรับของเรา" subtitle={`ทั้งหมด ${deck.length} ใบ · แตะการ์ดเพื่ออ่านรายละเอียด`} onClose={()=>dispatch({type:'CloseDeck'})}/></View>
 
       <View style={{flexDirection:'row',gap:8,paddingHorizontal:16,paddingBottom:8}}>
-       {(['deck','blessings'] as const).map(t=><Pressable key={t} testID={`bag-tab-${t}`} accessibilityRole="tab" accessibilityState={{selected:tab===t}} onPress={()=>setTab(t)} style={{flex:1,minHeight:44,alignItems:'center',justifyContent:'center',backgroundColor:tab===t?palette.paperDeep:palette.scrim,borderBottomWidth:2,borderColor:tab===t?palette.moon:palette.line}}><Text style={{fontFamily:font.heading,color:palette.moon,fontSize:14}}>{t==='deck'?`สำรับ (${deck.length})`:`พร (${state.blessings?.length??0})`}</Text></Pressable>)}
+       {(['deck','blessings'] as const).map(t=><Pressable key={t} testID={`bag-tab-${t}`} accessibilityRole="tab" accessibilityState={{selected:tab===t}} onPress={()=>setTab(t)} style={{flex:1,minHeight:44}}>
+        <RitualSurface kind={tab===t?'hideCard':'quietSlate'} style={{minHeight:44,padding:8,flexDirection:'row',gap:8,alignItems:'center',justifyContent:'center'}}>
+         <StatIcon name={t==='deck'?'deck':'blessing'} size={26}/><Text style={{fontFamily:font.heading,color:tab===t?paper.ink:palette.moon,fontSize:14}}>{t==='deck'?`สำรับ (${deck.length})`:`พร (${state.blessings?.length??0})`}</Text>
+        </RitualSurface>
+       </Pressable>)}
       </View>
       <ScrollView
         contentContainerStyle={{
@@ -97,16 +105,8 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
       {manage&&<EquipmentPicker manage state={state} onCancel={()=>setManage(false)} onConfirm={indices=>{dispatch({type:'SetEquipmentLoadout',indices});setManage(false);}}/>}
       <Modal visible={!!selected} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
         <View style={{ flex: 1, backgroundColor: palette.scrimHeavy, paddingHorizontal: 20, paddingTop: pad.top + 16, paddingBottom: pad.bottom + 16, justifyContent: 'center' }}>
-          {selected && <RitualSurface kind="occupationPage" style={{ maxHeight: '95%', padding: 24 }}>
-            <ScrollView contentContainerStyle={{ paddingVertical: 12 }}>
-              <Text accessibilityRole="header" style={{ color: paper.ink, fontFamily: font.heading, fontSize: 18, textAlign: 'center' }}>รายละเอียดการ์ด</Text>
-              <View style={{ alignItems: 'center', marginTop: 10 }}><CardGlyphArt card={selected.card} size={110} /></View>
-              <CardRow card={selected.card} count={selected.count} plain />
-            </ScrollView>
-            <Pressable accessibilityRole="button" accessibilityLabel="กลับไปดูสำรับ" onPress={() => setSelected(null)} style={{ minHeight: 48, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: paper.ink, fontFamily: font.heading, fontSize: 14 }}>กลับไปดูสำรับ</Text>
-            </Pressable>
-          </RitualSurface>}
+          {selected && <DetailPanel title={selected.card.name} art={<CardGlyphArt card={selected.card} size={76}/>} badges={<CardBadges showType card={selected.card} ink={palette.moon}/>} description={[describeCard(selected.card),selected.card.flavor].filter(Boolean).join('\n')}
+           actions={<QuietButton label="กลับไปดูสำรับ" onPress={()=>setSelected(null)}/>}/>}
         </View>
       </Modal>
     </ImageBackground>

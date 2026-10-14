@@ -3,6 +3,7 @@ import {ImageBackground,ImageSourcePropType,Pressable,ScrollView,StyleProp,Text,
 import {font,palette,quietUiColors} from '../theme';
 import {useScreenPadding} from '../useScreenPadding';
 import RitualSurface from './RitualSurface';
+import CloseSeal from './CloseSeal';
 
 export function QuietButton({label,onPress,disabled=false,primary=false,style,testID}:{label:string;onPress?:()=>void;disabled?:boolean;primary?:boolean;style?:StyleProp<ViewStyle>;testID?:string}){
  return <Pressable testID={testID} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{disabled}} disabled={disabled} onPress={onPress}
@@ -16,7 +17,7 @@ export function QuietHeader({title,subtitle,onClose,closeLabel='ปิด'}:{tit
  return <View style={{flexDirection:'row',alignItems:'center',gap:12,paddingHorizontal:20,paddingVertical:12}}>
   <View style={{flex:1}}><Text accessibilityRole="header" style={{fontFamily:font.display,fontSize:28,color:palette.moon}}>{title}</Text>
    {subtitle&&<Text style={{fontFamily:font.ui,fontSize:12,lineHeight:20,color:palette.textDim,marginTop:3}}>{subtitle}</Text>}</View>
-  {onClose&&<QuietButton label={closeLabel} onPress={onClose}/>}
+  {onClose&&<CloseSeal label={closeLabel} onPress={onClose}/>}
  </View>;
 }
 export function QuietPage({title,subtitle,onClose,closeLabel,source,children,footer}:{title:string;subtitle?:string;onClose?:()=>void;closeLabel?:string;source?:ImageSourcePropType;children:React.ReactNode;footer?:React.ReactNode}){

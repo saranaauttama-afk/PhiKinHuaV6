@@ -1,5 +1,5 @@
 import React from 'react';
-import {Animated,Image,Pressable,ScrollView,Text,View,useWindowDimensions} from 'react-native';
+import {Animated,Easing,Image,Pressable,ScrollView,Text,View,useWindowDimensions} from 'react-native';
 import type {PageOffer} from '../../src/core/map/pages';
 import {describeOffer,ghostTierLabel} from './offerDisplay';
 import EncounterPortrait from './EncounterPortrait';
@@ -7,9 +7,11 @@ import {encounterClue} from './encounterClue';
 import InkIcon,{type InkSymbol} from './InkIcon';
 import RitualSurface from './RitualSurface';
 import {QuietButton} from './QuietChrome';
+import CloseSeal from './CloseSeal';
 import {layer,font,palette} from '../theme';
 
 import {useGameSettings} from './Settings';
+import {SceneContentVisible} from './SceneArrival';
 const frame=require('../../assets/ui/encounter-frame-v30.webp');
 const kindLabel=(o:PageOffer)=>o.kind==='monster'?'ต่อสู้':o.kind==='boss'?'ศึกใหญ่':o.kind==='story_event'?'สำรวจเรื่องราว':o.kind==='treasure'||o.kind==='treasure_single'?'รับสมบัติ':o.kind==='shop_card'||o.kind==='shop_equipment'?'เข้าร้าน':o.kind==='well'?'ดื่มน้ำ':o.kind==='shop_upgrade'?'ปลุกเสก':o.kind==='shop_remove'?'สละการ์ด':o.kind==='next_event'?'เดินต่อ':'พักฟื้น';
 const pageLabel=(o:PageOffer)=>o.kind==='story_event'?'เรื่องสำคัญ':kindLabel(o);
@@ -28,10 +30,10 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCo
  React.useEffect(()=>{setSelected(null)},[slotIds.join('|')]);
  return <ScrollView testID="adventure-choices" style={{flex:1}} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setViewport(v=>v.width===width&&v.height===height?v:{width,height})}} contentContainerStyle={{paddingHorizontal:12,paddingTop:topSpace,paddingBottom:10,flexGrow:1}}>
   <View testID="adventure-row" style={{flexDirection:'row',gap:8,justifyContent:'center'}}>
-   {offers.map((o,i)=>!o||resolved[i]?<View key={'empty-'+i} style={{width:cardWidth}}/>:<PageFade key={slotIds[i]??i} appearanceKey={appearanceKey+'|'+slotIds.join('|')} delay={i*55} reduced={reduced} testID={'adventure-frame-'+i} style={{width:cardWidth,height:cardHeight}}>
+   {offers.map((o,i)=>!o||resolved[i]?<View key={'empty-'+i} style={{width:cardWidth}}/>:<PageFade key={slotIds[i]??i} appearanceKey={appearanceKey} delay={i*80} reduced={reduced} testID={'adventure-frame-'+i} style={{width:cardWidth,height:cardHeight}}>
     <Image accessible={false} source={frame} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight}}/>
     <Image accessible={false} source={frame} tintColor={palette.bloodLit} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight,opacity:selected===i?.28:0}}/>
-    {!!onDestroy&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<Pressable testID={'adventure-destroy-'+i} accessibilityRole="button" accessibilityLabel={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}} style={{position:'absolute',top:0,right:0,width:44,height:44,zIndex:layer.control,alignItems:'flex-end',justifyContent:'flex-start',padding:4}}><Image source={require('../../assets/images/btnDelete.png')} style={{width:25,height:25}}/></Pressable>}
+    {selected===i&&!!onDestroy&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<View style={{position:'absolute',top:-4,right:-4,zIndex:layer.control}}><CloseSeal testID={'adventure-destroy-'+i} label={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}}/></View>}
     <View style={{paddingTop:18,paddingHorizontal:8,alignItems:'center'}}>
      <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+(ghostTierLabel(o)??pageLabel(o))} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
       {ghostTierLabel(o)?<View style={{height:42,justifyContent:'center',alignItems:'center'}}>
@@ -54,13 +56,21 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCo
 }
 
 function PageFade({appearanceKey,delay,reduced,children,...props}:{appearanceKey:string;delay:number;reduced:boolean;children:React.ReactNode;style:any;testID:string}){
+ const visible=React.useContext(SceneContentVisible);
  const [ready,setReady]=React.useState(reduced);
- const opacity=React.useRef(new Animated.Value(reduced?1:0)).current;
+ const progress=React.useRef(new Animated.Value(reduced?1:0)).current;
  React.useEffect(()=>{
   let active=true;setReady(reduced);
-  opacity.stopAnimation();opacity.setValue(reduced?1:0);
-  const a=Animated.timing(opacity,{toValue:1,duration:230,delay:reduced?0:delay,useNativeDriver:true});
-  if(!reduced)a.start(({finished})=>{if(active&&finished)setReady(true)});return ()=>{active=false;a.stop();};
- },[appearanceKey,reduced]);
- return <Animated.View {...props} pointerEvents={ready?'auto':'none'} accessibilityElementsHidden={!ready} style={[props.style,{opacity}]}>{children}</Animated.View>;
+  progress.stopAnimation();progress.setValue(reduced?1:0);
+  if(reduced||!visible)return ()=>{active=false};
+  const a=Animated.timing(progress,{toValue:1,duration:620,delay,easing:Easing.out(Easing.quad),useNativeDriver:true});
+  a.start(({finished})=>{if(active&&finished)setReady(true)});return ()=>{active=false;a.stop();};
+ },[appearanceKey,reduced,visible,delay]);
+ const opacity=progress;
+ const translateY=progress.interpolate({inputRange:[0,1],outputRange:[12,0]});
+ const scale=progress.interpolate({inputRange:[0,1],outputRange:[.94,1]});
+ return <Animated.View {...props} pointerEvents={ready?'auto':'none'} accessibilityElementsHidden={!ready} importantForAccessibility={ready?'auto':'no-hide-descendants'} style={[props.style,{opacity,transform:[{translateY},{scale}]}]}>
+  <Animated.View testID={props.testID+'-arrival-glow'} pointerEvents="none" style={{position:'absolute',left:'-10%',top:'-7%',width:'120%',height:'114%',opacity:progress.interpolate({inputRange:[0,.25,.65,1],outputRange:[0,.38,.12,0]})}}><Image accessible={false} source={require('../../assets/ui/candle-selection.webp')} resizeMode="stretch" style={{width:'100%',height:'100%'}}/></Animated.View>
+  {children}
+ </Animated.View>;
 }

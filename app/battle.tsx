@@ -28,6 +28,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
+import {playSfx,setBeds} from '../src/audio/audio';
+import {BOSS_INTRO} from '../src/audio/manifest';
 import TurnEndDiscard from './components/battle/TurnEndDiscard';
 import { retainLimit, turnEndExcess } from '../src/core/engine/handlers/combat';
 import { bossRule } from '../src/core/campaign/bossRules';
@@ -49,6 +51,7 @@ import { palette, surface, tint, layer, font } from './theme';
 import Settings from './components/Settings';
 import StartPage from './components/StartPage';
 import RitualSurface from './components/RitualSurface';
+import CloseSeal from './components/CloseSeal';
 import {QuietButton} from './components/QuietChrome';
 import {baseNewState} from '../src/core/commands';
 import {fxText} from '../src/core/cards/describe';
@@ -135,6 +138,14 @@ export default function BattlePage() {
   const reward = gameState.lastReward ?? { exp: 0, gold: 0 };
 
   const playerHand = gameState.piles.hand;
+
+  // เสียง: ในฉากต่อสู้มีเสียงบรรยากาศกลางคืนซ้อนใต้เพลง ออกจากฉากแล้วเหลือแต่เพลง
+  React.useEffect(()=>{setBeds(['music','ambienceNight1']);return ()=>setBeds(['music']);},[]);
+  // บอสที่มีเสียงเปิดตัว ดังครั้งเดียวตอนเข้าฉาก
+  React.useEffect(()=>{const intro=BOSS_INTRO[String(monsterId??'')];if(intro)playSfx(intro);},[monsterId]);
+  // จั่วการ์ด = มือเพิ่มขึ้น (ทั้งต้นเทิร์นและการ์ดที่ให้จั่ว) ดังครั้งเดียวต่อครั้งที่มือเพิ่ม
+  const handSizeRef = React.useRef(playerHand.length);
+  React.useEffect(()=>{if(playerHand.length>handSizeRef.current)playSfx('cardDraw');handSizeRef.current=playerHand.length;},[playerHand.length]);
 
   /**
    * เลขข้างไอคอนสำรับ = **เหลือในกองจั่วกี่ใบ**
@@ -290,6 +301,8 @@ export default function BattlePage() {
 
       case 'Damage': {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง ไม่ใช่ค่าบนการ์ด
+        // เสียงกรงเล็บดังทุกครั้งที่ผีตีด้วยการ์ด แม้เกราะจะกันไว้หมดก็ตาม
+        if (currentEvent.target === 'player' && currentEvent.sourceKind === 'card') playSfx('ghostAttack');
         if (currentEvent.hpLoss <= 0) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss };
         if (currentEvent.target === 'player') flashRef.current?.flash();
@@ -332,13 +345,7 @@ export default function BattlePage() {
     <View style={{ flex: 1 }}>
       <BattleBackdrop source={battleScene(gameState).source}>
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="พักการต่อสู้" onPress={openPause} style={{minWidth:44,minHeight:44,alignItems:'center',justifyContent:'center'}}>
-            <Image
-              source={require('../assets/images/btnDelete.png')}
-              style={{ width: 40, height: 40 }}
-              resizeMode="stretch"
-            />
-          </Pressable>
+          <CloseSeal label="พักการต่อสู้" onPress={openPause}/>
         </View>
 
 

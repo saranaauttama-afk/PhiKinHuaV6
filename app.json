@@ -3,7 +3,7 @@
     "name": "PhiKinHua",
     "slug": "PhiKinHua",
     "scheme": "phikinhua",
-    "version": "1.0.43",
+    "version": "1.0.48",
     "userInterfaceStyle": "dark",
     "orientation": "portrait",
     "plugins": [
@@ -23,11 +23,14 @@
     ],
     "android": {
       "package": "com.phikinhua.episode",
-      "versionCode": 44,
+      "versionCode": 49,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-pulp.png",
         "backgroundColor": "#1a0a00"
-      }
+      },
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "icon": "./assets/icon-pulp.png",
     "splash": {

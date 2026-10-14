@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, View, Image, Modal, StyleSheet } from 'react-native';
+import { Pressable, Text, View, Image, Modal, StyleSheet, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { GameState } from '../../src/core/types';
 import { CHARACTER_CLASSES } from '../../src/core/classes';
@@ -15,7 +15,7 @@ import AlignmentMeter from './AlignmentMeter';
 import { skillsFor } from '../../src/core/skills';
 import { font, layer, paper, pulpColors, palette } from '../theme';
 
-export const STATUS_BAR_SPACE = 124;
+export const STATUS_BAR_SPACE = 84;
 export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings, onUseSkill }: {
   state: GameState; onOpenDeck?: () => void; onOpenBlessings?: () => void;
   /** Slot A skill (map only). */
@@ -30,12 +30,13 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings, on
   const [detailsOpen, setDetailsOpen] = React.useState(false);
   const health = Math.max(0, Math.min(1, p.hp / Math.max(1, p.maxHp)));
   return <>
-    <QuietPlayerHud classId={state.classId} hp={p.hp} maxHp={p.maxHp} onPortrait={()=>setDetailsOpen(true)} extras={<><HudStat icon="hand" text={`มือ ${retainLimit(state)}`} label="มือสูงสุดท้ายเทิร์น" onPress={()=>setDetailsOpen(true)}/><HudStat icon="deck" text={`จั่ว ${p.drawPerTurn}`} label="จั่วต่อเทิร์น" onPress={()=>setDetailsOpen(true)}/></>}
-     stats={<><HudStat icon="gold" text={`${p.gold??0}`} label="เบี้ย"/><HudStat icon="deck" text={`${state.masterDeck?.length??0}`} onPress={onOpenDeck} label={`สำรับ ${state.masterDeck?.length??0}`}/><HudStat icon="blessing" text={`${state.blessings?.length??0}`} onPress={onOpenBlessings} label={`พร ${state.blessings?.length??0}`}/>{state.campaign&&<HudStat icon="lantern" text={`${state.campaign.courage??0}·${state.campaign.merit??0}`} onPress={()=>setDetailsOpen(true)} label={`ความกล้า ${state.campaign.courage??0} บุญ ${state.campaign.merit??0}`}/>}{mapSkill&&<HudStat icon={mapSkillStatus!.ready?'lantern':'rest'} text={mapSkillStatus!.ready?'A':`${state.skills?.[mapSkill.id]??0}`} onPress={()=>setSkillOpen(mapSkill.id)} label={`สกิล ${mapSkill.name} · ${mapSkillStatus!.label}`}/>}</>}/>
+    <QuietPlayerHud classId={state.classId} hp={p.hp} maxHp={p.maxHp} onPortrait={()=>setDetailsOpen(true)}
+     stats={<><HudStat icon="gold" text={`${p.gold??0}`} label="เบี้ย"/><HudStat icon="deck" text={`${state.masterDeck?.length??0}`} onPress={onOpenDeck} label={`สำรับ ${state.masterDeck?.length??0}`}/><HudStat icon="hand" text={`${retainLimit(state)}`} label="มือสูงสุดท้ายเทิร์น" onPress={()=>setDetailsOpen(true)}/><HudStat icon="draw" text={`${p.drawPerTurn}`} label="จั่วต่อเทิร์น" onPress={()=>setDetailsOpen(true)}/></>}/>
+
     {onUseSkill&&<SkillSheet state={state} id={skillOpen} onClose={()=>setSkillOpen(null)} onUse={onUseSkill}/>}
     <Modal visible={detailsOpen} transparent animationType="fade" onRequestClose={() => setDetailsOpen(false)}>
       <View style={[styles.scrim, { paddingTop: pad.top + 16, paddingBottom: pad.bottom + 16 }]}>
-        <RitualSurface kind="occupationPage" accessibilityViewIsModal style={styles.details}>
+        <RitualSurface kind="occupationPage" accessibilityViewIsModal style={[styles.details,{maxHeight:'90%'}]}><ScrollView contentContainerStyle={{gap:10}}>
           <Text accessibilityRole="header" style={styles.detailTitle}>ข้อมูลผู้เดินทาง</Text>
           <Text style={styles.detailText}>{character.name} · เลเวล {p.level}</Text>
           <Text style={styles.detailText}>พลังชีวิต {p.hp}/{p.maxHp}</Text>
@@ -44,8 +45,10 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings, on
           <Text style={styles.detailText}>เปิดศึก {openingHandSize(state)} ใบ · ถือระหว่างเล่นไม่เกิน {p.handMax} ใบ</Text>
           <Text style={styles.detailText}>EXP {p.exp}/{p.expToNext}</Text>
           {state.campaign&&<View style={{marginTop:8}}><AlignmentMeter campaign={state.campaign} ink/></View>}
+          <Pressable accessibilityRole="button" accessibilityLabel={`ดูพร ${state.blessings?.length??0} พร`} onPress={()=>{setDetailsOpen(false);onOpenBlessings?.();}} style={styles.close}><Text style={styles.linkText}>พรติดตัว {state.blessings?.length??0}</Text></Pressable>
+          {mapSkill&&<Pressable accessibilityRole="button" accessibilityLabel={`สกิล ${mapSkill.name}`} onPress={()=>{setDetailsOpen(false);setSkillOpen(mapSkill.id);}} style={styles.close}><Text style={styles.linkText}>{mapSkill.name} · {mapSkillStatus?.label}</Text></Pressable>}
           <Pressable accessibilityRole="button" accessibilityLabel="ปิดข้อมูลผู้เดินทาง" onPress={() => setDetailsOpen(false)} style={styles.close}><Text style={styles.linkText}>กลับไปเลือกทาง</Text></Pressable>
-        </RitualSurface>
+        </ScrollView></RitualSurface>
       </View>
     </Modal>
   </>;

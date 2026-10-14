@@ -1,7 +1,8 @@
 /** One coordinate system for full-body art, compact HUDs and the hand. */
+export const PLAYER_BATTLE_HUD_HEIGHT=100;
 export function battleGeometry(screenW:number,screenH:number,top=0,bottom=0) {
  const short=screenH-top-bottom<700;
- const playerHudHeight=76,playerHudBottom=bottom+6,sealHeight=36;
+ const playerHudHeight=PLAYER_BATTLE_HUD_HEIGHT,playerHudBottom=bottom+6,sealHeight=36;
  const handBottom=playerHudBottom+playerHudHeight+sealHeight+8;
  const cardHeight=screenH-top-bottom<600?114:short?134:166,handHeight=cardHeight+24;
  const handTop=screenH-handBottom-handHeight;

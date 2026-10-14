@@ -12,10 +12,14 @@ import {enemyLane,enemyHandGeometry} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
 import {font,layer} from '../../theme';
 import {paper} from '../Paper';
+import StatIcon from '../StatIcon';
 import RitualSurface from '../RitualSurface';
 import InkIcon from '../InkIcon';
 import {artSource} from '../Art';
 import {CardGlyphArt} from '../DeckCard';
+import {enemyCardById} from '../../../src/core/pack_enemy_cards';
+import {cardTypeWash} from '../cardTypeWash';
+import CardTypeMark from '../CardTypeMark';
 
 const CARD_W      = 200;
 const CARD_H      = 270;
@@ -135,6 +139,7 @@ export default function EnemyHandCard({
   }));
 
   const isAttack = card.damage > 0;
+  const cardType=enemyCardById(card.id??'')?.type??(isAttack?'attack':'action');
 
 
   return (
@@ -142,18 +147,19 @@ export default function EnemyHandCard({
     <Animated.View testID={`enemy-card-face-${ownerIndex}`} style={containerStyle}>
       {/* Back face (face-down) */}
       <Animated.View style={backStyle}>
-        <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5}}><Image source={require('../../../assets/ui/trail-ghost.png')} resizeMode="contain" style={{width:100,height:140}}/></RitualSurface>
+        <RitualSurface kind="hideCard" style={{flex:1,alignItems:'center',justifyContent:'center',padding:5}}><Image source={require('../../../assets/ui/trail-ghost.png')} resizeMode="contain" style={{width:100,height:140}}/></RitualSurface>
       </Animated.View>
 
       {/* Front face */}
       <Animated.View style={frontStyle}>
-        {playing && <RitualSurface kind="occupationPage" style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,gap:4}}>
-          <Text style={{color:paper.ink,fontFamily:font.ui,fontSize:18}}>{card.cost?`${card.cost} แต้ม`:'ฟรี'}</Text>
+        {playing && <RitualSurface kind="hideCard" hideWash={cardTypeWash[cardType]} style={{flex:1,alignItems:'center',justifyContent:'center',padding:10,paddingBottom:30,gap:4}}>
+          <View style={{flexDirection:'row',gap:4,alignItems:'center'}}><StatIcon name="energy" size={20}/><Text style={{color:paper.ink,fontFamily:font.heading,fontSize:18}}>{card.cost??0}</Text></View>
           {ownerId?<Image testID="enemy-card-owner-art" accessible={false} source={artSource(`monster/${ownerId}`)} resizeMode="contain" style={{width:68,height:68}}/>:<CardGlyphArt card={{id:card.id??'',name:card.name,type:isAttack?'attack':'action',fx:{}}} size={68}/>}
           <Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.heading,fontSize:22,textAlign:'center'}}>{card.name}</Text>
-          {card.damage>0&&<Text style={{color:paper.red,fontFamily:font.heading,fontSize:22}}>โจมตี {card.damage}{(card.hits??1)>1?` ×${card.hits}`:''}</Text>}
-          {card.block>0&&<Text style={{color:paper.ink,fontFamily:font.heading,fontSize:21}}>ป้องกัน {card.block}</Text>}
-          {!!card.desc&&<Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.ui,fontSize:18,lineHeight:18,textAlign:'center'}}>{card.desc}</Text>}
+          {card.damage>0&&<Text style={{color:paper.red,fontFamily:font.ui,fontSize:15}}>โจมตี {card.damage}{(card.hits??1)>1?` ×${card.hits}`:''}</Text>}
+          {card.block>0&&<Text style={{color:paper.ink,fontFamily:font.ui,fontSize:15}}>เกราะ {card.block}</Text>}
+          {!!card.desc&&<Text numberOfLines={2} style={{color:paper.ink,fontFamily:font.ui,fontSize:15,lineHeight:23,textAlign:'center'}}>{card.desc}</Text>}
+          <View style={{position:'absolute',right:20,bottom:14}}><CardTypeMark type={cardType}/></View>
         </RitualSurface>}
       </Animated.View>
 

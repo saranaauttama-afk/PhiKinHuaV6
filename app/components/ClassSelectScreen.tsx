@@ -1,108 +1,61 @@
+import React from 'react';
+import {View,Text,Image,Pressable,PanResponder,ScrollView} from 'react-native';
+import {CHARACTER_CLASSES,ALL_CLASS_IDS,type ClassId} from '../../src/core/classes';
 import {CARD_RULES,CLASS_RESOURCES} from '../../src/core/balance/notfm';
 import {skillsFor} from '../../src/core/skills';
-import React from 'react';
-import { View, Text, Pressable, ScrollView, Image, Modal, StyleSheet, useWindowDimensions } from 'react-native';
-import { CHARACTER_CLASSES, type ClassId } from '../../src/core/classes';
-import Art, { artSource } from './Art';
-import RitualSurface from './RitualSurface';
-import {QuietButton} from './QuietChrome';
-import { font, layer, occupationColors as sceneColors, notebookColors as colors } from '../theme';
-import { useScreenPadding } from '../useScreenPadding';
-const scene = require('../../assets/ui/occupation-table-tall.jpg');
-// One normalized coordinate system keeps illustrated sheets and tap targets aligned.
-const sheets: { id: ClassId; x: number; y: number; w: number; h: number; angle: string }[] = [
-  { id: 'shaman', x: .112, y: .447, w: .224, h: .108, angle: '16deg' },
-  { id: 'warrior', x: .301, y: .465, w: .223, h: .108, angle: '15deg' },
-  { id: 'nun', x: .511, y: .482, w: .223, h: .108, angle: '13deg' },
-  { id: 'medium', x: .737, y: .50, w: .223, h: .108, angle: '9deg' },
-];
-type Props = { onPick: (id: ClassId) => void; onBack?: () => void };
-export default function ClassSelectScreen({ onPick, onBack }: Props) {
-  const pad = useScreenPadding();
-  const { width, height } = useWindowDimensions();
-  const [bounds, setBounds] = React.useState({ width, height });
-  const sceneWidth = bounds.width;
-  const sceneHeight = bounds.height;
-  const detailWidth = Math.min(width - 24, 480);
-  const portraitHeight = Math.min(290, height * .32);
-  const [selected, setSelected] = React.useState<ClassId | null>(null);
-  const picked = selected ? CHARACTER_CLASSES[selected] : null;
-  return <View collapsable={false} onLayout={e => { const { width: w, height: h } = e.nativeEvent.layout; setBounds(b => b.width === w && b.height === h ? b : { width: w, height: h }); }} style={styles.screen}>
-    <View collapsable={false} style={{ width: sceneWidth, height: sceneHeight }}>
-      <Image accessible={false} source={scene} resizeMode="stretch" style={{ position: 'absolute', width: sceneWidth, height: sceneHeight }} />
-      <View pointerEvents="box-none" style={[styles.heading, { top: pad.top + 12 }]}>
-        <Text accessibilityRole="header" style={[styles.title,{color:sceneColors.cream}]}>เลือกอาชีพ</Text>
-        <Text style={styles.subtitle}>คืนมืดกำลังรอ… คุณจะเป็นใคร</Text>
+import {useJournal} from '../../src/store/journalStore';
+import {artSource} from './Art';
+import {BookScreen,BookStage,BookPage,BookButton,BookArrow,bookCream,bookInk,bookRed} from './OccupationBook';
+import {font,paper} from '../theme';
+type Props={onPick:(id:ClassId)=>void;onBack?:()=>void};
+/** Presentation only: class values, skills and run callbacks come from the game. */
+export default function ClassSelectScreen({onPick,onBack}:Props) {
+ const [page,setPage]=React.useState(-1);
+ const {journal,ready,error,hydrate}=useJournal();
+ React.useEffect(()=>{void hydrate().catch(()=>{});},[hydrate]);
+ const id=ALL_CLASS_IDS[Math.max(0,page)],picked=CHARACTER_CLASSES[id];
+ const completed=Math.max(0,...journal.history.filter(r=>r.classId===id).map(r=>r.completedNights));
+ const move=React.useCallback((offset:number)=>setPage(p=>Math.max(-1,Math.min(ALL_CLASS_IDS.length-1,p+offset))),[]);
+ const swipe=React.useMemo(()=>PanResponder.create({onMoveShouldSetPanResponder:(_,g)=>Math.abs(g.dx)>22&&Math.abs(g.dx)>Math.abs(g.dy)*1.6,onPanResponderRelease:(_,g)=>{if(Math.abs(g.dx)>45)move(g.dx<0?1:-1);}}),[move]);
+ return <BookScreen onBack={page<0?onBack:()=>setPage(-1)} footer={page<0?
+  <BookButton label="เปิดตำรา" onPress={()=>move(1)}/>:<>
+   <View style={{flexDirection:'row',gap:8,alignItems:'center'}}><BookArrow label={page===0?'หน้าปก':'หน้าก่อน'} direction="left" onPress={()=>move(-1)} style={{height:40}}/>{ALL_CLASS_IDS.map((c,i)=><Pressable key={c} accessibilityRole="button" accessibilityLabel={'เปิดหน้า'+CHARACTER_CLASSES[c].name} accessibilityState={{selected:page===i}} onPress={()=>setPage(i)} style={{width:24,height:24,alignItems:'center',justifyContent:'center'}}><View style={{width:8,height:8,borderRadius:4,borderWidth:1,borderColor:bookCream,backgroundColor:page===i?bookCream:'transparent'}}/></Pressable>)}<BookArrow label="หน้าถัดไป" direction="right" disabled={page===ALL_CLASS_IDS.length-1} onPress={()=>move(1)} style={{height:40}}/></View>
+   <BookButton label={'เลือก'+picked.name} onPress={()=>onPick(id)}/>
+  </>}>
+  <BookStage cover={page<0} testID={page<0?'occupation-book-cover':`occupation-${id}`}>{({width,height})=>page<0?
+   <View accessible accessibilityLabel="ปกตำรานักปราบผี คืนหัวก่อนรุ่งสาง" style={{width,height}}/>:<>
+    <BookPage><View style={{flex:1}} {...swipe.panHandlers}>
+     <ClassPage key={id} id={id} page={page} width={width} height={height}/>
+     <View testID="class-completion-corner" style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingTop:4}}>
+      <Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>{page+1}/{ALL_CLASS_IDS.length}</Text>
+      <View style={{alignItems:'flex-end',gap:2}}>
+       <View style={{flexDirection:'row',alignItems:'center',gap:3}}><Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>คืนที่ผ่าน</Text>{[1,2,3].map(n=><View key={n} accessible accessibilityLabel={'คืน '+n+(ready&&completed>=n?' ผ่านแล้ว':' ยังไม่ผ่าน')} style={{width:17,height:17,borderRadius:9,borderWidth:1,borderColor:ready&&completed>=n?bookRed:paper.muted,alignItems:'center',justifyContent:'center'}}><Text style={{fontFamily:font.heading,fontSize:10,lineHeight:14,color:ready&&completed>=n?bookRed:paper.muted}}>{ready&&completed>=n?'✓':n}</Text></View>)}</View>
+       <Text style={{fontFamily:font.ui,fontSize:8,lineHeight:12,color:paper.muted}}>{!ready?'กำลังอ่านบันทึก…':error?'อ่านบันทึกไม่สำเร็จ':`อาถรรพ์ ${journal.classes[id].highestDifficulty}/5`}</Text>
       </View>
-      {onBack && <Pressable accessibilityRole="button" accessibilityLabel="ย้อนกลับ" onPress={onBack} style={[styles.back, { top: pad.top + 12 }]}><Text style={styles.backLabel}>‹</Text></Pressable>}
-      {sheets.map(sheet => <View key={sheet.id} collapsable={false} pointerEvents="box-none" style={{
-        position: 'absolute', left: sceneWidth * sheet.x, top: sceneHeight * sheet.y,
-        width: sceneWidth * sheet.w, height: sceneHeight * sheet.h,
-        transform: [{ rotate: sheet.angle }], zIndex: layer.badge,
-      }}>
-        <Pressable collapsable={false} testID={`occupation-${sheet.id}`} accessibilityRole="button"
-          accessibilityLabel={`เลือก${CHARACTER_CLASSES[sheet.id].name}`} accessibilityHint="เปิดภาพใหญ่และรายละเอียดอาชีพ"
-          onPress={() => setSelected(sheet.id)} android_ripple={{ color: sceneColors.pressWash }}
-          style={styles.sheetButton}>
-          <View pointerEvents="none" collapsable={false} style={{ position: 'absolute', top: sceneHeight * sheet.h * .03,
-            left: sceneWidth * sheet.w * .06, width: sceneWidth * sheet.w * .88, height: sceneHeight * sheet.h * .76, overflow: 'hidden' }}>
-            <Image accessible={false} source={artSource(`class/${sheet.id}`)} resizeMode="contain"
-              style={{ width: sceneWidth * sheet.w * .88, height: sceneWidth * sheet.w * 1.32 }} />
-          </View>
-        </Pressable>
-      </View>)}
-      <View pointerEvents="none" style={[styles.hintWrap, { bottom: pad.bottom + 12 }]}><Text style={styles.hint}>แตะใบอาชีพบนโต๊ะเพื่อดูรายละเอียด</Text></View>
-    </View>
-    <Modal visible={!!picked} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
-      <View style={[styles.scrim, { paddingTop: pad.top, paddingBottom: pad.bottom }]}>
-        {picked && <RitualSurface kind="occupationPage" accessibilityViewIsModal style={[styles.detail, { width: detailWidth, maxHeight: height - pad.top - pad.bottom }]}>
-          <ScrollView contentContainerStyle={styles.detailContent}>
-            <Text accessibilityRole="header" style={styles.detailName}>{picked.name}</Text><Text style={styles.detailTitle}>{picked.title}</Text>
-            <View collapsable={false} style={[styles.portrait, { width: detailWidth - 44, height: portraitHeight }]}>
-              <Image accessible={false} source={require('../../assets/ui/occupation-temple.jpg')} resizeMode="stretch"
-                style={{ position: 'absolute', width: detailWidth - 44, height: portraitHeight }} />
-              <Art slot={`class/${picked.id}`} width={portraitHeight * 2 / 3} height={portraitHeight} />
-            </View>
-            <Text style={styles.copy}>{picked.desc}</Text>
-            <View style={styles.stats}><Stat label="ชีวิต" value={picked.startHp} /><Stat label="แต้ม/เทิร์น" value={CARD_RULES.apPerTurn} /><Stat label="มานาตั้งต้น" value={CLASS_RESOURCES[picked.id].startMana} /></View>
-            <Text style={styles.passive}>{picked.passiveName}</Text><Text style={styles.copy}>{picked.passiveDesc}</Text>
-            {skillsFor(picked.id).map(d=><Text key={d.id} testID={`class-skill-${d.slot}`} style={styles.copy}>สกิล {d.slot} · {d.name} (พัก {d.cd} ไฟต์): {d.text}</Text>)}
-          </ScrollView>
-          <View style={styles.actions}>
-            <QuietButton primary label={`เลือก${picked.name} · ออกเดินทาง →`} onPress={()=>{const id=picked.id;setSelected(null);onPick(id);}}/>
-            <QuietButton label="กลับไปเลือกอาชีพ" onPress={()=>setSelected(null)} style={{marginTop:6}}/>
-          </View>
-        </RitualSurface>}
-      </View>
-    </Modal>
-  </View>;
+     </View>
+    </View></BookPage>
+   </>}</BookStage>
+ </BookScreen>;
 }
-function Stat({ label, value }: { label: string; value: number }) {
-  return <View style={styles.stat}><Text style={styles.statValue}>{value}</Text><Text style={styles.statLabel}>{label}</Text></View>;
+function ClassPage({id,page,width,height}:{id:ClassId;page:number;width:number;height:number}) {
+ const picked=CHARACTER_CLASSES[id];
+ const [copyHeight,setCopyHeight]=React.useState(330);
+ // Give the illustration the remaining space; all rules stay on this page.
+ // Scrolling remains available for large accessibility font settings.
+ const portrait=Math.max(54,Math.min(160,height*.27,height*.84-copyHeight-42));
+ const compact=height<510;
+ const copy={fontFamily:font.ui,fontSize:compact?10:11,lineHeight:compact?15:17,color:paper.ink};
+ return <ScrollView testID="class-single-page" style={{flex:1}} showsVerticalScrollIndicator={false} contentContainerStyle={{gap:4}}>
+  <View style={{height:portrait,overflow:'hidden',borderWidth:1,borderColor:bookInk}}>
+   <Image accessible={false} source={require('../../assets/ui/occupation-temple.jpg')} resizeMode="cover" style={{position:'absolute',width:width*.72,height:portrait}}/>
+   <Image accessible={false} source={artSource(`class/${id}`)} resizeMode="contain" style={{position:'absolute',width:width*.76,height:portrait*2.1,top:-portrait*.03,alignSelf:'center'}}/>
+  </View>
+  <View onLayout={e=>setCopyHeight(e.nativeEvent.layout.height)} style={{gap:4}}>
+   <View style={{flexDirection:'row',alignItems:'baseline',justifyContent:'space-between',borderBottomWidth:1,borderColor:bookRed,paddingBottom:2}}><Text accessibilityRole="header" style={{fontFamily:font.display,fontSize:compact?20:23,lineHeight:compact?27:31,color:bookInk}}>{picked.name}</Text><Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>บทที่ {page+1}</Text></View>
+   <Text style={copy}>{picked.desc}</Text>
+   <Text style={{...copy,fontFamily:font.heading,color:bookRed}}>ชีวิต {picked.startHp} · พลังงาน {CARD_RULES.apPerTurn} · มานา {CLASS_RESOURCES[id].startMana}</Text>
+   <View testID="class-passive" style={{borderTopWidth:1,borderColor:paper.line,paddingTop:3}}><Text style={{...copy,fontFamily:font.heading,color:bookRed}}>{picked.passiveName} · ความสามารถประจำตัว</Text><Text style={copy}>{picked.passiveDesc}</Text></View>
+   {skillsFor(id).map(d=><View key={d.id} testID={`class-skill-${d.slot}`} style={{borderTopWidth:1,borderColor:paper.line,paddingTop:3}}><View style={{flexDirection:'row',justifyContent:'space-between',gap:4}}><Text style={{...copy,fontFamily:font.heading}}>{d.name}</Text><Text style={{fontFamily:font.ui,fontSize:8,lineHeight:copy.lineHeight,color:paper.muted}}>{d.slot==='A'?'นอกศึก':'ในศึก'} · พัก {d.cd} ไฟต์</Text></View><Text style={copy}>{d.text}</Text></View>)}
+  </View>
+ </ScrollView>;
 }
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: sceneColors.night, alignItems: 'center', justifyContent: 'center' },
-  heading: { position: 'absolute', top: '5%', left: '16%', right: '5%', alignItems: 'center' },
-  titlePaper: { width: '100%', paddingTop: 14, paddingBottom: 25 },
-  title: { color: colors.ink, fontFamily: font.display, fontSize: 30, textAlign: 'center' },
-  subtitle: { color: sceneColors.cream, backgroundColor: sceneColors.subtitleShade, fontFamily: font.ui, fontSize: 12, textAlign: 'center', marginTop: 4, padding: 5 },
-  back: { position: 'absolute', top: 10, left: 10, width: 44, height: 44, backgroundColor: sceneColors.backShade, borderWidth: 2, borderColor: sceneColors.backEdge, alignItems: 'center', justifyContent: 'center' },
-  backLabel: { color: sceneColors.backInk, fontSize: 38, lineHeight: 40 },
-  sheetButton: { width: '100%', height: '100%' },
-  hintWrap: { position: 'absolute', bottom: '4%', left: 10, right: 10, alignItems: 'center' },
-  hint: { color: sceneColors.cream, backgroundColor: sceneColors.hintShade, fontFamily: font.ui, fontSize: 12, paddingHorizontal: 12, paddingVertical: 7, textAlign: 'center' },
-  scrim: { flex: 1, backgroundColor: sceneColors.scrim, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
-  detail: { padding: 0, paddingVertical: 24, flexShrink: 1 },
-  detailContent: { paddingHorizontal: 24, alignItems: 'center' },
-  detailName: { color: colors.ink, fontFamily: font.display, fontSize: 30 },
-  detailTitle: { color: sceneColors.mutedInk, fontFamily: font.ui, fontSize: 14, textAlign: 'center' },
-  portrait: { marginVertical: 8, alignItems: 'center', justifyContent: 'center' },
-  copy: { color: colors.ink, fontFamily: font.body, fontSize: 20, lineHeight: 26, alignSelf: 'stretch' },
-  stats: { flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', paddingVertical: 12, marginVertical: 10, borderTopWidth: 1, borderBottomWidth: 1, borderColor: sceneColors.rule },
-  stat: { alignItems: 'center' }, statValue: { color: colors.red, fontFamily: font.display, fontSize: 24 }, statLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 12 },
-  passive: { color: colors.red, fontFamily: font.heading, fontSize: 17, alignSelf: 'stretch', marginBottom: 4 },
-  actions: { paddingHorizontal: 24, paddingTop: 8 },
-  depart: { minHeight: 56, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 },
-  departLabel: { color: colors.paper, fontFamily: font.heading, fontSize: 16, textAlign: 'center' },
-  close: { minHeight: 48, alignItems: 'center', justifyContent: 'center' }, closeLabel: { color: colors.ink, fontFamily: font.ui, fontSize: 14 },
-});
