@@ -29,7 +29,7 @@ export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardDat
 }
 /** Same paper, art, energy, level and complete ability text in deck and all shops. */
 export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardData;count?:number;compact?:boolean;equippedCount?:number}) {
- return <RitualSurface kind="hideCard" hideWash={cardTypeWash[card.type]} style={[styles.card,compact&&{minHeight:158,paddingHorizontal:12,paddingTop:16,paddingBottom:28}]}>
+ return <RitualSurface kind="hideCard" hideWash={cardTypeWash[card.type]} style={[styles.card,compact&&{minHeight:158},{paddingLeft:compact?14:24,paddingRight:compact?14:24,paddingTop:compact?16:17,paddingBottom:compact?28:34}]}>
   <CardBadges card={card} compact={compact}/>
   <View style={styles.symbol}><CardGlyphArt card={card} size={compact?50:76}/></View>
   <Text style={[styles.name,compact&&{fontSize:11}]}>{card.name??card.id}</Text>
@@ -46,7 +46,7 @@ export default function DeckCard({card,count,onPress,selected=false,dim=false,fu
  </Pressable>;
 }
 const styles = StyleSheet.create({
-  touch: { width: '48%' }, card: { minHeight: 205, paddingHorizontal: 16, paddingTop:17,paddingBottom:34 },
+  touch: { width: '48%' }, card: { minHeight: 205 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cost: { fontFamily: font.heading, fontSize: 12, color: paper.red }, count: { fontFamily: font.uiMed, fontSize: 12, color: paper.ink },
   symbol: { alignItems: 'center', marginVertical: 4 }, name: { fontFamily: font.heading, fontSize: 14, textAlign: 'center', color: paper.ink },

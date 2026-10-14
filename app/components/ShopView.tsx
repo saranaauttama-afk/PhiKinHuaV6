@@ -262,12 +262,14 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {kind === 'treasure_single' && treasure(true)}
           {kind === 'blessing'        && blessingStop()}
         </ScrollView>
-        {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,padding:14,gap:6,maxHeight:220}}>
+        {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,gap:10,maxHeight:'45%'}}>
+         <ScrollView style={{flexShrink:1}} contentContainerStyle={{gap:6,paddingBottom:4}}>
          <Text numberOfLines={2} style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>ยืนยันซื้อ {purchaseCard.name}</Text>
          <Text testID="shop-card-type" style={{fontFamily:font.ui,color:paper.ink,fontSize:12}}>ประเภท: {TYPE_LABEL[purchaseCard.type]}</Text>
-         <ScrollView style={{maxHeight:56}}><Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13,lineHeight:20}}>{describeCard(purchaseCard)}{purchaseCard.flavor?` · ${purchaseCard.flavor}`:''}</Text></ScrollView>
+         <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13,lineHeight:20}}>{describeCard(purchaseCard)}{purchaseCard.flavor?` · ${purchaseCard.flavor}`:''}</Text>
          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13}}>ราคา {shopPrice(state,purchaseItem.price)} เบี้ย · มี {state.player.gold} เบี้ย{state.player.gold<shopPrice(state,purchaseItem.price)?' · เบี้ยไม่พอ':''}</Text>
-         <View style={{flexDirection:'row',gap:8}}><QuietButton label={`ยืนยันซื้อ ${shopPrice(state,purchaseItem.price)} เบี้ย`} primary disabled={state.player.gold<shopPrice(state,purchaseItem.price)} style={{flex:2}} onPress={()=>{if(selected===null||state.player.gold<shopPrice(state,purchaseItem.price))return;dispatch({type:'TakeShop',index:selected});setSelected(null);setNotice(`ซื้อ ${purchaseCard.name} แล้ว`);}}/><QuietButton label="ยกเลิกการเลือก" style={{flex:1}} onPress={()=>setSelected(null)}/></View>
+         </ScrollView>
+         <View style={{flexDirection:'row',gap:8}}><QuietButton label={`ยืนยันซื้อ ${shopPrice(state,purchaseItem.price)} เบี้ย`} primary disabled={state.player.gold<shopPrice(state,purchaseItem.price)} style={{flex:2}} onPress={()=>{if(selected===null||state.player.gold<shopPrice(state,purchaseItem.price))return;dispatch({type:'TakeShop',index:selected});setSelected(null);setNotice(`ซื้อ ${purchaseCard.name} แล้ว`);}}/><QuietButton label="ยกเลิก" style={{flex:1}} onPress={()=>setSelected(null)}/></View>
         </RitualSurface>}
         <View style={{paddingHorizontal:16,paddingTop:8,paddingBottom:pad.bottom+12}}>
           <QuietButton label="กลับจุดพัก" primary onPress={()=>dispatch({type:'CompleteNode'})}/>
