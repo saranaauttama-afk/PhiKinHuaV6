@@ -20,7 +20,7 @@ def shot(name):
  (out/(name+'.png')).write_bytes(subprocess.check_output(['adb','exec-out','screencap','-p']))
 app='com.phikinhua.episode'
 try:
- for cls in ['นักรบวัด','หมอผี','แม่ชี','คนทรง']:
+ for cls in ['นักมวยคาดเชือก','หมอผี','แม่ชี','คนทรง']:
   adb('shell','am','force-stop',app);adb('shell','pm','clear',app);adb('shell','am','start','-W','-n',app+'/.MainActivity')
   tap('^เริ่มเกม$');tap('^เลือก'+cls+'$');tap('ออกเดินทาง');tap('ดูระดับอาถรรพ์ 1');tap('เริ่มรอบ · ระดับ 1');tap('^(ข้ามบทนี้|เดินทางต่อ)$')
   tap('^พรติดตัว 1:');assert not any(label(n)=='แตะพรเพื่ออ่านรายละเอียด' for n in nodes());shot(cls+'-starter');checks.append(cls+': starter selection shows effect')

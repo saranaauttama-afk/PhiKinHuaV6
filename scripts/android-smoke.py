@@ -72,14 +72,14 @@ if '--helpers-only' not in sys.argv:
     adb('logcat','-c');adb('shell','am','start','-W','-n',package+'/.MainActivity')
     wait_for('เริ่มเกม');shot('01-cover')
     tap('เริ่มเกม');shot('02-class-table')
-    for class_name, hp in [('หมอผี', '50'), ('นักรบวัด', '66'), ('แม่ชี', '50'), ('คนทรง', '46')]:
+    for class_name, hp in [('หมอผี', '50'), ('นักมวยคาดเชือก', '66'), ('แม่ชี', '50'), ('คนทรง', '46')]:
         tap('เลือก'+class_name)
         wait_for('เลือก'+class_name+' · ออกเดินทาง →')
         root=shot('02-class-'+class_name)
         assert has(root,hp), 'Class stats not visible: '+class_name
         tap('กลับไปเลือกอาชีพ')
         wait_for('เลือก'+class_name)
-    tap('เลือกนักรบวัด');shot('02-class');tap('เลือกนักรบวัด · ออกเดินทาง →')
+    tap('เลือกนักมวยคาดเชือก');shot('02-class');tap('เลือกนักมวยคาดเชือก · ออกเดินทาง →')
     wait_for('เล่นคืนที่ 1');root=shot('03-night-select')
     tap('ดูคืนที่ 2');root=dump();locked=find(root,'ผ่านคืนที่ 1 ก่อน');assert locked is not None and locked.get('enabled')=='false', 'Second night was not locked'
     tap('ดูคืนที่ 1')
