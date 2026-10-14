@@ -105,7 +105,7 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
       {manage&&<EquipmentPicker manage state={state} onCancel={()=>setManage(false)} onConfirm={indices=>{dispatch({type:'SetEquipmentLoadout',indices});setManage(false);}}/>}
       <Modal visible={!!selected} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
         <View style={{ flex: 1, backgroundColor: palette.scrimHeavy, paddingHorizontal: 20, paddingTop: pad.top + 16, paddingBottom: pad.bottom + 16, justifyContent: 'center' }}>
-          {selected && <DetailPanel title={selected.card.name} art={<CardGlyphArt card={selected.card} size={76}/>} badges={<CardBadges card={selected.card} ink={palette.moon}/>} description={[describeCard(selected.card),selected.card.flavor].filter(Boolean).join('\n')}
+          {selected && <DetailPanel title={selected.card.name} art={<CardGlyphArt card={selected.card} size={76}/>} badges={<CardBadges showType card={selected.card} ink={palette.moon}/>} description={[describeCard(selected.card),selected.card.flavor].filter(Boolean).join('\n')}
            actions={<QuietButton label="กลับไปดูสำรับ" onPress={()=>setSelected(null)}/>}/>}
         </View>
       </Modal>

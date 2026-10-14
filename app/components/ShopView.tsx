@@ -26,11 +26,12 @@ import { SHOP_REROLL_COST } from '../../src/core/balance/economy';
 import { ECONOMY } from '../../src/core/balance/notfm';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import {QuietButton} from './QuietChrome';
+import CloseSeal from './CloseSeal';
 import DeckCard,{CardGlyphArt,CardFace} from './DeckCard';
 import {canRemoveCard} from '../../src/core/engine/shared';
 import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
-import {describeCard,describeBlessing} from '../../src/core/cards/describe';
+import {describeCard,describeBlessing,TYPE_LABEL} from '../../src/core/cards/describe';
 import {shopPrice,markedUp,removePrice,upgradePrice,shrineCost,wellHeal,healAmount} from '../../src/core/engine/handlers/shops_events';
 
 function Panel({title,children}:{title:string;children:React.ReactNode}) {
@@ -247,7 +248,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
     <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
-        {state.pages?.adventure?.version===5&&<Pressable testID="shop-destroy-page" accessibilityRole="button" accessibilityLabel="ปิดและทำลายเพจร้าน" onPress={()=>dispatch({type:'DeleteShop'})} style={{position:'absolute',top:pad.top+4,right:8,width:44,height:44,alignItems:'center',justifyContent:'center',zIndex:layer.control}}><Image source={require('../../assets/images/btnDelete.png')} style={{width:32,height:32}}/></Pressable>}
+        {state.pages?.adventure?.version===5&&<View style={{position:'absolute',top:pad.top+4,right:8,zIndex:layer.control}}><CloseSeal testID="shop-destroy-page" label="ปิดและทำลายเพจร้าน" onPress={()=>dispatch({type:'DeleteShop'})}/></View>}
         <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+48,paddingBottom:24,gap:12}}>
           <Image testID="destination-object" accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>
           <RewardReceiptView receipt={state.rewardReceipt}/>
@@ -263,6 +264,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         </ScrollView>
         {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,padding:14,gap:6,maxHeight:220}}>
          <Text numberOfLines={2} style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>ยืนยันซื้อ {purchaseCard.name}</Text>
+         <Text testID="shop-card-type" style={{fontFamily:font.ui,color:paper.ink,fontSize:12}}>ประเภท: {TYPE_LABEL[purchaseCard.type]}</Text>
          <ScrollView style={{maxHeight:56}}><Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13,lineHeight:20}}>{describeCard(purchaseCard)}{purchaseCard.flavor?` · ${purchaseCard.flavor}`:''}</Text></ScrollView>
          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13}}>ราคา {shopPrice(state,purchaseItem.price)} เบี้ย · มี {state.player.gold} เบี้ย{state.player.gold<shopPrice(state,purchaseItem.price)?' · เบี้ยไม่พอ':''}</Text>
          <View style={{flexDirection:'row',gap:8}}><QuietButton label={`ยืนยันซื้อ ${shopPrice(state,purchaseItem.price)} เบี้ย`} primary disabled={state.player.gold<shopPrice(state,purchaseItem.price)} style={{flex:2}} onPress={()=>{if(selected===null||state.player.gold<shopPrice(state,purchaseItem.price))return;dispatch({type:'TakeShop',index:selected});setSelected(null);setNotice(`ซื้อ ${purchaseCard.name} แล้ว`);}}/><QuietButton label="ยกเลิกการเลือก" style={{flex:1}} onPress={()=>setSelected(null)}/></View>

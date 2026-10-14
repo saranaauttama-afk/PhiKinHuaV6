@@ -19,6 +19,8 @@ import {paper} from './Paper';
 import CandleSelection from './CandleSelection';
 import RitualSurface from './RitualSurface';
 import CardBadges from './CardBadges';
+import CardTypeMark from './CardTypeMark';
+import {cardTypeWash} from './cardTypeWash';
 import { CardGlyphArt } from './DeckCard';
 import { cardSummary } from '../cardPresentation';
 import { costLabel } from '../../src/core/cards/describe';
@@ -54,7 +56,8 @@ export default function Card({
   const [isHovered, setIsHovered] = useState(false);
   const badgeTop=Math.max(10,Math.round(height*.07));
   const headerPadding=badgeTop+24;
-  const illustrationSize=Math.max(14,Math.min(height*.38,height-94)-(headerPadding-28));
+  const shortCard=height<130,titleLine=shortCard?14:16,summaryLine=shortCard?12:14,stampSize=shortCard?10:12;
+  const illustrationSize=Math.max(10,Math.min(height*.38,height-headerPadding-titleLine*2-summaryLine*2-(stampSize+4)-4));
   const reducedMotion=useGameSettings(s=>s.reducedMotion);
   const entrance=useSharedValue(reducedMotion?1:0);
   React.useEffect(()=>{entrance.value=reducedMotion?1:withDelay(animationDelay,withTiming(1,{duration:380,easing:Easing.out(Easing.cubic)}));},[reducedMotion]);
@@ -179,11 +182,12 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} style={{width:'100%',height:'100%',padding:9,paddingTop:headerPadding,paddingBottom:4}}>
+      <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} hideWash={disabled?undefined:cardTypeWash[card.type]} style={{width:'100%',height:'100%',padding:9,paddingTop:headerPadding,paddingBottom:stampSize+4}}>
         <View style={{position:'absolute',top:badgeTop,left:Math.max(12,width*.14),right:Math.max(12,width*.14),zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact/></View>
-        <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
+        <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:shortCard?11:12,lineHeight:titleLine,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
         <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={illustrationSize} muted={disabled}/></View>
-        <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:10,lineHeight:14,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>
+        <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:shortCard?9:10,lineHeight:summaryLine,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>
+        <View pointerEvents="none" style={{position:'absolute',right:Math.max(10,width*.1),bottom:5}}><CardTypeMark type={card.type} size={stampSize} ink={disabled?badgeColors.disabledInk:undefined}/></View>
         {card.exhaust&&<Text style={{position:'absolute',bottom:5,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:8}}>ใช้แล้วหาย</Text>}
       </RitualSurface></CandleSelection>
       </Animated.View>

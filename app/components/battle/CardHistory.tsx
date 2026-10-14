@@ -25,7 +25,7 @@ export default function CardHistory({entries}:{entries:CardHistoryEntry[]}){
   <Modal visible={!!selected} transparent animationType="fade" onRequestClose={()=>setSelected(null)}>
    <View style={{flex:1,backgroundColor:palette.scrimHeavy,padding:24,paddingTop:safe.top+24,paddingBottom:safe.bottom+24,justifyContent:'center'}}>
     <Pressable accessibilityLabel="ปิดประวัติการ์ด" onPress={()=>setSelected(null)} style={{position:'absolute',inset:0}}/>
-    {selected&&<DetailPanel title={selected.card.name} art={<CardGlyphArt card={selected.card} size={68}/>} badges={<CardBadges card={selected.card} ink={palette.moon}/>} description={describeCard(selected.card,selected.side)}
+    {selected&&<DetailPanel title={selected.card.name} art={<CardGlyphArt card={selected.card} size={68}/>} badges={<CardBadges showType card={selected.card} ink={palette.moon}/>} description={describeCard(selected.card,selected.side)}
      actions={<QuietButton label="ปิดประวัติ" onPress={()=>setSelected(null)}/>}>
      <Text style={detailCopy}>เทิร์น {selected.turn}</Text><Text style={{...detailCopy,fontFamily:font.heading}}>ผลที่เกิดขึ้น</Text>
      {selected.results.map((line,i)=><Text key={i} style={detailCopy}>{line}</Text>)}

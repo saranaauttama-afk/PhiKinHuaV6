@@ -1,7 +1,7 @@
 import {ritualColors,palette} from '../theme';
 import React from 'react';
 import {Image,View,StyleProp,ViewStyle} from 'react-native';
-import HideTexture from './HideTexture';
+import HideTexture,{type HideWash} from './HideTexture';
 
 const surfaces={
  quietSlate:require('../../assets/ui/quiet-slate.png'),
@@ -19,12 +19,12 @@ const surfaces={
 };
 export const chalk=ritualColors.chalk;
 /** Numeric measured bounds avoid native Image intrinsic/percentage sizing surprises. */
-export default function RitualSurface({kind,children,style,accessibilityViewIsModal,testID}:{kind:keyof typeof surfaces|'hideCard'|'hideGray';children?:React.ReactNode;style?:StyleProp<ViewStyle>;accessibilityViewIsModal?:boolean;testID?:string}){
+export default function RitualSurface({kind,children,style,accessibilityViewIsModal,testID,hideWash}:{kind:keyof typeof surfaces|'hideCard'|'hideGray';children?:React.ReactNode;style?:StyleProp<ViewStyle>;accessibilityViewIsModal?:boolean;testID?:string;hideWash?:HideWash}){
  const [size,setSize]=React.useState({width:0,height:0});
  // Preserve the native parent when borders/opacity change; avoid Fabric reparenting on exit.
  // Keep the image mounted: measurement changes dimensions, never the child hierarchy.
  return <View testID={testID} collapsable={false} accessibilityViewIsModal={accessibilityViewIsModal} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setSize(s=>s.width===width&&s.height===height?s:{width,height})}} style={[{padding:16,backgroundColor:'transparent'},style]}>
-  {kind==='hideCard'||kind==='hideGray'?<HideTexture width={size.width} height={size.height} muted={kind==='hideGray'}/>:<Image accessible={false} source={surfaces[kind]} resizeMode="stretch" style={{position:'absolute',left:0,top:0,width:size.width,height:size.height}}/>}
+  {kind==='hideCard'||kind==='hideGray'?<HideTexture width={size.width} height={size.height} muted={kind==='hideGray'} wash={hideWash}/>:<Image accessible={false} source={surfaces[kind]} resizeMode="stretch" style={{position:'absolute',left:0,top:0,width:size.width,height:size.height}}/>}
   {children}
  </View>;
 }

@@ -7,6 +7,7 @@ import {encounterClue} from './encounterClue';
 import InkIcon,{type InkSymbol} from './InkIcon';
 import RitualSurface from './RitualSurface';
 import {QuietButton} from './QuietChrome';
+import CloseSeal from './CloseSeal';
 import {layer,font,palette} from '../theme';
 
 import {useGameSettings} from './Settings';
@@ -31,7 +32,7 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCo
    {offers.map((o,i)=>!o||resolved[i]?<View key={'empty-'+i} style={{width:cardWidth}}/>:<PageFade key={slotIds[i]??i} appearanceKey={appearanceKey+'|'+slotIds.join('|')} delay={i*55} reduced={reduced} testID={'adventure-frame-'+i} style={{width:cardWidth,height:cardHeight}}>
     <Image accessible={false} source={frame} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight}}/>
     <Image accessible={false} source={frame} tintColor={palette.bloodLit} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight,opacity:selected===i?.28:0}}/>
-    {!!onDestroy&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<Pressable testID={'adventure-destroy-'+i} accessibilityRole="button" accessibilityLabel={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}} style={{position:'absolute',top:0,right:0,width:44,height:44,zIndex:layer.control,alignItems:'flex-end',justifyContent:'flex-start',padding:4}}><Image source={require('../../assets/images/btnDelete.png')} style={{width:25,height:25}}/></Pressable>}
+    {selected===i&&!!onDestroy&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<View style={{position:'absolute',top:-4,right:-4,zIndex:layer.control}}><CloseSeal testID={'adventure-destroy-'+i} label={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}}/></View>}
     <View style={{paddingTop:18,paddingHorizontal:8,alignItems:'center'}}>
      <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+(ghostTierLabel(o)??pageLabel(o))} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
       {ghostTierLabel(o)?<View style={{height:42,justifyContent:'center',alignItems:'center'}}>

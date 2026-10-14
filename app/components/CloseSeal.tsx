@@ -3,8 +3,8 @@ import {Pressable} from 'react-native';
 import Svg,{Path,G} from 'react-native-svg';
 import {paper} from '../theme';
 /** A worn paper tab with a brush-printed cross, shared by page and battle chrome. */
-export default function CloseSeal({onPress,label='ปิด'}:{onPress:()=>void;label?:string}) {
- return <Pressable testID="close-seal" accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({pressed})=>({width:44,height:44,alignItems:'center',justifyContent:'center',opacity:pressed?.8:1,transform:[{scale:pressed?.94:1}]})}>
+export default function CloseSeal({onPress,label='ปิด',testID='close-seal'}:{onPress:()=>void;label?:string;testID?:string}) {
+ return <Pressable testID={testID} accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({pressed})=>({width:44,height:44,alignItems:'center',justifyContent:'center',opacity:pressed?.8:1,transform:[{scale:pressed?.94:1}]})}>
   <Svg accessible={false} width={30} height={30} viewBox="0 0 40 40">
    <Path d="M8 4L18 2L29 4L35 10L38 21L34 31L26 37L14 38L6 33L2 23L3 12Z" fill={paper.ink} opacity=".6" transform="translate(1 1)"/>
    <Path d="M8 4L17 1L27 3L34 8L36 17L38 20L35 29L29 34L20 37L11 35L5 30L2 21L4 11Z" fill={paper.light} stroke={paper.ink} strokeWidth="1.8" strokeLinejoin="round"/>

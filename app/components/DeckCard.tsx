@@ -4,11 +4,13 @@ import type { CardData } from '../../src/core/types';
 import { CARD_ART_SOURCES, GRAY_CARD_ART_SOURCES } from '../cardArt';
 import { cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
-import { font, paper, hudPictogramColors } from '../theme';
+import { font, paper } from '../theme';
 import {costLabel,TYPE_LABEL} from '../../src/core/cards/describe';
 import {starOf} from '../../src/core/cards/model';
 import CardBadges from './CardBadges';
 import CandleSelection from './CandleSelection';
+import CardTypeMark from './CardTypeMark';
+import {cardTypeWash} from './cardTypeWash';
 
 const glyphs = {
   clap: require('../../assets/ui/card-clap.png'), sword: require('../../assets/ui/card-sword.png'),
@@ -27,24 +29,24 @@ export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardDat
 }
 /** Same paper, art, energy, level and complete ability text in deck and all shops. */
 export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardData;count?:number;compact?:boolean;equippedCount?:number}) {
- return <RitualSurface kind="hideCard" style={[styles.card,compact&&{minHeight:158,paddingHorizontal:12,paddingVertical:16},card.type==='equipment'&&{borderWidth:2,borderColor:hudPictogramColors.equipment}]}>
+ return <RitualSurface kind="hideCard" hideWash={cardTypeWash[card.type]} style={[styles.card,compact&&{minHeight:158,paddingHorizontal:12,paddingTop:16,paddingBottom:28}]}>
   <CardBadges card={card} compact={compact}/>
   <View style={styles.symbol}><CardGlyphArt card={card} size={compact?50:76}/></View>
   <Text style={[styles.name,compact&&{fontSize:11}]}>{card.name??card.id}</Text>
-  <Text style={[styles.note,{color:paper.muted}]}>{TYPE_LABEL[card.type]}</Text>
   <Text style={[styles.summary,compact&&{fontSize:10,lineHeight:16},{color:card.type==='attack'?paper.red:paper.ink}]}>{cardSummary(card)}</Text>
   {!compact&&!!card.flavor&&<Text style={styles.summary}>{card.flavor}</Text>}
   {equippedCount>0&&<Text style={styles.note}>✓ สวม {equippedCount} ใบ</Text>}
   {count!=null&&<Text style={styles.note}>×{count} ใบ</Text>}
+  <View pointerEvents="none" style={{position:'absolute',right:compact?14:18,bottom:compact?10:12}}><CardTypeMark type={card.type} size={compact?12:16}/></View>
  </RitualSurface>;
 }
 export default function DeckCard({card,count,onPress,selected=false,dim=false,fullWidth=false,compact=false,equippedCount=0}:{card:CardData;count?:number;onPress:()=>void;selected?:boolean;dim?:boolean;fullWidth?:boolean;compact?:boolean;equippedCount?:number}) {
- return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${costLabel(card)} · ระดับ ${starOf(card)} · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,compact&&{width:'31.5%'},fullWidth&&{width:'100%'}]}>
+ return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${TYPE_LABEL[card.type]} · ${costLabel(card)} · ระดับ ${starOf(card)} · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,compact&&{width:'31.5%'},fullWidth&&{width:'100%'}]}>
   <CandleSelection selected={selected} dim={dim}><CardFace card={card} count={count} compact={compact} equippedCount={equippedCount}/></CandleSelection>
  </Pressable>;
 }
 const styles = StyleSheet.create({
-  touch: { width: '48%' }, card: { minHeight: 205, paddingHorizontal: 16, paddingVertical: 17 },
+  touch: { width: '48%' }, card: { minHeight: 205, paddingHorizontal: 16, paddingTop:17,paddingBottom:34 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cost: { fontFamily: font.heading, fontSize: 12, color: paper.red }, count: { fontFamily: font.uiMed, fontSize: 12, color: paper.ink },
   symbol: { alignItems: 'center', marginVertical: 4 }, name: { fontFamily: font.heading, fontSize: 14, textAlign: 'center', color: paper.ink },
