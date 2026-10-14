@@ -24,17 +24,17 @@ Run locally: `npm install && npx expo start` (`--web` / `--android` / `--ios` va
 
 - New work: branch from `main` (`work/<topic>`), open a PR into `main`.
 - CI: `.github/workflows/android-notfm.yml` runs on push to `main` and on PRs into `main` — typecheck + tests + web smoke (`verify`), signed APK (`android`), Android emulator smoke (`native`). Bump `version` / `versionCode` in `app.json` **and** the matching strings in that workflow for every APK delivery.
-- Current goal (owner, Oct 2026): tune the existing systems to be fun and challenging and release to the store; **no new systems before launch** (card-system expansion, 4th equipment slot are deferred).
+- Current goal (owner, 14 Oct 2026): **store launch postponed** to expand the card system to Night-of-the-Full-Moon variety first, **one class at a time**. Minions and combos are back (in a new form). The first class is **นักมวยคาดเชือก** (renamed from นักรบวัด; `ClassId` is still `warrior`) — design `docs/nak-muay/DESIGN.md`, status and next steps `docs/nak-muay/HANDOFF.md`, art prompts `docs/nak-muay/ART-PROMPTS.md`. Ghosts get the same mechanics, simpler. A 4th equipment slot is still deferred.
 - The owner wants game-design changes discussed and agreed before code changes; agreed-but-unimplemented ideas go to a backlog first; write the reason for every design change into the docs.
 
 Read before changing any game rule or number:
-1. `docs/phase7/DESIGN-DECISIONS.md` — design intent, what was cut (combos, minions, fusion), balance targets (§2.4) and the reason behind each Phase 6–7 and tuning decision (§2.6).
-2. Latest handoff: `docs/tuning-2026-10-13/HANDOFF.md` (before it: `docs/playtest-2026-10-13/HANDOFF.md`, `docs/phase7/HANDOFF.md`, `docs/HANDOFF-notfm-rebuild.md`).
+1. `docs/phase7/DESIGN-DECISIONS.md` — design intent, what was cut (fusion; combos and minions came back 14 Oct 2026, §5), balance targets (§2.4) and the reason behind each Phase 6–7 and tuning decision (§2.6).
+2. Latest handoff: `docs/nak-muay/HANDOFF.md` (before it: `docs/tuning-2026-10-13/HANDOFF.md`, `docs/playtest-2026-10-13/HANDOFF.md`, `docs/phase7/HANDOFF.md`, `docs/HANDOFF-notfm-rebuild.md`).
 3. Research: `docs/research/notfm/`.
 
 Balance sim: `npm run balance -- --runs 40 --difficulty 1,2,3,4,5 --seed tune` (bot win rates; not a substitute for human play). Tests: `npx tsc --noEmit` and `npx vitest run`.
 
-Note: much of the Architecture section below predates the NOTFM rebuild (e.g. minions, combos, adaptive AI were removed). Trust the code and the handoff docs over it.
+Note: much of the Architecture section below predates the NOTFM rebuild (adaptive AI was removed; the old minion/combo code was removed and **new** versions live in `src/core/combat/minions.ts` and `src/core/cards/fighter.ts`). Trust the code and the handoff docs over it.
 
 ## Architecture
 

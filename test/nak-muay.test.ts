@@ -78,7 +78,7 @@ describe('จังหวะ', () => {
     play(s); // 4
     const hp = s.enemy!.hp;
     play(s); // knee 6 +1 rhythm
-    expect(hp - s.enemy!.hp).toBe(6 + FIGHTER_RULES.dmgPerStack);
+    expect(hp - s.enemy!.hp).toBe(c('straight_knee').fx.dmg! + FIGHTER_RULES.dmgPerStack);
   });
 
   it('สูงสุดตาม FIGHTER_RULES.rhythmMax', () => {
@@ -159,7 +159,7 @@ describe('ช้ำ ท่าหนัก มึน', () => {
     expect(bruise(s)).toBe(3);
     const hp = s.enemy!.hp;
     play(s); // elbow 5 + rhythm 1 (hook→elbow; jab→hook is the same move) + bruise 3×2
-    expect(hp - s.enemy!.hp).toBe(5 + 1 + 3 * FIGHTER_RULES.heavyPerBruise);
+    expect(hp - s.enemy!.hp).toBe(c('slant_elbow').fx.dmg! + 1 + 3 * FIGHTER_RULES.heavyPerBruise);
     expect(bruise(s)).toBe(0);
   });
 
@@ -300,7 +300,7 @@ describe('ของขลัง', () => {
     expect(bruise(s)).toBe(2);
     const hp = s.enemy!.hp;
     play(s);
-    expect(hp - s.enemy!.hp).toBe(5 + 1 + 2 * 3);
+    expect(hp - s.enemy!.hp).toBe(c('slant_elbow').fx.dmg! + 1 + 2 * 3);
   });
 });
 

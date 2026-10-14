@@ -1090,7 +1090,7 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "dmg": 4,
+   "dmg": 5,
    "status": [
     {
      "id": "bruise",
@@ -1111,7 +1111,7 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "dmg": 5
+   "dmg": 6
   },
   "move": "kick",
   "after": {
@@ -1137,7 +1137,7 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "dmg": 6
+   "dmg": 7
   },
   "move": "knee",
   "starter": 1,
@@ -1150,7 +1150,7 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "dmg": 5
+   "dmg": 6
   },
   "move": "elbow",
   "heavy": true,
@@ -1522,7 +1522,7 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "block": 6
+   "block": 7
   },
   "ap": 1,
   "starter": 3,

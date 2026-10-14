@@ -1,3 +1,5 @@
+import * as Fighter from '../src/core/cards/fighter';
+import { addFx } from '../src/core/cards/mechanics';
 import {choiceLocked,getStoryEvent} from '../src/core/events/story';
 // scripts/pilot.ts — automated player for balance runs.
 //
@@ -27,10 +29,13 @@ export type RunRecord={seed:string;classId:ClassId;difficulty:Difficulty;won:boo
  /** Permanent upgrades bought (boon id → count) and blessings held at the end. */
  blessings?:number;goldEarned?:number;goldSpent?:number};
 
-const fxValue=(fx:Fx)=>(fx.dmg??0)*(fx.hits??1)+(fx.block??0)*.6+(fx.draw??0)*4+(fx.mana??0)*2+(fx.heal??0)*.6+(fx.status??[]).reduce((n,e)=>n+e.stacks*2.5,0)+(fx.borrow??0)*5;
+const fxValue=(fx:Fx)=>(fx.dmg??0)*(fx.hits??1)+(fx.block??0)*.6+(fx.draw??0)*4+(fx.mana??0)*2+(fx.heal??0)*.6+(fx.status??[]).reduce((n,e)=>n+e.stacks*2.5,0)+(fx.borrow??0)*5
+ // นักมวยคาดเชือก
+ +(fx.rhythm??0)*3+(fx.summon?11:0)+(fx.breakBlock??0)*.4+(fx.keepRhythm?1.5:0)+(fx.lockRhythm?5:0)+(fx.doubleNext?7:0)+(fx.sweep?2:0);
 /** Rough worth per resource spent; used for rewards, shop and removal. */
 export const cardValue=(c:CardData)=>{
- const fx=starFx(c);let v=fxValue(fx)+(c.conditional?fxValue(c.conditional.bonus)*.5:0)+(c.equip?8:0)+(c.counter?4:0)+(c.type==='prayer'?fxValue(fx)*.6:0);
+ const fx=starFx(c);let v=fxValue(fx)+(c.conditional?fxValue(c.conditional.bonus)*.5:0)+(c.equip?8:0)+(c.counter?4:0)+(c.type==='prayer'?fxValue(fx)*.6:0)
+  +(c.after?fxValue(c.after.bonus)*.5:0)+(c.heavy?4:0)+(c.riposte?fxValue(c.riposte)*.6:0)+(c.spendRhythm?(c.spendRhythm.mode==='hits'?(fx.dmg??0)*3:(c.spendRhythm.perStack??0)*3):0)+(c.repeatIf?(fx.dmg??0)*.4:0)+(c.innate?2:0)+(c.move?1.5:0);
  if(c.exhaust)v*=.8;
  return v/Math.max(1,(c.ap??0)+(c.mana??0)/2.5);
 };
@@ -50,12 +55,35 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
   if(card.type==='mana')return 100;
   if(card.type==='equipment')return 90;
   if(card.type==='counter')return 60;
-  const c=cardFx(s,card);
-  let v=Math.max(0,(c.dmg??0)*(c.hits??1)-(s.enemy?.block??0)*.45)*1.2;
+  let c=cardFx(s,card);
+  // นักมวย: what this attack would really do now (ต่อจาก, rhythm gained by a new move, ช้ำ eaten, rhythm spent).
+  const F=Fighter;
+  const rhythm=F.rhythmOf(s);
+  let fighterBonus=0;
+  if(card.type==='attack'){
+   if(card.after&&s.turnFlags?.lastMove===card.after.move)c=addFx(c,card.after.bonus);
+   const gain=F.usesRhythm(s)&&card.move&&s.fight?.lastAttackMove&&s.fight.lastAttackMove!==card.move?1:0;
+   let r=Math.min(8,rhythm+gain);
+   if(card.spendRhythm){if(card.spendRhythm.mode==='hits')c={...c,hits:Math.max(1,r)};else c={...c,dmg:(c.dmg??0)+r*(card.spendRhythm.perStack??0)};fighterBonus-=r*1.6;r=0;}
+   fighterBonus+=r*(c.hits??1)+gain*2.5;
+   const bruise=F.bruiseOn(s);
+   if(card.heavy){fighterBonus+=bruise*F.heavyPerBruise(s);if(!bruise&&s.piles.hand.some(h=>h!==card&&h.type==='attack'&&!h.heavy))fighterBonus-=4;}
+   if(card.spendRhythm&&rhythm<3&&s.piles.hand.length>1)fighterBonus-=6;
+   if(card.repeatIf&&conditionMet(s,card.repeatIf,card))fighterBonus+=(c.dmg??0);
+   if(s.turnFlags?.doubleNext)fighterBonus+=(c.dmg??0)*(c.hits??1);
+  }
+  let v=Math.max(0,(c.dmg??0)*(c.hits??1)+fighterBonus-(s.enemy?.block??0)*.45)*1.2;
+  if(c.rhythm)v+=c.rhythm*2.5;
+  if(c.keepRhythm&&!s.piles.hand.some(h=>h!==card&&h.type==='attack'))v+=rhythm*.6;
+  if(c.lockRhythm)v+=3+rhythm*.5;
+  if(c.doubleNext)v+=s.piles.hand.some(h=>h!==card&&h.type==='attack')?8:-5;
+  if(c.summon)v+=(s.minions?.length??0)>=2?2:10;
+  if(c.breakBlock)v+=Math.min(c.breakBlock,s.enemy?.block??0)*.8;
+  if(card.riposte)v+=(card.riposte.dmg??0)*.55;
   v+=Math.min(c.block??0,guardNeed)*(low?1.15:.6);
   v+=Math.min(c.heal??0,s.player.maxHp-s.player.hp)*.8;
   v+=(c.draw??0)*1.8+(c.mana??0)+(c.borrow??0)*5;
-  for(const e of c.status??[])v+=e.id==='poison'?e.stacks*e.turns*.8:e.id==='strength'?e.stacks*4:e.id==='regeneration'?Math.min(6,s.player.maxHp-s.player.hp)*.7:3;
+  for(const e of c.status??[])v+=e.id==='poison'?e.stacks*e.turns*.8:e.id==='strength'?e.stacks*4:e.id==='regeneration'?Math.min(6,s.player.maxHp-s.player.hp)*.7:e.id==='bruise'?e.stacks*1.8:e.id==='stun'?6:3;
   if(c.cleanse)v+=(s.player.statusEffects??[]).filter(e=>e.id==='poison'||e.id==='weakness').length*4;
   if(card.type==='prayer')v*=1.4;
   for(const follow of s.piles.hand){

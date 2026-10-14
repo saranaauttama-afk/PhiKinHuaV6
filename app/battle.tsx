@@ -351,7 +351,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea relic={bossRelicView(gameState)} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
+        <MonsterArea relic={bossRelicView(gameState)} minions={require('../src/core/combat/fightBadges').enemyMinionBadges(gameState)} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}

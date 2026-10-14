@@ -35,6 +35,8 @@ type Props = {
   helpers?:React.ReactNode;
   /** Rage is on this fight; shown as a rule until the ghost's rage status appears. */
   rage?:{startTurn:number;perTurn:number};
+  /** The ghost's ลูกสมุน (combat/fightBadges.ts enemyMinionBadges). */
+  minions?:import('./StatusStrip').BattleBadge[];
   /** The boss's relic: its rule works until the player's hits break it. */
   relic?:{name:string;durability:number;text:string;flavor:string;broken:boolean;stolen:number};
   /** Stable face-down slots for the single ghost: total places and which are still held. */
@@ -57,7 +59,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   turnLabel,
   helpers,
   rage,
-  relic,
+  relic,minions,
   handSlots,
   enemies,
   rules=false,
@@ -130,7 +132,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       </View>
      </RitualSurface>
       <View testID={`enemy-extras-${index}`} style={{height:layout.enemyExtrasHeight,flexDirection:'row',gap:4,alignItems:'center'}}>
-       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={[...(relic&&index===0?[{id:'boss-relic',name:relic.name,symbol:'curse',bad:!relic.broken,neutral:relic.broken,count:relic.broken?'✕':`${relic.durability}`,detail:relic.broken?`${relic.name} แตกแล้ว · กฎนี้หยุดทำงาน`:`${relic.text}\nโจมตีโดนบอสอีก ${relic.durability} ครั้ง อุปกรณ์จะแตก${relic.stolen?` · ถูกขโมยไว้ ${relic.stolen} ใบ`:''}\n${relic.flavor}`}]:[]),...(rules&&enemyBattleRule(actor.id)?[{id:'ghost-rule',...enemyBattleRule(actor.id)!,neutral:true}]:[]),...(rage&&!actor.statusEffects?.some(e=>e.id==='rage')?[{id:'rage-rule',name:'โกรธ',symbol:'strength',bad:true,detail:`ตั้งแต่เทิร์น ${rage.startTurn} ทุกหมัดของผีแรงขึ้น ${rage.perTurn} ทุกเทิร์นที่ไฟต์ยืดออกไป`}]:[])]} compact/></View>
+       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={[...(index===0?minions??[]:[]),...(relic&&index===0?[{id:'boss-relic',name:relic.name,symbol:'curse',bad:!relic.broken,neutral:relic.broken,count:relic.broken?'✕':`${relic.durability}`,detail:relic.broken?`${relic.name} แตกแล้ว · กฎนี้หยุดทำงาน`:`${relic.text}\nโจมตีโดนบอสอีก ${relic.durability} ครั้ง อุปกรณ์จะแตก${relic.stolen?` · ถูกขโมยไว้ ${relic.stolen} ใบ`:''}\n${relic.flavor}`}]:[]),...(rules&&enemyBattleRule(actor.id)?[{id:'ghost-rule',...enemyBattleRule(actor.id)!,neutral:true}]:[]),...(rage&&!actor.statusEffects?.some(e=>e.id==='rage')?[{id:'rage-rule',name:'โกรธ',symbol:'strength',bad:true,detail:`ตั้งแต่เทิร์น ${rage.startTurn} ทุกหมัดของผีแรงขึ้น ${rage.perTurn} ทุกเทิร์นที่ไฟต์ยืดออกไป`}]:[])]} compact/></View>
        {index===0&&<View style={{flex:1,minWidth:0}}>{helpers}</View>}
       </View>
     </View>

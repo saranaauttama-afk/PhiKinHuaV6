@@ -15,6 +15,7 @@ export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
   const self = side === 'player' ? 'เรา' : 'ผี', other = side === 'player' ? 'ผี' : 'เรา';
   const out: string[] = [];
   if (fx.dmg) out.push(`โจมตี ${fx.dmg}${(fx.hits ?? 1) > 1 ? ` ×${fx.hits}` : ''}`);
+  else if (fx.hits) out.push(`ตีเพิ่ม ${fx.hits} ครั้ง`);
   if (fx.block) out.push(`เกราะ ${fx.block}`);
   if (fx.heal) out.push(`ฟื้น ${fx.heal}`);
   if (fx.mana) out.push(`มานา +${fx.mana}`);
@@ -50,7 +51,7 @@ export function passiveText(p: Passive): string[] {
   const out = p.triggers.map(t => {
     const when = t.on === 'play' ? `เมื่อเล่นการ์ด${t.type ? TYPE_LABEL[t.type] : ''}${t.once ? 'ใบแรกของเทิร์น' : ''}` : TRIGGER_WHEN[t.on];
     const cond = t.when ? ` ${conditionText(t.when)}` : '';
-    return `${when}${cond}: ${fxText(t.fx).join(' · ')}`;
+    return `${when}${cond}${t.once && t.on !== 'play' ? ' (เทิร์นละครั้ง)' : ''}: ${fxText(t.fx).join(' · ')}`;
   });
   if (p.armor) out.push(`รับดาเมจจากผีลดลง ${p.armor} ต่อครั้ง`);
   if (p.attackBonus) out.push(`การ์ดโจมตีแรงขึ้น ${p.attackBonus} ต่อครั้ง`);
