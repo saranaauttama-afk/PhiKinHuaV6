@@ -6,6 +6,8 @@ import { useGameSettings } from './Settings';
 type Props = { source: ImageSourcePropType; sceneKey: string; children: React.ReactNode; instant?: boolean };
 const WALK_MS = 2600;
 const FADE_MS = 450;
+// Child reveals wait until the camera actually starts showing the content.
+export const SceneContentVisible = React.createContext(true);
 
 /** A presentation-only camera; no callbacks dispatch rewards or game commands. */
 export default function SceneArrival({ source, sceneKey, children, instant = false }: Props) {
@@ -45,10 +47,12 @@ export default function SceneArrival({ source, sceneKey, children, instant = fal
         <Image source={source} resizeMode="cover" style={{width:'100%',height:'100%'}} />
       </View>
       </View>
+      <SceneContentVisible.Provider value={frame.key===sceneKey&&(reducedMotion||elapsed>=WALK_MS)}>
       <View collapsable={false} pointerEvents={ready ? 'auto' : 'none'} accessibilityElementsHidden={!ready}
         importantForAccessibility={ready ? 'auto' : 'no-hide-descendants'} style={{flex:1,opacity}}>
         {children}
       </View>
+      </SceneContentVisible.Provider>
     </View>
   );
 }
