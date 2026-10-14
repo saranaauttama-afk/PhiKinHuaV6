@@ -1,0 +1,56 @@
+name: Thin comic book UI APK
+run-name: PhiKinHua v1.0.46 thin comic book
+on:
+  push:
+    branches: ['work/occupation-thin-book']
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+concurrency:
+  group: thin-book-apk-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Check TypeScript (no test suite or emulator)
+        run: npx tsc --noEmit
+      - run: CI=1 npx expo prebuild --platform android
+      - name: Build installable UI playtest APK
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
+      - name: Audit APK package, signature and alignment
+        run: |
+          mkdir -p apk-audit
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
+          "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
+          "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
+          grep "package: name='com.phikinhua.episode' versionCode='47' versionName='1.0.46'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-ThinBook-v1.0.46.apk
+          sha256sum PhiKinHua-ThinBook-v1.0.46.apk > apk-audit/sha256.txt
+          git rev-parse HEAD > apk-audit/source-commit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhiKinHua-ThinBook-v1.0.46-APK
+          path: PhiKinHua-ThinBook-v1.0.46.apk
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ThinBook-APK-audit
+          path: apk-audit/

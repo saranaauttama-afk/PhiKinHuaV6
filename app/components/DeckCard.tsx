@@ -27,7 +27,7 @@ export function CardGlyphArt({ card, size = 76, muted = false }: { card: CardDat
 }
 /** Same paper, art, energy, level and complete ability text in deck and all shops. */
 export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardData;count?:number;compact?:boolean;equippedCount?:number}) {
- return <RitualSurface kind="hideCard" style={[styles.card,compact&&{minHeight:158,paddingHorizontal:6,paddingVertical:12},card.type==='equipment'&&{borderWidth:2,borderColor:hudPictogramColors.equipment}]}>
+ return <RitualSurface kind="hideCard" style={[styles.card,compact&&{minHeight:158,paddingHorizontal:12,paddingVertical:16},card.type==='equipment'&&{borderWidth:2,borderColor:hudPictogramColors.equipment}]}>
   <CardBadges card={card} compact={compact}/>
   <View style={styles.symbol}><CardGlyphArt card={card} size={compact?50:76}/></View>
   <Text style={[styles.name,compact&&{fontSize:11}]}>{card.name??card.id}</Text>

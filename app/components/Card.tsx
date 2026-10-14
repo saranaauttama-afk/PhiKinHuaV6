@@ -52,6 +52,9 @@ export default function Card({
   costNow,
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const badgeTop=Math.max(10,Math.round(height*.07));
+  const headerPadding=badgeTop+24;
+  const illustrationSize=Math.max(14,Math.min(height*.38,height-94)-(headerPadding-28));
   const reducedMotion=useGameSettings(s=>s.reducedMotion);
   const entrance=useSharedValue(reducedMotion?1:0);
   React.useEffect(()=>{entrance.value=reducedMotion?1:withDelay(animationDelay,withTiming(1,{duration:380,easing:Easing.out(Easing.cubic)}));},[reducedMotion]);
@@ -176,10 +179,10 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} style={{width:'100%',height:'100%',padding:9,paddingTop:28,paddingBottom:4}}>
-        <View style={{position:'absolute',top:4,left:6,right:7,zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact/></View>
+      <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} style={{width:'100%',height:'100%',padding:9,paddingTop:headerPadding,paddingBottom:4}}>
+        <View style={{position:'absolute',top:badgeTop,left:Math.max(12,width*.14),right:Math.max(12,width*.14),zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact/></View>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:12,lineHeight:16,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
-        <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={Math.max(18,Math.min(height*.38,height-94))} muted={disabled}/></View>
+        <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={illustrationSize} muted={disabled}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:10,lineHeight:14,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>
         {card.exhaust&&<Text style={{position:'absolute',bottom:5,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:8}}>ใช้แล้วหาย</Text>}
       </RitualSurface></CandleSelection>

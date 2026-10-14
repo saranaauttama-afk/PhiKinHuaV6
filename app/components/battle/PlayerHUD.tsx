@@ -9,7 +9,7 @@ type Props={blessings?:React.ReactNode;helpers?:React.ReactNode;statuses?:React.
 export default function PlayerHUD(p:Props){
  const [details,setDetails]=React.useState(false);return <>
  <QuietPlayerHud compact classId={p.classId} hp={p.hp} maxHp={p.maxHp}
- stats={<><HudStat icon="energy" text={`${p.ap}/${p.maxAp}`} label="แต้มต่อเทิร์น" onPress={()=>setDetails(true)}/><HudStat icon="spell_charging" text={`${p.mana}`} label="มานา" onPress={()=>setDetails(true)}/><HudStat icon="block" text={`${p.block}`} label="เกราะ" onPress={()=>setDetails(true)}/><HudStat icon="hand" text={`${p.handCount??0}/${p.retain??2}`} label={`ในมือ ${p.handCount??0} · มือสูงสุดท้ายเทิร์น ${p.retain??2}`} onPress={()=>setDetails(true)}/></>}
+ stats={<><HudStat icon="energy" text={`${p.ap}/${p.maxAp}`} label="แต้มต่อเทิร์น" onPress={()=>setDetails(true)}/><HudStat icon="mana" text={`${p.mana}`} label="มานา · น้ำมนต์" onPress={()=>setDetails(true)}/><HudStat icon="block" text={`${p.block}`} label="เกราะ" onPress={()=>setDetails(true)}/><HudStat icon="hand" text={`${p.handCount??0}/${p.retain??2}`} label={`ในมือ ${p.handCount??0} · มือสูงสุดท้ายเทิร์น ${p.retain??2}`} onPress={()=>setDetails(true)}/></>}
  action={<SealPotButton disabled={p.isEnemyTurn} onPress={p.onEndTurn}/>}
  blessings={p.blessings}
  extras={<View style={{flexDirection:'row',alignItems:'center',gap:4}}><View style={{flex:2,minWidth:0}}>{p.helpers}</View><View style={{flex:2,minWidth:0}}>{p.statuses}</View></View>}/>

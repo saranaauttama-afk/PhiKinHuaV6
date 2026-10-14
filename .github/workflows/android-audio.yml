@@ -1,5 +1,5 @@
-name: Audio playtest APK
-run-name: PhiKinHua v1.0.45 audio playtest
+name: Comic UI and comic UI + audio playtest APK
+run-name: PhiKinHua v1.0.46 comic UI + audio playtest
 on:
   push:
     branches: ['work/audio-sfx']
@@ -29,7 +29,7 @@ jobs:
       - name: Check TypeScript (no test suite or emulator)
         run: npx tsc --noEmit
       - run: CI=1 npx expo prebuild --platform android
-      - name: Build installable audio playtest APK
+      - name: Build installable comic UI + audio playtest APK
         working-directory: android
         run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enablePngCrunchInReleaseBuilds=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g"
       - name: Audit APK package, signature and alignment
@@ -40,14 +40,14 @@ jobs:
           "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
-          grep "package: name='com.phikinhua.episode' versionCode='46' versionName='1.0.45'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-Audio-v1.0.45.apk
-          sha256sum PhiKinHua-Audio-v1.0.45.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='47' versionName='1.0.46'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-ComicUI-Audio-v1.0.46.apk
+          sha256sum PhiKinHua-ComicUI-Audio-v1.0.46.apk > apk-audit/sha256.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: PhiKinHua-Audio-v1.0.45-APK
-          path: PhiKinHua-Audio-v1.0.45.apk
+          name: PhiKinHua-ComicUI-Audio-v1.0.46-APK
+          path: PhiKinHua-ComicUI-Audio-v1.0.46.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4

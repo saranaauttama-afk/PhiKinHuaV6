@@ -1,53 +1,61 @@
 import React from 'react';
-import {View,Text,ScrollView,ImageBackground,useWindowDimensions} from 'react-native';
+import {View,Text,Image,Pressable,PanResponder,ScrollView} from 'react-native';
 import {CHARACTER_CLASSES,ALL_CLASS_IDS,type ClassId} from '../../src/core/classes';
 import {CARD_RULES,CLASS_RESOURCES} from '../../src/core/balance/notfm';
 import {skillsFor} from '../../src/core/skills';
 import {useJournal} from '../../src/store/journalStore';
-import Art from './Art';
-import RitualSurface from './RitualSurface';
-import {QuietButton} from './QuietChrome';
-import CloseSeal from './CloseSeal';
-import StatIcon from './StatIcon';
-import {font,palette,paper} from '../theme';
-import {useScreenPadding} from '../useScreenPadding';
+import {artSource} from './Art';
+import {BookScreen,BookStage,BookPage,BookButton,BookArrow,bookCream,bookInk,bookRed} from './OccupationBook';
+import {font,paper} from '../theme';
 type Props={onPick:(id:ClassId)=>void;onBack?:()=>void};
-/** One cover and one page per existing occupation; selection still enters difficulty choice. */
+/** Presentation only: class values, skills and run callbacks come from the game. */
 export default function ClassSelectScreen({onPick,onBack}:Props) {
- const pad=useScreenPadding(),{height}=useWindowDimensions();
  const [page,setPage]=React.useState(-1);
  const {journal,ready,error,hydrate}=useJournal();
  React.useEffect(()=>{void hydrate().catch(()=>{});},[hydrate]);
  const id=ALL_CLASS_IDS[Math.max(0,page)],picked=CHARACTER_CLASSES[id];
- const progress=journal.classes[id];
  const completed=Math.max(0,...journal.history.filter(r=>r.classId===id).map(r=>r.completedNights));
- return <ImageBackground source={require('../../assets/ui/occupation-table-tall.jpg')} style={{flex:1}}>
-  <View style={{flex:1,paddingTop:pad.top+8,paddingBottom:pad.bottom+12,paddingHorizontal:18,backgroundColor:palette.scrim}}>
-   <View style={{height:44,alignItems:'flex-end'}}>{onBack&&<CloseSeal label="กลับ" onPress={onBack}/>}</View>
-   {page<0?<RitualSurface testID="occupation-book-cover" kind="darkCloth" style={{flex:1,maxWidth:480,width:'100%',alignSelf:'center',padding:26,justifyContent:'space-between',borderLeftWidth:5,borderLeftColor:paper.line}}>
-    <View style={{alignItems:'center',gap:12,paddingTop:22}}><StatIcon name="blessing" size={48}/><Text style={{fontFamily:font.ui,color:palette.moonDim,fontSize:12}}>ผีกินหัว</Text><Text accessibilityRole="header" style={{fontFamily:font.display,fontSize:30,lineHeight:44,color:palette.moon,textAlign:'center'}}>ตำรานักปราบผี</Text><Text style={{fontFamily:font.ui,fontSize:13,color:palette.text,textAlign:'center'}}>สี่วิชา · สามคืนตามหัว</Text></View>
-    <View style={{alignItems:'center'}}><Art slot="class/shaman" width={Math.min(190,height*.23)} height={Math.min(280,height*.32)}/></View>
-    <View style={{gap:12}}><Text style={{fontFamily:font.ui,color:palette.text,fontSize:13,lineHeight:23,textAlign:'center'}}>เปิดตำรา เลือกวิชาประจำตัวก่อนออกตามหัวกลับมา</Text><QuietButton primary label="เปิดตำรา" onPress={()=>setPage(0)}/></View>
-   </RitualSurface>:<RitualSurface testID={`occupation-${id}`} kind="occupationPage" style={{flex:1,maxWidth:480,width:'100%',alignSelf:'center',padding:22}}>
-    <ScrollView contentContainerStyle={{gap:10}}>
-     <Text style={{fontFamily:font.ui,fontSize:10,color:paper.muted,textAlign:'center'}}>ตำรานักปราบผี · {page+1} / {ALL_CLASS_IDS.length}</Text>
-     <Text accessibilityRole="header" style={{fontFamily:font.display,color:paper.ink,fontSize:28,textAlign:'center'}}>{picked.name}</Text>
-     <Text style={{fontFamily:font.ui,fontSize:12,color:paper.muted,textAlign:'center'}}>{picked.title}</Text>
-     <View style={{alignItems:'center'}}><Art slot={`class/${id}`} width={Math.min(180,height*.23)} height={Math.min(240,height*.28)}/></View>
-     <Text style={{fontFamily:font.ui,fontSize:13,lineHeight:23,color:paper.ink}}>{picked.desc}</Text>
-     <View style={{flexDirection:'row',gap:12,justifyContent:'space-around',borderTopWidth:1,borderBottomWidth:1,borderColor:paper.line,paddingVertical:8}}>
-      <Stat label="ชีวิต" value={picked.startHp}/><Stat label="พลังงาน" value={CARD_RULES.apPerTurn}/><Stat label="มานา" value={CLASS_RESOURCES[id].startMana}/>
+ const move=React.useCallback((offset:number)=>setPage(p=>Math.max(-1,Math.min(ALL_CLASS_IDS.length-1,p+offset))),[]);
+ const swipe=React.useMemo(()=>PanResponder.create({onMoveShouldSetPanResponder:(_,g)=>Math.abs(g.dx)>22&&Math.abs(g.dx)>Math.abs(g.dy)*1.6,onPanResponderRelease:(_,g)=>{if(Math.abs(g.dx)>45)move(g.dx<0?1:-1);}}),[move]);
+ return <BookScreen onBack={page<0?onBack:()=>setPage(-1)} footer={page<0?
+  <BookButton label="เปิดตำรา" onPress={()=>move(1)}/>:<>
+   <View style={{flexDirection:'row',gap:8,alignItems:'center'}}><BookArrow label={page===0?'หน้าปก':'หน้าก่อน'} direction="left" onPress={()=>move(-1)} style={{height:40}}/>{ALL_CLASS_IDS.map((c,i)=><Pressable key={c} accessibilityRole="button" accessibilityLabel={'เปิดหน้า'+CHARACTER_CLASSES[c].name} accessibilityState={{selected:page===i}} onPress={()=>setPage(i)} style={{width:24,height:24,alignItems:'center',justifyContent:'center'}}><View style={{width:8,height:8,borderRadius:4,borderWidth:1,borderColor:bookCream,backgroundColor:page===i?bookCream:'transparent'}}/></Pressable>)}<BookArrow label="หน้าถัดไป" direction="right" disabled={page===ALL_CLASS_IDS.length-1} onPress={()=>move(1)} style={{height:40}}/></View>
+   <BookButton label={'เลือก'+picked.name} onPress={()=>onPick(id)}/>
+  </>}>
+  <BookStage cover={page<0} testID={page<0?'occupation-book-cover':`occupation-${id}`}>{({width,height})=>page<0?
+   <View accessible accessibilityLabel="ปกตำรานักปราบผี คืนหัวก่อนรุ่งสาง" style={{width,height}}/>:<>
+    <BookPage><View style={{flex:1}} {...swipe.panHandlers}>
+     <ClassPage key={id} id={id} page={page} width={width} height={height}/>
+     <View testID="class-completion-corner" style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingTop:4}}>
+      <Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>{page+1}/{ALL_CLASS_IDS.length}</Text>
+      <View style={{alignItems:'flex-end',gap:2}}>
+       <View style={{flexDirection:'row',alignItems:'center',gap:3}}><Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>คืนที่ผ่าน</Text>{[1,2,3].map(n=><View key={n} accessible accessibilityLabel={'คืน '+n+(ready&&completed>=n?' ผ่านแล้ว':' ยังไม่ผ่าน')} style={{width:17,height:17,borderRadius:9,borderWidth:1,borderColor:ready&&completed>=n?bookRed:paper.muted,alignItems:'center',justifyContent:'center'}}><Text style={{fontFamily:font.heading,fontSize:10,lineHeight:14,color:ready&&completed>=n?bookRed:paper.muted}}>{ready&&completed>=n?'✓':n}</Text></View>)}</View>
+       <Text style={{fontFamily:font.ui,fontSize:8,lineHeight:12,color:paper.muted}}>{!ready?'กำลังอ่านบันทึก…':error?'อ่านบันทึกไม่สำเร็จ':`อาถรรพ์ ${journal.classes[id].highestDifficulty}/5`}</Text>
+      </View>
      </View>
-     <Text style={{fontFamily:font.heading,fontSize:14,color:paper.red}}>{picked.passiveName}</Text>
-     <Text style={{fontFamily:font.ui,fontSize:12,lineHeight:22,color:paper.ink}}>{picked.passiveDesc}</Text>
-     {skillsFor(id).map(d=><Text key={d.id} testID={`class-skill-${d.slot}`} style={{fontFamily:font.ui,fontSize:12,lineHeight:22,color:paper.ink}}>{d.name} · {d.text} · พัก {d.cd} ไฟต์</Text>)}
-     <Text style={{fontFamily:font.ui,fontSize:12,lineHeight:22,color:paper.red}}>{!ready?'กำลังอ่านบันทึก…':error?'อ่านบันทึกไม่สำเร็จ':`ผ่านถึงคืน ${completed}/3 · ผ่านอาถรรพ์ ${progress.highestDifficulty}/5`}</Text>
-    </ScrollView>
-    <View style={{gap:6,paddingTop:8}}><QuietButton primary label={`เลือก${picked.name}`} onPress={()=>onPick(id)}/>
-     <View style={{flexDirection:'row',gap:8}}><QuietButton label={page===0?'หน้าปก':'‹ หน้าก่อน'} onPress={()=>setPage(page-1)} style={{flex:1}}/><QuietButton label="หน้าถัดไป ›" disabled={page===ALL_CLASS_IDS.length-1} onPress={()=>setPage(page+1)} style={{flex:1}}/></View>
-    </View>
-   </RitualSurface>}
-  </View>
- </ImageBackground>;
+    </View></BookPage>
+   </>}</BookStage>
+ </BookScreen>;
 }
-function Stat({label,value}:{label:string;value:number}) {return <View style={{alignItems:'center'}}><Text style={{fontFamily:font.heading,fontSize:17,color:paper.red}}>{value}</Text><Text style={{fontFamily:font.ui,fontSize:10,color:paper.ink}}>{label}</Text></View>}
+function ClassPage({id,page,width,height}:{id:ClassId;page:number;width:number;height:number}) {
+ const picked=CHARACTER_CLASSES[id];
+ const [copyHeight,setCopyHeight]=React.useState(330);
+ // Give the illustration the remaining space; all rules stay on this page.
+ // Scrolling remains available for large accessibility font settings.
+ const portrait=Math.max(54,Math.min(160,height*.27,height*.84-copyHeight-42));
+ const compact=height<510;
+ const copy={fontFamily:font.ui,fontSize:compact?10:11,lineHeight:compact?15:17,color:paper.ink};
+ return <ScrollView testID="class-single-page" style={{flex:1}} showsVerticalScrollIndicator={false} contentContainerStyle={{gap:4}}>
+  <View style={{height:portrait,overflow:'hidden',borderWidth:1,borderColor:bookInk}}>
+   <Image accessible={false} source={require('../../assets/ui/occupation-temple.jpg')} resizeMode="cover" style={{position:'absolute',width:width*.72,height:portrait}}/>
+   <Image accessible={false} source={artSource(`class/${id}`)} resizeMode="contain" style={{position:'absolute',width:width*.76,height:portrait*2.1,top:-portrait*.03,alignSelf:'center'}}/>
+  </View>
+  <View onLayout={e=>setCopyHeight(e.nativeEvent.layout.height)} style={{gap:4}}>
+   <View style={{flexDirection:'row',alignItems:'baseline',justifyContent:'space-between',borderBottomWidth:1,borderColor:bookRed,paddingBottom:2}}><Text accessibilityRole="header" style={{fontFamily:font.display,fontSize:compact?20:23,lineHeight:compact?27:31,color:bookInk}}>{picked.name}</Text><Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>บทที่ {page+1}</Text></View>
+   <Text style={copy}>{picked.desc}</Text>
+   <Text style={{...copy,fontFamily:font.heading,color:bookRed}}>ชีวิต {picked.startHp} · พลังงาน {CARD_RULES.apPerTurn} · มานา {CLASS_RESOURCES[id].startMana}</Text>
+   <View testID="class-passive" style={{borderTopWidth:1,borderColor:paper.line,paddingTop:3}}><Text style={{...copy,fontFamily:font.heading,color:bookRed}}>{picked.passiveName} · ความสามารถประจำตัว</Text><Text style={copy}>{picked.passiveDesc}</Text></View>
+   {skillsFor(id).map(d=><View key={d.id} testID={`class-skill-${d.slot}`} style={{borderTopWidth:1,borderColor:paper.line,paddingTop:3}}><View style={{flexDirection:'row',justifyContent:'space-between',gap:4}}><Text style={{...copy,fontFamily:font.heading}}>{d.name}</Text><Text style={{fontFamily:font.ui,fontSize:8,lineHeight:copy.lineHeight,color:paper.muted}}>{d.slot==='A'?'นอกศึก':'ในศึก'} · พัก {d.cd} ไฟต์</Text></View><Text style={copy}>{d.text}</Text></View>)}
+  </View>
+ </ScrollView>;
+}

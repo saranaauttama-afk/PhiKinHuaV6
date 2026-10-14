@@ -9,6 +9,7 @@ import DetailPanel from '../DetailPanel';
 import {QuietButton} from '../QuietChrome';
 import InkIcon,{type InkSymbol} from '../InkIcon';
 import {font,palette,badgeColors,paper} from '../../theme';
+import BattleSeal,{BATTLE_SEAL_ART_SIZE} from './BattleSeal';
 export type BattleBadge={id:string;name:string;symbol:string;detail:string;count?:string;bad?:boolean;neutral?:boolean;cardId?:string;onPress?:()=>void};
 const symbols:Record<string,InkSymbol>={thorns:'thorns',dodge:'dodge',fear:'fear',poison:'poison',curse:'curse',corruption:'corruption',entangle:'entangle',weak:'weakness',weakness:'weakness',vulnerable:'vulnerable',strength:'strength',rage:'strength',regeneration:'regeneration',regen:'regeneration',protection:'block',haste:'energy',draw_reduction:'draw_reduction',block_next:'block_next',energy_boost:'energy_boost',spell_charging:'spell_charging',burn:'rest',bleed:'hp'};
 const badgeSymbol=(e:BattleBadge)=>(e.symbol in symbols?symbols[e.symbol]:e.id.startsWith('trap:')?'trap':e.id==='rage-rule'?'strength':e.symbol==='✓'?'check':e.symbol) as InkSymbol;
@@ -20,10 +21,9 @@ export default function StatusStrip({effects,extra=[],compact=false,align='cente
  if(!list.length)return null;
  return <View style={{width:'100%'}}>
   <ScrollView horizontal showsHorizontalScrollIndicator={list.length>7} style={{height:36}} contentContainerStyle={{gap:4,alignItems:'center',flexGrow:1,justifyContent:'flex-start',paddingHorizontal:2}}>
-   {list.map(e=><Pressable key={e.id} accessibilityRole="button" accessibilityLabel={`ดู${e.name}`} accessibilityHint={e.detail} onPress={()=>e.onPress?e.onPress():setOpen(e.id)} style={{width:36,height:36,alignItems:'center',justifyContent:'center'}}>
-    <View style={{width:compact?28:30,height:compact?28:30,borderRadius:18,backgroundColor:e.neutral?badgeColors.neutral:e.bad?badgeColors.negative:badgeColors.positive,borderWidth:1,borderColor:e.neutral?badgeColors.neutralLine:e.bad?badgeColors.negativeLine:badgeColors.positiveLine,alignItems:'center',justifyContent:'center'}}>{e.cardId&&CARD_ART_SOURCES[e.cardId]?<Image source={CARD_ART_SOURCES[e.cardId]} resizeMode="contain" style={{width:26,height:26}}/>:<StatusArt name={badgeSymbol(e)} size={26}/>}</View>
-    {!!e.count&&<View style={{position:'absolute',right:0,bottom:0,backgroundColor:badgeColors.counter,borderRadius:8,paddingHorizontal:3}}><Text style={{fontFamily:font.ui,fontSize:9,color:palette.moon}}>{e.count}</Text></View>}
-   </Pressable>)}
+   {list.map(e=><BattleSeal key={e.id} label={`ดู${e.name}`} hint={e.detail} onPress={()=>e.onPress?e.onPress():setOpen(e.id)} hitSize={36} tone={e.neutral?'neutral':e.bad?'negative':'positive'} count={e.count}>
+    {e.cardId&&CARD_ART_SOURCES[e.cardId]?<Image accessible={false} source={CARD_ART_SOURCES[e.cardId]} resizeMode="contain" style={{width:BATTLE_SEAL_ART_SIZE,height:BATTLE_SEAL_ART_SIZE}}/>:<StatusArt name={badgeSymbol(e)} size={BATTLE_SEAL_ART_SIZE}/>}
+   </BattleSeal>)}
   </ScrollView>
   <Modal visible={!!selected} transparent animationType="fade" onRequestClose={()=>setOpen(null)}>
    <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>

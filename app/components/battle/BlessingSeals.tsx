@@ -7,17 +7,14 @@ import {describeBlessing} from '../../../src/core/cards/describe';
 import RitualSurface from '../RitualSurface';
 import {QuietButton} from '../QuietChrome';
 import {font,palette,blessingSealColors} from '../../theme';
-import StatIcon from '../StatIcon';
+import BattleSeal,{BATTLE_SEAL_ART_SIZE} from './BattleSeal';
 export default function BlessingSeals({blessings}:{blessings?:BlessingDef[]}) {
  const [open,setOpen]=React.useState<string|null>(null);const [all,setAll]=React.useState(false);
  const rows=groupBlessings(blessings??[]);const selected=rows.find(r=>r.blessing.id===open);
  return <View testID="player-blessing-seals" style={{height:44,width:'100%',alignItems:'flex-end'}}>
-  <Pressable testID="blessing-seals-more" accessibilityRole="button" accessibilityLabel={`ดูพรทั้งหมด ${blessings?.length??0} พร`} onPress={()=>setAll(true)} style={{width:44,height:44,borderRadius:22,borderColor:blessingSealColors.line,borderWidth:1.5,backgroundColor:blessingSealColors.backing,alignItems:'center',justifyContent:'center'}}>
-   <StatIcon name="blessing" size={30}/>
-   <View style={{position:'absolute',right:-2,top:-2,minWidth:16,height:16,borderRadius:8,backgroundColor:palette.ink,borderWidth:1,borderColor:palette.moonDim,alignItems:'center',justifyContent:'center'}}>
-    <Text style={{fontFamily:font.ui,fontSize:9,lineHeight:13,color:palette.moon}}>{blessings?.length??0}</Text>
-   </View>
-  </Pressable>
+  <BattleSeal testID="blessing-seals-more" label={`ดูพรทั้งหมด ${blessings?.length??0} พร`} onPress={()=>setAll(true)} count={blessings?.length??0}>
+   <Image accessible={false} source={require('../../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:BATTLE_SEAL_ART_SIZE,height:BATTLE_SEAL_ART_SIZE}}/>
+  </BattleSeal>
   <Modal visible={all} transparent animationType="fade" onRequestClose={()=>setAll(false)}>
    <View style={{flex:1,justifyContent:'center',padding:24,backgroundColor:palette.scrimHeavy}}>
     <Pressable accessibilityLabel="ปิดรายการพร" onPress={()=>setAll(false)} style={{position:'absolute',top:0,left:0,right:0,bottom:0}}/>
