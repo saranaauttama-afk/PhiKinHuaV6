@@ -251,3 +251,56 @@ The big senior fighter in high guard, full body, facing right
 `assets/minions/old_master.webp`
 
 The elderly master in a fighting stance, full body, facing right
+
+## ไอคอนใหม่ (9 ชิ้น)
+
+ตอนนี้หน้าจอยืมไอคอนเก่ามาใช้ (ช้ำ=แผล, มึน=ความกลัว, จังหวะ=พลังงาน ฯลฯ) ทำใหม่ให้ตรงกลไก
+
+สไตล์ไอคอน: Small status icon for a mobile card game, same ink-and-muted-colour Thai pulp comic style as the cards, single bold object, very simple silhouette that reads at 24–32 px, thick outline, transparent background, square 1:1, no text or numbers. 
+
+### ไอคอนท่า: หมัด · `move_punch`
+`assets/ui/moves/move_punch.webp`
+
+Card corner mark for punch moves: a rope-wrapped fist seen from the front
+
+### ไอคอนท่า: เตะ · `move_kick`
+`assets/ui/moves/move_kick.webp`
+
+Card corner mark for kick moves: a bare shin and foot swinging in an arc
+
+### ไอคอนท่า: เข่า · `move_knee`
+`assets/ui/moves/move_knee.webp`
+
+Card corner mark for knee moves: a raised bent knee with a short impact line
+
+### ไอคอนท่า: ศอก · `move_elbow`
+`assets/ui/moves/move_elbow.webp`
+
+Card corner mark for elbow moves: a sharp bent elbow striking downward
+
+### สถานะ: ช้ำ (บนผี) · `status_bruise`
+`assets/status/status_bruise.webp`
+
+A purple-blue bruise blotch on pale grey ghost skin, knuckle marks
+
+### สถานะ: มึน (บนผี) · `status_stun`
+`assets/status/status_stun.webp`
+
+A dizzy ghost head with spiralling eyes and three small stars circling
+
+### สถานะ: จังหวะ · `status_rhythm`
+`assets/status/status_rhythm.webp`
+
+A small Javanese oboe (ปี่ชวา) with three rising musical wave lines
+
+### สถานะ: ยก · `status_round`
+`assets/status/status_round.webp`
+
+A small Thai boxing-ring bell (กระดิ่ง/ฆ้อง) with a wooden striker
+
+### สถานะ: สวน (ตั้งการ์ดรอ) · `status_riposte`
+`assets/status/status_riposte.webp`
+
+Two crossed rope-wrapped forearms in a guard with a small counter-strike arrow
+
+ใส่ภาพแล้ว: ไอคอนสถานะเพิ่ม key ใน `app/components/battle/StatusArt.tsx` (`STATUS_ART`) และแก้ `symbols` ใน `StatusStrip.tsx` · ไอคอนท่าต้องเพิ่มโค้ดแสดงที่มุมการ์ดก่อน (งาน UI ข้อ 2 ใน HANDOFF)
