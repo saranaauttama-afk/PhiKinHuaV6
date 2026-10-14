@@ -24,6 +24,7 @@ import {cardTypeWash} from './cardTypeWash';
 import { CardGlyphArt } from './DeckCard';
 import { cardSummary } from '../cardPresentation';
 import { costLabel } from '../../src/core/cards/describe';
+import { isCardPlayDrag } from '../../src/ui/cardDrag';
 
 interface CardProps {
   card: CardData;
@@ -112,8 +113,9 @@ export default function Card({
   };
 
   const panGesture = Gesture.Pan()
-    .activeOffsetY([-10, 10])
-    .failOffsetX([-20, 20])
+    .activeOffsetY(-8)
+    .failOffsetY(12)
+    .failOffsetX([-36, 36])
     .onStart(() => {
       'worklet';
       // Lift the card — dragOffsetY handles finger follow independently
@@ -126,9 +128,10 @@ export default function Card({
       // Track finger separately — does NOT cancel the lift animation
       dragOffsetY.value = Math.min(0, event.translationY);
     })
-    .onEnd((event) => {
+    .onEnd((event, success) => {
       'worklet';
-      if (event.translationY < -90 && Math.abs(event.translationX) < 55) {
+      if (!success) return;
+      if (isCardPlayDrag(event.translationX, event.translationY, height)) {
         if (isDisabledShared.value) {
           shakeX.value = withSequence(
             withTiming(15, { duration: 60 }),
@@ -154,8 +157,8 @@ export default function Card({
     });
 
   const tapGesture = Gesture.Tap()
-    .onEnd(() => {
-      runOnJS(handlePress)();
+    .onEnd((_event, success) => {
+      if (success) runOnJS(handlePress)();
     });
 
   const composedGesture = Gesture.Exclusive(panGesture, tapGesture);
