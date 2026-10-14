@@ -1,5 +1,5 @@
 name: Comic UI and comic UI + audio playtest APK
-run-name: PhiKinHua v1.0.46 comic UI + audio playtest
+run-name: PhiKinHua v1.0.47 comic UI + audio playtest
 on:
   push:
     branches: ['work/audio-sfx']
@@ -40,14 +40,14 @@ jobs:
           "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
-          grep "package: name='com.phikinhua.episode' versionCode='47' versionName='1.0.46'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-ComicUI-Audio-v1.0.46.apk
-          sha256sum PhiKinHua-ComicUI-Audio-v1.0.46.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='48' versionName='1.0.47'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-ComicUI-Audio-v1.0.47.apk
+          sha256sum PhiKinHua-ComicUI-Audio-v1.0.47.apk > apk-audit/sha256.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: PhiKinHua-ComicUI-Audio-v1.0.46-APK
-          path: PhiKinHua-ComicUI-Audio-v1.0.46.apk
+          name: PhiKinHua-ComicUI-Audio-v1.0.47-APK
+          path: PhiKinHua-ComicUI-Audio-v1.0.47.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
