@@ -1,0 +1,38 @@
+[
+  {
+    "id": "camp_pupil", "name": "ลูกศิษย์ตัวน้อย", "side": "player", "hp": 8,
+    "passive": { "triggers": [
+      { "on": "turnEnd", "fx": { "dmg": 3 } },
+      { "on": "turnEnd", "when": { "kind": "played_move", "move": "punch" }, "fx": { "dmg": 3 } }
+    ] },
+    "desc": "ท้ายเทิร์นเรา ตี 3 · ถ้าเทิร์นนี้เราออกหมัด ตีอีก 3"
+  },
+  {
+    "id": "corner_man", "name": "พี่เลี้ยงมุมเวที", "side": "player", "hp": 10,
+    "passive": { "triggers": [
+      { "on": "turnStart", "fx": { "heal": 3, "cleanseOne": true } },
+      { "on": "roundEnd", "fx": { "heal": 4 } }
+    ] },
+    "desc": "ต้นเทิร์นเรา ฟื้น 3 และล้างสถานะลบ 1 อย่าง · พักยก ฟื้นอีก 4"
+  },
+  {
+    "id": "pi_player", "name": "คนเป่าปี่ชวา", "side": "player", "hp": 6,
+    "passive": { "keepsRhythm": true, "triggers": [ { "on": "turnStart", "fx": { "rhythm": 1 } } ] },
+    "desc": "ต้นเทิร์นเรา จังหวะ +1 · ระหว่างยังอยู่ จังหวะไม่หาย"
+  },
+  {
+    "id": "drummer", "name": "มือกลองแขก", "side": "player", "hp": 6,
+    "passive": { "triggers": [ { "on": "rhythm", "fx": { "dmg": 2 } } ] },
+    "desc": "ทุกครั้งที่เราได้จังหวะ ตีผี 2"
+  },
+  {
+    "id": "senior_boxer", "name": "นักมวยรุ่นพี่", "side": "player", "hp": 14,
+    "passive": { "guard": true, "triggers": [] },
+    "desc": "รับการ์ดโจมตีใบแรกของผีแทนเราทุกเทิร์นผี"
+  },
+  {
+    "id": "old_master", "name": "ครูมวยเฒ่า", "side": "player", "hp": 12,
+    "passive": { "echoFirstAttack": 0.5, "triggers": [] },
+    "desc": "การ์ดโจมตีใบแรกของเราแต่ละเทิร์น ทำซ้ำอีกครั้งที่แรงครึ่งหนึ่ง"
+  }
+]

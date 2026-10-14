@@ -1,6 +1,6 @@
 // src/core/cards/fx.ts — resolve an effect set for the player.
 // Cards, counters, prayers, blessings and equipment all go through this one function.
-import type { CardData, CardType, Fx, GameState } from '../types';
+import type { CardData, CardType, Fx, GameState, Move } from '../types';
 import type { RNG } from '../rng';
 import { dealDamage, gainBlock, heal } from '../combat/damage';
 import { applyStatusEffect, clearAllStatusEffects } from '../statusEffectsRuntime';
@@ -12,6 +12,10 @@ export type FxContext = {
   type?: CardType;
   /** Prayer multiplier. */
   mult?: number;
+  /** นักมวย: move of the attack card (move bonuses). */
+  move?: Move;
+  /** Extra damage on the first hit only (ท่าหนัก). */
+  firstHitBonus?: number;
 };
 
 export function scaleFx(fx: Fx, mult: number): Fx {
@@ -40,11 +44,22 @@ export function drawCards(s: GameState, rng: RNG, n: number): RNG {
 /** Apply `fx` from the player. Returns the advanced RNG (draws reshuffle). */
 export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
   const eff = scaleFx(fx, ctx.mult ?? 1);
+  if (eff.breakBlock && s.enemy && s.enemy.block > 0) {
+    const gone = Math.min(s.enemy.block, eff.breakBlock);
+    s.enemy.block -= gone;
+    s.log.push(`ทำลายเกราะผี ${gone}`);
+  }
   if (eff.dmg && s.enemy) {
-    const bonus = ctx.type === 'attack' ? require('./passives').attackBonus(s) : 0;
+    const bonus = ctx.type === 'attack' ? require('./passives').attackBonus(s) + require('./fighter').fighterAttackBonus(s, ctx.move) : 0;
+    const minions = require('../combat/minions');
     for (let h = 0; h < hitsOf(eff); h++) {
       if (!s.enemy || s.enemy.hp <= 0) break;
-      dealDamage(s, { from: 'player', to: 'enemy', raw: eff.dmg + bonus, source: { kind: 'card', cardId: ctx.sourceId } });
+      const raw = eff.dmg + bonus + (h === 0 ? ctx.firstHitBonus ?? 0 : 0);
+      // A taunting ghost minion takes single-target hits first; a sweep hits everyone.
+      const taunt = eff.sweep ? undefined : minions.tauntTarget(s);
+      if (taunt) minions.damageMinion(s, taunt, raw);
+      else dealDamage(s, { from: 'player', to: 'enemy', raw, source: { kind: 'card', cardId: ctx.sourceId } });
+      if (eff.sweep) for (const m of [...(s.enemyMinions ?? [])]) minions.damageMinion(s, m, raw);
     }
   }
   if (eff.block) gainBlock(s, 'player', eff.block);
@@ -52,6 +67,7 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
   if (eff.mana) s.player.mana += eff.mana;
   if (eff.ap) s.player.ap += eff.ap;
   if (eff.cleanse) clearAllStatusEffects('player', s, 'debuff');
+  if (eff.cleanseOne) cleanseOneDebuff(s);
   for (const e of eff.status ?? []) {
     const target = e.to === 'self' ? 'player' : 'enemy';
     if (target === 'enemy' && !s.enemy) continue;
@@ -59,7 +75,26 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
   }
   if (eff.borrow) require('./borrow').borrowEnemyCards(s, eff.borrow);
   if (eff.draw) rng = drawCards(s, rng, fxDrawAllowance(s, eff.draw));
+  // นักมวยคาดเชือก (cards/fighter.ts).
+  if (eff.keepRhythm) s.turnFlags.keepRhythm = true;
+  if (eff.lockRhythm && s.fight) s.fight.rhythmLocked = true;
+  if (eff.doubleNext) s.turnFlags.doubleNext = true;
+  if (eff.rhythm) rng = require('./fighter').gainRhythm(s, eff.rhythm, rng);
+  if (eff.summon && s.phase === 'combat') require('../combat/minions').summonMinion(s, 'player', eff.summon);
   return rng;
+}
+
+/** Remove the newest debuff on the player (พี่เลี้ยงมุมเวที). */
+export function cleanseOneDebuff(s: GameState): void {
+  const { STATUS_EFFECTS_REGISTRY } = require('../combat/status-effects/registry');
+  const list = s.player.statusEffects ?? [];
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (STATUS_EFFECTS_REGISTRY[list[i].id]?.tags?.includes('debuff')) {
+      s.log.push(`ล้าง${list[i].name}`);
+      s.player.statusEffects = list.filter((_, j) => j !== i);
+      return;
+    }
+  }
 }
 
 /**

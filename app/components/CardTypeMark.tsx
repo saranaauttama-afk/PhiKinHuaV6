@@ -1,8 +1,9 @@
 import React from 'react';
 import Svg,{Path,Circle,G} from 'react-native-svg';
 import type {CardType} from '../../src/core/types';
+import {cardTypeInkColors} from '../theme';
 
-export const typeInk:Record<CardType,string>={attack:'#8d3f2f',action:'#8d3f2f',counter:'#8d3f2f',spell:'#48596c',mana:'#48596c',prayer:'#48596c',equipment:'#826333',curse:'#38302c'};
+export const typeInk:Record<CardType,string>={attack:cardTypeInkColors.strike,action:cardTypeInkColors.strike,counter:cardTypeInkColors.strike,spell:cardTypeInkColors.arcane,mana:cardTypeInkColors.arcane,prayer:cardTypeInkColors.arcane,equipment:cardTypeInkColors.gear,curse:cardTypeInkColors.curse};
 const marks:Record<CardType,string>={
  attack:'M5 22L9 17 M5 14L11 20 M8 17L18 3L22 1L22 6L11 19 M15 8L18 5',
  action:'M4 19L3 12L5 10L7 11L7 6Q9 4 10 6L10 10L11 4Q13 2 14 5L14 10L16 5Q18 4 18 7L18 12L20 9Q22 9 22 12L20 18L17 22L8 22Z M7 13L17 14 M8 17L16 18',

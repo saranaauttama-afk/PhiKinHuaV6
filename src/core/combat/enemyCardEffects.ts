@@ -1,7 +1,7 @@
 // src/core/combat/enemyCardEffects.ts — a ghost card's effect, read from the ghost's side.
 import type { Fx, GameState } from '../types';
 import type { EnemyCardDef } from '../pack_enemy_cards';
-import { dealDamage, gainBlock, heal } from './damage';
+import { computeModifiedDamage, dealDamage, gainBlock, heal } from './damage';
 import { hasStatusEffect } from './status-effects';
 import { curseById } from '../pack';
 import { applyStatusEffect, clearAllStatusEffects } from '../statusEffectsRuntime';
@@ -17,10 +17,18 @@ export function cardFx(s: GameState, card: EnemyCardDef): Fx {
 export function applyEnemyFx(s: GameState, fx: Fx, sourceId: string): void {
   if (!s.enemy) return;
   if (fx.dmg) {
+    const minions = require('./minions');
+    // นักมวยรุ่นพี่: takes the ghost's first attack card each ghost turn instead of the player.
+    const guard = sourceId.startsWith('minion:') ? undefined : minions.guardFor(s);
+    if (guard && s.fight) { s.fight.guardTurn = s.fight.ghostTurns; s.log.push(`${guard.name} รับแทน`); }
     for (let h = 0; h < hitsOf(fx) && s.player.hp > 0 && s.enemy.hp > 0; h++) {
-      dealDamage(s, { from: 'enemy', to: 'player', raw: fx.dmg, source: { kind: 'card', cardId: sourceId } });
+      if (guard && guard.hp > 0) {
+        minions.damageMinion(s, guard, computeModifiedDamage(s, { from: 'enemy', to: 'player', raw: fx.dmg, source: { kind: 'card', cardId: sourceId } }));
+      } else dealDamage(s, { from: 'enemy', to: 'player', raw: fx.dmg, source: { kind: 'card', cardId: sourceId } });
+      if (fx.sweep) for (const m of [...(s.minions ?? [])]) minions.damageMinion(s, m, computeModifiedDamage(s, { from: 'enemy', to: 'player', raw: fx.dmg, source: { kind: 'card', cardId: sourceId } }));
     }
   }
+  if (fx.summon && s.enemy.hp > 0) require('./minions').summonMinion(s, 'enemy', fx.summon);
   if (s.enemy.hp <= 0 || s.player.hp <= 0) return;
   if (fx.block) gainBlock(s, 'enemy', fx.block);
   if (fx.heal) heal(s, 'enemy', fx.heal);

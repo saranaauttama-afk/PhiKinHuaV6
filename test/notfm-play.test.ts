@@ -233,12 +233,13 @@ describe('ยืมการ์ดผี', () => {
 
 describe('เงื่อนไข ค้างมือ และหลายหมัด', () => {
   it('เงื่อนไขเข้าได้ของแถม ไม่เข้าได้ค่าพื้นฐาน', () => {
-    const a = fight([card('ward_riposte')]);
+    // ใจนักสู้ (นักมวย): 6, +12 when below half HP.
+    const a = fight([card('death_throes')]);
     play(a);
-    expect(a.enemy!.hp).toBe(195);
-    const b = fight([card('ward_riposte')], { playerBlock: 6 });
+    expect(a.enemy!.hp).toBe(194);
+    const b = fight([card('death_throes')], { playerHp: 20 });
     play(b);
-    expect(b.enemy!.hp).toBe(188);
+    expect(b.enemy!.hp).toBe(182);
   });
 
   it('ค้างมือท้ายเทิร์นได้เกราะ', () => {

@@ -40,7 +40,7 @@ export function rollThreeCards(rng: RNG, playerLevel = 1, classId?: import('./cl
     const rarityRoll = next(r);
     r = rarityRoll.rng;
     const roll = rarityRoll.value * 100;
-    const forClass = (list: CardData[]) => list.filter(c => (c.unlockAt??0)<=milestoneLevel&&(!c.class || c.class === classId));
+    const forClass = (list: CardData[]) => list.filter(c => (c.unlockAt??0)<=milestoneLevel&&require('./pack').fitsClass(c, classId));
     const POOL = {
       Common:    forClass(BY_RARITY.Common),
       Uncommon:  forClass(BY_RARITY.Uncommon),

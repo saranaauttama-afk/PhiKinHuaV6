@@ -14,7 +14,19 @@ export type CardCondition =
   /** ไม่มีการ์ดอื่นเหลือในมือแล้ว */
   | { kind: 'hand_empty' }
   /** สำรับ (ทั้งกอง) เหลือไม่เกิน value ใบ */
-  | { kind: 'deck_at_most'; value: number };
+  | { kind: 'deck_at_most'; value: number }
+  /** นักมวย: จังหวะตั้งแต่ value */
+  | { kind: 'rhythm_at_least'; value: number }
+  /** นักมวย: จังหวะไม่เกิน value */
+  | { kind: 'rhythm_at_most'; value: number }
+  /** ศัตรูติดสถานะนี้อย่างน้อย value ชั้น (เช่น ช้ำ ≥ 3) */
+  | { kind: 'enemy_status_at_least'; statusId: string; value: number }
+  /** เทิร์นนี้ออกท่าต่างกันแล้วอย่างน้อย value ท่า */
+  | { kind: 'moves_this_turn_at_least'; value: number }
+  /** เทิร์นสุดท้ายของยก (ก่อนพักยก) */
+  | { kind: 'round_last_turn' }
+  /** เทิร์นนี้ออกท่านี้ไปแล้ว */
+  | { kind: 'played_move'; move: import('../types').Move };
 
 /** Added on top of the card's numbers while the condition holds. */
 export type CardConditional = { when: CardCondition; bonus: Fx };
@@ -41,6 +53,20 @@ export function conditionMet(s: GameState, cond: CardCondition, self?: CardData,
       return side === 'player' ? s.piles.hand.filter(c => c !== self).length === 0 : !s.enemyPiles?.hand.length;
     case 'deck_at_most':
       return side === 'player' && (s.masterDeck?.length ?? 0) <= cond.value;
+    case 'rhythm_at_least':
+      return side === 'player' && (s.fight?.rhythm ?? 0) >= cond.value;
+    case 'rhythm_at_most':
+      return side === 'player' && (s.fight?.rhythm ?? 0) <= cond.value;
+    case 'enemy_status_at_least': {
+      const t = side === 'player' ? s.enemy : s.player;
+      return (t?.statusEffects?.find(e => e.id === cond.statusId)?.stacks ?? 0) >= cond.value;
+    }
+    case 'moves_this_turn_at_least':
+      return side === 'player' && (s.turnFlags?.moves?.length ?? 0) >= cond.value;
+    case 'round_last_turn':
+      return require('./fighter').isRoundLastTurn(s);
+    case 'played_move':
+      return side === 'player' && !!s.turnFlags?.moves?.includes(cond.move);
   }
 }
 
@@ -79,6 +105,12 @@ export function resetCardsPlayed(s: GameState): void {
   s.turnFlags.limited = [];
   s.turnFlags.triggerOnce = [];
   s.turnFlags.spellsCast = 0;
+  s.turnFlags.lastMove = null;
+  s.turnFlags.moves = [];
+  s.turnFlags.attacks = 0;
+  s.turnFlags.keepRhythm = false;
+  s.turnFlags.doubleNext = false;
+  s.turnFlags.echoed = false;
 }
 
 /** Held cards act before the enemy turn; two held copies act twice. */
@@ -101,5 +133,11 @@ export function conditionText(c: CardCondition, side: 'player' | 'enemy' = 'play
     case 'enemy_has_status': return `ถ้า${them}ติด${require('../combat/status-effects/registry').STATUS_EFFECTS_REGISTRY[c.statusId]?.name ?? c.statusId}`;
     case 'hand_empty': return 'ถ้าไม่มีการ์ดอื่นในมือ';
     case 'deck_at_most': return `ถ้าสำรับเหลือไม่เกิน ${c.value} ใบ`;
+    case 'rhythm_at_least': return `ถ้าจังหวะตั้งแต่ ${c.value}`;
+    case 'rhythm_at_most': return c.value === 0 ? 'ถ้าไม่มีจังหวะ' : `ถ้าจังหวะไม่เกิน ${c.value}`;
+    case 'enemy_status_at_least': return `ถ้า${them}ติด${require('../combat/status-effects/registry').STATUS_EFFECTS_REGISTRY[c.statusId]?.name ?? c.statusId}ตั้งแต่ ${c.value}`;
+    case 'moves_this_turn_at_least': return `ถ้าเทิร์นนี้ออกท่าต่างกันครบ ${c.value} ท่า`;
+    case 'round_last_turn': return 'ถ้าเป็นเทิร์นสุดท้ายของยก';
+    case 'played_move': return `ถ้าเทิร์นนี้ออก${require('./fighter').MOVE_NAMES[c.move]}แล้ว`;
   }
 }

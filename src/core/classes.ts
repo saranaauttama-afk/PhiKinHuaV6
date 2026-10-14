@@ -34,6 +34,10 @@ export function classPassiveText(id: ClassId): string {
   const lines = require('./cards/describe').passiveText(p) as string[];
   if (p.spellDiscount) lines.push(`คาถาใบแรกของแต่ละเทิร์นใช้มานาน้อยลง ${p.spellDiscount}`);
   if (p.copyFirstGhostCard) lines.push('การ์ดผีใบแรกที่เปิดในแต่ละไฟต์ ได้สำเนาเข้ามือ (ฟรี · นำออก)');
+  if (p.rhythm) {
+    const R = require('./balance/notfm').FIGHTER_RULES;
+    lines.push(`ออกท่าไม่ซ้ำกับท่าก่อนหน้า จังหวะ +${R.perNewMove} · จังหวะ 1 = การ์ดโจมตี +${R.dmgPerStack} ดาเมจ (สูงสุด ${R.rhythmMax}) · จบเทิร์นโดยไม่ได้ตี จังหวะหายหมด`);
+  }
   return lines.join(' · ').replace('เมื่อสวม: ', 'สวมอุปกรณ์แต่ละชิ้น: ');
 }
 
@@ -47,7 +51,8 @@ const make = (id: ClassId, name: string, title: string, desc: string): Character
 
 export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
   shaman: make('shaman', 'หมอผี', 'ผู้สาปและผู้แก้สาป', 'สะสมมานาแล้วร่ายคาถาสาปและพิษ เข็มปักแรงขึ้นเมื่อผีติดคำสาป'),
-  warrior: make('warrior', 'นักรบวัด', 'ผู้ยืนหยัด', 'การ์ดโจมตีฟรีเยอะที่สุด ตั้งรับแล้วสวน สะสมแรงให้ทุกหมัดหนักขึ้น และใช้อุปกรณ์'),
+  // Was นักรบวัด until 14 Oct 2026 (no such role exists; owner chose นักมวยคาดเชือก). Id stays 'warrior' for saves.
+  warrior: make('warrior', 'นักมวยคาดเชือก', 'ผู้ต่อแม่ไม้', 'ต่อท่าหมัด เตะ เข่า ศอก ไม่ซ้ำให้จังหวะติด ทุบให้ผีช้ำแล้วปิดด้วยท่าหนัก ตั้งการ์ดรอสวน และเรียกศิษย์ค่ายมาช่วย'),
   nun: make('nun', 'แม่ชี', 'ผู้ถือศีล', 'บทสวดที่ยิ่งรอยิ่งแรง เลือกว่าจะรอกี่เทิร์น ตั้งเกราะแล้วหมุนธรรมจักร'),
   medium: make('medium', 'คนทรง', 'ผู้เชิญวิญญาณ', 'ยืมท่าที่ผีเพิ่งใช้มาเป็นของตัวเอง วางพิษแล้วซ้ำแผล'),
 };

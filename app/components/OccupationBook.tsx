@@ -1,16 +1,16 @@
 import React from 'react';
 import {Image,Pressable,Text,View,type StyleProp,type ViewStyle} from 'react-native';
 import Svg,{Path} from 'react-native-svg';
-import {font,paper} from '../theme';
+import {font,occupationBookColors,paper} from '../theme';
 import {useScreenPadding} from '../useScreenPadding';
 
-export const bookInk='#191610',bookCream='#efdbb1',bookRed='#983e2e';
+export const bookInk=occupationBookColors.ink,bookCream=occupationBookColors.cream,bookRed=occupationBookColors.red;
 type Size={width:number;height:number};
 /** Same illustrated desk and physical book on every pre-run screen. */
 export function BookScreen({title='',onBack,children,footer}:{title?:string;onBack?:()=>void;children:React.ReactNode;footer:React.ReactNode}) {
  const pad=useScreenPadding();
  const [bounds,setBounds]=React.useState<Size>({width:0,height:0});
- return <View style={{flex:1,backgroundColor:'#21160f'}} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setBounds(s=>s.width===width&&s.height===height?s:{width,height});}}>
+ return <View style={{flex:1,backgroundColor:occupationBookColors.backdrop}} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setBounds(s=>s.width===width&&s.height===height?s:{width,height});}}>
   <Image accessible={false} source={require('../../assets/ui/occupation-book/desk.png')} resizeMode="cover" style={{position:'absolute',width:bounds.width,height:bounds.height}}/>
   <View style={{flex:1,paddingTop:pad.top,paddingBottom:pad.bottom}}>
    <View style={{height:40,flexDirection:'row',alignItems:'center',paddingHorizontal:10,gap:8}}>
@@ -47,7 +47,7 @@ export function InkTitle({children}:{children:string}) {
  return <View style={{minHeight:38,justifyContent:'center'}}><Svg accessible={false} width="100%" height="100%" viewBox="0 0 300 40" preserveAspectRatio="none" style={{position:'absolute'}}><Path d="M9 3 L286 1 L278 6 L298 8 L288 15 L300 19 L283 25 L294 29 L276 34 L288 39 L5 36 L15 31 L0 28 L12 20 L3 13 L17 9 Z" fill={bookInk}/></Svg><Text accessibilityRole="header" style={{fontFamily:font.display,fontSize:24,lineHeight:34,textAlign:'center',color:bookCream,paddingHorizontal:12}}>{children}</Text></View>;
 }
 export function BookStamp({value,complete,selected=false,disabled=false,onPress}:{value:number;complete:boolean;selected?:boolean;disabled?:boolean;onPress?:()=>void}) {
- const color=complete?bookRed:disabled?'#8f887a':paper.muted;
- const seal=<View style={{width:36,height:36,borderRadius:18,borderWidth:selected?2:1,borderColor:color,backgroundColor:selected?'#e8cf94':'transparent',alignItems:'center',justifyContent:'center',transform:[{rotate:complete?'-6deg':'0deg'}]}}><Text style={{fontFamily:font.heading,fontSize:19,lineHeight:27,color}}>{value}</Text>{complete&&<Text style={{position:'absolute',right:-3,top:-5,fontFamily:font.heading,fontSize:13,color:bookRed}}>✓</Text>}</View>;
+ const color=complete?bookRed:disabled?occupationBookColors.disabled:paper.muted;
+ const seal=<View style={{width:36,height:36,borderRadius:18,borderWidth:selected?2:1,borderColor:color,backgroundColor:selected?occupationBookColors.selected:'transparent',alignItems:'center',justifyContent:'center',transform:[{rotate:complete?'-6deg':'0deg'}]}}><Text style={{fontFamily:font.heading,fontSize:19,lineHeight:27,color}}>{value}</Text>{complete&&<Text style={{position:'absolute',right:-3,top:-5,fontFamily:font.heading,fontSize:13,color:bookRed}}>✓</Text>}</View>;
  return onPress?<Pressable accessibilityRole="button" accessibilityLabel={'ดูระดับอาถรรพ์ '+value} accessibilityState={{selected}} onPress={onPress} style={{minWidth:44,minHeight:48,alignItems:'center',justifyContent:'center'}}>{seal}</Pressable>:<View accessible accessibilityLabel={'คืน '+value+(complete?' ผ่านแล้ว':' ยังไม่ผ่าน')} style={{minWidth:36,minHeight:40,justifyContent:'center'}}>{seal}</View>;
 }

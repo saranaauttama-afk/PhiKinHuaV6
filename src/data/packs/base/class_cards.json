@@ -1,397 +1,5 @@
 [
  {
-  "id": "temple_blade",
-  "name": "ฟันดาบวัด",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 5
-  },
-  "starter": 4,
-  "flavor": "ดาบที่ใช้ฝึกในลานวัด"
- },
- {
-  "id": "ward_riposte",
-  "name": "ยันต์รับแล้วสวน",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 5
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_block_at_least",
-    "value": 6
-   },
-   "bonus": {
-    "dmg": 7
-   }
-  },
-  "starter": 1,
-  "flavor": "ต้องตั้งรับก่อนถึงสวนได้"
- },
- {
-  "id": "muay_stance",
-  "name": "ตั้งท่ามวย",
-  "type": "action",
-  "rarity": "Common",
-  "class": "warrior",
-  "ap": 1,
-  "fx": {
-   "block": 7
-  },
-  "starter": 3,
-  "flavor": "ตั้งการ์ดแบบมวยวัด"
- },
- {
-  "id": "war_cry",
-  "name": "โห่ลั่นลานวัด",
-  "type": "action",
-  "rarity": "Common",
-  "class": "warrior",
-  "ap": 1,
-  "fx": {
-   "block": 4,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 99,
-     "to": "self"
-    }
-   ]
-  },
-  "starter": 1,
-  "flavor": "โห่จนเสียงก้องกุฏิ"
- },
- {
-  "id": "threefold_strike",
-  "name": "เข่าครูมวย",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 3,
-   "hits": 3
-  },
-  "starter": 1,
-  "flavor": "เข่าสามทีติด แรงที่สะสมเข้าทุกหมัด"
- },
- {
-  "id": "triple_knee",
-  "name": "เข่าสามชั้น",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 4,
-   "hits": 3
-  },
-  "flavor": "ยกเข่าทีละชั้น"
- },
- {
-  "id": "elbow_return",
-  "name": "ศอกกลับ",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  },
-  "flavor": "ปล่อยให้มันเข้ามาก่อนแล้วศอกกลับ"
- },
- {
-  "id": "thunder_clap",
-  "name": "ตบมือลั่น",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 5,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  },
-  "flavor": "ตบมือดังจนผีเสียจังหวะ"
- },
- {
-  "id": "shin_block",
-  "name": "ปิดแข้ง",
-  "type": "action",
-  "rarity": "Common",
-  "class": "warrior",
-  "ap": 1,
-  "fx": {
-   "block": 5,
-   "draw": 1
-  },
-  "flavor": "ยกแข้งรับไว้เฉยๆ"
- },
- {
-  "id": "flying_knee",
-  "name": "เข่าลอย",
-  "type": "attack",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "fx": {
-   "dmg": 11
-  },
-  "flavor": "กระโดดเข่าลอยเข้าใส่"
- },
- {
-  "id": "long_spear",
-  "name": "แทงหอกยาว",
-  "type": "attack",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "fx": {
-   "dmg": 8,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  },
-  "flavor": "หอกยาวกว่าที่มันคิด"
- },
- {
-  "id": "death_throes",
-  "name": "ดิ้นตาย",
-  "type": "attack",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "fx": {
-   "dmg": 6
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_hp_below",
-    "value": 50
-   },
-   "bonus": {
-    "dmg": 12
-   }
-  },
-  "flavor": "ยิ่งใกล้ตายยิ่งแรง"
- },
- {
-  "id": "stand_firm",
-  "name": "ยืนหยัด",
-  "type": "action",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "ap": 2,
-  "fx": {
-   "block": 15
-  },
-  "flavor": "ปักหลักไม่ถอย"
- },
- {
-  "id": "gate_watch",
-  "name": "ยืนเฝ้าประตูโบสถ์",
-  "type": "action",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "ap": 1,
-  "fx": {
-   "block": 8,
-   "draw": 1
-  },
-  "flavor": "ยืนตรงที่ที่ต้องยืน"
- },
- {
-  "id": "iron_will",
-  "name": "ใจเหล็ก",
-  "type": "action",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 2,
-     "turns": 99,
-     "to": "self"
-    }
-   ]
-  },
-  "exhaust": true,
-  "flavor": "รวบรวมใจ ทุกหมัดหนักขึ้นจนจบไฟต์"
- },
- {
-  "id": "bamboo_spike",
-  "name": "ขวากไผ่",
-  "type": "counter",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "fx": {
-   "dmg": 10
-  },
-  "counter": {
-   "trigger": "enemy_any"
-  },
-  "flavor": "ผีที่ขยับเข้ามาโดนขวาก"
- },
- {
-  "id": "war_drum_trap",
-  "name": "กลองศึกลั่น",
-  "type": "counter",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 6,
-   "block": 6
-  },
-  "counter": {
-   "trigger": "enemy_skill"
-  },
-  "flavor": "ผีที่ตั้งท่าจะถูกเสียงกลองขัด"
- },
- {
-  "id": "equipment_iron_bracer",
-  "name": "กำไลเหล็ก",
-  "type": "equipment",
-  "rarity": "Uncommon",
-  "class": "warrior",
-  "fx": {},
-  "equip": {
-   "triggers": [
-    {
-     "on": "turnStart",
-     "fx": {
-      "block": 3
-     }
-    }
-   ]
-  },
-  "flavor": "กำไลของครูดาบ"
- },
- {
-  "id": "equipment_war_drum",
-  "name": "กลองศึกประจำกาย",
-  "type": "equipment",
-  "rarity": "Rare",
-  "class": "warrior",
-  "fx": {},
-  "equip": {
-   "triggers": [
-    {
-     "on": "equip",
-     "fx": {
-      "status": [
-       {
-        "id": "strength",
-        "stacks": 2,
-        "turns": 99,
-        "to": "self"
-       }
-      ]
-     }
-    }
-   ]
-  },
-  "flavor": "เสียงกลองลั่นตั้งแต่ก่อนเริ่ม"
- },
- {
-  "id": "karma_cut",
-  "name": "ดาบตัดกรรม",
-  "type": "attack",
-  "rarity": "Rare",
-  "class": "warrior",
-  "fx": {
-   "dmg": 22
-  },
-  "exhaust": true,
-  "flavor": "ฟันครั้งเดียวให้จบเรื่อง"
- },
- {
-  "id": "hold_the_line",
-  "name": "ยันจนตัวตาย",
-  "type": "action",
-  "rarity": "Rare",
-  "class": "warrior",
-  "ap": 2,
-  "fx": {
-   "block": 20,
-   "heal": 6
-  },
-  "exhaust": true,
-  "flavor": "ทำได้ครั้งเดียวต่อไฟต์"
- },
- {
-  "id": "night_guardian_cut",
-  "name": "มีดครูห้าคืน",
-  "type": "attack",
-  "rarity": "Rare",
-  "class": "warrior",
-  "fx": {
-   "dmg": 6,
-   "hits": 2
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_block_at_least",
-    "value": 8
-   },
-   "bonus": {
-    "dmg": 4
-   }
-  },
-  "locked": true,
-  "flavor": "มีดที่ครูมอบให้หลังผ่านคืนที่ห้า"
- },
- {
-  "id": "shadow_flurry",
-  "name": "เงาซัดรัว",
-  "type": "attack",
-  "rarity": "Legendary",
-  "class": "warrior",
-  "fx": {
-   "dmg": 3,
-   "hits": 6
-  },
-  "flavor": "หกหมัดติด ยิ่งแข็งแกร่งยิ่งต่างกันมาก"
- },
- {
-  "id": "ancestor_blade",
-  "name": "ดาบบรรพบุรุษ",
-  "type": "attack",
-  "rarity": "Legendary",
-  "class": "warrior",
-  "fx": {
-   "dmg": 12,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 2,
-     "turns": 99,
-     "to": "self"
-    }
-   ]
-  },
-  "exhaust": true,
-  "flavor": "ดาบที่ส่งต่อกันมาเจ็ดชั่วคน"
- },
- {
   "id": "bamboo_dart",
   "name": "ปาไผ่เผา",
   "type": "attack",
@@ -1474,5 +1082,1074 @@
   },
   "exhaust": true,
   "flavor": "ทุกเสียงพูดพร้อมกันจนหูอื้อ"
+ },
+ {
+  "id": "jab",
+  "name": "หมัดแย็บ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "bruise",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "move": "punch",
+  "starter": 2,
+  "flavor": "หมัดเบาที่ทำให้ผีเริ่มช้ำ"
+ },
+ {
+  "id": "low_kick",
+  "name": "เตะตัดขา",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5
+  },
+  "move": "kick",
+  "after": {
+   "move": "punch",
+   "bonus": {
+    "status": [
+     {
+      "id": "weakness",
+      "stacks": 1,
+      "turns": 2,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "starter": 1,
+  "flavor": "เตะต่ำให้ผีเสียหลัก"
+ },
+ {
+  "id": "straight_knee",
+  "name": "เข่าตรง",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6
+  },
+  "move": "knee",
+  "starter": 1,
+  "flavor": "เข่าพุ่งตรงเข้ากลางลำตัว"
+ },
+ {
+  "id": "slant_elbow",
+  "name": "ศอกเฉียง",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5
+  },
+  "move": "elbow",
+  "heavy": true,
+  "starter": 1,
+  "flavor": "ศอกปิดท้ายที่เก็บรอยช้ำทั้งหมด"
+ },
+ {
+  "id": "straight_punch",
+  "name": "หมัดตรง",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 7
+  },
+  "move": "punch",
+  "conditional": {
+   "when": {
+    "kind": "round_last_turn"
+   },
+   "bonus": {
+    "dmg": 5
+   }
+  },
+  "flavor": "หมัดที่ครูสอนเป็นอย่างแรก"
+ },
+ {
+  "id": "short_hook",
+  "name": "หมัดเหวี่ยงสั้น",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5
+  },
+  "move": "punch",
+  "after": {
+   "move": "kick",
+   "bonus": {
+    "status": [
+     {
+      "id": "bruise",
+      "stacks": 2,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "flavor": "เหวี่ยงสั้นตามหลังลูกเตะ"
+ },
+ {
+  "id": "push_kick",
+  "name": "ถีบจิก",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 6
+  },
+  "move": "kick",
+  "flavor": "ถีบให้ท่าตั้งรับของผีพัง"
+ },
+ {
+  "id": "threefold_strike",
+  "name": "เข่าโค้ง",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 3,
+   "hits": 2
+  },
+  "move": "knee",
+  "after": {
+   "move": "elbow",
+   "bonus": {
+    "hits": 1
+   }
+  },
+  "flavor": "เข่าโค้งเข้าข้างลำตัว ต่อจากศอกได้อีกที"
+ },
+ {
+  "id": "elbow_return",
+  "name": "ศอกกลับ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "move": "elbow",
+  "flavor": "ปล่อยให้มันเข้ามาก่อนแล้วศอกกลับ"
+ },
+ {
+  "id": "neck_kick",
+  "name": "เตะก้านคอ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 8
+  },
+  "move": "kick",
+  "heavy": true,
+  "flavor": "เตะสูงเข้าก้านคอเต็มแรง"
+ },
+ {
+  "id": "double_hook",
+  "name": "หมัดฮุกคู่",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 3,
+   "hits": 2,
+   "status": [
+    {
+     "id": "bruise",
+     "stacks": 2,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "move": "punch",
+  "flavor": "ซ้ายขวาติดกันเป็นรอยช้ำสองรอย"
+ },
+ {
+  "id": "uppercut",
+  "name": "หมัดอัปเปอร์",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6
+  },
+  "move": "punch",
+  "conditional": {
+   "when": {
+    "kind": "rhythm_at_least",
+    "value": 3
+   },
+   "bonus": {
+    "dmg": 6
+   }
+  },
+  "flavor": "หมัดเสยที่ต้องรอจังหวะติดก่อน"
+ },
+ {
+  "id": "spin_back_kick",
+  "name": "เตะกลับหลัง",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 8
+  },
+  "move": "kick",
+  "after": {
+   "move": "knee",
+   "bonus": {
+    "rhythm": 1
+   }
+  },
+  "flavor": "หมุนตัวเตะกลับต่อจากเข่า"
+ },
+ {
+  "id": "sweep_kick",
+  "name": "เตะกวาด",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "sweep": true
+  },
+  "move": "kick",
+  "flavor": "เตะกวาดทั้งผีและลูกสมุนที่ห้อมล้อม"
+ },
+ {
+  "id": "flying_knee",
+  "name": "เข่าลอย",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 11
+  },
+  "move": "knee",
+  "heavy": true,
+  "flavor": "กระโดดเข่าลอยเข้าใส่"
+ },
+ {
+  "id": "triple_knee",
+  "name": "เข่าสามชั้น",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4,
+   "hits": 3
+  },
+  "move": "knee",
+  "flavor": "ยกเข่าทีละชั้น ยิ่งจังหวะติดยิ่งหนัก"
+ },
+ {
+  "id": "clinch_knee",
+  "name": "จับคอขย่มเข่า",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 3,
+   "hits": 2
+  },
+  "move": "knee",
+  "conditional": {
+   "when": {
+    "kind": "enemy_status_at_least",
+    "statusId": "bruise",
+    "value": 3
+   },
+   "bonus": {
+    "hits": 2
+   }
+  },
+  "flavor": "ล็อกคอแล้วขย่มเข่าซ้ำรอยช้ำ"
+ },
+ {
+  "id": "reverse_elbow",
+  "name": "ศอกกลับลังกา",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4
+  },
+  "move": "elbow",
+  "spendRhythm": {
+   "mode": "add",
+   "perStack": 3
+  },
+  "flavor": "ทุ่มจังหวะทั้งหมดลงในศอกเดียว"
+ },
+ {
+  "id": "death_throes",
+  "name": "ใจนักสู้",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6
+  },
+  "move": "elbow",
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 12
+   }
+  },
+  "flavor": "ยิ่งใกล้แพ้ยิ่งออกอาวุธหนัก"
+ },
+ {
+  "id": "karma_cut",
+  "name": "ศอกตัดกรรม",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "dmg": 18
+  },
+  "move": "elbow",
+  "heavy": true,
+  "exhaust": true,
+  "flavor": "ศอกเดียวให้จบเรื่อง"
+ },
+ {
+  "id": "chin_kick",
+  "name": "เตะเสยคาง",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "dmg": 10
+  },
+  "move": "kick",
+  "conditional": {
+   "when": {
+    "kind": "enemy_status_at_least",
+    "statusId": "bruise",
+    "value": 3
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "stun",
+      "stacks": 1,
+      "turns": 2,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "flavor": "เตะเสยคางผีที่ช้ำจนตาลาย"
+ },
+ {
+  "id": "shadow_flurry",
+  "name": "เงาซัดรัว",
+  "type": "attack",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {
+   "dmg": 3,
+   "hits": 6
+  },
+  "move": "punch",
+  "flavor": "หกหมัดติด ยิ่งจังหวะติดยิ่งต่างกันมาก"
+ },
+ {
+  "id": "hanuman_ring",
+  "name": "หนุมานถวายแหวน",
+  "type": "attack",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5
+  },
+  "move": "elbow",
+  "heavy": true,
+  "spendRhythm": {
+   "mode": "hits"
+  },
+  "flavor": "แม่ไม้ที่ปล่อยจังหวะทั้งหมดออกมาทีเดียว"
+ },
+ {
+  "id": "crocodile_tail",
+  "name": "จระเข้ฟาดหาง",
+  "type": "attack",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {
+   "dmg": 14
+  },
+  "move": "kick",
+  "heavy": true,
+  "repeatIf": {
+   "kind": "moves_this_turn_at_least",
+   "value": 3
+  },
+  "flavor": "หมุนตัวฟาดหางเมื่อแม่ไม้ต่อกันครบ"
+ },
+ {
+  "id": "muay_stance",
+  "name": "ตั้งการ์ด",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 6
+  },
+  "ap": 1,
+  "starter": 3,
+  "flavor": "ยกการ์ดสูงแบบมวยโบราณ"
+ },
+ {
+  "id": "shin_block",
+  "name": "ก้าวสลับฟันปลา",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 5,
+   "keepRhythm": true
+  },
+  "ap": 1,
+  "starter": 1,
+  "flavor": "ถอยฉากสลับเท้าโดยไม่เสียจังหวะ"
+ },
+ {
+  "id": "wai_khru",
+  "name": "ไหว้ครูร่ายรำ",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 4,
+   "rhythm": 2
+  },
+  "ap": 1,
+  "innate": true,
+  "exhaust": true,
+  "starter": 1,
+  "flavor": "รำไหว้ครูก่อนขึ้นสังเวียน"
+ },
+ {
+  "id": "gate_watch",
+  "name": "ตั้งการ์ดสวนหมัด",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 6
+  },
+  "ap": 1,
+  "riposte": {
+   "dmg": 6
+  },
+  "flavor": "ตั้งการ์ดแน่น รอให้ผีเข้ามาเอง"
+ },
+ {
+  "id": "war_cry",
+  "name": "โห่ลั่นค่าย",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 4,
+   "rhythm": 2
+  },
+  "ap": 1,
+  "flavor": "เสียงโห่จากค่ายมวยเร่งจังหวะ"
+ },
+ {
+  "id": "stare_down",
+  "name": "จ้องตาคู่ชก",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "status": [
+    {
+     "id": "bruise",
+     "stacks": 3,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "round_last_turn"
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "bruise",
+      "stacks": 3,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "flavor": "จ้องจนผีเผลอเปิดช่อง"
+ },
+ {
+  "id": "holy_water_spray",
+  "name": "อมน้ำมนต์พ่น",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "heal": 5,
+   "cleanse": true
+  },
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "round_last_turn"
+   },
+   "bonus": {
+    "heal": 5
+   }
+  },
+  "flavor": "พี่เลี้ยงพ่นน้ำมนต์ตอนพักยก"
+ },
+ {
+  "id": "rewrap",
+  "name": "คาดเชือกใหม่",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "doubleNext": true
+  },
+  "ap": 1,
+  "flavor": "พันเชือกใหม่ให้แน่น หมัดต่อไปหนักสองเท่า"
+ },
+ {
+  "id": "iron_will",
+  "name": "ใจนักมวย",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "rhythm": 1,
+   "lockRhythm": true
+  },
+  "ap": 1,
+  "exhaust": true,
+  "flavor": "ใจที่ไม่ยอมหลุดจังหวะ"
+ },
+ {
+  "id": "stand_firm",
+  "name": "ยืนหยัดกลางเวที",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "block": 15
+  },
+  "ap": 2,
+  "riposte": {
+   "dmg": 10
+  },
+  "flavor": "ปักหลักกลางเวที รอสวนหมัดใหญ่"
+ },
+ {
+  "id": "hold_the_line",
+  "name": "ยืนไม่ล้ม",
+  "type": "action",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "block": 20,
+   "heal": 6
+  },
+  "ap": 2,
+  "exhaust": true,
+  "flavor": "ล้มไม่ได้ ทำได้ครั้งเดียวต่อไฟต์"
+ },
+ {
+  "id": "call_pupil",
+  "name": "ลูกศิษย์ตัวน้อย",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "summon": "camp_pupil"
+  },
+  "ap": 1,
+  "flavor": "เด็กวัดที่ตามมาเชียร์และช่วยต่อย"
+ },
+ {
+  "id": "call_corner",
+  "name": "พี่เลี้ยงมุมเวที",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "summon": "corner_man"
+  },
+  "ap": 1,
+  "flavor": "คนที่รู้ว่าเราต้องการอะไรตอนพักยก"
+ },
+ {
+  "id": "call_pi",
+  "name": "คนเป่าปี่ชวา",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "summon": "pi_player"
+  },
+  "ap": 1,
+  "flavor": "เสียงปี่ที่ไม่ยอมให้จังหวะหลุด"
+ },
+ {
+  "id": "call_drummer",
+  "name": "มือกลองแขก",
+  "type": "action",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "summon": "drummer"
+  },
+  "ap": 1,
+  "flavor": "ตีกลองตามทุกจังหวะที่เราออกอาวุธ"
+ },
+ {
+  "id": "call_senior",
+  "name": "นักมวยรุ่นพี่",
+  "type": "action",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "summon": "senior_boxer"
+  },
+  "ap": 2,
+  "flavor": "รุ่นพี่ที่ยอมรับหมัดแทนน้อง"
+ },
+ {
+  "id": "call_old_master",
+  "name": "ครูมวยเฒ่า",
+  "type": "action",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {
+   "summon": "old_master"
+  },
+  "ap": 2,
+  "flavor": "ครูที่ยังออกอาวุธตามศิษย์ได้ทุกท่า"
+ },
+ {
+  "id": "ward_riposte",
+  "name": "ยันต์รับแล้วสวน",
+  "type": "counter",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 8,
+   "dmg": 6
+  },
+  "counter": {
+   "trigger": "enemy_attack"
+  },
+  "flavor": "รับไว้ก่อนแล้วสวนกลับทันที"
+ },
+ {
+  "id": "parry_bait",
+  "name": "ปัดล่อ",
+  "type": "counter",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 10,
+   "status": [
+    {
+     "id": "bruise",
+     "stacks": 2,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "counter": {
+   "trigger": "enemy_attack"
+  },
+  "flavor": "ปัดหมัดผีแล้วตบกลับเป็นรอยช้ำ"
+ },
+ {
+  "id": "stop_kick",
+  "name": "ถีบสกัด",
+  "type": "counter",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "counter": {
+   "trigger": "enemy_any"
+  },
+  "flavor": "ถีบสกัดก่อนผีจะออกท่า"
+ },
+ {
+  "id": "neck_lock",
+  "name": "จับล็อกคอ",
+  "type": "counter",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "rhythm": 1
+  },
+  "counter": {
+   "trigger": "enemy_skill",
+   "negate": true
+  },
+  "flavor": "ล็อกคอผีไว้ไม่ให้ร่ายอะไรได้"
+ },
+ {
+  "id": "oiled_wraps",
+  "name": "เชือกคาดชุบน้ำมันงา",
+  "type": "equipment",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [],
+   "moveBonus": {
+    "punch": 2
+   }
+  },
+  "flavor": "เชือกดิบชุบน้ำมันงาจนแข็งเหมือนหนัง"
+ },
+ {
+  "id": "mongkhon",
+  "name": "มงคลสวมหัว",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "equip",
+     "fx": {
+      "rhythm": 1
+     }
+    },
+    {
+     "on": "turnStart",
+     "when": {
+      "kind": "rhythm_at_most",
+      "value": 0
+     },
+     "fx": {
+      "rhythm": 1
+     }
+    }
+   ]
+  },
+  "flavor": "มงคลที่ครูสวมให้ก่อนขึ้นเวที"
+ },
+ {
+  "id": "arm_prajiad",
+  "name": "ประเจียดแขน",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [],
+   "damageCap": {
+    "over": 8,
+    "to": 4
+   }
+  },
+  "charges": 3,
+  "flavor": "ผ้ายันต์ผูกต้นแขน รับหมัดหนักแทนได้สามครั้ง"
+ },
+ {
+  "id": "yantra_shorts",
+  "name": "กางเกงมวยลงยันต์",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [],
+   "riposteBonus": 4
+  },
+  "flavor": "ลงยันต์ไว้ให้ทุกครั้งที่สวน"
+ },
+ {
+  "id": "glass_wraps",
+  "name": "เชือกคาดเศษแก้ว",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [],
+   "moveBruise": {
+    "punch": 1
+   },
+   "heavyPerBruise": 3
+  },
+  "flavor": "ตามตำนานเชือกคาดชุบกาวคลุกเศษแก้ว"
+ },
+ {
+  "id": "takrut",
+  "name": "ตะกรุดโทน",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [],
+   "deathSave": {
+    "hp": 1,
+    "block": 10
+   }
+  },
+  "charges": 1,
+  "flavor": "ตะกรุดดอกเดียวที่คุ้มชีวิตได้หนึ่งครั้ง"
+ },
+ {
+  "id": "master_cloth",
+  "name": "ผ้าประเจียดครูให้",
+  "type": "equipment",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "rhythm",
+     "once": "turn",
+     "when": {
+      "kind": "rhythm_at_least",
+      "value": 5
+     },
+     "fx": {
+      "block": 8,
+      "status": [
+       {
+        "id": "bruise",
+        "stacks": 2,
+        "turns": 99,
+        "to": "enemy"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "flavor": "ผ้าที่ครูผูกให้ก่อนจากไป"
+ },
+ {
+  "id": "night_guardian_cut",
+  "name": "แม่ไม้ครูห้าคืน",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "hits": 2
+  },
+  "move": "punch",
+  "after": {
+   "move": "knee",
+   "bonus": {
+    "dmg": 4
+   }
+  },
+  "locked": true,
+  "flavor": "แม่ไม้ที่ครูถ่ายทอดหลังผ่านห้าคืน"
+ },
+ {
+  "id": "temple_blade",
+  "name": "ฟันดาบวัด",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5
+  },
+  "flavor": "ดาบที่ใช้ฝึกในลานวัด",
+  "retired": true
+ },
+ {
+  "id": "thunder_clap",
+  "name": "ตบมือลั่น",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 5,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "ตบมือดังจนผีเสียจังหวะ",
+  "retired": true
+ },
+ {
+  "id": "long_spear",
+  "name": "แทงหอกยาว",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 8,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "หอกยาวกว่าที่มันคิด",
+  "retired": true
+ },
+ {
+  "id": "bamboo_spike",
+  "name": "ขวากไผ่",
+  "type": "counter",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 10
+  },
+  "counter": {
+   "trigger": "enemy_any"
+  },
+  "flavor": "ผีที่ขยับเข้ามาโดนขวาก",
+  "retired": true
+ },
+ {
+  "id": "war_drum_trap",
+  "name": "กลองศึกลั่น",
+  "type": "counter",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 6,
+   "block": 6
+  },
+  "counter": {
+   "trigger": "enemy_skill"
+  },
+  "flavor": "ผีที่ตั้งท่าจะถูกเสียงกลองขัด",
+  "retired": true
+ },
+ {
+  "id": "equipment_iron_bracer",
+  "name": "กำไลเหล็ก",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "turnStart",
+     "fx": {
+      "block": 3
+     }
+    }
+   ]
+  },
+  "flavor": "กำไลของครูดาบ",
+  "retired": true
+ },
+ {
+  "id": "equipment_war_drum",
+  "name": "กลองศึกประจำกาย",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "equip",
+     "fx": {
+      "status": [
+       {
+        "id": "strength",
+        "stacks": 2,
+        "turns": 99,
+        "to": "self"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "flavor": "เสียงกลองลั่นตั้งแต่ก่อนเริ่ม",
+  "retired": true
+ },
+ {
+  "id": "ancestor_blade",
+  "name": "ดาบบรรพบุรุษ",
+  "type": "attack",
+  "rarity": "Legendary",
+  "class": "warrior",
+  "fx": {
+   "dmg": 12,
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 2,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  },
+  "exhaust": true,
+  "flavor": "ดาบที่ส่งต่อกันมาเจ็ดชั่วคน",
+  "retired": true
  }
 ]

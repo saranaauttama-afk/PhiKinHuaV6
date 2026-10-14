@@ -163,6 +163,13 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   applyHeldEffects(s);
   tickTraps(s);
   r = runTriggers(s, 'turnEnd', r);
+  // นักมวย: rhythm is lost on a turn with no attack; พักยก after every third turn.
+  require('../../cards/fighter').endTurnRhythm(s);
+  if (require('../../cards/fighter').isRoundLastTurn(s)) {
+    s.log.push(`พักยก (จบยก ${require('../../cards/fighter').roundOf(s.turn ?? 1)})`);
+    r = runTriggers(s, 'roundEnd', r);
+  }
+  require('../../combat/minions').tickPlayerMinions(s);
 
 
   emit(s, { t: 'TurnEnded', who: 'player' });
@@ -227,6 +234,13 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         cost: enemyCardCost(def),
       });
 
+      // มึน: the ghost's first attack card this turn is lost.
+      if(def.type==='attack'&&s.enemy.statusEffects?.some(e=>e.id==='stun')){
+        s.enemy.statusEffects=s.enemy.statusEffects.filter(e=>e.id!=='stun');
+        s.log.push(`${def.name}: ผีมึน ออกท่าไม่ได้`);
+        recordCardHistory(s,'enemy',cardFromEnemy(def),historyBefore,eventStart,'มึน');
+        continue;
+      }
       // กับดักที่ตั้งไว้ทำงานก่อนการ์ดของศัตรูจะมีผล — ดักที่ยกเลิกได้
       // ต้องยกเลิกก่อนดาเมจเข้า ไม่งั้นมันคือการ "ยกเลิกหลังโดนแล้ว"
       const trapped = springTraps(s, def.type === 'attack' ? 'attack' : 'skill');
@@ -239,13 +253,17 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         continue;
       }
 
+      const hpBefore=s.player.hp;
       require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
       recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart,undefined,{ap:enemyCardCost(def),mana:0});
+      // สวน: armed ripostes answer the ghost's next attack card.
+      if(def.type==='attack'&&s.phase==='combat')r=require('../../cards/fighter').resolveRipostes(s,hpBefore,!!enemyCardFx(s,def).dmg,r);
 
       r = settleCombat(s, r);
     }
   }
 
+  if(s.phase==='combat'){require('../../combat/minions').ghostMinionsAct(s);r=settleCombat(s,r);}
   finishEnemyHand(s,s.enemyLastPlayed?.length??0);
   if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
   if(s.enemy)s.enemy.handCount=s.enemyPiles?.hand.length??0;

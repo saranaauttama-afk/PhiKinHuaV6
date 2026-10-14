@@ -27,11 +27,33 @@ export function cardById(id: string): CardData | undefined {
 }
 
 /** Cards a class can find in rewards and shops: the neutral pool plus its own pool. */
+/**
+ * Whether the class has any way to spend mana: it starts with mana or owns mana-cost cards.
+ * Why: shared mana cards (เสียงระฆัง, ดูดวิญญาณ, จุดเทียนบูชา) were offered to classes that
+ * start at 0 mana and have no use for it, so the shop sold cards that could never be played.
+ */
+export function classUsesMana(classId?: ClassId): boolean {
+  if (!classId) return true;
+  const { CLASS_RESOURCES } = require('./balance/notfm');
+  return (CLASS_RESOURCES[classId]?.startMana ?? 0) > 0 || ALL_CARDS.some(c => c.class === classId && (c.mana ?? 0) > 0);
+}
+/** Shared cards that only make sense with mana: cost mana, or give mana and nothing else. */
+export function needsMana(c: CardData): boolean {
+  if ((c.mana ?? 0) > 0) return true;
+  const keys = Object.keys(c.fx ?? {}).filter(k => (c.fx as any)[k] != null);
+  return keys.length > 0 && keys.every(k => k === 'mana');
+}
+/** Card fits the class: own or shared, and not a mana card for a class without mana. */
+export function fitsClass(c: CardData, classId?: ClassId): boolean {
+  if (c.retired) return false;
+  if (c.class && c.class !== classId) return false;
+  return !!c.class || !needsMana(c) || classUsesMana(classId);
+}
 export function poolFor(classId?: ClassId,milestoneLevel=0): CardData[] {
-  return ALL_CARDS.filter(c => !c.locked && (c.unlockAt??0)<=milestoneLevel && (!c.class || c.class === classId));
+  return ALL_CARDS.filter(c => !c.locked && (c.unlockAt??0)<=milestoneLevel && fitsClass(c, classId));
 }
 
-const OFFERED = ALL_CARDS.filter(c => !c.locked);
+const OFFERED = ALL_CARDS.filter(c => !c.locked && !c.retired);
 export const BY_RARITY: Record<Rarity, CardData[]> = {
   Common: OFFERED.filter(c => c.rarity === 'Common'),
   Uncommon: OFFERED.filter(c => c.rarity === 'Uncommon'),
