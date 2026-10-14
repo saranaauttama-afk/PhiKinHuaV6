@@ -37,3 +37,11 @@ export function fighterBadges(s:GameState){
 export function enemyMinionBadges(s:GameState){
  return (s.enemyMinions??[]).map(m=>({id:`minion:${m.uid}`,name:m.name,symbol:'minion',bad:true,count:`${m.hp}`,detail:`ลูกสมุนของผี · เลือด ${m.hp}/${m.maxHp}${m.taunt?' · รับหมัดแทนผี':''}${m.turnsLeft!=null?` · อยู่อีก ${m.turnsLeft} เทิร์น`:''}\n${require('./minions').minionDef(m.id)?.desc??''}`}));
 }
+
+/** ความลึก of the current ghost (ENEMY_DEPTH): how much tougher it is than the night's first fight. */
+export function enemyDepthBadges(s:GameState){
+ const depth=s.enemy?.depth??0;if(!depth)return [];
+ const {ENEMY_DEPTH}=require('../balance/notfm');
+ const str=(ENEMY_DEPTH.strengthAt as number[]).filter(a=>depth>=a).length,ap=depth>=ENEMY_DEPTH.apFrom;
+ return [{id:'ghost-depth',name:`ไฟต์ที่ ${depth+1} ของคืน`,symbol:'strength',bad:true,count:`${depth+1}`,detail:`ยิ่งเดินลึก ผียิ่งแกร่ง · เลือด +${depth*ENEMY_DEPTH.hpPct}%${str?` · แรง +${str}`:''}${ap?' · แต้มผี +1':''}\nนับจากผีที่ชนะไปแล้วในคืนนี้ ไม่ว่าจะเลือกเพจไหนก่อน`}];
+}

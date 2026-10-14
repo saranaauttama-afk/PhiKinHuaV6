@@ -8,7 +8,8 @@ import { applyCommand } from '../src/core/reducer';
 import { playCard } from '../src/core/cards/play';
 import { cardById, poolFor, ALL_CARDS, BLESSING_POOL, PANDORA_BLESSINGS, blessingFitsClass } from '../src/core/pack';
 import { describeCard } from '../src/core/cards/describe';
-import { FIGHTER_RULES, CLASS_PASSIVES } from '../src/core/balance/notfm';
+import { FIGHTER_RULES, CLASS_PASSIVES, ENEMY_DEPTH } from '../src/core/balance/notfm';
+import { climbingRoute, ADVENTURE_GHOSTS } from '../src/core/map/adventure';
 import { CHARACTER_CLASSES, buildStarterDeck } from '../src/core/classes';
 import { CARD_LIST_WITH_STARTERS } from '../src/core/pack';
 import { beginPlayerFight } from '../src/core/commands';
@@ -333,5 +334,35 @@ describe('ติดมือ และคำอธิบาย', () => {
     }
     expect(describeCard(c('gate_watch'))).toContain('สวน: โจมตี 6');
     expect(describeCard(c('call_pupil'))).toContain('เลือด 8');
+  });
+});
+
+describe('ความลึกในคืน (ENEMY_DEPTH)', () => {
+  const start = (seed: string) => {
+    let s = applyCommand(baseNewState(seed), { type: 'NewRun', seed, classId: 'warrior', difficulty: 1 }, makeRng(seed)).state;
+    let r = makeRng(seed);
+    const go = (c: any) => ({ state: s, rng: r } = applyCommand(s, c, r));
+    while (s.chapter) go({ type: 'SkipChapter' });
+    go({ type: 'ChooseStarterBlessing', index: 0 });
+    return { get s() { return s; }, go };
+  };
+  it('ผีไฟต์หลังของคืนเลือดหนาขึ้น แรงขึ้น และแต้มเพิ่ม ไม่ว่าจะเลือกเพจไหน', () => {
+    const a = start('depth'), b = start('depth');
+    const ix = a.s.pages!.current!.offers.findIndex(o => o?.kind === 'monster');
+    b.s.pages!.adventure!.fightsWon = 6;
+    a.go({ type: 'ChooseOffer', index: ix }); b.go({ type: 'ChooseOffer', index: ix });
+    expect(a.s.enemy!.id).toBe(b.s.enemy!.id);
+    expect(b.s.enemy!.depth).toBe(6);
+    expect(b.s.enemy!.maxHp).toBeCloseTo(a.s.enemy!.maxHp * (1 + 6 * ENEMY_DEPTH.hpPct / 100), -1);
+    const str = (x: GameState) => x.enemy!.statusEffects?.find(e => e.id === 'strength')?.stacks ?? 0;
+    expect(str(b.s) - str(a.s)).toBe(2);
+    expect(b.s.enemy!.maxAp).toBe(a.s.enemy!.maxAp! + 1);
+  });
+
+  it('เส้นทางคืน 1 เริ่มผีระดับต่ำแล้วไต่ขึ้น', () => {
+    const route = climbingRoute(ADVENTURE_GHOSTS, 7, 1).map((m: any) => Number(m.tier.slice(1)) || 6);
+    expect(route[0]).toBe(1);
+    expect(route.at(-1)).toBeGreaterThanOrEqual(3);
+    for (let i = 1; i < route.length; i++) expect(route[i]).toBeGreaterThanOrEqual(route[i - 1]);
   });
 });

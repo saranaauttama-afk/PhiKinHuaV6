@@ -118,10 +118,15 @@ export function isShopLike(offer: PageOffer): boolean {
 }
 
 /** Risk label shown under a ghost's name on the map, so the player can judge before choosing. */
-export function ghostTierLabel(offer: PageOffer): string | undefined {
+/**
+ * Tier line under a ghost page. `depth` = fights won this night (ENEMY_DEPTH): every ghost page
+ * shows the same "ไฟต์ที่ N" because whichever ghost is fought next is the N-th fight of the night.
+ */
+export function ghostTierLabel(offer: PageOffer, depth?: number): string | undefined {
   if (offer.kind === 'boss') return 'บอสประจำคืน';
   if (offer.kind !== 'monster') return undefined;
-  if (offer.tier === 'elite') return 'ผีชั้นสูง';
+  const fight = depth != null ? ` · ไฟต์ที่ ${depth + 1}` : '';
+  if (offer.tier === 'elite') return 'ผีชั้นสูง' + fight;
   const n = Number(getMonsterById(offer.enemyId)?.tier.slice(1));
-  return n ? `ผีระดับ ${n}` : 'ผีธรรมดา';
+  return (n ? `ผีระดับ ${n}` : 'ผีธรรมดา') + fight;
 }

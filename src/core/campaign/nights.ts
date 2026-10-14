@@ -31,11 +31,21 @@ export function configureNightEnemy(s:GameState):void{
  const elite=offer?.kind==='monster'&&offer.tier==='elite';
  const tier=Math.max(1,Math.min(5,Number(monster?.tier.slice(1))||1));
  const baseHp=boss?(s.enemy.id==='phi-kin-hua'?ENEMY_HP.ultimateBoss:ENEMY_HP.boss):elite?ENEMY_HP.elite:ENEMY_HP.normal+tier*ENEMY_HP.perTier;
- s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*(boss?ENEMY_HP.bossNight:ENEMY_HP.night)[s.campaign.night-1]*(d>=DIFFICULTY.hpFrom?1+DIFFICULTY.hpPct/100:1));
+ // ความลึก: fights already won this night make the next ghost tougher (ENEMY_DEPTH).
+ const depth=boss?0:nightDepth(s);
+ const {ENEMY_DEPTH}=require('../balance/notfm');
+ s.enemy.depth=depth;
+ s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*(boss?ENEMY_HP.bossNight:ENEMY_HP.night)[s.campaign.night-1]*(d>=DIFFICULTY.hpFrom?1+DIFFICULTY.hpPct/100:1)*(1+ENEMY_DEPTH.hpPct*depth/100));
  const rules=ENEMY_RULES[boss?'boss':elite?'elite':'normal'];
- s.enemy.maxAp=rules.ap;s.enemy.handSize=rules.handSize;
+ s.enemy.maxAp=rules.ap+(depth>=ENEMY_DEPTH.apFrom?1:0);s.enemy.handSize=rules.handSize;
  if(NIGHT_ENEMY_DECKS[s.enemy.id])s.enemy.deck=[...NIGHT_ENEMY_DECKS[s.enemy.id]];
  applyEnemyBattleRule(s);
+ const strength=(ENEMY_DEPTH.strengthAt as readonly number[]).filter(at=>depth>=at).length;
+ if(strength)applyStatusEffect('enemy',s,'strength',99,strength);
+}
+/** Monster fights already won this night (0 before the first): the ความลึก of the next fight. */
+export function nightDepth(s:Partial<GameState>):number{
+ return s.pages?.adventure?.fightsWon??0;
 }
 /** Whether rage is on for this fight: from night `RAGE.fromNight(difficulty)`. */
 export function rageActive(s:Partial<GameState>):boolean{

@@ -152,6 +152,8 @@ export type EnemyState = {
   handSize?: number;
   /** Card ids the ghost's deck is built from (swapped when a boss awakens). */
   deck?: string[];
+  /** ความลึก: fights won this night before this one (balance/notfm.ts ENEMY_DEPTH). */
+  depth?: number;
   statusEffects?: StatusEffect[];
 };
 
