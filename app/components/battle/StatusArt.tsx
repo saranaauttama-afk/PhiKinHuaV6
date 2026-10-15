@@ -16,6 +16,8 @@ export const STATUS_ART:Record<string,any>={
  bruise:require('../../../assets/status/status_bruise.webp'),
  stun:require('../../../assets/status/status_stun.webp'),
  rhythm:require('../../../assets/status/status_rhythm.webp'),
+ // จังหวะรำ (ผีนางรำ) mirrors the นักมวย's จังหวะ, so it borrows its icon.
+ dance:require('../../../assets/status/status_rhythm.webp'),
  round:require('../../../assets/status/status_round.webp'),
  riposte:require('../../../assets/status/status_riposte.webp'),
  equipment:require('../../../assets/cards/thai-v24/equipment_iron_bracer.webp'),

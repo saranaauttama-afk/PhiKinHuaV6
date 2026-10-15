@@ -47,7 +47,10 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
  if(!tactical)return playable[int(makeRng(decisionSeed),0,playable.length-1).value].i;
  const strength=s.enemy?.statusEffects?.find(e=>e.id==='strength')?.stacks??0;
  const rage=s.enemy?.statusEffects?.find(e=>e.id==='rage')?.stacks??0;
- const threat=((s.enemy?.maxAp??2)+1)*3.5+(strength+rage)*2;
+ // Night-1 ghosts (15 Oct 2026): a charging card back is public, so a player blocks for it.
+ const charged=(require('../src/core/combat/ghostMechanics').enemyHandCharges(s) as Array<number|null>).reduce<number>((t,n)=>t+(n??0)*3,0);
+ const threat=((s.enemy?.maxAp??2)+1)*3.5+(strength+rage)*2+charged;
+ const ghostGuard=!!s.fight?.enemyRipostes?.length,ghostRiposte=(s.fight?.enemyRipostes??[]).reduce((t,f)=>t+(f.dmg??0),0);
  const guardNeed=Math.max(0,threat-s.player.block);
  const low=s.player.hp<s.player.maxHp*.4;
  const score=(card:CardData)=>{
@@ -73,6 +76,8 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
    if(s.turnFlags?.doubleNext)fighterBonus+=(c.dmg??0)*(c.hits??1);
   }
   let v=Math.max(0,(c.dmg??0)*(c.hits??1)+fighterBonus-(s.enemy?.block??0)*.45)*1.2;
+  // The ghost's สวน is on its status row: do not swing an attack its block swallows into it.
+  if(card.type==='attack'&&ghostGuard&&!(s.enemyMinions??[]).some(m=>m.taunt&&m.hp>0)&&((c.dmg??0)+fighterBonus)*(c.hits??1)<=(s.enemy?.block??0))v-=ghostRiposte*1.5+4;
   if(c.rhythm)v+=c.rhythm*2.5;
   if(c.keepRhythm&&!s.piles.hand.some(h=>h!==card&&h.type==='attack'))v+=rhythm*.6;
   if(c.lockRhythm)v+=3+rhythm*.5;

@@ -35,12 +35,14 @@ type Props = {
   helpers?:React.ReactNode;
   /** Rage is on this fight; shown as a rule until the ghost's rage status appears. */
   rage?:{startTurn:number;perTurn:number};
-  /** The ghost's ลูกสมุน (combat/fightBadges.ts enemyMinionBadges). */
+  /** Extra ghost badges: ความลึก, ชาร์จ, ผีรอสวน (combat/fightBadges.ts). ลูกสมุน stand as figures (MinionRow side="enemy"). */
   minions?:import('./StatusStrip').BattleBadge[];
   /** The boss's relic: its rule works until the player's hits break it. */
   relic?:{name:string;durability:number;text:string;flavor:string;broken:boolean;stolen:number};
   /** Stable face-down slots for the single ghost: total places and which are still held. */
   handSlots?:{total:number;remaining:number[]};
+  /** ชาร์จ count per held card (null = not a charge card), from ghostMechanics.enemyHandCharges. */
+  handCharges?:Array<number|null>;
   enemy?: {
     hp: number; maxHp: number; name: string;
     handCount?:number; ap?: number; block?: number; maxAp?: number; handSize?: number; drawPerTurn?:number; maxRetained?:number;
@@ -60,7 +62,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   helpers,
   rage,
   relic,minions,
-  handSlots,
+  handSlots,handCharges,
   enemies,
   rules=false,
 }, ref) {
@@ -118,7 +120,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
      <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize}/>
     </Animated.View>
-    <EnemyHandRack count={actor.handCount??0} slots={actors.length===1?handSlots:undefined} ownerIndex={index} ownerCount={actors.length}/>
+    <EnemyHandRack count={actor.handCount??0} slots={actors.length===1?handSlots:undefined} charges={actors.length===1?handCharges:undefined} ownerIndex={index} ownerCount={actors.length}/>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
      <RitualSurface kind="quietSlate" style={{height:layout.enemyHudHeight,paddingHorizontal:actors.length>1?6:10,paddingVertical:4,gap:2}}>
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>

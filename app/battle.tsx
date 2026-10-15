@@ -364,7 +364,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').enemyMinionBadges(gameState)]} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
+        <MonsterArea relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').ghostMechanicBadges(gameState)]} handCharges={require('../src/core/combat/ghostMechanics').enemyHandCharges(gameState)} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
@@ -441,6 +441,8 @@ export default function BattlePage() {
         />}
 
         {!victoryIntro&&gameState.phase==='combat'&&<MinionRow minions={gameState.minions??[]}/>}
+        {/* The ghost's ลูกสมุน stand as figures on its other side (was a status badge until 15 Oct 2026). */}
+        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" minions={gameState.enemyMinions??[]}/>}
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}

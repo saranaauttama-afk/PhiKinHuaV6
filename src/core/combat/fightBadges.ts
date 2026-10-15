@@ -33,9 +33,20 @@ export function fighterBadges(s:GameState){
  return out;
 }
 
-/** The ghost's ลูกสมุน for the enemy status row. */
-export function enemyMinionBadges(s:GameState){
- return (s.enemyMinions??[]).map(m=>({id:`minion:${m.uid}`,name:m.name,symbol:'minion',bad:true,count:`${m.hp}`,detail:`ลูกสมุนของผี · เลือด ${m.hp}/${m.maxHp}${m.taunt?' · รับหมัดแทนผี':''}${m.turnsLeft!=null?` · อยู่อีก ${m.turnsLeft} เทิร์น`:''}\n${require('./minions').minionDef(m.id)?.desc??''}`}));
+/**
+ * Night-1 ghost mechanics on the ghost's status row (docs/ghosts/NIGHT1-DESIGN.md): how many held
+ * cards are charging and how far (the number is public, the card is not), and an armed สวน.
+ */
+export function ghostMechanicBadges(s:GameState){
+ const {enemyHandCharges}=require('./ghostMechanics'),{GHOST_MECHANICS}=require('../balance/notfm');
+ const out:Array<{id:string;name:string;symbol:string;detail:string;count?:string;bad?:boolean}>=[];
+ const charges=(enemyHandCharges(s) as Array<number|null>).filter((x):x is number=>x!=null);
+ if(charges.length){
+  const top=Math.max(...charges),max=GHOST_MECHANICS.chargeMaxTurns;
+  out.push({id:'ghost:charge',name:'ชาร์จ',symbol:'spell_charging',bad:true,count:`${top}`,detail:`ผีถือไพ่ชาร์จไว้ ${charges.length} ใบ (${charges.map(n=>`${n}/${max}`).join(', ')})\nยิ่งถือนานยิ่งแรง สูงสุด ${max} เทิร์น · ไม่รู้ว่าจะปล่อยเมื่อไหร่ — ตั้งเกราะรอ หรือเร่งฆ่าก่อน`});
+ }
+ for(const [i,fx] of (s.fight?.enemyRipostes??[]).entries())out.push({id:`ghost:riposte:${i}`,name:'ผีรอสวน',symbol:'riposte',bad:true,detail:`ถ้าการ์ดโจมตีใบถัดไปของเราไม่ทำให้ผีเสียเลือด (เกราะหรือหลบกินหมด) ผีสวน: ${fxText(fx,'enemy').join(' · ')}\nตีให้ทะลุเกราะ หรือรอให้หมดเองตอนเทิร์นผี`});
+ return out;
 }
 
 /** ความลึก of the current ghost (ENEMY_DEPTH): how much tougher it is than the night's first fight. */
