@@ -27,9 +27,9 @@ export function fighterBadges(s:GameState){
   const turn=s.turn??1,round=F.roundOf(turn),left=FIGHTER_RULES.roundTurns-((turn-1)%FIGHTER_RULES.roundTurns);
   out.push({id:'fighter:round',name:`ยก ${round}`,symbol:'round',neutral:true,count:`${round}`,detail:`ยกละ ${FIGHTER_RULES.roundTurns} เทิร์น · ${left===1?'เทิร์นนี้เป็นเทิร์นสุดท้ายของยก พักยกหลังจบเทิร์น':`อีก ${left} เทิร์นถึงพักยก`}`});
  }
- for(const [i,fx] of (s.fight?.ripostes??[]).entries())out.push({id:`fighter:riposte:${i}`,name:'สวน',symbol:'trap',neutral:true,detail:`ถ้าการ์ดโจมตีใบถัดไปของผีทำให้เราไม่เสียเลือด: ${fxText(fx).join(' · ')}`});
+ for(const [i,fx] of (s.fight?.ripostes??[]).entries())out.push({id:`fighter:riposte:${i}`,name:'สวน',symbol:'riposte',neutral:true,detail:`ถ้าการ์ดโจมตีใบถัดไปของผีทำให้เราไม่เสียเลือด: ${fxText(fx).join(' · ')}`});
  if(s.turnFlags?.doubleNext)out.push({id:'fighter:double',name:'คาดเชือกใหม่',symbol:'check',neutral:true,detail:'การ์ดโจมตีใบถัดไปเทิร์นนี้ทำงาน 2 ครั้ง'});
- for(const m of s.minions??[])out.push({id:`minion:${m.uid}`,name:m.name,symbol:'minion',neutral:true,count:`${m.hp}`,detail:`ศิษย์ค่าย · เลือด ${m.hp}/${m.maxHp}\n${require('./minions').minionDef(m.id)?.desc??''}`});
+ for(const m of s.minions??[])out.push({id:`minion:${m.uid}`,name:m.name,symbol:['camp_pupil','corner_man','pi_player','drummer','senior_boxer','old_master'].includes(m.id)?m.id:'minion',neutral:true,count:`${m.hp}`,detail:`ศิษย์ค่าย · เลือด ${m.hp}/${m.maxHp}\n${require('./minions').minionDef(m.id)?.desc??''}`});
  return out;
 }
 
