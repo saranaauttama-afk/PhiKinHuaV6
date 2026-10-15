@@ -76,8 +76,7 @@ Android: `expo-audio` ประกาศสิทธิ์ไมโครโฟ�
 | turnStart / uiTap | เริ่มเทิร์น / แตะปุ่ม | 0.4 / 0.35 |
 
 **ไฟล์เสียง:** สร้างแล้วใน ElevenLabs (Sound Effects v2, ตัวละ 4 แบบ) flow "ผีกินหัว SFX ชุด 2 — นักมวยและการต่อสู้" https://elevenlabs.io/app/flows/nf28P3nJp9Uaol5MBTu8
-**ยังดึงเข้า repo ไม่ได้:** ไฟล์อยู่บน storage.googleapis.com ซึ่ง sandbox ของ Claude ถูกบล็อก ทางออก (เลือกอย่างใดอย่างหนึ่ง)
-1. เปิด storage.googleapis.com ใน network allowlist (Settings → Capabilities) แล้วให้ Claude ดึง/ตัด/normalize ต่อ
-2. เจ้าของโหลดแบบที่ชอบจาก flow (ตัวละ 1–3 ไฟล์) แล้วแนบมา/push เข้า `assets/audio/sfx/`
+**ใส่แล้ว 15 ต.ค.** — เจ้าของโหลดจาก flow (กล่องตั้งชื่อ `01 ต่อยโดนผี → playerHit` … `14 แตะปุ่ม → uiTap` เพราะชื่อเดิม "New sfx node" ทุกกล่องทำให้ไฟล์สลับกัน) ได้เสียงละ 1 แบบ → `assets/audio/sfx/<id>-1.mp3` (~160 KB รวม)
 
-ขั้นตอนหลังได้ไฟล์: ตัดหัวท้ายเงียบ, mono 96 kbps, normalize ~−18 LUFS, ตั้งชื่อ `player-hit-1.mp3` … แล้วใส่ใน `files` ของ manifest (หลายไฟล์ = สุ่มสลับกันไม่ให้ซ้ำหู)
+การแปลงไฟล์ (scripted, ffmpeg): ตัดเงียบหัวท้าย (−50 dB), เฟดท้าย 40 ms, mono 44.1 kHz 96 kbps, ปรับดังเข้า −18 LUFS แต่ไม่ให้ peak เกิน −2.5 dBTP; `rhythmUp`/`turnStart` ตัดไม่เกิน 0.8 วิ เพราะดังบ่อย (จังหวะขึ้นได้ทุกใบ) ความดังเทียบกันคุมด้วย `volume` ใน manifest
+ถ้าอยากได้หลายแบบสลับกัน: เพิ่มไฟล์ `-2`, `-3` แล้วใส่ใน `files` ของ id นั้น
