@@ -334,9 +334,17 @@
  },
  "night-head-collector": {
   "name": "หัวในกระด้ง",
-  "flavor": "หัวคนที่มันฉวยมาลอยรับหมัดแทน",
+  "flavor": "หัวคนที่มันฉวยมาลอยรับหมัดแทน มือในความมืดทำให้แรงหาย",
   "fx": {
-   "summon": "basket_head"
+   "summon": "basket_head",
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
   },
   "phase2": {
    "belowPct": 50,

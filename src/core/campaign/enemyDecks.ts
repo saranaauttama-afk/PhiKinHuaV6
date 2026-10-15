@@ -361,7 +361,7 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_head_collector_v29_pressure",
   "night_head_collector_n1_basket",
   "night_head_collector_n1_snatch",
-  "night_head_collector_n1_snatch",
+  "night_head_collector_v29_double",
   "night_head_collector_v29_strike"
  ],
  "night-bell-keeper": [

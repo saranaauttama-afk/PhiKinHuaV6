@@ -24,12 +24,12 @@ Run locally: `npm install && npx expo start` (`--web` / `--android` / `--ios` va
 
 - New work: branch from `main` (`work/<topic>`), open a PR into `main`.
 - CI: `.github/workflows/android-notfm.yml` runs on push to `main` and on PRs into `main` — typecheck + tests + web smoke (`verify`), signed APK (`android`), Android emulator smoke (`native`). Bump `version` / `versionCode` in `app.json` **and** the matching strings in that workflow for every APK delivery.
-- Current goal (owner, 14 Oct 2026): **store launch postponed** to expand the card system to Night-of-the-Full-Moon variety first, **one class at a time**. Minions and combos are back (in a new form). The first class is **นักมวยคาดเชือก** (renamed from นักรบวัด; `ClassId` is still `warrior`) — design `docs/nak-muay/DESIGN.md`, status and next steps `docs/nak-muay/HANDOFF.md`, art prompts `docs/nak-muay/ART-PROMPTS.md`. Ghosts get the same mechanics, simpler. A 4th equipment slot is still deferred.
+- Current goal (owner, 14 Oct 2026): **store launch postponed** to expand the card system to Night-of-the-Full-Moon variety first, **one class at a time**. Minions and combos are back (in a new form). The first class is **นักมวยคาดเชือก** (renamed from นักรบวัด; `ClassId` is still `warrior`) — design `docs/nak-muay/DESIGN.md`, status and next steps `docs/nak-muay/HANDOFF.md`, art prompts `docs/nak-muay/ART-PROMPTS.md`. Ghosts get the same mechanics, simpler: night-1 ghosts + boss were rebuilt 15 Oct 2026 (charge, ghost riposte, stun on the player, ghost minions, boss phase 2, ghost AI) — `docs/ghosts/NIGHT1-DESIGN.md`, status `docs/ghosts/HANDOFF.md`. A 4th equipment slot is still deferred.
 - The owner wants game-design changes discussed and agreed before code changes; agreed-but-unimplemented ideas go to a backlog first; write the reason for every design change into the docs.
 
 Read before changing any game rule or number:
 1. `docs/phase7/DESIGN-DECISIONS.md` — design intent, what was cut (fusion; combos and minions came back 14 Oct 2026, §5), balance targets (§2.4) and the reason behind each Phase 6–7 and tuning decision (§2.6).
-2. Latest handoff: `docs/nak-muay/HANDOFF.md` (before it: `docs/tuning-2026-10-13/HANDOFF.md`, `docs/playtest-2026-10-13/HANDOFF.md`, `docs/phase7/HANDOFF.md`, `docs/HANDOFF-notfm-rebuild.md`).
+2. Latest handoff: `docs/ghosts/HANDOFF.md`, then `docs/nak-muay/HANDOFF.md` (before it: `docs/tuning-2026-10-13/HANDOFF.md`, `docs/playtest-2026-10-13/HANDOFF.md`, `docs/phase7/HANDOFF.md`, `docs/HANDOFF-notfm-rebuild.md`).
 3. Research: `docs/research/notfm/`.
 
 Balance sim: `npm run balance -- --runs 40 --difficulty 1,2,3,4,5 --seed tune` (bot win rates; not a substitute for human play). Tests: `npx tsc --noEmit` and `npx vitest run`.

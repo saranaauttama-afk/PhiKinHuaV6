@@ -22,6 +22,7 @@ import {isCriticalOffer} from '../src/core/map/adventure';
 import type {ClassId} from '../src/core/classes';
 import type {Difficulty} from '../src/core/campaign/threeNight';
 import type {Command,CardData,Fx,GameState} from '../src/core/types';
+import {enemyHandCharges} from '../src/core/combat/ghostMechanics';
 
 export type FightKind='normal'|'elite'|'boss';
 export type FightRecord={night:number;index:number;enemyId:string;kind:FightKind;turns:number;hpBefore:number;hpAfter:number;maxHp:number;won:boolean};
@@ -48,7 +49,7 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
  const strength=s.enemy?.statusEffects?.find(e=>e.id==='strength')?.stacks??0;
  const rage=s.enemy?.statusEffects?.find(e=>e.id==='rage')?.stacks??0;
  // Night-1 ghosts (15 Oct 2026): a charging card back is public, so a player blocks for it.
- const charged=(require('../src/core/combat/ghostMechanics').enemyHandCharges(s) as Array<number|null>).reduce<number>((t,n)=>t+(n??0)*3,0);
+ const charged=(enemyHandCharges(s) as Array<number|null>).reduce<number>((t,n)=>t+(n??0)*3,0);
  const threat=((s.enemy?.maxAp??2)+1)*3.5+(strength+rage)*2+charged;
  const ghostGuard=!!s.fight?.enemyRipostes?.length,ghostRiposte=(s.fight?.enemyRipostes??[]).reduce((t,f)=>t+(f.dmg??0),0);
  const guardNeed=Math.max(0,threat-s.player.block);

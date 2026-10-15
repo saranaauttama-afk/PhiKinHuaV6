@@ -4440,7 +4440,7 @@
   "name": "ฉวยหัว",
   "type": "attack",
   "fx": {
-   "dmg": 8
+   "dmg": 10
   },
   "charge": {
    "dmg": 4
@@ -4465,7 +4465,7 @@
   "name": "โฉบหนอง",
   "type": "attack",
   "fx": {
-   "dmg": 5,
+   "dmg": 6,
    "hits": 2
   }
  }
