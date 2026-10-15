@@ -53,12 +53,25 @@ function minionValue(b:Board,m:Pick<MinionState,'hp'|'taunt'|'act'|'chargeBoost'
  return (m.taunt?m.hp*.35:0)+act*remaining+(charging?(m.chargeBoost??0)*3:0);
 }
 
+/**
+ * One-time value of a ghost minion's `arrive` effect (16 Oct 2026). Counted only for the
+ * incoming minion — a displaced one already arrived. Same weights as `minionValue`'s act;
+ * block-strip is worth only the player's current block. Heuristic: the arrival hit is not
+ * replayed on the scratch board, so it never by itself justifies a lethal line.
+ */
+function arrivalValue(b:Board,f?:Fx):number{
+ if(!f)return 0;
+ const missing=Math.max(0,b.enemy!.maxHp-b.enemy!.hp);
+ return (f.dmg??0)*hitsOf(f)+(f.block??0)*.65+Math.min(f.heal??0,missing)*.75+
+  (f.status?.reduce((n,e)=>n+e.stacks*1.5,0)??0)+(f.steal??0)*3+Math.min(f.breakBlock??0,b.player.block)*.8;
+}
+
 /** Marginal board value: summoning at capacity replaces the oldest minion, not an empty slot. */
 export function enemySummonValue(s:GameState,id:string,charging=false):number{
  const def=minionDef(id);if(!def||!s.enemy)return 0;
  const b=s as Board,list=b.enemyMinions??[];
  const incoming={...def,turnsLeft:def.turns};
- return minionValue(b,incoming,charging)-(list.length>=MINION_RULES.enemySlots?minionValue(b,list[0],charging):0);
+ return minionValue(b,incoming,charging)+arrivalValue(b,def.arrive)-(list.length>=MINION_RULES.enemySlots?minionValue(b,list[0],charging):0);
 }
 
 /** Mirror useCharge on visible equipment only; never read/write the player's exhaust pile. */
