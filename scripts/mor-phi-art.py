@@ -68,11 +68,15 @@ ICONS = [
 
 def main():
     have = open(os.path.join(ROOT, 'app/cardArt.ts'), encoding='utf-8').read()
+    status_art = open(os.path.join(ROOT, 'app/components/battle/StatusArt.tsx'), encoding='utf-8').read()
+    def status_done(key, asset):
+        return f"{key}:require('../../../{asset}')" in status_art and os.path.isfile(os.path.join(ROOT, asset))
     cards = [{"id": i, "name": n, "status": "done" if f"'{i}'" in have else "new", "path": f"assets/cards/thai-v24/{i}.webp",
               "prompt": f"{STYLE} Subject: {s}"} for i, n, s in CARDS]
-    minions = [{"id": i, "name": n, "status": "new", "path": f"assets/minions/{i}.webp",
+    minions = [{"id": i, "name": n, "status": "done" if status_done(i, f"assets/minions/{i}.webp") else "new", "path": f"assets/minions/{i}.webp",
                 "prompt": f"{STYLE} {MINION_STYLE} Subject: {s}"} for i, n, s in MINIONS]
-    ui = [{"id": i, "name": n, "status": "new", "path": p, "prompt": f"{ICON_STYLE} Subject: {s}"} for i, n, p, s in ICONS]
+    ui_keys = {"status_yant": "yant", "ui_water_bowl": "water_bowl"}
+    ui = [{"id": i, "name": n, "status": "done" if status_done(ui_keys[i], p) else "new", "path": p, "prompt": f"{ICON_STYLE} Subject: {s}"} for i, n, p, s in ICONS]
     out = {"style": STYLE, "output": {
         "cards": "assets/cards/thai-v24/<id>.webp", "minions": "assets/minions/<id>.webp",
         "size": "384×384 RGBA webp (generate at 1024×1024 transparent PNG, then downscale)",

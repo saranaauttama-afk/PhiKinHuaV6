@@ -1,10 +1,12 @@
 import React from 'react';
 import Svg,{Path,Circle,Rect,Ellipse,G} from 'react-native-svg';
 import InkIcon,{type InkSymbol} from './InkIcon';
+import StatusArt from './battle/StatusArt';
 import {palette,paper,hudPictogramColors} from '../theme';
-export type StatSymbol=InkSymbol|'draw'|'bell'|'mana';
+export type StatSymbol=InkSymbol|'draw'|'bell'|'mana'|'water_bowl';
 /** Miniature objects drawn in ink, ochre and bone, rather than modern UI symbols. */
 export default function StatIcon({name,size=22}:{name:StatSymbol;size?:number}) {
+ if(name==='water_bowl')return <StatusArt name="water_bowl" size={size}/>;
  const ink=paper.ink,gold=hudPictogramColors.energy,tan=hudPictogramColors.cards;
  let art:React.ReactNode;
  if(name==='energy'||name==='energy_boost')art=<>
