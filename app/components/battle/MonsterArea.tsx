@@ -48,6 +48,7 @@ type Props = {
   enemy?: {
     hp: number; maxHp: number; name: string;
     handCount?:number; ap?: number; block?: number; maxAp?: number; handSize?: number; drawPerTurn?:number; maxRetained?:number;
+    drawCadence?:{extra:number;every:number};
     statusEffects?: StatusEffect[];
   } | null;
 };
@@ -132,7 +133,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       <View style={{flexDirection:'row',gap:actors.length>1?4:12,alignItems:'center',minHeight:24}}>
        <EnemyStatItem icon="energy" label="" value={`${actor.ap??actor.maxAp??0}`}/>
        <EnemyStatItem icon="block" label="" value={`${actor.block??0}`}/>
-       <EnemyStatItem icon="hand" label="" value={`${actor.handCount??0}/${actor.handSize??0}`} detail={`ไพ่ในมือ ${actor.handCount??0} ใบ · ถือได้สูงสุด ${actor.handSize??0} ใบ\nจั่วต่อเทิร์น ${enemy?.drawPerTurn??0} ใบ · เก็บข้ามเทิร์น ${enemy?.maxRetained??0} ใบ`}/>
+       <EnemyStatItem icon="hand" label="" value={`${actor.handCount??0}/${actor.handSize??0}`} detail={`ไพ่ในมือ ${actor.handCount??0} ใบ · ถือได้สูงสุด ${actor.handSize??0} ใบ\nจั่วต่อเทิร์น ${enemy?.drawPerTurn??0} ใบ · เก็บข้ามเทิร์น ${enemy?.maxRetained??0} ใบ${enemy?.drawCadence?`\nทุก ${enemy.drawCadence.every} เทิร์นผี จั่วเพิ่ม ${enemy.drawCadence.extra} ใบ เท่าที่มือว่าง`:''}`}/>
       </View>
      </RitualSurface>
       <View testID={`enemy-extras-${index}`} style={{height:layout.enemyExtrasHeight,flexDirection:'row',gap:4,alignItems:'center'}}>

@@ -8,6 +8,55 @@
  },
  "cards": [
   {
+   "id": "yant_ladle",
+   "name": "กระบวยลงยันต์",
+   "status": "done",
+   "path": "assets/cards/thai-v24/yant_ladle.webp",
+   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: A coconut-shell ladle dipping into a bronze water bowl, one paper talisman tied to its wooden handle"
+  },
+  {
+   "id": "threaded_needle",
+   "name": "เข็มร้อยสายสิญจน์",
+   "status": "done",
+   "path": "assets/cards/thai-v24/threaded_needle.webp",
+   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: A ritual needle trailing white sacred cotton thread, taut against the wrist of a ghost raising its claw"
+  },
+  {
+   "id": "familiar_ward",
+   "name": "สายสิญจน์คล้องของเลี้ยง",
+   "status": "done",
+   "path": "assets/cards/thai-v24/familiar_ward.webp",
+   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: The shaman looping white protective thread around a small straw effigy and his own wrist"
+  },
+  {
+   "id": "brimming_yant",
+   "name": "ยันต์ชุบน้ำเต็มขัน",
+   "status": "done",
+   "path": "assets/cards/thai-v24/brimming_yant.webp",
+   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: Three folded paper talismans dipping into a bronze bowl filled to the rim"
+  },
+  {
+   "id": "blood_thread",
+   "name": "ด้ายแดงผูกเงา",
+   "status": "done",
+   "path": "assets/cards/thai-v24/blood_thread.webp",
+   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: A red ritual thread tied around a paper talisman and a dark ghost silhouette, a small offering cup below, no gore"
+  },
+  {
+   "id": "spirit_rice_scatter",
+   "name": "ข้าวเสกเลี้ยงบริวาร",
+   "status": "done",
+   "path": "assets/cards/thai-v24/spirit_rice_scatter.webp",
+   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: Blessed rice scattered between a friendly straw effigy and hostile ghost wisps, the effigy catching grains"
+  },
+  {
+   "id": "sealed_bowl_rite",
+   "name": "พิธีปิดขันกักเงา",
+   "status": "done",
+   "path": "assets/cards/thai-v24/sealed_bowl_rite.webp",
+   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: The shaman pouring a brimming bronze bowl into a clay spirit jar while drawing a white cloth over its mouth"
+  },
+  {
    "id": "paper_yant",
    "name": "แปะยันต์กระดาษ",
    "status": "done",

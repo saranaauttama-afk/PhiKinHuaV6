@@ -265,8 +265,8 @@ describe('ของเลี้ยง', () => {
 
 describe('ข้อมูลการ์ดหมอผี', () => {
   const own = ALL_CARDS.filter(x => x.class === 'shaman' && !x.locked);
-  it('การ์ดอาชีพครบ 52 ใบ (+1 ปลดล็อกจากสมุดบันทึก) ครอบคลุมทุกชนิด', () => {
-    expect(own).toHaveLength(52);
+  it('การ์ดอาชีพครบ 59 ใบ (+1 ปลดล็อกจากสมุดบันทึก) ครอบคลุมทุกชนิด', () => {
+    expect(own).toHaveLength(59);
     for (const t of ['attack', 'action', 'spell', 'mana', 'counter', 'equipment', 'prayer']) expect(own.some(x => x.type === t), t).toBe(true);
   });
   it('ทุกใบมีข้อความผล และคำว่ามานาไม่โผล่ในการ์ดหมอผี', () => {

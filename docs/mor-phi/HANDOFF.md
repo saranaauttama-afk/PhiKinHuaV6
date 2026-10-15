@@ -1,5 +1,7 @@
 # หมอผี (น้ำมนต์) — สถานะงาน (15 ต.ค. 2026)
 
+> อัปเดตต่อ 16 ต.ค. 2026: [ขยายสองอาชีพและสำรับผีทั้ง 34 ตัว](../card-depth-2026-10-16/README.md) เป็น handoff ล่าสุด ขนาดสำรับ จำนวนการ์ด และผลซิมด้านล่างเป็นหลักฐานรอบก่อน
+
 Branch `work/mor-phi-nam-mon` (ต่อจาก `work/ghosts-night1` / PR #21 ซึ่งยังไม่ merge) · APK 1.0.56 (versionCode 57)
 ออกแบบและเหตุผล: `docs/mor-phi/DESIGN.md` · ภาพ: `docs/mor-phi/ART-PROMPTS.md`
 

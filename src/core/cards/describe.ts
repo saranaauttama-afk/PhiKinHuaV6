@@ -128,7 +128,8 @@ export function describeCard(card: CardData, side: 'player' | 'enemy' = 'player'
   if (card.counter?.turns) parts.push(`อยู่ ${card.counter.turns} เทิร์น`);
   if (card.limit === 'turn') parts.push('เทิร์นละครั้ง');
   if (card.exhaust) parts.push('นำออก');
-  return lead + parts.join(' · ');
+  const text = lead + parts.join(' · ');
+  return card.class === 'warrior' ? text.replace(/ของเลี้ยง/g, 'ศิษย์ค่าย') : text;
 }
 
 /** One point of สาด / ปลุกยันต์ in words. */

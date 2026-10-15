@@ -1,5 +1,354 @@
 [
  {
+  "id": "guarding_elbow",
+  "name": "ศอกบังหน้า",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 3,
+   "block": 3
+  },
+  "flavor": "ศอกสั้นกั้นใบหน้า ออกอาวุธโดยไม่เปิดการ์ด",
+  "move": "elbow",
+  "after": {
+   "move": "punch",
+   "bonus": {
+    "block": 3
+   }
+  }
+ },
+ {
+  "id": "checking_knee",
+  "name": "เข่าสกัดวงใน",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "bruise",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "เข่าขวางลำตัว ทิ้งรอยช้ำไว้รอท่าหนัก",
+  "move": "knee",
+  "after": {
+   "move": "kick",
+   "bonus": {
+    "block": 4
+   }
+  }
+ },
+ {
+  "id": "corner_towel",
+  "name": "ผ้าขาวม้ามุมเวที",
+  "type": "action",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "block": 4,
+   "healMinions": 4
+  },
+  "flavor": "เช็ดเหงื่อให้ศิษย์ค่ายก่อนออกยกต่อไป",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "round_last_turn"
+   },
+   "bonus": {
+    "block": 4
+   }
+  }
+ },
+ {
+  "id": "measured_breath",
+  "name": "หายใจตามกลอง",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "block": 5,
+   "keepRhythm": true
+  },
+  "flavor": "ฟังเสียงกลอง เก็บแรงไว้รอช่อง",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "rhythm_at_least",
+    "value": 3
+   },
+   "bonus": {
+    "draw": 1
+   }
+  }
+ },
+ {
+  "id": "bruise_guard",
+  "name": "ปิดรอยช้ำรอสวน",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "block": 7
+  },
+  "flavor": "รู้ว่าผีเจ็บตรงไหน ก็รู้ว่ามันจะสวนทางไหน",
+  "ap": 1,
+  "riposte": {
+   "dmg": 5
+  },
+  "conditional": {
+   "when": {
+    "kind": "enemy_status_at_least",
+    "statusId": "bruise",
+    "value": 3
+   },
+   "bonus": {
+    "block": 5
+   }
+  }
+ },
+ {
+  "id": "temple_ring_sweep",
+  "name": "เตะเปิดวงค่าย",
+  "type": "attack",
+  "rarity": "Uncommon",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4,
+   "sweep": true
+  },
+  "flavor": "ศิษย์ค่ายช่วยเปิดช่องให้เตะกวาดทั้งวง",
+  "move": "kick",
+  "conditional": {
+   "when": {
+    "kind": "minions_at_least",
+    "value": 1
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  }
+ },
+ {
+  "id": "last_bell_elbow",
+  "name": "ศอกส่งท้ายยก",
+  "type": "attack",
+  "rarity": "Rare",
+  "class": "warrior",
+  "fx": {
+   "dmg": 7
+  },
+  "flavor": "เก็บรอยช้ำไว้จนเสียงกลองส่งท้ายยก",
+  "move": "elbow",
+  "heavy": true,
+  "conditional": {
+   "when": {
+    "kind": "round_last_turn"
+   },
+   "bonus": {
+    "block": 10
+   }
+  }
+ },
+ {
+  "id": "yant_ladle",
+  "name": "กระบวยลงยันต์",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "mana": 2,
+   "status": [
+    {
+     "id": "yant",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "ap": 1,
+  "flavor": "จุ่มกระบวยเสกน้ำ แล้วแตะยันต์ลงเงาผี"
+ },
+ {
+  "id": "threaded_needle",
+  "name": "เข็มร้อยสายสิญจน์",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 4
+  },
+  "conditional": {
+   "when": {
+    "kind": "ghost_charging"
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "yant",
+      "stacks": 2,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "flavor": "ด้ายที่ปลายเข็มตึงเมื่อผีเริ่มง้าง"
+ },
+ {
+  "id": "familiar_ward",
+  "name": "สายสิญจน์คล้องของเลี้ยง",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "block": 5,
+   "healMinions": 3
+  },
+  "mana": 1,
+  "conditional": {
+   "when": {
+    "kind": "minions_at_least",
+    "value": 1
+   },
+   "bonus": {
+    "block": 4
+   }
+  },
+  "flavor": "คล้องด้ายขาวให้ของเลี้ยง มันก็ช่วยคุ้มครองเรา"
+ },
+ {
+  "id": "brimming_yant",
+  "name": "ยันต์ชุบน้ำเต็มขัน",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "block": 5,
+   "status": [
+    {
+     "id": "yant",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "water_at_least",
+    "value": 8
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "yant",
+      "stacks": 2,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "flavor": "เก็บน้ำไว้ให้ยันต์อิ่ม ก่อนคิดจะสาด"
+ },
+ {
+  "id": "blood_thread",
+  "name": "ด้ายแดงผูกเงา",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "block": 6,
+   "status": [
+    {
+     "id": "yant",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "mana": 2,
+  "blood": true,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "yant",
+      "stacks": 1,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ],
+    "block": 3
+   }
+  },
+  "flavor": "ของต่ำผูกยันต์ด้วยเลือด แต่ไม่เคยให้ชีวิตคืนเปล่า"
+ },
+ {
+  "id": "spirit_rice_scatter",
+  "name": "ข้าวเสกเลี้ยงบริวาร",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "dmg": 4,
+   "sweep": true,
+   "healMinions": 3
+  },
+  "mana": 2,
+  "conditional": {
+   "when": {
+    "kind": "minions_at_least",
+    "value": 1
+   },
+   "bonus": {
+    "dmg": 4
+   }
+  },
+  "flavor": "ข้าวเสกทำร้ายบริวารผี แต่เลี้ยงของที่เราปลุกไว้"
+ },
+ {
+  "id": "sealed_bowl_rite",
+  "name": "พิธีปิดขันกักเงา",
+  "type": "action",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "block": 7
+  },
+  "ap": 2,
+  "conditional": {
+   "when": {
+    "kind": "water_at_least",
+    "value": 8
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "yant",
+      "stacks": 4,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "flavor": "เทน้ำจากขันลงหม้อ ปิดเงาผีไว้ใต้ผ้าขาว"
+ },
+ {
   "id": "bamboo_dart",
   "name": "ปาไผ่เผา",
   "type": "attack",

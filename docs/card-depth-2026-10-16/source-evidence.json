@@ -1,0 +1,22 @@
+{
+  "baseCommit": "0df356181a654c2aa3bd8d6d028f1f06d0c9c5d7",
+  "branch": "work/card-depth-astra",
+  "method": "SHA256 of sorted relative src/scripts regular file paths + NUL + bytes, plus package.json, tsconfig.json, vitest.config.ts in same sort. Excludes app/art/docs/tests; this fingerprints balance inputs, not the full release.",
+  "balanceInputSha256": "5dc98f6a35e07bd41d1f7bcedd28185886bfe3ab6cc9eaff7b4aecfe41388510",
+  "changedBalanceInputs": {
+    "scripts/mor-phi-art.py": "8b878916fad825590e43670a8cdb1795133d1b2b9c2da060ea3dfc958824ea31",
+    "scripts/mor-phi-data.py": "2857c9fbb31ce9811dba59e9fa508d02fd3716a6e4e1922bee66115bbffe34c6",
+    "src/core/balance/notfm.ts": "6ca89f042316feecb76a44131143c974e59330086f31ed1eb002eaa8a353afa7",
+    "src/core/campaign/enemyDecks.ts": "cfb26d55419b83ad6ce1cd4cccb3cd1c978b32cd348d61e391b556c414951e4e",
+    "src/core/cards/describe.ts": "0af77699173041f188e05c0c808965cd6fc3dee8253f5a93d5562400ea51d9c0",
+    "src/core/combat/enemyHand.ts": "3179fa0eb1553a13d69f2abcb722f7ab1343d9a406c8862d5b8a12ade39a25d8",
+    "src/core/combat/enemyPlan.ts": "efb2945aab659d226e663d93965124ff6c8cb51cd801cca9f494d975be752489",
+    "src/data/packs/base/class_cards.json": "ea8275634cfd780349a4e9b8f59efaa81db76453f3c62ab642b4fd6fc3546444",
+    "src/data/packs/base/enemy_cards.json": "a9e3af4cc10aab87fd16d44aa5ed3f61804d65ad596067d3145be885ffa456ff",
+    "src/data/packs/base/ghost_rules.json": "97218ce89b1e24bf5d4541fa0c606b9f6b0a7e032650581705d001cb592f2dcf"
+  },
+  "finalPublishedBalanceInputSha256": "f7fa2220e7f8cebe8abd533a126cf1523ff14488d82ab5031da22c6251d4b367",
+  "notes": [
+    "The only source edit after the final run launch clarified the enemyDecks.ts header comment. Runtime code and card data were unchanged. balanceInputSha256 records launch-time inputs; finalPublishedBalanceInputSha256 records the final file snapshot."
+  ]
+}

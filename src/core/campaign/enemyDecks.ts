@@ -1,4 +1,7 @@
-/** v34: physical copies are distinct from card definitions and per-turn draws. */
+/** Card depth: physical copies grow with encounter strength; base hand/draw/retain stay fixed.
+ * Late elite/boss extra-draw cadence lives in balance/notfm.ts and combat/enemyHand.ts.
+ * Unique themed roles and compact phase-two decks preserve readable signature exposure.
+ * Rationale and roster audit: docs/card-depth-2026-10-16/GHOST-DESIGN.md. */
 export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
  "phi-krasue": [
   "phi_krasue_v29_strike",
@@ -8,7 +11,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_krasue_n1_float",
   "phi_krasue_n1_entrails",
   "phi_krasue_n1_drain",
-  "phi_krasue_n1_drain"
+  "phi_krasue_n1_drain",
+  "phi_krasue_depth_1",
+  "phi_krasue_depth_2",
+  "phi_krasue_depth_3"
  ],
  "phi-pop": [
   "phi_pop_v29_strike",
@@ -18,7 +24,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_pop_n1_gape",
   "phi_pop_n1_gape",
   "phi_pop_n1_entrails",
-  "phi_pop_n1_hunger"
+  "phi_pop_n1_hunger",
+  "phi_pop_depth_1",
+  "phi_pop_depth_2",
+  "phi_pop_depth_3"
  ],
  "nang-tanee": [
   "nang_tanee_v29_strike",
@@ -28,7 +37,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "nang_tanee_n1_leafguard",
   "nang_tanee_n1_leafguard",
   "nang_tanee_n1_leafcut",
-  "nang_tanee_n1_embrace"
+  "nang_tanee_n1_embrace",
+  "nang_tanee_depth_1",
+  "nang_tanee_depth_2",
+  "nang_tanee_depth_3"
  ],
  "phi-nang-ram": [
   "phi_nang_ram_v29_strike",
@@ -38,7 +50,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_nang_ram_n1_overture",
   "phi_nang_ram_n1_flow",
   "phi_nang_ram_n1_flow",
-  "phi_nang_ram_n1_finger"
+  "phi_nang_ram_n1_finger",
+  "phi_nang_ram_depth_1",
+  "phi_nang_ram_depth_2",
+  "phi_nang_ram_depth_3"
  ],
  "phi-pong-kang": [
   "phi_pong_kang_v29_strike",
@@ -48,7 +63,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_pong_kang_n1_call",
   "phi_pong_kang_n1_mud",
   "phi_pong_kang_n1_pound",
-  "phi_pong_kang_n1_pound"
+  "phi_pong_kang_n1_pound",
+  "phi_pong_kang_depth_1",
+  "phi_pong_kang_depth_2",
+  "phi_pong_kang_depth_3"
  ],
  "ngu-phi-sang": [
   "ngu_phi_sang_v29_strike",
@@ -58,7 +76,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "ngu_phi_sang_n1_glow",
   "ngu_phi_sang_n1_fire",
   "ngu_phi_sang_n1_burn",
-  "ngu_phi_sang_n1_burn"
+  "ngu_phi_sang_n1_burn",
+  "ngu_phi_sang_depth_1",
+  "ngu_phi_sang_depth_2",
+  "ngu_phi_sang_depth_3"
  ],
  "phi-pret": [
   "phi_pret_v29_strike",
@@ -69,7 +90,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_pret_n1_slash",
   "phi_pret_n1_needle",
   "phi_pret_n1_needle",
-  "phi_pret_n1_starve"
+  "phi_pret_n1_starve",
+  "phi_pret_depth_1",
+  "phi_pret_depth_2",
+  "phi_pret_depth_3"
  ],
  "krahang": [
   "krahang_v29_strike",
@@ -79,7 +103,11 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "krahang_n1_winnow",
   "krahang_n1_swoop",
   "krahang_n1_swoop",
-  "krahang_n1_pestle"
+  "krahang_n1_pestle",
+  "krahang_depth_1",
+  "krahang_depth_2",
+  "krahang_depth_3",
+  "krahang_depth_1"
  ],
  "kuman-thong": [
   "kuman_thong_v29_strike",
@@ -89,7 +117,11 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "kuman_thong_n1_ashrise",
   "kuman_thong_n1_ashrise",
   "kuman_thong_n1_ashcrawl",
-  "kuman_thong_n1_ashcurse"
+  "kuman_thong_n1_ashcurse",
+  "kuman_thong_depth_1",
+  "kuman_thong_depth_2",
+  "kuman_thong_depth_3",
+  "kuman_thong_depth_1"
  ],
  "phi-tai-hong": [
   "phi_tai_hong_v29_strike",
@@ -100,7 +132,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_tai_hong_n1_grudge",
   "phi_tai_hong_n1_rancor",
   "phi_tai_hong_n1_rancor",
-  "phi_tai_hong_n1_baddeath"
+  "phi_tai_hong_n1_baddeath",
+  "phi_tai_hong_depth_1",
+  "phi_tai_hong_depth_2",
+  "phi_tai_hong_depth_3"
  ],
  "phi-pa": [
   "phi_pa_v29_strike",
@@ -110,7 +145,11 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_pa_n1_shade",
   "phi_pa_n1_shade",
   "phi_pa_n1_thicket",
-  "phi_pa_n1_whirl"
+  "phi_pa_n1_whirl",
+  "phi_pa_depth_1",
+  "phi_pa_depth_2",
+  "phi_pa_depth_3",
+  "phi_pa_depth_1"
  ],
  "mae-nak": [
   "mae_nak_v29_strike",
@@ -121,7 +160,12 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "mae_nak_n2_wait",
   "mae_nak_n2_arm",
   "mae_nak_n2_lime",
-  "mae_nak_n2_baby"
+  "mae_nak_n2_baby",
+  "mae_nak_depth_1",
+  "mae_nak_depth_2",
+  "mae_nak_depth_3",
+  "mae_nak_depth_4",
+  "mae_nak_depth_5"
  ],
  "pop-yai": [
   "pop_yai_v29_strike",
@@ -132,7 +176,12 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "pop_yai_n2_maw",
   "pop_yai_n2_liver",
   "pop_yai_v29_setup",
-  "pop_yai_v29_signature_support"
+  "pop_yai_v29_signature_support",
+  "pop_yai_depth_1",
+  "pop_yai_depth_2",
+  "pop_yai_depth_3",
+  "pop_yai_depth_4",
+  "pop_yai_depth_5"
  ],
  "phi-ha-ratri": [
   "phi_ha_ratri_v29_strike",
@@ -142,7 +191,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_ha_ratri_n2_lure",
   "phi_ha_ratri_n2_spread",
   "phi_ha_ratri_n2_blaze",
-  "phi_ha_ratri_n2_blaze"
+  "phi_ha_ratri_n2_blaze",
+  "phi_ha_ratri_depth_1",
+  "phi_ha_ratri_depth_2",
+  "phi_ha_ratri_depth_3",
+  "phi_ha_ratri_depth_4",
+  "phi_ha_ratri_depth_5",
+  "phi_ha_ratri_depth_1"
  ],
  "asuragaya": [
   "asuragaya_v29_strike",
@@ -152,7 +207,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "asuragaya_n2_hop",
   "asuragaya_n2_koi",
   "asuragaya_n2_koi",
-  "asuragaya_n2_call"
+  "asuragaya_n2_call",
+  "asuragaya_depth_1",
+  "asuragaya_depth_2",
+  "asuragaya_depth_3",
+  "asuragaya_depth_4",
+  "asuragaya_depth_5",
+  "asuragaya_depth_1"
  ],
  "yak-wat-jaeng": [
   "yak_wat_jaeng_v29_strike",
@@ -162,7 +223,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "yak_wat_jaeng_n2_grip",
   "yak_wat_jaeng_n2_suck",
   "yak_wat_jaeng_n2_suck",
-  "yak_wat_jaeng_n2_merit"
+  "yak_wat_jaeng_n2_merit",
+  "yak_wat_jaeng_depth_1",
+  "yak_wat_jaeng_depth_2",
+  "yak_wat_jaeng_depth_3",
+  "yak_wat_jaeng_depth_4",
+  "yak_wat_jaeng_depth_5",
+  "yak_wat_jaeng_depth_1"
  ],
  "phi-phrai": [
   "phi_phrai_v29_strike",
@@ -173,7 +240,12 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_phrai_v34_payoff",
   "phi_phrai_v29_strike",
   "phi_phrai_n2_call",
-  "phi_phrai_n2_tears"
+  "phi_phrai_n2_tears",
+  "phi_phrai_depth_1",
+  "phi_phrai_depth_2",
+  "phi_phrai_depth_3",
+  "phi_phrai_depth_4",
+  "phi_phrai_depth_5"
  ],
  "winyan-rerorn": [
   "winyan_rerorn_v29_strike",
@@ -185,7 +257,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "winyan_rerorn_n2_curse",
   "winyan_rerorn_n2_follow",
   "winyan_rerorn_n2_follow",
-  "winyan_rerorn_v29_ward"
+  "winyan_rerorn_v29_ward",
+  "winyan_rerorn_depth_1",
+  "winyan_rerorn_depth_2",
+  "winyan_rerorn_depth_3",
+  "winyan_rerorn_depth_4",
+  "winyan_rerorn_depth_5",
+  "winyan_rerorn_depth_1"
  ],
  "pisaj-fai": [
   "pisaj_fai_v29_strike",
@@ -197,7 +275,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "pisaj_fai_n2_trick",
   "pisaj_fai_n2_sparks",
   "pisaj_fai_n2_sparks",
-  "pisaj_fai_v29_pierce"
+  "pisaj_fai_v29_pierce",
+  "pisaj_fai_depth_1",
+  "pisaj_fai_depth_2",
+  "pisaj_fai_depth_3",
+  "pisaj_fai_depth_4",
+  "pisaj_fai_depth_5",
+  "pisaj_fai_depth_1"
  ],
  "jao-por-pa": [
   "jao_por_pa_v29_strike",
@@ -209,7 +293,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "jao_por_pa_n2_vine",
   "jao_por_pa_n2_thicket",
   "jao_por_pa_n2_thicket",
-  "jao_por_pa_v29_signature"
+  "jao_por_pa_v29_signature",
+  "jao_por_pa_depth_1",
+  "jao_por_pa_depth_2",
+  "jao_por_pa_depth_3",
+  "jao_por_pa_depth_4",
+  "jao_por_pa_depth_5",
+  "jao_por_pa_depth_1"
  ],
  "phi-nang-yai": [
   "phi_nang_yai_v29_strike",
@@ -221,7 +311,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_nang_yai_n2_nails",
   "phi_nang_yai_n2_nails",
   "phi_nang_yai_n2_embrace",
-  "phi_nang_yai_n2_embrace"
+  "phi_nang_yai_n2_embrace",
+  "phi_nang_yai_depth_1",
+  "phi_nang_yai_depth_2",
+  "phi_nang_yai_depth_3",
+  "phi_nang_yai_depth_4",
+  "phi_nang_yai_depth_5",
+  "phi_nang_yai_depth_1"
  ],
  "winyan-dek": [
   "winyan_dek_v29_strike",
@@ -233,7 +329,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "winyan_dek_n2_ankle",
   "winyan_dek_n2_ankle",
   "winyan_dek_n2_cold",
-  "winyan_dek_n2_cold"
+  "winyan_dek_n2_cold",
+  "winyan_dek_depth_1",
+  "winyan_dek_depth_2",
+  "winyan_dek_depth_3",
+  "winyan_dek_depth_4",
+  "winyan_dek_depth_5",
+  "winyan_dek_depth_1"
  ],
  "yak-dam": [
   "yak_dam_v29_strike",
@@ -245,7 +347,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "yak_dam_n2_pestle",
   "yak_dam_n2_pestle",
   "yak_dam_n2_circle",
-  "yak_dam_v29_signature"
+  "yak_dam_v29_signature",
+  "yak_dam_depth_1",
+  "yak_dam_depth_2",
+  "yak_dam_depth_3",
+  "yak_dam_depth_4",
+  "yak_dam_depth_5",
+  "yak_dam_depth_1"
  ],
  "phi-mae-mai": [
   "phi_mae_mai_v29_strike",
@@ -257,7 +365,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_mae_mai_n2_kiss",
   "phi_mae_mai_n2_kiss",
   "phi_mae_mai_n2_mourn",
-  "phi_mae_mai_n2_mourn"
+  "phi_mae_mai_n2_mourn",
+  "phi_mae_mai_depth_1",
+  "phi_mae_mai_depth_2",
+  "phi_mae_mai_depth_3",
+  "phi_mae_mai_depth_4",
+  "phi_mae_mai_depth_5",
+  "phi_mae_mai_depth_1"
  ],
  "phra-upakut": [
   "phra_upakut_v29_strike",
@@ -269,7 +383,13 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phra_upakut_n2_claw",
   "phra_upakut_n2_gulp",
   "phra_upakut_n2_gulp",
-  "phra_upakut_v29_pierce"
+  "phra_upakut_v29_pierce",
+  "phra_upakut_depth_1",
+  "phra_upakut_depth_2",
+  "phra_upakut_depth_3",
+  "phra_upakut_depth_4",
+  "phra_upakut_depth_5",
+  "phra_upakut_depth_1"
  ],
  "phaya-nak": [
   "phaya_nak_v29_strike",
@@ -286,7 +406,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phaya_nak_v29_signature",
   "phaya_nak_v29_strike",
   "phaya_nak_v29_defense",
-  "phaya_nak_v34_payoff"
+  "phaya_nak_v34_payoff",
+  "phaya_nak_depth_1",
+  "phaya_nak_depth_2",
+  "phaya_nak_depth_3"
  ],
  "thep-aksorn": [
   "thep_aksorn_v29_strike",
@@ -303,7 +426,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "thep_aksorn_v29_signature",
   "thep_aksorn_v29_strike",
   "thep_aksorn_v29_defense",
-  "thep_aksorn_v34_payoff"
+  "thep_aksorn_v34_payoff",
+  "thep_aksorn_depth_1",
+  "thep_aksorn_depth_2",
+  "thep_aksorn_depth_3"
  ],
  "phraya-maccurat": [
   "phraya_maccurat_v29_strike",
@@ -320,7 +446,10 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phraya_maccurat_v29_signature",
   "phraya_maccurat_v29_strike",
   "phraya_maccurat_v29_defense",
-  "phraya_maccurat_v34_payoff"
+  "phraya_maccurat_v34_payoff",
+  "phraya_maccurat_depth_1",
+  "phraya_maccurat_depth_2",
+  "phraya_maccurat_depth_3"
  ],
  "night-head-collector": [
   "night_head_collector_v29_strike",
@@ -331,7 +460,16 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_head_collector_v29_strike",
   "night_head_collector_n1_snatch",
   "night_head_collector_v29_double",
-  "night_head_collector_n1_basket"
+  "night_head_collector_n1_basket",
+  "night_head_collector_depth_1",
+  "night_head_collector_depth_2",
+  "night_head_collector_depth_3",
+  "night_head_collector_depth_4",
+  "night_head_collector_depth_5",
+  "night_head_collector_depth_6",
+  "night_head_collector_depth_7",
+  "night_head_collector_depth_1",
+  "night_head_collector_depth_2"
  ],
  "night-bell-keeper": [
   "night_bell_keeper_v29_strike",
@@ -344,7 +482,14 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_bell_keeper_v29_double",
   "night_bell_keeper_n2_ring",
   "night_bell_keeper_n2_bowl",
-  "night_bell_keeper_v29_strike"
+  "night_bell_keeper_v29_strike",
+  "night_bell_keeper_depth_1",
+  "night_bell_keeper_depth_2",
+  "night_bell_keeper_depth_3",
+  "night_bell_keeper_depth_4",
+  "night_bell_keeper_depth_5",
+  "night_bell_keeper_depth_6",
+  "night_bell_keeper_depth_7"
  ],
  "night-root-lord": [
   "night_root_lord_v29_strike",
@@ -356,7 +501,17 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_root_lord_n3_root",
   "night_root_lord_n3_bark",
   "night_root_lord_n3_bark",
-  "night_root_lord_v29_strike"
+  "night_root_lord_v29_strike",
+  "night_root_lord_depth_1",
+  "night_root_lord_depth_2",
+  "night_root_lord_depth_3",
+  "night_root_lord_depth_4",
+  "night_root_lord_depth_5",
+  "night_root_lord_depth_6",
+  "night_root_lord_depth_7",
+  "night_root_lord_depth_1",
+  "night_root_lord_depth_2",
+  "night_root_lord_depth_4"
  ],
  "night-cave-mother": [
   "night_cave_mother_v29_strike",
@@ -368,7 +523,17 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_cave_mother_n3_mist",
   "night_cave_mother_n3_mist",
   "night_cave_mother_n3_pool",
-  "night_cave_mother_v29_strike"
+  "night_cave_mother_v29_strike",
+  "night_cave_mother_depth_1",
+  "night_cave_mother_depth_2",
+  "night_cave_mother_depth_3",
+  "night_cave_mother_depth_4",
+  "night_cave_mother_depth_5",
+  "night_cave_mother_depth_6",
+  "night_cave_mother_depth_7",
+  "night_cave_mother_depth_1",
+  "night_cave_mother_depth_2",
+  "night_cave_mother_depth_3"
  ],
  "night-headless-king": [
   "night_headless_king_v29_strike",
@@ -380,7 +545,17 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_headless_king_n3_glare",
   "night_headless_king_n3_brew",
   "night_headless_king_n3_brew",
-  "night_headless_king_v29_ward"
+  "night_headless_king_v29_ward",
+  "night_headless_king_depth_1",
+  "night_headless_king_depth_2",
+  "night_headless_king_depth_3",
+  "night_headless_king_depth_4",
+  "night_headless_king_depth_5",
+  "night_headless_king_depth_6",
+  "night_headless_king_depth_7",
+  "night_headless_king_depth_1",
+  "night_headless_king_depth_2",
+  "night_headless_king_depth_3"
  ],
  "phi-kin-hua": [
   "phi_kin_hua_v29_strike",
@@ -393,7 +568,16 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_kin_hua_n3_swallow",
   "phi_kin_hua_n3_hide",
   "phi_kin_hua_n3_hide",
-  "phi_kin_hua_v29_strike"
+  "phi_kin_hua_v29_strike",
+  "phi_kin_hua_depth_1",
+  "phi_kin_hua_depth_2",
+  "phi_kin_hua_depth_3",
+  "phi_kin_hua_depth_4",
+  "phi_kin_hua_depth_5",
+  "phi_kin_hua_depth_6",
+  "phi_kin_hua_depth_7",
+  "phi_kin_hua_depth_1",
+  "phi_kin_hua_depth_2"
  ]
 };
 export const ENEMY_ARCHETYPES:Record<string,string>={

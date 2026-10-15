@@ -54,13 +54,13 @@ const NEEDLE = 'phi_pret_n1_needle';       // เปรต ปากเท่า
 const STRIKE = 'phi_pop_v29_strike';       // ตี 3
 
 describe('ข้อมูล', () => {
-  it('ผี 11 ตัวคืน 1 + บอส ใช้เด็คใหม่ 8–10 ใบ มีการ์ดประจำตัว 3–4 แบบ', () => {
+  it('ผี 11 ตัวคืน 1 + บอส คงการ์ดประจำตัวคืน 1 หลังขยายเด็คตามระดับ', () => {
     const ghosts = ['phi-krasue', 'phi-pop', 'nang-tanee', 'phi-nang-ram', 'phi-pong-kang', 'ngu-phi-sang',
       'phi-pret', 'krahang', 'kuman-thong', 'phi-tai-hong', 'phi-pa', 'night-head-collector'];
     for (const id of ghosts) {
       const deck = NIGHT_ENEMY_DECKS[id];
-      expect(deck.length, id).toBeGreaterThanOrEqual(8);
-      expect(deck.length, id).toBeLessThanOrEqual(10);
+      expect(deck.length, id).toBeGreaterThanOrEqual(11);
+      expect(deck.length, id).toBeLessThanOrEqual(18);
       const own = new Set(deck.filter(x => x.includes('_n1_')));
       expect(own.size, id).toBeGreaterThanOrEqual(2);
       expect(own.size, id).toBeLessThanOrEqual(4);

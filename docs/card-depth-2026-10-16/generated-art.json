@@ -1,0 +1,282 @@
+[
+  {
+    "id": "guarding_elbow",
+    "path": "assets/cards/thai-v24/guarding_elbow.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: A rope-wrapped fighter shielding his cheek with a raised elbow while striking a ghost with the other elbow",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "67a97b7d17a20b7c09b5081c7f0948564bfc8b61d4a7808c8edb85bc92acf047"
+  },
+  {
+    "id": "checking_knee",
+    "path": "assets/cards/thai-v24/checking_knee.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: A fighter lifting a bent knee to check a lunging ghost at close range",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "843f5eec1c4bfcd59fc6a8384c7d78ed791a3a33712135a2c3d3ded4afc86a0e"
+  },
+  {
+    "id": "corner_towel",
+    "path": "assets/cards/thai-v24/corner_towel.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: A corner man wrapping a white checked towel around a tired young camp pupil, caring gesture",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "6c4472010cb3b9ec368edeb147186b31921f87bee455b49e25ab18738b2e9e62"
+  },
+  {
+    "id": "measured_breath",
+    "path": "assets/cards/thai-v24/measured_breath.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: A fighter breathing steadily with fists raised beside a traditional klong khaek drum",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "c1b89f23ce54e93ff978dfb456e24c34945bec29d4affa08f69c79a9cfdf2bef"
+  },
+  {
+    "id": "bruise_guard",
+    "path": "assets/cards/thai-v24/bruise_guard.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: A guarded fighter watching a bruised ghost, elbows tight and fist poised to counter",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "2f4bb7b7897fc5830064d032c6685d204e120f206fd0eb21f5cc05aff9b9e466"
+  },
+  {
+    "id": "temple_ring_sweep",
+    "path": "assets/cards/thai-v24/temple_ring_sweep.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: A fighter sweeping his leg low across two small ghost silhouettes while a camp pupil cheers behind him",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "aa8423058948e335e5e1941a45d2e667273b968e3597e4e18f72b15b5f1967c2"
+  },
+  {
+    "id": "last_bell_elbow",
+    "path": "assets/cards/thai-v24/last_bell_elbow.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: A fighter landing a decisive elbow beside a small traditional round-ending drum",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "a69a6cb2f7dfd00a428a0e26a2b1c33469d763cd3a7df1bc8ecc61d0a66aa276"
+  },
+  {
+    "id": "yant_ladle",
+    "path": "assets/cards/thai-v24/yant_ladle.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: A coconut-shell ladle dipping into a bronze water bowl, one paper talisman tied to its wooden handle",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "e83cc8cc4c9aff684282a488e514fc655f09c8f3ca33b7c3ee004c31819744a4"
+  },
+  {
+    "id": "threaded_needle",
+    "path": "assets/cards/thai-v24/threaded_needle.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: A ritual needle trailing white sacred cotton thread, taut against the wrist of a ghost raising its claw",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "33782f861a451ee7efb1558137392233bd32b252243630d8df2a57a5110f30dc"
+  },
+  {
+    "id": "familiar_ward",
+    "path": "assets/cards/thai-v24/familiar_ward.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: The shaman looping white protective thread around a small straw effigy and his own wrist",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "71e4bf12824258e1bea9de596b24b238ec5bbc619073c9973717949fc0f24dce"
+  },
+  {
+    "id": "brimming_yant",
+    "path": "assets/cards/thai-v24/brimming_yant.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: Three folded paper talismans dipping into a bronze bowl filled to the rim",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "f2fa3cc8810366f5192ee17df35264665bf219a29da831e9a460a565780189f3"
+  },
+  {
+    "id": "blood_thread",
+    "path": "assets/cards/thai-v24/blood_thread.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: A red ritual thread tied around a paper talisman and a dark ghost silhouette, a small offering cup below, no gore",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "4d1702e786a90032aa5f914029744ca82e81fb454c7345c74e0e9ff0fd8ef82e"
+  },
+  {
+    "id": "spirit_rice_scatter",
+    "path": "assets/cards/thai-v24/spirit_rice_scatter.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: Blessed rice scattered between a friendly straw effigy and hostile ghost wisps, the effigy catching grains",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "0cde3575a56802b7672b43a44c153fb85c8ef199f7fb1d552281bc30d8657555"
+  },
+  {
+    "id": "sealed_bowl_rite",
+    "path": "assets/cards/thai-v24/sealed_bowl_rite.webp",
+    "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones, dull bronze), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Shaman look: lean rural Thai village shaman (หมอผี), middle-aged, faded indigo or white collarless shirt, pha khao ma sash, sak yant tattoo lines on the forearms, white sacred cotton thread (สายสิญจน์) around the wrist, often holding a dull bronze holy-water bowl (ขันน้ำมนต์) and a sprig of leaves. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese exorcist styling, not Western witch styling. Subject: The shaman pouring a brimming bronze bowl into a clay spirit jar while drawing a white cloth over its mouth",
+    "generator": "built-in image_gen",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "alpha": true,
+    "sha256": "93a8b5257cc72ce1ccfb3efb002da856adb49e6b060e1395012c8f85703bc38f"
+  }
+]

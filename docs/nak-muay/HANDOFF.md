@@ -1,5 +1,7 @@
 # Handoff — นักมวยคาดเชือก (14 ต.ค. 2026)
 
+> อัปเดตต่อ 16 ต.ค. 2026: [ขยายสองอาชีพและสำรับผีทั้ง 34 ตัว](../card-depth-2026-10-16/README.md) เป็น handoff ล่าสุด ขนาดสำรับ จำนวนการ์ด และผลซิมด้านล่างเป็นหลักฐานรอบก่อน
+
 Branch `work/nak-muay` จาก `main` @ `d4f0d4f` (v1.0.48) · PR เข้า `main` · APK 1.0.49 / versionCode 50
 ออกแบบและเหตุผลทั้งหมด: `docs/nak-muay/DESIGN.md` · ภาพ: `docs/nak-muay/ART-PROMPTS.md` (+ `art-prompts.json`)
 

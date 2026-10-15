@@ -54,9 +54,9 @@ describe('อาชีพ', () => {
     for (const id of ['temple_blade', 'long_spear', 'ancestor_blade', 'equipment_iron_bracer']) expect(cardById(id)).toBeUndefined();
   });
 
-  it('การ์ดอาชีพครบ 52 ใบ และการ์ดโจมตีทุกใบมีท่า', () => {
+  it('การ์ดอาชีพครบ 59 ใบ และการ์ดโจมตีทุกใบมีท่า', () => {
     const own = ALL_CARDS.filter(x => x.class === 'warrior' && !x.locked);
-    expect(own).toHaveLength(52);
+    expect(own).toHaveLength(59);
     for (const x of own.filter(x => x.type === 'attack')) expect(x.move, x.id).toBeDefined();
   });
 

@@ -1,6 +1,7 @@
 import {fightBadges} from '../src/core/combat/fightBadges';
 import {rageStartTurn} from '../src/core/campaign/nights';
 import {RAGE} from '../src/core/balance/notfm';
+import {enemyDrawCadence} from '../src/core/combat/enemyHand';
 import {ghostLore} from '../src/core/monsters/folklore';
 import {battleScene} from './scenePresentation';
 import BattleBackdrop from './components/battle/BattleBackdrop';
@@ -404,7 +405,7 @@ export default function BattlePage() {
           ref={monsterRef}
           monsterId={monsterId}
           monsterName={monsterName}
-          enemy={enemy?{...enemy,drawPerTurn:gameState.enemyDrawPerTurn,maxRetained:gameState.enemyMaxRetained}:null}
+          enemy={enemy?{...enemy,drawPerTurn:gameState.enemyDrawPerTurn,maxRetained:gameState.enemyMaxRetained,drawCadence:enemyDrawCadence(gameState)}:null}
           handSlots={handSlotsRef.current}
           turnLabel={`เทิร์น ${gameState.turn} · ${phase==='enemy'?'ตาผี':'ตาเรา'}`}
         />

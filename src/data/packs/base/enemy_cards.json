@@ -3443,5 +3443,2472 @@
     }
    ]
   }
+ },
+ {
+  "id": "phi_krasue_depth_1",
+  "owner": "phi-krasue",
+  "name": "ไส้เกี่ยวชายคา",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "block": 3
+  },
+  "flavor": "หลบแล้วฉวยเลือด — ไส้เกี่ยวชายคา"
+ },
+ {
+  "id": "phi_krasue_depth_2",
+  "owner": "phi-krasue",
+  "name": "เลียแผลสด",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "weakness"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "drain": true
+  },
+  "flavor": "หลบแล้วฉวยเลือด — เลียแผลสด"
+ },
+ {
+  "id": "phi_krasue_depth_3",
+  "owner": "phi-krasue",
+  "name": "ซุกหัวใต้ถุน",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "หลบแล้วฉวยเลือด — ซุกหัวใต้ถุน"
+ },
+ {
+  "id": "phi_pop_depth_1",
+  "owner": "phi-pop",
+  "name": "เล็บควักชายโครง",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "breakBlock": 2
+  },
+  "flavor": "รอจังหวะกลืนกิน — เล็บควักชายโครง"
+ },
+ {
+  "id": "phi_pop_depth_2",
+  "owner": "phi-pop",
+  "name": "งับคอคนอ่อนแรง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "รอจังหวะกลืนกิน — งับคอคนอ่อนแรง"
+ },
+ {
+  "id": "phi_pop_depth_3",
+  "owner": "phi-pop",
+  "name": "ซ่อนท้องอิ่ม",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "heal": 2
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "รอจังหวะกลืนกิน — ซ่อนท้องอิ่ม"
+ },
+ {
+  "id": "nang_tanee_depth_1",
+  "owner": "nang-tanee",
+  "name": "ฟาดก้านกล้วย",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 3
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "คุ้มกอแล้วสวนกลับ — ฟาดก้านกล้วย"
+ },
+ {
+  "id": "nang_tanee_depth_2",
+  "owner": "nang-tanee",
+  "name": "ยางกล้วยติดมือ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "คุ้มกอแล้วสวนกลับ — ยางกล้วยติดมือ"
+ },
+ {
+  "id": "nang_tanee_depth_3",
+  "owner": "nang-tanee",
+  "name": "ห่มใบแห้ง",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "block": 3
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "คุ้มกอแล้วสวนกลับ — ห่มใบแห้ง"
+ },
+ {
+  "id": "phi_nang_ram_depth_1",
+  "owner": "phi-nang-ram",
+  "name": "ส้นเท้ากระทบโรง",
+  "type": "attack",
+  "fx": {
+   "dmg": 1,
+   "hits": 3
+  },
+  "flavor": "รำต่อเนื่องสลับตั้งหลัก — ส้นเท้ากระทบโรง"
+ },
+ {
+  "id": "phi_nang_ram_depth_2",
+  "owner": "phi-nang-ram",
+  "name": "คลี่ชายสไบ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3,
+   "status": [
+    {
+     "id": "dance",
+     "stacks": 1,
+     "turns": 1,
+     "to": "self"
+    }
+   ]
+  },
+  "flavor": "รำต่อเนื่องสลับตั้งหลัก — คลี่ชายสไบ"
+ },
+ {
+  "id": "phi_nang_ram_depth_3",
+  "owner": "phi-nang-ram",
+  "name": "จีบหักข้อมือ",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "weakness"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "รำต่อเนื่องสลับตั้งหลัก — จีบหักข้อมือ"
+ },
+ {
+  "id": "phi_pong_kang_depth_1",
+  "owner": "phi-pong-kang",
+  "name": "ดินเค็มแตกกระเซ็น",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "sweep": true
+  },
+  "flavor": "ลิงคุ้มร่างดินโป่ง — ดินเค็มแตกกระเซ็น"
+ },
+ {
+  "id": "phi_pong_kang_depth_2",
+  "owner": "phi-pong-kang",
+  "name": "ถล่มดินพอก",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "ลิงคุ้มร่างดินโป่ง — ถล่มดินพอก"
+ },
+ {
+  "id": "phi_pong_kang_depth_3",
+  "owner": "phi-pong-kang",
+  "name": "ฝุ่นโป่งเข้าตา",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "ลิงคุ้มร่างดินโป่ง — ฝุ่นโป่งเข้าตา"
+ },
+ {
+  "id": "ngu_phi_sang_depth_1",
+  "owner": "ngu-phi-sang",
+  "name": "ไฟกัดรอยไหม้",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "แสงหลอกกับไฟพิษ — ไฟกัดรอยไหม้"
+ },
+ {
+  "id": "ngu_phi_sang_depth_2",
+  "owner": "ngu-phi-sang",
+  "name": "สะบัดหางไฟ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2
+  },
+  "flavor": "แสงหลอกกับไฟพิษ — สะบัดหางไฟ",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "block": 2
+   }
+  }
+ },
+ {
+  "id": "ngu_phi_sang_depth_3",
+  "owner": "ngu-phi-sang",
+  "name": "ควันพรางร่าง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "แสงหลอกกับไฟพิษ — ควันพรางร่าง"
+ },
+ {
+  "id": "phi_pret_depth_1",
+  "owner": "phi-pret",
+  "name": "เล็บขูดแนวเกราะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "breakBlock": 3
+  },
+  "flavor": "แผลเปิดล่อปากเข็ม — เล็บขูดแนวเกราะ"
+ },
+ {
+  "id": "phi_pret_depth_2",
+  "owner": "phi-pret",
+  "name": "กอดท้องแห้ง",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "แผลเปิดล่อปากเข็ม — กอดท้องแห้ง"
+ },
+ {
+  "id": "phi_pret_depth_3",
+  "owner": "phi-pret",
+  "name": "ก้มเลียรอยกรีด",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "vulnerable"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "drain": true
+  },
+  "flavor": "แผลเปิดล่อปากเข็ม — ก้มเลียรอยกรีด"
+ },
+ {
+  "id": "krahang_depth_1",
+  "owner": "krahang",
+  "name": "สากเกี่ยวโล่",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 3
+  },
+  "flavor": "โฉบชาร์จจากกระด้ง — สากเกี่ยวโล่"
+ },
+ {
+  "id": "krahang_depth_2",
+  "owner": "krahang",
+  "name": "โฉบเฉียดดิน",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_block_at_least",
+    "value": 1
+   },
+   "bonus": {
+    "hits": 1
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "hits": 1
+  },
+  "flavor": "โฉบชาร์จจากกระด้ง — โฉบเฉียดดิน"
+ },
+ {
+  "id": "krahang_depth_3",
+  "owner": "krahang",
+  "name": "พับปีกลงนา",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "heal": 2
+  },
+  "flavor": "โฉบชาร์จจากกระด้ง — พับปีกลงนา"
+ },
+ {
+  "id": "kuman_thong_depth_1",
+  "owner": "kuman-thong",
+  "name": "เถ้าลวกมือ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "เถ้ากระดูกคุ้มร่าง — เถ้าลวกมือ"
+ },
+ {
+  "id": "kuman_thong_depth_2",
+  "owner": "kuman-thong",
+  "name": "กระดูกทิ่มรอยสาป",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "curse"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "เถ้ากระดูกคุ้มร่าง — กระดูกทิ่มรอยสาป"
+ },
+ {
+  "id": "kuman_thong_depth_3",
+  "owner": "kuman-thong",
+  "name": "รวบเถ้าคลุมอก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "heal": 2
+  },
+  "flavor": "เถ้ากระดูกคุ้มร่าง — รวบเถ้าคลุมอก"
+ },
+ {
+  "id": "phi_tai_hong_depth_1",
+  "owner": "phi-tai-hong",
+  "name": "เลือดคั่ง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "hurt_last_turn"
+   },
+   "bonus": {
+    "block": 4
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "แค้นเมื่อถูกทำร้าย — เลือดคั่ง"
+ },
+ {
+  "id": "phi_tai_hong_depth_2",
+  "owner": "phi-tai-hong",
+  "name": "รอยแผลไม่ปิด",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "vulnerable"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "แค้นเมื่อถูกทำร้าย — รอยแผลไม่ปิด"
+ },
+ {
+  "id": "phi_tai_hong_depth_3",
+  "owner": "phi-tai-hong",
+  "name": "ซ่อนศพใต้เสื่อ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3,
+   "heal": 2
+  },
+  "flavor": "แค้นเมื่อถูกทำร้าย — ซ่อนศพใต้เสื่อ"
+ },
+ {
+  "id": "phi_pa_depth_1",
+  "owner": "phi-pa",
+  "name": "หนามหวายฟาด",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "breakBlock": 2
+  },
+  "flavor": "เงาป่าพรางแรงลม — หนามหวายฟาด"
+ },
+ {
+  "id": "phi_pa_depth_2",
+  "owner": "phi-pa",
+  "name": "กิ่งไม้จากเงามืด",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "เงาป่าพรางแรงลม — กิ่งไม้จากเงามืด"
+ },
+ {
+  "id": "phi_pa_depth_3",
+  "owner": "phi-pa",
+  "name": "ใบไม้กลบรอย",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "เงาป่าพรางแรงลม — ใบไม้กลบรอย"
+ },
+ {
+  "id": "mae_nak_depth_1",
+  "owner": "mae-nak",
+  "name": "เล็บขูดฝาเรือน",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "hits": 2
+  },
+  "flavor": "รอผัว สวน และทวงของ — เล็บขูดฝาเรือน"
+ },
+ {
+  "id": "mae_nak_depth_2",
+  "owner": "mae-nak",
+  "name": "มือเอื้อมพ้นชาน",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "รอผัว สวน และทวงของ — มือเอื้อมพ้นชาน"
+ },
+ {
+  "id": "mae_nak_depth_3",
+  "owner": "mae-nak",
+  "name": "เงาทาบท่าน้ำ",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "รอผัว สวน และทวงของ — เงาทาบท่าน้ำ"
+ },
+ {
+  "id": "mae_nak_depth_4",
+  "owner": "mae-nak",
+  "name": "กล่อมเรือนเงียบ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "รอผัว สวน และทวงของ — กล่อมเรือนเงียบ"
+ },
+ {
+  "id": "mae_nak_depth_5",
+  "owner": "mae-nak",
+  "name": "กอดผ้าห่มเก่า",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "รอผัว สวน และทวงของ — กอดผ้าห่มเก่า"
+ },
+ {
+  "id": "pop_yai_depth_1",
+  "owner": "pop-yai",
+  "name": "กัดทะลุชายเกราะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4
+  },
+  "flavor": "ปากชาร์จและกินตับ — กัดทะลุชายเกราะ"
+ },
+ {
+  "id": "pop_yai_depth_2",
+  "owner": "pop-yai",
+  "name": "ลิ้นเลียเลือด",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "drain": true
+  },
+  "flavor": "ปากชาร์จและกินตับ — ลิ้นเลียเลือด"
+ },
+ {
+  "id": "pop_yai_depth_3",
+  "owner": "pop-yai",
+  "name": "ตะปบสองมือ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2,
+   "block": 2
+  },
+  "flavor": "ปากชาร์จและกินตับ — ตะปบสองมือ"
+ },
+ {
+  "id": "pop_yai_depth_4",
+  "owner": "pop-yai",
+  "name": "หนังท้องตึง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "ปากชาร์จและกินตับ — หนังท้องตึง"
+ },
+ {
+  "id": "pop_yai_depth_5",
+  "owner": "pop-yai",
+  "name": "หมอบซ่อนเครื่องใน",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "ปากชาร์จและกินตับ — หมอบซ่อนเครื่องใน"
+ },
+ {
+  "id": "phi_ha_ratri_depth_1",
+  "owner": "phi-ha-ratri",
+  "name": "สะเก็ดไฟปลายหญ้า",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2
+  },
+  "flavor": "ไฟโขมดเผาพิษ — สะเก็ดไฟปลายหญ้า",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 1
+   }
+  }
+ },
+ {
+  "id": "phi_ha_ratri_depth_2",
+  "owner": "phi-ha-ratri",
+  "name": "เขม่าดำติดแขน",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "ไฟโขมดเผาพิษ — เขม่าดำติดแขน"
+ },
+ {
+  "id": "phi_ha_ratri_depth_3",
+  "owner": "phi-ha-ratri",
+  "name": "ถ่านแดงซ้ำแผล",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "ไฟโขมดเผาพิษ — ถ่านแดงซ้ำแผล"
+ },
+ {
+  "id": "phi_ha_ratri_depth_4",
+  "owner": "phi-ha-ratri",
+  "name": "ม่านควันดำ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "ไฟโขมดเผาพิษ — ม่านควันดำ"
+ },
+ {
+  "id": "phi_ha_ratri_depth_5",
+  "owner": "phi-ha-ratri",
+  "name": "ดับแสงหลบลม",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "ไฟโขมดเผาพิษ — ดับแสงหลบลม"
+ },
+ {
+  "id": "asuragaya_depth_1",
+  "owner": "asuragaya",
+  "name": "ส้นเท้าตอกพื้น",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4
+  },
+  "flavor": "กระโดดหนีแล้วชาร์จ — ส้นเท้าตอกพื้น"
+ },
+ {
+  "id": "asuragaya_depth_2",
+  "owner": "asuragaya",
+  "name": "ตวัดเท้าสองจังหวะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2,
+   "block": 2
+  },
+  "flavor": "กระโดดหนีแล้วชาร์จ — ตวัดเท้าสองจังหวะ"
+ },
+ {
+  "id": "asuragaya_depth_3",
+  "owner": "asuragaya",
+  "name": "กระโจนข้ามโล่",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "กระโดดหนีแล้วชาร์จ — กระโจนข้ามโล่"
+ },
+ {
+  "id": "asuragaya_depth_4",
+  "owner": "asuragaya",
+  "name": "ยันขากับโคนไม้",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "กระโดดหนีแล้วชาร์จ — ยันขากับโคนไม้"
+ },
+ {
+  "id": "asuragaya_depth_5",
+  "owner": "asuragaya",
+  "name": "ซ่อนขาในพุ่มหนาม",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "กระโดดหนีแล้วชาร์จ — ซ่อนขาในพุ่มหนาม"
+ },
+ {
+  "id": "yak_wat_jaeng_depth_1",
+  "owner": "yak-wat-jaeng",
+  "name": "เล็บครูดบาตร",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 3
+  },
+  "flavor": "ขอส่วนบุญแล้วซ้ำแผล — เล็บครูดบาตร"
+ },
+ {
+  "id": "yak_wat_jaeng_depth_2",
+  "owner": "yak-wat-jaeng",
+  "name": "ดูดแผลคนลืมบุญ",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "vulnerable"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "drain": true
+  },
+  "flavor": "ขอส่วนบุญแล้วซ้ำแผล — ดูดแผลคนลืมบุญ"
+ },
+ {
+  "id": "yak_wat_jaeng_depth_3",
+  "owner": "yak-wat-jaeng",
+  "name": "คว่ำบาตรบังอก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 6
+  },
+  "flavor": "ขอส่วนบุญแล้วซ้ำแผล — คว่ำบาตรบังอก"
+ },
+ {
+  "id": "yak_wat_jaeng_depth_4",
+  "owner": "yak-wat-jaeng",
+  "name": "แขนยาวพาดกำแพง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "ขอส่วนบุญแล้วซ้ำแผล — แขนยาวพาดกำแพง"
+ },
+ {
+  "id": "yak_wat_jaeng_depth_5",
+  "owner": "yak-wat-jaeng",
+  "name": "เสียงท้องร้อง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "ขอส่วนบุญแล้วซ้ำแผล — เสียงท้องร้อง"
+ },
+ {
+  "id": "phi_phrai_depth_1",
+  "owner": "phi-phrai",
+  "name": "สาหร่ายบาดขา",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "น้ำพิษกับพรายรับหมัด — สาหร่ายบาดขา"
+ },
+ {
+  "id": "phi_phrai_depth_2",
+  "owner": "phi-phrai",
+  "name": "น้ำวนใต้แผล",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 1
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "hits": 2
+  },
+  "flavor": "น้ำพิษกับพรายรับหมัด — น้ำวนใต้แผล"
+ },
+ {
+  "id": "phi_phrai_depth_3",
+  "owner": "phi-phrai",
+  "name": "ฟองน้ำคุ้มร่าง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "น้ำพิษกับพรายรับหมัด — ฟองน้ำคุ้มร่าง"
+ },
+ {
+  "id": "phi_phrai_depth_4",
+  "owner": "phi-phrai",
+  "name": "หินใต้น้ำกระแทก",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 3
+  },
+  "flavor": "น้ำพิษกับพรายรับหมัด — หินใต้น้ำกระแทก"
+ },
+ {
+  "id": "phi_phrai_depth_5",
+  "owner": "phi-phrai",
+  "name": "ซ่อนในกอบัว",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "น้ำพิษกับพรายรับหมัด — ซ่อนในกอบัว"
+ },
+ {
+  "id": "winyan_rerorn_depth_1",
+  "owner": "winyan-rerorn",
+  "name": "เงาตามรอยเลือด",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "hurt_last_turn"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "แค้นตามติดและคำกระซิบ — เงาตามรอยเลือด"
+ },
+ {
+  "id": "winyan_rerorn_depth_2",
+  "owner": "winyan-rerorn",
+  "name": "เล็บครูดกำแพง",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 3
+  },
+  "flavor": "แค้นตามติดและคำกระซิบ — เล็บครูดกำแพง"
+ },
+ {
+  "id": "winyan_rerorn_depth_3",
+  "owner": "winyan-rerorn",
+  "name": "ลากเท้าผ่านฝุ่น",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "block": 3
+  },
+  "flavor": "แค้นตามติดและคำกระซิบ — ลากเท้าผ่านฝุ่น"
+ },
+ {
+  "id": "winyan_rerorn_depth_4",
+  "owner": "winyan-rerorn",
+  "name": "เสียงสะอื้นข้างหู",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "แค้นตามติดและคำกระซิบ — เสียงสะอื้นข้างหู"
+ },
+ {
+  "id": "winyan_rerorn_depth_5",
+  "owner": "winyan-rerorn",
+  "name": "หลบใต้ชายคาร้าง",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "แค้นตามติดและคำกระซิบ — หลบใต้ชายคาร้าง"
+ },
+ {
+  "id": "pisaj_fai_depth_1",
+  "owner": "pisaj-fai",
+  "name": "ถ่านพุ่งแตก",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 3
+  },
+  "flavor": "สุมไฟชาร์จและไฟรัว — ถ่านพุ่งแตก"
+ },
+ {
+  "id": "pisaj_fai_depth_2",
+  "owner": "pisaj-fai",
+  "name": "เถ้าร้อนเกาะโล่",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4
+  },
+  "flavor": "สุมไฟชาร์จและไฟรัว — เถ้าร้อนเกาะโล่"
+ },
+ {
+  "id": "pisaj_fai_depth_3",
+  "owner": "pisaj-fai",
+  "name": "เปลวไฟเลียเกราะ",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "สุมไฟชาร์จและไฟรัว — เปลวไฟเลียเกราะ"
+ },
+ {
+  "id": "pisaj_fai_depth_4",
+  "owner": "pisaj-fai",
+  "name": "กำแพงควัน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "สุมไฟชาร์จและไฟรัว — กำแพงควัน",
+  "conditional": {
+   "when": {
+    "kind": "foe_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "block": 3
+   }
+  }
+ },
+ {
+  "id": "pisaj_fai_depth_5",
+  "owner": "pisaj-fai",
+  "name": "หรี่ไฟซ่อนแกน",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "สุมไฟชาร์จและไฟรัว — หรี่ไฟซ่อนแกน"
+ },
+ {
+  "id": "jao_por_pa_depth_1",
+  "owner": "jao-por-pa",
+  "name": "หวายสะบัด",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4
+  },
+  "flavor": "เสือและเถาวัลย์คุมดง — หวายสะบัด"
+ },
+ {
+  "id": "jao_por_pa_depth_2",
+  "owner": "jao-por-pa",
+  "name": "ตอไม้ถล่ม",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 5
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "เสือและเถาวัลย์คุมดง — ตอไม้ถล่ม"
+ },
+ {
+  "id": "jao_por_pa_depth_3",
+  "owner": "jao-por-pa",
+  "name": "ใบมีดจากพงไพร",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2
+  },
+  "flavor": "เสือและเถาวัลย์คุมดง — ใบมีดจากพงไพร"
+ },
+ {
+  "id": "jao_por_pa_depth_4",
+  "owner": "jao-por-pa",
+  "name": "ร่มเงาไม้ใหญ่",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "เสือและเถาวัลย์คุมดง — ร่มเงาไม้ใหญ่"
+ },
+ {
+  "id": "jao_por_pa_depth_5",
+  "owner": "jao-por-pa",
+  "name": "ยางไม้สมานร่าง",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "เสือและเถาวัลย์คุมดง — ยางไม้สมานร่าง"
+ },
+ {
+  "id": "phi_nang_yai_depth_1",
+  "owner": "phi-nang-yai",
+  "name": "ส้นเท้าสามจังหวะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 1,
+   "hits": 3
+  },
+  "flavor": "รำเปิดแผลแล้วกอดตาย — ส้นเท้าสามจังหวะ"
+ },
+ {
+  "id": "phi_nang_yai_depth_2",
+  "owner": "phi-nang-yai",
+  "name": "ชายสไบบังอก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "dance",
+     "stacks": 1,
+     "turns": 1,
+     "to": "self"
+    }
+   ]
+  },
+  "flavor": "รำเปิดแผลแล้วกอดตาย — ชายสไบบังอก"
+ },
+ {
+  "id": "phi_nang_yai_depth_3",
+  "owner": "phi-nang-yai",
+  "name": "เล็บจิกชายโครง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "vulnerable"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "รำเปิดแผลแล้วกอดตาย — เล็บจิกชายโครง"
+ },
+ {
+  "id": "phi_nang_yai_depth_4",
+  "owner": "phi-nang-yai",
+  "name": "ตวัดแขนหลบเสา",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "block": 3
+  },
+  "flavor": "รำเปิดแผลแล้วกอดตาย — ตวัดแขนหลบเสา"
+ },
+ {
+  "id": "phi_nang_yai_depth_5",
+  "owner": "phi-nang-yai",
+  "name": "เสียงครางใต้ถุน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "รำเปิดแผลแล้วกอดตาย — เสียงครางใต้ถุน"
+ },
+ {
+  "id": "winyan_dek_depth_1",
+  "owner": "winyan-dek",
+  "name": "ฟองน้ำกัดผิว",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2,
+   "drain": true
+  },
+  "flavor": "ดำน้ำหลบและดูดแรง — ฟองน้ำกัดผิว"
+ },
+ {
+  "id": "winyan_dek_depth_2",
+  "owner": "winyan-dek",
+  "name": "กระชากชายเสื้อ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 3
+  },
+  "flavor": "ดำน้ำหลบและดูดแรง — กระชากชายเสื้อ"
+ },
+ {
+  "id": "winyan_dek_depth_3",
+  "owner": "winyan-dek",
+  "name": "เท้าเย็นเกาะหลัง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "weakness"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "ดำน้ำหลบและดูดแรง — เท้าเย็นเกาะหลัง"
+ },
+ {
+  "id": "winyan_dek_depth_4",
+  "owner": "winyan-dek",
+  "name": "โคลนก้นบ่อ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "ดำน้ำหลบและดูดแรง — โคลนก้นบ่อ"
+ },
+ {
+  "id": "winyan_dek_depth_5",
+  "owner": "winyan-dek",
+  "name": "นอนใต้ใบบัว",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "ดำน้ำหลบและดูดแรง — นอนใต้ใบบัว"
+ },
+ {
+  "id": "yak_dam_depth_1",
+  "owner": "yak-dam",
+  "name": "กระด้งเฉือนขอบโล่",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4
+  },
+  "flavor": "ปีกสวนคุ้มสากชาร์จ — กระด้งเฉือนขอบโล่"
+ },
+ {
+  "id": "yak_dam_depth_2",
+  "owner": "yak-dam",
+  "name": "สากไถลตามปีก",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "ปีกสวนคุ้มสากชาร์จ — สากไถลตามปีก"
+ },
+ {
+  "id": "yak_dam_depth_3",
+  "owner": "yak-dam",
+  "name": "ปัดปีกสองข้าง",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2,
+   "block": 2
+  },
+  "flavor": "ปีกสวนคุ้มสากชาร์จ — ปัดปีกสองข้าง"
+ },
+ {
+  "id": "yak_dam_depth_4",
+  "owner": "yak-dam",
+  "name": "หุบปีกคุ้มอก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 6
+  },
+  "flavor": "ปีกสวนคุ้มสากชาร์จ — หุบปีกคุ้มอก"
+ },
+ {
+  "id": "yak_dam_depth_5",
+  "owner": "yak-dam",
+  "name": "พักสากในเงา",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "ปีกสวนคุ้มสากชาร์จ — พักสากในเงา"
+ },
+ {
+  "id": "phi_mae_mai_depth_1",
+  "owner": "phi-mae-mai",
+  "name": "เล็บแม่ม่ายกรีด",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 3
+  },
+  "flavor": "จุมพิตดูดแรงหลังฝัน — เล็บแม่ม่ายกรีด"
+ },
+ {
+  "id": "phi_mae_mai_depth_2",
+  "owner": "phi-mae-mai",
+  "name": "กอดคนอ่อนแรง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "weakness"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "drain": true
+  },
+  "flavor": "จุมพิตดูดแรงหลังฝัน — กอดคนอ่อนแรง"
+ },
+ {
+  "id": "phi_mae_mai_depth_3",
+  "owner": "phi-mae-mai",
+  "name": "ลมหายใจเย็น",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "จุมพิตดูดแรงหลังฝัน — ลมหายใจเย็น"
+ },
+ {
+  "id": "phi_mae_mai_depth_4",
+  "owner": "phi-mae-mai",
+  "name": "ม่านดำคลุมเรือน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "จุมพิตดูดแรงหลังฝัน — ม่านดำคลุมเรือน",
+  "conditional": {
+   "when": {
+    "kind": "foe_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "block": 3
+   }
+  }
+ },
+ {
+  "id": "phi_mae_mai_depth_5",
+  "owner": "phi-mae-mai",
+  "name": "กอดหมอนเปล่า",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 3
+  },
+  "flavor": "จุมพิตดูดแรงหลังฝัน — กอดหมอนเปล่า"
+ },
+ {
+  "id": "phra_upakut_depth_1",
+  "owner": "phra-upakut",
+  "name": "ตะกุยรอยเกราะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4
+  },
+  "flavor": "เล็บเปิดแผลกับชาร์จฟื้น — ตะกุยรอยเกราะ"
+ },
+ {
+  "id": "phra_upakut_depth_2",
+  "owner": "phra-upakut",
+  "name": "ลิ้นแตะแผล",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "vulnerable"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 3,
+   "drain": true
+  },
+  "flavor": "เล็บเปิดแผลกับชาร์จฟื้น — ลิ้นแตะแผล"
+ },
+ {
+  "id": "phra_upakut_depth_3",
+  "owner": "phra-upakut",
+  "name": "เล็บสั้นสับซ้ำ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2
+  },
+  "flavor": "เล็บเปิดแผลกับชาร์จฟื้น — เล็บสั้นสับซ้ำ"
+ },
+ {
+  "id": "phra_upakut_depth_4",
+  "owner": "phra-upakut",
+  "name": "หนังหุ้มกระดูก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 6
+  },
+  "flavor": "เล็บเปิดแผลกับชาร์จฟื้น — หนังหุ้มกระดูก"
+ },
+ {
+  "id": "phra_upakut_depth_5",
+  "owner": "phra-upakut",
+  "name": "ท้องร้องก้องดง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "block": 4
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "เล็บเปิดแผลกับชาร์จฟื้น — ท้องร้องก้องดง"
+ },
+ {
+  "id": "phaya_nak_depth_1",
+  "owner": "phaya-nak",
+  "name": "สายน้ำเซาะเกราะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4,
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "น้ำพิษกัดซ้ำใต้เกราะ — สายน้ำเซาะเกราะ"
+ },
+ {
+  "id": "phaya_nak_depth_2",
+  "owner": "phaya-nak",
+  "name": "ระลอกพิษคู่",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 2,
+   "hits": 2
+  },
+  "flavor": "น้ำพิษกัดซ้ำใต้เกราะ — ระลอกพิษคู่"
+ },
+ {
+  "id": "phaya_nak_depth_3",
+  "owner": "phaya-nak",
+  "name": "เกล็ดพรางแอ่งน้ำ",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "น้ำพิษกัดซ้ำใต้เกราะ — เกล็ดพรางแอ่งน้ำ"
+ },
+ {
+  "id": "thep_aksorn_depth_1",
+  "owner": "thep-aksorn",
+  "name": "ปลายไม้ขีดอาคม",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "breakBlock": 4
+  },
+  "flavor": "คำสาปผู้เฒ่าเปิดแผล — ปลายไม้ขีดอาคม"
+ },
+ {
+  "id": "thep_aksorn_depth_2",
+  "owner": "thep-aksorn",
+  "name": "อ่านรอยเลือด",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "vulnerable"
+   },
+   "bonus": {
+    "dmg": 4
+   }
+  },
+  "fx": {
+   "dmg": 3
+  },
+  "flavor": "คำสาปผู้เฒ่าเปิดแผล — อ่านรอยเลือด"
+ },
+ {
+  "id": "thep_aksorn_depth_3",
+  "owner": "thep-aksorn",
+  "name": "เผากระดาษคุ้มร่าง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "คำสาปผู้เฒ่าเปิดแผล — เผากระดาษคุ้มร่าง"
+ },
+ {
+  "id": "phraya_maccurat_depth_1",
+  "owner": "phraya-maccurat",
+  "name": "งับข้อมือ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "drain": true
+  },
+  "flavor": "ปอบดงดูดแรงบีบมือ — งับข้อมือ"
+ },
+ {
+  "id": "phraya_maccurat_depth_2",
+  "owner": "phraya-maccurat",
+  "name": "กลืนแรงคนเจ็บ",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4,
+   "drain": true
+  },
+  "flavor": "ปอบดงดูดแรงบีบมือ — กลืนแรงคนเจ็บ"
+ },
+ {
+  "id": "phraya_maccurat_depth_3",
+  "owner": "phraya-maccurat",
+  "name": "ห่อร่างในหนังแห้ง",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 5
+  },
+  "flavor": "ปอบดงดูดแรงบีบมือ — ห่อร่างในหนังแห้ง"
+ },
+ {
+  "id": "night_head_collector_depth_1",
+  "owner": "night-head-collector",
+  "name": "สากครูดขอบเกราะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "breakBlock": 4,
+   "hits": 2
+  },
+  "flavor": "กระด้งเก็บหัวและฉวยชาร์จ — สากครูดขอบเกราะ"
+ },
+ {
+  "id": "night_head_collector_depth_2",
+  "owner": "night-head-collector",
+  "name": "กระด้งตวัดวน",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 3
+  },
+  "flavor": "กระด้งเก็บหัวและฉวยชาร์จ — กระด้งตวัดวน"
+ },
+ {
+  "id": "night_head_collector_depth_3",
+  "owner": "night-head-collector",
+  "name": "เงากระด้งคลุมบึง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "กระด้งเก็บหัวและฉวยชาร์จ — เงากระด้งคลุมบึง"
+ },
+ {
+  "id": "night_head_collector_depth_4",
+  "owner": "night-head-collector",
+  "name": "โฉบซ้ำรอยหวั่น",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "weakness"
+   },
+   "bonus": {
+    "dmg": 2
+   }
+  },
+  "fx": {
+   "dmg": 5
+  },
+  "flavor": "กระด้งเก็บหัวและฉวยชาร์จ — โฉบซ้ำรอยหวั่น"
+ },
+ {
+  "id": "night_head_collector_depth_5",
+  "owner": "night-head-collector",
+  "name": "ขอบกระด้งฟาด",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "block": 3
+  },
+  "flavor": "กระด้งเก็บหัวและฉวยชาร์จ — ขอบกระด้งฟาด",
+  "charge": {
+   "dmg": 2
+  }
+ },
+ {
+  "id": "night_head_collector_depth_6",
+  "owner": "night-head-collector",
+  "name": "ซุกหัวใต้กระด้ง",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 40
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "กระด้งเก็บหัวและฉวยชาร์จ — ซุกหัวใต้กระด้ง"
+ },
+ {
+  "id": "night_head_collector_depth_7",
+  "owner": "night-head-collector",
+  "name": "สากกวาดริมนา",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "sweep": true
+  },
+  "flavor": "กระด้งเก็บหัวและฉวยชาร์จ — สากกวาดริมนา"
+ },
+ {
+  "id": "night_bell_keeper_depth_1",
+  "owner": "night-bell-keeper",
+  "name": "ไม้ระฆังเคาะเกราะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "breakBlock": 4
+  },
+  "flavor": "บาตร ระฆัง และเปรตบริวาร — ไม้ระฆังเคาะเกราะ"
+ },
+ {
+  "id": "night_bell_keeper_depth_2",
+  "owner": "night-bell-keeper",
+  "name": "เสียงก้องรอยแผล",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "vulnerable"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "บาตร ระฆัง และเปรตบริวาร — เสียงก้องรอยแผล"
+ },
+ {
+  "id": "night_bell_keeper_depth_3",
+  "owner": "night-bell-keeper",
+  "name": "ขอบบาตรบาดมือ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "บาตร ระฆัง และเปรตบริวาร — ขอบบาตรบาดมือ"
+ },
+ {
+  "id": "night_bell_keeper_depth_4",
+  "owner": "night-bell-keeper",
+  "name": "ชายจีวรบังบาตร",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "บาตร ระฆัง และเปรตบริวาร — ชายจีวรบังบาตร"
+ },
+ {
+  "id": "night_bell_keeper_depth_5",
+  "owner": "night-bell-keeper",
+  "name": "เคาะระฆังสั้น",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "hits": 2
+  },
+  "flavor": "บาตร ระฆัง และเปรตบริวาร — เคาะระฆังสั้น"
+ },
+ {
+  "id": "night_bell_keeper_depth_6",
+  "owner": "night-bell-keeper",
+  "name": "บาตรหนักตกใส่",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 4
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "บาตร ระฆัง และเปรตบริวาร — บาตรหนักตกใส่"
+ },
+ {
+  "id": "night_bell_keeper_depth_7",
+  "owner": "night-bell-keeper",
+  "name": "เก็บเศษบาตร",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 35
+   },
+   "bonus": {
+    "heal": 3
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "บาตร ระฆัง และเปรตบริวาร — เก็บเศษบาตร"
+ },
+ {
+  "id": "night_root_lord_depth_1",
+  "owner": "night-root-lord",
+  "name": "รากเซาะขอบโล่",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "breakBlock": 5
+  },
+  "flavor": "รากคุ้มไทรก่อนกิ่งสวน — รากเซาะขอบโล่"
+ },
+ {
+  "id": "night_root_lord_depth_2",
+  "owner": "night-root-lord",
+  "name": "กิ่งแตกจากเปลือก",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 5
+   },
+   "bonus": {
+    "dmg": 4
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "รากคุ้มไทรก่อนกิ่งสวน — กิ่งแตกจากเปลือก"
+ },
+ {
+  "id": "night_root_lord_depth_3",
+  "owner": "night-root-lord",
+  "name": "ใบไทรบดบัง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "รากคุ้มไทรก่อนกิ่งสวน — ใบไทรบดบัง"
+ },
+ {
+  "id": "night_root_lord_depth_4",
+  "owner": "night-root-lord",
+  "name": "เมล็ดไทรกระหน่ำ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 3
+  },
+  "flavor": "รากคุ้มไทรก่อนกิ่งสวน — เมล็ดไทรกระหน่ำ"
+ },
+ {
+  "id": "night_root_lord_depth_5",
+  "owner": "night-root-lord",
+  "name": "ยางไทรสมานรอย",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 35
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "รากคุ้มไทรก่อนกิ่งสวน — ยางไทรสมานรอย"
+ },
+ {
+  "id": "night_root_lord_depth_6",
+  "owner": "night-root-lord",
+  "name": "เถาไทรกวาดพื้น",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "sweep": true
+  },
+  "flavor": "รากคุ้มไทรก่อนกิ่งสวน — เถาไทรกวาดพื้น"
+ },
+ {
+  "id": "night_root_lord_depth_7",
+  "owner": "night-root-lord",
+  "name": "กิ่งต่ำค้ำร่าง",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "block": 4
+  },
+  "flavor": "รากคุ้มไทรก่อนกิ่งสวน — กิ่งต่ำค้ำร่าง"
+ },
+ {
+  "id": "night_cave_mother_depth_1",
+  "owner": "night-cave-mother",
+  "name": "หินงอกบาดเท้า",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "พรายน้ำ พิษ และคลื่นถ้ำ — หินงอกบาดเท้า"
+ },
+ {
+  "id": "night_cave_mother_depth_2",
+  "owner": "night-cave-mother",
+  "name": "น้ำวนใต้หมอก",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "poison"
+   },
+   "bonus": {
+    "dmg": 4
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "พรายน้ำ พิษ และคลื่นถ้ำ — น้ำวนใต้หมอก"
+ },
+ {
+  "id": "night_cave_mother_depth_3",
+  "owner": "night-cave-mother",
+  "name": "คลื่นเซาะโล่",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "breakBlock": 4
+  },
+  "flavor": "พรายน้ำ พิษ และคลื่นถ้ำ — คลื่นเซาะโล่"
+ },
+ {
+  "id": "night_cave_mother_depth_4",
+  "owner": "night-cave-mother",
+  "name": "ผลึกถ้ำกำบัง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "flavor": "พรายน้ำ พิษ และคลื่นถ้ำ — ผลึกถ้ำกำบัง"
+ },
+ {
+  "id": "night_cave_mother_depth_5",
+  "owner": "night-cave-mother",
+  "name": "หยดน้ำกระหน่ำ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 3
+  },
+  "flavor": "พรายน้ำ พิษ และคลื่นถ้ำ — หยดน้ำกระหน่ำ"
+ },
+ {
+  "id": "night_cave_mother_depth_6",
+  "owner": "night-cave-mother",
+  "name": "ไอเย็นหุ้มร่าง",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 35
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "พรายน้ำ พิษ และคลื่นถ้ำ — ไอเย็นหุ้มร่าง"
+ },
+ {
+  "id": "night_cave_mother_depth_7",
+  "owner": "night-cave-mother",
+  "name": "น้ำซัดชายถ้ำ",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "sweep": true
+  },
+  "flavor": "พรายน้ำ พิษ และคลื่นถ้ำ — น้ำซัดชายถ้ำ"
+ },
+ {
+  "id": "night_headless_king_depth_1",
+  "owner": "night-headless-king",
+  "name": "คมมีดขูดอักขระ",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "breakBlock": 4
+  },
+  "flavor": "อาคมชาร์จก่อนคืนชีพรำรัว — คมมีดขูดอักขระ"
+ },
+ {
+  "id": "night_headless_king_depth_2",
+  "owner": "night-headless-king",
+  "name": "ควันยากัดคอ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "อาคมชาร์จก่อนคืนชีพรำรัว — ควันยากัดคอ"
+ },
+ {
+  "id": "night_headless_king_depth_3",
+  "owner": "night-headless-king",
+  "name": "แทงตามควันยา",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "enemy_has_status",
+    "statusId": "weakness"
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "อาคมชาร์จก่อนคืนชีพรำรัว — แทงตามควันยา"
+ },
+ {
+  "id": "night_headless_king_depth_4",
+  "owner": "night-headless-king",
+  "name": "ผ้ายันต์พันอก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "dance",
+     "stacks": 1,
+     "turns": 1,
+     "to": "self"
+    }
+   ]
+  },
+  "flavor": "อาคมชาร์จก่อนคืนชีพรำรัว — ผ้ายันต์พันอก"
+ },
+ {
+  "id": "night_headless_king_depth_5",
+  "owner": "night-headless-king",
+  "name": "ยาเคลือบกระดูก",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 35
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "อาคมชาร์จก่อนคืนชีพรำรัว — ยาเคลือบกระดูก"
+ },
+ {
+  "id": "night_headless_king_depth_6",
+  "owner": "night-headless-king",
+  "name": "มีดหมอสะบัดคู่",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "hits": 2
+  },
+  "flavor": "อาคมชาร์จก่อนคืนชีพรำรัว — มีดหมอสะบัดคู่"
+ },
+ {
+  "id": "night_headless_king_depth_7",
+  "owner": "night-headless-king",
+  "name": "เถ้าหม้อกวาดลาน",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "sweep": true
+  },
+  "flavor": "อาคมชาร์จก่อนคืนชีพรำรัว — เถ้าหม้อกวาดลาน"
+ },
+ {
+  "id": "phi_kin_hua_depth_1",
+  "owner": "phi-kin-hua",
+  "name": "เขี้ยวขูดขอบเกราะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "breakBlock": 5
+  },
+  "flavor": "หัวลอยคุ้มการกลืนก่อนคลั่ง — เขี้ยวขูดขอบเกราะ"
+ },
+ {
+  "id": "phi_kin_hua_depth_2",
+  "owner": "phi-kin-hua",
+  "name": "กัดซ้ำคนไร้แรง",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "foe_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 3
+   }
+  },
+  "fx": {
+   "dmg": 5
+  },
+  "flavor": "หัวลอยคุ้มการกลืนก่อนคลั่ง — กัดซ้ำคนไร้แรง"
+ },
+ {
+  "id": "phi_kin_hua_depth_3",
+  "owner": "phi-kin-hua",
+  "name": "ลมหายใจจากหัวที่หาย",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 1,
+     "to": "enemy"
+    }
+   ]
+  },
+  "flavor": "หัวลอยคุ้มการกลืนก่อนคลั่ง — ลมหายใจจากหัวที่หาย"
+ },
+ {
+  "id": "phi_kin_hua_depth_4",
+  "owner": "phi-kin-hua",
+  "name": "ขากรรไกรทับเงา",
+  "type": "attack",
+  "conditional": {
+   "when": {
+    "kind": "player_block_at_least",
+    "value": 5
+   },
+   "bonus": {
+    "dmg": 4
+   }
+  },
+  "fx": {
+   "dmg": 4
+  },
+  "flavor": "หัวลอยคุ้มการกลืนก่อนคลั่ง — ขากรรไกรทับเงา"
+ },
+ {
+  "id": "phi_kin_hua_depth_5",
+  "owner": "phi-kin-hua",
+  "name": "เงาหัวลอยบังอก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 6
+  },
+  "flavor": "หัวลอยคุ้มการกลืนก่อนคลั่ง — เงาหัวลอยบังอก"
+ },
+ {
+  "id": "phi_kin_hua_depth_6",
+  "owner": "phi-kin-hua",
+  "name": "ผมยาวกวาดพื้น",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "sweep": true
+  },
+  "flavor": "หัวลอยคุ้มการกลืนก่อนคลั่ง — ผมยาวกวาดพื้น"
+ },
+ {
+  "id": "phi_kin_hua_depth_7",
+  "owner": "phi-kin-hua",
+  "name": "ซ่อนคอในความมืด",
+  "type": "action",
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 35
+   },
+   "bonus": {
+    "heal": 4
+   }
+  },
+  "fx": {
+   "block": 4
+  },
+  "flavor": "หัวลอยคุ้มการกลืนก่อนคลั่ง — ซ่อนคอในความมืด"
  }
 ]

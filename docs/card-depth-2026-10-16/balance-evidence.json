@@ -1,0 +1,6598 @@
+{
+  "baseCommit": "0df356181a654c2aa3bd8d6d028f1f06d0c9c5d7",
+  "notes": [
+    "Bot tactical policy, seed prefix tune; matching seed names do not imply identical later draws after card-pool changes.",
+    "Aggregate evidence only: raw run records intentionally excluded from git. Reproduce using commands in BALANCE.md.",
+    "hpNetLoss includes healing, level-ups and max-HP gains; negative values are possible and are not raw incoming damage."
+  ],
+  "variants": {
+    "baseline": {
+      "rawSha256": "607297dbc4f769ae9810fe0aff4e70c631b855dd14bd353f2dd79b4f3f877664",
+      "runsPerCell": 120,
+      "totalRuns": 1200,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 1,
+          "runs": 120,
+          "win": "82%",
+          "stalled": 0,
+          "deathNight": "3/19/0",
+          "deathKind": "5/7/10",
+          "turns": "3.5/3.9/5.4",
+          "hpLoss": "-0.8/-3.7/14.9",
+          "fights": 27.1,
+          "deck": 16.5,
+          "killers": "night-bell-keeper×8 phi-phrai×5 night-head-collector×2",
+          "wins": 98,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 119,
+              "deaths": 2,
+              "meanTurns": 5.403,
+              "meanHpNetLoss": 13.538
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 839,
+              "deaths": 1,
+              "meanTurns": 3.61,
+              "meanHpNetLoss": -0.431
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 106,
+              "deaths": 8,
+              "meanTurns": 5.528,
+              "meanHpNetLoss": 12.915
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 113,
+              "deaths": 7,
+              "meanTurns": 4.186,
+              "meanHpNetLoss": -1.602
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1024,
+              "deaths": 4,
+              "meanTurns": 3.761,
+              "meanHpNetLoss": 0.166
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 98,
+              "deaths": 0,
+              "meanTurns": 5.255,
+              "meanHpNetLoss": 18.684
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 196,
+              "deaths": 0,
+              "meanTurns": 3.77,
+              "meanHpNetLoss": -4.985
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 784,
+              "deaths": 0,
+              "meanTurns": 2.929,
+              "meanHpNetLoss": -2.515
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 2,
+          "runs": 120,
+          "win": "73%",
+          "stalled": 0,
+          "deathNight": "10/22/0",
+          "deathKind": "13/8/11",
+          "turns": "3.8/4.2/6.2",
+          "hpLoss": "-0.8/-2.9/17.5",
+          "fights": 25.1,
+          "deck": 16.2,
+          "killers": "night-head-collector×6 night-bell-keeper×5 yak-wat-jaeng×4",
+          "wins": 88,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 116,
+              "deaths": 6,
+              "meanTurns": 6.336,
+              "meanHpNetLoss": 17.207
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 828,
+              "deaths": 4,
+              "meanTurns": 4.037,
+              "meanHpNetLoss": -0.165
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 93,
+              "deaths": 5,
+              "meanTurns": 6.323,
+              "meanHpNetLoss": 15.258
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 101,
+              "deaths": 8,
+              "meanTurns": 4.465,
+              "meanHpNetLoss": 0.0
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 944,
+              "deaths": 9,
+              "meanTurns": 4.142,
+              "meanHpNetLoss": 0.811
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 88,
+              "deaths": 0,
+              "meanTurns": 5.773,
+              "meanHpNetLoss": 20.42
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 176,
+              "deaths": 0,
+              "meanTurns": 4.011,
+              "meanHpNetLoss": -4.557
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 704,
+              "deaths": 0,
+              "meanTurns": 3.125,
+              "meanHpNetLoss": -3.771
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 120,
+          "win": "59%",
+          "stalled": 0,
+          "deathNight": "39/10/0",
+          "deathKind": "20/2/27",
+          "turns": "3.7/4.1/5.8",
+          "hpLoss": "-0.1/-3.3/19.8",
+          "fights": 20.9,
+          "deck": 15.1,
+          "killers": "night-head-collector×23 kuman-thong×7 night-bell-keeper×4",
+          "wins": 71,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 104,
+              "deaths": 23,
+              "meanTurns": 5.731,
+              "meanHpNetLoss": 25.663
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 812,
+              "deaths": 16,
+              "meanTurns": 3.973,
+              "meanHpNetLoss": 1.8
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 75,
+              "deaths": 4,
+              "meanTurns": 6.107,
+              "meanHpNetLoss": 12.467
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 77,
+              "deaths": 2,
+              "meanTurns": 4.416,
+              "meanHpNetLoss": 0.039
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 707,
+              "deaths": 4,
+              "meanTurns": 3.911,
+              "meanHpNetLoss": 0.161
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 71,
+              "deaths": 0,
+              "meanTurns": 5.563,
+              "meanHpNetLoss": 18.944
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 142,
+              "deaths": 0,
+              "meanTurns": 3.88,
+              "meanHpNetLoss": -5.113
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 568,
+              "deaths": 0,
+              "meanTurns": 3.125,
+              "meanHpNetLoss": -3.218
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 120,
+          "win": "46%",
+          "stalled": 0,
+          "deathNight": "53/12/0",
+          "deathKind": "34/3/28",
+          "turns": "3.9/4.2/5.9",
+          "hpLoss": "0.8/-7.4/24.2",
+          "fights": 17.6,
+          "deck": 14.4,
+          "killers": "night-head-collector×23 kuman-thong×11 ngu-phi-sang×5",
+          "wins": 55,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 90,
+              "deaths": 23,
+              "meanTurns": 5.878,
+              "meanHpNetLoss": 29.644
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 767,
+              "deaths": 30,
+              "meanTurns": 4.089,
+              "meanHpNetLoss": 2.927
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 60,
+              "deaths": 5,
+              "meanTurns": 6.017,
+              "meanHpNetLoss": 15.033
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 64,
+              "deaths": 3,
+              "meanTurns": 4.719,
+              "meanHpNetLoss": -10.484
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 589,
+              "deaths": 4,
+              "meanTurns": 4.185,
+              "meanHpNetLoss": 1.43
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 0,
+              "meanTurns": 5.727,
+              "meanHpNetLoss": 25.473
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 110,
+              "deaths": 0,
+              "meanTurns": 3.882,
+              "meanHpNetLoss": -5.673
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 440,
+              "deaths": 0,
+              "meanTurns": 3.139,
+              "meanHpNetLoss": -3.598
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 120,
+          "win": "35%",
+          "stalled": 0,
+          "deathNight": "64/12/2",
+          "deathKind": "50/1/27",
+          "turns": "4.1/4.4/6.1",
+          "hpLoss": "1.5/-4.7/15.4",
+          "fights": 15.3,
+          "deck": 14.2,
+          "killers": "night-head-collector×20 kuman-thong×13 phi-nang-ram×8",
+          "wins": 42,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 76,
+              "deaths": 20,
+              "meanTurns": 5.75,
+              "meanHpNetLoss": 27.671
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 738,
+              "deaths": 44,
+              "meanTurns": 4.558,
+              "meanHpNetLoss": 5.29
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 49,
+              "deaths": 5,
+              "meanTurns": 6.061,
+              "meanHpNetLoss": 14.918
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 50,
+              "deaths": 1,
+              "meanTurns": 4.7,
+              "meanHpNetLoss": -4.42
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 472,
+              "deaths": 6,
+              "meanTurns": 4.004,
+              "meanHpNetLoss": -0.492
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 88,
+              "deaths": 2,
+              "meanTurns": 6.5,
+              "meanHpNetLoss": 5.034
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 88,
+              "deaths": 0,
+              "meanTurns": 4.182,
+              "meanHpNetLoss": -4.841
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 352,
+              "deaths": 0,
+              "meanTurns": 3.253,
+              "meanHpNetLoss": -3.682
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 1,
+          "runs": 120,
+          "win": "81%",
+          "stalled": 0,
+          "deathNight": "3/16/4",
+          "deathKind": "10/3/10",
+          "turns": "3/3.7/5.7",
+          "hpLoss": "-0.7/-4.1/20.4",
+          "fights": 27.3,
+          "deck": 16,
+          "killers": "night-bell-keeper×5 kuman-thong×3 night-root-lord×3",
+          "wins": 97,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 118,
+              "deaths": 1,
+              "meanTurns": 4.322,
+              "meanHpNetLoss": 11.669
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 838,
+              "deaths": 2,
+              "meanTurns": 2.803,
+              "meanHpNetLoss": -0.815
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 106,
+              "deaths": 5,
+              "meanTurns": 5.962,
+              "meanHpNetLoss": 16.613
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 109,
+              "deaths": 3,
+              "meanTurns": 3.165,
+              "meanHpNetLoss": -5.083
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1013,
+              "deaths": 8,
+              "meanTurns": 3.218,
+              "meanHpNetLoss": 0.479
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 101,
+              "deaths": 4,
+              "meanTurns": 7.089,
+              "meanHpNetLoss": 34.475
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 202,
+              "deaths": 0,
+              "meanTurns": 3.975,
+              "meanHpNetLoss": -3.545
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 808,
+              "deaths": 0,
+              "meanTurns": 2.969,
+              "meanHpNetLoss": -2.16
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 2,
+          "runs": 120,
+          "win": "73%",
+          "stalled": 0,
+          "deathNight": "2/14/17",
+          "deathKind": "7/1/25",
+          "turns": "3.2/3.9/6.3",
+          "hpLoss": "-0.5/-4.5/25.7",
+          "fights": 27.9,
+          "deck": 16.1,
+          "killers": "night-bell-keeper×10 night-root-lord×6 night-cave-mother×6",
+          "wins": 87,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 118,
+              "deaths": 0,
+              "meanTurns": 4.678,
+              "meanHpNetLoss": 12.153
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 838,
+              "deaths": 2,
+              "meanTurns": 2.964,
+              "meanHpNetLoss": -0.672
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 114,
+              "deaths": 10,
+              "meanTurns": 6.711,
+              "meanHpNetLoss": 20.386
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 115,
+              "deaths": 0,
+              "meanTurns": 3.209,
+              "meanHpNetLoss": -8.922
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1058,
+              "deaths": 4,
+              "meanTurns": 3.455,
+              "meanHpNetLoss": 1.318
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 102,
+              "deaths": 15,
+              "meanTurns": 7.706,
+              "meanHpNetLoss": 47.245
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 206,
+              "deaths": 1,
+              "meanTurns": 4.301,
+              "meanHpNetLoss": -2.0
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 828,
+              "deaths": 1,
+              "meanTurns": 3.075,
+              "meanHpNetLoss": -2.601
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 120,
+          "win": "69%",
+          "stalled": 0,
+          "deathNight": "12/21/4",
+          "deathKind": "9/0/28",
+          "turns": "3.2/4/6.2",
+          "hpLoss": "-0.3/-4.5/25.5",
+          "fights": 25.3,
+          "deck": 15.5,
+          "killers": "night-bell-keeper×14 night-head-collector×10 phi-pa×4",
+          "wins": 83,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 118,
+              "deaths": 10,
+              "meanTurns": 5.0,
+              "meanHpNetLoss": 20.432
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 839,
+              "deaths": 2,
+              "meanTurns": 2.887,
+              "meanHpNetLoss": 0.244
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 101,
+              "deaths": 14,
+              "meanTurns": 6.525,
+              "meanHpNetLoss": 20.317
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 102,
+              "deaths": 0,
+              "meanTurns": 3.49,
+              "meanHpNetLoss": -5.314
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 951,
+              "deaths": 6,
+              "meanTurns": 3.452,
+              "meanHpNetLoss": 0.787
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 87,
+              "deaths": 4,
+              "meanTurns": 7.609,
+              "meanHpNetLoss": 38.506
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 174,
+              "deaths": 0,
+              "meanTurns": 4.339,
+              "meanHpNetLoss": -4.046
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 696,
+              "deaths": 0,
+              "meanTurns": 3.059,
+              "meanHpNetLoss": -2.335
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 120,
+          "win": "53%",
+          "stalled": 0,
+          "deathNight": "17/29/11",
+          "deathKind": "24/5/28",
+          "turns": "3/4.3/6.1",
+          "hpLoss": "-0.1/-4.2/27.7",
+          "fights": 22.9,
+          "deck": 15.1,
+          "killers": "night-bell-keeper×13 night-head-collector×8 phi-pa×5",
+          "wins": 63,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 111,
+              "deaths": 8,
+              "meanTurns": 4.622,
+              "meanHpNetLoss": 20.856
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 827,
+              "deaths": 9,
+              "meanTurns": 2.73,
+              "meanHpNetLoss": 0.579
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 87,
+              "deaths": 13,
+              "meanTurns": 6.747,
+              "meanHpNetLoss": 25.782
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 90,
+              "deaths": 1,
+              "meanTurns": 3.667,
+              "meanHpNetLoss": -9.467
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 879,
+              "deaths": 15,
+              "meanTurns": 3.29,
+              "meanHpNetLoss": 1.093
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 70,
+              "deaths": 7,
+              "meanTurns": 7.5,
+              "meanHpNetLoss": 41.1
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 148,
+              "deaths": 4,
+              "meanTurns": 4.622,
+              "meanHpNetLoss": -1.068
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 590,
+              "deaths": 0,
+              "meanTurns": 3.02,
+              "meanHpNetLoss": -2.898
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 120,
+          "win": "17%",
+          "stalled": 0,
+          "deathNight": "32/33/35",
+          "deathKind": "28/5/67",
+          "turns": "3.5/4.1/6.5",
+          "hpLoss": "0.7/-5.9/30.6",
+          "fights": 19.7,
+          "deck": 14.9,
+          "killers": "phi-kin-hua×26 night-bell-keeper×19 night-head-collector×14",
+          "wins": 20,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 102,
+              "deaths": 14,
+              "meanTurns": 4.853,
+              "meanHpNetLoss": 23.255
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 809,
+              "deaths": 18,
+              "meanTurns": 3.23,
+              "meanHpNetLoss": 1.886
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 74,
+              "deaths": 19,
+              "meanTurns": 7.014,
+              "meanHpNetLoss": 29.405
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 78,
+              "deaths": 4,
+              "meanTurns": 3.551,
+              "meanHpNetLoss": -8.321
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 750,
+              "deaths": 10,
+              "meanTurns": 3.773,
+              "meanHpNetLoss": 1.835
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 100,
+              "deaths": 34,
+              "meanTurns": 7.7,
+              "meanHpNetLoss": 39.07
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 109,
+              "deaths": 1,
+              "meanTurns": 4.578,
+              "meanHpNetLoss": -4.128
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 440,
+              "deaths": 0,
+              "meanTurns": 3.375,
+              "meanHpNetLoss": -3.214
+            }
+          ]
+        }
+      ]
+    },
+    "expanded-untuned": {
+      "rawSha256": "0aef2ef8be17ae1c54fbc52860bf6839fcbce059fe6e9cb603cbcbd0dec34072",
+      "runsPerCell": 120,
+      "totalRuns": 1200,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 1,
+          "runs": 120,
+          "win": "88%",
+          "stalled": 0,
+          "deathNight": "2/13/0",
+          "deathKind": "6/2/7",
+          "turns": "3.4/3.7/5.3",
+          "hpLoss": "-1.2/-4.8/14.6",
+          "fights": 28,
+          "deck": 16.4,
+          "killers": "night-bell-keeper×5 pop-yai×4 asuragaya×2",
+          "wins": 105,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 120,
+              "deaths": 2,
+              "meanTurns": 5.267,
+              "meanHpNetLoss": 11.417
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 3.561,
+              "meanHpNetLoss": -1.065
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 110,
+              "deaths": 5,
+              "meanTurns": 5.655,
+              "meanHpNetLoss": 15.509
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 112,
+              "deaths": 2,
+              "meanTurns": 4.098,
+              "meanHpNetLoss": -5.411
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1033,
+              "deaths": 6,
+              "meanTurns": 3.74,
+              "meanHpNetLoss": 0.676
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 105,
+              "deaths": 0,
+              "meanTurns": 5.0,
+              "meanHpNetLoss": 17.171
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 210,
+              "deaths": 0,
+              "meanTurns": 3.505,
+              "meanHpNetLoss": -4.424
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 2.921,
+              "meanHpNetLoss": -3.544
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 2,
+          "runs": 120,
+          "win": "80%",
+          "stalled": 0,
+          "deathNight": "3/21/0",
+          "deathKind": "16/3/5",
+          "turns": "3.8/4.2/6",
+          "hpLoss": "-0.4/-4.8/15.6",
+          "fights": 26.6,
+          "deck": 16.3,
+          "killers": "mae-nak×4 phi-phrai×4 asuragaya×3",
+          "wins": 96,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 119,
+              "deaths": 2,
+              "meanTurns": 6.042,
+              "meanHpNetLoss": 11.42
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 839,
+              "deaths": 1,
+              "meanTurns": 4.159,
+              "meanHpNetLoss": -0.418
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 99,
+              "deaths": 3,
+              "meanTurns": 5.98,
+              "meanHpNetLoss": 13.838
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 103,
+              "deaths": 3,
+              "meanTurns": 4.602,
+              "meanHpNetLoss": -4.777
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 997,
+              "deaths": 15,
+              "meanTurns": 4.1,
+              "meanHpNetLoss": 1.691
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 96,
+              "deaths": 0,
+              "meanTurns": 5.812,
+              "meanHpNetLoss": 22.677
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 192,
+              "deaths": 0,
+              "meanTurns": 3.953,
+              "meanHpNetLoss": -4.844
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 768,
+              "deaths": 0,
+              "meanTurns": 3.158,
+              "meanHpNetLoss": -3.197
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 120,
+          "win": "68%",
+          "stalled": 0,
+          "deathNight": "19/19/0",
+          "deathKind": "25/4/9",
+          "turns": "3.8/4.2/5.7",
+          "hpLoss": "-0.2/-3.4/18.6",
+          "fights": 23.4,
+          "deck": 15.7,
+          "killers": "night-head-collector×8 mae-nak×6 phi-tai-hong×4",
+          "wins": 82,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 109,
+              "deaths": 8,
+              "meanTurns": 5.789,
+              "meanHpNetLoss": 19.991
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 820,
+              "deaths": 11,
+              "meanTurns": 3.955,
+              "meanHpNetLoss": 1.232
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 83,
+              "deaths": 1,
+              "meanTurns": 5.578,
+              "meanHpNetLoss": 14.012
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 87,
+              "deaths": 4,
+              "meanTurns": 4.586,
+              "meanHpNetLoss": -1.759
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 846,
+              "deaths": 14,
+              "meanTurns": 4.119,
+              "meanHpNetLoss": 0.73
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 82,
+              "deaths": 0,
+              "meanTurns": 5.561,
+              "meanHpNetLoss": 21.354
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 164,
+              "deaths": 0,
+              "meanTurns": 3.963,
+              "meanHpNetLoss": -4.287
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 656,
+              "deaths": 0,
+              "meanTurns": 3.101,
+              "meanHpNetLoss": -3.262
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 120,
+          "win": "58%",
+          "stalled": 0,
+          "deathNight": "30/20/0",
+          "deathKind": "27/5/18",
+          "turns": "3.8/4.2/5.6",
+          "hpLoss": "-0.3/-5.4/22.8",
+          "fights": 21.1,
+          "deck": 15.2,
+          "killers": "night-head-collector×12 night-bell-keeper×6 phi-pong-kang×6",
+          "wins": 70,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 102,
+              "deaths": 12,
+              "meanTurns": 5.549,
+              "meanHpNetLoss": 24.098
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 783,
+              "deaths": 18,
+              "meanTurns": 4.073,
+              "meanHpNetLoss": 2.04
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 76,
+              "deaths": 6,
+              "meanTurns": 5.842,
+              "meanHpNetLoss": 20.224
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 82,
+              "deaths": 5,
+              "meanTurns": 4.512,
+              "meanHpNetLoss": -6.805
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 768,
+              "deaths": 9,
+              "meanTurns": 4.023,
+              "meanHpNetLoss": -0.078
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 70,
+              "deaths": 0,
+              "meanTurns": 5.429,
+              "meanHpNetLoss": 23.586
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 140,
+              "deaths": 0,
+              "meanTurns": 3.943,
+              "meanHpNetLoss": -4.65
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 560,
+              "deaths": 0,
+              "meanTurns": 3.098,
+              "meanHpNetLoss": -3.741
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 120,
+          "win": "43%",
+          "stalled": 0,
+          "deathNight": "53/14/2",
+          "deathKind": "42/4/23",
+          "turns": "4.1/4.2/6",
+          "hpLoss": "1.1/-6.4/13.6",
+          "fights": 17.3,
+          "deck": 14.6,
+          "killers": "night-head-collector×19 phi-pong-kang×8 ngu-phi-sang×7",
+          "wins": 51,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 86,
+              "deaths": 19,
+              "meanTurns": 5.651,
+              "meanHpNetLoss": 23.605
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 743,
+              "deaths": 34,
+              "meanTurns": 4.502,
+              "meanHpNetLoss": 4.241
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 2,
+              "meanTurns": 6.091,
+              "meanHpNetLoss": 20.582
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 59,
+              "deaths": 4,
+              "meanTurns": 4.576,
+              "meanHpNetLoss": -7.017
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 565,
+              "deaths": 8,
+              "meanTurns": 4.196,
+              "meanHpNetLoss": 0.816
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 106,
+              "deaths": 2,
+              "meanTurns": 6.179,
+              "meanHpNetLoss": 1.925
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 106,
+              "deaths": 0,
+              "meanTurns": 3.953,
+              "meanHpNetLoss": -6.094
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 424,
+              "deaths": 0,
+              "meanTurns": 3.278,
+              "meanHpNetLoss": -3.983
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 1,
+          "runs": 120,
+          "win": "89%",
+          "stalled": 0,
+          "deathNight": "1/11/1",
+          "deathKind": "4/2/7",
+          "turns": "2.9/3.7/5.3",
+          "hpLoss": "-0.8/-4.3/18.2",
+          "fights": 28.5,
+          "deck": 16,
+          "killers": "night-bell-keeper×5 phi-ha-ratri×2 night-headless-king×1",
+          "wins": 107,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 120,
+              "deaths": 1,
+              "meanTurns": 4.033,
+              "meanHpNetLoss": 9.783
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 2.708,
+              "meanHpNetLoss": -1.055
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 113,
+              "deaths": 5,
+              "meanTurns": 5.805,
+              "meanHpNetLoss": 17.354
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 115,
+              "deaths": 2,
+              "meanTurns": 3.165,
+              "meanHpNetLoss": -5.426
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1054,
+              "deaths": 4,
+              "meanTurns": 3.139,
+              "meanHpNetLoss": 0.58
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 108,
+              "deaths": 1,
+              "meanTurns": 6.241,
+              "meanHpNetLoss": 28.417
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 216,
+              "deaths": 0,
+              "meanTurns": 4.056,
+              "meanHpNetLoss": -3.639
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 864,
+              "deaths": 0,
+              "meanTurns": 2.803,
+              "meanHpNetLoss": -2.334
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 2,
+          "runs": 120,
+          "win": "88%",
+          "stalled": 0,
+          "deathNight": "0/7/7",
+          "deathKind": "2/3/9",
+          "turns": "3.2/4.1/6.1",
+          "hpLoss": "-0.6/-5.4/21.6",
+          "fights": 29.2,
+          "deck": 16.2,
+          "killers": "night-headless-king×4 night-bell-keeper×4 phi-phrai×2",
+          "wins": 106,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 120,
+              "deaths": 0,
+              "meanTurns": 4.55,
+              "meanHpNetLoss": 10.892
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 2.848,
+              "meanHpNetLoss": -1.095
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 117,
+              "deaths": 4,
+              "meanTurns": 6.41,
+              "meanHpNetLoss": 18.812
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 118,
+              "deaths": 1,
+              "meanTurns": 3.229,
+              "meanHpNetLoss": -8.814
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1077,
+              "deaths": 2,
+              "meanTurns": 3.463,
+              "meanHpNetLoss": 1.11
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 111,
+              "deaths": 5,
+              "meanTurns": 7.378,
+              "meanHpNetLoss": 36.054
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 226,
+              "deaths": 2,
+              "meanTurns": 4.527,
+              "meanHpNetLoss": -3.65
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 904,
+              "deaths": 0,
+              "meanTurns": 3.145,
+              "meanHpNetLoss": -2.179
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 120,
+          "win": "87%",
+          "stalled": 0,
+          "deathNight": "6/6/4",
+          "deathKind": "8/1/7",
+          "turns": "3.1/4.2/5.9",
+          "hpLoss": "-0.7/-4.7/22.1",
+          "fights": 28,
+          "deck": 15.9,
+          "killers": "kuman-thong×2 night-cave-mother×2 phi-pa×2",
+          "wins": 104,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 116,
+              "deaths": 2,
+              "meanTurns": 4.431,
+              "meanHpNetLoss": 14.914
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 837,
+              "deaths": 4,
+              "meanTurns": 2.832,
+              "meanHpNetLoss": -0.186
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 109,
+              "deaths": 1,
+              "meanTurns": 6.138,
+              "meanHpNetLoss": 20.376
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 110,
+              "deaths": 1,
+              "meanTurns": 3.436,
+              "meanHpNetLoss": -7.0
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1014,
+              "deaths": 4,
+              "meanTurns": 3.332,
+              "meanHpNetLoss": 0.329
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 108,
+              "deaths": 4,
+              "meanTurns": 7.102,
+              "meanHpNetLoss": 31.481
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 216,
+              "deaths": 0,
+              "meanTurns": 4.537,
+              "meanHpNetLoss": -3.491
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 864,
+              "deaths": 0,
+              "meanTurns": 3.078,
+              "meanHpNetLoss": -2.369
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 120,
+          "win": "83%",
+          "stalled": 0,
+          "deathNight": "4/12/5",
+          "deathKind": "6/3/12",
+          "turns": "3/4/5.8",
+          "hpLoss": "-1.2/-5.4/26.3",
+          "fights": 27.8,
+          "deck": 15.8,
+          "killers": "night-bell-keeper×6 night-head-collector×3 phi-phrai×3",
+          "wins": 99,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 119,
+              "deaths": 3,
+              "meanTurns": 4.437,
+              "meanHpNetLoss": 17.748
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 839,
+              "deaths": 1,
+              "meanTurns": 2.731,
+              "meanHpNetLoss": -0.61
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 110,
+              "deaths": 6,
+              "meanTurns": 6.209,
+              "meanHpNetLoss": 24.655
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 112,
+              "deaths": 2,
+              "meanTurns": 3.339,
+              "meanHpNetLoss": -7.812
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1035,
+              "deaths": 4,
+              "meanTurns": 3.267,
+              "meanHpNetLoss": -0.016
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 102,
+              "deaths": 3,
+              "meanTurns": 6.922,
+              "meanHpNetLoss": 38.186
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 206,
+              "deaths": 1,
+              "meanTurns": 4.311,
+              "meanHpNetLoss": -4.015
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 829,
+              "deaths": 1,
+              "meanTurns": 3.011,
+              "meanHpNetLoss": -3.378
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 120,
+          "win": "46%",
+          "stalled": 0,
+          "deathNight": "9/24/32",
+          "deathKind": "15/5/45",
+          "turns": "3.5/4.2/6.6",
+          "hpLoss": "0/-7.5/23.3",
+          "fights": 25.6,
+          "deck": 16.2,
+          "killers": "phi-kin-hua×25 night-bell-keeper×14 mae-nak×4",
+          "wins": 55,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 114,
+              "deaths": 3,
+              "meanTurns": 4.781,
+              "meanHpNetLoss": 17.86
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 830,
+              "deaths": 6,
+              "meanTurns": 3.228,
+              "meanHpNetLoss": 1.122
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 101,
+              "deaths": 14,
+              "meanTurns": 6.822,
+              "meanHpNetLoss": 26.733
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 103,
+              "deaths": 2,
+              "meanTurns": 3.631,
+              "meanHpNetLoss": -14.058
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 965,
+              "deaths": 8,
+              "meanTurns": 3.884,
+              "meanHpNetLoss": 1.333
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 163,
+              "deaths": 28,
+              "meanTurns": 7.785,
+              "meanHpNetLoss": 25.037
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 172,
+              "deaths": 3,
+              "meanTurns": 4.576,
+              "meanHpNetLoss": -3.5
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 690,
+              "deaths": 1,
+              "meanTurns": 3.371,
+              "meanHpNetLoss": -3.183
+            }
+          ]
+        }
+      ]
+    },
+    "retune-a": {
+      "rawSha256": "93085ca406390133111a2945f3c86c1bc4ee71f27bfc21c9ff8fa2d4a6e1d4ea",
+      "runsPerCell": 60,
+      "totalRuns": 480,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 1,
+          "runs": 60,
+          "win": "88%",
+          "stalled": 0,
+          "deathNight": "0/7/0",
+          "deathKind": "2/3/2",
+          "turns": "3.4/3.7/5.5",
+          "hpLoss": "-1.1/-5.3/14.7",
+          "fights": 28.3,
+          "deck": 16.6,
+          "killers": "night-bell-keeper×2 phi-phrai×1 kuman-thong×1",
+          "wins": 53,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 60,
+              "deaths": 0,
+              "meanTurns": 5.667,
+              "meanHpNetLoss": 13.1
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 420,
+              "deaths": 0,
+              "meanTurns": 3.45,
+              "meanHpNetLoss": -1.307
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 2,
+              "meanTurns": 5.764,
+              "meanHpNetLoss": 14.491
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 58,
+              "deaths": 3,
+              "meanTurns": 4.086,
+              "meanHpNetLoss": -6.828
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 527,
+              "deaths": 2,
+              "meanTurns": 3.805,
+              "meanHpNetLoss": 1.082
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 0,
+              "meanTurns": 5.038,
+              "meanHpNetLoss": 16.623
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 106,
+              "deaths": 0,
+              "meanTurns": 3.519,
+              "meanHpNetLoss": -4.472
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 424,
+              "deaths": 0,
+              "meanTurns": 2.927,
+              "meanHpNetLoss": -3.58
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "77%",
+          "stalled": 0,
+          "deathNight": "8/6/0",
+          "deathKind": "9/1/4",
+          "turns": "3.7/4.1/5.6",
+          "hpLoss": "-0.5/-3.7/19",
+          "fights": 25.1,
+          "deck": 15.9,
+          "killers": "night-head-collector×4 mae-nak×2 phi-tai-hong×2",
+          "wins": 46,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 56,
+              "deaths": 4,
+              "meanTurns": 5.964,
+              "meanHpNetLoss": 22.875
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 412,
+              "deaths": 4,
+              "meanTurns": 3.876,
+              "meanHpNetLoss": 0.704
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 46,
+              "deaths": 0,
+              "meanTurns": 5.435,
+              "meanHpNetLoss": 10.978
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 47,
+              "deaths": 1,
+              "meanTurns": 4.34,
+              "meanHpNetLoss": -2.383
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 452,
+              "deaths": 5,
+              "meanTurns": 4.02,
+              "meanHpNetLoss": -0.177
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 46,
+              "deaths": 0,
+              "meanTurns": 5.457,
+              "meanHpNetLoss": 22.152
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 92,
+              "deaths": 0,
+              "meanTurns": 4.0,
+              "meanHpNetLoss": -4.348
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 368,
+              "deaths": 0,
+              "meanTurns": 3.155,
+              "meanHpNetLoss": -2.261
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "68%",
+          "stalled": 0,
+          "deathNight": "11/8/0",
+          "deathKind": "13/1/5",
+          "turns": "3.7/4.1/5.8",
+          "hpLoss": "-0.8/-6/24.1",
+          "fights": 22.9,
+          "deck": 15.5,
+          "killers": "night-head-collector×4 phi-nang-ram×2 mae-nak×2",
+          "wins": 41,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 4,
+              "meanTurns": 5.981,
+              "meanHpNetLoss": 28.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 399,
+              "deaths": 7,
+              "meanTurns": 4.07,
+              "meanHpNetLoss": 1.481
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 42,
+              "deaths": 1,
+              "meanTurns": 5.786,
+              "meanHpNetLoss": 19.905
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 43,
+              "deaths": 1,
+              "meanTurns": 4.326,
+              "meanHpNetLoss": -9.907
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 407,
+              "deaths": 6,
+              "meanTurns": 3.855,
+              "meanHpNetLoss": -0.528
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 41,
+              "deaths": 0,
+              "meanTurns": 5.512,
+              "meanHpNetLoss": 23.463
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 82,
+              "deaths": 0,
+              "meanTurns": 3.927,
+              "meanHpNetLoss": -4.012
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 328,
+              "deaths": 0,
+              "meanTurns": 3.015,
+              "meanHpNetLoss": -4.055
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "40%",
+          "stalled": 0,
+          "deathNight": "29/7/0",
+          "deathKind": "17/4/15",
+          "turns": "4.1/4.2/6.1",
+          "hpLoss": "1.2/-8.7/13.8",
+          "fights": 16.5,
+          "deck": 14.2,
+          "killers": "night-head-collector×14 ngu-phi-sang×5 phi-pong-kang×4",
+          "wins": 24,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 14,
+              "meanTurns": 5.8,
+              "meanHpNetLoss": 29.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 371,
+              "deaths": 15,
+              "meanTurns": 4.464,
+              "meanHpNetLoss": 4.111
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 25,
+              "deaths": 1,
+              "meanTurns": 6.36,
+              "meanHpNetLoss": 19.8
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 29,
+              "deaths": 4,
+              "meanTurns": 4.655,
+              "meanHpNetLoss": -10.552
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 266,
+              "deaths": 2,
+              "meanTurns": 4.293,
+              "meanHpNetLoss": 0.823
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 48,
+              "deaths": 0,
+              "meanTurns": 6.229,
+              "meanHpNetLoss": -3.667
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 48,
+              "deaths": 0,
+              "meanTurns": 3.958,
+              "meanHpNetLoss": -7.521
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 192,
+              "deaths": 0,
+              "meanTurns": 3.333,
+              "meanHpNetLoss": -3.964
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 1,
+          "runs": 60,
+          "win": "85%",
+          "stalled": 0,
+          "deathNight": "0/8/1",
+          "deathKind": "1/2/6",
+          "turns": "2.9/3.5/5.4",
+          "hpLoss": "-0.7/-6.2/19.2",
+          "fights": 28.2,
+          "deck": 16.1,
+          "killers": "night-bell-keeper×5 night-headless-king×1 asuragaya×1",
+          "wins": 51,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 60,
+              "deaths": 0,
+              "meanTurns": 4.283,
+              "meanHpNetLoss": 11.883
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 420,
+              "deaths": 0,
+              "meanTurns": 2.874,
+              "meanHpNetLoss": -0.979
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 5,
+              "meanTurns": 5.702,
+              "meanHpNetLoss": 19.684
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 59,
+              "deaths": 2,
+              "meanTurns": 2.797,
+              "meanHpNetLoss": -10.153
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 533,
+              "deaths": 1,
+              "meanTurns": 3.084,
+              "meanHpNetLoss": 1.086
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 52,
+              "deaths": 1,
+              "meanTurns": 6.212,
+              "meanHpNetLoss": 27.096
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 104,
+              "deaths": 0,
+              "meanTurns": 3.923,
+              "meanHpNetLoss": -3.971
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 416,
+              "deaths": 0,
+              "meanTurns": 2.719,
+              "meanHpNetLoss": -2.726
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "87%",
+          "stalled": 0,
+          "deathNight": "3/3/2",
+          "deathKind": "4/0/4",
+          "turns": "3.1/4.1/6.2",
+          "hpLoss": "-0.6/-5.9/25.7",
+          "fights": 28,
+          "deck": 15.9,
+          "killers": "kuman-thong×1 night-cave-mother×1 phi-pa×1",
+          "wins": 52,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 1,
+              "meanTurns": 5.086,
+              "meanHpNetLoss": 19.293
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 418,
+              "deaths": 2,
+              "meanTurns": 2.864,
+              "meanHpNetLoss": 0.196
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 1,
+              "meanTurns": 6.6,
+              "meanHpNetLoss": 24.018
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 0,
+              "meanTurns": 3.255,
+              "meanHpNetLoss": -11.4
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 508,
+              "deaths": 2,
+              "meanTurns": 3.398,
+              "meanHpNetLoss": 0.435
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 54,
+              "deaths": 2,
+              "meanTurns": 7.093,
+              "meanHpNetLoss": 34.148
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 108,
+              "deaths": 0,
+              "meanTurns": 4.528,
+              "meanHpNetLoss": -3.12
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 432,
+              "deaths": 0,
+              "meanTurns": 3.046,
+              "meanHpNetLoss": -2.697
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "78%",
+          "stalled": 0,
+          "deathNight": "4/4/5",
+          "deathKind": "3/3/7",
+          "turns": "3/3.8/5.8",
+          "hpLoss": "-1.4/-4.4/27.5",
+          "fights": 27.3,
+          "deck": 15.7,
+          "killers": "night-head-collector×3 night-bell-keeper×2 pop-yai×1",
+          "wins": 47,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 3,
+              "meanTurns": 4.61,
+              "meanHpNetLoss": 19.949
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.802,
+              "meanHpNetLoss": -0.835
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 54,
+              "deaths": 2,
+              "meanTurns": 6.185,
+              "meanHpNetLoss": 25.556
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 1,
+              "meanTurns": 3.218,
+              "meanHpNetLoss": -6.0
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 500,
+              "deaths": 1,
+              "meanTurns": 3.166,
+              "meanHpNetLoss": -0.646
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 49,
+              "deaths": 2,
+              "meanTurns": 6.673,
+              "meanHpNetLoss": 38.571
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 101,
+              "deaths": 2,
+              "meanTurns": 4.188,
+              "meanHpNetLoss": -3.505
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 411,
+              "deaths": 1,
+              "meanTurns": 3.112,
+              "meanHpNetLoss": -2.735
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "33%",
+          "stalled": 0,
+          "deathNight": "10/16/14",
+          "deathKind": "8/1/31",
+          "turns": "3.5/4.3/6.6",
+          "hpLoss": "-0.1/-5.1/25",
+          "fights": 22.5,
+          "deck": 15.6,
+          "killers": "phi-kin-hua×11 night-bell-keeper×11 night-head-collector×7",
+          "wins": 20,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 7,
+              "meanTurns": 4.93,
+              "meanHpNetLoss": 23.018
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 414,
+              "deaths": 3,
+              "meanTurns": 3.089,
+              "meanHpNetLoss": 0.913
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 11,
+              "meanTurns": 6.8,
+              "meanHpNetLoss": 32.489
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 46,
+              "deaths": 1,
+              "meanTurns": 3.913,
+              "meanHpNetLoss": -7.652
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 429,
+              "deaths": 4,
+              "meanTurns": 3.846,
+              "meanHpNetLoss": 0.72
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 64,
+              "deaths": 13,
+              "meanTurns": 7.969,
+              "meanHpNetLoss": 21.609
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 66,
+              "deaths": 0,
+              "meanTurns": 4.636,
+              "meanHpNetLoss": -3.333
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 269,
+              "deaths": 1,
+              "meanTurns": 3.457,
+              "meanHpNetLoss": -2.866
+            }
+          ]
+        }
+      ]
+    },
+    "shaman-old-pool": {
+      "rawSha256": "6c01a6f71bc005aa90990704b58e8637838d42563d0ecceadf2c000e714be105",
+      "runsPerCell": 60,
+      "totalRuns": 180,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "87%",
+          "stalled": 0,
+          "deathNight": "0/7/1",
+          "deathKind": "1/2/5",
+          "turns": "3.1/4/6",
+          "hpLoss": "-1/-1.8/21.8",
+          "fights": 28.4,
+          "deck": 16.1,
+          "killers": "night-bell-keeper×4 krahang×1 asuragaya×1",
+          "wins": 52,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 60,
+              "deaths": 0,
+              "meanTurns": 4.5,
+              "meanHpNetLoss": 13.7
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 420,
+              "deaths": 0,
+              "meanTurns": 2.767,
+              "meanHpNetLoss": -0.3
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 4,
+              "meanTurns": 6.544,
+              "meanHpNetLoss": 21.035
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 59,
+              "deaths": 2,
+              "meanTurns": 3.61,
+              "meanHpNetLoss": -1.712
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 531,
+              "deaths": 1,
+              "meanTurns": 3.475,
+              "meanHpNetLoss": -0.224
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 1,
+              "meanTurns": 7.189,
+              "meanHpNetLoss": 31.679
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 106,
+              "deaths": 0,
+              "meanTurns": 4.189,
+              "meanHpNetLoss": -1.887
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 424,
+              "deaths": 0,
+              "meanTurns": 3.083,
+              "meanHpNetLoss": -2.58
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "83%",
+          "stalled": 0,
+          "deathNight": "2/7/1",
+          "deathKind": "3/1/6",
+          "turns": "3.1/4/6.2",
+          "hpLoss": "-1.2/-7.3/25.6",
+          "fights": 27.5,
+          "deck": 15.8,
+          "killers": "night-bell-keeper×4 pop-yai×1 krahang×1",
+          "wins": 50,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 1,
+              "meanTurns": 4.458,
+              "meanHpNetLoss": 17.729
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.671,
+              "meanHpNetLoss": -0.749
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 4,
+              "meanTurns": 7.164,
+              "meanHpNetLoss": 26.455
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 56,
+              "deaths": 1,
+              "meanTurns": 3.446,
+              "meanHpNetLoss": -10.643
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 512,
+              "deaths": 2,
+              "meanTurns": 3.379,
+              "meanHpNetLoss": 0.182
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 51,
+              "deaths": 1,
+              "meanTurns": 7.294,
+              "meanHpNetLoss": 33.784
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 102,
+              "deaths": 0,
+              "meanTurns": 4.304,
+              "meanHpNetLoss": -5.471
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 408,
+              "deaths": 0,
+              "meanTurns": 3.12,
+              "meanHpNetLoss": -3.551
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "45%",
+          "stalled": 0,
+          "deathNight": "8/12/13",
+          "deathKind": "6/4/23",
+          "turns": "3.5/4.4/6.7",
+          "hpLoss": "0.3/-8.1/20.3",
+          "fights": 24.5,
+          "deck": 15.8,
+          "killers": "phi-kin-hua×11 night-bell-keeper×6 night-head-collector×4",
+          "wins": 27,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 56,
+              "deaths": 4,
+              "meanTurns": 4.643,
+              "meanHpNetLoss": 15.768
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 414,
+              "deaths": 4,
+              "meanTurns": 3.145,
+              "meanHpNetLoss": 1.35
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 46,
+              "deaths": 6,
+              "meanTurns": 6.783,
+              "meanHpNetLoss": 24.957
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 50,
+              "deaths": 4,
+              "meanTurns": 4.06,
+              "meanHpNetLoss": -14.0
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 461,
+              "deaths": 2,
+              "meanTurns": 3.935,
+              "meanHpNetLoss": 1.584
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 78,
+              "deaths": 13,
+              "meanTurns": 8.051,
+              "meanHpNetLoss": 20.769
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 80,
+              "deaths": 0,
+              "meanTurns": 4.575,
+              "meanHpNetLoss": -4.362
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 320,
+              "deaths": 0,
+              "meanTurns": 3.306,
+              "meanHpNetLoss": -3.041
+            }
+          ]
+        }
+      ]
+    },
+    "shaman-new-pool": {
+      "rawSha256": "de2af3871ffae070b380fe4d5ac6a819bf7a99cbad5ee2c352f7b7e4e2a4ff1a",
+      "runsPerCell": 60,
+      "totalRuns": 180,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "87%",
+          "stalled": 0,
+          "deathNight": "3/2/3",
+          "deathKind": "4/0/4",
+          "turns": "3.1/4.1/5.9",
+          "hpLoss": "-0.3/-5.8/23.2",
+          "fights": 28.2,
+          "deck": 16,
+          "killers": "night-cave-mother×2 kuman-thong×1 phi-pa×1",
+          "wins": 52,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 1,
+              "meanTurns": 4.724,
+              "meanHpNetLoss": 16.5
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 418,
+              "deaths": 2,
+              "meanTurns": 2.864,
+              "meanHpNetLoss": 0.196
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 0,
+              "meanTurns": 6.164,
+              "meanHpNetLoss": 21.127
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 0,
+              "meanTurns": 3.327,
+              "meanHpNetLoss": -11.4
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 508,
+              "deaths": 2,
+              "meanTurns": 3.437,
+              "meanHpNetLoss": 0.894
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 3,
+              "meanTurns": 6.982,
+              "meanHpNetLoss": 32.473
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 110,
+              "deaths": 0,
+              "meanTurns": 4.527,
+              "meanHpNetLoss": -2.964
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 440,
+              "deaths": 0,
+              "meanTurns": 3.057,
+              "meanHpNetLoss": -2.209
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "83%",
+          "stalled": 0,
+          "deathNight": "4/3/3",
+          "deathKind": "3/1/6",
+          "turns": "3/3.9/5.8",
+          "hpLoss": "-1.4/-5.5/26.7",
+          "fights": 27.6,
+          "deck": 15.7,
+          "killers": "night-head-collector×3 pop-yai×1 night-headless-king×1",
+          "wins": 50,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 3,
+              "meanTurns": 4.492,
+              "meanHpNetLoss": 19.186
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.802,
+              "meanHpNetLoss": -0.835
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 54,
+              "deaths": 1,
+              "meanTurns": 6.167,
+              "meanHpNetLoss": 23.056
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 1,
+              "meanTurns": 3.255,
+              "meanHpNetLoss": -7.127
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 500,
+              "deaths": 1,
+              "meanTurns": 3.17,
+              "meanHpNetLoss": -0.354
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 52,
+              "deaths": 2,
+              "meanTurns": 6.75,
+              "meanHpNetLoss": 38.923
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 104,
+              "deaths": 0,
+              "meanTurns": 4.231,
+              "meanHpNetLoss": -4.567
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 421,
+              "deaths": 1,
+              "meanTurns": 3.078,
+              "meanHpNetLoss": -3.169
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "43%",
+          "stalled": 0,
+          "deathNight": "5/16/13",
+          "deathKind": "9/3/22",
+          "turns": "3.5/4.2/6.6",
+          "hpLoss": "0/-5.8/21.5",
+          "fights": 24.4,
+          "deck": 16,
+          "killers": "night-bell-keeper×9 phi-kin-hua×9 night-head-collector×2",
+          "wins": 26,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 2,
+              "meanTurns": 4.719,
+              "meanHpNetLoss": 18.211
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 414,
+              "deaths": 3,
+              "meanTurns": 3.089,
+              "meanHpNetLoss": 0.913
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 48,
+              "deaths": 9,
+              "meanTurns": 7.0,
+              "meanHpNetLoss": 29.938
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 50,
+              "deaths": 2,
+              "meanTurns": 3.74,
+              "meanHpNetLoss": -9.32
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 472,
+              "deaths": 5,
+              "meanTurns": 3.824,
+              "meanHpNetLoss": 0.994
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 72,
+              "deaths": 11,
+              "meanTurns": 7.847,
+              "meanHpNetLoss": 18.431
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 76,
+              "deaths": 1,
+              "meanTurns": 4.553,
+              "meanHpNetLoss": -3.447
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 307,
+              "deaths": 1,
+              "meanTurns": 3.41,
+              "meanHpNetLoss": -2.733
+            }
+          ]
+        }
+      ]
+    },
+    "draw3": {
+      "rawSha256": "ccaa18af06fc2080181b1ebc52757500096eecb71b6d05a703b71d849fe1f797",
+      "runsPerCell": 60,
+      "totalRuns": 360,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "42%",
+          "stalled": 0,
+          "deathNight": "28/7/0",
+          "deathKind": "6/1/28",
+          "turns": "3.6/4/5.7",
+          "hpLoss": "-1.4/5.4/38.1",
+          "fights": 17.5,
+          "deck": 14.1,
+          "killers": "night-head-collector×24 night-bell-keeper×4 phi-tai-hong×2",
+          "wins": 25,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 56,
+              "deaths": 24,
+              "meanTurns": 5.768,
+              "meanHpNetLoss": 45.964
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 412,
+              "deaths": 4,
+              "meanTurns": 3.876,
+              "meanHpNetLoss": 0.704
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 29,
+              "deaths": 4,
+              "meanTurns": 5.483,
+              "meanHpNetLoss": 27.655
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 30,
+              "deaths": 1,
+              "meanTurns": 4.3,
+              "meanHpNetLoss": 14.967
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 282,
+              "deaths": 2,
+              "meanTurns": 3.727,
+              "meanHpNetLoss": -2.17
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 25,
+              "deaths": 0,
+              "meanTurns": 5.64,
+              "meanHpNetLoss": 32.64
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 50,
+              "deaths": 0,
+              "meanTurns": 3.86,
+              "meanHpNetLoss": -0.38
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 200,
+              "deaths": 0,
+              "meanTurns": 2.86,
+              "meanHpNetLoss": -4.5
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "30%",
+          "stalled": 0,
+          "deathNight": "32/9/1",
+          "deathKind": "8/2/32",
+          "turns": "3.6/4/5.4",
+          "hpLoss": "-0.8/5.9/43.6",
+          "fights": 15.3,
+          "deck": 13.9,
+          "killers": "night-head-collector×25 night-bell-keeper×6 phi-nang-ram×2",
+          "wins": 18,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 25,
+              "meanTurns": 5.415,
+              "meanHpNetLoss": 48.151
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 399,
+              "deaths": 7,
+              "meanTurns": 4.07,
+              "meanHpNetLoss": 1.481
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 25,
+              "deaths": 6,
+              "meanTurns": 5.12,
+              "meanHpNetLoss": 30.16
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 27,
+              "deaths": 2,
+              "meanTurns": 4.296,
+              "meanHpNetLoss": 10.444
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 245,
+              "deaths": 1,
+              "meanTurns": 3.408,
+              "meanHpNetLoss": -2.118
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 19,
+              "deaths": 1,
+              "meanTurns": 5.579,
+              "meanHpNetLoss": 48.526
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 38,
+              "deaths": 0,
+              "meanTurns": 3.868,
+              "meanHpNetLoss": 2.632
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 152,
+              "deaths": 0,
+              "meanTurns": 2.888,
+              "meanHpNetLoss": -4.737
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "17%",
+          "stalled": 0,
+          "deathNight": "42/7/1",
+          "deathKind": "18/2/30",
+          "turns": "4.1/4/5.5",
+          "hpLoss": "1.5/-2.9/34.4",
+          "fights": 11.2,
+          "deck": 13.1,
+          "killers": "night-head-collector×27 ngu-phi-sang×5 phi-pong-kang×4",
+          "wins": 10,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 27,
+              "meanTurns": 5.156,
+              "meanHpNetLoss": 45.578
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 371,
+              "deaths": 15,
+              "meanTurns": 4.464,
+              "meanHpNetLoss": 4.111
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 13,
+              "deaths": 2,
+              "meanTurns": 5.615,
+              "meanHpNetLoss": 30.308
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 15,
+              "deaths": 2,
+              "meanTurns": 3.867,
+              "meanHpNetLoss": 1.333
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 147,
+              "deaths": 3,
+              "meanTurns": 3.837,
+              "meanHpNetLoss": -1.02
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 22,
+              "deaths": 1,
+              "meanTurns": 6.227,
+              "meanHpNetLoss": 13.773
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 22,
+              "deaths": 0,
+              "meanTurns": 4.045,
+              "meanHpNetLoss": -5.773
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 88,
+              "deaths": 0,
+              "meanTurns": 3.08,
+              "meanHpNetLoss": -5.159
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "42%",
+          "stalled": 0,
+          "deathNight": "9/19/7",
+          "deathKind": "3/6/26",
+          "turns": "3.1/3.9/6.2",
+          "hpLoss": "-1.4/4/45.4",
+          "fights": 22.3,
+          "deck": 14.7,
+          "killers": "night-bell-keeper×15 night-head-collector×7 night-cave-mother×2",
+          "wins": 25,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 7,
+              "meanTurns": 5.483,
+              "meanHpNetLoss": 36.741
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 418,
+              "deaths": 2,
+              "meanTurns": 2.864,
+              "meanHpNetLoss": 0.196
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 47,
+              "deaths": 15,
+              "meanTurns": 6.447,
+              "meanHpNetLoss": 47.957
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 50,
+              "deaths": 3,
+              "meanTurns": 3.16,
+              "meanHpNetLoss": -1.58
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 452,
+              "deaths": 1,
+              "meanTurns": 3.365,
+              "meanHpNetLoss": -1.292
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 29,
+              "deaths": 4,
+              "meanTurns": 7.207,
+              "meanHpNetLoss": 58.655
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 64,
+              "deaths": 3,
+              "meanTurns": 4.5,
+              "meanHpNetLoss": 8.438
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 253,
+              "deaths": 0,
+              "meanTurns": 3.0,
+              "meanHpNetLoss": -4.257
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "33%",
+          "stalled": 0,
+          "deathNight": "17/15/8",
+          "deathKind": "2/7/31",
+          "turns": "2.9/4.1/5.5",
+          "hpLoss": "-2.3/9.7/43.6",
+          "fights": 20,
+          "deck": 14.3,
+          "killers": "night-head-collector×16 night-bell-keeper×10 phaya-nak×3",
+          "wins": 20,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 16,
+              "meanTurns": 4.525,
+              "meanHpNetLoss": 35.322
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.802,
+              "meanHpNetLoss": -0.835
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 38,
+              "deaths": 10,
+              "meanTurns": 6.316,
+              "meanHpNetLoss": 51.947
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 42,
+              "deaths": 4,
+              "meanTurns": 3.429,
+              "meanHpNetLoss": 7.881
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 382,
+              "deaths": 1,
+              "meanTurns": 2.953,
+              "meanHpNetLoss": -1.628
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 25,
+              "deaths": 5,
+              "meanTurns": 6.36,
+              "meanHpNetLoss": 50.68
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 3,
+              "meanTurns": 4.6,
+              "meanHpNetLoss": 11.055
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 222,
+              "deaths": 0,
+              "meanTurns": 2.928,
+              "meanHpNetLoss": -6.095
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "5%",
+          "stalled": 0,
+          "deathNight": "24/23/10",
+          "deathKind": "5/8/44",
+          "turns": "3.3/4.6/5.7",
+          "hpLoss": "-0.6/15.4/43.7",
+          "fights": 15.7,
+          "deck": 14.1,
+          "killers": "night-head-collector×21 night-bell-keeper×15 phi-kin-hua×6",
+          "wins": 3,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 21,
+              "meanTurns": 4.825,
+              "meanHpNetLoss": 38.86
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 414,
+              "deaths": 3,
+              "meanTurns": 3.089,
+              "meanHpNetLoss": 0.913
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 28,
+              "deaths": 15,
+              "meanTurns": 6.393,
+              "meanHpNetLoss": 50.607
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 35,
+              "deaths": 6,
+              "meanTurns": 4.486,
+              "meanHpNetLoss": 17.514
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 314,
+              "deaths": 2,
+              "meanTurns": 3.697,
+              "meanHpNetLoss": -1.245
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 20,
+              "deaths": 8,
+              "meanTurns": 7.45,
+              "meanHpNetLoss": 47.8
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 26,
+              "deaths": 2,
+              "meanTurns": 4.731,
+              "meanHpNetLoss": 12.654
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 103,
+              "deaths": 0,
+              "meanTurns": 3.184,
+              "meanHpNetLoss": -4.777
+            }
+          ]
+        }
+      ]
+    },
+    "draw3-late": {
+      "rawSha256": "5d4c085930797acdcbc2eef7c066850cb0218f4796b0e2f16577ac67281225b9",
+      "runsPerCell": 60,
+      "totalRuns": 360,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "60%",
+          "stalled": 0,
+          "deathNight": "8/15/1",
+          "deathKind": "9/3/12",
+          "turns": "3.7/4.2/5.7",
+          "hpLoss": "-0.9/6.8/28.4",
+          "fights": 23.2,
+          "deck": 15.7,
+          "killers": "night-bell-keeper×8 night-head-collector×4 mae-nak×2",
+          "wins": 36,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 56,
+              "deaths": 4,
+              "meanTurns": 5.964,
+              "meanHpNetLoss": 22.875
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 412,
+              "deaths": 4,
+              "meanTurns": 3.876,
+              "meanHpNetLoss": 0.704
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 8,
+              "meanTurns": 5.489,
+              "meanHpNetLoss": 28.711
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 47,
+              "deaths": 2,
+              "meanTurns": 4.596,
+              "meanHpNetLoss": 14.851
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 451,
+              "deaths": 5,
+              "meanTurns": 4.024,
+              "meanHpNetLoss": -0.248
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 36,
+              "deaths": 0,
+              "meanTurns": 5.722,
+              "meanHpNetLoss": 36.722
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 73,
+              "deaths": 1,
+              "meanTurns": 3.959,
+              "meanHpNetLoss": 1.534
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 295,
+              "deaths": 0,
+              "meanTurns": 3.007,
+              "meanHpNetLoss": -4.217
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "38%",
+          "stalled": 0,
+          "deathNight": "11/24/2",
+          "deathKind": "13/6/18",
+          "turns": "3.8/4.3/5.8",
+          "hpLoss": "-0.6/7.9/34.5",
+          "fights": 19.6,
+          "deck": 15.1,
+          "killers": "night-bell-keeper×12 night-head-collector×4 phi-nang-ram×2",
+          "wins": 23,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 4,
+              "meanTurns": 5.981,
+              "meanHpNetLoss": 28.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 399,
+              "deaths": 7,
+              "meanTurns": 4.07,
+              "meanHpNetLoss": 1.481
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 37,
+              "deaths": 12,
+              "meanTurns": 5.622,
+              "meanHpNetLoss": 35.811
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 43,
+              "deaths": 6,
+              "meanTurns": 4.721,
+              "meanHpNetLoss": 12.581
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 404,
+              "deaths": 6,
+              "meanTurns": 3.851,
+              "meanHpNetLoss": -0.77
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 25,
+              "deaths": 2,
+              "meanTurns": 5.72,
+              "meanHpNetLoss": 46.36
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 50,
+              "deaths": 0,
+              "meanTurns": 4.02,
+              "meanHpNetLoss": 3.9
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 200,
+              "deaths": 0,
+              "meanTurns": 2.98,
+              "meanHpNetLoss": -4.51
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "20%",
+          "stalled": 0,
+          "deathNight": "29/14/5",
+          "deathKind": "17/7/24",
+          "turns": "4.2/4.3/5.9",
+          "hpLoss": "1.2/3.6/26.9",
+          "fights": 14.8,
+          "deck": 13.9,
+          "killers": "night-head-collector×14 night-bell-keeper×7 ngu-phi-sang×5",
+          "wins": 12,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 14,
+              "meanTurns": 5.8,
+              "meanHpNetLoss": 29.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 371,
+              "deaths": 15,
+              "meanTurns": 4.464,
+              "meanHpNetLoss": 4.111
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 24,
+              "deaths": 7,
+              "meanTurns": 5.708,
+              "meanHpNetLoss": 35.375
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 29,
+              "deaths": 5,
+              "meanTurns": 4.621,
+              "meanHpNetLoss": 3.655
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 265,
+              "deaths": 2,
+              "meanTurns": 4.287,
+              "meanHpNetLoss": 0.66
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 29,
+              "deaths": 3,
+              "meanTurns": 6.069,
+              "meanHpNetLoss": 16.69
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 34,
+              "deaths": 2,
+              "meanTurns": 4.0,
+              "meanHpNetLoss": 3.5
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 136,
+              "deaths": 0,
+              "meanTurns": 3.169,
+              "meanHpNetLoss": -5.926
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "43%",
+          "stalled": 0,
+          "deathNight": "3/24/7",
+          "deathKind": "4/7/23",
+          "turns": "3.1/4/5.9",
+          "hpLoss": "-0.7/4.9/37.1",
+          "fights": 23.5,
+          "deck": 15.1,
+          "killers": "night-bell-keeper×19 winyan-dek×2 kuman-thong×1",
+          "wins": 26,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 1,
+              "meanTurns": 5.086,
+              "meanHpNetLoss": 19.293
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 418,
+              "deaths": 2,
+              "meanTurns": 2.864,
+              "meanHpNetLoss": 0.196
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 52,
+              "deaths": 19,
+              "meanTurns": 6.346,
+              "meanHpNetLoss": 48.135
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 3,
+              "meanTurns": 3.418,
+              "meanHpNetLoss": 0.636
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 506,
+              "deaths": 2,
+              "meanTurns": 3.393,
+              "meanHpNetLoss": 0.364
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 29,
+              "deaths": 3,
+              "meanTurns": 6.724,
+              "meanHpNetLoss": 52.897
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 66,
+              "deaths": 4,
+              "meanTurns": 4.394,
+              "meanHpNetLoss": 8.364
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 260,
+              "deaths": 0,
+              "meanTurns": 2.923,
+              "meanHpNetLoss": -4.131
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "40%",
+          "stalled": 0,
+          "deathNight": "4/23/9",
+          "deathKind": "2/10/24",
+          "turns": "3/4/5.5",
+          "hpLoss": "-1.7/9.7/36.1",
+          "fights": 23.3,
+          "deck": 15.1,
+          "killers": "night-bell-keeper×16 phaya-nak×3 night-head-collector×3",
+          "wins": 24,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 3,
+              "meanTurns": 4.61,
+              "meanHpNetLoss": 19.949
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.802,
+              "meanHpNetLoss": -0.835
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 49,
+              "deaths": 16,
+              "meanTurns": 6.041,
+              "meanHpNetLoss": 47.286
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 6,
+              "meanTurns": 3.473,
+              "meanHpNetLoss": 8.455
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 499,
+              "deaths": 1,
+              "meanTurns": 3.164,
+              "meanHpNetLoss": -0.653
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 29,
+              "deaths": 5,
+              "meanTurns": 6.552,
+              "meanHpNetLoss": 50.138
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 65,
+              "deaths": 4,
+              "meanTurns": 4.538,
+              "meanHpNetLoss": 10.815
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 261,
+              "deaths": 0,
+              "meanTurns": 2.923,
+              "meanHpNetLoss": -5.295
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "5%",
+          "stalled": 0,
+          "deathNight": "10/34/13",
+          "deathKind": "8/11/38",
+          "turns": "3.4/4.5/5.8",
+          "hpLoss": "0.1/13.3/36.7",
+          "fights": 18.3,
+          "deck": 14.9,
+          "killers": "night-bell-keeper×20 night-head-collector×7 phi-phrai×7",
+          "wins": 3,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 7,
+              "meanTurns": 4.93,
+              "meanHpNetLoss": 23.018
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 414,
+              "deaths": 3,
+              "meanTurns": 3.089,
+              "meanHpNetLoss": 0.913
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 36,
+              "deaths": 20,
+              "meanTurns": 6.361,
+              "meanHpNetLoss": 51.222
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 46,
+              "deaths": 9,
+              "meanTurns": 4.391,
+              "meanHpNetLoss": 15.5
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 422,
+              "deaths": 5,
+              "meanTurns": 3.844,
+              "meanHpNetLoss": 0.427
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 23,
+              "deaths": 11,
+              "meanTurns": 7.0,
+              "meanHpNetLoss": 47.739
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 31,
+              "deaths": 2,
+              "meanTurns": 4.677,
+              "meanHpNetLoss": 10.129
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 127,
+              "deaths": 0,
+              "meanTurns": 3.173,
+              "meanHpNetLoss": -3.85
+            }
+          ]
+        }
+      ]
+    },
+    "cadence": {
+      "rawSha256": "cd6293f1f8b890b5bbdb9de78c2bd17b98852036c2d4b0b9facdb3e8fb686f47",
+      "runsPerCell": 60,
+      "totalRuns": 360,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "67%",
+          "stalled": 0,
+          "deathNight": "8/11/1",
+          "deathKind": "9/2/9",
+          "turns": "3.7/4.2/5.6",
+          "hpLoss": "-0.6/-0.3/22.5",
+          "fights": 24,
+          "deck": 15.8,
+          "killers": "night-bell-keeper×4 night-head-collector×4 mae-nak×2",
+          "wins": 40,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 56,
+              "deaths": 4,
+              "meanTurns": 5.964,
+              "meanHpNetLoss": 22.875
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 412,
+              "deaths": 4,
+              "meanTurns": 3.876,
+              "meanHpNetLoss": 0.704
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 4,
+              "meanTurns": 5.356,
+              "meanHpNetLoss": 16.2
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 47,
+              "deaths": 2,
+              "meanTurns": 4.404,
+              "meanHpNetLoss": 4.617
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 451,
+              "deaths": 5,
+              "meanTurns": 4.022,
+              "meanHpNetLoss": -0.253
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 41,
+              "deaths": 1,
+              "meanTurns": 5.537,
+              "meanHpNetLoss": 28.878
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 82,
+              "deaths": 0,
+              "meanTurns": 4.061,
+              "meanHpNetLoss": -3.098
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 328,
+              "deaths": 0,
+              "meanTurns": 3.088,
+              "meanHpNetLoss": -2.738
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "62%",
+          "stalled": 0,
+          "deathNight": "11/11/1",
+          "deathKind": "13/1/9",
+          "turns": "3.7/4.2/5.9",
+          "hpLoss": "-0.9/-2.3/28.4",
+          "fights": 22.3,
+          "deck": 15.4,
+          "killers": "night-bell-keeper×4 night-head-collector×4 phi-nang-ram×2",
+          "wins": 37,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 4,
+              "meanTurns": 5.981,
+              "meanHpNetLoss": 28.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 399,
+              "deaths": 7,
+              "meanTurns": 4.07,
+              "meanHpNetLoss": 1.481
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 42,
+              "deaths": 4,
+              "meanTurns": 5.881,
+              "meanHpNetLoss": 26.952
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 43,
+              "deaths": 1,
+              "meanTurns": 4.581,
+              "meanHpNetLoss": -3.279
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 407,
+              "deaths": 6,
+              "meanTurns": 3.857,
+              "meanHpNetLoss": -0.558
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 38,
+              "deaths": 1,
+              "meanTurns": 5.711,
+              "meanHpNetLoss": 30.658
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 76,
+              "deaths": 0,
+              "meanTurns": 4.013,
+              "meanHpNetLoss": -1.724
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 304,
+              "deaths": 0,
+              "meanTurns": 3.046,
+              "meanHpNetLoss": -4.461
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "32%",
+          "stalled": 0,
+          "deathNight": "29/11/1",
+          "deathKind": "17/4/20",
+          "turns": "4.2/4.2/6",
+          "hpLoss": "1.3/-5.2/19",
+          "fights": 15.6,
+          "deck": 14,
+          "killers": "night-head-collector×14 night-bell-keeper×5 ngu-phi-sang×5",
+          "wins": 19,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 14,
+              "meanTurns": 5.8,
+              "meanHpNetLoss": 29.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 371,
+              "deaths": 15,
+              "meanTurns": 4.464,
+              "meanHpNetLoss": 4.111
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 25,
+              "deaths": 5,
+              "meanTurns": 5.92,
+              "meanHpNetLoss": 25.4
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 29,
+              "deaths": 4,
+              "meanTurns": 4.586,
+              "meanHpNetLoss": -6.897
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 266,
+              "deaths": 2,
+              "meanTurns": 4.289,
+              "meanHpNetLoss": 0.699
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 40,
+              "deaths": 1,
+              "meanTurns": 6.35,
+              "meanHpNetLoss": 3.675
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 40,
+              "deaths": 0,
+              "meanTurns": 3.95,
+              "meanHpNetLoss": -3.95
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 160,
+              "deaths": 0,
+              "meanTurns": 3.288,
+              "meanHpNetLoss": -3.994
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "73%",
+          "stalled": 0,
+          "deathNight": "3/7/6",
+          "deathKind": "4/2/10",
+          "turns": "3.1/4.1/6.1",
+          "hpLoss": "-0.8/-2.2/30.2",
+          "fights": 27.1,
+          "deck": 15.9,
+          "killers": "night-bell-keeper×5 night-cave-mother×2 kuman-thong×1",
+          "wins": 44,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 1,
+              "meanTurns": 5.086,
+              "meanHpNetLoss": 19.293
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 418,
+              "deaths": 2,
+              "meanTurns": 2.864,
+              "meanHpNetLoss": 0.196
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 5,
+              "meanTurns": 6.436,
+              "meanHpNetLoss": 31.436
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 0,
+              "meanTurns": 3.309,
+              "meanHpNetLoss": -8.909
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 508,
+              "deaths": 2,
+              "meanTurns": 3.39,
+              "meanHpNetLoss": 0.356
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 48,
+              "deaths": 4,
+              "meanTurns": 6.917,
+              "meanHpNetLoss": 42.083
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 99,
+              "deaths": 2,
+              "meanTurns": 4.475,
+              "meanHpNetLoss": 1.535
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 399,
+              "deaths": 0,
+              "meanTurns": 3.08,
+              "meanHpNetLoss": -3.168
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "62%",
+          "stalled": 0,
+          "deathNight": "4/9/10",
+          "deathKind": "3/4/16",
+          "turns": "3/4.1/5.6",
+          "hpLoss": "-1.5/1.3/33",
+          "fights": 26.2,
+          "deck": 15.8,
+          "killers": "night-bell-keeper×5 night-headless-king×3 night-root-lord×3",
+          "wins": 37,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 3,
+              "meanTurns": 4.61,
+              "meanHpNetLoss": 19.949
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.802,
+              "meanHpNetLoss": -0.835
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 52,
+              "deaths": 5,
+              "meanTurns": 5.962,
+              "meanHpNetLoss": 33.135
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 3,
+              "meanTurns": 3.418,
+              "meanHpNetLoss": 0.073
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 499,
+              "deaths": 1,
+              "meanTurns": 3.164,
+              "meanHpNetLoss": -0.645
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 8,
+              "meanTurns": 6.378,
+              "meanHpNetLoss": 50.022
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 92,
+              "deaths": 1,
+              "meanTurns": 4.446,
+              "meanHpNetLoss": 2.043
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 373,
+              "deaths": 1,
+              "meanTurns": 3.029,
+              "meanHpNetLoss": -3.488
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "17%",
+          "stalled": 0,
+          "deathNight": "10/23/17",
+          "deathKind": "8/4/38",
+          "turns": "3.4/4.4/6.2",
+          "hpLoss": "-0.2/0.5/33.2",
+          "fights": 20.9,
+          "deck": 15.2,
+          "killers": "night-bell-keeper×15 phi-kin-hua×12 night-head-collector×7",
+          "wins": 10,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 7,
+              "meanTurns": 4.93,
+              "meanHpNetLoss": 23.018
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 414,
+              "deaths": 3,
+              "meanTurns": 3.089,
+              "meanHpNetLoss": 0.913
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 42,
+              "deaths": 15,
+              "meanTurns": 6.548,
+              "meanHpNetLoss": 44.357
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 46,
+              "deaths": 3,
+              "meanTurns": 4.13,
+              "meanHpNetLoss": -0.174
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 427,
+              "deaths": 5,
+              "meanTurns": 3.843,
+              "meanHpNetLoss": 0.604
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 48,
+              "deaths": 16,
+              "meanTurns": 7.312,
+              "meanHpNetLoss": 35.625
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 54,
+              "deaths": 1,
+              "meanTurns": 4.685,
+              "meanHpNetLoss": 1.019
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 215,
+              "deaths": 0,
+              "meanTurns": 3.321,
+              "meanHpNetLoss": -4.098
+            }
+          ]
+        }
+      ]
+    },
+    "cadence3": {
+      "rawSha256": "e14647fe3e0495e1630dc3ba0f59e6572599913bbae6d89180f9569307c2bb5e",
+      "runsPerCell": 60,
+      "totalRuns": 360,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "72%",
+          "stalled": 0,
+          "deathNight": "8/8/1",
+          "deathKind": "9/1/7",
+          "turns": "3.7/4.2/5.7",
+          "hpLoss": "-0.8/-2.5/22.5",
+          "fights": 24.7,
+          "deck": 15.8,
+          "killers": "night-head-collector×4 mae-nak×2 phi-tai-hong×2",
+          "wins": 43,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 56,
+              "deaths": 4,
+              "meanTurns": 5.964,
+              "meanHpNetLoss": 22.875
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 412,
+              "deaths": 4,
+              "meanTurns": 3.876,
+              "meanHpNetLoss": 0.704
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 46,
+              "deaths": 2,
+              "meanTurns": 5.435,
+              "meanHpNetLoss": 18.891
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 47,
+              "deaths": 1,
+              "meanTurns": 4.404,
+              "meanHpNetLoss": 1.255
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 452,
+              "deaths": 5,
+              "meanTurns": 4.02,
+              "meanHpNetLoss": -0.199
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 44,
+              "deaths": 1,
+              "meanTurns": 5.614,
+              "meanHpNetLoss": 25.909
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 88,
+              "deaths": 0,
+              "meanTurns": 4.045,
+              "meanHpNetLoss": -4.511
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 352,
+              "deaths": 0,
+              "meanTurns": 3.17,
+              "meanHpNetLoss": -3.241
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "63%",
+          "stalled": 0,
+          "deathNight": "11/11/0",
+          "deathKind": "13/2/7",
+          "turns": "3.7/4.1/5.8",
+          "hpLoss": "-0.9/-3.9/28",
+          "fights": 22.3,
+          "deck": 15.5,
+          "killers": "night-head-collector×4 night-bell-keeper×3 phi-nang-ram×2",
+          "wins": 38,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 4,
+              "meanTurns": 5.981,
+              "meanHpNetLoss": 28.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 399,
+              "deaths": 7,
+              "meanTurns": 4.07,
+              "meanHpNetLoss": 1.481
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 41,
+              "deaths": 3,
+              "meanTurns": 5.854,
+              "meanHpNetLoss": 28.561
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 43,
+              "deaths": 2,
+              "meanTurns": 4.419,
+              "meanHpNetLoss": -5.395
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 406,
+              "deaths": 6,
+              "meanTurns": 3.852,
+              "meanHpNetLoss": -0.643
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 38,
+              "deaths": 0,
+              "meanTurns": 5.632,
+              "meanHpNetLoss": 27.289
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 76,
+              "deaths": 0,
+              "meanTurns": 3.842,
+              "meanHpNetLoss": -3.079
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 304,
+              "deaths": 0,
+              "meanTurns": 2.974,
+              "meanHpNetLoss": -4.503
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "33%",
+          "stalled": 0,
+          "deathNight": "29/11/0",
+          "deathKind": "17/4/19",
+          "turns": "4.2/4.2/6",
+          "hpLoss": "1.4/-6.6/18.1",
+          "fights": 15.6,
+          "deck": 14.1,
+          "killers": "night-head-collector×14 night-bell-keeper×5 ngu-phi-sang×5",
+          "wins": 20,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 14,
+              "meanTurns": 5.8,
+              "meanHpNetLoss": 29.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 371,
+              "deaths": 15,
+              "meanTurns": 4.464,
+              "meanHpNetLoss": 4.111
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 25,
+              "deaths": 5,
+              "meanTurns": 6.12,
+              "meanHpNetLoss": 27.52
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 29,
+              "deaths": 4,
+              "meanTurns": 4.621,
+              "meanHpNetLoss": -8.448
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 266,
+              "deaths": 2,
+              "meanTurns": 4.289,
+              "meanHpNetLoss": 0.865
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 40,
+              "deaths": 0,
+              "meanTurns": 6.275,
+              "meanHpNetLoss": 0.025
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 40,
+              "deaths": 0,
+              "meanTurns": 3.9,
+              "meanHpNetLoss": -5.175
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 160,
+              "deaths": 0,
+              "meanTurns": 3.269,
+              "meanHpNetLoss": -4.15
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "78%",
+          "stalled": 0,
+          "deathNight": "3/6/4",
+          "deathKind": "4/1/8",
+          "turns": "3.1/4.2/6.1",
+          "hpLoss": "-0.8/-2.4/29.5",
+          "fights": 27.3,
+          "deck": 15.9,
+          "killers": "night-bell-keeper×4 night-cave-mother×2 kuman-thong×1",
+          "wins": 47,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 1,
+              "meanTurns": 5.086,
+              "meanHpNetLoss": 19.293
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 418,
+              "deaths": 2,
+              "meanTurns": 2.864,
+              "meanHpNetLoss": 0.196
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 4,
+              "meanTurns": 6.509,
+              "meanHpNetLoss": 31.891
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 0,
+              "meanTurns": 3.345,
+              "meanHpNetLoss": -8.836
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 508,
+              "deaths": 2,
+              "meanTurns": 3.398,
+              "meanHpNetLoss": 0.4
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 50,
+              "deaths": 3,
+              "meanTurns": 6.96,
+              "meanHpNetLoss": 38.64
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 101,
+              "deaths": 1,
+              "meanTurns": 4.683,
+              "meanHpNetLoss": 1.119
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 408,
+              "deaths": 0,
+              "meanTurns": 3.061,
+              "meanHpNetLoss": -3.272
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "67%",
+          "stalled": 0,
+          "deathNight": "4/10/6",
+          "deathKind": "3/2/15",
+          "turns": "3/3.9/5.8",
+          "hpLoss": "-1.5/-2.6/32.7",
+          "fights": 26.1,
+          "deck": 15.6,
+          "killers": "night-bell-keeper×7 night-head-collector×3 night-headless-king×2",
+          "wins": 40,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 3,
+              "meanTurns": 4.61,
+              "meanHpNetLoss": 19.949
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.802,
+              "meanHpNetLoss": -0.835
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 7,
+              "meanTurns": 6.075,
+              "meanHpNetLoss": 33.962
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 55,
+              "deaths": 2,
+              "meanTurns": 3.273,
+              "meanHpNetLoss": -3.236
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 499,
+              "deaths": 1,
+              "meanTurns": 3.164,
+              "meanHpNetLoss": -0.645
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 45,
+              "deaths": 5,
+              "meanTurns": 6.911,
+              "meanHpNetLoss": 47.956
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 90,
+              "deaths": 0,
+              "meanTurns": 4.256,
+              "meanHpNetLoss": -2.222
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 365,
+              "deaths": 1,
+              "meanTurns": 3.074,
+              "meanHpNetLoss": -3.529
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "22%",
+          "stalled": 0,
+          "deathNight": "10/23/14",
+          "deathKind": "7/6/34",
+          "turns": "3.4/4.4/6.3",
+          "hpLoss": "-0.1/-1.1/30.7",
+          "fights": 20.9,
+          "deck": 15.3,
+          "killers": "night-bell-keeper×15 phi-kin-hua×11 night-head-collector×7",
+          "wins": 13,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 7,
+              "meanTurns": 4.93,
+              "meanHpNetLoss": 23.018
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 414,
+              "deaths": 3,
+              "meanTurns": 3.089,
+              "meanHpNetLoss": 0.913
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 42,
+              "deaths": 15,
+              "meanTurns": 6.571,
+              "meanHpNetLoss": 38.286
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 46,
+              "deaths": 4,
+              "meanTurns": 4.087,
+              "meanHpNetLoss": -1.565
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 427,
+              "deaths": 4,
+              "meanTurns": 3.843,
+              "meanHpNetLoss": 0.618
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 49,
+              "deaths": 12,
+              "meanTurns": 7.755,
+              "meanHpNetLoss": 33.204
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 54,
+              "deaths": 2,
+              "meanTurns": 4.667,
+              "meanHpNetLoss": -0.778
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 215,
+              "deaths": 0,
+              "meanTurns": 3.353,
+              "meanHpNetLoss": -3.451
+            }
+          ]
+        }
+      ]
+    },
+    "final": {
+      "rawSha256": "1ef9c9279a6d815680df6bffc73938947d9e9c75dbd57b3ab79fbae684d5e3ee",
+      "runsPerCell": 120,
+      "totalRuns": 1200,
+      "policy": "tactical",
+      "seedPrefix": "tune",
+      "cells": [
+        {
+          "class": "shaman",
+          "difficulty": 1,
+          "runs": 120,
+          "win": "87%",
+          "stalled": 0,
+          "deathNight": "1/10/5",
+          "deathKind": "4/3/9",
+          "turns": "2.9/3.7/5.2",
+          "hpLoss": "-0.8/-2.9/19.9",
+          "fights": 28.5,
+          "deck": 16,
+          "killers": "night-bell-keeper×4 night-headless-king×2 night-root-lord×2",
+          "wins": 104,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 120,
+              "deaths": 1,
+              "meanTurns": 4.442,
+              "meanHpNetLoss": 10.633
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 2.708,
+              "meanHpNetLoss": -1.055
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 113,
+              "deaths": 4,
+              "meanTurns": 5.159,
+              "meanHpNetLoss": 15.088
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 115,
+              "deaths": 2,
+              "meanTurns": 3.061,
+              "meanHpNetLoss": -5.461
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1054,
+              "deaths": 4,
+              "meanTurns": 3.09,
+              "meanHpNetLoss": 0.268
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 108,
+              "deaths": 4,
+              "meanTurns": 6.204,
+              "meanHpNetLoss": 35.204
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 218,
+              "deaths": 1,
+              "meanTurns": 4.055,
+              "meanHpNetLoss": -1.537
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 871,
+              "deaths": 0,
+              "meanTurns": 2.805,
+              "meanHpNetLoss": -1.696
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 2,
+          "runs": 120,
+          "win": "82%",
+          "stalled": 0,
+          "deathNight": "0/10/12",
+          "deathKind": "1/2/19",
+          "turns": "3.2/4.3/6.1",
+          "hpLoss": "-0.8/-1.7/25.3",
+          "fights": 28.9,
+          "deck": 16.2,
+          "killers": "night-bell-keeper×8 night-root-lord×7 night-headless-king×3",
+          "wins": 98,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 120,
+              "deaths": 0,
+              "meanTurns": 5.15,
+              "meanHpNetLoss": 12.183
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 2.848,
+              "meanHpNetLoss": -1.095
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 118,
+              "deaths": 8,
+              "meanTurns": 6.025,
+              "meanHpNetLoss": 18.373
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 119,
+              "deaths": 1,
+              "meanTurns": 3.504,
+              "meanHpNetLoss": -4.58
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1078,
+              "deaths": 1,
+              "meanTurns": 3.456,
+              "meanHpNetLoss": 0.562
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 109,
+              "deaths": 11,
+              "meanTurns": 7.248,
+              "meanHpNetLoss": 47.257
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 220,
+              "deaths": 1,
+              "meanTurns": 4.695,
+              "meanHpNetLoss": -0.077
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 880,
+              "deaths": 0,
+              "meanTurns": 3.1,
+              "meanHpNetLoss": -2.302
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 120,
+          "win": "77%",
+          "stalled": 0,
+          "deathNight": "5/13/10",
+          "deathKind": "9/7/12",
+          "turns": "3.1/4.1/5.9",
+          "hpLoss": "-0.9/-1.7/27.5",
+          "fights": 27.3,
+          "deck": 15.8,
+          "killers": "night-root-lord×3 night-bell-keeper×3 kuman-thong×3",
+          "wins": 92,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 116,
+              "deaths": 1,
+              "meanTurns": 5.078,
+              "meanHpNetLoss": 20.724
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 837,
+              "deaths": 4,
+              "meanTurns": 2.832,
+              "meanHpNetLoss": -0.186
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 105,
+              "deaths": 3,
+              "meanTurns": 5.857,
+              "meanHpNetLoss": 19.171
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 111,
+              "deaths": 5,
+              "meanTurns": 3.441,
+              "meanHpNetLoss": -3.793
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1019,
+              "deaths": 4,
+              "meanTurns": 3.355,
+              "meanHpNetLoss": -0.087
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 100,
+              "deaths": 8,
+              "meanTurns": 7.0,
+              "meanHpNetLoss": 44.07
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 202,
+              "deaths": 2,
+              "meanTurns": 4.48,
+              "meanHpNetLoss": -0.5
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 815,
+              "deaths": 0,
+              "meanTurns": 3.099,
+              "meanHpNetLoss": -2.492
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 120,
+          "win": "70%",
+          "stalled": 0,
+          "deathNight": "10/15/11",
+          "deathKind": "6/5/25",
+          "turns": "3/4.1/5.8",
+          "hpLoss": "-1/-2.4/28.1",
+          "fights": 26.2,
+          "deck": 15.6,
+          "killers": "night-head-collector×9 night-bell-keeper×8 night-root-lord×4",
+          "wins": 84,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 119,
+              "deaths": 9,
+              "meanTurns": 4.908,
+              "meanHpNetLoss": 21.445
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 839,
+              "deaths": 1,
+              "meanTurns": 2.731,
+              "meanHpNetLoss": -0.61
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 103,
+              "deaths": 8,
+              "meanTurns": 5.835,
+              "meanHpNetLoss": 22.126
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 106,
+              "deaths": 3,
+              "meanTurns": 3.519,
+              "meanHpNetLoss": -5.283
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 980,
+              "deaths": 4,
+              "meanTurns": 3.318,
+              "meanHpNetLoss": -0.057
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 92,
+              "deaths": 8,
+              "meanTurns": 6.848,
+              "meanHpNetLoss": 43.25
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 186,
+              "deaths": 2,
+              "meanTurns": 4.414,
+              "meanHpNetLoss": -0.79
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 755,
+              "deaths": 1,
+              "meanTurns": 3.009,
+              "meanHpNetLoss": -2.809
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 120,
+          "win": "20%",
+          "stalled": 0,
+          "deathNight": "15/34/47",
+          "deathKind": "19/5/72",
+          "turns": "3.5/4.4/6.4",
+          "hpLoss": "0.1/-4.9/31.6",
+          "fights": 23.1,
+          "deck": 15.7,
+          "killers": "phi-kin-hua×37 night-bell-keeper×19 night-head-collector×9",
+          "wins": 24,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 114,
+              "deaths": 9,
+              "meanTurns": 5.342,
+              "meanHpNetLoss": 24.009
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 830,
+              "deaths": 6,
+              "meanTurns": 3.228,
+              "meanHpNetLoss": 1.122
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 90,
+              "deaths": 19,
+              "meanTurns": 6.278,
+              "meanHpNetLoss": 28.033
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 95,
+              "deaths": 3,
+              "meanTurns": 3.768,
+              "meanHpNetLoss": -11.242
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 912,
+              "deaths": 12,
+              "meanTurns": 3.894,
+              "meanHpNetLoss": 1.167
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 129,
+              "deaths": 44,
+              "meanTurns": 7.512,
+              "meanHpNetLoss": 40.899
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 140,
+              "deaths": 2,
+              "meanTurns": 4.871,
+              "meanHpNetLoss": -0.679
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 564,
+              "deaths": 1,
+              "meanTurns": 3.333,
+              "meanHpNetLoss": -3.037
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 1,
+          "runs": 120,
+          "win": "87%",
+          "stalled": 0,
+          "deathNight": "2/13/1",
+          "deathKind": "5/7/4",
+          "turns": "3.5/3.8/5.4",
+          "hpLoss": "-1.1/-3.6/16.2",
+          "fights": 27.9,
+          "deck": 16.3,
+          "killers": "phi-phrai×4 pop-yai×4 yak-wat-jaeng×2",
+          "wins": 104,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 120,
+              "deaths": 2,
+              "meanTurns": 5.958,
+              "meanHpNetLoss": 13.917
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 3.561,
+              "meanHpNetLoss": -1.065
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 106,
+              "deaths": 1,
+              "meanTurns": 5.226,
+              "meanHpNetLoss": 12.358
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 113,
+              "deaths": 7,
+              "meanTurns": 4.221,
+              "meanHpNetLoss": -2.717
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 1030,
+              "deaths": 5,
+              "meanTurns": 3.823,
+              "meanHpNetLoss": 0.778
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 105,
+              "deaths": 1,
+              "meanTurns": 5.086,
+              "meanHpNetLoss": 22.695
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 210,
+              "deaths": 0,
+              "meanTurns": 3.586,
+              "meanHpNetLoss": -4.048
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 840,
+              "deaths": 0,
+              "meanTurns": 2.911,
+              "meanHpNetLoss": -3.394
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 2,
+          "runs": 120,
+          "win": "74%",
+          "stalled": 0,
+          "deathNight": "3/28/0",
+          "deathKind": "19/7/5",
+          "turns": "3.8/4.2/6",
+          "hpLoss": "-0.4/-1.7/16.7",
+          "fights": 25.6,
+          "deck": 16.2,
+          "killers": "phi-phrai×5 yak-wat-jaeng×4 asuragaya×3",
+          "wins": 89,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 119,
+              "deaths": 2,
+              "meanTurns": 6.647,
+              "meanHpNetLoss": 14.008
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 839,
+              "deaths": 1,
+              "meanTurns": 4.159,
+              "meanHpNetLoss": -0.418
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 92,
+              "deaths": 3,
+              "meanTurns": 5.565,
+              "meanHpNetLoss": 10.228
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 100,
+              "deaths": 7,
+              "meanTurns": 4.57,
+              "meanHpNetLoss": 0.67
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 979,
+              "deaths": 18,
+              "meanTurns": 4.088,
+              "meanHpNetLoss": 1.246
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 89,
+              "deaths": 0,
+              "meanTurns": 5.618,
+              "meanHpNetLoss": 26.888
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 178,
+              "deaths": 0,
+              "meanTurns": 3.966,
+              "meanHpNetLoss": -3.034
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 712,
+              "deaths": 0,
+              "meanTurns": 3.093,
+              "meanHpNetLoss": -2.816
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 120,
+          "win": "63%",
+          "stalled": 0,
+          "deathNight": "27/16/1",
+          "deathKind": "22/3/19",
+          "turns": "3.8/4.2/5.8",
+          "hpLoss": "-0.6/-1.5/22.3",
+          "fights": 22.4,
+          "deck": 15.4,
+          "killers": "night-head-collector×16 phi-tai-hong×4 mae-nak×4",
+          "wins": 76,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 109,
+              "deaths": 16,
+              "meanTurns": 6.284,
+              "meanHpNetLoss": 28.963
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 820,
+              "deaths": 11,
+              "meanTurns": 3.955,
+              "meanHpNetLoss": 1.232
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 79,
+              "deaths": 2,
+              "meanTurns": 5.278,
+              "meanHpNetLoss": 11.962
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 82,
+              "deaths": 3,
+              "meanTurns": 4.549,
+              "meanHpNetLoss": 2.561
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 794,
+              "deaths": 11,
+              "meanTurns": 4.067,
+              "meanHpNetLoss": -0.457
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 77,
+              "deaths": 1,
+              "meanTurns": 5.558,
+              "meanHpNetLoss": 23.468
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 154,
+              "deaths": 0,
+              "meanTurns": 4.013,
+              "meanHpNetLoss": -3.656
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 616,
+              "deaths": 0,
+              "meanTurns": 3.104,
+              "meanHpNetLoss": -3.226
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 120,
+          "win": "54%",
+          "stalled": 0,
+          "deathNight": "43/11/1",
+          "deathKind": "24/5/26",
+          "turns": "3.7/4/5.7",
+          "hpLoss": "-0.5/-3.5/27",
+          "fights": 19.6,
+          "deck": 14.8,
+          "killers": "night-head-collector×25 phi-pong-kang×6 krahang×4",
+          "wins": 65,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 102,
+              "deaths": 25,
+              "meanTurns": 5.912,
+              "meanHpNetLoss": 34.304
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 783,
+              "deaths": 18,
+              "meanTurns": 4.073,
+              "meanHpNetLoss": 2.04
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 66,
+              "deaths": 0,
+              "meanTurns": 5.515,
+              "meanHpNetLoss": 14.273
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 72,
+              "deaths": 5,
+              "meanTurns": 4.319,
+              "meanHpNetLoss": -2.667
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 662,
+              "deaths": 6,
+              "meanTurns": 3.843,
+              "meanHpNetLoss": -0.976
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 66,
+              "deaths": 1,
+              "meanTurns": 5.409,
+              "meanHpNetLoss": 28.288
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 132,
+              "deaths": 0,
+              "meanTurns": 3.864,
+              "meanHpNetLoss": -3.932
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 528,
+              "deaths": 0,
+              "meanTurns": 3.008,
+              "meanHpNetLoss": -3.536
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 120,
+          "win": "33%",
+          "stalled": 0,
+          "deathNight": "62/16/3",
+          "deathKind": "41/4/36",
+          "turns": "4.1/4.2/6",
+          "hpLoss": "1.1/-3.4/22.1",
+          "fights": 15.3,
+          "deck": 14,
+          "killers": "night-head-collector×28 phi-pong-kang×8 ngu-phi-sang×7",
+          "wins": 39,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 86,
+              "deaths": 28,
+              "meanTurns": 5.895,
+              "meanHpNetLoss": 33.5
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 743,
+              "deaths": 34,
+              "meanTurns": 4.502,
+              "meanHpNetLoss": 4.241
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 47,
+              "deaths": 5,
+              "meanTurns": 5.915,
+              "meanHpNetLoss": 19.021
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 51,
+              "deaths": 4,
+              "meanTurns": 4.529,
+              "meanHpNetLoss": 0.039
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 480,
+              "deaths": 7,
+              "meanTurns": 4.148,
+              "meanHpNetLoss": -0.171
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 84,
+              "deaths": 3,
+              "meanTurns": 6.155,
+              "meanHpNetLoss": 12.214
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 84,
+              "deaths": 0,
+              "meanTurns": 3.988,
+              "meanHpNetLoss": -5.464
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 336,
+              "deaths": 0,
+              "meanTurns": 3.289,
+              "meanHpNetLoss": -3.94
+            }
+          ]
+        }
+      ]
+    },
+    "holdout": {
+      "rawSha256": "8d0ef231932c32932023844ecf96d0a08d25febbfdfbbb925ca01b0c963047de",
+      "runsPerCell": 60,
+      "totalRuns": 360,
+      "policy": "tactical",
+      "seedPrefix": "depth-holdout",
+      "cells": [
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "60%",
+          "stalled": 0,
+          "deathNight": "14/10/0",
+          "deathKind": "11/2/11",
+          "turns": "3.8/4.1/5.7",
+          "hpLoss": "-0.1/-3/24.6",
+          "fights": 21.9,
+          "deck": 15.4,
+          "killers": "night-head-collector×8 kuman-thong×3 night-bell-keeper×3",
+          "wins": 36,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 54,
+              "deaths": 8,
+              "meanTurns": 6.093,
+              "meanHpNetLoss": 30.537
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 415,
+              "deaths": 6,
+              "meanTurns": 4.176,
+              "meanHpNetLoss": 2.048
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 39,
+              "deaths": 3,
+              "meanTurns": 5.538,
+              "meanHpNetLoss": 15.692
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 41,
+              "deaths": 2,
+              "meanTurns": 4.732,
+              "meanHpNetLoss": -1.78
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 391,
+              "deaths": 5,
+              "meanTurns": 4.146,
+              "meanHpNetLoss": 0.217
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 36,
+              "deaths": 0,
+              "meanTurns": 5.417,
+              "meanHpNetLoss": 25.167
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 72,
+              "deaths": 0,
+              "meanTurns": 3.778,
+              "meanHpNetLoss": -3.681
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 288,
+              "deaths": 0,
+              "meanTurns": 2.913,
+              "meanHpNetLoss": -3.719
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "37%",
+          "stalled": 0,
+          "deathNight": "23/14/1",
+          "deathKind": "17/3/18",
+          "turns": "4/4.4/5.9",
+          "hpLoss": "0.7/-3.4/31.7",
+          "fights": 16.9,
+          "deck": 14.4,
+          "killers": "night-head-collector×13 night-bell-keeper×5 phi-phrai×3",
+          "wins": 22,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 50,
+              "deaths": 13,
+              "meanTurns": 6.12,
+              "meanHpNetLoss": 38.0
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 387,
+              "deaths": 10,
+              "meanTurns": 4.142,
+              "meanHpNetLoss": 3.003
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 28,
+              "deaths": 5,
+              "meanTurns": 5.643,
+              "meanHpNetLoss": 16.5
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 30,
+              "deaths": 2,
+              "meanTurns": 4.833,
+              "meanHpNetLoss": -1.6
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 308,
+              "deaths": 7,
+              "meanTurns": 4.367,
+              "meanHpNetLoss": 0.406
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 22,
+              "deaths": 0,
+              "meanTurns": 5.636,
+              "meanHpNetLoss": 36.545
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 46,
+              "deaths": 1,
+              "meanTurns": 4.043,
+              "meanHpNetLoss": -4.5
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 183,
+              "deaths": 0,
+              "meanTurns": 3.175,
+              "meanHpNetLoss": -3.847
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "18%",
+          "stalled": 0,
+          "deathNight": "37/9/3",
+          "deathKind": "28/2/19",
+          "turns": "4.4/4.6/5.8",
+          "hpLoss": "2.2/3.1/23.2",
+          "fights": 12.1,
+          "deck": 13.5,
+          "killers": "night-head-collector×16 phi-nang-ram×6 ngu-phi-sang×4",
+          "wins": 11,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 39,
+              "deaths": 16,
+              "meanTurns": 5.641,
+              "meanHpNetLoss": 33.41
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 355,
+              "deaths": 21,
+              "meanTurns": 4.69,
+              "meanHpNetLoss": 5.746
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 14,
+              "deaths": 0,
+              "meanTurns": 6.5,
+              "meanHpNetLoss": 19.929
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 17,
+              "deaths": 2,
+              "meanTurns": 5.118,
+              "meanHpNetLoss": 15.529
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 184,
+              "deaths": 7,
+              "meanTurns": 4.473,
+              "meanHpNetLoss": -0.06
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 28,
+              "deaths": 3,
+              "meanTurns": 5.786,
+              "meanHpNetLoss": 10.5
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 28,
+              "deaths": 0,
+              "meanTurns": 4.286,
+              "meanHpNetLoss": -4.429
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 112,
+              "deaths": 0,
+              "meanTurns": 3.455,
+              "meanHpNetLoss": -5.295
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "72%",
+          "stalled": 0,
+          "deathNight": "0/10/7",
+          "deathKind": "2/4/11",
+          "turns": "3/4.1/5.9",
+          "hpLoss": "-0.7/-0.8/27.3",
+          "fights": 27.6,
+          "deck": 16,
+          "killers": "night-bell-keeper×6 night-root-lord×4 winyan-dek×2",
+          "wins": 43,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 60,
+              "deaths": 0,
+              "meanTurns": 4.783,
+              "meanHpNetLoss": 17.85
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 420,
+              "deaths": 0,
+              "meanTurns": 2.533,
+              "meanHpNetLoss": -0.867
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 56,
+              "deaths": 6,
+              "meanTurns": 5.929,
+              "meanHpNetLoss": 20.214
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 59,
+              "deaths": 2,
+              "meanTurns": 3.22,
+              "meanHpNetLoss": -2.881
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 535,
+              "deaths": 2,
+              "meanTurns": 3.293,
+              "meanHpNetLoss": 0.581
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 48,
+              "deaths": 5,
+              "meanTurns": 7.104,
+              "meanHpNetLoss": 47.521
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 100,
+              "deaths": 2,
+              "meanTurns": 4.65,
+              "meanHpNetLoss": 0.44
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 398,
+              "deaths": 0,
+              "meanTurns": 3.028,
+              "meanHpNetLoss": -2.256
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "57%",
+          "stalled": 0,
+          "deathNight": "5/16/5",
+          "deathKind": "6/2/18",
+          "turns": "3.1/4/5.8",
+          "hpLoss": "-0.6/-4.5/30.4",
+          "fights": 24.2,
+          "deck": 15.7,
+          "killers": "night-bell-keeper×10 night-head-collector×4 night-headless-king×3",
+          "wins": 34,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 59,
+              "deaths": 4,
+              "meanTurns": 4.712,
+              "meanHpNetLoss": 21.136
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 1,
+              "meanTurns": 2.823,
+              "meanHpNetLoss": 0.291
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 49,
+              "deaths": 10,
+              "meanTurns": 6.347,
+              "meanHpNetLoss": 30.918
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 51,
+              "deaths": 2,
+              "meanTurns": 3.176,
+              "meanHpNetLoss": -8.627
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 477,
+              "deaths": 4,
+              "meanTurns": 3.329,
+              "meanHpNetLoss": 0.021
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 38,
+              "deaths": 4,
+              "meanTurns": 6.895,
+              "meanHpNetLoss": 43.974
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 76,
+              "deaths": 0,
+              "meanTurns": 4.5,
+              "meanHpNetLoss": -1.737
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 309,
+              "deaths": 1,
+              "meanTurns": 3.055,
+              "meanHpNetLoss": -2.838
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "18%",
+          "stalled": 0,
+          "deathNight": "12/13/24",
+          "deathKind": "9/1/39",
+          "turns": "3.4/4.2/6",
+          "hpLoss": "0.5/-6.7/31.2",
+          "fights": 22.3,
+          "deck": 15.3,
+          "killers": "phi-kin-hua×16 night-bell-keeper×8 night-head-collector×7",
+          "wins": 11,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 55,
+              "deaths": 7,
+              "meanTurns": 5.0,
+              "meanHpNetLoss": 25.145
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 411,
+              "deaths": 5,
+              "meanTurns": 3.153,
+              "meanHpNetLoss": 1.367
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 43,
+              "deaths": 8,
+              "meanTurns": 6.209,
+              "meanHpNetLoss": 25.326
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 44,
+              "deaths": 1,
+              "meanTurns": 3.591,
+              "meanHpNetLoss": -14.432
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 420,
+              "deaths": 4,
+              "meanTurns": 3.65,
+              "meanHpNetLoss": 1.605
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 62,
+              "deaths": 24,
+              "meanTurns": 6.742,
+              "meanHpNetLoss": 40.629
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 70,
+              "deaths": 0,
+              "meanTurns": 4.657,
+              "meanHpNetLoss": -1.886
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 280,
+              "deaths": 0,
+              "meanTurns": 3.254,
+              "meanHpNetLoss": -2.425
+            }
+          ]
+        }
+      ]
+    },
+    "baseline-holdout": {
+      "rawSha256": "9eca987a4b61350ecbc014772a3729628537c988728d9d7e52f928a42afcd705",
+      "runsPerCell": 60,
+      "totalRuns": 360,
+      "policy": "tactical",
+      "seedPrefix": "depth-holdout",
+      "cells": [
+        {
+          "class": "shaman",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "68%",
+          "stalled": 0,
+          "deathNight": "3/10/6",
+          "deathKind": "5/1/13",
+          "turns": "3.1/4.1/6",
+          "hpLoss": "-0.5/-4.6/23.5",
+          "fights": 26.4,
+          "deck": 15.6,
+          "killers": "night-root-lord×6 night-bell-keeper×6 phi-pa×3",
+          "wins": 41,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 1,
+              "meanTurns": 4.69,
+              "meanHpNetLoss": 16.414
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 2,
+              "meanTurns": 2.761,
+              "meanHpNetLoss": -0.017
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 53,
+              "deaths": 6,
+              "meanTurns": 6.491,
+              "meanHpNetLoss": 16.906
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 54,
+              "deaths": 1,
+              "meanTurns": 3.315,
+              "meanHpNetLoss": -6.426
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 500,
+              "deaths": 3,
+              "meanTurns": 3.308,
+              "meanHpNetLoss": 0.078
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 47,
+              "deaths": 6,
+              "meanTurns": 7.17,
+              "meanHpNetLoss": 39.809
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 94,
+              "deaths": 0,
+              "meanTurns": 4.606,
+              "meanHpNetLoss": -3.617
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 376,
+              "deaths": 0,
+              "meanTurns": 3.061,
+              "meanHpNetLoss": -1.782
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "50%",
+          "stalled": 0,
+          "deathNight": "6/18/6",
+          "deathKind": "8/5/17",
+          "turns": "3.1/3.8/5.7",
+          "hpLoss": "-0.1/-5.4/28.5",
+          "fights": 23.3,
+          "deck": 15.1,
+          "killers": "night-bell-keeper×11 kuman-thong×4 night-head-collector×3",
+          "wins": 30,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 57,
+              "deaths": 3,
+              "meanTurns": 4.316,
+              "meanHpNetLoss": 19.737
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 419,
+              "deaths": 3,
+              "meanTurns": 2.773,
+              "meanHpNetLoss": 0.284
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 47,
+              "deaths": 11,
+              "meanTurns": 6.404,
+              "meanHpNetLoss": 30.617
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 52,
+              "deaths": 3,
+              "meanTurns": 3.481,
+              "meanHpNetLoss": -9.308
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 469,
+              "deaths": 4,
+              "meanTurns": 3.307,
+              "meanHpNetLoss": 1.328
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 33,
+              "deaths": 3,
+              "meanTurns": 7.152,
+              "meanHpNetLoss": 40.515
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 70,
+              "deaths": 2,
+              "meanTurns": 4.0,
+              "meanHpNetLoss": -2.486
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 282,
+              "deaths": 1,
+              "meanTurns": 3.074,
+              "meanHpNetLoss": -2.855
+            }
+          ]
+        },
+        {
+          "class": "shaman",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "15%",
+          "stalled": 0,
+          "deathNight": "11/21/19",
+          "deathKind": "14/1/36",
+          "turns": "3.5/4.4/6.4",
+          "hpLoss": "0.9/-5.5/30.4",
+          "fights": 20.4,
+          "deck": 15.4,
+          "killers": "phi-kin-hua×13 night-head-collector×9 night-bell-keeper×8",
+          "wins": 9,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 58,
+              "deaths": 9,
+              "meanTurns": 4.586,
+              "meanHpNetLoss": 20.707
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 417,
+              "deaths": 2,
+              "meanTurns": 3.209,
+              "meanHpNetLoss": 1.974
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 36,
+              "deaths": 8,
+              "meanTurns": 7.056,
+              "meanHpNetLoss": 29.389
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 37,
+              "deaths": 1,
+              "meanTurns": 3.649,
+              "meanHpNetLoss": -8.811
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 399,
+              "deaths": 12,
+              "meanTurns": 3.822,
+              "meanHpNetLoss": 2.271
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 50,
+              "deaths": 19,
+              "meanTurns": 8.14,
+              "meanHpNetLoss": 42.24
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 56,
+              "deaths": 0,
+              "meanTurns": 4.875,
+              "meanHpNetLoss": -3.393
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 224,
+              "deaths": 0,
+              "meanTurns": 3.268,
+              "meanHpNetLoss": -3.339
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 3,
+          "runs": 60,
+          "win": "60%",
+          "stalled": 0,
+          "deathNight": "21/3/0",
+          "deathKind": "11/0/13",
+          "turns": "3.7/4.1/5.9",
+          "hpLoss": "0/-5.1/20.9",
+          "fights": 20.7,
+          "deck": 15,
+          "killers": "night-head-collector×12 kuman-thong×3 phi-nang-ram×2",
+          "wins": 36,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 51,
+              "deaths": 12,
+              "meanTurns": 6.02,
+              "meanHpNetLoss": 28.059
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 400,
+              "deaths": 9,
+              "meanTurns": 4.0,
+              "meanHpNetLoss": 1.79
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 37,
+              "deaths": 1,
+              "meanTurns": 5.649,
+              "meanHpNetLoss": 10.351
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 37,
+              "deaths": 0,
+              "meanTurns": 4.162,
+              "meanHpNetLoss": -3.378
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 346,
+              "deaths": 2,
+              "meanTurns": 3.928,
+              "meanHpNetLoss": 0.332
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 36,
+              "deaths": 0,
+              "meanTurns": 6.0,
+              "meanHpNetLoss": 21.75
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 72,
+              "deaths": 0,
+              "meanTurns": 4.056,
+              "meanHpNetLoss": -6.028
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 288,
+              "deaths": 0,
+              "meanTurns": 3.108,
+              "meanHpNetLoss": -2.802
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 4,
+          "runs": 60,
+          "win": "33%",
+          "stalled": 0,
+          "deathNight": "35/5/0",
+          "deathKind": "21/1/18",
+          "turns": "3.9/4/6",
+          "hpLoss": "1.4/-6.9/27",
+          "fights": 14.1,
+          "deck": 13.8,
+          "killers": "night-head-collector×17 phi-pong-kang×5 phi-nang-ram×3",
+          "wins": 20,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 42,
+              "deaths": 17,
+              "meanTurns": 5.952,
+              "meanHpNetLoss": 35.286
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 370,
+              "deaths": 17,
+              "meanTurns": 4.27,
+              "meanHpNetLoss": 3.897
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 21,
+              "deaths": 1,
+              "meanTurns": 6.238,
+              "meanHpNetLoss": 15.81
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 22,
+              "deaths": 1,
+              "meanTurns": 4.318,
+              "meanHpNetLoss": -8.409
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 210,
+              "deaths": 3,
+              "meanTurns": 4.014,
+              "meanHpNetLoss": 0.814
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 20,
+              "deaths": 0,
+              "meanTurns": 5.75,
+              "meanHpNetLoss": 21.4
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 40,
+              "deaths": 0,
+              "meanTurns": 3.875,
+              "meanHpNetLoss": -6.025
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 160,
+              "deaths": 0,
+              "meanTurns": 3.094,
+              "meanHpNetLoss": -3.481
+            }
+          ]
+        },
+        {
+          "class": "warrior",
+          "difficulty": 5,
+          "runs": 60,
+          "win": "17%",
+          "stalled": 0,
+          "deathNight": "41/7/2",
+          "deathKind": "30/1/19",
+          "turns": "4.3/4/6",
+          "hpLoss": "4.1/-11.2/21.2",
+          "fights": 11,
+          "deck": 13.4,
+          "killers": "night-head-collector×16 krahang×6 kuman-thong×5",
+          "wins": 10,
+          "encountersByNightAndKind": [
+            {
+              "night": 1,
+              "kind": "boss",
+              "encounters": 35,
+              "deaths": 16,
+              "meanTurns": 5.857,
+              "meanHpNetLoss": 30.286
+            },
+            {
+              "night": 1,
+              "kind": "normal",
+              "encounters": 354,
+              "deaths": 25,
+              "meanTurns": 4.582,
+              "meanHpNetLoss": 6.672
+            },
+            {
+              "night": 2,
+              "kind": "boss",
+              "encounters": 13,
+              "deaths": 1,
+              "meanTurns": 5.846,
+              "meanHpNetLoss": 21.769
+            },
+            {
+              "night": 2,
+              "kind": "elite",
+              "encounters": 15,
+              "deaths": 1,
+              "meanTurns": 4.2,
+              "meanHpNetLoss": -15.8
+            },
+            {
+              "night": 2,
+              "kind": "normal",
+              "encounters": 149,
+              "deaths": 5,
+              "meanTurns": 4.262,
+              "meanHpNetLoss": 2.497
+            },
+            {
+              "night": 3,
+              "kind": "boss",
+              "encounters": 23,
+              "deaths": 2,
+              "meanTurns": 6.261,
+              "meanHpNetLoss": 6.913
+            },
+            {
+              "night": 3,
+              "kind": "elite",
+              "encounters": 24,
+              "deaths": 0,
+              "meanTurns": 3.875,
+              "meanHpNetLoss": -8.375
+            },
+            {
+              "night": 3,
+              "kind": "normal",
+              "encounters": 96,
+              "deaths": 0,
+              "meanTurns": 3.333,
+              "meanHpNetLoss": -2.708
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
