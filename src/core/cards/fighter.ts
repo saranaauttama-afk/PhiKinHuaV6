@@ -204,3 +204,14 @@ export function liftInnate(s: GameState): void {
   if (!innate.length) return;
   s.piles.draw = [...innate, ...s.piles.draw.filter(c => !c.innate)];
 }
+
+/**
+ * Hand hint for one card, read by the card face (MoveMark): `rhythm` — playing it now is a new
+ * move and gains จังหวะ; `after` — its ต่อจาก bonus is live right now. Pure; spends nothing.
+ */
+export function moveHint(s: Partial<GameState>, card: CardData): { rhythm: boolean; after: boolean } {
+  const last = s.fight?.lastAttackMove;
+  const rhythm = !!(card.move && usesRhythm(s) && last && last !== card.move && rhythmOf(s) < FIGHTER_RULES.rhythmMax);
+  const after = !!(card.after && s.turnFlags?.lastMove === card.after.move);
+  return { rhythm, after };
+}

@@ -17,6 +17,7 @@ import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
 import BlessingSeals from './components/battle/BlessingSeals';
 import EnemyHandCard from './components/battle/EnemyHandCard';
+import MinionRow from './components/battle/MinionRow';
 import CardHistory from './components/battle/CardHistory';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
@@ -437,6 +438,8 @@ export default function BattlePage() {
           onPlayCard={handlePlayCard}
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />}
+
+        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow minions={gameState.minions??[]}/>}
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}

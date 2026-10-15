@@ -39,6 +39,8 @@ interface CardProps {
   animationDelay?: number; // Stagger only newly mounted physical copies.
   /** ค่าร่ายจริง ณ ตอนนี้ — การ์ดบางใบถูกลงตามจำนวนใบที่เล่นไปแล้วในเทิร์น */
   costNow?: { ap: number; mana: number };
+  /** นักมวย: whether playing it now gains จังหวะ / triggers ต่อจาก (fighter.ts moveHint). */
+  moveHint?: { rhythm: boolean; after: boolean };
 }
 
 export default function Card({
@@ -53,6 +55,7 @@ export default function Card({
   isPlayed = false,
   animationDelay = 0,
   costNow,
+  moveHint,
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const badgeTop=Math.max(10,Math.round(height*.07));
@@ -186,7 +189,7 @@ export default function Card({
         animatedStyle
       ]}>
       <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} hideWash={disabled?undefined:cardTypeWash[card.type]} style={{width:'100%',height:'100%',padding:9,paddingTop:headerPadding,paddingBottom:stampSize+4}}>
-        <View style={{position:'absolute',top:badgeTop,left:Math.max(12,width*.14),right:Math.max(12,width*.14),zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact/></View>
+        <View style={{position:'absolute',top:badgeTop,left:Math.max(12,width*.14),right:Math.max(12,width*.14),zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact moveHint={moveHint}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:shortCard?11:12,lineHeight:titleLine,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
         <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={illustrationSize} muted={disabled}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:shortCard?9:10,lineHeight:summaryLine,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>

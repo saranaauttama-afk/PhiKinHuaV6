@@ -366,3 +366,14 @@ describe('ความลึกในคืน (ENEMY_DEPTH)', () => {
     for (let i = 1; i < route.length; i++) expect(route[i]).toBeGreaterThanOrEqual(route[i - 1]);
   });
 });
+
+import { moveHint } from '../src/core/cards/fighter';
+describe('moveHint (hand hints)', () => {
+  it('lights rhythm for a new move and ต่อจาก when the last card was that move', () => {
+    const s: any = { classId: 'warrior', fight: { lastAttackMove: 'punch', rhythm: 1 }, turnFlags: { lastMove: 'punch' } };
+    expect(moveHint(s, { move: 'kick' } as any)).toEqual({ rhythm: true, after: false });
+    expect(moveHint(s, { move: 'punch' } as any).rhythm).toBe(false);
+    expect(moveHint(s, { move: 'knee', after: { move: 'punch', bonus: {} } } as any)).toEqual({ rhythm: true, after: true });
+    expect(moveHint({ ...s, classId: 'nun' }, { move: 'kick' } as any).rhythm).toBe(false);
+  });
+});

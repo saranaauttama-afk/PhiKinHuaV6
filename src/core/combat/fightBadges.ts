@@ -15,7 +15,7 @@ export function fightBadges(s:GameState){
 }
 
 /**
- * นักมวยคาดเชือก state on the player's status row: จังหวะ, ยก, สวนที่ตั้งไว้, คาดเชือกใหม่, ศิษย์ค่าย.
+ * นักมวยคาดเชือก state on the player's status row: จังหวะ, ยก, สวนที่ตั้งไว้, คาดเชือกใหม่.
  * Rhythm and round show only for a class with rhythm; minions show for anyone who has them.
  */
 export function fighterBadges(s:GameState){
@@ -29,7 +29,7 @@ export function fighterBadges(s:GameState){
  }
  for(const [i,fx] of (s.fight?.ripostes??[]).entries())out.push({id:`fighter:riposte:${i}`,name:'สวน',symbol:'riposte',neutral:true,detail:`ถ้าการ์ดโจมตีใบถัดไปของผีทำให้เราไม่เสียเลือด: ${fxText(fx).join(' · ')}`});
  if(s.turnFlags?.doubleNext)out.push({id:'fighter:double',name:'คาดเชือกใหม่',symbol:'check',neutral:true,detail:'การ์ดโจมตีใบถัดไปเทิร์นนี้ทำงาน 2 ครั้ง'});
- for(const m of s.minions??[])out.push({id:`minion:${m.uid}`,name:m.name,symbol:['camp_pupil','corner_man','pi_player','drummer','senior_boxer','old_master'].includes(m.id)?m.id:'minion',neutral:true,count:`${m.hp}`,detail:`ศิษย์ค่าย · เลือด ${m.hp}/${m.maxHp}\n${require('./minions').minionDef(m.id)?.desc??''}`});
+ // Our minions stand as figures above the hand (app/components/battle/MinionRow.tsx), not badges.
  return out;
 }
 
