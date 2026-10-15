@@ -16,13 +16,23 @@ def find(pattern,timeout=30):
  raise AssertionError('Missing '+pattern+'; '+str([label(n) for n in ns]))
 def tap(pattern):
  n=find(pattern);x1,y1,x2,y2=map(int,re.findall(r'\d+',n.attrib['bounds']));adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2));time.sleep(.45)
+def tap_if(pattern,timeout=4):
+ """Optional step: tap when it shows up within `timeout`, else carry on."""
+ try:n=find(pattern,timeout)
+ except AssertionError:return False
+ x1,y1,x2,y2=map(int,re.findall(r'\d+',n.attrib['bounds']));adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2));time.sleep(.45);return True
 def shot(name):
  (out/(name+'.png')).write_bytes(subprocess.check_output(['adb','exec-out','screencap','-p']))
 app='com.phikinhua.episode'
 try:
- for cls in ['นักรบวัด','หมอผี','แม่ชี','คนทรง']:
+ # Only นักมวยคาดเชือก is open (classes.ts PLAYABLE_CLASSES); the others must show as locked.
+ for cls in ['นักมวยคาดเชือก']:
   adb('shell','am','force-stop',app);adb('shell','pm','clear',app);adb('shell','am','start','-W','-n',app+'/.MainActivity')
-  tap('^เริ่มเกม$');tap('^เลือก'+cls+'$');tap('ออกเดินทาง');tap('ดูระดับอาถรรพ์ 1');tap('เริ่มรอบ · ระดับ 1');tap('^(ข้ามบทนี้|เดินทางต่อ)$')
+  # v1.0.48 class book: open it, turn to the class page, then choose; the old 'ออกเดินทาง' step may not exist.
+  tap('^เริ่มเกม$');tap_if('^เปิดตำรา$')
+  for other in ['หมอผี','แม่ชี','คนทรง']:
+   tap('^เปิดหน้า'+other+'$');find('^'+other+' · ยังไม่เปิด');checks.append(other+': locked in the class book')
+  tap_if('^เปิดหน้า'+cls+'$');tap('^เลือก'+cls+'$');tap_if('ออกเดินทาง');tap('ดูระดับอาถรรพ์ 1');tap('เริ่มรอบ · ระดับ 1');tap('^(ข้ามบทนี้|เดินทางต่อ)$')
   tap('^พรติดตัว 1:');assert not any(label(n)=='แตะพรเพื่ออ่านรายละเอียด' for n in nodes());shot(cls+'-starter');checks.append(cls+': starter selection shows effect')
   tap('^ยืนยันพร$');find('^สำรับ 10$');time.sleep(4)
   tap('^สำรับ 10$');find('ช่องสวมอุปกรณ์');find('ยังไม่มีอุปกรณ์ในสำรับ');shot(cls+'-bag')

@@ -4,7 +4,7 @@ import { describeCard } from '../src/core/cards/describe';
 export type CardGlyph = 'clap' | 'sword' | 'stance' | 'parry' | 'breath' | 'trap' | 'equipment' | 'curse';
 /** A symbol for every card, from its type and main effect. */
 export function cardGlyph(card: CardData): CardGlyph {
-  const explicit: Record<string, CardGlyph> = { thunder_clap: 'clap', temple_blade: 'sword', muay_stance: 'stance' };
+  const explicit: Record<string, CardGlyph> = { muay_stance: 'stance' };
   if (explicit[card.id]) return explicit[card.id];
   if (card.type === 'counter') return 'trap';
   if (card.type === 'equipment' || card.type === 'curse') return card.type;

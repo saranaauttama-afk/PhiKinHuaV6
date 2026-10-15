@@ -104,7 +104,7 @@ export function useSkill(s: GameState, id: string, rng: RNG, index?: number): { 
     // ── warrior
     case 'rune_weapon':
       s.masterDeck[index!] = upgradeCard(s.masterDeck[index!]);
-      s.log.push(`ลงยันต์อาวุธ: ${s.masterDeck[index!].name} ${s.masterDeck[index!].star} ดาว`);
+      s.log.push(`ครูต่อท่าให้: ${s.masterDeck[index!].name} ${s.masterDeck[index!].star} ดาว`);
       break;
     case 'muay_teacher':
       fight!.copyNext = true;

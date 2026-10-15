@@ -13,6 +13,28 @@ export type Adventure={version:5;deck:Encounter[];cursor:number;slotIds:(string|
 const finalIds=new Set([...NIGHT_BOSSES.map(m=>m.id),ULTIMATE_BOSS.id]);
 /** Every existing ghost except the six difficulty-specific final bosses. */
 export const ADVENTURE_GHOSTS:ThaiGhostData[]=Object.values(THAI_GHOST_POOLS).flat().filter(m=>!finalIds.has(m.id));
+/**
+ * Pick `quota` distinct ghosts whose folklore tier climbs through the night (ENEMY_DEPTH.tierSpan):
+ * night 1 goes T1→T3, night 2 T2→T4, night 3 T3→T5. When a tier has run out the nearest tier is
+ * used. Why (15 Oct 2026): the route used to take the lowest tiers left, so a whole night showed
+ * T1–T2 faces while the player kept growing. Order inside `pool` is already shuffled.
+ */
+export function climbingRoute(pool:ThaiGhostData[],quota:number,night:number):ThaiGhostData[]{
+ const {ENEMY_DEPTH}=require('../balance/notfm');
+ const [lo,hi]=ENEMY_DEPTH.tierSpan[Math.max(0,Math.min(2,night-1))];
+ const tierOf=(m:ThaiGhostData)=>Number(m.tier.slice(1))||6;
+ const left=[...pool]; // Elite and mid-boss roster tiers count as 6: used once the T5 faces run out.
+ const route:ThaiGhostData[]=[];
+ for(let i=0;i<quota;i++){
+  const want=quota<=1?lo:Math.round(lo+(hi-lo)*i/(quota-1));
+  let best=-1;
+  for(let j=0;j<left.length;j++)if(best<0||Math.abs(tierOf(left[j])-want)<Math.abs(tierOf(left[best])-want))best=j;
+  if(best<0)break;
+  route.push(left.splice(best,1)[0]);
+ }
+ // Elites sit at the end of the route; they are marked by position (eliteQuota), not by roster tier.
+ return route.sort((a,b)=>tierOf(a)-tierOf(b));
+}
 export function startAdventure(s:GameState,r:RNG):RNG {
  const night=s.campaign!.night,quota=routeFightQuota(s),eliteQuota=runEliteQuota(night,difficultyOf(s));
  const isElite=(m:ThaiGhostData)=>!m.tier.startsWith('T');
@@ -20,7 +42,7 @@ export function startAdventure(s:GameState,r:RNG):RNG {
  // roster tier, so there are enough distinct creatures at every difficulty.
  const available=ADVENTURE_GHOSTS.filter(m=>!s.defeatedEnemyIds?.includes(m.id));
  const out=shuffle(r,available);r=out.rng;
- const route=out.array.sort((a,b)=>Number(isElite(a))-Number(isElite(b))||(Number(a.tier.slice(1))||7)-(Number(b.tier.slice(1))||7)).slice(0,quota);
+ const route=climbingRoute(out.array,quota,night);
  if(route.length!==quota)throw Error('Not enough distinct route ghosts');
  const fights:PageOffer[]=route.map((m,i)=>({kind:'monster',tier:i>=quota-eliteQuota?'elite':'normal',enemyId:m.id}));
  const pick=<T,>(pool:T[]):T=>{const out=shuffle(r,pool);r=out.rng;return out.array[0];};

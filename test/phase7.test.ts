@@ -38,7 +38,7 @@ describe('Phase 7 deck and combat visibility',()=>{
   expect(new Set([...ALL_CARDS,...CURSE_CARDS].map(c=>c.type))).toEqual(new Set(CARD_TYPE_ORDER));
  });
  it('pre-equips owned instances, respects slots, and swapping returns the same card once',()=>{
-  const d=run();const gear=cardById('equipment_iron_bracer')!;d.s.masterDeck.push(gear,structuredClone(gear));d.s.equipmentSlotsMax=2;
+  const d=run();const gear=cardById('equipment_cooling_cloth')!;d.s.masterDeck.push(gear,structuredClone(gear));d.s.equipmentSlotsMax=2;
   expect(validEquipmentSelection(d.s,[10,10])).toBe(false);expect(validEquipmentSelection(d.s,[10,11])).toBe(true);
   const index=d.s.pages!.current!.offers.findIndex(o=>o.kind==='monster');
   const refused=applyCommand(d.s,{type:'ChooseOffer',index,equipmentIndices:[10,10]},d.r);expect(refused.state.phase).toBe('map');expect(refused.rng).toEqual(d.r);
@@ -99,8 +99,9 @@ describe('Phase 7 Pandora rules and resource growth',()=>{
   let out=applyCommand(s,{type:'PlayCard',index:0},rng);expect(out.state.player.hp).toBe(8);out=applyCommand(out.state,{type:'PlayCard',index:0},out.rng);expect(out.state.player.hp).toBe(6);expect(out.state.masterDeck).toHaveLength(0);
  });
  for(const option of ['ap','mana','draw'] as const)it(`level ${option} is selectable, persists and is capped`,()=>{
-  const d=run();d.s.phase='levelup';d.s.levelUp={cards:[],offers:[option]};d.go({type:'ChooseLevelUpOption',option,index:0});expect(d.s.levelUp!.consumed).toBe(true);
-  expect(d.s.player[option==='ap'?'maxAp':option==='mana'?'startMana':'drawPerTurn']).toBe(option==='mana'?2:3);
+  // Mana level-ups only exist for classes that use mana (นักมวย/แม่ชี never see them).
+  const d=run('p7',option==='mana'?'shaman':'warrior');d.s.phase='levelup';d.s.levelUp={cards:[],offers:[option]};d.go({type:'ChooseLevelUpOption',option,index:0});expect(d.s.levelUp!.consumed).toBe(true);
+  expect(d.s.player[option==='ap'?'maxAp':option==='mana'?'startMana':'drawPerTurn']).toBe(option==='mana'?6:3);
   const s=d.s;s.player.maxAp=3;s.player.startMana=10;s.player.drawPerTurn=4;for(let i=0;i<25;i++)expect(rollLevelOffers(s,makeRng('caps'+i)).list).not.toContain(option);
  });
  it('no existing card is milestone-gated: new players keep the full Phase 6 class pool',()=>{

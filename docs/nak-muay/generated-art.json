@@ -1,0 +1,289 @@
+{
+  "generator": "built-in imagegen",
+  "prompts": "docs/nak-muay/ART-PROMPTS.md (original art-prompts.json at a76bfa5)",
+  "processing": "RGBA, Lanczos resize to 384x384, WebP quality 90/method 6, alpha preserved",
+  "assets": [
+    {
+      "id": "jab",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/jab.webp"
+    },
+    {
+      "id": "low_kick",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/low_kick.webp"
+    },
+    {
+      "id": "straight_knee",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/straight_knee.webp"
+    },
+    {
+      "id": "slant_elbow",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/slant_elbow.webp"
+    },
+    {
+      "id": "straight_punch",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/straight_punch.webp"
+    },
+    {
+      "id": "short_hook",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/short_hook.webp"
+    },
+    {
+      "id": "push_kick",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/push_kick.webp"
+    },
+    {
+      "id": "neck_kick",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/neck_kick.webp"
+    },
+    {
+      "id": "double_hook",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/double_hook.webp"
+    },
+    {
+      "id": "uppercut",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/uppercut.webp"
+    },
+    {
+      "id": "spin_back_kick",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/spin_back_kick.webp"
+    },
+    {
+      "id": "sweep_kick",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/sweep_kick.webp"
+    },
+    {
+      "id": "clinch_knee",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/clinch_knee.webp"
+    },
+    {
+      "id": "reverse_elbow",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/reverse_elbow.webp"
+    },
+    {
+      "id": "chin_kick",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/chin_kick.webp"
+    },
+    {
+      "id": "hanuman_ring",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/hanuman_ring.webp"
+    },
+    {
+      "id": "crocodile_tail",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/crocodile_tail.webp"
+    },
+    {
+      "id": "wai_khru",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/wai_khru.webp"
+    },
+    {
+      "id": "stare_down",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/stare_down.webp"
+    },
+    {
+      "id": "holy_water_spray",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/holy_water_spray.webp"
+    },
+    {
+      "id": "rewrap",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/rewrap.webp"
+    },
+    {
+      "id": "call_pupil",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/call_pupil.webp"
+    },
+    {
+      "id": "call_corner",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/call_corner.webp"
+    },
+    {
+      "id": "call_pi",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/call_pi.webp"
+    },
+    {
+      "id": "call_drummer",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/call_drummer.webp"
+    },
+    {
+      "id": "call_senior",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/call_senior.webp"
+    },
+    {
+      "id": "call_old_master",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/call_old_master.webp"
+    },
+    {
+      "id": "parry_bait",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/parry_bait.webp"
+    },
+    {
+      "id": "stop_kick",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/stop_kick.webp"
+    },
+    {
+      "id": "neck_lock",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/neck_lock.webp"
+    },
+    {
+      "id": "oiled_wraps",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/oiled_wraps.webp"
+    },
+    {
+      "id": "arm_prajiad",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/arm_prajiad.webp"
+    },
+    {
+      "id": "yantra_shorts",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/yantra_shorts.webp"
+    },
+    {
+      "id": "glass_wraps",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/glass_wraps.webp"
+    },
+    {
+      "id": "takrut",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/takrut.webp"
+    },
+    {
+      "id": "master_cloth",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/master_cloth.webp"
+    },
+    {
+      "id": "ward_riposte",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/ward_riposte.webp"
+    },
+    {
+      "id": "gate_watch",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/gate_watch.webp"
+    },
+    {
+      "id": "karma_cut",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/karma_cut.webp"
+    },
+    {
+      "id": "night_guardian_cut",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/night_guardian_cut.webp"
+    },
+    {
+      "id": "camp_pupil",
+      "group": "minions",
+      "path": "assets/minions/camp_pupil.webp"
+    },
+    {
+      "id": "corner_man",
+      "group": "minions",
+      "path": "assets/minions/corner_man.webp"
+    },
+    {
+      "id": "pi_player",
+      "group": "minions",
+      "path": "assets/minions/pi_player.webp"
+    },
+    {
+      "id": "drummer",
+      "group": "minions",
+      "path": "assets/minions/drummer.webp"
+    },
+    {
+      "id": "senior_boxer",
+      "group": "minions",
+      "path": "assets/minions/senior_boxer.webp"
+    },
+    {
+      "id": "old_master",
+      "group": "minions",
+      "path": "assets/minions/old_master.webp"
+    },
+    {
+      "id": "move_punch",
+      "group": "ui",
+      "path": "assets/ui/moves/move_punch.webp"
+    },
+    {
+      "id": "move_kick",
+      "group": "ui",
+      "path": "assets/ui/moves/move_kick.webp"
+    },
+    {
+      "id": "move_knee",
+      "group": "ui",
+      "path": "assets/ui/moves/move_knee.webp"
+    },
+    {
+      "id": "move_elbow",
+      "group": "ui",
+      "path": "assets/ui/moves/move_elbow.webp"
+    },
+    {
+      "id": "status_bruise",
+      "group": "ui",
+      "path": "assets/status/status_bruise.webp"
+    },
+    {
+      "id": "status_stun",
+      "group": "ui",
+      "path": "assets/status/status_stun.webp"
+    },
+    {
+      "id": "status_rhythm",
+      "group": "ui",
+      "path": "assets/status/status_rhythm.webp"
+    },
+    {
+      "id": "status_round",
+      "group": "ui",
+      "path": "assets/status/status_round.webp"
+    },
+    {
+      "id": "status_riposte",
+      "group": "ui",
+      "path": "assets/status/status_riposte.webp"
+    },
+    {
+      "id": "mongkhon",
+      "group": "cards",
+      "path": "assets/cards/thai-v24/mongkhon.webp",
+      "source": "exec-d3558571-2bc5-4328-a854-732b90239bd4.png",
+      "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: Item: a sacred Muay Thai mongkol headband (braided cord ring with a tail), red and white, resting on a small offering tray"
+    }
+  ]
+}

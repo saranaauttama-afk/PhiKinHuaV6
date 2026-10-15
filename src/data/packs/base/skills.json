@@ -3,7 +3,7 @@
   "id": "rune_weapon",
   "class": "warrior",
   "slot": "A",
-  "name": "ลงยันต์อาวุธ",
+  "name": "ครูต่อท่าให้",
   "cd": 5,
   "params": {},
   "text": "เพิ่มดาวการ์ด 1 ใบในสำรับ"

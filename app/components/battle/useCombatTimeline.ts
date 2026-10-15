@@ -20,9 +20,16 @@ const DURATION: Record<CombatEvent['t'], number> = {
   Damage: 450,
   BlockGained: 350,
   Healed: 350,
-  StatusApplied: 350,
+  // Emitted since the audio pass (15 Oct 2026); kept short so ghost turns do not drag.
+  StatusApplied: 120,
   Died: 500,
   TurnEnded: 150,
+  RhythmChanged: 0,
+  HeavyHit: 0,
+  Riposte: 350,
+  RoundEnd: 600,
+  MinionSummoned: 250,
+  MinionDamaged: 200,
 };
 
 export type TimelineState = {

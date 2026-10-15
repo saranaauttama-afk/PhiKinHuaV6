@@ -40,7 +40,7 @@ try:
     for difficulty in range(1,6):
         night=1
         tap(r'^เริ่มเกม$'); root=nodes()[0]; x1,y1,x2,y2=bounds(root); assert y2-y1>x2-x1,'Android must be portrait'
-        tap(r'^เลือกนักรบวัด'); tap(r'ออกเดินทาง'); tap('ดูระดับอาถรรพ์ '+str(difficulty)); tap('เริ่มรอบ · ระดับ '+str(difficulty)); tap(r'^(ข้ามบทนี้|เดินทางต่อ)$'); tap(r'^พรติดตัว 1:'); tap(r'^ยืนยันพร$')
+        tap(r'^เลือกนักมวยคาดเชือก'); tap(r'ออกเดินทาง'); tap('ดูระดับอาถรรพ์ '+str(difficulty)); tap('เริ่มรอบ · ระดับ '+str(difficulty)); tap(r'^(ข้ามบทนี้|เดินทางต่อ)$'); tap(r'^พรติดตัว 1:'); tap(r'^ยืนยันพร$')
         before=slots(nodes()); assert len(before)==3,('three pages',before)
         shop_checked=False
         battles=0; stories=0; bosses=[]; ghosts=[]; complete=False
@@ -105,7 +105,7 @@ try:
     expected=len(set(name for n in runs for name in n['ghosts']+n['bosses']))
     text=' '.join(label(n) for n in nodes()); assert f'พบแล้ว {expected} / 34 ตัว' in text and f'ปราบแล้ว {expected} ตัว' in text,text
     tap(r'^ดูทั้งหมด$'); first=runs[0]['ghosts'][0]; tap(r'^ดูผี '+re.escape(first)+r'$'); detail=' '.join(label(n) for n in nodes()); count=sum(first in set(n['ghosts']+n['bosses']) for n in runs); assert f'พบ {count} การเดินทาง' in detail and f'ปราบ {count} การเดินทาง' in detail,detail
-    tap(r'^ปิดรายละเอียด$'); tap(r'^การ์ด$'); tap(r'^ทุกกลุ่ม$'); tap(r'^นักรบวัด$'); tap(r'^ดูการ์ด ฟันดาบวัด$'); tap(r'^ดูการ์ดปลุกเสกขั้น 1$'); tap(r'^ปิดรายละเอียด$')
+    tap(r'^ปิดรายละเอียด$'); tap(r'^การ์ด$'); tap(r'^ทุกกลุ่ม$'); tap(r'^นักมวยคาดเชือก$'); tap(r'^ดูการ์ด ฟันดาบวัด$'); tap(r'^ดูการ์ดปลุกเสกขั้น 1$'); tap(r'^ปิดรายละเอียด$')
     tap(r'^กลับ$'); adb('shell','am','force-stop',APP); adb('shell','am','start','-W','-n',APP+'/.MainActivity')
     tap(r'^บันทึกอาถรรพ์ · ผีและการ์ด$'); text=' '.join(label(n) for n in nodes()); assert f'พบแล้ว {expected} / 34 ตัว' in text and f'ปราบแล้ว {expected} ตัว' in text,text
     snapshot('archive-cold-reopen',nodes()); tap(r'^กลับ$'); record('archive sampled roster and card inspection persist across five three-night runs and cold restart')

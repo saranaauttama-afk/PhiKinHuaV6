@@ -13,7 +13,14 @@ function sources(s: GameState): Source[] {
   if (cls) out.push({ key: 'c:' + s.classId, name: cls.name, passive: cls });
   for (const b of s.blessings ?? []) if (b.triggers) out.push({ key: 'b:' + b.id, name: b.name, passive: b });
   for (const c of s.equipped ?? []) if (c.equip) out.push({ key: 'e:' + (c.instanceId ?? c.id), name: c.name, passive: c.equip });
+  // ศิษย์ค่าย act like small blessings while they stand (combat/minions.ts).
+  for (const m of s.minions ?? []) if (m.hp > 0) out.push({ key: 'm:' + m.uid, name: m.name, passive: m.passive });
   return out;
+}
+
+/** Everything in play that can react to fight moments (for flags read elsewhere). */
+export function passiveSources(s: GameState): Source[] {
+  return sources(s);
 }
 
 type RuleKey = keyof NonNullable<import('../types').BlessingDef['rules']>;

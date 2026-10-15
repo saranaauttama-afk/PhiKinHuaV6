@@ -66,6 +66,8 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   state.player.block = 0;
   // สำรวมจิต lasts until the start of the next player turn.
   if (state.fight) state.fight.halfDamage = false;
+  // สวน waits for one ghost turn only.
+  if (state.fight) state.fight.ripostes = [];
   processStatusEffectsOnTurnStart('player', state);
   rng = require('./cards/play').resolvePrayers(state, rng);
   if (state.phase !== 'combat') return { state, rng };
@@ -83,7 +85,8 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   ({ state: s, rng } = buildAndShuffleDeck(s, rng));
   s.cardHistory = []; s.cardHistorySeq = 0;
   s.equipped = []; s.prayers = []; s.traps = [];
-  s.fight = { hpLost: 0, ghostTurns: 0 };
+  s.fight = { hpLost: 0, ghostTurns: 0, rhythm: 0 };
+  require('./combat/minions').resetMinions(s);
   require('./campaign/bossRules').initBossRelic(s);
   require('./skills').tickSkillCooldowns(s);
   s.player.block = 0;
@@ -91,6 +94,7 @@ export function beginPlayerFight(s: GameState, rng: RNG): RNG {
   s.player.mana = s.player.startMana;
   require('./cards/mechanics').resetCardsPlayed(s);
   rng = require('./cards/equipment').prepareEquipment(s,rng);
+  require('./cards/fighter').liftInnate(s);
   const opening=require('./cards/hand').openingHandSize(s);
   ({ state: s, rng } = drawCards(s, rng, opening));
   rng = require('./cards/passives').runTriggers(s, 'battleStart', rng);

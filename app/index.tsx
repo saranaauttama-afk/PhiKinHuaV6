@@ -178,7 +178,7 @@ export default function Home() {
       <SceneArrival instant={state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex} sceneKey={`${location.key}:board-${state.pages?.adventure?.boardIndex}`} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
 
-          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices appearanceKey={`${state.phase}:${state.fightCount??0}`} offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
+          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices appearanceKey={`${state.phase}:${state.fightCount??0}`} runKey={`${state.seed}:${state.campaign?.night??0}`} depth={state.pages?.adventure?.fightsWon} offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
           {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool

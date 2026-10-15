@@ -212,3 +212,12 @@ export const archiveColors={scene:'rgba(12,16,12,.90)',scrim:'rgba(0,0,0,.82)',f
 export const battleSceneColors={base:'#101714',centre:'#131b19',floor:'#0c120f'} as const;
 
 export const hudPictogramColors={equipment:'#376b61',energy:'#ebbe65',mana:'#9ac9d9',block:'#95b9a4',cards:'#d8bc89'};
+
+/** Card-type ink for type marks (approved comic UI v1.0.47). */
+export const cardTypeInkColors={strike:'#8d3f2f',arcane:'#48596c',gear:'#826333',curse:'#38302c'} as const;
+/** Health bar track and fill edges. */
+export const healthBarColors={track:'#282017',fillTop:'#b35b46',fillBottom:'#63251d'} as const;
+/** Occupation book pages (class select). */
+export const occupationBookColors={ink:'#191610',cream:'#efdbb1',red:'#983e2e',backdrop:'#21160f',disabled:'#8f887a',selected:'#e8cf94'} as const;
+/** นักมวย hand hints and ringside minions (MoveMark, MinionRow). */
+export const fighterColors={hint:'#d9a441',idle:'#6b5a45',plate:'rgba(20,14,10,.82)',plateLine:'#7a6447',plateLow:'#b8463a',hpText:'#f2e6cf',hpLow:'#f0a090'} as const;

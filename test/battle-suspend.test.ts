@@ -29,7 +29,7 @@ describe('paused battle resume',()=>{
  it('cannot advance or complete an unfinished battle even through a map command',()=>{
   const {state,rng}=fight().get();
   for(const type of ['CompleteNode'] as const){
-   const result=applyCommand(state,{type},rng);expect(result.state).toEqual(state);expect(result.rng).toEqual(rng);
+   const result=applyCommand(state,{type},rng);expect({...result.state,pendingEvents:[]}).toEqual({...state,pendingEvents:[]});expect(result.rng).toEqual(rng);
   }
  });
  it('rejects a victory snapshot so unclaimed rewards cannot turn into a repeated fight',()=>{

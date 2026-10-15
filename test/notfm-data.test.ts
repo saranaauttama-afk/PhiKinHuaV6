@@ -9,7 +9,7 @@ import { upgradeCard } from '../src/core/engine/shared';
 import { STATUS_EFFECTS_REGISTRY } from '../src/core/combat/status-effects/registry';
 
 const statusIds = new Set(Object.keys(STATUS_EFFECTS_REGISTRY));
-const TRIGGER_ON = ['battleStart', 'equip', 'turnStart', 'turnEnd', 'play', 'prayerDone'];
+const TRIGGER_ON = ['battleStart', 'equip', 'turnStart', 'turnEnd', 'play', 'prayerDone', 'rhythm', 'roundEnd'];
 
 function fxStatuses(fx?: Fx): string[] {
   return (fx?.status ?? []).map(e => e.id);
@@ -68,7 +68,10 @@ describe('ข้อมูลการ์ด', () => {
     for (const c of ALL_CARDS) {
       if (c.type === 'equipment') {
         expect(c.equip, c.id).toBeDefined();
-        expect(c.equip!.triggers.length + (c.equip!.armor ?? 0) + (c.equip!.attackBonus ?? 0), c.id).toBeGreaterThan(0);
+        const e = c.equip!;
+        // นักมวย equipment may work only through passive fields (move bonus, charges, riposte).
+        const flags = Object.values(e.moveBonus ?? {}).length + Object.values(e.moveBruise ?? {}).length + (e.heavyPerBruise ?? 0) + (e.riposteBonus ?? 0) + (e.damageCap ? 1 : 0) + (e.deathSave ? 1 : 0);
+        expect(e.triggers.length + (e.armor ?? 0) + (e.attackBonus ?? 0) + flags, c.id).toBeGreaterThan(0);
         for (const t of c.equip!.triggers) expect(TRIGGER_ON, c.id).toContain(t.on);
       }
       if (c.type === 'counter') expect(c.counter?.trigger, c.id).toBeDefined();

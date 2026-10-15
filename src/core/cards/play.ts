@@ -54,18 +54,61 @@ export function playCard(s: GameState, index: number, rng: RNG, wait = 1): { rng
       break;
     }
     default: {
-      const fx = cardFx(s, card);
       (card.exhaust || card.borrowed ? s.piles.exhaust : s.piles.discard).push(card);
+      if (card.type === 'attack') { rng = playAttack(s, card, rng); break; }
+      const fx = cardFx(s, card);
       // ปลุกเสก: the next spell's effect is multiplied.
       let mult = 1;
       if (card.type === 'spell' && s.fight?.nextSpellMult) { mult = s.fight.nextSpellMult; s.fight.nextSpellMult = undefined; }
       rng = applyFx(s, fx, { sourceId: card.id, type: card.type, mult }, rng);
     }
   }
+  if (card.riposte) require('./fighter').armRiposte(s, starRiposte(card));
+  require('./fighter').rememberMove(s, card);
   if(card.borrowed){const loss=require('./passives').ruleModifier(s,'borrowHpCost');if(loss>0){const hpLoss=Math.min(s.player.hp,loss);s.player.hp-=hpLoss;require('../combat/damage').emit(s,{t:'Damage',target:'player',raw:loss,modified:loss,blocked:0,hpLoss,died:s.player.hp<=0,sourceKind:'blessing'});}}
   rng = runTriggers(s, 'play', rng, card.type);
   copyPlayedCard(s, card);
   return { rng, played: true };
+}
+
+/** สวน numbers follow the card's star like its other numbers. */
+function starRiposte(card: CardData) {
+  const { STAR_RULES } = require('../balance/notfm');
+  const m = STAR_RULES.mult[Math.max(1, Math.min(3, card.star ?? 1)) - 1];
+  const r = card.riposte!;
+  return { ...r, dmg: r.dmg == null ? r.dmg : Math.round(r.dmg * m), block: r.block == null ? r.block : Math.round(r.block * m) };
+}
+
+/**
+ * An attack card (cards/fighter.ts): a new move gains rhythm first, then ต่อจาก and rhythm
+ * spending shape the effect, ท่าหนัก adds the ghost's ช้ำ to the first hit, and
+ * คาดเชือกใหม่ / ครูมวยเฒ่า / repeatIf may resolve it again (never spending rhythm twice).
+ */
+function playAttack(s: GameState, card: CardData, rng: RNG): RNG {
+  const F = require('./fighter');
+  rng = F.onAttackStart(s, card, rng);
+  const fx = F.attackFx(s, card, cardFx(s, card));
+  const ctx = { sourceId: card.id, type: 'attack' as const, move: card.move };
+  const heavy = card.heavy ? F.consumeBruise(s) : 0;
+  rng = applyFx(s, fx, { ...ctx, firstHitBonus: heavy }, rng);
+  if (s.turnFlags.doubleNext && s.enemy && s.enemy.hp > 0) {
+    s.turnFlags.doubleNext = false;
+    s.log.push(`${card.name} อีกครั้ง`);
+    rng = applyFx(s, fx, ctx, rng);
+  }
+  const echo = F.echoFraction(s);
+  if (echo > 0 && s.enemy && s.enemy.hp > 0) {
+    s.turnFlags.echoed = true;
+    s.log.push(`ครูมวยเฒ่า: ${card.name} ซ้ำ`);
+    const half = (n?: number) => (n == null ? n : Math.max(1, Math.round(n * echo)));
+    rng = applyFx(s, { dmg: half(fx.dmg), hits: fx.hits, block: half(fx.block) }, ctx, rng);
+  }
+  if (card.repeatIf && s.enemy && s.enemy.hp > 0 && require('./mechanics').conditionMet(s, card.repeatIf, card)) {
+    s.log.push(`${card.name} ต่อเนื่อง!`);
+    rng = applyFx(s, fx, ctx, rng);
+  }
+  F.onAttackEnd(s, card);
+  return rng;
 }
 
 /** ครูสอนมวย: the next card played gets a one-use copy in hand. A copy is never copied again. */

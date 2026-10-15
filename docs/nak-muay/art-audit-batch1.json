@@ -1,0 +1,728 @@
+{
+  "sourcePngCount": 57,
+  "matchedIdCount": 55,
+  "missingIds": [
+    "mongkhon"
+  ],
+  "sources": [
+    {
+      "id": "jab",
+      "source": "exec-23e99ae1-96b8-4d61-808d-243c1ca0af0d.png",
+      "sha256": "bd48edd32cbac4e454cc0194e5e40847bd8809828f76ff1fb7411083c5613ee9",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "low_kick",
+      "source": "exec-d5559044-428b-4884-8f56-af03ed62f0e4.png",
+      "sha256": "ca056ad223a10ec6bffc5f24d1ea997bd22b1af30ba701fa250ddcb692548197",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "straight_knee",
+      "source": "exec-342b8008-c641-4f60-a97e-df79e80b90e1.png",
+      "sha256": "042b416342344435d877015bbe21b4839fc2dcf3a8c990f04efa01aa7a1c53e8",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "slant_elbow",
+      "source": "exec-646c9c6b-7164-48e9-a250-96882b8e430e.png",
+      "sha256": "e9ed97d08f7614864bf6a95f13df276f3597377f3734ecdb047dd7836633b214",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "straight_punch",
+      "source": "exec-8173c30d-27bd-49a7-b90b-0d1a9217c9c6.png",
+      "sha256": "5904f6fbee1f1b3f34b7f60d3cee0c47177e1798efb35b21e664026a5f5638af",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "short_hook",
+      "source": "exec-66efb8d3-fec5-499a-a867-ca9924c06c3d.png",
+      "sha256": "33bff989654a4c02baf220899ef14723ab3254ef0cd27bf18a9320f48097a830",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "push_kick",
+      "source": "exec-a2de81ac-e128-4aa1-b6b2-57636f155c5c.png",
+      "sha256": "cc31404273dc2a47d35d5707b1489b0209532311f75413e85a42b52898408412",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "neck_kick",
+      "source": "exec-cfbfdebc-87e1-47af-921b-33bb9ccfc2d2.png",
+      "sha256": "fff7103cbc997a513baf94ea605a99cd566606baa9537b35143c08f7e516d209",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "double_hook",
+      "source": "exec-6fd9edb6-a762-4358-9cf6-4d8f2f2c8e7d.png",
+      "sha256": "726d09c1b1dd26a179fc1b1eb322270e34df8cabb361868ed82a82746924614a",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "uppercut",
+      "source": "exec-8a15870d-d6b8-4db3-a4e6-5419d05db14e.png",
+      "sha256": "81633366964acd0e573f45a9a0f5cf3b608ffa59abd9e792b1a36f94acfd0106",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "spin_back_kick",
+      "source": "exec-7ca04581-a564-4ec6-845e-b5138a633445.png",
+      "sha256": "ad156e427bc7e2194ccb19ec70d90e9e4ed5b150a2268adc6598d1f94c4151ad",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "sweep_kick",
+      "source": "exec-fcd7bee5-7c98-43fc-b347-cf316bc69aec.png",
+      "sha256": "ca0d89d4786b8f8b4f4a7c147481c78bac1469e66c8b8fbad6f0356f62fff038",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "clinch_knee",
+      "source": "exec-64164318-9429-4e51-9e57-280ca3376b49.png",
+      "sha256": "87d792fb251a09bce46c67137cb8e0059b618eaf796728153246ccba41ae00c5",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "reverse_elbow",
+      "source": "exec-911e8b86-8a84-4e56-9e78-9d5f07263c7e.png",
+      "sha256": "d27c89d521636c58c862abf40694d2ec1751af133b8a59f1e65f5aadb85e9525",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "camp_pupil",
+      "source": "exec-653a13dd-26f1-42ae-b982-37496f73fcca.png",
+      "sha256": "9cbfa99f8075778f3a602502b872d0b0a1c9167474397a7bb29bf2579af57956",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "corner_man",
+      "source": "exec-598f104a-7716-4be9-aa8a-592dcd2f02d8.png",
+      "sha256": "dd5546468315e1ad98f66edff358f7a6847de6853a4d3dc5670c0c5812aef130",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "pi_player",
+      "source": "exec-476c6157-3448-4efc-b418-450a08ae3203.png",
+      "sha256": "4fe0f48a4b964d805a3af868e1b51e64dc1e4b9b1cc1d2f377e6060d5b2f40e6",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "drummer",
+      "source": "exec-e9e0236c-2af3-49e4-b50c-6698c2e4d263.png",
+      "sha256": "c8a5466d26011340ced243560f1f74403f7e2bb61b1e5b391d9c9c21c8d07a78",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "senior_boxer",
+      "source": "exec-b318a8a4-0165-4b93-b7b9-e6a267c859ea.png",
+      "sha256": "beb9648e5c0e5ac19a36806bf4b852d0b227263be374609ced17f7cb8feb5a0f",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "old_master",
+      "source": "exec-e8903267-91bf-4d2b-a811-23fe9317f466.png",
+      "sha256": "1f8672645bb3f04b46f80578171c158aab4cf0f3ec63899b7503e0e2d4b6c199",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "chin_kick",
+      "source": "exec-7cca72ec-dbd3-404e-b27f-c901866e1c16.png",
+      "sha256": "f7b5dbfff62376f28a4f0719044d0db6e5d2a908d90a07e91ea710f8270f28a9",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "hanuman_ring",
+      "source": "exec-58175538-0575-46a5-8352-9dd63f165e44.png",
+      "sha256": "8a8b19c67b251cbaeba2192813c002b3624afb41779a0830c244c5962ebb7998",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "crocodile_tail",
+      "source": "exec-e513576f-24c4-4406-a20e-7a0e0701dcde.png",
+      "sha256": "10681cc35352cc2858855442b67d899b440795cd127422495e4581e124792be2",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "wai_khru",
+      "source": "exec-9cc20f39-b2c9-49f9-89ba-55877875cbf5.png",
+      "sha256": "19c70560c3b7c0da9503cb567d639185ab90d6c114c0fbf7de5cb2701299277f",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "stare_down",
+      "source": "exec-3016a3f0-adad-4b74-bc3d-4ddbc1fd5a42.png",
+      "sha256": "8723854951e29f3203efb6b5f13cf287db0d6ff75028d9eb1c5531db93b26c27",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "holy_water_spray",
+      "source": "exec-2b05feeb-c3de-4de7-b325-45f2ad24f9b6.png",
+      "sha256": "857f3430fdd9d7cfebcc2c06682c9e45817f0e887f7428bc9deb20bdd0b6dcb3",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "rewrap",
+      "source": "exec-9d878a10-4807-41e1-acb9-11916a3d72a3.png",
+      "sha256": "2777e4b5000aff255a0344f4bd473a37fc7e34f00cd0d2fdb37467fc3b41f638",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "call_pupil",
+      "source": "exec-a1f1163a-e4c9-416f-ac31-ea1b4ae637de.png",
+      "sha256": "64f5ce4832024a254b667759ed0ecd4372ed064a5b174be79872003a82e624f0",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "call_drummer",
+      "source": "exec-12041adb-62c8-435b-949a-a8aa728fd5c9.png",
+      "sha256": "140cf2141cd61c7b9cceeabfa1d0ffe344c2b465069274c02139bc78209d6c25",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "arm_prajiad",
+      "source": "exec-106a9a56-0746-476a-882f-74f58b444a37.png",
+      "sha256": "87c017005db868a295ed57bbea9f4ed69fbe8452e4d4f5c42c869e00ed35b95e",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "yantra_shorts",
+      "source": "exec-59715a94-6cfe-4baf-8cc7-7b33b115b99e.png",
+      "sha256": "be8e49123fb74767dd507ad986400b27a3f92a05fe43d7a3fe6a3d055dec823c",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "glass_wraps",
+      "source": "exec-0d764b3d-560c-4793-bba0-ae34e7467d63.png",
+      "sha256": "eaf2b4b971fb898d05d907d604e0d64b095218f3fd274f1ca654f76ba8538cec",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "takrut",
+      "source": "exec-020f2462-d004-4448-b083-f67b78c3fd02.png",
+      "sha256": "9b81e2d2f6a2913d10c3accf0ea0cd49ef0aec8042fcd83376a869371186a8c7",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "master_cloth",
+      "source": "exec-cb5dc84d-16b4-4d74-ae48-aab887f1d0fe.png",
+      "sha256": "c412bcd289d4ab60e1a1338820fe4850e76895babe9fc108db3f3dcffbfd3103",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "ward_riposte",
+      "source": "exec-b9b49345-b29c-4969-9302-dfb8e053f4d7.png",
+      "sha256": "03895ad411ff2be8583ac87fe43e3f6e8c5fb215ff0c1c2990ed08d38f135e85",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "gate_watch",
+      "source": "exec-ff3d93e8-3ba8-4cd5-860f-6e35afc4136c.png",
+      "sha256": "b9afe926735c4ffaff7a731898981d499bad6d3cdf89ed53576b72afff7bb742",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "karma_cut",
+      "source": "exec-a625a19d-f0f2-43c2-a9bf-1bdc2f6b501f.png",
+      "sha256": "0c6b2a7e9c4a49f0f6500236fc149d5e684489134140b13aed4ef65e828d8e7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "night_guardian_cut",
+      "source": "exec-be77a112-10f2-4851-af8a-d8df2652e9f5.png",
+      "sha256": "7671ca6c494674e85c49af50ab64e5dd1512051ed8309871639bf4f413c019d7",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "status_bruise",
+      "source": "exec-25d82d4f-c44a-4b69-a21b-f0ae8d973406.png",
+      "sha256": "a59ddf8b62e240feef742d6c362ca83339232359c8bb4bd81312898ea160deb5",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "move_kick",
+      "source": "exec-331e7190-bd99-4617-b808-2f422b778a72.png",
+      "sha256": "192f9817209a6007ffc2dab931733d0b2456840081a8ffa6cc4f2ccdaf00fcb3",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "oiled_wraps",
+      "source": "exec-334d852f-f805-4ab0-98cf-d6baa49a130d.png",
+      "sha256": "89eb766b3b128543bd240d9203a7a282bfc7d0c1e21e6802bb25d2c6ba61f692",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "move_knee",
+      "source": "exec-3c8a087a-aaba-4e2a-891e-fe68f356e381.png",
+      "sha256": "22d7925e9d8b0e7a9cad684144bc563e5a8f9cd1040fe73294a92717f10901a3",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "parry_bait",
+      "source": "exec-3e8080af-49b1-4e92-81cd-69c1d718eabd.png",
+      "sha256": "aefeb6d9c24fced10e8b6fd6e8cbc472db3948e7a6fbe79fec25cef408a86714",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "neck_lock",
+      "source": "exec-407c012a-f1c6-40eb-a037-de4c3a51d744.png",
+      "sha256": "1759edc89dd782b15c569595de990cc26dde53ca72612cef4ee63a17f2991660",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "status_riposte",
+      "source": "exec-463924f2-9542-443f-82c3-b3af78ac94d7.png",
+      "sha256": "79f5b1467987820caf6eff1feffcbf0ec87a5c9a2221dcb7e4f7b24f4909a043",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "move_punch",
+      "source": "exec-4e7b1e66-7ed8-4ccd-a1fa-6676e2b29bc4.png",
+      "sha256": "df4130f1f19de5c477483aae147f239ac7d7727b9f9bb69a031da22c91069e9a",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "move_elbow",
+      "source": "exec-520128ee-05e2-40c9-859f-d93458810f25.png",
+      "sha256": "45a80b68b911faa919516fa97784f402616a17844c365bb0c84f5b8392da0dc4",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "call_old_master",
+      "source": "exec-5c54dbe3-218c-423b-9dbc-3d16352b2fbb.png",
+      "sha256": "aa20f67597d562b5df4f6a0e88de97e35d4d6bb3584ec200663972605d05fad2",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "call_corner",
+      "source": "exec-7ced533c-c8b3-4086-9c7f-7b81c667e51b.png",
+      "sha256": "990f190b4300cf6f86f4d2597cc6caea6eabbb82e3ce68debd93ef4b9106abfb",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "status_rhythm",
+      "source": "exec-96273788-a874-4fb2-a167-abbf6cd1351e.png",
+      "sha256": "56fd257b9155cfaef77e01888f716a80afa4beffb630310dece6cf69af7895ea",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "call_senior",
+      "source": "exec-b4d5c300-fbc3-48bf-88cd-6b5ad7c50335.png",
+      "sha256": "05b5ffbd5e833ccbf501667e4bc8b0da827beb6e8da8d7107873eb5ae0c63c7e",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "status_round",
+      "source": "exec-bd20972e-7fbe-4f64-b46c-0d62fe3ec9d9.png",
+      "sha256": "0e3f89b78552262fc7081a97df97ffbaca3ccc9ddc8d0f575627e2db1c7d5935",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "stop_kick",
+      "source": "exec-bfc269c5-230b-4d8c-bbee-6e112dc53eac.png",
+      "sha256": "bddd7535ce2a665630b56c96f3438c3992a983234cb1f015a196c018f488d828",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "call_pi",
+      "source": "exec-cdee3009-88d4-4516-ab19-c28c61dc7201.png",
+      "sha256": "b4158646c346134532525c535bf98f17418c185bb107d4cbb39743e1ba36c33c",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "status_stun",
+      "source": "exec-dc4af728-ffe5-4ed5-9809-7a99e4bd4bc1.png",
+      "sha256": "43db417d5c414bdac5ec694e3532078bc375dc7fa1ea2f142dcaaaf615759cf3",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    }
+  ],
+  "unusedSourceFiles": [
+    "exec-3df8246a-b334-4397-914d-6858f882281d.png",
+    "exec-265267f8-11db-48a0-82f5-b360d20ac8f6.png"
+  ]
+}

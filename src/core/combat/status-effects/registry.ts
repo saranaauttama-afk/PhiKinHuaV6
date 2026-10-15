@@ -10,6 +10,26 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   
   // ===== 🔴 สถานะผลลบ (Debuffs) =====
   
+  // นักมวยคาดเชือก (14 ต.ค. 2026): ช้ำไม่ลดเองตามเวลา — มันรอให้ท่าหนักมาเก็บ
+  bruise: {
+    id: 'bruise',
+    name: 'ช้ำ',
+    description: 'ท่าหนักของนักมวยกินช้ำทั้งหมดเป็นดาเมจเพิ่ม',
+    defaultDuration: 99,
+    stackable: true,
+    maxStacks: 10,
+    tags: ['debuff', 'mark'],
+  },
+
+  stun: {
+    id: 'stun',
+    name: 'มึน',
+    description: 'การ์ดโจมตีใบแรกของเทิร์นถัดไปถูกยกเลิก',
+    defaultDuration: 2,
+    stackable: false,
+    tags: ['debuff', 'restriction'],
+  },
+
   fear: {
     id: 'fear',
     name: 'ความกลัว',

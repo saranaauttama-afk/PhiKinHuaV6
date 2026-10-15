@@ -11,7 +11,22 @@
 export type SfxId =
   | 'cardDraw'
   | 'ghostAttack'
-  | 'bossIntroHeadCollector';
+  | 'bossIntroHeadCollector'
+  // ชุด 2 (15 ต.ค. 2026): นักมวยและการต่อสู้ — ElevenLabs flow "ผีกินหัว SFX ชุด 2"
+  | 'playerHit'
+  | 'heavyHit'
+  | 'block'
+  | 'riposte'
+  | 'rhythmUp'
+  | 'roundBell'
+  | 'minionSummon'
+  | 'stun'
+  | 'ghostDeath'
+  | 'playerDeath'
+  | 'heal'
+  | 'debuff'
+  | 'turnStart'
+  | 'uiTap';
 
 export type BedId = 'music' | 'ambienceNight1';
 
@@ -29,6 +44,21 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
     volume: 0.8,
   },
   bossIntroHeadCollector: { files: [require('../../assets/audio/boss-intro-head-collector.mp3')], volume: 0.9 },
+  // ชุด 2 (assets/audio/sfx/) — ตัดเงียบ, mono 96k, ปรับดัง ~−18 LUFS แล้ว; volume ด้านล่างคุมความดังเทียบกัน
+  playerHit: { files: [require('../../assets/audio/sfx/player-hit-1.mp3')], volume: 0.75 },
+  heavyHit: { files: [require('../../assets/audio/sfx/heavy-hit-1.mp3')], volume: 0.9 },
+  block: { files: [require('../../assets/audio/sfx/block-1.mp3')], volume: 0.55 },
+  riposte: { files: [require('../../assets/audio/sfx/riposte-1.mp3')], volume: 0.8 },
+  rhythmUp: { files: [require('../../assets/audio/sfx/rhythm-up-1.mp3')], volume: 0.5 },
+  roundBell: { files: [require('../../assets/audio/sfx/round-bell-1.mp3')], volume: 0.7 },
+  minionSummon: { files: [require('../../assets/audio/sfx/minion-summon-1.mp3')], volume: 0.6 },
+  stun: { files: [require('../../assets/audio/sfx/stun-1.mp3')], volume: 0.7 },
+  ghostDeath: { files: [require('../../assets/audio/sfx/ghost-death-1.mp3')], volume: 0.85 },
+  playerDeath: { files: [require('../../assets/audio/sfx/player-death-1.mp3')], volume: 0.9 },
+  heal: { files: [require('../../assets/audio/sfx/heal-1.mp3')], volume: 0.55 },
+  debuff: { files: [require('../../assets/audio/sfx/debuff-1.mp3')], volume: 0.6 },
+  turnStart: { files: [require('../../assets/audio/sfx/turn-start-1.mp3')], volume: 0.4 },
+  uiTap: { files: [require('../../assets/audio/sfx/ui-tap-1.mp3')], volume: 0.35 },
 };
 
 /** เสียงพื้นที่เล่นวนยาว ๆ — ตั้งให้เบากว่าเสียงเอฟเฟกต์มาก */

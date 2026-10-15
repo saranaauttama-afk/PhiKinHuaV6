@@ -48,11 +48,12 @@ export function applyBlessingGain(s: GameState, b: BlessingDef): void {
   if (g.hp) p.hp += g.hp;
   p.hp = Math.max(1, Math.min(p.maxHp, p.hp));
   if (g.gold) p.gold = (p.gold ?? 0) + g.gold;
-  if (g.ap) { p.maxAp += g.ap; p.ap = p.maxAp; }
+  // Pandora gains stop at the level-up caps too (review 14 Oct 2026: AP 4 and a 4th slot were reachable).
+  if (g.ap) { p.maxAp = Math.max(p.maxAp, Math.min(LEVEL_UP.caps.ap, p.maxAp + g.ap)); p.ap = p.maxAp; }
   if (g.draw) p.drawPerTurn = g.draw>0?Math.max(p.drawPerTurn,Math.min(LEVEL_UP.caps.draw,p.drawPerTurn+g.draw)):Math.max(1,p.drawPerTurn+g.draw);
   if (g.retain) p.retain = g.retain>0?Math.max(p.retain??CARD_RULES.retain,Math.min(LEVEL_UP.caps.retain,(p.retain ?? CARD_RULES.retain) + g.retain)):Math.max(0,(p.retain??CARD_RULES.retain)+g.retain);
   if (g.startMana) p.startMana = (p.startMana ?? 0) + g.startMana;
-  if (g.slot) s.equipmentSlotsMax = (s.equipmentSlotsMax ?? 1) + g.slot;
+  if (g.slot) s.equipmentSlotsMax = Math.max(s.equipmentSlotsMax ?? 1, Math.min(LEVEL_UP.caps.slot, (s.equipmentSlotsMax ?? 1) + g.slot));
 }
 
 /** Two different level-up rewards, weighted by LEVEL_UP.weights, skipping ones that cannot be used. */
@@ -60,7 +61,7 @@ export function rollLevelOffers(s: GameState, r: RNG): { rng: RNG; list: import(
   const { int } = require('../rng');
   const usable: Record<import('../types').LevelOption, boolean> = {
     ap:s.player.maxAp<LEVEL_UP.caps.ap,
-    mana:s.player.startMana<LEVEL_UP.caps.mana,
+    mana:s.player.startMana<LEVEL_UP.caps.mana&&require('../pack').classUsesMana(s.classId),
     draw:s.player.drawPerTurn<LEVEL_UP.caps.draw,
     card: true,
     upgrade: s.masterDeck.some(canUpgrade),

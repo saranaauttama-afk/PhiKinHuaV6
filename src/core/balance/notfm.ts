@@ -31,6 +31,25 @@ export const CARD_RULES = {
   fxDrawPerTurn: 2,
 } as const;
 
+/**
+ * นักมวยคาดเชือก (14 Oct 2026, docs/nak-muay/DESIGN.md). จังหวะ: an attack card whose move
+ * differs from the previous attack card gains `perNewMove`; every stack adds `dmgPerStack`
+ * to each hit of attack cards, up to `max`. It is lost at the end of a turn with no attack.
+ * ท่าหนัก consumes every ช้ำ for `heavyPerBruise` damage each. A round (ยก) is `roundTurns`
+ * player turns; `roundEnd` triggers fire at the end of its last turn.
+ */
+export const FIGHTER_RULES = {
+  rhythmMax: 8,
+  perNewMove: 1,
+  dmgPerStack: 1,
+  heavyPerBruise: 2,
+  roundTurns: 3,
+  /** ครูมวยเฒ่า and other echoes never echo an echo. */
+} as const;
+
+/** Minions in play at once; a new one replaces the oldest. */
+export const MINION_RULES = { playerSlots: 2, enemySlots: 3 } as const;
+
 /** Star 1–3. Numbers scale by `mult`; status stacks gain `statusBonus`. Card data may override. */
 export const STAR_RULES = {
   mult: [1, 1.5, 2],
@@ -66,9 +85,10 @@ export const ENEMY_RULES: Record<EnemyKind, { handSize: number; drawPerTurn: num
 
 /** Ghost HP before night and difficulty scaling. Normal ghosts add `perTier` per tier (T1–T5). */
 export const ENEMY_HP = {
-  normal: 28, perTier: 2, elite: 48, boss: 72, ultimateBoss: 105,
+  normal: 28, perTier: 2, elite: 42, boss: 72, ultimateBoss: 105,
   /** Multiplier for nights 1–3. */
-  night: [0.9, 1.45, 2.4],
+  /** Re-centred 15 Oct 2026 for ENEMY_DEPTH: a night's average fight stays near the old flat value. */
+  night: [0.75, 1.1, 1.8],
   /**
    * Night bosses use their own multipliers: the night-1 boss is the first wall, kept short.
    * Tuning 13 Oct 2026 (was night 1/1.8/2.6, boss .85/2/2.9): hand/draw growth now comes only
@@ -76,6 +96,26 @@ export const ENEMY_HP = {
    * weaker in nights 1–2; HP was lowered most there. See docs/tuning-2026-10-13/HANDOFF.md.
    */
   bossNight: [0.75, 1.6, 2.7],
+} as const;
+
+/**
+ * Depth (ความลึก) inside a night (15 Oct 2026, owner playtest: late ghosts felt easy because HP
+ * followed folklore tier only and the player grows all night). The n-th fight of a night is always
+ * harder than the one before, whichever page the player picks, so skipping a page cannot dodge it.
+ * `depth` = monster fights already won this night (0 for the first). Bosses use their own numbers.
+ */
+export const ENEMY_DEPTH = {
+  /** HP +this % per fight already won this night. */
+  hpPct: 8,
+  /** Ghost strength +1 at each of these depths (permanent for the fight). */
+  strengthAt: [3, 6, 9],
+  /** From this depth ghosts get +1 AP (more setup and defence per turn). */
+  apFrom: 5,
+  /**
+   * Folklore tier the route aims for at the start and end of each night (1–5); the ghosts in
+   * between climb evenly, so the faces you meet also show you are going deeper.
+   */
+  tierSpan: [[1, 3], [2, 4], [3, 5]] as ReadonlyArray<readonly [number, number]>,
 } as const;
 
 /**
@@ -100,8 +140,11 @@ export const CLASS_PASSIVES: Record<ClassId, import('../types').Passive & {
   spellDiscount?: number;
   /** The first ghost card revealed each fight is copied into hand (free, removed after use). */
   copyFirstGhostCard?: boolean;
+  /** นักมวย: จังหวะ (FIGHTER_RULES). */
+  rhythm?: boolean;
 }> = {
-  warrior: { name: 'ยืนเฝ้าประตู', triggers: [{ on: 'equip', fx: { block: 3 } }] },
+  // Was นักรบวัด 'ยืนเฝ้าประตู' (block 3 on equip) until 14 Oct 2026.
+  warrior: { name: 'แม่ไม้มวยไทย', triggers: [], rhythm: true },
   shaman: { name: 'ครูพักลักจำ', triggers: [], spellDiscount: 1 },
   nun: { name: 'อานิสงส์', triggers: [{ on: 'prayerDone', fx: { heal: 3 } }] },
   medium: { name: 'ผีติดตาม', triggers: [], copyFirstGhostCard: true },
@@ -164,6 +207,16 @@ export const ECONOMY = {
     { Common: 65, Uncommon: 35, Rare: 0, Legendary: 0 },
     { Common: 50, Uncommon: 35, Rare: 15, Legendary: 0 },
     { Common: 40, Uncommon: 35, Rare: 20, Legendary: 5 },
+  ],
+  /**
+   * Card reward (elites and night bosses) rarity weights per night. The pick inside a lane is
+   * by rarity first, so a lane with many Commons does not drown its single Legendary or the reverse.
+   * Night 1 has no Legendary; night 2 has a small chance; night 3 opens up.
+   */
+  rewardRarity: [
+    { Common: 45, Uncommon: 40, Rare: 15, Legendary: 0 },
+    { Common: 20, Uncommon: 45, Rare: 28, Legendary: 7 },
+    { Common: 0, Uncommon: 40, Rare: 42, Legendary: 18 },
   ],
   blessingChoices: 3,
   chestChance: 0.5,

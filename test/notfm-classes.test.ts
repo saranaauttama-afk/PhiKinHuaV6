@@ -83,10 +83,8 @@ describe('กฎพักสกิล', () => {
 });
 
 describe('passive ประจำอาชีพ', () => {
-  it('นักรบ: สวมอุปกรณ์แต่ละชิ้นได้เกราะ', () => {
-    const s = fight('warrior', [{ ...cardById('equipment_prayer_beads')!, instanceId: 'e1' }]);
-    playCard(s, 0, rng);
-    expect(s.player.block).toBe(CLASS_PASSIVES.warrior.triggers[0].fx.block);
+  it('นักมวยคาดเชือก: passive จังหวะ (รายละเอียดใน test/nak-muay.test.ts)', () => {
+    expect(CLASS_PASSIVES.warrior.rhythm).toBe(true);
   });
 
   it('หมอผี: คาถาใบแรกของเทิร์นลดมานา ใบที่สองราคาเต็ม', () => {

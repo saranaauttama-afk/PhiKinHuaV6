@@ -1,6 +1,6 @@
 import React from 'react';
 import {View,Text,Image,Pressable,PanResponder,ScrollView} from 'react-native';
-import {CHARACTER_CLASSES,ALL_CLASS_IDS,type ClassId} from '../../src/core/classes';
+import {CHARACTER_CLASSES,CLASS_BOOK_ORDER as ALL_CLASS_IDS,classPlayable,type ClassId} from '../../src/core/classes';
 import {CARD_RULES,CLASS_RESOURCES} from '../../src/core/balance/notfm';
 import {skillsFor} from '../../src/core/skills';
 import {useJournal} from '../../src/store/journalStore';
@@ -20,12 +20,13 @@ export default function ClassSelectScreen({onPick,onBack}:Props) {
  return <BookScreen onBack={page<0?onBack:()=>setPage(-1)} footer={page<0?
   <BookButton label="เปิดตำรา" onPress={()=>move(1)}/>:<>
    <View style={{flexDirection:'row',gap:8,alignItems:'center'}}><BookArrow label={page===0?'หน้าปก':'หน้าก่อน'} direction="left" onPress={()=>move(-1)} style={{height:40}}/>{ALL_CLASS_IDS.map((c,i)=><Pressable key={c} accessibilityRole="button" accessibilityLabel={'เปิดหน้า'+CHARACTER_CLASSES[c].name} accessibilityState={{selected:page===i}} onPress={()=>setPage(i)} style={{width:24,height:24,alignItems:'center',justifyContent:'center'}}><View style={{width:8,height:8,borderRadius:4,borderWidth:1,borderColor:bookCream,backgroundColor:page===i?bookCream:'transparent'}}/></Pressable>)}<BookArrow label="หน้าถัดไป" direction="right" disabled={page===ALL_CLASS_IDS.length-1} onPress={()=>move(1)} style={{height:40}}/></View>
-   <BookButton label={'เลือก'+picked.name} onPress={()=>onPick(id)}/>
+   <BookButton label={classPlayable(id)?'เลือก'+picked.name:picked.name+' · ยังไม่เปิด รอการ์ดชุดใหม่'} disabled={!classPlayable(id)} onPress={()=>{if(classPlayable(id))onPick(id);}}/>
   </>}>
   <BookStage cover={page<0} testID={page<0?'occupation-book-cover':`occupation-${id}`}>{({width,height})=>page<0?
    <View accessible accessibilityLabel="ปกตำรานักปราบผี คืนหัวก่อนรุ่งสาง" style={{width,height}}/>:<>
     <BookPage><View style={{flex:1}} {...swipe.panHandlers}>
      <ClassPage key={id} id={id} page={page} width={width} height={height}/>
+     {!classPlayable(id)&&<View pointerEvents="none" accessible accessibilityLabel="ยังไม่เปิด" style={{position:'absolute',top:'38%',alignSelf:'center',transform:[{rotate:'-12deg'}],borderWidth:3,borderColor:bookRed,borderRadius:6,paddingHorizontal:14,paddingVertical:4}}><Text style={{fontFamily:font.heading,fontSize:22,color:bookRed}}>ยังไม่เปิด</Text></View>}
      <View testID="class-completion-corner" style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingTop:4}}>
       <Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>{page+1}/{ALL_CLASS_IDS.length}</Text>
       <View style={{alignItems:'flex-end',gap:2}}>

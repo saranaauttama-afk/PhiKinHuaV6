@@ -9,8 +9,8 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
  if(process.env.PHIKINHUA_REVIEW_ONLY==='1'){await require('./preview-remaining.cjs')({browser,base:'http://127.0.0.1:8129',errors});if(fs.existsSync('/tmp/quiet-review-fixtures.json'))await require('./preview-journey.cjs')({browser,base:'http://127.0.0.1:8129',errors});
  if(errors.length)throw Error(errors.join('\n'));return;}
  await p.goto('http://127.0.0.1:8129');await p.getByRole('button',{name:'เริ่มเกม',exact:true}).click();
- await p.getByRole('button',{name:'เลือกนักรบวัด',exact:true}).click();
- await p.getByRole('button',{name:'เลือกนักรบวัด · ออกเดินทาง →',exact:true}).click();
+ await p.getByRole('button',{name:'เลือกนักมวยคาดเชือก',exact:true}).click();
+ await p.getByRole('button',{name:'เลือกนักมวยคาดเชือก · ออกเดินทาง →',exact:true}).click();
  await p.getByRole('button',{name:'เล่นคืนที่ 1',exact:true}).click();
  await p.getByRole('button',{name:'ข้ามบทนี้',exact:true}).click();
  if(await p.getByRole('button',{name:'ยืนยันพร',exact:true}).isEnabled())throw Error('Blessing confirmation enabled without a choice');

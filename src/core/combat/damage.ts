@@ -148,6 +148,11 @@ export function dealDamage(
   let modified = computeModifiedDamage(state, { from, to, raw, source: args.source });
 
   const isAttack=sourceKind==='card';
+  // ประเจียดแขน: one big ghost hit is cut down (uses a charge).
+  if(to==='player'&&from==='enemy'&&isAttack){
+    const cap=require('../cards/fighter').chargedEquipment(state,'damageCap');
+    if(cap&&modified>cap.equip.damageCap.over){state.log.push(`${cap.name} รับไว้ ${modified} → ${cap.equip.damageCap.to}`);modified=cap.equip.damageCap.to;require('../cards/fighter').useCharge(state,cap);}
+  }
   const dodge=targetState.statusEffects?.find(e=>e.id==='dodge');
   if(isAttack&&modified>0&&dodge){modified=0;dodge.stacks=(dodge.stacks??1)-1;if(dodge.stacks<=0)targetState.statusEffects=targetState.statusEffects!.filter(e=>e!==dodge);}
   // 4) block ดูดซับ (ดาเมจบางชนิดทะลุ block — ดู rulesFor)
@@ -160,6 +165,11 @@ export function dealDamage(
   // 5) ตัด HP
   const hpBefore = targetState.hp;
   targetState.hp = Math.max(0, hpBefore - hpLoss);
+  // ตะกรุดโทน: a lethal hit leaves the player standing (uses a charge).
+  if(to==='player'&&hpBefore>0&&targetState.hp<=0){
+    const save=require('../cards/fighter').chargedEquipment(state,'deathSave');
+    if(save){targetState.hp=save.equip.deathSave.hp;targetState.block=(targetState.block??0)+save.equip.deathSave.block;state.log.push(`${save.name} คุ้มตัวไว้`);require('../cards/fighter').useCharge(state,save);}
+  }
   const died = hpBefore > 0 && targetState.hp <= 0;
 
   emit(state, {

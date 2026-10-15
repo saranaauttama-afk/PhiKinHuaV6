@@ -17,6 +17,7 @@ import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
 import BlessingSeals from './components/battle/BlessingSeals';
 import EnemyHandCard from './components/battle/EnemyHandCard';
+import MinionRow from './components/battle/MinionRow';
 import CardHistory from './components/battle/CardHistory';
 import DamagePopup from './components/battle/DamagePopup';
 import StatGainPopup from './components/battle/StatGainPopup';
@@ -30,6 +31,7 @@ import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
 import {playSfx,setBeds} from '../src/audio/audio';
 import {BOSS_INTRO} from '../src/audio/manifest';
+import {cuesFor} from '../src/audio/cues';
 import TurnEndDiscard from './components/battle/TurnEndDiscard';
 import { retainLimit, turnEndExcess } from '../src/core/engine/handlers/combat';
 import { bossRule } from '../src/core/campaign/bossRules';
@@ -144,6 +146,8 @@ export default function BattlePage() {
   // บอสที่มีเสียงเปิดตัว ดังครั้งเดียวตอนเข้าฉาก
   React.useEffect(()=>{const intro=BOSS_INTRO[String(monsterId??'')];if(intro)playSfx(intro);},[monsterId]);
   // จั่วการ์ด = มือเพิ่มขึ้น (ทั้งต้นเทิร์นและการ์ดที่ให้จั่ว) ดังครั้งเดียวต่อครั้งที่มือเพิ่ม
+  // ต้นเทิร์นผู้เล่น (ตั้งแต่เทิร์น 2) — เคาะไม้เบา ๆ ให้รู้ว่าถึงตาเรา
+  React.useEffect(()=>{if((gameState.turn??1)>1&&gameState.phase==='combat')playSfx('turnStart');},[gameState.turn]);
   const handSizeRef = React.useRef(playerHand.length);
   React.useEffect(()=>{if(playerHand.length>handSizeRef.current)playSfx('cardDraw');handSizeRef.current=playerHand.length;},[playerHand.length]);
 
@@ -214,6 +218,7 @@ export default function BattlePage() {
 
     // เทิร์นผู้เล่นให้ฟีดแบ็กทันที ไม่ต้องหน่วงเป็นคิวเหมือนเทิร์นศัตรู
     const after = useGame.getState().state;
+    for (const cue of cuesFor(after.pendingEvents ?? [])) playSfx(cue);
     for (const ev of after.pendingEvents ?? []) {
       if (ev.t === 'Damage' && ev.target === 'enemy' && ev.hpLoss > 0) {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง — เดิมโชว์ค่าบนการ์ดซึ่งไม่หัก block/buff
@@ -299,10 +304,16 @@ export default function BattlePage() {
         break;
       }
 
+      case 'HeavyHit': case 'Riposte': case 'RoundEnd': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        break;
+      }
+
       case 'Damage': {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง ไม่ใช่ค่าบนการ์ด
         // เสียงกรงเล็บดังทุกครั้งที่ผีตีด้วยการ์ด แม้เกราะจะกันไว้หมดก็ตาม
         if (currentEvent.target === 'player' && currentEvent.sourceKind === 'card') playSfx('ghostAttack');
+        else for (const cue of cuesFor([currentEvent])) playSfx(cue);
         if (currentEvent.hpLoss <= 0) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss };
         if (currentEvent.target === 'player') flashRef.current?.flash();
@@ -313,6 +324,7 @@ export default function BattlePage() {
       }
 
       case 'BlockGained': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
         setStatGainPopups(prev => [...prev, {
           id: `block-${eventKey(currentEvent)}`,
           statType: 'block',
@@ -351,7 +363,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea relic={bossRelicView(gameState)} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
+        <MonsterArea relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').enemyMinionBadges(gameState)]} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
@@ -426,6 +438,8 @@ export default function BattlePage() {
           onPlayCard={handlePlayCard}
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />}
+
+        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow minions={gameState.minions??[]}/>}
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}

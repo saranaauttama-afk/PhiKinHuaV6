@@ -42,7 +42,7 @@ def end_turn():
     raise AssertionError('Enemy presentation did not return control')
 def hand(ns):return sorted(label(n) for n in ns if label(n).startswith('การ์ด '))
 adb('logcat','-c')
-for cls in ['นักรบวัด','หมอผี','แม่ชี','คนทรง']:
+for cls in ['นักมวยคาดเชือก','หมอผี','แม่ชี','คนทรง']:
     adb('shell','am','force-stop',app);adb('shell','pm','clear',app);adb('shell','am','start','-W','-n',app+'/.MainActivity')
     tap(r'^เริ่มเกม$');tap('^เลือก'+cls+'$');tap('ออกเดินทาง');tap('ดูระดับอาถรรพ์ 1');tap('เริ่มรอบ · ระดับ 1');tap(r'^(ข้ามบทนี้|เดินทางต่อ)$');tap(r'^พรติดตัว 1:');tap(r'^ยืนยันพร$')
     ns=nodes();ghost=next(n for n in ns if 'adventure-slot-' in n.attrib.get('resource-id','') and ' · ต่อสู้' in label(n));click(ghost);tap(r'^เผชิญหน้า · ')
@@ -57,7 +57,7 @@ for cls in ['นักรบวัด','หมอผี','แม่ชี','ค�
     assert not any('ข้าม ▸▸' in label(n) for n in ns)
     checks.append(cls+': one พระประธาน plus normal opening cards and any starter-blessing additions')
     print('PASS first-hand QA:',cls,hand(ns),flush=True)
-    if cls=='นักรบวัด':
+    if cls=='นักมวยคาดเชือก':
         for turn in range(3):
             end_turn();ns=nodes()
             if find(ns,r'^ประวัติ ผีใช้ ') is not None:break

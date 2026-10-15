@@ -4,10 +4,35 @@
 import type { StatusEffect } from './types_extended';
 
 /** A passive (blessing or equipped card) reacts to these moments of a fight. */
-export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayerDone'|'discard';
+export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayerDone'|'discard'
+  /** นักมวย: whenever rhythm (จังหวะ) is gained. */
+  |'rhythm'
+  /** End of the last player turn of a round (ยก = 3 player turns). */
+  |'roundEnd';
 export type Trigger={on:TriggerOn;type?:CardType;once?:'turn';when?:import('./cards/mechanics').CardCondition;fx:Fx};
 /** Always-on modifiers plus triggers, shared by blessings and equipment cards. */
-export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number};
+export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number;
+  /** Extra damage per hit for attack cards of a move (เชือกคาด). */
+  moveBonus?:Partial<Record<Move,number>>;
+  /** Extra ช้ำ put on the ghost by attack cards of a move. */
+  moveBruise?:Partial<Record<Move,number>>;
+  /** Damage per ช้ำ stack when a heavy move (ท่าหนัก) consumes it; the highest source wins. */
+  heavyPerBruise?:number;
+  /** Extra damage on every สวน. */
+  riposteBonus?:number;
+  /** One ghost hit above `over` becomes `to`; uses a charge. */
+  damageCap?:{over:number;to:number};
+  /** Survive a lethal hit with `hp` HP and `block` block; uses a charge. */
+  deathSave?:{hp:number;block:number};
+  /** Minion: rhythm is not lost at turn end while it stands (คนเป่าปี่ชวา). */
+  keepsRhythm?:boolean;
+  /** Minion: the first attack card each turn resolves again at this fraction (ครูมวยเฒ่า). */
+  echoFirstAttack?:number;
+  /** Minion: takes the first ghost attack card each ghost turn instead of the player. */
+  guard?:boolean;
+};
+/** นักมวยคาดเชือก: the four weapons of Muay Boran. */
+export type Move='punch'|'kick'|'knee'|'elbow';
 /** One-time changes when a blessing is gained (แพนโดรา: a gain paid for with a cost). */
 export type BlessingGain = { hp?: number; maxHp?: number; gold?: number; ap?: number; draw?: number; retain?: number; startMana?: number; slot?: number };
 export type BlessingDef = Passive & {
@@ -37,6 +62,22 @@ export type Fx = {
   mana?: number; ap?: number; status?: StatusFx[]; cleanse?: boolean;
   /** Copy the last N enemy cards into hand (free, removed after use). */
   borrow?: number;
+  /** Gain จังหวะ (rhythm). */
+  rhythm?: number;
+  /** Rhythm is not lost at the end of this turn even without an attack. */
+  keepRhythm?: boolean;
+  /** Rhythm is never lost by an empty turn for the rest of the fight. */
+  lockRhythm?: boolean;
+  /** Remove up to N block from the target before damage. */
+  breakBlock?: number;
+  /** The next attack card this turn resolves twice. */
+  doubleNext?: boolean;
+  /** Put a minion (ศิษย์ค่าย / ลูกสมุน) into play by id (data/packs/base/minions.json). */
+  summon?: string;
+  /** Damage also hits every minion on the other side. */
+  sweep?: boolean;
+  /** Remove one debuff (the newest). */
+  cleanseOne?: boolean;
 };
 export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negate?: boolean; turns?: number };
 
@@ -76,6 +117,25 @@ export type CardData = {
   unremovable?: boolean;
   flavor?: string;
   tags?: string[];
+  /** นักมวย: the move of an attack card (หมัด/เตะ/เข่า/ศอก). */
+  move?: Move;
+  /** ต่อจาก[ท่า]: bonus when the previous card played this turn was this move. */
+  after?: { move: Move; bonus: Fx };
+  /** ท่าหนัก: consumes all ช้ำ on the ghost for extra damage on the first hit. */
+  heavy?: boolean;
+  /** ติดมือ: always in the opening hand. */
+  innate?: boolean;
+  /**
+   * Spend all rhythm. 'add': dmg += perStack × rhythm. 'hits': hits = rhythm (min 1).
+   */
+  spendRhythm?: { mode: 'add' | 'hits'; perStack?: number };
+  /** สวน: if the ghost's next attack card leaves the player's HP untouched, this fires. */
+  riposte?: Fx;
+  /** Resolve the card again when this holds after it resolved (จระเข้ฟาดหาง). */
+  repeatIf?: import('./cards/mechanics').CardCondition;
+  /** Equipment uses before it wears out; `chargesLeft` counts down in a fight. */
+  charges?: number;
+  chargesLeft?: number;
 };
 
 // Enemy
@@ -92,6 +152,8 @@ export type EnemyState = {
   handSize?: number;
   /** Card ids the ghost's deck is built from (swapped when a boss awakens). */
   deck?: string[];
+  /** ความลึก: fights won this night before this one (balance/notfm.ts ENEMY_DEPTH). */
+  depth?: number;
   statusEffects?: StatusEffect[];
 };
 
@@ -140,6 +202,31 @@ export type FightState = {
   /** Effect draws used on turn `fxDrawTurn` (CARD_RULES.fxDrawPerTurn). */
   fxDrawTurn?: number;
   fxDrawn?: number;
+  /** นักมวย: จังหวะ this fight and the move of the last attack card (any turn). */
+  rhythm?: number;
+  lastAttackMove?: Move;
+  rhythmLocked?: boolean;
+  /** สวน waiting for the ghost's next attack card. */
+  ripostes?: Fx[];
+  /** Ghost turn number the guard minion already took a card on. */
+  guardTurn?: number;
+};
+
+/** A minion in play (ศิษย์ค่ายของเรา / ลูกสมุนของผี). */
+export type MinionState = {
+  uid: string;
+  id: string;
+  name: string;
+  hp: number;
+  maxHp: number;
+  side: 'player' | 'enemy';
+  passive: Passive;
+  /** Ghost minion: what it does at the end of each ghost turn. */
+  act?: Fx;
+  /** Ghost minion: player attacks hit it before the ghost. */
+  taunt?: boolean;
+  /** Leaves after this many turns of its side (undefined = until it dies or the fight ends). */
+  turnsLeft?: number;
 };
 
 export type BossRelicState = {
@@ -244,6 +331,16 @@ export type CombatEvent = (
   | { t: 'StatusApplied'; target: CombatEventTarget; effectId: string; stacks: number }
   | { t: 'Died'; who: CombatEventTarget }
   | { t: 'TurnEnded'; who: CombatEventTarget }
+  /** นักมวย: จังหวะ changed (value after). */
+  | { t: 'RhythmChanged'; value: number }
+  /** ท่าหนัก ate ช้ำ for `bonus` damage. */
+  | { t: 'HeavyHit'; bonus: number }
+  /** สวน fired after a fully blocked ghost attack. */
+  | { t: 'Riposte' }
+  /** พักยก: the end of round `round`. */
+  | { t: 'RoundEnd'; round: number }
+  | { t: 'MinionSummoned'; side: CombatEventTarget; uid: string; id: string }
+  | { t: 'MinionDamaged'; side: CombatEventTarget; uid: string; amount: number }
 ) & { frame?: CombatFrame };
 
 /**
@@ -330,6 +427,10 @@ export type GameState = {
 
   /** กับดักที่ตั้งไว้และยังไม่ทำงาน — เป็นสเตตของไฟต์ ไม่ถูกเก็บลงเซฟ */
   traps?: import('./combat/traps').ArmedTrap[];
+  /** ศิษย์ค่าย in play (นักมวย) and the ghost's ลูกสมุน; both emptied when a fight starts. */
+  minions?: MinionState[];
+  enemyMinions?: MinionState[];
+  minionSeq?: number;
 
   enemyHandSize?: number;
   enemyDrawPerTurn?: number;
@@ -406,6 +507,17 @@ export type GameState = {
     triggerOnce?: string[];
     /** Spells played this turn (shaman passive). */
     spellsCast?: number;
+    /** นักมวย: move of the last card played this turn (null after a card with no move). */
+    lastMove?: Move | null;
+    /** Distinct moves of attack cards played this turn. */
+    moves?: Move[];
+    /** Attack cards played this turn (rhythm is lost on a turn with none). */
+    attacks?: number;
+    keepRhythm?: boolean;
+    /** คาดเชือกใหม่: the next attack card resolves twice. */
+    doubleNext?: boolean;
+    /** ครูมวยเฒ่า already echoed an attack this turn. */
+    echoed?: boolean;
   };
   runCounters?: RunCounters;
   combatVictoryLock?: boolean;
