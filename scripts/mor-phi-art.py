@@ -20,6 +20,14 @@ ICON_STYLE = ("Small status icon for a mobile card game, same ink-and-muted-colo
  "bold object, very simple silhouette that reads at 24–32 px, thick outline, transparent background, square 1:1, no text or numbers.")
 
 CARDS = [
+ ('yant_ladle', 'กระบวยลงยันต์', 'A coconut-shell ladle dipping into a bronze water bowl, one paper talisman tied to its wooden handle'),
+ ('threaded_needle', 'เข็มร้อยสายสิญจน์', 'A ritual needle trailing white sacred cotton thread, taut against the wrist of a ghost raising its claw'),
+ ('familiar_ward', 'สายสิญจน์คล้องของเลี้ยง', 'The shaman looping white protective thread around a small straw effigy and his own wrist'),
+ ('brimming_yant', 'ยันต์ชุบน้ำเต็มขัน', 'Three folded paper talismans dipping into a bronze bowl filled to the rim'),
+ ('blood_thread', 'ด้ายแดงผูกเงา', 'A red ritual thread tied around a paper talisman and a dark ghost silhouette, a small offering cup below, no gore'),
+ ('spirit_rice_scatter', 'ข้าวเสกเลี้ยงบริวาร', 'Blessed rice scattered between a friendly straw effigy and hostile ghost wisps, the effigy catching grains'),
+ ('sealed_bowl_rite', 'พิธีปิดขันกักเงา', 'The shaman pouring a brimming bronze bowl into a clay spirit jar while drawing a white cloth over its mouth'),
+
  ("paper_yant", "แปะยันต์กระดาษ", "The shaman slapping two small square paper yant talismans covered in ink script onto a shadowy ghost's shoulder, paper fluttering"),
  ("nail_coffin", "ตอกตะปูโลงผี", "A hand hammering a long old iron nail into a cracked wooden coffin lid marked with a yant square, a ghostly hand recoiling from inside"),
  ("rice_throw", "เสกข้าวสารซัด", "The shaman flinging a fistful of blessed raw rice grains in a wide arc, the grains spraying outward like buckshot"),

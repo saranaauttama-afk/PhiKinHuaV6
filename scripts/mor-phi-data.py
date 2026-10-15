@@ -16,6 +16,15 @@ def card(id, name, type, rarity, fx, flavor, **kw):
     return c
 
 C = [
+  # Card-depth bridges: each spends a card and AP/water; no free draw loops.
+  card("yant_ladle", "กระบวยลงยันต์", "action", "Common", {"mana": 2, "status": [yant(1)]}, "จุ่มกระบวยเสกน้ำ แล้วแตะยันต์ลงเงาผี", ap=1),
+  card("threaded_needle", "เข็มร้อยสายสิญจน์", "attack", "Common", {"dmg": 4}, "ด้ายที่ปลายเข็มตึงเมื่อผีเริ่มง้าง", conditional={"when": {"kind": "ghost_charging"}, "bonus": {"status": [yant(2)]}}),
+  card("familiar_ward", "สายสิญจน์คล้องของเลี้ยง", "spell", "Common", {"block": 5, "healMinions": 3}, "คล้องด้ายขาวให้ของเลี้ยง มันก็ช่วยคุ้มครองเรา", mana=1, conditional={"when": {"kind": "minions_at_least", "value": 1}, "bonus": {"block": 4}}),
+  card("brimming_yant", "ยันต์ชุบน้ำเต็มขัน", "action", "Uncommon", {"block": 5, "status": [yant(1)]}, "เก็บน้ำไว้ให้ยันต์อิ่ม ก่อนคิดจะสาด", ap=1, conditional={"when": {"kind": "water_at_least", "value": 8}, "bonus": {"status": [yant(2)]}}),
+  card("blood_thread", "ด้ายแดงผูกเงา", "spell", "Uncommon", {"block": 6, "status": [yant(1)]}, "ของต่ำผูกยันต์ด้วยเลือด แต่ไม่เคยให้ชีวิตคืนเปล่า", mana=2, blood=True, conditional={"when": {"kind": "player_hp_below", "value": 50}, "bonus": {"status": [yant(1)], "block": 3}}),
+  card("spirit_rice_scatter", "ข้าวเสกเลี้ยงบริวาร", "spell", "Uncommon", {"dmg": 4, "sweep": True, "healMinions": 3}, "ข้าวเสกทำร้ายบริวารผี แต่เลี้ยงของที่เราปลุกไว้", mana=2, conditional={"when": {"kind": "minions_at_least", "value": 1}, "bonus": {"dmg": 4}}),
+  card("sealed_bowl_rite", "พิธีปิดขันกักเงา", "action", "Rare", {"block": 7}, "เทน้ำจากขันลงหม้อ ปิดเงาผีไว้ใต้ผ้าขาว", ap=2, conditional={"when": {"kind": "water_at_least", "value": 8}, "bonus": {"status": [yant(4)]}}),
+
   # ── การ์ดโจมตี (ฟรี) ─────────────────────────────────────────
   card("bamboo_dart", "ปาไผ่เผา", "attack", "Common", {"dmg": 6}, "ไผ่เผาไฟปลายแหลม", starter=1),
   card("bamboo_volley", "ปาไผ่รัว", "attack", "Common", {"dmg": 2, "hits": 4}, "ขว้างไผ่ทีละดุ้น"),

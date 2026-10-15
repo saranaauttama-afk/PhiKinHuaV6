@@ -102,6 +102,9 @@ export const ENEMY_RULES: Record<EnemyKind, { handSize: number; drawPerTurn: num
   boss: { handSize: 5, drawPerTurn: 2, maxRetained: 3, ap: 3 },
 };
 
+/** Late elites/bosses draw one extra card every third actual ghost turn; slots/AP stay fixed. */
+export const ENEMY_DRAW_CADENCE = { fromNight: 2, extra: 1, every: 3 } as const;
+
 /**
  * Night-1 ghost mechanics (15 Oct 2026, docs/ghosts/NIGHT1-DESIGN.md — owner agreed).
  * ชาร์จ: a card with `charge` grows by that effect for every ghost turn it waits in the ghost's
