@@ -58,7 +58,14 @@ export function playBlock(s: GameState, card: CardData): string | null {
   if (card.type === 'attack' && s.player.statusEffects?.some(e => e.id === 'entangle')) return 'ถูกพันธนาการ';
   const cost = cardCost(s, card);
   if (cost.ap > s.player.ap) return 'แต้มไม่พอ';
-  if (cost.mana > s.player.mana) return 'มานาไม่พอ';
+  const W = require('./water');
+  const word = W.resourceName(s.classId);
+  if (cost.mana > s.player.mana) {
+    // ของต่ำ: the missing น้ำมนต์ is paid with HP, so long as at least 1 HP is left.
+    if (!card.blood) return `${word}ไม่พอ`;
+    if (W.bloodCost(s, card, cost.mana) >= s.player.hp) return 'เลือดไม่พอจ่าย';
+  }
+  if (card.splash && s.player.mana - cost.mana < 1) return `ไม่มี${word}ให้สาด`;
   if (starFx(card).borrow && !lastEnemyCards(s, 1).length) return 'ผียังไม่ได้เล่นการ์ด';
   return null;
 }

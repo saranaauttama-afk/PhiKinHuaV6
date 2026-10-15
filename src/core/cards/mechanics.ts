@@ -32,7 +32,13 @@ export type CardCondition =
   /** อีกฝ่ายมีเกราะอย่างน้อย value (นางตานีโอบรัด) */
   | { kind: 'foe_block_at_least'; value: number }
   /** ผี: เทิร์นที่แล้วเราทำให้มันเสียเลือด (ผีตายโหง แค้นฝังใจ) */
-  | { kind: 'hurt_last_turn' };
+  | { kind: 'hurt_last_turn' }
+  /** หมอผี: น้ำมนต์ในขันตั้งแต่ value (ตอนเล่น ก่อนจ่ายค่าการ์ด) */
+  | { kind: 'water_at_least'; value: number }
+  /** หมอผี: ผีถือการ์ดที่กำลังชาร์จอยู่ */
+  | { kind: 'ghost_charging' }
+  /** มีมินเนียนของเรายืนอยู่อย่างน้อย value ตัว */
+  | { kind: 'minions_at_least'; value: number };
 
 /** Added on top of the card's numbers while the condition holds. */
 export type CardConditional = { when: CardCondition; bonus: Fx };
@@ -81,6 +87,12 @@ export function conditionMet(s: GameState, cond: CardCondition, self?: CardData,
       return ((side === 'player' ? s.enemy : s.player)?.block ?? 0) >= cond.value;
     case 'hurt_last_turn':
       return side === 'enemy' && s.fight?.enemyHurtTurn != null && s.fight.enemyHurtTurn === (s.turn ?? 1);
+    case 'water_at_least':
+      return side === 'player' && s.player.mana >= cond.value;
+    case 'ghost_charging':
+      return side === 'player' && require('./water').ghostCharging(s);
+    case 'minions_at_least':
+      return side === 'player' && (s.minions ?? []).filter(m => m.hp > 0).length >= cond.value;
   }
 }
 
@@ -156,5 +168,8 @@ export function conditionText(c: CardCondition, side: 'player' | 'enemy' = 'play
     case 'foe_hp_below': return `ถ้า${them}เลือดเหลือไม่ถึง ${c.value}%`;
     case 'foe_block_at_least': return c.value <= 1 ? `ถ้า${them}มีเกราะ` : `ถ้า${them}มีเกราะตั้งแต่ ${c.value}`;
     case 'hurt_last_turn': return side === 'enemy' ? 'ถ้าเทิร์นที่แล้วเราตีผีเข้าเนื้อ' : 'ถ้าเทิร์นที่แล้วผีตีเราเข้าเนื้อ';
+    case 'water_at_least': return `ถ้าน้ำมนต์ตั้งแต่ ${c.value}`;
+    case 'ghost_charging': return 'ถ้าผีกำลังชาร์จการ์ด';
+    case 'minions_at_least': return c.value <= 1 ? 'ถ้ามีของเลี้ยงอยู่' : `ถ้ามีของเลี้ยง ${c.value} ตัว`;
   }
 }

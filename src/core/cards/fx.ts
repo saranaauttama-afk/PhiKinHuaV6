@@ -76,7 +76,8 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
   }
   if (eff.block) gainBlock(s, 'player', eff.block);
   if (eff.heal) heal(s, 'player', eff.heal);
-  if (eff.mana) s.player.mana += eff.mana;
+  // หมอผี: น้ำมนต์ fills a bowl and overflows into block (cards/water.ts); others just gain mana.
+  if (eff.mana) require('./water').gainWater(s, eff.mana);
   if (eff.ap) s.player.ap += eff.ap;
   if (eff.cleanse) clearAllStatusEffects('player', s, 'debuff');
   if (eff.cleanseOne) cleanseOneDebuff(s);
@@ -85,6 +86,12 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
     if (target === 'enemy' && !s.enemy) continue;
     applyStatusEffect(target, s, e.id, e.turns, e.stacks);
   }
+  // หมอผี (cards/water.ts): ยันต์ that reached the mark seal a held ghost card.
+  if (s.enemy && (eff.status ?? []).some(e => e.id === 'yant')) rng = require('./water').checkSeal(s, rng);
+  for (let i = 0; i < (eff.seal ?? 0); i++) rng = require('./water').sealGhost(s, rng);
+  if (eff.unCharge) require('./water').unChargeGhost(s);
+  if (eff.selfDamage) selfDamage(s, eff.selfDamage);
+  if (eff.healMinions) for (const m of s.minions ?? []) if (m.hp > 0) m.hp = Math.min(m.maxHp, m.hp + eff.healMinions);
   if (eff.borrow) require('./borrow').borrowEnemyCards(s, eff.borrow);
   if (eff.draw) rng = drawCards(s, rng, fxDrawAllowance(s, eff.draw));
   // นักมวยคาดเชือก (cards/fighter.ts).
@@ -94,6 +101,15 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
   if (eff.rhythm) rng = require('./fighter').gainRhythm(s, eff.rhythm, rng);
   if (eff.summon && s.phase === 'combat') require('../combat/minions').summonMinion(s, 'player', eff.summon);
   return rng;
+}
+
+/** Lose HP on purpose (ของต่ำ): ignores block, never below 1. */
+export function selfDamage(s: GameState, n: number): void {
+  const loss = Math.max(0, Math.min(n, s.player.hp - 1));
+  if (!loss) return;
+  s.player.hp -= loss;
+  s.log.push(`เสียเลือด ${loss}`);
+  require('../combat/damage').emit(s, { t: 'Damage', target: 'player', raw: n, modified: loss, blocked: 0, hpLoss: loss, died: false, sourceKind: 'blessing' });
 }
 
 /** Remove the newest debuff on the player (พี่เลี้ยงมุมเวที). */

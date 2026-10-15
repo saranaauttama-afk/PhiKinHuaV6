@@ -33,6 +33,7 @@ import { font, radius, size, space, tint, layer } from '../theme';
 import { useScreenPadding } from '../useScreenPadding';
 import {describeCard,describeBlessing,TYPE_LABEL} from '../../src/core/cards/describe';
 import {shopPrice,markedUp,removePrice,upgradePrice,shrineCost,wellHeal,healAmount} from '../../src/core/engine/handlers/shops_events';
+import {cardTypeLabel} from '../../src/core/cards/typesRegistry';
 
 function Panel({title,children}:{title:string;children:React.ReactNode}) {
   return <RitualSurface kind="quietSlate" style={{padding:22,gap:10,width:'100%',minWidth:0}}>
@@ -265,7 +266,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
         {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,gap:10,maxHeight:'45%'}}>
          <ScrollView style={{flexShrink:1}} contentContainerStyle={{gap:6,paddingBottom:4}}>
          <Text numberOfLines={2} style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>ยืนยันซื้อ {purchaseCard.name}</Text>
-         <Text testID="shop-card-type" style={{fontFamily:font.ui,color:paper.ink,fontSize:12}}>ประเภท: {TYPE_LABEL[purchaseCard.type]}</Text>
+         <Text testID="shop-card-type" style={{fontFamily:font.ui,color:paper.ink,fontSize:12}}>ประเภท: {cardTypeLabel(purchaseCard)}</Text>
          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13,lineHeight:20}}>{describeCard(purchaseCard)}{purchaseCard.flavor?` · ${purchaseCard.flavor}`:''}</Text>
          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13}}>ราคา {shopPrice(state,purchaseItem.price)} เบี้ย · มี {state.player.gold} เบี้ย{state.player.gold<shopPrice(state,purchaseItem.price)?' · เบี้ยไม่พอ':''}</Text>
          </ScrollView>

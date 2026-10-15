@@ -59,6 +59,7 @@ export function statusDetail(e: StatusEffect, side: 'player' | 'enemy'): string 
     thorns: `โดนตีแต่ละครั้ง สะท้อนกลับใส่${foe} ${n}`,
     regeneration: `ต้นเทิร์น${me}ฟื้น ${n}`,
     bruise: `ท่าหนักของนักมวยกินช้ำทั้งหมด: +${n} × ${G.FIGHTER_RULES.heavyPerBruise} ดาเมจ`,
+    yant: `ยันต์ ${n}/${G.WATER_RULES.sealAt} · ครบแล้วผนึกการ์ดที่ผีถือไว้ 1 ใบ (ไม่มีการ์ด ผีมึนแทน) · ปลุกยันต์กินทั้งหมดได้`,
     stun: side === 'enemy' ? 'การ์ดโจมตีใบแรกของผีเทิร์นหน้าถูกยกเลิก' : `เทิร์นหน้าแต้ม −${G.GHOST_MECHANICS.stunApLoss}`,
     fear: 'ต้นเทิร์นแต้ม −1',
     entangle: `${me}เล่นการ์ดโจมตีไม่ได้`,

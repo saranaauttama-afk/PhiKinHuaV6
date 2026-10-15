@@ -325,7 +325,20 @@ export default function BattlePage() {
         break;
       }
 
-      case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen':
+      // หมอผี: ผนึก and สายสิญจน์ get a short banner so the player sees what left the ghost's hand.
+      case 'GhostSealed': case 'GhostUnCharged': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        const key = `seal-${eventKey(currentEvent)}`;
+        const text = currentEvent.t === 'GhostSealed'
+          ? (currentEvent.name === 'มึน' ? 'ผนึก! ผีไม่ได้ถือการ์ด จึงมึนแทน' : `ผนึก! ${currentEvent.name} ถูกขังไม่ได้เล่น`)
+          : 'สายสิญจน์ · แรงชาร์จของผีหายหมด';
+        setRoundBanner({ key, text });
+        const t = setTimeout(() => setRoundBanner(b => b?.key === key ? null : b), 1300);
+        cardFadeTimers.current.push(t);
+        break;
+      }
+
+      case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen': case 'WaterOverflow':
       case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;
@@ -484,6 +497,7 @@ export default function BattlePage() {
           ap={player.ap}
           maxAp={player.maxAp}
           mana={player.mana}
+          manaMax={require('../src/core/cards/water').usesWater(gameState)?require('../src/core/cards/water').bowlMax(gameState):undefined}
           block={player.block}
           handCount={gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length} handMax={player.handMax} retain={retainLimit(gameState)} drawPerTurn={player.drawPerTurn} opening={require('../src/core/cards/hand').openingHandSize(gameState)}
           drawCount={drawCount}

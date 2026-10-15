@@ -54,7 +54,7 @@ function ClassPage({id,page,width,height}:{id:ClassId;page:number;width:number;h
   <View onLayout={e=>setCopyHeight(e.nativeEvent.layout.height)} style={{gap:4}}>
    <View style={{flexDirection:'row',alignItems:'baseline',justifyContent:'space-between',borderBottomWidth:1,borderColor:bookRed,paddingBottom:2}}><Text accessibilityRole="header" style={{fontFamily:font.display,fontSize:compact?20:23,lineHeight:compact?27:31,color:bookInk}}>{picked.name}</Text><Text style={{fontFamily:font.ui,fontSize:9,color:paper.muted}}>บทที่ {page+1}</Text></View>
    <Text style={copy}>{picked.desc}</Text>
-   <Text style={{...copy,fontFamily:font.heading,color:bookRed}}>ชีวิต {picked.startHp} · พลังงาน {CARD_RULES.apPerTurn} · มานา {CLASS_RESOURCES[id].startMana}</Text>
+   <Text style={{...copy,fontFamily:font.heading,color:bookRed}}>ชีวิต {picked.startHp} · พลังงาน {CARD_RULES.apPerTurn} · {require('../../src/core/cards/water').resourceName(id)} {CLASS_RESOURCES[id].startMana}</Text>
    <View testID="class-passive" style={{borderTopWidth:1,borderColor:paper.line,paddingTop:3}}><Text style={{...copy,fontFamily:font.heading,color:bookRed}}>{picked.passiveName} · ความสามารถประจำตัว</Text><Text style={copy}>{picked.passiveDesc}</Text></View>
    {skillsFor(id).map(d=><View key={d.id} testID={`class-skill-${d.slot}`} style={{borderTopWidth:1,borderColor:paper.line,paddingTop:3}}><View style={{flexDirection:'row',justifyContent:'space-between',gap:4}}><Text style={{...copy,fontFamily:font.heading}}>{d.name}</Text><Text style={{fontFamily:font.ui,fontSize:8,lineHeight:copy.lineHeight,color:paper.muted}}>{d.slot==='A'?'นอกศึก':'ในศึก'} · พัก {d.cd} ไฟต์</Text></View><Text style={copy}>{d.text}</Text></View>)}
   </View>

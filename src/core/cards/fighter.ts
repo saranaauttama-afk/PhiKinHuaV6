@@ -209,13 +209,15 @@ export function liftInnate(s: GameState): void {
  * Hand hint for one card, read by the card face (MoveMark): `rhythm` — playing it now is a new
  * move and gains จังหวะ; `after` — its ต่อจาก bonus is live right now. Pure; spends nothing.
  */
-export function moveHint(s: Partial<GameState>, card: CardData): { rhythm: boolean; after: boolean; round?: boolean } {
+export function moveHint(s: Partial<GameState>, card: CardData): { rhythm: boolean; after: boolean; round?: boolean; stack?: number } {
   const last = s.fight?.lastAttackMove;
   const rhythm = !!(card.move && usesRhythm(s) && last && last !== card.move && rhythmOf(s) < FIGHTER_RULES.rhythmMax);
   const after = !!(card.after && s.turnFlags?.lastMove === card.after.move);
   // ยก: the card's bonus is live on the last turn of a round (owner playtest: say when ยก matters).
   const round = roundCard(card) ? isRoundLastTurn(s) : undefined;
-  return { rhythm, after, ...(round != null ? { round } : {}) };
+  // หมอผี: สาด / ปลุกยันต์ show how many points they would use right now (×N on the card).
+  const stack = card.splash ? Math.max(0, (s.player?.mana ?? 0) - (card.mana ?? 0)) : card.wakeYant ? require('./water').yantOn(s) : undefined;
+  return { rhythm, after, ...(round != null ? { round } : {}), ...(stack != null ? { stack } : {}) };
 }
 
 /** The card has a bonus on the last turn of a ยก (เทิร์นสุดท้ายของยก). */

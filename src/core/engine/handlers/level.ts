@@ -56,7 +56,7 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
     (s.runCounters as any).removed = ((s.runCounters as any).removed ?? 0) + 1;
     finish(s, `สละ ${gone.name} ออกจากสำรับ`);
   } else if(cmd.option==='ap'){s.player.maxAp++;s.player.ap=s.player.maxAp;finish(s,`แต้มต่อเทิร์น +1 (${s.player.maxAp})`);
-  } else if(cmd.option==='mana'){s.player.startMana=Math.min(LEVEL_UP.caps.mana,s.player.startMana+2);finish(s,`มานาตั้งต้น +2 (${s.player.startMana})`);
+  } else if(cmd.option==='mana'){s.player.startMana=Math.min(LEVEL_UP.caps.mana,s.player.startMana+2);finish(s,`${require('../../cards/water').resourceName(s.classId)}ตั้งต้น +2 (${s.player.startMana})`);
   } else if(cmd.option==='draw'){s.player.drawPerTurn++;finish(s,`จั่วต่อเทิร์น +1 (${s.player.drawPerTurn})`);
   } else if (cmd.option === 'slot') {
     s.equipmentSlotsMax = (s.equipmentSlotsMax ?? CARD_RULES.equipmentSlots) + 1;

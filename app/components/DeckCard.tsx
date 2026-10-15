@@ -11,6 +11,7 @@ import CardBadges from './CardBadges';
 import CandleSelection from './CandleSelection';
 import CardTypeMark from './CardTypeMark';
 import {cardTypeWash} from './cardTypeWash';
+import {cardTypeLabel} from '../../src/core/cards/typesRegistry';
 
 const glyphs = {
   clap: require('../../assets/ui/card-clap.png'), sword: require('../../assets/ui/card-sword.png'),
@@ -41,7 +42,7 @@ export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardDa
  </RitualSurface>;
 }
 export default function DeckCard({card,count,onPress,selected=false,dim=false,fullWidth=false,compact=false,equippedCount=0}:{card:CardData;count?:number;onPress:()=>void;selected?:boolean;dim?:boolean;fullWidth?:boolean;compact?:boolean;equippedCount?:number}) {
- return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${TYPE_LABEL[card.type]} · ${costLabel(card)} · ระดับ ${starOf(card)} · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,compact&&{width:'31.5%'},fullWidth&&{width:'100%'}]}>
+ return <Pressable accessibilityRole="button" accessibilityLabel={`ดูการ์ด ${card.name??card.id}${count!=null?` จำนวน ${count} ใบ`:''}`} accessibilityState={{selected}} accessibilityHint={`${cardTypeLabel(card)} · ${costLabel(card)} · ระดับ ${starOf(card)} · ${cardSummary(card)}`} onPress={onPress} style={[styles.touch,compact&&{width:'31.5%'},fullWidth&&{width:'100%'}]}>
   <CandleSelection selected={selected} dim={dim}><CardFace card={card} count={count} compact={compact} equippedCount={equippedCount}/></CandleSelection>
  </Pressable>;
 }

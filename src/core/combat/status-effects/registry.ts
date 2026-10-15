@@ -22,6 +22,17 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     tags: ['debuff', 'mark'],
   },
 
+  // หมอผี (15 ต.ค. 2026): ยันต์ไม่ลดเอง ครบ WATER_RULES.sealAt แล้วผนึกการ์ดที่ผีถือไว้ 1 ใบ
+  yant: {
+    id: 'yant',
+    name: 'ยันต์',
+    description: 'ครบ 5 ชั้น ผนึกการ์ดที่ผีถือไว้ 1 ใบ (ใบที่ชาร์จมากที่สุด) ถ้าผีไม่ได้ถือการ์ด ผีมึนแทน',
+    defaultDuration: 99,
+    stackable: true,
+    maxStacks: 10,
+    tags: ['debuff', 'mark'],
+  },
+
   stun: {
     id: 'stun',
     name: 'มึน',

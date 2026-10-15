@@ -41,7 +41,9 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
   const level = state.levelUp;
   if (!level || level.consumed) return null;
   const deck = state.masterDeck ?? [];
-  const offered = OPTIONS.filter(o => levelOffers(state).includes(o.id));
+  // หมอผี: mana is น้ำมนต์ (docs/mor-phi/DESIGN.md).
+  const word = require('../../../src/core/cards/water').resourceName(state.classId) as string;
+  const offered = OPTIONS.filter(o => levelOffers(state).includes(o.id)).map(o => o.id === 'mana' ? { ...o, title: `${word}ตั้งต้น`, detail: `${word}เปิดไฟต์ +2 (สูงสุด 10)` } : o);
   const upgrading = level.upgradesLeft != null;
   const unavailable = (o: LevelOption) =>
     o === 'card' ? !level.cards.length : o === 'upgrade' ? !deck.some(canUpgrade) : o === 'remove' ? !deck.some(c => canRemoveCard(c, deck.length)) : false;

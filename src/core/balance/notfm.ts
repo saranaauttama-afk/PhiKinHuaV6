@@ -47,6 +47,25 @@ export const FIGHTER_RULES = {
   /** ครูมวยเฒ่า and other echoes never echo an echo. */
 } as const;
 
+/**
+ * หมอผี — น้ำมนต์ (docs/mor-phi/DESIGN.md, 15 Oct 2026). Stored in `player.mana` so level-ups,
+ * skills, blessings and saves keep working; shown as น้ำมนต์ for the shaman only.
+ */
+export const WATER_RULES = {
+  /** ขันน้ำมนต์ประจำตัว (passive): น้ำมนต์ at the start of every player turn after the first. */
+  perTurn: 3,
+  /** ขัน: most น้ำมนต์ held at once (equipment `bowlBonus` adds to it). */
+  bowlMax: 12,
+  /** น้ำล้นขัน: block per point of น้ำมนต์ gained past the bowl. */
+  overflowBlock: 2,
+  /** ยันต์ stacks on a ghost that trigger ผนึก. */
+  sealAt: 5,
+  /** น้ำมนต์ gained by every ผนึก. */
+  sealWater: 2,
+  /** ของต่ำ: HP paid for each missing น้ำมนต์ on a `blood` spell. */
+  bloodPerWater: 2,
+} as const;
+
 /** Minions in play at once; a new one replaces the oldest. */
 export const MINION_RULES = { playerSlots: 2, enemySlots: 3 } as const;
 
@@ -156,10 +175,13 @@ export const CLASS_PASSIVES: Record<ClassId, import('../types').Passive & {
   copyFirstGhostCard?: boolean;
   /** นักมวย: จังหวะ (FIGHTER_RULES). */
   rhythm?: boolean;
+  /** หมอผี: mana is น้ำมนต์ in a bowl (WATER_RULES). */
+  water?: boolean;
 }> = {
   // Was นักรบวัด 'ยืนเฝ้าประตู' (block 3 on equip) until 14 Oct 2026.
   warrior: { name: 'แม่ไม้มวยไทย', triggers: [], rhythm: true },
-  shaman: { name: 'ครูพักลักจำ', triggers: [], spellDiscount: 1 },
+  // Was 'ครูพักลักจำ' (first spell each turn −1 mana) until 15 Oct 2026: น้ำมนต์ rebuild.
+  shaman: { name: 'ขันน้ำมนต์ประจำตัว', triggers: [{ on: 'turnStart', fx: { mana: WATER_RULES.perTurn } }], water: true },
   nun: { name: 'อานิสงส์', triggers: [{ on: 'prayerDone', fx: { heal: 3 } }] },
   medium: { name: 'ผีติดตาม', triggers: [], copyFirstGhostCard: true },
 };

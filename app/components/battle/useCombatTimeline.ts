@@ -35,6 +35,11 @@ const DURATION: Record<CombatEvent['t'], number> = {
   PlayerStunned: 450,
   GhostPhase: 900,
   CardStolen: 600,
+  // หมอผี (15 Oct 2026)
+  WaterChanged: 0,
+  WaterOverflow: 250,
+  GhostSealed: 700,
+  GhostUnCharged: 400,
 };
 
 export type TimelineState = {

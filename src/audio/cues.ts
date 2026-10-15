@@ -28,6 +28,10 @@ export function cuesFor(events: CombatEvent[]): SfxId[] {
       case 'CardStolen': out.add(e.back ? 'block' : 'debuff'); break;
       case 'RoundEnd': out.add('roundBell'); break;
       case 'MinionSummoned': out.add('minionSummon'); break;
+      // หมอผี (15 Oct 2026): reuse existing sounds until the owner records shaman ones.
+      case 'GhostSealed': out.add('stun'); break;
+      case 'GhostUnCharged': out.add('block'); break;
+      case 'WaterOverflow': out.add('heal'); break;
       case 'StatusApplied':
         if (e.target === 'enemy' && e.effectId === 'stun') out.add('stun');
         if (e.target === 'player' && DEBUFFS.has(e.effectId)) out.add('debuff');

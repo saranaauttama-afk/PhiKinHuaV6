@@ -33,9 +33,10 @@ export function recordCardHistory(s:GameState,side:CombatEventTarget,card:CardDa
   const paid=typeof costPaid==='number'?{ap:0,mana:0,energy:Math.max(0,costPaid)}:{...costPaid,energy:0};
   if(paid.energy)results.push(`ใช้พลัง ${paid.energy}`);
   if(paid.ap)results.push(`ใช้แต้ม ${paid.ap}`);
-  if(paid.mana)results.push(`ใช้มานา ${paid.mana}`);
+  const word=require('../cards/water').resourceName(s.classId);
+  if(paid.mana)results.push(`ใช้${word} ${paid.mana}`);
   const manaGained=s.player.mana-before.player.mana+(side==='player'?paid.mana:0);
-  if(manaGained>0)results.push(`เราได้มานา ${manaGained}`);
+  if(manaGained>0)results.push(`เราได้${word} ${manaGained}`);
   const drawn=s.piles.hand.length-before.hand+(side==='player'?1:0);
   if(drawn>0)results.push(`เราได้ไพ่ ${drawn} ใบ`);
   if((s.traps?.length??0)>before.traps.length)results.push('ตั้งกับดัก');

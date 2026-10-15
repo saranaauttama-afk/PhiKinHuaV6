@@ -383,9 +383,10 @@ describe('moveHint (hand hints)', () => {
 
 import { CLASS_BOOK_ORDER, classPlayable, ALL_CLASS_IDS } from '../src/core/classes';
 describe('store launch class gate', () => {
-  it('opens with นักมวย and only นักมวย can start; the book still lists every class', () => {
+  // หมอผี opened 15 Oct 2026 with its น้ำมนต์ card set (docs/mor-phi/DESIGN.md).
+  it('opens with นักมวย; นักมวย and หมอผี can start; the book still lists every class', () => {
     expect(CLASS_BOOK_ORDER[0]).toBe('warrior');
     expect([...CLASS_BOOK_ORDER].sort()).toEqual([...ALL_CLASS_IDS].sort());
-    expect(CLASS_BOOK_ORDER.filter(classPlayable)).toEqual(['warrior']);
+    expect(CLASS_BOOK_ORDER.filter(classPlayable)).toEqual(['warrior', 'shaman']);
   });
 });

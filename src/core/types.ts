@@ -8,7 +8,9 @@ export type TriggerOn='battleStart'|'equip'|'turnStart'|'turnEnd'|'play'|'prayer
   /** นักมวย: whenever rhythm (จังหวะ) is gained. */
   |'rhythm'
   /** End of the last player turn of a round (ยก = 3 player turns). */
-  |'roundEnd';
+  |'roundEnd'
+  /** หมอผี: a ghost card was sealed (ผนึก). */
+  |'seal';
 export type Trigger={on:TriggerOn;type?:CardType;once?:'turn';when?:import('./cards/mechanics').CardCondition;fx:Fx};
 /** Always-on modifiers plus triggers, shared by blessings and equipment cards. */
 export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number;
@@ -30,6 +32,10 @@ export type Passive={triggers:Trigger[];armor?:number;attackBonus?:number;
   echoFirstAttack?:number;
   /** Minion: takes the first ghost attack card each ghost turn instead of the player. */
   guard?:boolean;
+  /** หมอผี: the bowl holds this much more น้ำมนต์. */
+  bowlBonus?:number;
+  /** หมอผี: each point of น้ำมนต์ that overflows the bowl also hits the ghost for this much. */
+  overflowDmg?:number;
 };
 /** นักมวยคาดเชือก: the four weapons of Muay Boran. */
 export type Move='punch'|'kick'|'knee'|'elbow';
@@ -82,7 +88,17 @@ export type Fx = {
   drain?: boolean;
   /** Ghost: take the newest N cards from the player's hand; each hit that makes the ghost bleed drops one back. */
   steal?: number;
+  /** หมอผี: seal N cards the ghost holds (ผนึก), as if its ยันต์ were full. */
+  seal?: number;
+  /** หมอผี สายสิญจน์: every card the ghost holds goes back to charge 0. */
+  unCharge?: boolean;
+  /** Lose this much HP (ignores block, never below 1). */
+  selfDamage?: number;
+  /** Heal each of our minions. */
+  healMinions?: number;
 };
+/** หมอผี: per-point effect of สาด (all น้ำมนต์) or ปลุกยันต์ (all ยันต์ on the ghost). */
+export type PerStackFx = { dmg?: number; block?: number; heal?: number; mana?: number; sweep?: boolean };
 export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negate?: boolean; turns?: number };
 
 export type CardData = {
@@ -115,6 +131,12 @@ export type CardData = {
   borrowed?: boolean;
   /** A copy made in this fight (ครูสอนมวย); never copied again, removed after use. */
   copied?: boolean;
+  /** หมอผี สาด: spend all น้ำมนต์ (at least 1); the effect is per point spent. */
+  splash?: PerStackFx;
+  /** หมอผี ปลุกยันต์: consume every ยันต์ on the ghost; the effect is per stack. */
+  wakeYant?: PerStackFx;
+  /** หมอผี ของต่ำ: missing น้ำมนต์ is paid with HP (WATER_RULES.bloodPerWater each). */
+  blood?: boolean;
   /** Only offered after the class unlocks it in the journal. */
   locked?: boolean;
   unlockAt?: number;
@@ -369,6 +391,14 @@ export type CombatEvent = (
   | { t: 'GhostPhase'; text: string }
   /** A ghost took a card from our hand, or dropped one back. */
   | { t: 'CardStolen'; name: string; back?: boolean }
+  /** หมอผี: น้ำมนต์ in the bowl changed (value = now). */
+  | { t: 'WaterChanged'; value: number }
+  /** หมอผี: น้ำมนต์ overflowed the bowl (became block). */
+  | { t: 'WaterOverflow'; amount: number }
+  /** หมอผี: ยันต์ sealed a held ghost card (name), or stunned a ghost with an empty hand. */
+  | { t: 'GhostSealed'; name: string }
+  /** หมอผี: สายสิญจน์ took the charge off the ghost's held cards. */
+  | { t: 'GhostUnCharged' }
 ) & { frame?: CombatFrame };
 
 /**
