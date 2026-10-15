@@ -341,7 +341,7 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_bell_keeper_v29_strike",
   "night_bell_keeper_n2_bowl",
   "night_bell_keeper_n2_servant",
-  "night_bell_keeper_v29_ward",
+  "night_bell_keeper_v29_double",
   "night_bell_keeper_n2_ring",
   "night_bell_keeper_n2_bowl",
   "night_bell_keeper_v29_strike"

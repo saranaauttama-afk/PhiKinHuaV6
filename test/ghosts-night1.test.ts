@@ -216,8 +216,9 @@ describe('กลไกประจำตัวอื่น', () => {
   // as a bug, so ghosts only call minions with a card.
   it('ไม่มีผีตัวไหนเรียกลูกสมุนตอนเปิดไฟต์ ต้องมาจากการ์ด', () => {
     for (const g of Object.keys(NIGHT_ENEMY_DECKS)) expect(ghostRule(g)?.fx.summon, g).toBeUndefined();
-    expect(NIGHT_ENEMY_DECKS['phi-pong-kang'].filter(x => x === 'phi_pong_kang_n1_call')).toHaveLength(2);
-    expect(NIGHT_ENEMY_DECKS['night-head-collector'].filter(x => x === 'night_head_collector_n1_basket')).toHaveLength(2);
+    // One summon card each after the 15 Oct sim tuning (two made these the top killers once minions got jobs).
+    expect(NIGHT_ENEMY_DECKS['phi-pong-kang'].filter(x => x === 'phi_pong_kang_n1_call')).toHaveLength(1);
+    expect(NIGHT_ENEMY_DECKS['night-head-collector'].filter(x => x === 'night_head_collector_n1_basket')).toHaveLength(1);
   });
 });
 
