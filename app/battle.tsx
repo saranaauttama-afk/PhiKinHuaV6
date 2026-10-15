@@ -325,7 +325,7 @@ export default function BattlePage() {
         break;
       }
 
-      case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase':
+      case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen':
       case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;

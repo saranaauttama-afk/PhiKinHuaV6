@@ -48,6 +48,8 @@ export function ghostMechanicBadges(s:GameState){
   const max=GHOST_MECHANICS.chargeMaxTurns,left=charges.map(n=>Math.max(0,max-n)),soon=Math.min(...left);
   out.push({id:'ghost:charge',name:'ชาร์จ',symbol:'spell_charging',bad:true,count:soon?`${soon}`:'!',detail:`ผีถือไพ่ชาร์จไว้ ${charges.length} ใบ · ${left.map(n=>n?`เต็มในอีก ${n} เทิร์น`:'เต็มแล้ว').join(', ')}\nยิ่งถือนานยิ่งแรง (สูงสุด ${max} เทิร์น) · เต็มแล้วปล่อยได้ทุกเมื่อ และปล่อยก่อนเต็มได้ถ้าพอฆ่าเรา — ตั้งเกราะรอ หรือเร่งฆ่าก่อน`});
  }
+ const stolen=s.fight?.ghostStolen??[];
+ if(stolen.length)out.push({id:'ghost:stolen',name:'ขโมยการ์ด',symbol:'curse',bad:true,count:`${stolen.length}`,detail:`ผีถือการ์ดของเราไว้ ${stolen.length} ใบ: ${stolen.map(c=>c.name).join(', ')}\nตีให้ผีเสียเลือด 1 ครั้ง มันทำหล่นคืน 1 ใบ (ใบล่าสุดก่อน)`});
  for(const [i,fx] of (s.fight?.enemyRipostes??[]).entries())out.push({id:`ghost:riposte:${i}`,name:'ผีรอสวน',symbol:'riposte',bad:true,detail:`ถ้าการ์ดโจมตีใบถัดไปของเราไม่ทำให้ผีเสียเลือด (เกราะหรือหลบกินหมด) ผีสวน: ${fxText(fx,'enemy').join(' · ')}\nตีให้ทะลุเกราะ หรือรอให้หมดเองตอนเทิร์นผี`});
  return out;
 }

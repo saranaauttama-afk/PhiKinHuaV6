@@ -131,13 +131,14 @@ describe('v34 migration and scope',()=>{
   expect(s.enemyPiles!.hand).toHaveLength(4);expect(s.enemyPiles!.discard).toEqual([G]);expect(inventory(s)).toHaveLength(5);
  });
  it('all 34 ghosts have valid owned decks with meaningful mixed effects',()=>{
-  // Night-1 ghosts were rebuilt 15 Oct 2026 (docs/ghosts/NIGHT1-DESIGN.md): 8–10 cards, 4–5 shared
+  // Night-1 ghosts were rebuilt 15 Oct 2026, nights 2–3 the same day (docs/ghosts/NIGHT1-DESIGN.md): 8–10 cards, 4–5 shared
   // base cards + 3–4 signature cards. The rest keep the v34 10/12/15 decks until their night is redone.
   for(const id of getAllMonsterIds()){
    const deck=NIGHT_ENEMY_DECKS[id];expect(deck,id).toBeDefined();
-   if(deck.some(c=>c.includes('_n1_')))expect(deck.length,id).toBeGreaterThanOrEqual(8),expect(deck.length,id).toBeLessThanOrEqual(10);
+   // Nights 2–3 (_n2_/_n3_, 15 Oct 2026) use the same format; bosses may carry 11.
+   if(deck.some(c=>/_n[123]_/.test(c)))expect(deck.length,id).toBeGreaterThanOrEqual(8),expect(deck.length,id).toBeLessThanOrEqual(11);
    else expect([10,12,15]).toContain(deck.length);
-   for(const cardId of deck){const c=enemyCardById(cardId)!;expect(c,cardId).toBeDefined();expect(c.owner).toBe(id);expect(c.fx.dmg||c.fx.block||c.fx.heal||c.fx.status?.length||c.fx.summon||c.curseCard).toBeTruthy();}
+   for(const cardId of deck){const c=enemyCardById(cardId)!;expect(c,cardId).toBeDefined();expect(c.owner).toBe(id);expect(c.fx.dmg||c.fx.block||c.fx.heal||c.fx.status?.length||c.fx.summon||c.fx.steal||c.curseCard).toBeTruthy();}
   }
  });
  it('new runtime has no sequence tracking, meters or explicit combo handlers',()=>{

@@ -118,6 +118,36 @@ export function resolveGhostRipostes(s: GameState, sideHpBefore: number): void {
   }
 }
 
+// ── ผีขโมยการ์ด ─────────────────────────────────────────────────────
+
+/**
+ * แม่นาค / ผีกินหัว (nights 2–3, owner asked for "weird and fun"): the ghost takes the newest
+ * non-curse cards from our hand. They come back one per hit that makes the ghost bleed
+ * (`returnStolen` from damage.ts), so the answer to a thief is to hit it. Fight-only: piles are
+ * rebuilt from the deck every fight, so nothing is lost for good.
+ */
+export function stealCards(s: GameState, n: number): void {
+  if (!s.fight || !s.enemy) return;
+  for (let i = 0; i < n; i++) {
+    let at = -1;
+    for (let j = s.piles.hand.length - 1; j >= 0; j--) if (s.piles.hand[j].type !== 'curse') { at = j; break; }
+    if (at < 0) break;
+    const [card] = s.piles.hand.splice(at, 1);
+    (s.fight.ghostStolen ??= []).push(card);
+    s.log.push(`${s.enemy.name} ขโมย ${card.name}`);
+    emit(s, { t: 'CardStolen', name: card.name });
+  }
+}
+
+/** The player made the ghost bleed: it drops the last card it took (to hand if there is room). */
+export function returnStolen(s: GameState): void {
+  const card = s.fight?.ghostStolen?.pop();
+  if (!card) return;
+  (s.piles.hand.length < s.player.handMax ? s.piles.hand : s.piles.discard).push(card);
+  s.log.push(`${s.enemy?.name ?? 'ผี'} ทำ ${card.name} หล่น`);
+  emit(s, { t: 'CardStolen', name: card.name, back: true });
+}
+
 // ── มึนฝั่งเรา ─────────────────────────────────────────────────────────
 
 /** Start of a player turn, after AP refills: stun costs AP once, then it is gone. */
@@ -141,8 +171,10 @@ export function applyPlayerStun(s: GameState): void {
 export function checkGhostPhase(s: GameState, _rng: RNG): void {
   if (!s.enemy || !s.fight || s.fight.ghostPhase2 || s.enemy.hp <= 0) return;
   const rule = require('../campaign/enemyRules').ghostRule(s.enemy.id);
-  const p2 = rule?.phase2 as { belowPct: number; deck: string[]; text: string; breakRelic?: boolean } | undefined;
-  if (!p2 || s.enemy.hp * 100 > s.enemy.maxHp * p2.belowPct) return;
+  const p2 = rule?.phase2 as { belowPct?: number; afterRevive?: boolean; deck: string[]; text: string; breakRelic?: boolean } | undefined;
+  if (!p2) return;
+  // ปอบครูอาคม: phase 2 is what it wakes up as after its หม้อคาถา revive (not an HP line).
+  if (p2.afterRevive ? !s.fight.relic?.reviveUsed : s.enemy.hp * 100 > s.enemy.maxHp * (p2.belowPct ?? 50)) return;
   s.fight.ghostPhase2 = true;
   s.enemy.deck = [...p2.deck];
   const turn = s.fight.ghostTurns ?? 0, n = p2.deck.length;

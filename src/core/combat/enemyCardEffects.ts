@@ -28,6 +28,12 @@ export function cardFx(s: GameState, card: EnemyCardDef, charge = 0): Fx {
 /** Apply effects owned by the ghost: `to: 'self'` lands on the ghost, `to: 'enemy'` on the player. */
 export function applyEnemyFx(s: GameState, fx: Fx, sourceId: string): void {
   if (!s.enemy) return;
+  // ทำลายเกราะ (แม่นาค แขนยาว): the mirror of the นักมวย's ถีบจิก.
+  if (fx.breakBlock && s.player.block > 0) {
+    const gone = Math.min(s.player.block, fx.breakBlock);
+    s.player.block -= gone;
+    s.log.push(`${s.enemy.name} ทำลายเกราะเรา ${gone}`);
+  }
   if (fx.dmg) {
     const minions = require('./minions');
     // นักมวยรุ่นพี่: takes the ghost's first attack card each ghost turn instead of the player.
@@ -45,6 +51,7 @@ export function applyEnemyFx(s: GameState, fx: Fx, sourceId: string): void {
     if (fx.drain && s.enemy.hp > 0 && s.player.hp < hpBefore) heal(s, 'enemy', hpBefore - s.player.hp);
   }
   if (fx.summon && s.enemy.hp > 0) require('./minions').summonMinion(s, 'enemy', fx.summon);
+  if (fx.steal && s.enemy.hp > 0) require('./ghostMechanics').stealCards(s, fx.steal);
   if (s.enemy.hp <= 0 || s.player.hp <= 0) return;
   if (fx.block) gainBlock(s, 'enemy', fx.block);
   if (fx.heal) heal(s, 'enemy', fx.heal);

@@ -71,7 +71,8 @@ describe('ข้อมูล', () => {
     const ids = new Set<string>();
     for (const deck of Object.values(NIGHT_ENEMY_DECKS)) for (const id of deck) { const s = enemyCardById(id)?.fx.summon; if (s) ids.add(s); }
     for (const id of ids) expect(minionDef(id)?.side, id).toBe('enemy');
-    expect(ids.size).toBe(5);
+    // 5 on night 1 + 7 on nights 2–3 (docs/ghosts/NIGHT23-DESIGN.md).
+    expect(ids.size).toBe(12);
   });
 
   // Owner 15 Oct 2026 (playtest): we cannot pick a target, so a minion that does not take hits
@@ -399,5 +400,41 @@ describe('ยกอธิบายตัวเอง (เจ้าของเ�
     s.turn = 3; expect(F.moveHint(s, c('straight_punch')).round).toBe(true);
     expect(F.moveHint(s, c('jab')).round).toBeUndefined();
     expect(F.roundBeneficiaries(s)).toContain('หมัดตรง');
+  });
+});
+
+describe('ผีคืน 2–3 (docs/ghosts/NIGHT23-DESIGN.md)', () => {
+  it('แม่นาคขโมยการ์ดใบล่าสุด แล้วตีเข้าเนื้อ 1 ครั้งคืน 1 ใบ', () => {
+    const s = fight({ ghost: ['mae_nak_n2_lime'], hand: [c('jab'), c('straight_knee')], monster: 'mae-nak' });
+    const t = ghostTurn(s);
+    expect(t.fight!.ghostStolen!.map(x => x.id)).toEqual(['straight_knee']);
+    expect(t.piles.hand.map(x => x.id)).toEqual(['jab']);
+    t.turnFlags = { blessingOnce: {} }; resetCardsPlayed(t); t.player.ap = 2; t.enemy!.block = 0;
+    play(t);
+    expect(t.fight!.ghostStolen).toEqual([]);
+    expect(t.piles.hand.map(x => x.id)).toEqual(['straight_knee']);
+  });
+
+  it('แขนยาวทำลายเกราะเราก่อนตี', () => {
+    const s = fight({ ghost: ['mae_nak_n2_arm'] });
+    s.player.block = 8;
+    const hp = s.player.hp;
+    const t = ghostTurn(s);
+    expect(hp - t.player.hp).toBe(3); // 8 − 6 = 2 block left, 5 dmg
+  });
+
+  it('ปอบครูอาคมเข้าช่วง 2 หลังคืนชีพ ไม่ใช่ที่เลือด 50%', () => {
+    const s = fight({ ghost: [STRIKE], enemyHp: 40 });
+    s.enemy!.id = 'night-headless-king'; s.enemy!.maxHp = 200;
+    s.fight!.relic = { bossId: 'night-headless-king', durability: 6, broken: false, stolen: [] };
+    expect(ghostTurn(s).fight!.ghostPhase2).toBeFalsy();
+    s.fight!.relic.reviveUsed = true;
+    expect(ghostTurn(s).fight!.ghostPhase2).toBe(true);
+  });
+
+  it('บอสทุกตัวมีช่วง 2 และผีกินหัวเข้าที่ 40%', () => {
+    for (const b of ['night-head-collector', 'night-bell-keeper', 'night-root-lord', 'night-cave-mother', 'night-headless-king', 'phi-kin-hua'])
+      expect(ghostRule(b)?.phase2, b).toBeDefined();
+    expect(ghostRule('phi-kin-hua')!.phase2!.belowPct).toBe(40);
   });
 });

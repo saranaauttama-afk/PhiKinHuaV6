@@ -34,6 +34,7 @@ const DURATION: Record<CombatEvent['t'], number> = {
   GhostRiposte: 350,
   PlayerStunned: 450,
   GhostPhase: 900,
+  CardStolen: 600,
 };
 
 export type TimelineState = {

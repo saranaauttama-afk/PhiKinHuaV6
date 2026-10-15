@@ -25,6 +25,7 @@ export function cuesFor(events: CombatEvent[]): SfxId[] {
       case 'GhostGuard': out.add('block'); break;
       case 'PlayerStunned': out.add('stun'); break;
       case 'GhostPhase': out.add('roundBell'); break;
+      case 'CardStolen': out.add(e.back ? 'block' : 'debuff'); break;
       case 'RoundEnd': out.add('roundBell'); break;
       case 'MinionSummoned': out.add('minionSummon'); break;
       case 'StatusApplied':

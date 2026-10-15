@@ -212,6 +212,8 @@ export function dealDamage(
   });
   if (died) emit(state, { t: 'Died', who: to });
 
+  // A ghost that stole our cards drops one each time we make it bleed.
+  if (from === 'player' && to === 'enemy' && hpLoss > 0 && state.enemy && state.enemy.hp > 0 && state.fight?.ghostStolen?.length) require('./ghostMechanics').returnStolen(state);
   // ผีตายโหง แค้นฝังใจ reads the player turn the ghost last lost HP on.
   if (from === 'player' && to === 'enemy' && hpLoss > 0 && sourceKind !== 'status' && state.fight) state.fight.enemyHurtTurn = state.turn ?? 1;
   // A player hit that lands chips the boss's relic.

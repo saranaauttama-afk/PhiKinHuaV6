@@ -373,6 +373,22 @@
      "to": "enemy"
     }
    ]
+  },
+  "phase2": {
+   "belowPct": 50,
+   "breakRelic": true,
+   "text": "ระฆังวัดร้างแตก เปรตเคาะระฆังใหญ่ หุ้มจีวรขาดรอสวน",
+   "deck": [
+    "night_bell_keeper_n2_bigbell",
+    "night_bell_keeper_n2_bigbell",
+    "night_bell_keeper_n2_robe",
+    "night_bell_keeper_n2_robe",
+    "night_bell_keeper_n2_servant",
+    "night_bell_keeper_v29_strike",
+    "night_bell_keeper_v29_double",
+    "night_bell_keeper_v29_pressure",
+    "night_bell_keeper_v29_signature"
+   ]
   }
  },
  "night-root-lord": {
@@ -380,6 +396,22 @@
   "flavor": "รากไทรพอกเป็นเกราะ",
   "fx": {
    "block": 12
+  },
+  "phase2": {
+   "belowPct": 50,
+   "breakRelic": true,
+   "text": "รากไทรขาด ไทรโอบรัดรอสวน แล้วกิ่งฟาดรัว",
+   "deck": [
+    "night_root_lord_n3_hug",
+    "night_root_lord_n3_hug",
+    "night_root_lord_n3_branch",
+    "night_root_lord_n3_branch",
+    "night_root_lord_n3_branch",
+    "night_root_lord_n3_root",
+    "night_root_lord_v29_strike",
+    "night_root_lord_v29_pressure",
+    "night_root_lord_v29_signature"
+   ]
   }
  },
  "night-cave-mother": {
@@ -393,6 +425,21 @@
      "turns": 99,
      "to": "self"
     }
+   ]
+  },
+  "phase2": {
+   "belowPct": 50,
+   "breakRelic": true,
+   "text": "เสียงสะท้อนเงียบลง พรายแอ่งถ้ำเรียกคลื่นถ้ำและเสียงก้อง",
+   "deck": [
+    "night_cave_mother_n3_wave",
+    "night_cave_mother_n3_wave",
+    "night_cave_mother_n3_echo",
+    "night_cave_mother_n3_mist",
+    "night_cave_mother_n3_spring",
+    "night_cave_mother_v29_strike",
+    "night_cave_mother_v29_double",
+    "night_cave_mother_v29_signature"
    ]
   }
  },
@@ -413,6 +460,20 @@
      "turns": 99,
      "to": "self"
     }
+   ]
+  },
+  "phase2": {
+   "afterRevive": true,
+   "text": "หม้อคาถาปลุกปอบครูอาคมขึ้นมาใหม่ ร่ายเวทเร็วแล้วฟันรัว",
+   "deck": [
+    "night_headless_king_n3_quick",
+    "night_headless_king_n3_quick",
+    "night_headless_king_n3_slash",
+    "night_headless_king_n3_slash",
+    "night_headless_king_n3_slash",
+    "night_headless_king_n3_glare",
+    "night_headless_king_v29_strike",
+    "night_headless_king_v29_signature"
    ]
   }
  },
@@ -456,6 +517,22 @@
      "turns": 99,
      "to": "self"
     }
+   ]
+  },
+  "phase2": {
+   "belowPct": 40,
+   "breakRelic": true,
+   "text": "หัวที่ขโมยมาหลุดคืน ผีกินหัวคลั่ง เรียกชื่อเจ้าของหัวแล้วกินคำสุดท้าย",
+   "deck": [
+    "phi_kin_hua_n3_last",
+    "phi_kin_hua_n3_last",
+    "phi_kin_hua_n3_last",
+    "phi_kin_hua_n3_name",
+    "phi_kin_hua_n3_name",
+    "phi_kin_hua_n3_swallow",
+    "phi_kin_hua_n3_head",
+    "phi_kin_hua_v29_strike",
+    "phi_kin_hua_v29_signature"
    ]
   }
  },

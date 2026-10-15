@@ -34,6 +34,7 @@ export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
   if (fx.lockRhythm) out.push('จังหวะไม่หายจนจบไฟต์');
   if (fx.doubleNext) out.push('การ์ดโจมตีใบถัดไปเทิร์นนี้ทำงาน 2 ครั้ง');
   if (fx.drain) out.push(`${self}ฟื้นเท่าที่ทะลุเกราะ${other}`);
+  if (fx.steal) out.push(`ขโมยการ์ดใบล่าสุดในมือ${other} ${fx.steal} ใบ (ตีเข้าเนื้อ 1 ครั้ง คืน 1 ใบ)`);
   if (fx.summon) {
     const m = require('../combat/minions');
     out.push(side === 'player' ? `เรียก${m.minionDef(fx.summon)?.name ?? fx.summon} (${m.minionText(fx.summon)})` : `เรียก${m.minionDef(fx.summon)?.name ?? fx.summon}`);

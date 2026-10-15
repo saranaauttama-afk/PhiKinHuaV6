@@ -6,7 +6,16 @@ const traits:Record<string,string>={hunger:'กัดกินพลังชี
  // Night-1 ghosts (15 Oct 2026, docs/ghosts/NIGHT1-DESIGN.md): each page names the ghost's one mechanic.
  evade:'ลอยหลบหมัด\nดูดเลือดเมื่อตีเข้า',charge:'เก็บไพ่ไว้ชาร์จ\nยิ่งรอยิ่งหนัก',dance:'ร่ายรำต่อท่า\nยิ่งรำยิ่งแรง',
  minion:'เรียกลูกสมุน\nรับหมัดแทน',daze:'แสงทำให้มึน\nแต้มเทิร์นหน้าลด',wound:'กรีดให้เปราะ\nแล้วซ้ำแผล',
- minionDaze:'เงาป่ารับหมัดแทน\nลมป่าทำให้มึน',headTaker:'หัวในกระด้งรับหมัดแทน\nชาร์จฉวยหัว ตั้งกระด้งสวน'};
+ minionDaze:'เงาป่ารับหมัดแทน\nลมป่าทำให้มึน',headTaker:'หัวในกระด้งรับหมัดแทน\nชาร์จฉวยหัว ตั้งกระด้งสวน',
+ // Nights 2–3 (docs/ghosts/NIGHT23-DESIGN.md): two mechanics each.
+ counterThief:'รอสวนริมท่าน้ำ\nแขนยาวขโมยการ์ด',chargeDrain:'อ้าปากชาร์จ\nกินตับดูดเลือด',dazePoison:'ไฟล่อให้มึน\nเผาลามเป็นพิษ',
+ evadeCharge:'กระโดดหลบ\nชาร์จกอยกอย',woundCurse:'กรีดให้เปราะ\nขอส่วนบุญเป็นคำสาป',minionPoison:'พรายน้ำรับหมัดแทน\nพิษจากน้ำตา',
+ counterCurse:'แค้นรอสวน\nสาปส่งเข้ากอง',chargeDaze:'ไฟสุมชาร์จ\nแสงหลอกให้มึน',minionWall:'เสือสมิง เถาวัลย์\nกำแพงดงทึบ',
+ danceWound:'ฟ้อนเร่งหมัด\nเล็บกรีดให้เปราะ',evadeDrain:'ดำน้ำหลบ\nดึงขาดูดเลือด',chargeCounter:'สากอาคมชาร์จ\nปีกกระด้งรอสวน',
+ drainDaze:'ชายในฝันทำให้มึน\nจุมพิตดูดเลือด',chargeWound:'หิวกระหายชาร์จฟื้น\nกลืนแผลที่เปราะ',
+ bellKeeper:'ระฆังยัดคำสาป เปรตบริวาร\nแตกแล้วเคาะระฆังใหญ่',rootLord:'รากไทรรับหมัดแทน\nขาดแล้วโอบรัดรอสวน',
+ caveMother:'พรายน้ำ ไอหมอกพิษ\nเงียบแล้วคลื่นถ้ำ',headlessKing:'ชาร์จเวทปอบ ตาจ้องให้มึน\nคืนชีพแล้วฟันรัว',
+ headEater:'หัวลอยคาบการ์ด กลืนหัวชาร์จ\nคลั่งแล้วกินคำสุดท้าย'};
 export function encounterClue(o:PageOffer):string{
  if(o.kind==='monster'||o.kind==='boss')return traits[ENEMY_ARCHETYPES[o.enemyId]]??'วิญญาณขวางทาง\nเตรียมพร้อมต่อสู้';
  switch(o.kind){

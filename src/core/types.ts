@@ -80,6 +80,8 @@ export type Fx = {
   cleanseOne?: boolean;
   /** Ghost: heal by the HP the player actually lost to this effect (ดูดเลือด). */
   drain?: boolean;
+  /** Ghost: take the newest N cards from the player's hand; each hit that makes the ghost bleed drops one back. */
+  steal?: number;
 };
 export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negate?: boolean; turns?: number };
 
@@ -220,6 +222,8 @@ export type FightState = {
   enemyHurtTurn?: number;
   /** The boss has crossed into its second phase (ghost_rules.json `phase2`). */
   ghostPhase2?: boolean;
+  /** Cards a ghost took from our hand this fight (แม่นาค, ผีกินหัว), newest last. */
+  ghostStolen?: CardData[];
 };
 
 /** A minion in play (ศิษย์ค่ายของเรา / ลูกสมุนของผี). */
@@ -363,6 +367,8 @@ export type CombatEvent = (
   | { t: 'PlayerStunned'; apLost: number }
   /** A ghost crossed into its second phase. */
   | { t: 'GhostPhase'; text: string }
+  /** A ghost took a card from our hand, or dropped one back. */
+  | { t: 'CardStolen'; name: string; back?: boolean }
 ) & { frame?: CombatFrame };
 
 /**

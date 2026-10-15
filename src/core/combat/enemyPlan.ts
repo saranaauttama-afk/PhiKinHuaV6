@@ -44,6 +44,8 @@ const stacks=(b:Board,who:'player'|'enemy',id:string)=>{const e=(who==='enemy'?b
 function step(s:GameState,b:Board,c:EnemyCardDef,index:number,attackHits:number,unplayed:EnemyCardDef[]):number{
  const age=s.enemyHandAges?.[index];
  const f=cardFx(b as GameState,c,chargeSteps(c,age));let value=0;
+ // ทำลายเกราะ lands before the hit, so the hit is scored against what is left.
+ if(f.breakBlock){const gone=Math.min(f.breakBlock,b.player.block);value+=gone*.6;b.player.block-=gone;}
  const missing=Math.max(0,b.enemy!.maxHp-b.enemy!.hp);
  // A pure heal at full health waits in hand unless it has been held a while.
  if(f.heal&&!f.dmg&&!f.status&&!c.curseCard&&missing===0&&(s.enemyHandAges?.[index]??0)<2&&(s.enemyIdleTurns??0)===0)return 0;
@@ -71,6 +73,7 @@ function step(s:GameState,b:Board,c:EnemyCardDef,index:number,attackHits:number,
   b.enemy!.block+=f.block;
  }
  if(c.curseCard)value+=2;
+ if(f.steal)value+=3*f.steal;
  // A minion is worth calling while the ghost's side has room for it.
  if(f.summon)value+=(s.enemyMinions?.length??0)<require('../balance/notfm').MINION_RULES.enemySlots?5:1;
  if(c.riposte&&!b.armed)value+=Math.min(4,(c.riposte.dmg??0)*.5);
