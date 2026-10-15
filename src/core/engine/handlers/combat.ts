@@ -193,6 +193,8 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     s.enemy.block = 0;
     if (s.fight) s.fight.ghostTurns += 1;
     require('../../campaign/nights').applyRage(s);
+    // Phase 2 first: a relic it breaks must not fire its rule on that same turn.
+    require('../../combat/ghostMechanics').checkGhostPhase(s,r);
     require('../../campaign/bossRules').applyBossRule(s);
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
@@ -200,7 +202,6 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     // The ghost's สวน waited one player turn; a boss low enough changes phase before drawing.
     const GM=require('../../combat/ghostMechanics');
     GM.clearGhostRipostes(s);
-    GM.checkGhostPhase(s,r);
 
     // Decide from the current public board and the real held cards once the turn starts.
     const handBeforeDraw=s.enemyPiles!.hand.length;

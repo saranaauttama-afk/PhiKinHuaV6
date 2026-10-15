@@ -1,5 +1,5 @@
 // src/core/engine/handlers/level.ts — level-up: pick one of the two rewards rolled for this level
-// (new card, upgrades, removal, equipment slot, retain). The full heal and the max HP increase
+// (new card, upgrades, removal, equipment slot, retain). The level-up heal (LEVEL_UP.healPct) and the max HP increase
 // already happened when the level was gained.
 import type { Command, GameState, LevelOption } from '../../types';
 import type { RNG } from '../../rng';

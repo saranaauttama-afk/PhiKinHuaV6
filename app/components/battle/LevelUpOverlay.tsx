@@ -59,7 +59,7 @@ export default function LevelUpOverlay({ state, playerLevel, onChoose, onSkip }:
       <RitualSurface kind="quietSlate" style={{ paddingVertical: 18, marginBottom: 10, alignItems: 'center', gap: 6 }}>
         <Text style={{ color: palette.moon, fontSize: 24, fontFamily: font.heading }}>เลเวล {playerLevel}</Text>
         <Text testID="levelup-heal" style={{ color: palette.text, fontSize: 13, fontFamily: font.ui, textAlign: 'center' }}>
-          ฟื้นพลังชีวิตเต็ม · ชีวิตสูงสุด +{LEVEL_UP.maxHp} ({state.player.hp}/{state.player.maxHp})
+          ฟื้นพลังชีวิต {LEVEL_UP.healPct}% · ชีวิตสูงสุด +{LEVEL_UP.maxHp} ({state.player.hp}/{state.player.maxHp})
         </Text>
       </RitualSurface>
 

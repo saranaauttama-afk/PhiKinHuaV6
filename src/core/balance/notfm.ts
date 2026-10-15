@@ -174,6 +174,12 @@ export const NIGHT_EXP = { normal: [12, 18, 24], elite: [20, 30, 40], boss: [30,
  */
 export const LEVEL_UP = {
   maxHp: 8, skipGold: 25, offers: 2, upgrades: 2,
+  /**
+   * Heal on level-up: the new max-HP points plus this % of max HP (was a full heal until
+   * 15 Oct 2026). Owner playtest: early cards plus a full heal every few fights made damage
+   * meaningless and class skills unnecessary.
+   */
+  healPct: 30,
   weights: { card: 3, upgrade: 3, remove: 2, slot: 1, retain: 0, ap:1, mana:2, draw:0 },
   /** Draw stops at 3: with 2–3 AP a turn, a 4th card a turn is rarely playable and removes choices. */
   caps: { slot: 3, retain: 4, ap:3, mana:10, draw:3 },

@@ -219,7 +219,7 @@ export const cardTypeInkColors={strike:'#8d3f2f',arcane:'#48596c',gear:'#826333'
 export const healthBarColors={track:'#282017',fillTop:'#b35b46',fillBottom:'#63251d'} as const;
 /** Occupation book pages (class select). */
 export const occupationBookColors={ink:'#191610',cream:'#efdbb1',red:'#983e2e',backdrop:'#21160f',disabled:'#8f887a',selected:'#e8cf94'} as const;
-/** นักมวย hand hints and ringside minions (MoveMark, MinionRow). */
 /** Night-1 ghost mechanics on the ghost's side (ชาร์จ glow on held card backs). */
 export const ghostColors={charge:'#e0763a',chargeGlow:'rgba(224,118,58,.6)',chargeText:'#fff4e6',chargePlate:'rgba(48,18,8,.9)'} as const;
+/** นักมวย hand hints and ringside minions (MoveMark, MinionRow). */
 export const fighterColors={hint:'#d9a441',idle:'#6b5a45',plate:'rgba(20,14,10,.82)',plateLine:'#7a6447',plateLow:'#b8463a',hpText:'#f2e6cf',hpLow:'#f0a090'} as const;

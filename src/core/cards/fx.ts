@@ -50,6 +50,7 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
     s.log.push(`ทำลายเกราะผี ${gone}`);
   }
   if (eff.dmg && s.enemy) {
+    const ghostHp = s.enemy.hp;
     const bonus = ctx.type === 'attack' ? require('./passives').attackBonus(s) + require('./fighter').fighterAttackBonus(s, ctx.move) : 0;
     const minions = require('../combat/minions');
     for (let h = 0; h < hitsOf(eff); h++) {
@@ -61,6 +62,8 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
       else dealDamage(s, { from: 'player', to: 'enemy', raw, source: { kind: 'card', cardId: ctx.sourceId } });
       if (eff.sweep) for (const m of [...(s.enemyMinions ?? [])]) minions.damageMinion(s, m, raw);
     }
+    // ดูดเลือด (a borrowed ghost card): heal by what got through the ghost's block.
+    if (eff.drain && s.enemy && ghostHp > s.enemy.hp) heal(s, 'player', ghostHp - s.enemy.hp);
   }
   if (eff.block) gainBlock(s, 'player', eff.block);
   if (eff.heal) heal(s, 'player', eff.heal);

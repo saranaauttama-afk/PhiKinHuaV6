@@ -98,7 +98,11 @@ export function describeCard(card: CardData, side: 'player' | 'enemy' = 'player'
   parts.push(...fxText(shown, side));
   if (card.after) parts.push(`ต่อจาก${require('./fighter').MOVE_NAMES[card.after.move]}: ${fxText(card.after.bonus, side).map(t => t.replace(/^โจมตี /, '+')).join(' · ')}`);
   const ghost = card as { charge?: Fx; perFoeStatus?: { statusId: string; dmg: number } };
-  if (ghost.perFoeStatus) parts.push(`+${ghost.perFoeStatus.dmg} ต่อชั้น${statusName(ghost.perFoeStatus.statusId)}ของ${side === 'player' ? 'ผี' : 'เรา'}`);
+  if (ghost.perFoeStatus) {
+    const p = ghost.perFoeStatus, who = side === 'player' ? 'ผี' : 'เรา';
+    const stacks = STATUS_EFFECTS_REGISTRY[p.statusId as keyof typeof STATUS_EFFECTS_REGISTRY]?.stackable;
+    parts.push(stacks ? `+${p.dmg} ต่อชั้น${statusName(p.statusId)}ของ${who}` : `ถ้า${who}ติด${statusName(p.statusId)} +${p.dmg}`);
+  }
   if (ghost.charge) {
     const max = require('../balance/notfm').GHOST_MECHANICS.chargeMaxTurns;
     parts.push(`ชาร์จ: ${fxText(ghost.charge, side).map(t => t.replace(/^(โจมตี|เกราะ|ฟื้น) /, '$1 +')).join(' · ')} ต่อเทิร์นที่ถือไว้ (สูงสุด ${max})`);

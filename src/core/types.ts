@@ -235,6 +235,8 @@ export type MinionState = {
   act?: Fx;
   /** Ghost minion: player attacks hit it before the ghost. */
   taunt?: boolean;
+  /** Ghost minion: extra ชาร์จ steps per ghost turn for the ghost's held charge cards (หัวในกระด้ง). */
+  chargeBoost?: number;
   /** Leaves after this many turns of its side (undefined = until it dies or the fight ends). */
   turnsLeft?: number;
 };

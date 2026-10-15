@@ -80,7 +80,9 @@ export function finishEnemyHand(s:GameState,played:number):void{
  }).filter(x=>x.age<MAX_ENEMY_CARD_WAIT||(x.charge&&x.age<=GHOST_MECHANICS.chargeMaxTurns+1)).sort((a,b)=>b.score-a.score||a.i-b.i);
  const keep=new Set(rank.slice(0,s.enemyMaxRetained).map(x=>x.i));
  const hand:string[]=[],ages:number[]=[];
- p.hand.forEach((id,i)=>{if(keep.has(i)){hand.push(id);ages.push((s.enemyHandAges?.[i]??0)+1);}else p.discard.push(id);});
+ // หัวในกระด้ง and other minions with chargeBoost make held charge cards grow faster.
+ const boost=(s.enemyMinions??[]).filter(m=>m.hp>0).reduce((n,m)=>n+(m.chargeBoost??0),0);
+ p.hand.forEach((id,i)=>{if(keep.has(i)){hand.push(id);ages.push((s.enemyHandAges?.[i]??0)+1+(held[i]?.charge?boost:0));}else p.discard.push(id);});
  p.hand=hand;s.enemyHandAges=ages;s.enemyIdleTurns=played?0:(s.enemyIdleTurns??0)+1;
  if(s.enemy)s.enemy.handCount=hand.length;
  syncHandCharges(s);

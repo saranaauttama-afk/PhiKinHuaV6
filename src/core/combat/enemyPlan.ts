@@ -37,7 +37,8 @@ export function payoffStatus(c:EnemyCardDef):string|undefined{
 /** The card puts this status on the player. */
 const sets=(c:EnemyCardDef,id:string)=>!!c.fx.status?.some(e=>e.to==='enemy'&&e.id===id);
 
-const stacks=(b:Board,who:'player'|'enemy',id:string)=>(who==='enemy'?b.enemy:b.player)?.statusEffects?.find(e=>e.id===id)?.stacks??0;
+// A status that does not stack (เปราะบาง, พันธนาการ) is stored without `stacks`: present = 1.
+const stacks=(b:Board,who:'player'|'enemy',id:string)=>{const e=(who==='enemy'?b.enemy:b.player)?.statusEffects?.find(x=>x.id===id);return e?e.stacks??1:0;};
 
 /** Score one card on a scratch board and apply its effect to that board. */
 function step(s:GameState,b:Board,c:EnemyCardDef,index:number,attackHits:number,unplayed:EnemyCardDef[]):number{
@@ -71,7 +72,7 @@ function step(s:GameState,b:Board,c:EnemyCardDef,index:number,attackHits:number,
  }
  if(c.curseCard)value+=2;
  // A minion is worth calling while the ghost's side has room for it.
- if(f.summon)value+=(s.enemyMinions?.length??0)<2?5:1;
+ if(f.summon)value+=(s.enemyMinions?.length??0)<require('../balance/notfm').MINION_RULES.enemySlots?5:1;
  if(c.riposte&&!b.armed)value+=Math.min(4,(c.riposte.dmg??0)*.5);
  for(const e of f.status??[]){
   const who=e.to==='self'?'enemy':'player',existing=stacks(b,who,e.id);

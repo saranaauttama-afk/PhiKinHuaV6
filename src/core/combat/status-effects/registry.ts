@@ -1,6 +1,7 @@
 // src/core/combat/status-effects/registry.ts — คลังข้อมูลสถานะผลทั้งหมด
 
 import type { StatusEffectType, StatusEffectDefinition } from './types';
+import { GHOST_MECHANICS } from '../../balance/notfm';
 
 /**
  * คลังข้อมูลสถานะผลทั้งหมดในเกม
@@ -26,7 +27,7 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     name: 'มึน',
     // One status, one word on both sides (owner, 15 Oct 2026): on a ghost it cancels the first
     // attack card; on the player it costs AP next turn (GHOST_MECHANICS.stunApLoss).
-    description: 'ผีมึน: การ์ดโจมตีใบแรกของเทิร์นถัดไปถูกยกเลิก · เรามึน: เทิร์นหน้าแต้ม −1',
+    description: `ผีมึน: การ์ดโจมตีใบแรกของเทิร์นถัดไปถูกยกเลิก · เรามึน: เทิร์นหน้าแต้ม −${GHOST_MECHANICS.stunApLoss}`,
     defaultDuration: 2,
     stackable: false,
     tags: ['debuff', 'restriction'],

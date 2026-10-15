@@ -20,6 +20,10 @@ import { ghostRule } from '../src/core/campaign/enemyRules';
 import { minionDef } from '../src/core/combat/minions';
 import { startPlayerTurn } from '../src/core/commands';
 import { applyStatusEffect } from '../src/core/statusEffectsRuntime';
+import { cardFromEnemy } from '../src/core/cards/borrow';
+import { summonMinion } from '../src/core/combat/minions';
+import { LEVEL_UP } from '../src/core/balance/notfm';
+import { grantExpAndQueueLevelUp } from '../src/core/engine/shared';
 
 const rng = makeRng('night1');
 const c = (id: string): CardData => ({ ...cardById(id)!, star: 1 });
@@ -91,7 +95,7 @@ describe('ข้อมูล', () => {
     expect(describeCard(enemyCardById(GAPE)!, 'enemy')).toContain('ชาร์จ: โจมตี +3 ต่อเทิร์นที่ถือไว้');
     expect(describeCard(enemyCardById(LEAF)!, 'enemy')).toContain('สวน: โจมตี 5');
     expect(describeCard(enemyCardById(GLOW)!, 'enemy')).toContain('เราติดมึน');
-    expect(describeCard(enemyCardById(NEEDLE)!, 'enemy')).toContain('+4 ต่อชั้นความเปราะบางของเรา');
+    expect(describeCard(enemyCardById(NEEDLE)!, 'enemy')).toContain('ถ้าเราติดความเปราะบาง +4');
     expect(describeCard(enemyCardById('phi_krasue_n1_drain')!, 'enemy')).toContain('ผีฟื้นเท่าที่ทะลุเกราะเรา');
   });
 });
@@ -303,5 +307,59 @@ describe('AI ผี', () => {
     const s = fight({ ghost: ['phi_phrai_v34_payoff', 'phi_phrai_v29_signature_support'] });
     expect(chooseEnemyCards(s, s.enemyPiles!.hand, 0)).toEqual([]);
     expect(chooseEnemyCards(s, s.enemyPiles!.hand, 1)).toEqual(['phi_phrai_v29_signature_support', 'phi_phrai_v34_payoff']);
+  });
+});
+
+describe('หลังเทสเล่นจริง + audit (15 ต.ค. 2026)', () => {
+  it('audit: AI เห็นเปราะบาง (สถานะไม่ซ้อนชั้น) จึงไม่กั๊กปากเท่ารูเข็มเมื่อเราเปราะบางอยู่แล้ว', () => {
+    const s = fight({ ghost: [NEEDLE, SLASH] });
+    applyStatusEffect('player', s, 'vulnerable', 2, 1);
+    s.player.block = 8; s.fight!.ripostes = [{ dmg: 6 }];
+    expect(chooseEnemyCards(s, s.enemyPiles!.hand, 2)).toEqual([NEEDLE]);
+  });
+
+  it('audit: คนทรงยืมดูดเลือดแล้วฟื้นจริง', () => {
+    const s = fight({ enemyHp: 50 });
+    s.player.hp = 30;
+    s.piles.hand = [{ ...cardFromEnemy(enemyCardById('phi_krasue_n1_drain')!, true), instanceId: 'b1' }];
+    play(s);
+    expect(s.player.hp).toBe(34);
+  });
+
+  it('ลิงโป่งตีเรา 2 · เงาป่าให้ผีเกราะ 3 ท้ายเทิร์นผี', () => {
+    const s = fight();
+    summonMinion(s, 'enemy', 'pong_monkey'); summonMinion(s, 'enemy', 'forest_shade');
+    const hp = s.player.hp;
+    const t = ghostTurn(s);
+    expect(hp - t.player.hp).toBe(2);
+    expect(t.enemy!.block).toBe(3);
+  });
+
+  it('หัวในกระด้งทำให้ไพ่ชาร์จของบอสชาร์จเร็วขึ้นเทิร์นละ 1', () => {
+    const s = fight({ ghost: ['night_head_collector_n1_snatch'], ages: [0] });
+    summonMinion(s, 'enemy', 'basket_head');
+    finishEnemyHand(s, 0);
+    expect(s.enemyHandAges).toEqual([2]);
+    s.enemyMinions = [];
+    finishEnemyHand(s, 0);
+    expect(s.enemyHandAges).toEqual([3]);
+  });
+
+  it('เลขชาร์จอยู่บนตัวผี ภาพระหว่างเทิร์นผีจึงยังเห็นเลข', () => {
+    const s = fight({ ghost: [GAPE, STRIKE], ages: [1, 0] });
+    const t = ghostTurn(s);
+    const frames = t.pendingEvents!.filter(e => e.frame?.enemy?.handCount);
+    expect(frames.length).toBeGreaterThan(0);
+    for (const e of frames) expect(e.frame!.enemy!.handCharges?.length).toBe(e.frame!.enemy!.handCount);
+  });
+
+  it('เลเวลอัปฟื้น 30% + เลือดสูงสุดที่เพิ่ม ไม่ฟื้นเต็ม', () => {
+    expect(LEVEL_UP.healPct).toBe(30);
+    const s = fight();
+    s.player.hp = 20; s.player.maxHp = 60; s.player.exp = s.player.expToNext - 1;
+    s.enemy!.hp = 0;
+    grantExpAndQueueLevelUp(s, rng);
+    expect(s.player.maxHp).toBe(68);
+    expect(s.player.hp).toBe(20 + 8 + Math.round(68 * 0.3));
   });
 });
