@@ -335,6 +335,8 @@ export type CombatEvent = (
       hpLoss: number;
       died: boolean;
       sourceKind: 'card' | 'status' | 'equipment' | 'event' | 'blessing';
+      /** What changed this hit (combat/damage.ts damageParts); the HUD shows it and shakes the badges. */
+      parts?: import('./combat/damage').DamagePart[];
     }
   | { t: 'EnemyHandChanged'; drawn: number }
   | { t: 'CardResolved'; entry: CardHistoryEntry }

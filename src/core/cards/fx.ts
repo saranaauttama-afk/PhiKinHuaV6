@@ -51,7 +51,16 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
   }
   if (eff.dmg && s.enemy) {
     const ghostHp = s.enemy.hp;
-    const bonus = ctx.type === 'attack' ? require('./passives').attackBonus(s) + require('./fighter').fighterAttackBonus(s, ctx.move) : 0;
+    const passiveBonus = ctx.type === 'attack' ? require('./passives').attackBonus(s) : 0;
+    const fighterBonus = ctx.type === 'attack' ? require('./fighter').fighterAttackBonus(s, ctx.move) : 0;
+    const bonus = passiveBonus + fighterBonus;
+    const rhythm = ctx.type === 'attack' ? require('./fighter').rhythmOf(s) * require('../balance/notfm').FIGHTER_RULES.dmgPerStack : 0;
+    const extra = (h: number) => [
+      ...(rhythm ? [{ id: 'rhythm', side: 'player' as const, label: `จังหวะ +${rhythm}` }] : []),
+      ...(fighterBonus - rhythm ? [{ id: 'equipment', side: 'player' as const, label: `ของขลัง +${fighterBonus - rhythm}` }] : []),
+      ...(passiveBonus ? [{ id: 'equipment', side: 'player' as const, label: `พร/ของขลัง +${passiveBonus}` }] : []),
+      ...(h === 0 && ctx.firstHitBonus ? [{ id: 'bruise', side: 'enemy' as const, label: `ท่าหนัก +${ctx.firstHitBonus}` }] : []),
+    ];
     const minions = require('../combat/minions');
     for (let h = 0; h < hitsOf(eff); h++) {
       if (!s.enemy || s.enemy.hp <= 0) break;
@@ -59,7 +68,7 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
       // A taunting ghost minion takes single-target hits first; a sweep hits everyone.
       const taunt = eff.sweep ? undefined : minions.tauntTarget(s);
       if (taunt) minions.damageMinion(s, taunt, raw);
-      else dealDamage(s, { from: 'player', to: 'enemy', raw, source: { kind: 'card', cardId: ctx.sourceId } });
+      else dealDamage(s, { from: 'player', to: 'enemy', raw, source: { kind: 'card', cardId: ctx.sourceId }, parts: extra(h) });
       if (eff.sweep) for (const m of [...(s.enemyMinions ?? [])]) minions.damageMinion(s, m, raw);
     }
     // ดูดเลือด (a borrowed ghost card): heal by what got through the ghost's block.

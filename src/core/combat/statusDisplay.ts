@@ -38,3 +38,36 @@ export function sortForDisplay(effects: StatusEffect[]): StatusEffect[] {
     return (a.name ?? a.id).localeCompare(b.name ?? b.id);
   });
 }
+
+/**
+ * What a status does right now, in numbers, from the side that carries it (owner playtest
+ * 15 Oct 2026: "statuses everywhere and I can't tell what I gain or lose"). One line of effect,
+ * one line of how long it lasts. Unknown ids fall back to the registry text.
+ */
+export function statusDetail(e: StatusEffect, side: 'player' | 'enemy'): string {
+  const n = e.stacks ?? 1, me = side === 'player' ? 'เรา' : 'ผี', foe = side === 'player' ? 'ผี' : 'เรา';
+  const G = require('../balance/notfm');
+  const what: Record<string, string> = {
+    strength: `ทุกหมัดของ${me} +${n}`,
+    weakness: `ดาเมจที่${me}ตีออกไป −25% (ปัดลง)`,
+    vulnerable: `${me}โดนตี ดาเมจ ×1.5`,
+    poison: `ท้ายเทิร์น${me}เสียเลือด ${n} (ทะลุเกราะ)`,
+    curse: `${me}โดนดาเมจทุกครั้ง +${n}`,
+    rage: `ทุกหมัดของผี +${n} และเพิ่มทุกเทิร์นที่ไฟต์ยืด`,
+    dance: `ทุกหมัดของผีเทิร์นนี้ +${n} หมดเมื่อจบเทิร์นผี`,
+    dodge: `หลบหมัดถัดไปได้ ${n} ครั้ง (ไม่หลบพิษ)`,
+    thorns: `โดนตีแต่ละครั้ง สะท้อนกลับใส่${foe} ${n}`,
+    regeneration: `ต้นเทิร์น${me}ฟื้น ${n}`,
+    bruise: `ท่าหนักของนักมวยกินช้ำทั้งหมด: +${n} × ${G.FIGHTER_RULES.heavyPerBruise} ดาเมจ`,
+    stun: side === 'enemy' ? 'การ์ดโจมตีใบแรกของผีเทิร์นหน้าถูกยกเลิก' : `เทิร์นหน้าแต้ม −${G.GHOST_MECHANICS.stunApLoss}`,
+    fear: 'ต้นเทิร์นแต้ม −1',
+    entangle: `${me}เล่นการ์ดโจมตีไม่ได้`,
+    corruption: `การ์ดของ${me}แพงขึ้น ${n} แต้ม/มานา`,
+    draw_reduction: `จั่วต้นเทิร์นน้อยลง ${n} ใบ`,
+    energy_boost: `ต้นเทิร์นได้แต้ม +${n}`,
+  };
+  const def = getStatusEffectDefinition(e.id as StatusEffectType);
+  const effect = what[e.id] ?? def?.description ?? e.description ?? '';
+  const last = e.duration >= 99 ? 'ตลอดไฟต์' : `เหลือ ${e.duration} เทิร์น`;
+  return `${effect}\n${last}`;
+}

@@ -100,7 +100,7 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   weakness: {
     id: 'weakness', 
     name: 'ความอ่อนแอ',
-    description: 'สร้างความเสียหายลดลง 50%',
+    description: 'ดาเมจที่ตีออกไปลดลง 25%',
     defaultDuration: 2,
     stackable: false,
     tags: ['debuff', 'damage_reduction'],

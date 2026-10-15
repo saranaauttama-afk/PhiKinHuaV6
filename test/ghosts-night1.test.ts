@@ -363,3 +363,28 @@ describe('หลังเทสเล่นจริง + audit (15 ต.ค. 202
     expect(s.player.hp).toBe(20 + 8 + Math.round(68 * 0.3));
   });
 });
+
+describe('อ่านเกมง่ายขึ้น (เทสเล่นจริง 15 ต.ค.)', () => {
+  it('ดาเมจบอกที่มา: จังหวะ แข็งแกร่ง เปราะบาง โกรธ', async () => {
+    const { statusDetail } = await import('../src/core/combat/statusDisplay');
+    const s = fight({ hand: [c('jab')] });
+    s.fight!.rhythm = 2; s.fight!.lastAttackMove = 'punch';
+    applyStatusEffect('player', s, 'strength', 2, 1);
+    applyStatusEffect('enemy', s, 'vulnerable', 2, 1);
+    play(s);
+    const hit = s.pendingEvents!.find(e => e.t === 'Damage' && e.target === 'enemy') as any;
+    expect(hit.parts.map((p: any) => p.label)).toEqual(['จังหวะ +2', 'แข็งแกร่ง +1', 'เปราะบาง ×1.5']);
+    expect(hit.parts.find((p: any) => p.id === 'vulnerable').side).toBe('enemy');
+    const w = s.enemy!.statusEffects!.find(e => e.id === 'vulnerable')!;
+    expect(statusDetail(w, 'enemy')).toContain('ผีโดนตี ดาเมจ ×1.5');
+  });
+
+  it('คำอธิบายอ่อนแอตรงกับโค้ดจริง (25% ไม่ใช่ 50%)', async () => {
+    const { statusDetail } = await import('../src/core/combat/statusDisplay');
+    const s = fight();
+    applyStatusEffect('player', s, 'weakness', 2, 1);
+    expect(statusDetail(s.player.statusEffects![0], 'player')).toContain('−25%');
+    applyStatusEffect('player', s, 'stun', 2, 1);
+    expect(statusDetail(s.player.statusEffects!.find(e => e.id === 'stun')!, 'player')).toContain('แต้ม −1');
+  });
+});

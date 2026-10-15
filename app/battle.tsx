@@ -109,8 +109,16 @@ export default function BattlePage() {
 
   const [hoveredCardId,  setHoveredCardId]  = React.useState<string | null>(null);
   const [playedCardIds,  setPlayedCardIds]  = React.useState<string[]>([]);
-  const [damagePopups,      setDamagePopups]      = React.useState<{ id: string; damage: number }[]>([]);
-  const [enemyDamagePopups, setEnemyDamagePopups] = React.useState<{ id: string; damage: number }[]>([]);
+  const [damagePopups,      setDamagePopups]      = React.useState<{ id: string; damage: number; parts?: string[] }[]>([]);
+  const [enemyDamagePopups, setEnemyDamagePopups] = React.useState<{ id: string; damage: number; parts?: string[] }[]>([]);
+  // Badges that just changed a hit give a small shake (owner playtest 15 Oct 2026), per side.
+  const [pulse, setPulse] = React.useState<{ player?: { ids: string[]; key: string }; enemy?: { ids: string[]; key: string } }>({});
+  const pulseFrom = React.useCallback((ev: CombatEvent) => {
+    if (ev.t !== 'Damage' || !ev.parts?.length) return;
+    const key = eventKey(ev);
+    const of = (side: 'player' | 'enemy') => { const ids = ev.parts!.filter(p => p.side === side).map(p => p.id); return ids.length ? { ids, key } : undefined; };
+    setPulse(prev => ({ player: of('player') ?? prev.player, enemy: of('enemy') ?? prev.enemy }));
+  }, []);
   const [statGainPopups, setStatGainPopups] = React.useState<{ id: string; statType: 'block' | 'energy'; side: 'player' | 'enemy'; amount: number }[]>([]);
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
   const [historyAtTurnStart,setHistoryAtTurnStart]=React.useState<CardHistoryEntry[]>([]);
@@ -222,7 +230,8 @@ export default function BattlePage() {
     for (const ev of after.pendingEvents ?? []) {
       if (ev.t === 'Damage' && ev.target === 'enemy' && ev.hpLoss > 0) {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง — เดิมโชว์ค่าบนการ์ดซึ่งไม่หัก block/buff
-        setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss }]);
+        setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss, parts: ev.parts?.map(p => p.label) }]);
+        pulseFrom(ev);
         const shakeTimer = setTimeout(() => monsterRef.current?.shake(), 250);
         cardFadeTimers.current.push(shakeTimer);
       } else if (ev.t === 'BlockGained' && ev.target === 'player') {
@@ -315,8 +324,9 @@ export default function BattlePage() {
         // เสียงกรงเล็บดังทุกครั้งที่ผีตีด้วยการ์ด แม้เกราะจะกันไว้หมดก็ตาม
         if (currentEvent.target === 'player' && currentEvent.sourceKind === 'card') playSfx('ghostAttack');
         else for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        pulseFrom(currentEvent);
         if (currentEvent.hpLoss <= 0) break;
-        const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss };
+        const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss, parts: currentEvent.parts?.map(p => p.label) };
         if (currentEvent.target === 'player') flashRef.current?.flash();
         else monsterRef.current?.shake();
         if (currentEvent.target === 'player') setDamagePopups(prev => [...prev, popup]);
@@ -364,7 +374,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').ghostMechanicBadges(gameState)]} handCharges={enemy?.handCharges} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
+        <MonsterArea pulse={pulse.enemy} relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').ghostMechanicBadges(gameState)]} handCharges={enemy?.handCharges} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
@@ -401,6 +411,7 @@ export default function BattlePage() {
             <DamagePopup
               key={popup.id}
               damage={popup.damage}
+              parts={popup.parts}
               onDone={() => setEnemyDamagePopups(prev => prev.filter(p => p.id !== popup.id))}
             />
           ))}
@@ -415,6 +426,7 @@ export default function BattlePage() {
             <DamagePopup
               key={popup.id}
               damage={popup.damage}
+              parts={popup.parts}
               onDone={() => setDamagePopups(prev => prev.filter(p => p.id !== popup.id))}
             />
           ))}
@@ -446,7 +458,7 @@ export default function BattlePage() {
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
-          statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges}/>:null}
+          statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges} pulse={pulse.player}/>:null}
           helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>dispatch({type:'UseSkill',id,index})}/>}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
