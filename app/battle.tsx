@@ -48,7 +48,7 @@ import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 import { useAppFonts } from './useAppFonts';
-import { palette, surface, tint, layer, font } from './theme';
+import { palette, surface, tint, layer, font, fighterColors } from './theme';
 
 import Settings from './components/Settings';
 import StartPage from './components/StartPage';
@@ -119,6 +119,8 @@ export default function BattlePage() {
     const of = (side: 'player' | 'enemy') => { const ids = ev.parts!.filter(p => p.side === side).map(p => p.id); return ids.length ? { ids, key } : undefined; };
     setPulse(prev => ({ player: of('player') ?? prev.player, enemy: of('enemy') ?? prev.enemy }));
   }, []);
+  // พักยก banner (owner playtest: say when a round ends and what it did).
+  const [roundBanner, setRoundBanner] = React.useState<{ key: string; text: string } | null>(null);
   const [statGainPopups, setStatGainPopups] = React.useState<{ id: string; statType: 'block' | 'energy'; side: 'player' | 'enemy'; amount: number }[]>([]);
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
   const [historyAtTurnStart,setHistoryAtTurnStart]=React.useState<CardHistoryEntry[]>([]);
@@ -313,8 +315,18 @@ export default function BattlePage() {
         break;
       }
 
+      case 'RoundEnd': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        const who = require('../src/core/cards/fighter').roundBeneficiaries(gameState).filter((x: string) => x.endsWith('(พักยก)'));
+        const key = `round-${currentEvent.round}-${gameState.turn}`;
+        setRoundBanner({ key, text: `พักยก · จบยก ${currentEvent.round}${who.length ? `\n${who.map((x: string) => x.replace(' (พักยก)', '')).join(', ')} ทำงาน` : ''}` });
+        const t = setTimeout(() => setRoundBanner(b => b?.key === key ? null : b), 1400);
+        cardFadeTimers.current.push(t);
+        break;
+      }
+
       case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase':
-      case 'HeavyHit': case 'Riposte': case 'RoundEnd': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
+      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;
       }
@@ -432,6 +444,11 @@ export default function BattlePage() {
           ))}
         </View>
 
+        {roundBanner && <View testID="round-banner" pointerEvents="none" style={{ position: 'absolute', top: battleLayout.hudTop - 70, left: 24, right: 24, alignItems: 'center', zIndex: layer.popup }}>
+          <RitualSurface kind="quietSlate" style={{ paddingHorizontal: 18, paddingVertical: 8 }}>
+            <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hint, textAlign: 'center' }}>{roundBanner.text}</Text>
+          </RitualSurface>
+        </View>}
         {statGainPopups.map(p => (
           <StatGainPopup
             key={p.id}

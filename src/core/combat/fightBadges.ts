@@ -24,8 +24,11 @@ export function fighterBadges(s:GameState){
  if(F.usesRhythm(s)){
   const r=F.rhythmOf(s);
   out.push({id:'fighter:rhythm',name:'จังหวะ',symbol:'rhythm',neutral:true,count:`${r}`,detail:`จังหวะ ${r}/${FIGHTER_RULES.rhythmMax} · การ์ดโจมตี +${r*FIGHTER_RULES.dmgPerStack} ดาเมจต่อครั้ง\nออกท่าไม่ซ้ำกับท่าก่อนหน้าได้ +${FIGHTER_RULES.perNewMove} · จบเทิร์นโดยไม่ได้ตี จังหวะหายหมด${s.fight?.rhythmLocked?'\nใจนักมวย: จังหวะไม่หายจนจบไฟต์':''}${s.fight?.lastAttackMove?`\nท่าล่าสุด: ${F.MOVE_NAMES[s.fight.lastAttackMove]}`:''}`});
-  const turn=s.turn??1,round=F.roundOf(turn),left=FIGHTER_RULES.roundTurns-((turn-1)%FIGHTER_RULES.roundTurns);
-  out.push({id:'fighter:round',name:`ยก ${round}`,symbol:'round',neutral:true,count:`${round}`,detail:`ยกละ ${FIGHTER_RULES.roundTurns} เทิร์น · ${left===1?'เทิร์นนี้เป็นเทิร์นสุดท้ายของยก พักยกหลังจบเทิร์น':`อีก ${left} เทิร์นถึงพักยก`}`});
+  const turn=s.turn??1,round=F.roundOf(turn),left=FIGHTER_RULES.roundTurns-((turn-1)%FIGHTER_RULES.roundTurns),last=left===1;
+  const who=F.roundBeneficiaries(s);
+  // ยก explained (owner playtest 15 Oct 2026): what it is, when it pays off, and for which cards here.
+  const why=who.length?`ได้ประโยชน์ในไฟต์นี้: ${who.join(', ')}`:'เด็คตอนนี้ยังไม่มีการ์ดที่ใช้ยก (การ์ดที่มีรูประฆังได้โบนัสในเทิร์นสุดท้ายของยก)';
+  out.push({id:'fighter:round',name:last?`ยก ${round} · เทิร์นสุดท้าย`:`ยก ${round}`,symbol:'round',neutral:!last,count:last?'!':`${left}`,detail:`ยกละ ${FIGHTER_RULES.roundTurns} เทิร์น · ${last?'เทิร์นนี้เป็นเทิร์นสุดท้ายของยก: การ์ดรูประฆังได้โบนัสตอนนี้ แล้วพักยกหลังจบเทิร์น':`อีก ${left} เทิร์นถึงเทิร์นสุดท้ายของยก`}\n${why}`});
  }
  for(const [i,fx] of (s.fight?.ripostes??[]).entries())out.push({id:`fighter:riposte:${i}`,name:'สวน',symbol:'riposte',neutral:true,detail:`ถ้าการ์ดโจมตีใบถัดไปของผีทำให้เราไม่เสียเลือด: ${fxText(fx).join(' · ')}`});
  if(s.turnFlags?.doubleNext)out.push({id:'fighter:double',name:'คาดเชือกใหม่',symbol:'check',neutral:true,detail:'การ์ดโจมตีใบถัดไปเทิร์นนี้ทำงาน 2 ครั้ง'});

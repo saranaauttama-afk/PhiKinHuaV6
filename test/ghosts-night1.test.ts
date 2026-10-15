@@ -388,3 +388,16 @@ describe('อ่านเกมง่ายขึ้น (เทสเล่น�
     expect(statusDetail(s.player.statusEffects!.find(e => e.id === 'stun')!, 'player')).toContain('แต้ม −1');
   });
 });
+
+describe('ยกอธิบายตัวเอง (เจ้าของเลือกคงยก 15 ต.ค.)', () => {
+  it('การ์ดที่ใช้ยกได้ระฆัง และสว่างในเทิร์นสุดท้ายของยก', async () => {
+    const F = await import('../src/core/cards/fighter');
+    const s = fight({ hand: [c('straight_punch'), c('jab')] });
+    expect(F.roundCard(c('straight_punch'))).toBe(true);
+    expect(F.roundCard(c('jab'))).toBe(false);
+    s.turn = 2; expect(F.moveHint(s, c('straight_punch')).round).toBe(false);
+    s.turn = 3; expect(F.moveHint(s, c('straight_punch')).round).toBe(true);
+    expect(F.moveHint(s, c('jab')).round).toBeUndefined();
+    expect(F.roundBeneficiaries(s)).toContain('หมัดตรง');
+  });
+});

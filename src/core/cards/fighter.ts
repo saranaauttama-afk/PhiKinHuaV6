@@ -209,9 +209,32 @@ export function liftInnate(s: GameState): void {
  * Hand hint for one card, read by the card face (MoveMark): `rhythm` — playing it now is a new
  * move and gains จังหวะ; `after` — its ต่อจาก bonus is live right now. Pure; spends nothing.
  */
-export function moveHint(s: Partial<GameState>, card: CardData): { rhythm: boolean; after: boolean } {
+export function moveHint(s: Partial<GameState>, card: CardData): { rhythm: boolean; after: boolean; round?: boolean } {
   const last = s.fight?.lastAttackMove;
   const rhythm = !!(card.move && usesRhythm(s) && last && last !== card.move && rhythmOf(s) < FIGHTER_RULES.rhythmMax);
   const after = !!(card.after && s.turnFlags?.lastMove === card.after.move);
-  return { rhythm, after };
+  // ยก: the card's bonus is live on the last turn of a round (owner playtest: say when ยก matters).
+  const round = roundCard(card) ? isRoundLastTurn(s) : undefined;
+  return { rhythm, after, ...(round != null ? { round } : {}) };
+}
+
+/** The card has a bonus on the last turn of a ยก (เทิร์นสุดท้ายของยก). */
+export function roundCard(card: Partial<CardData>): boolean {
+  const uses = (c?: { kind: string }) => c?.kind === 'round_last_turn';
+  return uses(card.conditional?.when) || uses(card.repeatIf as { kind: string } | undefined);
+}
+
+/**
+ * What ยก does for this player right now (round badge text): which cards in the deck and which
+ * ศิษย์ค่าย get something on the last turn of a round / at พักยก. Owner playtest 15 Oct 2026:
+ * "ยก — I don't know what it is for".
+ */
+export function roundBeneficiaries(s: GameState): string[] {
+  const deck = [...(s.piles?.draw ?? []), ...(s.piles?.hand ?? []), ...(s.piles?.discard ?? [])];
+  const names = [...new Set(deck.filter(roundCard).map(c => c.name))];
+  const minions = (s.minions ?? []).filter(m => m.hp > 0 && m.passive.triggers.some(t => t.on === 'roundEnd')).map(m => `${m.name} (พักยก)`);
+  const passives = (require('./passives').passiveSources(s) as Array<{ name?: string; passive: Passive }>)
+    .filter(x => x.passive.triggers?.some(t => t.on === 'roundEnd') && !(s.minions ?? []).some(m => m.passive === x.passive))
+    .map(x => `${x.name ?? 'พร'} (พักยก)`);
+  return [...names, ...minions, ...passives];
 }

@@ -40,7 +40,7 @@ interface CardProps {
   /** ค่าร่ายจริง ณ ตอนนี้ — การ์ดบางใบถูกลงตามจำนวนใบที่เล่นไปแล้วในเทิร์น */
   costNow?: { ap: number; mana: number };
   /** นักมวย: whether playing it now gains จังหวะ / triggers ต่อจาก (fighter.ts moveHint). */
-  moveHint?: { rhythm: boolean; after: boolean };
+  moveHint?: { rhythm: boolean; after: boolean; round?: boolean };
 }
 
 export default function Card({
