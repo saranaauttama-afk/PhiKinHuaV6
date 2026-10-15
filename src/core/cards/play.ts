@@ -55,7 +55,14 @@ export function playCard(s: GameState, index: number, rng: RNG, wait = 1): { rng
     }
     default: {
       (card.exhaust || card.borrowed ? s.piles.exhaust : s.piles.discard).push(card);
-      if (card.type === 'attack') { rng = playAttack(s, card, rng); break; }
+      if (card.type === 'attack') {
+        const GM = require('../combat/ghostMechanics');
+        const ghostSide = GM.ghostSideHp(s);
+        rng = playAttack(s, card, rng);
+        // สวนของผี: the ghost answers an attack card that did not hurt its side.
+        GM.resolveGhostRipostes(s, ghostSide);
+        break;
+      }
       const fx = cardFx(s, card);
       // ปลุกเสก: the next spell's effect is multiplied.
       let mult = 1;

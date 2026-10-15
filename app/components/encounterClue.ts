@@ -2,7 +2,11 @@ import type {PageOffer} from '../../src/core/map/pages';
 import {ENEMY_ARCHETYPES} from '../../src/core/campaign/enemyDecks';
 
 /** Public persistent traits, never a forecast of the enemy's next card. */
-const traits:Record<string,string>={hunger:'กัดกินพลังชีวิต\nฟื้นเลือดเมื่อโจมตี',poison:'ปล่อยพิษสะสม\nหลบการโจมตี',counter:'ตั้งรับแล้วสวนกลับ\nลดแรงโจมตี',fear:'ทำให้หวาดกลัว\nบั่นทอนพลัง',drain:'ดูดพลังชีวิต\nฟื้นกำลัง',curse:'แทรกคำสาป\nขัดจังหวะสำรับ',rush:'จู่โจมต่อเนื่อง\nเร่งพลังโจมตี',rage:'สะสมความแข็งแกร่ง\nโจมตีรุนแรง',guard:'ตั้งรับแน่นหนา\nรอจังหวะโจมตี'};
+const traits:Record<string,string>={hunger:'กัดกินพลังชีวิต\nฟื้นเลือดเมื่อโจมตี',poison:'ปล่อยพิษสะสม\nหลบการโจมตี',counter:'ตั้งรับแล้วสวนกลับ\nลดแรงโจมตี',fear:'ทำให้หวาดกลัว\nบั่นทอนพลัง',drain:'ดูดพลังชีวิต\nฟื้นกำลัง',curse:'แทรกคำสาป\nขัดจังหวะสำรับ',rush:'จู่โจมต่อเนื่อง\nเร่งพลังโจมตี',rage:'สะสมความแข็งแกร่ง\nโจมตีรุนแรง',guard:'ตั้งรับแน่นหนา\nรอจังหวะโจมตี',
+ // Night-1 ghosts (15 Oct 2026, docs/ghosts/NIGHT1-DESIGN.md): each page names the ghost's one mechanic.
+ evade:'ลอยหลบหมัด\nดูดเลือดเมื่อตีเข้า',charge:'เก็บไพ่ไว้ชาร์จ\nยิ่งรอยิ่งหนัก',dance:'ร่ายรำต่อท่า\nยิ่งรำยิ่งแรง',
+ minion:'เรียกลูกสมุน\nรับหมัดแทน',daze:'แสงทำให้มึน\nแต้มเทิร์นหน้าลด',wound:'กรีดให้เปราะ\nแล้วซ้ำแผล',
+ minionDaze:'เงาป่ารับหมัดแทน\nลมป่าทำให้มึน',headTaker:'หัวในกระด้งรับหมัดแทน\nชาร์จฉวยหัว ตั้งกระด้งสวน'};
 export function encounterClue(o:PageOffer):string{
  if(o.kind==='monster'||o.kind==='boss')return traits[ENEMY_ARCHETYPES[o.enemyId]]??'วิญญาณขวางทาง\nเตรียมพร้อมต่อสู้';
  switch(o.kind){

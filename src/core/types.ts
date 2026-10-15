@@ -78,6 +78,8 @@ export type Fx = {
   sweep?: boolean;
   /** Remove one debuff (the newest). */
   cleanseOne?: boolean;
+  /** Ghost: heal by the HP the player actually lost to this effect (ดูดเลือด). */
+  drain?: boolean;
 };
 export type CounterSpec = { trigger: import('./combat/traps').TrapTrigger; negate?: boolean; turns?: number };
 
@@ -210,6 +212,12 @@ export type FightState = {
   ripostes?: Fx[];
   /** Ghost turn number the guard minion already took a card on. */
   guardTurn?: number;
+  /** The ghost's สวน, waiting for the player's next attack card (cleared at the ghost's turn). */
+  enemyRipostes?: Fx[];
+  /** Player turn on which the player last made the ghost lose HP (ผีตายโหง แค้นฝังใจ). */
+  enemyHurtTurn?: number;
+  /** The boss has crossed into its second phase (ghost_rules.json `phase2`). */
+  ghostPhase2?: boolean;
 };
 
 /** A minion in play (ศิษย์ค่ายของเรา / ลูกสมุนของผี). */
@@ -311,7 +319,7 @@ export type CombatFrame = {
 
 export type CombatEvent = (
   /** ศัตรูเปิดการ์ดใบหนึ่ง — view ใช้จังหวะนี้พลิกการ์ด */
-  | { t: 'EnemyCardRevealed'; ownerId?:string; handIndex?:number; cardId: string; name: string; dmg: number; block: number; cost?: number; hits?: number; desc?: string }
+  | { t: 'EnemyCardRevealed'; ownerId?:string; handIndex?:number; cardId: string; name: string; dmg: number; block: number; cost?: number; hits?: number; desc?: string; charge?: number }
   | {
       t: 'Damage';
       target: CombatEventTarget;
@@ -341,6 +349,14 @@ export type CombatEvent = (
   | { t: 'RoundEnd'; round: number }
   | { t: 'MinionSummoned'; side: CombatEventTarget; uid: string; id: string }
   | { t: 'MinionDamaged'; side: CombatEventTarget; uid: string; amount: number }
+  /** The ghost armed สวน (waits for the player's next attack card). */
+  | { t: 'GhostGuard' }
+  /** The ghost's สวน fired after the player's attack card did not hurt it. */
+  | { t: 'GhostRiposte' }
+  /** มึน on the player cost AP at the start of the turn. */
+  | { t: 'PlayerStunned'; apLost: number }
+  /** A ghost crossed into its second phase. */
+  | { t: 'GhostPhase'; text: string }
 ) & { frame?: CombatFrame };
 
 /**

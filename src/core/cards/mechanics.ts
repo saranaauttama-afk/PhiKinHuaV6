@@ -26,7 +26,13 @@ export type CardCondition =
   /** เทิร์นสุดท้ายของยก (ก่อนพักยก) */
   | { kind: 'round_last_turn' }
   /** เทิร์นนี้ออกท่านี้ไปแล้ว */
-  | { kind: 'played_move'; move: import('../types').Move };
+  | { kind: 'played_move'; move: import('../types').Move }
+  /** อีกฝ่ายเลือดเหลือไม่ถึง value% (ผีปอบหิว: เราเลือดต่ำกว่าครึ่ง) */
+  | { kind: 'foe_hp_below'; value: number }
+  /** อีกฝ่ายมีเกราะอย่างน้อย value (นางตานีโอบรัด) */
+  | { kind: 'foe_block_at_least'; value: number }
+  /** ผี: เทิร์นที่แล้วเราทำให้มันเสียเลือด (ผีตายโหง แค้นฝังใจ) */
+  | { kind: 'hurt_last_turn' };
 
 /** Added on top of the card's numbers while the condition holds. */
 export type CardConditional = { when: CardCondition; bonus: Fx };
@@ -67,6 +73,14 @@ export function conditionMet(s: GameState, cond: CardCondition, self?: CardData,
       return require('./fighter').isRoundLastTurn(s);
     case 'played_move':
       return side === 'player' && !!s.turnFlags?.moves?.includes(cond.move);
+    case 'foe_hp_below': {
+      const foe = side === 'player' ? s.enemy : s.player;
+      return !!foe && foe.hp * 100 < foe.maxHp * cond.value;
+    }
+    case 'foe_block_at_least':
+      return ((side === 'player' ? s.enemy : s.player)?.block ?? 0) >= cond.value;
+    case 'hurt_last_turn':
+      return side === 'enemy' && s.fight?.enemyHurtTurn != null && s.fight.enemyHurtTurn === (s.turn ?? 1);
   }
 }
 
@@ -139,5 +153,8 @@ export function conditionText(c: CardCondition, side: 'player' | 'enemy' = 'play
     case 'moves_this_turn_at_least': return `ถ้าเทิร์นนี้ออกท่าต่างกันครบ ${c.value} ท่า`;
     case 'round_last_turn': return 'ถ้าเป็นเทิร์นสุดท้ายของยก';
     case 'played_move': return `ถ้าเทิร์นนี้ออก${require('./fighter').MOVE_NAMES[c.move]}แล้ว`;
+    case 'foe_hp_below': return `ถ้า${them}เลือดเหลือไม่ถึง ${c.value}%`;
+    case 'foe_block_at_least': return c.value <= 1 ? `ถ้า${them}มีเกราะ` : `ถ้า${them}มีเกราะตั้งแต่ ${c.value}`;
+    case 'hurt_last_turn': return side === 'enemy' ? 'ถ้าเทิร์นที่แล้วเราตีผีเข้าเนื้อ' : 'ถ้าเทิร์นที่แล้วผีตีเราเข้าเนื้อ';
   }
 }

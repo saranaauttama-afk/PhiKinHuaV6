@@ -180,6 +180,8 @@ export function dealDamage(
   });
   if (died) emit(state, { t: 'Died', who: to });
 
+  // ผีตายโหง แค้นฝังใจ reads the player turn the ghost last lost HP on.
+  if (from === 'player' && to === 'enemy' && hpLoss > 0 && sourceKind !== 'status' && state.fight) state.fight.enemyHurtTurn = state.turn ?? 1;
   // A player hit that lands chips the boss's relic.
   if (from === 'player' && to === 'enemy' && isAttack && modified > 0) require('../campaign/bossRules').chipBossRelic(state);
   // ใจเพชร reads the HP lost this fight.

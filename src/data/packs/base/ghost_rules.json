@@ -42,7 +42,7 @@
   }
  },
  "phi-nang-ram": {
-  "name": "รำเบิกโรง",
+  "name": "ท่ารำสะกด",
   "flavor": "ท่ารำสะกดให้มือไม้อ่อน",
   "fx": {
    "status": [
@@ -56,14 +56,14 @@
   }
  },
  "phi-pong-kang": {
-  "name": "ดินโป่งพอกตัว",
-  "flavor": "ดินเค็มเกาะเป็นเกราะหนา",
+  "name": "ลิงโป่งเฝ้าดิน",
+  "flavor": "ลิงผีเฝ้าดินโป่งให้นายของมัน",
   "fx": {
-   "block": 6
+   "summon": "pong_monkey"
   }
  },
  "ngu-phi-sang": {
-  "name": "ไฟผีโพง",
+  "name": "กลิ่นคาวผีโพง",
   "flavor": "ไอคาวลอยมาก่อนตัว",
   "fx": {
    "status": [
@@ -133,7 +133,7 @@
   }
  },
  "phi-pa": {
-  "name": "ป่าทึบ",
+  "name": "ป่ารก",
   "flavor": "กิ่งไม้พันกันบังตัวไว้",
   "fx": {
    "block": 8
@@ -333,17 +333,25 @@
   }
  },
  "night-head-collector": {
-  "name": "สะกดในความมืด",
-  "flavor": "มือที่ยื่นมาในความมืดทำให้แรงหาย",
+  "name": "หัวในกระด้ง",
+  "flavor": "หัวคนที่มันฉวยมาลอยรับหมัดแทน",
   "fx": {
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
+   "summon": "basket_head"
+  },
+  "phase2": {
+   "belowPct": 50,
+   "deck": [
+    "night_head_collector_n1_guard",
+    "night_head_collector_n1_guard",
+    "night_head_collector_n1_swoop",
+    "night_head_collector_n1_swoop",
+    "night_head_collector_n1_snatch",
+    "night_head_collector_v29_strike",
+    "night_head_collector_v29_double",
+    "night_head_collector_v29_pressure"
+   ],
+   "breakRelic": true,
+   "text": "ตะเกียงหนองแตก กระหังตั้งกระด้งรับแล้วโฉบสวน"
   }
  },
  "night-bell-keeper": {

@@ -30,6 +30,10 @@ const DURATION: Record<CombatEvent['t'], number> = {
   RoundEnd: 600,
   MinionSummoned: 250,
   MinionDamaged: 200,
+  GhostGuard: 250,
+  GhostRiposte: 350,
+  PlayerStunned: 450,
+  GhostPhase: 900,
 };
 
 export type TimelineState = {

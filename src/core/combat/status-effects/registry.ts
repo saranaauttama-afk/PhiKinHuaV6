@@ -24,7 +24,9 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   stun: {
     id: 'stun',
     name: 'มึน',
-    description: 'การ์ดโจมตีใบแรกของเทิร์นถัดไปถูกยกเลิก',
+    // One status, one word on both sides (owner, 15 Oct 2026): on a ghost it cancels the first
+    // attack card; on the player it costs AP next turn (GHOST_MECHANICS.stunApLoss).
+    description: 'ผีมึน: การ์ดโจมตีใบแรกของเทิร์นถัดไปถูกยกเลิก · เรามึน: เทิร์นหน้าแต้ม −1',
     defaultDuration: 2,
     stackable: false,
     tags: ['debuff', 'restriction'],
@@ -182,6 +184,8 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   },
 
   thorns:{id:'thorns',name:'หนามสะท้อน',description:'เมื่อรับการโจมตี สะท้อนความเสียหายตามจำนวนชั้น',defaultDuration:2,stackable:true,maxStacks:6,tags:['buff','protection']},
+  // ผีตายโหงนางรำ (15 Oct 2026): the ghost-side mirror of the นักมวย's จังหวะ, lasts one ghost turn.
+  dance:{id:'dance',name:'จังหวะรำ',description:'ทุกหมัดของผีเทิร์นนี้แรงขึ้นตามจำนวนชั้น หมดเมื่อจบเทิร์นผี',defaultDuration:1,stackable:true,maxStacks:6,tags:['buff','damage_boost']},
   dodge:{id:'dodge',name:'หลบครั้งถัดไป',description:'หลบการโจมตีถัดไปหนึ่งครั้ง ไม่หลบพิษหรือความเสียหายจากสถานะ',defaultDuration:1,stackable:true,maxStacks:2,tags:['buff','protection']},
   energy_boost: {
     id: 'energy_boost',

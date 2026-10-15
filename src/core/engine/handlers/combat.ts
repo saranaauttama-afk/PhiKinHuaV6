@@ -197,6 +197,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
     if(s.phase!=='combat')return {state:s,rng:r};
+    // The ghost's สวน waited one player turn; a boss low enough changes phase before drawing.
+    const GM=require('../../combat/ghostMechanics');
+    GM.clearGhostRipostes(s);
+    GM.checkGhostPhase(s,r);
 
     // Decide from the current public board and the real held cards once the turn starts.
     const handBeforeDraw=s.enemyPiles!.hand.length;
@@ -220,9 +224,11 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       const def=enemyCardById(cardId);
       if(!def)continue;
       const historyBefore=historySnapshot(s),eventStart=s.pendingEvents?.length??0;
+      // ชาร์จ is read from the card's place in hand before it leaves the hand.
+      const charge=index>=0?GM.heldCharge(s,index):0;
       if(index<0||!consumeEnemyCard(s,index))continue;
       if(original!=null)consumed.push(original);
-      const shown=enemyCardFx(s,def);
+      const shown=enemyCardFx(s,def,charge);
       mimicGhostCard(s,def);
       s.enemyLastPlayed.push(cardId);
       emit(s, {
@@ -236,6 +242,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         desc: describeCard({ ...def, conditional: undefined, fx: { ...shown, dmg: undefined, hits: undefined, block: undefined } }, 'enemy') || undefined,
         block: shown.block ?? 0,
         cost: enemyCardCost(def),
+        ...(charge?{charge}:{}),
       });
 
       // มึน: the ghost's first attack card this turn is lost.
@@ -258,10 +265,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       }
 
       const hpBefore=s.player.hp;
-      require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
+      require('../../combat/enemyCardEffects').resolveEnemyCard(s, def, charge);
       recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart,undefined,{ap:enemyCardCost(def),mana:0});
       // สวน: armed ripostes answer the ghost's next attack card.
-      if(def.type==='attack'&&s.phase==='combat')r=require('../../cards/fighter').resolveRipostes(s,hpBefore,!!enemyCardFx(s,def).dmg,r);
+      if(def.type==='attack'&&s.phase==='combat')r=require('../../cards/fighter').resolveRipostes(s,hpBefore,!!shown.dmg,r);
 
       r = settleCombat(s, r);
     }

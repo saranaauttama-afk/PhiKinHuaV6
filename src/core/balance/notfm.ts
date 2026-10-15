@@ -83,6 +83,18 @@ export const ENEMY_RULES: Record<EnemyKind, { handSize: number; drawPerTurn: num
   boss: { handSize: 5, drawPerTurn: 2, maxRetained: 3, ap: 3 },
 };
 
+/**
+ * Night-1 ghost mechanics (15 Oct 2026, docs/ghosts/NIGHT1-DESIGN.md — owner agreed).
+ * ชาร์จ: a card with `charge` grows by that effect for every ghost turn it waits in the ghost's
+ * hand, up to `chargeMaxTurns`; the player sees the count on the card back (owner's choice 2).
+ * A held charge card is never thrown away for age while it is still growing.
+ * มึน on the player: the next player turn starts with `stunApLoss` fewer AP (owner's choice 3).
+ */
+export const GHOST_MECHANICS = {
+  chargeMaxTurns: 3,
+  stunApLoss: 1,
+} as const;
+
 /** Ghost HP before night and difficulty scaling. Normal ghosts add `perTier` per tier (T1–T5). */
 export const ENEMY_HP = {
   normal: 28, perTier: 2, elite: 42, boss: 72, ultimateBoss: 105,

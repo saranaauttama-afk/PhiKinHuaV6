@@ -33,6 +33,7 @@ export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
   if (fx.keepRhythm) out.push('จังหวะไม่หายเทิร์นนี้');
   if (fx.lockRhythm) out.push('จังหวะไม่หายจนจบไฟต์');
   if (fx.doubleNext) out.push('การ์ดโจมตีใบถัดไปเทิร์นนี้ทำงาน 2 ครั้ง');
+  if (fx.drain) out.push(`${self}ฟื้นเท่าที่ทะลุเกราะ${other}`);
   if (fx.summon) {
     const m = require('../combat/minions');
     out.push(side === 'player' ? `เรียก${m.minionDef(fx.summon)?.name ?? fx.summon} (${m.minionText(fx.summon)})` : `เรียก${m.minionDef(fx.summon)?.name ?? fx.summon}`);
@@ -96,6 +97,12 @@ export function describeCard(card: CardData, side: 'player' | 'enemy' = 'player'
   const shown = card.spendRhythm?.mode === 'hits' ? { ...fx, dmg: undefined } : fx;
   parts.push(...fxText(shown, side));
   if (card.after) parts.push(`ต่อจาก${require('./fighter').MOVE_NAMES[card.after.move]}: ${fxText(card.after.bonus, side).map(t => t.replace(/^โจมตี /, '+')).join(' · ')}`);
+  const ghost = card as { charge?: Fx; perFoeStatus?: { statusId: string; dmg: number } };
+  if (ghost.perFoeStatus) parts.push(`+${ghost.perFoeStatus.dmg} ต่อชั้น${statusName(ghost.perFoeStatus.statusId)}ของ${side === 'player' ? 'ผี' : 'เรา'}`);
+  if (ghost.charge) {
+    const max = require('../balance/notfm').GHOST_MECHANICS.chargeMaxTurns;
+    parts.push(`ชาร์จ: ${fxText(ghost.charge, side).map(t => t.replace(/^(โจมตี|เกราะ|ฟื้น) /, '$1 +')).join(' · ')} ต่อเทิร์นที่ถือไว้ (สูงสุด ${max})`);
+  }
   if (card.riposte) parts.push(`สวน: ${fxText(card.riposte, side).join(' · ')}`);
   if (card.repeatIf) parts.push(`${conditionText(card.repeatIf, side)}: ทำซ้ำอีกครั้ง`);
   if (card.conditional) parts.push(`${conditionText(card.conditional.when, side)} +${fxText(card.conditional.bonus, side).join(' · ')}`);

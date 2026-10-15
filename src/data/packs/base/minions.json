@@ -34,5 +34,30 @@
     "id": "old_master", "name": "ครูมวยเฒ่า", "side": "player", "hp": 12,
     "passive": { "echoFirstAttack": 0.5, "triggers": [] },
     "desc": "การ์ดโจมตีใบแรกของเราแต่ละเทิร์น ทำซ้ำอีกครั้งที่แรงครึ่งหนึ่ง"
+  },
+  {
+    "id": "pong_monkey", "name": "ลิงโป่ง", "side": "enemy", "hp": 8,
+    "taunt": true,
+    "desc": "รับหมัดเดี่ยวแทนผี · เตะกวาดโดนทุกตัว"
+  },
+  {
+    "id": "ash_bones", "name": "เถ้ากระดูก", "side": "enemy", "hp": 5,
+    "act": {"dmg": 3},
+    "desc": "ท้ายเทิร์นผี ตีเรา 3"
+  },
+  {
+    "id": "ash_crawler", "name": "เถ้ากระดูกคลาน", "side": "enemy", "hp": 5,
+    "act": {"status": [{"id": "poison", "stacks": 1, "turns": 2, "to": "enemy"}]},
+    "desc": "ท้ายเทิร์นผี เราติดพิษ 1"
+  },
+  {
+    "id": "forest_shade", "name": "เงาป่า", "side": "enemy", "hp": 8,
+    "taunt": true,
+    "desc": "รับหมัดเดี่ยวแทนผี · เตะกวาดโดนทุกตัว"
+  },
+  {
+    "id": "basket_head", "name": "หัวในกระด้ง", "side": "enemy", "hp": 10,
+    "taunt": true,
+    "desc": "รับหมัดเดี่ยวแทนกระหัง · เตะกวาดโดนทุกตัว"
   }
 ]

@@ -470,6 +470,8 @@ export function modifyDamageForStatusEffects(state: GameState, baseDamage: numbe
     }
     // Rage: the longer the fight, the harder each hit.
     modifiedDamage += getStatusEffectStacks('enemy', state, 'rage');
+    // จังหวะรำ (ผีนางรำ): +1 per stack this ghost turn.
+    modifiedDamage += getStatusEffectStacks('enemy', state, 'dance');
     
     if (hasStatusEffect('enemy', state, 'weakness')) {
       const stacks = getStatusEffectStacks('enemy', state, 'weakness');
