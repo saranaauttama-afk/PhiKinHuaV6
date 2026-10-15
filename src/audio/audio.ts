@@ -74,6 +74,19 @@ export function initAudio() {
   void useAudioSettings.getState().hydrate();
 }
 
+/** On web, play() before the first tap is refused by the browser; that is expected, not an error. */
+function quiet(r: unknown) {
+  (r as Promise<unknown> | undefined)?.catch?.(() => {});
+}
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  // expo-audio's web player does not hand back the play() promise, so its autoplay refusal
+  // ("user didn't interact with the document first") would surface as an uncaught rejection.
+  window.addEventListener('unhandledrejection', e => {
+    const r = (e as PromiseRejectionEvent).reason;
+    if (r?.name === 'NotAllowedError' || /user didn't interact/.test(String(r?.message ?? r))) e.preventDefault();
+  });
+}
+
 /** เล่นเสียงเอฟเฟกต์ — ถ้ามีหลายไฟล์จะสุ่ม และไม่เล่นไฟล์เดิมซ้ำติดกัน */
 export function playSfx(id: SfxId) {
   if (!useAudioSettings.getState().sfxOn || !foreground) return;
@@ -85,7 +98,7 @@ export function playSfx(id: SfxId) {
   try {
     const p = players[i];
     void p.seekTo(0);
-    p.play();
+    quiet(p.play());
   } catch {}
 }
 
@@ -106,7 +119,7 @@ function syncBeds() {
   for (const [id, p] of bedPlayers) {
     const should = musicOn && foreground && wantedBeds.has(id);
     try {
-      if (should && !p.playing) p.play();
+      if (should && !p.playing) quiet(p.play());
       else if (!should && p.playing) p.pause();
     } catch {}
   }
