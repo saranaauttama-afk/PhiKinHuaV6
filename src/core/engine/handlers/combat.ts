@@ -219,7 +219,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       if (s.phase !== 'combat') break;
 
       const original=indexes[playIndex];
-      const index=original==null?s.enemyPiles!.hand.indexOf(plannedId):original-consumed.filter(i=>i<original).length;
+      let index=original==null?s.enemyPiles!.hand.indexOf(plannedId):original-consumed.filter(i=>i<original).length;
+      // หมอผี ผนึก can take a held card mid-turn (a ยันต์ counter fired): find the planned card again;
+      // if it was the one sealed, it is simply not played.
+      if(index>=0&&s.enemyPiles!.hand[index]!==plannedId)index=s.enemyPiles!.hand.indexOf(plannedId);
       // Traps/counters can awaken the boss between reveals. Read the actual transformed copy.
       const cardId=s.enemyPiles!.hand[index];
       const def=enemyCardById(cardId);

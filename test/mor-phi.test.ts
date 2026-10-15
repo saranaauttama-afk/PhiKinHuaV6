@@ -186,6 +186,18 @@ describe('ยันต์และผนึก', () => {
   });
 });
 
+describe('ผนึกกลางเทิร์นผี', () => {
+  it('ยันต์ดักทำงานตอนผีตี จนครบผนึก — ผีเล่นใบที่เหลือต่อได้ ไม่พัง', () => {
+    const s = fight({ hand: [c('yantra_snare')], ghost: [STRIKE, STRIKE, GAPE], ages: [0, 0, 1] });
+    play(s);
+    applyFx(s, { status: [yant(3)] }, { sourceId: 't' }, rng);
+    s.enemyHandSize = 5; s.enemyDrawPerTurn = 0; s.enemyMaxRetained = 2;
+    const t = applyCommand(s, { type: 'ResolveEnemyTurn' }, rng).state;
+    expect(t.phase).toBe('combat');
+    expect(t.log.some(x => x.startsWith('ผนึก!'))).toBe(true);
+  });
+});
+
 describe('สายสิญจน์', () => {
   it('ล้อมสายสิญจน์ ชาร์จการ์ดผีกลับเป็น 0', () => {
     const s = fight({ hand: [c('sai_sin')], ghost: [GAPE], ages: [2] });
