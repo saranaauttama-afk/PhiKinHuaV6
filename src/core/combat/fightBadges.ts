@@ -42,8 +42,8 @@ export function ghostMechanicBadges(s:GameState){
  const out:Array<{id:string;name:string;symbol:string;detail:string;count?:string;bad?:boolean}>=[];
  const charges=(enemyHandCharges(s) as Array<number|null>).filter((x):x is number=>x!=null);
  if(charges.length){
-  const top=Math.max(...charges),max=GHOST_MECHANICS.chargeMaxTurns;
-  out.push({id:'ghost:charge',name:'ชาร์จ',symbol:'spell_charging',bad:true,count:`${top}`,detail:`ผีถือไพ่ชาร์จไว้ ${charges.length} ใบ (${charges.map(n=>`${n}/${max}`).join(', ')})\nยิ่งถือนานยิ่งแรง สูงสุด ${max} เทิร์น · ไม่รู้ว่าจะปล่อยเมื่อไหร่ — ตั้งเกราะรอ หรือเร่งฆ่าก่อน`});
+  const max=GHOST_MECHANICS.chargeMaxTurns,left=charges.map(n=>Math.max(0,max-n)),soon=Math.min(...left);
+  out.push({id:'ghost:charge',name:'ชาร์จ',symbol:'spell_charging',bad:true,count:soon?`${soon}`:'!',detail:`ผีถือไพ่ชาร์จไว้ ${charges.length} ใบ · ${left.map(n=>n?`เต็มในอีก ${n} เทิร์น`:'เต็มแล้ว').join(', ')}\nยิ่งถือนานยิ่งแรง (สูงสุด ${max} เทิร์น) · เต็มแล้วปล่อยได้ทุกเมื่อ และปล่อยก่อนเต็มได้ถ้าพอฆ่าเรา — ตั้งเกราะรอ หรือเร่งฆ่าก่อน`});
  }
  for(const [i,fx] of (s.fight?.enemyRipostes??[]).entries())out.push({id:`ghost:riposte:${i}`,name:'ผีรอสวน',symbol:'riposte',bad:true,detail:`ถ้าการ์ดโจมตีใบถัดไปของเราไม่ทำให้ผีเสียเลือด (เกราะหรือหลบกินหมด) ผีสวน: ${fxText(fx,'enemy').join(' · ')}\nตีให้ทะลุเกราะ หรือรอให้หมดเองตอนเทิร์นผี`});
  return out;

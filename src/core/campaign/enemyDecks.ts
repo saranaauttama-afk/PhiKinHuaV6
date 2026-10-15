@@ -45,7 +45,7 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "phi_pong_kang_v29_double",
   "phi_pong_kang_v29_pierce",
   "phi_pong_kang_n1_call",
-  "phi_pong_kang_n1_mud",
+  "phi_pong_kang_n1_call",
   "phi_pong_kang_n1_mud",
   "phi_pong_kang_n1_pound",
   "phi_pong_kang_n1_pound"
@@ -362,7 +362,7 @@ export const NIGHT_ENEMY_DECKS:Record<string,string[]>={
   "night_head_collector_n1_basket",
   "night_head_collector_n1_snatch",
   "night_head_collector_v29_double",
-  "night_head_collector_v29_strike"
+  "night_head_collector_n1_basket"
  ],
  "night-bell-keeper": [
   "night_bell_keeper_v29_strike",

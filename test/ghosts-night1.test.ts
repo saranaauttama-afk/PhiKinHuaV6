@@ -66,7 +66,6 @@ describe('ข้อมูล', () => {
   it('ลูกสมุนที่การ์ดและกฎผีเรียกมีอยู่จริงและเป็นฝั่งผี', () => {
     const ids = new Set<string>();
     for (const deck of Object.values(NIGHT_ENEMY_DECKS)) for (const id of deck) { const s = enemyCardById(id)?.fx.summon; if (s) ids.add(s); }
-    for (const g of ['phi-pong-kang', 'night-head-collector']) ids.add(ghostRule(g)!.fx.summon!);
     for (const id of ids) expect(minionDef(id)?.side, id).toBe('enemy');
     expect(ids.size).toBe(5);
   });
@@ -208,10 +207,12 @@ describe('กลไกประจำตัวอื่น', () => {
     expect(cardFx(s, card).dmg).toBe(8);
   });
 
-  it('ผีป่าโป่ง: กฎเปิดไฟต์เรียกลิงโป่งที่รับหมัดแทน', () => {
-    const r = ghostRule('phi-pong-kang')!;
-    expect(r.fx.summon).toBe('pong_monkey');
-    expect(minionDef('pong_monkey')!.taunt).toBe(true);
+  // Owner 15 Oct 2026 (playtest, choice 2 ก): a minion standing before any card was played read
+  // as a bug, so ghosts only call minions with a card.
+  it('ไม่มีผีตัวไหนเรียกลูกสมุนตอนเปิดไฟต์ ต้องมาจากการ์ด', () => {
+    for (const g of Object.keys(NIGHT_ENEMY_DECKS)) expect(ghostRule(g)?.fx.summon, g).toBeUndefined();
+    expect(NIGHT_ENEMY_DECKS['phi-pong-kang'].filter(x => x === 'phi_pong_kang_n1_call')).toHaveLength(2);
+    expect(NIGHT_ENEMY_DECKS['night-head-collector'].filter(x => x === 'night_head_collector_n1_basket')).toHaveLength(2);
   });
 });
 

@@ -6,11 +6,13 @@ import {useGameSettings} from '../Settings';
 import {font,ghostColors,layer} from '../../theme';
 import {enemyHandGeometry} from '../../battleGeometry';
 import {GHOST_MECHANICS} from '../../../src/core/balance/notfm';
+import {chargeCountdown} from '../../../src/core/combat/ghostMechanics';
 
 /**
  * One face-down card in the ghost's hand. `charge` (ชาร์จ, docs/ghosts/NIGHT1-DESIGN.md): a held
- * charge card glows and shows how many turns it has charged (owner's choice: show the number).
- * The player sees that something heavy waits and how far it has built, not what it is or when it lands.
+ * charge card glows and counts down the turns until it is full (owner playtest 15 Oct 2026: a
+ * countdown reads better than a count up); "!" = full, it can land any time.
+ * The player sees that something heavy waits and how soon it peaks, not what it is.
  */
 function BackCard({index,reduced,width,height,prefix,charge}:{index:number;reduced:boolean;width:number;height:number;prefix:string;charge?:number|null}){
  const enter=useSharedValue(reduced?1:0),pulse=useSharedValue(0);
@@ -25,7 +27,7 @@ function BackCard({index,reduced,width,height,prefix,charge}:{index:number;reduc
   <Image accessible={false} source={require('../../../assets/ui/occupation-page.png')} resizeMode="stretch" style={{position:'absolute',width,height}}/>
   <Image accessible={false} source={require('../../../assets/ui/trail-ghost.png')} resizeMode="contain" style={{width:width*.75,height:height*.76,margin:width*.125}}/>
   {charging&&<View testID={`${prefix}-charge-${index}`} style={{position:'absolute',top:-8,alignSelf:'center',minWidth:18,height:18,borderRadius:9,paddingHorizontal:3,alignItems:'center',justifyContent:'center',backgroundColor:ghostColors.chargePlate,borderWidth:1,borderColor:ghostColors.charge}}>
-   <Text style={{fontFamily:font.heading,fontSize:11,lineHeight:14,color:ghostColors.chargeText}}>{charge}</Text>
+   <Text style={{fontFamily:font.heading,fontSize:11,lineHeight:14,color:ghostColors.chargeText}}>{full?'!':chargeCountdown(charge??0)}</Text>
   </View>}
  </Animated.View>;
 }

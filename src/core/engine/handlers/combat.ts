@@ -277,7 +277,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   if(s.phase==='combat'){require('../../combat/minions').ghostMinionsAct(s);r=settleCombat(s,r);}
   finishEnemyHand(s,s.enemyLastPlayed?.length??0);
   if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
-  if(s.enemy)s.enemy.handCount=s.enemyPiles?.hand.length??0;
+  if(s.enemy){s.enemy.handCount=s.enemyPiles?.hand.length??0;require('../../combat/ghostMechanics').syncHandCharges(s);}
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 
   // ไม่ประกาศแผนล่วงหน้าอีกแล้ว — ล้างทิ้งเพื่อไม่ให้ค้างเป็นข้อมูลเก่า

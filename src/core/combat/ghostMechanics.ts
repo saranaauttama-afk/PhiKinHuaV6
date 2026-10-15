@@ -56,6 +56,22 @@ export function enemyHandCharges(s: Partial<GameState>): Array<number | null> {
   });
 }
 
+/**
+ * Keep `enemy.handCharges` in step with the hand. It lives on the ghost's state (not only in the
+ * piles) so every animation frame of the ghost turn carries it: reading the final state instead
+ * made the numbers vanish while cards were drawn and played (owner playtest, 15 Oct 2026).
+ */
+export function syncHandCharges(s: Partial<GameState>): void {
+  if (!s.enemy) return;
+  const c = enemyHandCharges(s);
+  s.enemy.handCharges = c.some(x => x != null) ? c : undefined;
+}
+
+/** Turns until a held charge card is full (0 = full: it can land any time). */
+export function chargeCountdown(steps: number): number {
+  return Math.max(0, GHOST_MECHANICS.chargeMaxTurns - steps);
+}
+
 // ── สวนของผี ─────────────────────────────────────────────────────────
 
 /** A ghost card with `riposte` arms it until the player's next attack card. */
@@ -134,6 +150,7 @@ export function checkGhostPhase(s: GameState, _rng: RNG): void {
   s.enemyPiles = { draw, hand: [], discard: [] };
   s.enemyHandAges = [];
   s.enemy.handCount = 0;
+  s.enemy.handCharges = undefined;
   if (p2.breakRelic && s.fight.relic && !s.fight.relic.broken) {
     const { chipBossRelic } = require('../campaign/bossRules');
     s.fight.relic.durability = 1;

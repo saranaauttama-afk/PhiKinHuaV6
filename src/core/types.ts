@@ -152,6 +152,8 @@ export type EnemyState = {
   maxAp?: number;
   handCount?: number;
   handSize?: number;
+  /** ชาร์จ steps of each held card (null = not a charge card); public, set by ghostMechanics.syncHandCharges. */
+  handCharges?: Array<number | null>;
   /** Card ids the ghost's deck is built from (swapped when a boss awakens). */
   deck?: string[];
   /** ความลึก: fights won this night before this one (balance/notfm.ts ENEMY_DEPTH). */

@@ -4,6 +4,7 @@ import {enemyCardById,enemyCardCost} from '../pack_enemy_cards';
 import {getMonsterById} from '../monsters/thai-ghosts';
 import {ENEMY_RULES,GHOST_MECHANICS,type EnemyKind} from '../balance/notfm';
 import {cardFx} from './enemyCardEffects';
+import {syncHandCharges} from './ghostMechanics';
 
 export type {EnemyKind};
 /** A held card is discarded after waiting this many turns, so the hand keeps moving. */
@@ -30,7 +31,7 @@ export function initializeEnemyHand(s:GameState):void{
   for(const key of ['draw','hand','discard'] as const)s.enemyPiles[key]=Array.isArray(s.enemyPiles[key])?s.enemyPiles[key]:[];
   s.enemyPiles.discard.push(...s.enemyPiles.hand.splice(s.enemyHandSize));
   s.enemyHandAges=s.enemyPiles.hand.map((_,i)=>valid(s.enemyHandAges?.[i],0));
-  s.enemy.handCount=s.enemyPiles.hand.length;
+  s.enemy.handCount=s.enemyPiles.hand.length;syncHandCharges(s);
  }
 }
 
@@ -44,6 +45,7 @@ export function drawEnemyHand(s:GameState):void{
   p.hand.push(id);s.enemyHandAges!.push(0);
  }
  if(s.enemy)s.enemy.handCount=p.hand.length;
+ syncHandCharges(s);
 }
 
 /** Pay for and discard one copy before counters and effects; a cancelled card is still paid. */
@@ -54,7 +56,7 @@ export function consumeEnemyCard(s:GameState,index:number):boolean{
  if((s.enemy.ap??0)<cost)return false;
  s.enemy.ap=(s.enemy.ap??0)-cost;
  p.discard.push(p.hand.splice(index,1)[0]);s.enemyHandAges?.splice(index,1);
- s.enemy.handCount=p.hand.length;
+ s.enemy.handCount=p.hand.length;syncHandCharges(s);
  return true;
 }
 
@@ -81,4 +83,5 @@ export function finishEnemyHand(s:GameState,played:number):void{
  p.hand.forEach((id,i)=>{if(keep.has(i)){hand.push(id);ages.push((s.enemyHandAges?.[i]??0)+1);}else p.discard.push(id);});
  p.hand=hand;s.enemyHandAges=ages;s.enemyIdleTurns=played?0:(s.enemyIdleTurns??0)+1;
  if(s.enemy)s.enemy.handCount=hand.length;
+ syncHandCharges(s);
 }
