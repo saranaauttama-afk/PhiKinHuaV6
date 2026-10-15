@@ -1,5 +1,6 @@
 /** Distinct art for the chapter pilot cards; upgrades keep their original identity. */
 export const CARD_ART_SOURCES: Record<string, import('react-native').ImageSourcePropType> = {
+ 'mongkhon': require('../assets/cards/thai-v24/mongkhon.webp'),
  // นักมวยคาดเชือก: generated from docs/nak-muay/ART-PROMPTS.md.
  'jab': require('../assets/cards/thai-v24/jab.webp'),
  'low_kick': require('../assets/cards/thai-v24/low_kick.webp'),
@@ -324,6 +325,7 @@ export const CARD_ART_SOURCES: Record<string, import('react-native').ImageSource
 
 /** Distinct art for the chapter pilot cards; upgrades keep their original identity. */
 export const GRAY_CARD_ART_SOURCES: Record<string, import('react-native').ImageSourcePropType> = {
+ 'mongkhon': require('../assets/cards/thai-v24/mongkhon.webp'),
  // นักมวยคาดเชือก: generated from docs/nak-muay/ART-PROMPTS.md.
  'jab': require('../assets/cards/thai-v24/jab.webp'),
  'low_kick': require('../assets/cards/thai-v24/low_kick.webp'),

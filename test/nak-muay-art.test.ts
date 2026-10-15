@@ -8,8 +8,8 @@ const read=(file:string)=>fs.readFileSync(path.join(root,file),'utf8');
 const manifest=JSON.parse(read('docs/nak-muay/generated-art.json'));
 
 describe('นักมวยคาดเชือก production art',()=>{
- it('ships the first 55 distinct, transparent 384×384 WebP assets',()=>{
-  expect(manifest.assets).toHaveLength(55);
+ it('ships all 56 distinct, transparent 384×384 WebP assets',()=>{
+  expect(manifest.assets).toHaveLength(56);
   const hashes=new Set<string>();
   for(const asset of manifest.assets){
    const bytes=fs.readFileSync(path.join(root,asset.path));
@@ -27,7 +27,7 @@ describe('นักมวยคาดเชือก production art',()=>{
  it('uses the new fighter illustrations in active and disabled cards',()=>{
   const [active,disabled]=read('app/cardArt.ts').split('export const GRAY_CARD_ART_SOURCES:');
   const pending=JSON.parse(read('docs/nak-muay/art-prompts.json')).cards;
-  expect(pending.map((a:any)=>a.id)).toEqual(['mongkhon']);
+  expect(pending).toEqual([]);
   for(const a of manifest.assets.filter((a:any)=>a.group==='cards')){
    const reference=`'${a.id}': require('../${a.path}')`;
    expect(active,a.id).toContain(reference);

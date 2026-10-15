@@ -7,15 +7,7 @@
   "wire": "add `'<id>': require('../assets/cards/thai-v24/<id>.webp')` to app/cardArt.ts (CARD_ART_SOURCES), then remove the id from `cards` here so the art test requires it",
   "ui": "move marks → show at the card corner (needs a small UI change, see HANDOFF next steps); status icons → add keys bruise/stun/rhythm/round/riposte to app/components/battle/StatusArt.tsx STATUS_ART and map them in StatusStrip.tsx symbols"
  },
- "cards": [
-  {
-   "id": "mongkhon",
-   "name": "มงคลสวมหัว",
-   "status": "new",
-   "path": "assets/cards/thai-v24/mongkhon.webp",
-   "prompt": "Thai one-baht horror pulp comic card illustration, matching the existing ผีกินหัว card set: rough confident black ink outlines with coarse cross-hatching, muted vintage print colours (ochre, olive, brick red, faded indigo, warm skin tones), one clear subject or a tight two-figure action, dynamic readable silhouette that still reads at 80 px, transparent background (real alpha), square 1:1 canvas, subject fills about 85%, small clean margin. Fighter look: lean rural Thai Muay Boran fighter, bare chest, hands wrapped in raw hemp rope (คาดเชือก), red cloth headband (มงคล) and red arm band (ประเจียด), loincloth/pha khao ma wrapped as shorts, barefoot. Night-of-ghosts mood without gore close-ups. No text, letters, numbers, logos, card frame, border, parchment, gradient background, 3D render or glow effects. Not Chinese/Japanese martial-arts styling. Subject: Item: a sacred Muay Thai mongkol headband (braided cord ring with a tail), red and white, resting on a small offering tray"
-  }
- ],
+ "cards": [],
  "minions": [
   {
    "id": "camp_pupil",
