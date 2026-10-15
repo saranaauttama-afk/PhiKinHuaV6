@@ -42,13 +42,15 @@
   },
   {
     "id": "ash_bones", "name": "เถ้ากระดูก", "side": "enemy", "hp": 5,
+    "taunt": true,
     "act": {"dmg": 3},
-    "desc": "ท้ายเทิร์นผี ตีเรา 3"
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี ตีเรา 3"
   },
   {
     "id": "ash_crawler", "name": "เถ้ากระดูกคลาน", "side": "enemy", "hp": 5,
+    "taunt": true,
     "act": {"status": [{"id": "poison", "stacks": 1, "turns": 2, "to": "enemy"}]},
-    "desc": "ท้ายเทิร์นผี เราติดพิษ 1"
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี เราติดพิษ 1"
   },
   {
     "id": "forest_shade", "name": "เงาป่า", "side": "enemy", "hp": 8,

@@ -71,6 +71,23 @@ describe('ข้อมูล', () => {
     expect(ids.size).toBe(5);
   });
 
+  // Owner 15 Oct 2026 (playtest): we cannot pick a target, so a minion that does not take hits
+  // could only be killed by a sweep. Every ghost minion takes single hits, oldest first.
+  it('ลูกสมุนผีทุกตัวรับหมัดแทน เพราะเราเลือกเป้าไม่ได้', () => {
+    for (const m of ['pong_monkey', 'ash_bones', 'ash_crawler', 'forest_shade', 'basket_head']) expect(minionDef(m)!.taunt, m).toBe(true);
+  });
+
+  it('หมัดเดี่ยวโดนลูกสมุนตัวที่มาก่อน', () => {
+    const s = fight({ hand: [c('jab')] });
+    s.enemyMinions = [
+      { uid: 'a', id: 'ash_bones', name: 'เถ้ากระดูก', hp: 5, maxHp: 5, side: 'enemy', passive: { triggers: [] }, taunt: true },
+      { uid: 'b', id: 'ash_crawler', name: 'เถ้ากระดูกคลาน', hp: 5, maxHp: 5, side: 'enemy', passive: { triggers: [] }, taunt: true },
+    ];
+    play(s);
+    expect(s.enemyMinions.map(m => m.uid)).toEqual(['b']);
+    expect(s.enemy!.hp).toBe(200);
+  });
+
   it('คำอธิบายการ์ดบอกกลไก', () => {
     expect(describeCard(enemyCardById(GAPE)!, 'enemy')).toContain('ชาร์จ: โจมตี +3 ต่อเทิร์นที่ถือไว้');
     expect(describeCard(enemyCardById(LEAF)!, 'enemy')).toContain('สวน: โจมตี 5');
