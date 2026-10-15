@@ -107,7 +107,9 @@ export const ENEMY_HP = {
    * after the night-2 boss, shops are smaller and effect draws are capped, so the player is
    * weaker in nights 1–2; HP was lowered most there. See docs/tuning-2026-10-13/HANDOFF.md.
    */
-  bossNight: [0.75, 1.6, 2.7],
+  // 15 Oct 2026: night-2 boss 1.6 → 1.4. The rebuilt เปรตวัดร้าง (curses + บริวาร + phase 2 charge)
+  // became the level-1 wall in simulation (21 of 24 level-1 losses on night 2); see docs/ghosts/HANDOFF.md.
+  bossNight: [0.75, 1.4, 2.7],
 } as const;
 
 /**

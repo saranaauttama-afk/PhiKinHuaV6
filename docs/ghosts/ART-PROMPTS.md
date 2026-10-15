@@ -54,3 +54,35 @@ A woven bamboo winnowing tray (กระด้ง) floating upright like a shiel
 A pale clawed ghost hand clenched into a fist, with three short curved ink strokes coiling around it like gathering wind, tension before a strike
 
 ใส่ภาพแล้ว: เพิ่ม `charge:require('../../../assets/status/status_charge.webp'),` ใน `STATUS_ART` แล้วเปลี่ยน `symbol:'spell_charging'` เป็น `symbol:'charge'` ใน `ghostMechanicBadges` (`src/core/combat/fightBadges.ts`)
+
+## ลูกสมุนคืน 2–3 (7 ภาพ) — 15 ต.ค. 2026
+
+ที่มา: `docs/ghosts/NIGHT23-DESIGN.md` · สไตล์เดียวกับข้างบน (ยืนขวาของผี หันซ้าย อ่านออกที่ 60 px) · ใส่ภาพแล้วเพิ่ม id ใน `STATUS_ART`
+
+### ลูกแดง · `luk_daeng`
+`assets/minions/luk_daeng.webp` · แม่นาค · เลือด 6 · ฟื้นแม่นาค 3
+A pale ghost infant wrapped in a faded red cloth, floating at waist height, tiny reaching hands, big dark eyes, a faint river-water drip from the cloth; eerie but not gory, full body, facing left
+
+### พรายน้ำ · `phrai_nam`
+`assets/minions/phrai_nam.webp` · ผีพราย / พรายแอ่งถ้ำ · เลือด 6 · เราติดพิษ 1
+A small drowned water spirit rising out of a dark puddle, long wet hair covering most of the face, greenish pale skin, dripping waterweed, one arm stretched forward, full body, facing left
+
+### เสือสมิง · `suea_saming`
+`assets/minions/suea_saming.webp` · ผีป่าดงลึก · เลือด 10 · ตะปบ 4
+A gaunt were-tiger of Thai forest folklore: half-tiger half-human figure crouched on all fours, striped hide hanging loosely like a cloak, human eyes in a tiger face, claws out, full body, facing left
+
+### เถาวัลย์ · `thaowan`
+`assets/minions/thaowan.webp` · ผีป่าดงลึก · เลือด 8 · ให้ผีเกราะ 4
+A writhing knot of jungle vines and creepers shaped like a coiled serpent rearing up to shield someone, a few pale leaves, thorny tips, full body, facing left
+
+### เปรตบริวาร · `pret_borivan`
+`assets/minions/pret_borivan.webp` · เปรตวัดร้าง (บอสคืน 2) · เลือด 8 · ตี 3
+A small skinny preta servant with an absurdly long thin neck and a tiny needle mouth, holding a cracked alms bowl, ribs showing, temple-ground dust around its feet, full body, facing left
+
+### รากไทร · `rak_sai`
+`assets/minions/rak_sai.webp` · ผีป่าไทรพันราก (บอสคืน 3) · เลือด 12 · ให้ผีเกราะ 5
+A thick twisted banyan root rising from the ground like an arm, wrapped with faded colourful shrine cloths (ผ้าสามสี), bark textured with a hint of a face, full body, facing left
+
+### หัวลอย · `hua_loi`
+`assets/minions/hua_loi.webp` · ผีกินหัว (บอสลับ) · เลือด 10 · คาบการ์ดเราไป 1 ใบ
+A severed floating head with long tangled hair and a wide toothy grin, holding a playing card in its teeth, a few loose strands trailing like a tail, no gore close-up, facing left
