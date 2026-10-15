@@ -9,7 +9,7 @@ type Props={blessings?:React.ReactNode;helpers?:React.ReactNode;statuses?:React.
 export default function PlayerHUD(p:Props){
  const [details,setDetails]=React.useState(false);return <>
  <QuietPlayerHud compact classId={p.classId} hp={p.hp} maxHp={p.maxHp}
- stats={<><HudStat icon="energy" text={`${p.ap}/${p.maxAp}`} label="แต้มต่อเทิร์น" onPress={()=>setDetails(true)}/><HudStat icon="mana" text={p.manaMax?`${p.mana}/${p.manaMax}`:`${p.mana}`} label={p.manaMax?`น้ำมนต์ในขัน ${p.mana}/${p.manaMax}`:'มานา'} onPress={()=>setDetails(true)}/><HudStat icon="block" text={`${p.block}`} label="เกราะ" onPress={()=>setDetails(true)}/><HudStat icon="hand" text={`${p.handCount??0}/${p.retain??2}`} label={`ในมือ ${p.handCount??0} · มือสูงสุดท้ายเทิร์น ${p.retain??2}`} onPress={()=>setDetails(true)}/></>}
+ stats={<><HudStat icon="energy" text={`${p.ap}/${p.maxAp}`} label="แต้มต่อเทิร์น" onPress={()=>setDetails(true)}/><HudStat icon={p.manaMax?'water_bowl':'mana'} text={p.manaMax?`${p.mana}/${p.manaMax}`:`${p.mana}`} label={p.manaMax?`น้ำมนต์ในขัน ${p.mana}/${p.manaMax}`:'มานา'} onPress={()=>setDetails(true)}/><HudStat icon="block" text={`${p.block}`} label="เกราะ" onPress={()=>setDetails(true)}/><HudStat icon="hand" text={`${p.handCount??0}/${p.retain??2}`} label={`ในมือ ${p.handCount??0} · มือสูงสุดท้ายเทิร์น ${p.retain??2}`} onPress={()=>setDetails(true)}/></>}
  action={<SealPotButton compact disabled={p.isEnemyTurn} onPress={p.onEndTurn}/>}
  blessings={p.blessings}
  helpers={p.helpers}
