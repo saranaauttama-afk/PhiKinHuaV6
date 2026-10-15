@@ -13,6 +13,7 @@ import { starOf } from '../../src/core/cards/model';
 import CardBadges from './CardBadges';
 import UpgradeMarks from './UpgradeMarks';
 import { font, radius, size, space, tint, paper } from '../theme';
+import {cardTypeLabel} from '../../src/core/cards/typesRegistry';
 
 /** ป้ายเล็กบอกคุณสมบัติพิเศษของใบนี้ */
 function Badge({ label, tone = 'moon' }: { label: string; tone?: 'moon' | 'blood' }) {
@@ -75,7 +76,7 @@ export default function CardRow({ card, count, spent = false, plain = false }: P
               ×{count}
             </Text>
           )}
-          <Badge label={TYPE_LABEL[card.type]} tone={card.type === 'curse' ? 'blood' : 'moon'} />
+          <Badge label={cardTypeLabel(card)} tone={card.type === 'curse' ? 'blood' : 'moon'} />
           {starOf(card) > 1 && <UpgradeMarks level={starOf(card)}/>}
           {spent && <Badge label="ใช้ไปแล้ว" tone="blood" />}
         </View>

@@ -48,7 +48,8 @@ describe('player card and blessing art coverage',()=>{
   const cards=['cards','class_cards','curse_cards'].flatMap(f=>JSON.parse(read(`src/data/packs/base/${f}.json`)));
   const used=new Map<string,string>();
   // New นักมวย cards wait for art listed in docs/nak-muay/art-prompts.json (status new); they show a glyph until wired.
-  const pending=new Set(JSON.parse(read('docs/nak-muay/art-prompts.json')).cards.filter((c:any)=>c.status==='new').map((c:any)=>c.id));
+  // New หมอผี cards (15 Oct 2026) likewise wait in docs/mor-phi/art-prompts.json.
+  const pending=new Set(['docs/nak-muay/art-prompts.json','docs/mor-phi/art-prompts.json'].flatMap(f=>JSON.parse(read(f)).cards).filter((c:any)=>c.status==='new').map((c:any)=>c.id));
   for(const card of cards){
    if(pending.has(card.id)){expect(art.get(card.id),card.id+' has art now; remove it from art-prompts.json').toBeUndefined();continue;}
    const file=art.get(card.id);

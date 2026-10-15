@@ -68,6 +68,8 @@ export function startPlayerTurn(state: GameState, rng: RNG): { state: GameState;
   if (state.fight) state.fight.halfDamage = false;
   // สวน waits for one ghost turn only.
   if (state.fight) state.fight.ripostes = [];
+  // มึน from a ghost: this turn starts with less AP (GHOST_MECHANICS.stunApLoss).
+  require('./combat/ghostMechanics').applyPlayerStun(state);
   processStatusEffectsOnTurnStart('player', state);
   rng = require('./cards/play').resolvePrayers(state, rng);
   if (state.phase !== 'combat') return { state, rng };

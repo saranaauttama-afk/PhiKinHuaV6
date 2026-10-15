@@ -35,12 +35,16 @@ type Props = {
   helpers?:React.ReactNode;
   /** Rage is on this fight; shown as a rule until the ghost's rage status appears. */
   rage?:{startTurn:number;perTurn:number};
-  /** The ghost's ลูกสมุน (combat/fightBadges.ts enemyMinionBadges). */
+  /** Extra ghost badges: ความลึก, ชาร์จ, ผีรอสวน (combat/fightBadges.ts). ลูกสมุน stand as figures (MinionRow side="enemy"). */
   minions?:import('./StatusStrip').BattleBadge[];
   /** The boss's relic: its rule works until the player's hits break it. */
   relic?:{name:string;durability:number;text:string;flavor:string;broken:boolean;stolen:number};
   /** Stable face-down slots for the single ghost: total places and which are still held. */
   handSlots?:{total:number;remaining:number[]};
+  /** ชาร์จ count per held card (null = not a charge card), from ghostMechanics.enemyHandCharges. */
+  handCharges?:Array<number|null>;
+  /** Ghost badges that just changed a hit (shake). */
+  pulse?:{ids:string[];key:string};
   enemy?: {
     hp: number; maxHp: number; name: string;
     handCount?:number; ap?: number; block?: number; maxAp?: number; handSize?: number; drawPerTurn?:number; maxRetained?:number;
@@ -60,7 +64,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   helpers,
   rage,
   relic,minions,
-  handSlots,
+  handSlots,handCharges,pulse,
   enemies,
   rules=false,
 }, ref) {
@@ -118,7 +122,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
      <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize}/>
     </Animated.View>
-    <EnemyHandRack count={actor.handCount??0} slots={actors.length===1?handSlots:undefined} ownerIndex={index} ownerCount={actors.length}/>
+    <EnemyHandRack count={actor.handCount??0} slots={actors.length===1?handSlots:undefined} charges={actors.length===1?handCharges:undefined} ownerIndex={index} ownerCount={actors.length}/>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
      <RitualSurface kind="quietSlate" style={{height:layout.enemyHudHeight,paddingHorizontal:actors.length>1?6:10,paddingVertical:4,gap:2}}>
       <View style={{flexDirection:'row',alignItems:'center',gap:6}}>
@@ -132,7 +136,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       </View>
      </RitualSurface>
       <View testID={`enemy-extras-${index}`} style={{height:layout.enemyExtrasHeight,flexDirection:'row',gap:4,alignItems:'center'}}>
-       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={[...(index===0?minions??[]:[]),...(relic&&index===0?[{id:'boss-relic',name:relic.name,symbol:'curse',bad:!relic.broken,neutral:relic.broken,count:relic.broken?'✕':`${relic.durability}`,detail:relic.broken?`${relic.name} แตกแล้ว · กฎนี้หยุดทำงาน`:`${relic.text}\nโจมตีโดนบอสอีก ${relic.durability} ครั้ง อุปกรณ์จะแตก${relic.stolen?` · ถูกขโมยไว้ ${relic.stolen} ใบ`:''}\n${relic.flavor}`}]:[]),...(rules&&enemyBattleRule(actor.id)?[{id:'ghost-rule',...enemyBattleRule(actor.id)!,neutral:true}]:[]),...(rage&&!actor.statusEffects?.some(e=>e.id==='rage')?[{id:'rage-rule',name:'โกรธ',symbol:'strength',bad:true,detail:`ตั้งแต่เทิร์น ${rage.startTurn} ทุกหมัดของผีแรงขึ้น ${rage.perTurn} ทุกเทิร์นที่ไฟต์ยืดออกไป`}]:[])]} compact/></View>
+       <View style={{flex:2}}><StatusStrip effects={actor.statusEffects} extra={[...(index===0?minions??[]:[]),...(relic&&index===0?[{id:'boss-relic',name:relic.name,symbol:'curse',bad:!relic.broken,neutral:relic.broken,count:relic.broken?'✕':`${relic.durability}`,detail:relic.broken?`${relic.name} แตกแล้ว · กฎนี้หยุดทำงาน`:`${relic.text}\nโจมตีโดนบอสอีก ${relic.durability} ครั้ง อุปกรณ์จะแตก${relic.stolen?` · ถูกขโมยไว้ ${relic.stolen} ใบ`:''}\n${relic.flavor}`}]:[]),...(rules&&enemyBattleRule(actor.id)?[{id:'ghost-rule',...enemyBattleRule(actor.id)!,neutral:true}]:[]),...(rage&&!actor.statusEffects?.some(e=>e.id==='rage')?[{id:'rage-rule',name:'โกรธ',symbol:'strength',bad:true,detail:`ตั้งแต่เทิร์น ${rage.startTurn} ทุกหมัดของผีแรงขึ้น ${rage.perTurn} ทุกเทิร์นที่ไฟต์ยืดออกไป`}]:[])]} compact side="enemy" pulse={index===0?pulse:undefined}/></View>
        {index===0&&<View style={{flex:1,minWidth:0}}>{helpers}</View>}
       </View>
     </View>

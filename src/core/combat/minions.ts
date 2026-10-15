@@ -16,6 +16,8 @@ import { emit } from './damage';
 export type MinionDef = {
   id: string; name: string; side: 'player' | 'enemy'; hp: number;
   passive?: Passive; act?: Fx; taunt?: boolean; turns?: number; desc?: string;
+  /** Ghost minion: while it stands, the ghost's held ชาร์จ cards gain this many extra steps per turn. */
+  chargeBoost?: number;
 };
 
 export const MINION_DEFS: MinionDef[] = minionsJson as any;
@@ -48,7 +50,7 @@ export function summonMinion(s: GameState, side: 'player' | 'enemy', id: string)
   const m: MinionState = {
     uid: `${id}#${s.minionSeq}`, id, name: def.name, hp: def.hp, maxHp: def.hp, side,
     passive: JSON.parse(JSON.stringify(def.passive ?? { triggers: [] })),
-    act: def.act, taunt: def.taunt, turnsLeft: def.turns,
+    act: def.act, taunt: def.taunt, turnsLeft: def.turns, chargeBoost: def.chargeBoost,
   };
   list.push(m);
   s.log.push(side === 'player' ? `เรียก ${def.name} เข้าข้างเวที` : `ผีเรียก ${def.name}`);

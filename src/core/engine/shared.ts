@@ -142,9 +142,9 @@ export function grantExpAndQueueLevelUp(s: GameState, r: RNG): RNG {
     s.player.level += 1;
     s.player.expToNext = nextExpForLevel(s.player.level);
 
-    // Every level: full heal and more max HP. One reward choice is offered at a time.
+    // Every level: more max HP and a partial heal (LEVEL_UP.healPct). One reward choice at a time.
     s.player.maxHp += LEVEL_UP.maxHp;
-    s.player.hp = s.player.maxHp;
+    s.player.hp = Math.min(s.player.maxHp, s.player.hp + LEVEL_UP.maxHp + Math.round(s.player.maxHp * LEVEL_UP.healPct / 100));
     if (!s.levelUp || s.levelUp.consumed) {
       const rolled = rollThreeCards(r, s.player.level, s.classId,s.campaign?.milestoneLevel??0); r = rolled.rng;
       const offers = rollLevelOffers(s, r); r = offers.rng;

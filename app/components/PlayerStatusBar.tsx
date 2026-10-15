@@ -40,7 +40,7 @@ export default function PlayerStatusBar({ state, onOpenDeck, onOpenBlessings, on
           <Text accessibilityRole="header" style={styles.detailTitle}>ข้อมูลผู้เดินทาง</Text>
           <Text style={styles.detailText}>{character.name} · เลเวล {p.level}</Text>
           <Text style={styles.detailText}>พลังชีวิต {p.hp}/{p.maxHp}</Text>
-          <Text style={styles.detailText}>แต้ม {p.maxAp} · มานาตั้งต้น {p.startMana}</Text>
+          <Text style={styles.detailText}>แต้ม {p.maxAp} · {require('../../src/core/cards/water').resourceName(state.classId)}ตั้งต้น {p.startMana}</Text>
           <Text style={styles.detailText}>มือสูงสุดท้ายเทิร์น {retainLimit(state)} · จั่วต่อเทิร์น {p.drawPerTurn}</Text>
           <Text style={styles.detailText}>เปิดศึก {openingHandSize(state)} ใบ · ถือระหว่างเล่นไม่เกิน {p.handMax} ใบ</Text>
           <Text style={styles.detailText}>EXP {p.exp}/{p.expToNext}</Text>

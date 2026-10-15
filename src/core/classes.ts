@@ -33,6 +33,10 @@ export function classPassiveText(id: ClassId): string {
   const p = CLASS_PASSIVES[id];
   const lines = require('./cards/describe').passiveText(p) as string[];
   if (p.spellDiscount) lines.push(`คาถาใบแรกของแต่ละเทิร์นใช้มานาน้อยลง ${p.spellDiscount}`);
+  if (p.water) {
+    const W = require('./balance/notfm').WATER_RULES;
+    lines.splice(0, lines.length, `ต้นเทิร์น (ตั้งแต่เทิร์น 2) น้ำมนต์ +${W.perTurn} · ขันจุ ${W.bowlMax} น้ำที่ล้นขันกลายเป็นเกราะ ${W.overflowBlock} ต่อ 1 · ยันต์บนผีครบ ${W.sealAt} ผนึกการ์ดที่ผีถือไว้`);
+  }
   if (p.copyFirstGhostCard) lines.push('การ์ดผีใบแรกที่เปิดในแต่ละไฟต์ ได้สำเนาเข้ามือ (ฟรี · นำออก)');
   if (p.rhythm) {
     const R = require('./balance/notfm').FIGHTER_RULES;
@@ -50,7 +54,7 @@ const make = (id: ClassId, name: string, title: string, desc: string): Character
 });
 
 export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
-  shaman: make('shaman', 'หมอผี', 'ผู้สาปและผู้แก้สาป', 'สะสมมานาแล้วร่ายคาถาสาปและพิษ เข็มปักแรงขึ้นเมื่อผีติดคำสาป'),
+  shaman: make('shaman', 'หมอผี', 'ผู้ถือขันน้ำมนต์', 'ปลุกเสกน้ำมนต์จนเต็มขันแล้วสาดทีเดียว ลงยันต์ผนึกการ์ดที่ผีถือไว้ ล้อมสายสิญจน์ล้างแรงชาร์จ หรือยอมจ่ายเลือดเลี้ยงของต่ำ'),
   // Was นักรบวัด until 14 Oct 2026 (no such role exists; owner chose นักมวยคาดเชือก). Id stays 'warrior' for saves.
   warrior: make('warrior', 'นักมวยคาดเชือก', 'ผู้ต่อแม่ไม้', 'ต่อท่าหมัด เตะ เข่า ศอก ไม่ซ้ำให้จังหวะติด ทุบให้ผีช้ำแล้วปิดด้วยท่าหนัก ตั้งการ์ดรอสวน และเรียกศิษย์ค่ายมาช่วย'),
   nun: make('nun', 'แม่ชี', 'ผู้ถือศีล', 'บทสวดที่ยิ่งรอยิ่งแรง เลือกว่าจะรอกี่เทิร์น ตั้งเกราะแล้วหมุนธรรมจักร'),
@@ -64,9 +68,10 @@ export const ALL_CLASS_IDS = Object.keys(CHARACTER_CLASSES) as ClassId[];
  * opens the book and is the only class a player can start. The others stay in the book, locked,
  * until their own card sets are done (one class at a time). Engine, sims and old saves still use
  * every class — this gate is for starting a new run only.
+ * หมอผี opened 15 Oct 2026 with its น้ำมนต์ card set (docs/mor-phi/DESIGN.md).
  */
 export const CLASS_BOOK_ORDER: ClassId[] = ['warrior', 'shaman', 'nun', 'medium'];
-export const PLAYABLE_CLASSES: readonly ClassId[] = ['warrior'];
+export const PLAYABLE_CLASSES: readonly ClassId[] = ['warrior', 'shaman'];
 export function classPlayable(id: ClassId): boolean { return PLAYABLE_CLASSES.includes(id); }
 
 export function getClass(id?: ClassId): CharacterClass {

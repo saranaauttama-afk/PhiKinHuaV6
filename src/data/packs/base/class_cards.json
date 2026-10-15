@@ -8,100 +8,8 @@
   "fx": {
    "dmg": 6
   },
-  "starter": 3,
+  "starter": 1,
   "flavor": "ไผ่เผาไฟปลายแหลม"
- },
- {
-  "id": "cursed_needle",
-  "name": "เสกเข็มปัก",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "shaman",
-  "fx": {
-   "dmg": 5
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "curse"
-   },
-   "bonus": {
-    "dmg": 6
-   }
-  },
-  "starter": 1,
-  "flavor": "เข็มที่ปักตรงรอยคำสาป"
- },
- {
-  "id": "cooling_cloth",
-  "name": "ผ้าเย็น",
-  "type": "action",
-  "rarity": "Common",
-  "class": "shaman",
-  "ap": 1,
-  "fx": {
-   "block": 7
-  },
-  "starter": 3,
-  "flavor": "ตั้งรับด้วยผ้าเย็น"
- },
- {
-  "id": "direct_poison_spell",
-  "name": "เสกพิษตรง",
-  "type": "spell",
-  "rarity": "Common",
-  "class": "shaman",
-  "mana": 3,
-  "fx": {
-   "status": [
-    {
-     "id": "poison",
-     "stacks": 3,
-     "turns": 3,
-     "to": "enemy"
-    }
-   ]
-  },
-  "flavor": "คาถาพิษเข้าเลือดโดยตรง"
- },
- {
-  "id": "meditation",
-  "name": "นั่งสมาธิ",
-  "type": "mana",
-  "rarity": "Common",
-  "class": "shaman",
-  "fx": {
-   "mana": 3
-  },
-  "starter": 1,
-  "flavor": "ใจนิ่งพลังก็มา"
- },
- {
-  "id": "curse_chant",
-  "name": "เสกคาถาสาป",
-  "type": "spell",
-  "rarity": "Common",
-  "class": "shaman",
-  "mana": 2,
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "curse",
-     "stacks": 2,
-     "turns": 3,
-     "to": "enemy"
-    },
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  },
-  "starter": 2,
-  "flavor": "คำสาปทำให้ผีเจ็บทุกครั้งที่โดน และมือไม้อ่อนแรง"
  },
  {
   "id": "bamboo_volley",
@@ -116,132 +24,89 @@
   "flavor": "ขว้างไผ่ทีละดุ้น"
  },
  {
-  "id": "yantra_in_hand",
-  "name": "ยันต์ในมือ",
-  "type": "action",
-  "rarity": "Common",
-  "class": "shaman",
-  "ap": 1,
-  "fx": {
-   "block": 11
-  },
-  "whileHeld": {
-   "block": 3
-  },
-  "flavor": "ปล่อยได้ป้องกันเต็ม ถือไว้ก็ยังกันให้"
- },
- {
-  "id": "yantra_snare",
-  "name": "ยันต์ดัก",
-  "type": "counter",
+  "id": "cursed_needle",
+  "name": "เสกเข็มปัก",
+  "type": "attack",
   "rarity": "Common",
   "class": "shaman",
   "fx": {
-   "dmg": 6,
+   "dmg": 5,
    "status": [
     {
-     "id": "curse",
+     "id": "yant",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "starter": 2,
+  "flavor": "เข็มเสกปักลงเงาผี ทิ้งรอยยันต์ไว้"
+ },
+ {
+  "id": "paper_yant",
+  "name": "แปะยันต์กระดาษ",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 2,
+   "status": [
+    {
+     "id": "yant",
      "stacks": 2,
-     "turns": 3,
+     "turns": 99,
      "to": "enemy"
     }
    ]
   },
-  "counter": {
-   "trigger": "enemy_attack"
-  },
-  "flavor": "ยันต์ลุกเป็นไฟเมื่อผีเข้ามาตี"
+  "flavor": "ยันต์กระดาษสาตัวเล็ก แปะได้ทีละแผ่นสองแผ่น"
  },
  {
-  "id": "ghost_possession",
-  "name": "ทรงผี",
-  "type": "mana",
+  "id": "nail_coffin",
+  "name": "ตอกตะปูโลงผี",
+  "type": "attack",
   "rarity": "Uncommon",
   "class": "shaman",
   "fx": {
-   "mana": 4,
-   "draw": 1
-  },
-  "limit": "turn",
-  "flavor": "ผีเข้าร่างพาพลังมาด้วย"
- },
- {
-  "id": "withering_hex",
-  "name": "คาถาเหี่ยวแห้ง",
-  "type": "spell",
-  "rarity": "Uncommon",
-  "class": "shaman",
-  "mana": 3,
-  "fx": {
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    },
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  },
-  "flavor": "ผีอ่อนแรงและเปราะบางพร้อมกัน"
- },
- {
-  "id": "flowing_chant",
-  "name": "คาถาไหลลื่น",
-  "type": "spell",
-  "rarity": "Uncommon",
-  "class": "shaman",
-  "mana": 4,
-  "fx": {
-   "dmg": 14
-  },
-  "flavor": "คาถาไหลออกมาไม่ขาดสาย"
- },
- {
-  "id": "salt_hex",
-  "name": "เกลือเสกคาถา",
-  "type": "spell",
-  "rarity": "Uncommon",
-  "class": "shaman",
-  "mana": 3,
-  "fx": {
-   "block": 10,
-   "status": [
-    {
-     "id": "curse",
-     "stacks": 1,
-     "turns": 3,
-     "to": "enemy"
-    }
-   ]
-  },
-  "flavor": "เกลือเสกกันตัวและสาปผีไปพร้อมกัน"
- },
- {
-  "id": "phi_tai_hong",
-  "name": "ผีตายโหง",
-  "type": "spell",
-  "rarity": "Rare",
-  "class": "shaman",
-  "mana": 4,
-  "fx": {
-   "dmg": 12
+   "dmg": 6
   },
   "conditional": {
    "when": {
-    "kind": "player_hp_below",
-    "value": 50
+    "kind": "enemy_status_at_least",
+    "statusId": "yant",
+    "value": 3
    },
    "bonus": {
-    "dmg": 12
+    "dmg": 7
    }
   },
-  "flavor": "เรียกผีตายโหงมาแก้แค้น"
+  "flavor": "ตะปูสังฆวานรตอกลงตรงรอยยันต์"
+ },
+ {
+  "id": "rice_throw",
+  "name": "เสกข้าวสารซัด",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 2,
+   "hits": 3,
+   "sweep": true
+  },
+  "flavor": "ข้าวสารเสกซัดไปทั้งวง ผีตัวไหนก็โดน"
+ },
+ {
+  "id": "lotus_dip",
+  "name": "ดอกบัวจุ่มน้ำมนต์",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 4,
+   "mana": 1
+  },
+  "flavor": "ฟาดด้วยดอกบัว น้ำมนต์ที่ปลายกลีบหยดกลับลงขัน"
  },
  {
   "id": "all_or_nothing",
@@ -265,74 +130,157 @@
   "flavor": "ทุ่มทุกอย่างที่มีในมือ"
  },
  {
-  "id": "night_hex_knot",
-  "name": "เงื่อนคาถาห้าคืน",
-  "type": "spell",
-  "rarity": "Rare",
+  "id": "ghost_debt",
+  "name": "ทวงหนี้ผี",
+  "type": "attack",
+  "rarity": "Common",
   "class": "shaman",
-  "mana": 2,
   "fx": {
-   "dmg": 5,
-   "status": [
-    {
-     "id": "poison",
-     "stacks": 2,
-     "turns": 3,
-     "to": "enemy"
-    }
-   ]
+   "dmg": 6
   },
   "conditional": {
    "when": {
-    "kind": "enemy_has_status",
-    "statusId": "poison"
+    "kind": "player_hp_below",
+    "value": 50
    },
    "bonus": {
-    "dmg": 7
+    "dmg": 6,
+    "heal": 3
    }
   },
-  "locked": true,
-  "flavor": "เงื่อนคาถาที่ผูกไว้ห้าคืน"
+  "flavor": "เลือดที่เสียไปต้องได้คืน"
  },
  {
-  "id": "equipment_shaman_staff",
-  "name": "ไม้เท้าหมอผี",
-  "type": "equipment",
-  "rarity": "Rare",
+  "id": "meditation",
+  "name": "นั่งสมาธิปลุกเสก",
+  "type": "mana",
+  "rarity": "Common",
   "class": "shaman",
-  "fx": {},
-  "equip": {
-   "triggers": [
-    {
-     "on": "play",
-     "type": "spell",
-     "once": "turn",
-     "fx": {
-      "mana": 2
-     }
-    }
-   ]
+  "fx": {
+   "mana": 3,
+   "draw": 1
   },
-  "flavor": "คาถาใบแรกแต่ละเทิร์นคืนมานา"
+  "limit": "turn",
+  "starter": 2,
+  "flavor": "ใจนิ่ง น้ำในขันก็ขลัง"
  },
  {
-  "id": "equipment_nang_tani_skull",
-  "name": "กะโหลกนางตานี",
-  "type": "equipment",
-  "rarity": "Rare",
+  "id": "ghost_possession",
+  "name": "ทรงผี",
+  "type": "mana",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "mana": 4,
+   "draw": 1
+  },
+  "limit": "turn",
+  "flavor": "ผีเข้าร่างพาของขลังมาด้วย"
+ },
+ {
+  "id": "blood_offering",
+  "name": "กรีดเลือดเซ่น",
+  "type": "mana",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "selfDamage": 3,
+   "mana": 4
+  },
+  "flavor": "ของต่ำกินเลือดก่อนจะยอมทำงานให้"
+ },
+ {
+  "id": "holy_water_splash",
+  "name": "สาดน้ำมนต์",
+  "type": "spell",
+  "rarity": "Common",
   "class": "shaman",
   "fx": {},
-  "equip": {
-   "triggers": [
-    {
-     "on": "turnStart",
-     "fx": {
-      "mana": 1
-     }
-    }
-   ]
+  "mana": 0,
+  "splash": {
+   "dmg": 5
   },
-  "flavor": "มันกระซิบคาถาให้ทุกเช้า"
+  "starter": 1,
+  "flavor": "สาดทั้งขัน ไม่เหลือสักหยด"
+ },
+ {
+  "id": "sprinkle",
+  "name": "ประพรมน้ำมนต์",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "block": 7,
+   "heal": 2
+  },
+  "mana": 1,
+  "starter": 1,
+  "flavor": "ใบมะยมจุ่มน้ำมนต์ประพรมรอบตัว"
+ },
+ {
+  "id": "boil_water",
+  "name": "น้ำมนต์เดือด",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {},
+  "mana": 0,
+  "splash": {
+   "dmg": 3,
+   "sweep": true
+  },
+  "flavor": "น้ำมนต์ต้มจนเดือด ลวกทั้งผีทั้งบริวาร"
+ },
+ {
+  "id": "water_curtain",
+  "name": "ม่านน้ำมนต์",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {},
+  "mana": 0,
+  "splash": {
+   "block": 3
+  },
+  "flavor": "สาดเป็นม่านกั้นระหว่างเรากับผี"
+ },
+ {
+  "id": "mouth_spray",
+  "name": "พ่นน้ำมนต์ใส่หน้า",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 5,
+   "hits": 2
+  },
+  "mana": 2,
+  "flavor": "อมไว้ใต้ลิ้น เสกแล้วพ่นใส่หน้าผี"
+ },
+ {
+  "id": "flowing_chant",
+  "name": "คาถาไหลลื่น",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "dmg": 18
+  },
+  "mana": 4,
+  "flavor": "คาถาไหลออกมาไม่ขาดสายเหมือนน้ำ"
+ },
+ {
+  "id": "cleansing_bath",
+  "name": "อาบน้ำมนต์ล้างอาถรรพ์",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "cleanse": true,
+   "block": 6
+  },
+  "mana": 2,
+  "flavor": "รดหัวล้างทุกสิ่งที่ผีแปะไว้"
  },
  {
   "id": "black_magic",
@@ -340,12 +288,214 @@
   "type": "spell",
   "rarity": "Legendary",
   "class": "shaman",
-  "mana": 6,
   "fx": {
-   "dmg": 32
+   "dmg": 30
   },
+  "mana": 6,
+  "blood": true,
   "exhaust": true,
-  "flavor": "ของต้องห้ามที่ใช้ได้ครั้งเดียว"
+  "flavor": "ของต้องห้าม ถ้าน้ำไม่พอ มันขอเลือดแทน"
+ },
+ {
+  "id": "yant_burst",
+  "name": "ปลุกยันต์ลุกไฟ",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {},
+  "mana": 2,
+  "wakeYant": {
+   "dmg": 6
+  },
+  "flavor": "ยันต์ทุกแผ่นบนตัวผีลุกเป็นไฟพร้อมกัน"
+ },
+ {
+  "id": "yant_ward",
+  "name": "ยันต์คุ้มกาย",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "block": 3
+  },
+  "mana": 1,
+  "wakeYant": {
+   "block": 4
+  },
+  "flavor": "ดึงยันต์จากตัวผีมาห่อตัวเราแทน"
+ },
+ {
+  "id": "sai_sin_bind",
+  "name": "สายสิญจน์มัดมือ",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    },
+    {
+     "id": "yant",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "mana": 2,
+  "conditional": {
+   "when": {
+    "kind": "ghost_charging"
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "yant",
+      "stacks": 2,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ]
+   }
+  },
+  "flavor": "มัดมือผีตอนมันกำลังง้าง"
+ },
+ {
+  "id": "seal_jar",
+  "name": "หม้อดินกักผี",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "seal": 1,
+   "dmg": 6
+  },
+  "mana": 4,
+  "flavor": "ดึงผีลงหม้อ ปิดผ้าขาว ผูกสายสิญจน์"
+ },
+ {
+  "id": "night_hex_knot",
+  "name": "เงื่อนคาถาห้าคืน",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "dmg": 5,
+   "status": [
+    {
+     "id": "yant",
+     "stacks": 2,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "mana": 2,
+  "locked": true,
+  "conditional": {
+   "when": {
+    "kind": "enemy_status_at_least",
+    "statusId": "yant",
+    "value": 3
+   },
+   "bonus": {
+    "dmg": 7
+   }
+  },
+  "flavor": "เงื่อนคาถาที่ผูกไว้ห้าคืน"
+ },
+ {
+  "id": "curse_chant",
+  "name": "เสกคาถาสาป",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 7,
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  },
+  "mana": 2,
+  "starter": 1,
+  "flavor": "คำสาปทำให้ผีเจ็บทุกครั้งที่โดน"
+ },
+ {
+  "id": "direct_poison_spell",
+  "name": "เสกพิษตรง",
+  "type": "spell",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 4,
+     "to": "enemy"
+    }
+   ]
+  },
+  "mana": 2,
+  "blood": true,
+  "flavor": "คาถาพิษเข้าเลือดโดยตรง"
+ },
+ {
+  "id": "withering_hex",
+  "name": "คาถาเหี่ยวแห้ง",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    },
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  },
+  "mana": 3,
+  "blood": true,
+  "flavor": "ผีอ่อนแรงและเปราะบางพร้อมกัน"
+ },
+ {
+  "id": "phi_tai_hong",
+  "name": "ผีตายโหง",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "dmg": 12
+  },
+  "mana": 4,
+  "blood": true,
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "dmg": 12
+   }
+  },
+  "flavor": "เรียกผีตายโหงมาแก้แค้นแทน"
  },
  {
   "id": "herbal_ritual",
@@ -353,7 +503,6 @@
   "type": "spell",
   "rarity": "Legendary",
   "class": "shaman",
-  "mana": 4,
   "fx": {
    "heal": 12,
    "status": [
@@ -365,8 +514,395 @@
     }
    ]
   },
+  "mana": 4,
   "exhaust": true,
   "flavor": "สมุนไพรเก้าชนิดต้มในหม้อดิน"
+ },
+ {
+  "id": "salt_hex",
+  "name": "เกลือเสกคาถา",
+  "type": "spell",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "block": 8,
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 1,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  },
+  "mana": 2,
+  "flavor": "เกลือเสกกันตัวและสาปผีไปพร้อมกัน"
+ },
+ {
+  "id": "hong_phrai_call",
+  "name": "เลี้ยงโหงพราย",
+  "type": "spell",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "summon": "hong_phrai"
+  },
+  "mana": 3,
+  "blood": true,
+  "flavor": "ผีพรายตายทั้งกลมที่ขอเลือดเลี้ยงทุกคืน"
+ },
+ {
+  "id": "cooling_cloth",
+  "name": "ผ้าเย็น",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "block": 7
+  },
+  "ap": 1,
+  "starter": 2,
+  "flavor": "ตั้งรับด้วยผ้าชุบน้ำมนต์"
+ },
+ {
+  "id": "fill_bowl",
+  "name": "ตักน้ำใส่ขัน",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "mana": 2,
+   "block": 4
+  },
+  "ap": 1,
+  "flavor": "ตักน้ำบ่อวัดใส่ขันแล้วเสกต่อ"
+ },
+ {
+  "id": "full_bowl",
+  "name": "ขันเต็มเปี่ยม",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "block": 5
+  },
+  "ap": 1,
+  "conditional": {
+   "when": {
+    "kind": "water_at_least",
+    "value": 8
+   },
+   "bonus": {
+    "dmg": 16
+   }
+  },
+  "flavor": "ขันที่เต็มจนปริ่มมีแรงในตัวเอง"
+ },
+ {
+  "id": "yantra_in_hand",
+  "name": "ยันต์ในมือ",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "block": 8,
+   "status": [
+    {
+     "id": "yant",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "ap": 1,
+  "whileHeld": {
+   "block": 3
+  },
+  "flavor": "ปล่อยได้กันเต็ม ถือไว้ก็ยังกันให้"
+ },
+ {
+  "id": "sai_sin",
+  "name": "ล้อมสายสิญจน์",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "unCharge": true,
+   "block": 5
+  },
+  "ap": 1,
+  "flavor": "วงด้ายขาวรอบตัว ผีที่กำลังง้างต้องเริ่มใหม่"
+ },
+ {
+  "id": "read_omen",
+  "name": "ดูฤกษ์ยาม",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "draw": 2,
+   "mana": 1
+  },
+  "ap": 1,
+  "flavor": "ดูตำราว่าคืนนี้อะไรจะมา"
+ },
+ {
+  "id": "hun_payon_call",
+  "name": "ปลุกหุ่นพยนต์",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "summon": "hun_payon"
+  },
+  "ap": 1,
+  "flavor": "หุ่นฟางเสกให้ลุกขึ้นยืนรับหมัดแทน"
+ },
+ {
+  "id": "golden_child_call",
+  "name": "เลี้ยงกุมารทอง",
+  "type": "action",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "summon": "golden_child"
+  },
+  "ap": 1,
+  "flavor": "ป้อนน้ำแดงขนม แล้วกุมารทองจะตักน้ำให้"
+ },
+ {
+  "id": "khwai_thanu_call",
+  "name": "ปลุกควายธนู",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "summon": "khwai_thanu"
+  },
+  "ap": 1,
+  "flavor": "ควายทองเหลืองตัวน้อยเสกให้ขวิดผี"
+ },
+ {
+  "id": "rak_yom_call",
+  "name": "บูชารักยม",
+  "type": "action",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "summon": "rak_yom"
+  },
+  "ap": 1,
+  "flavor": "กุมารพี่น้องในขวดน้ำมันคอยช่วยร่าย"
+ },
+ {
+  "id": "spirit_feast",
+  "name": "ข้าวปลาเลี้ยงผี",
+  "type": "action",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "healMinions": 6,
+   "block": 5
+  },
+  "ap": 1,
+  "flavor": "เลี้ยงของเลี้ยงให้อิ่ม มันจะอยู่กับเราไปนาน ๆ"
+ },
+ {
+  "id": "rain_rite",
+  "name": "พิธีขอฝน",
+  "type": "prayer",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "mana": 3,
+   "block": 4
+  },
+  "ap": 1,
+  "flavor": "ยิ่งสวดนาน ฝนยิ่งเทลงขัน"
+ },
+ {
+  "id": "yantra_snare",
+  "name": "ยันต์ดัก",
+  "type": "counter",
+  "rarity": "Common",
+  "class": "shaman",
+  "fx": {
+   "dmg": 5,
+   "status": [
+    {
+     "id": "yant",
+     "stacks": 2,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "counter": {
+   "trigger": "enemy_attack"
+  },
+  "flavor": "ยันต์ลุกเป็นไฟเมื่อผีเข้ามาตี"
+ },
+ {
+  "id": "chalk_circle",
+  "name": "วงปูนเสก",
+  "type": "counter",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {
+   "status": [
+    {
+     "id": "yant",
+     "stacks": 1,
+     "turns": 99,
+     "to": "enemy"
+    }
+   ]
+  },
+  "counter": {
+   "trigger": "enemy_skill",
+   "negate": true
+  },
+  "flavor": "ผีก้าวข้ามวงปูนไม่ได้ ร่ายอะไรก็ไม่ออก"
+ },
+ {
+  "id": "water_bowl_guard",
+  "name": "บาตรน้ำมนต์รับหมัด",
+  "type": "counter",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {
+   "block": 8,
+   "mana": 2
+  },
+  "counter": {
+   "trigger": "enemy_attack"
+  },
+  "flavor": "ยกบาตรรับไว้ น้ำกระฉอกกลับลงขัน"
+ },
+ {
+  "id": "equipment_shaman_staff",
+  "name": "ไม้เท้าหมอผี",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "play",
+     "type": "spell",
+     "once": "turn",
+     "fx": {
+      "mana": 1
+     }
+    }
+   ]
+  },
+  "flavor": "คาถาใบแรกแต่ละเทิร์นคืนน้ำมนต์"
+ },
+ {
+  "id": "equipment_nang_tani_skull",
+  "name": "กะโหลกนางตานี",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "seal",
+     "fx": {
+      "dmg": 8,
+      "heal": 3
+     }
+    }
+   ]
+  },
+  "flavor": "นางตานีหัวเราะทุกครั้งที่ผีตนอื่นถูกขัง"
+ },
+ {
+  "id": "bronze_bowl",
+  "name": "ขันน้ำมนต์สำริด",
+  "type": "equipment",
+  "rarity": "Uncommon",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "equip",
+     "fx": {
+      "mana": 2
+     }
+    }
+   ],
+   "bowlBonus": 5
+  },
+  "flavor": "ขันใบใหญ่ของหลวงตา จุได้มากกว่าขันของเรา"
+ },
+ {
+  "id": "overflow_trough",
+  "name": "รางน้ำมนต์",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [],
+   "overflowDmg": 3
+  },
+  "flavor": "น้ำที่ล้นขันไหลตามรางไปลวกผี"
+ },
+ {
+  "id": "bone_rosary",
+  "name": "ประคำกระดูก",
+  "type": "equipment",
+  "rarity": "Rare",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "play",
+     "type": "spell",
+     "when": {
+      "kind": "player_hp_below",
+      "value": 50
+     },
+     "fx": {
+      "dmg": 5
+     }
+    }
+   ]
+  },
+  "flavor": "ยิ่งเจ็บ ลูกประคำยิ่งร้อน"
+ },
+ {
+  "id": "red_yant_cloth",
+  "name": "ผ้ายันต์แดงประจำตัว",
+  "type": "equipment",
+  "rarity": "Legendary",
+  "class": "shaman",
+  "fx": {},
+  "equip": {
+   "triggers": [
+    {
+     "on": "turnStart",
+     "fx": {
+      "status": [
+       {
+        "id": "yant",
+        "stacks": 1,
+        "turns": 99,
+        "to": "enemy"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "flavor": "ผ้ายันต์ที่ครูลงอักขระให้ตั้งแต่บวชเณร"
  },
  {
   "id": "dharma_wheel",

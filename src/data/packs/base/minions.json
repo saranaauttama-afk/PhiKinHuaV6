@@ -34,5 +34,102 @@
     "id": "old_master", "name": "ครูมวยเฒ่า", "side": "player", "hp": 12,
     "passive": { "echoFirstAttack": 0.5, "triggers": [] },
     "desc": "การ์ดโจมตีใบแรกของเราแต่ละเทิร์น ทำซ้ำอีกครั้งที่แรงครึ่งหนึ่ง"
+  },
+  {
+    "id": "pong_monkey", "name": "ลิงโป่ง", "side": "enemy", "hp": 6,
+    "taunt": true,
+    "act": {"dmg": 2},
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี ขว้างดินใส่เรา ตี 2"
+  },
+  {
+    "id": "ash_bones", "name": "เถ้ากระดูก", "side": "enemy", "hp": 5,
+    "taunt": true,
+    "act": {"dmg": 2},
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี ตีเรา 2"
+  },
+  {
+    "id": "ash_crawler", "name": "เถ้ากระดูกคลาน", "side": "enemy", "hp": 5,
+    "taunt": true,
+    "act": {"status": [{"id": "poison", "stacks": 1, "turns": 2, "to": "enemy"}]},
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี เราติดพิษ 1"
+  },
+  {
+    "id": "forest_shade", "name": "เงาป่า", "side": "enemy", "hp": 8,
+    "taunt": true,
+    "act": {"block": 3},
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี พันกิ่งไม้ให้ผี เกราะ 3"
+  },
+  {
+    "id": "basket_head", "name": "หัวในกระด้ง", "side": "enemy", "hp": 10,
+    "taunt": true,
+    "chargeBoost": 1,
+    "desc": "รับหมัดเดี่ยวแทนกระหัง · ระหว่างยังอยู่ ไพ่ชาร์จของกระหังชาร์จเร็วขึ้นเทิร์นละ 1"
+  },
+  {
+    "id": "luk_daeng", "name": "ลูกแดง", "side": "enemy", "hp": 6,
+    "taunt": true,
+    "act": {"heal": 3},
+    "desc": "รับหมัดเดี่ยวแทนแม่ · ท้ายเทิร์นผี แม่นาคฟื้น 3"
+  },
+  {
+    "id": "phrai_nam", "name": "พรายน้ำ", "side": "enemy", "hp": 6,
+    "taunt": true,
+    "act": {"status": [{"id": "poison", "stacks": 1, "turns": 2, "to": "enemy"}]},
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี เราติดพิษ 1"
+  },
+  {
+    "id": "suea_saming", "name": "เสือสมิง", "side": "enemy", "hp": 10,
+    "taunt": true,
+    "act": {"dmg": 4},
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี ตะปบเรา 4"
+  },
+  {
+    "id": "thaowan", "name": "เถาวัลย์", "side": "enemy", "hp": 8,
+    "taunt": true,
+    "act": {"block": 4},
+    "desc": "รับหมัดเดี่ยวแทนผี · ท้ายเทิร์นผี พันผีไว้ เกราะ 4"
+  },
+  {
+    "id": "pret_borivan", "name": "เปรตบริวาร", "side": "enemy", "hp": 8,
+    "taunt": true,
+    "act": {"dmg": 3},
+    "desc": "รับหมัดเดี่ยวแทนเปรตวัดร้าง · ท้ายเทิร์นผี ตีเรา 3"
+  },
+  {
+    "id": "rak_sai", "name": "รากไทร", "side": "enemy", "hp": 12,
+    "taunt": true,
+    "act": {"block": 5},
+    "desc": "รับหมัดเดี่ยวแทนผีป่าไทร · ท้ายเทิร์นผี รากพันให้ผีเกราะ 5"
+  },
+  {
+    "id": "hua_loi", "name": "หัวลอย", "side": "enemy", "hp": 10,
+    "taunt": true,
+    "act": {"steal": 1},
+    "desc": "รับหมัดเดี่ยวแทนผีกินหัว · ท้ายเทิร์นผี คาบการ์ดใบล่าสุดในมือเราไป 1 ใบ (ตีผีเข้าเนื้อแล้วคืน)"
+    },
+  {
+    "id": "hun_payon", "name": "หุ่นพยนต์ฟาง", "side": "player", "hp": 12,
+    "passive": { "guard": true, "triggers": [] },
+    "desc": "รับการ์ดโจมตีใบแรกของผีแทนเราทุกเทิร์นผี"
+  },
+  {
+    "id": "golden_child", "name": "กุมารทอง", "side": "player", "hp": 7,
+    "passive": { "triggers": [ { "on": "turnStart", "fx": { "mana": 1 } }, { "on": "seal", "fx": { "draw": 1 } } ] },
+    "desc": "ต้นเทิร์นเรา น้ำมนต์ +1 · ทุกครั้งที่ผนึกผี จั่ว 1"
+  },
+  {
+    "id": "khwai_thanu", "name": "ควายธนู", "side": "player", "hp": 9,
+    "passive": { "triggers": [ { "on": "turnEnd", "fx": { "dmg": 5 } } ] },
+    "desc": "ท้ายเทิร์นเรา ขวิดผี 5"
+  },
+  {
+    "id": "rak_yom", "name": "รักยม", "side": "player", "hp": 6,
+    "passive": { "triggers": [ { "on": "play", "type": "spell", "once": "turn", "fx": { "dmg": 3, "block": 3 } } ] },
+    "desc": "คาถาใบแรกของแต่ละเทิร์น: ตีผี 3 และเกราะ 3"
+  },
+  {
+    "id": "hong_phrai", "name": "โหงพราย", "side": "player", "hp": 8,
+    "passive": { "triggers": [ { "on": "turnEnd", "fx": { "status": [ { "id": "poison", "stacks": 2, "turns": 3, "to": "enemy" } ] } } ] },
+    "desc": "ท้ายเทิร์นเรา ผีติดพิษ 2"
   }
 ]

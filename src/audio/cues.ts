@@ -21,9 +21,17 @@ export function cuesFor(events: CombatEvent[]): SfxId[] {
       case 'BlockGained': if (e.target === 'player') out.add('block'); break;
       case 'Healed': if (e.target === 'player') out.add('heal'); break;
       case 'RhythmChanged': if (rhythm == null || e.value > rhythm) { if (e.value > 0) out.add('rhythmUp'); } rhythm = e.value; break;
-      case 'Riposte': out.add('riposte'); break;
+      case 'Riposte': case 'GhostRiposte': out.add('riposte'); break;
+      case 'GhostGuard': out.add('block'); break;
+      case 'PlayerStunned': out.add('stun'); break;
+      case 'GhostPhase': out.add('roundBell'); break;
+      case 'CardStolen': out.add(e.back ? 'block' : 'debuff'); break;
       case 'RoundEnd': out.add('roundBell'); break;
       case 'MinionSummoned': out.add('minionSummon'); break;
+      // หมอผี (15 Oct 2026): reuse existing sounds until the owner records shaman ones.
+      case 'GhostSealed': out.add('stun'); break;
+      case 'GhostUnCharged': out.add('block'); break;
+      case 'WaterOverflow': out.add('heal'); break;
       case 'StatusApplied':
         if (e.target === 'enemy' && e.effectId === 'stun') out.add('stun');
         if (e.target === 'player' && DEBUFFS.has(e.effectId)) out.add('debuff');
@@ -36,4 +44,4 @@ export function cuesFor(events: CombatEvent[]): SfxId[] {
   return [...out];
 }
 
-const DEBUFFS = new Set(['fear', 'poison', 'curse', 'corruption', 'entangle', 'weakness', 'vulnerable', 'draw_reduction']);
+const DEBUFFS = new Set(['stun', 'fear', 'poison', 'curse', 'corruption', 'entangle', 'weakness', 'vulnerable', 'draw_reduction']);

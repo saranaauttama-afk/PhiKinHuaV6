@@ -1,6 +1,7 @@
 // src/core/combat/status-effects/registry.ts — คลังข้อมูลสถานะผลทั้งหมด
 
 import type { StatusEffectType, StatusEffectDefinition } from './types';
+import { GHOST_MECHANICS } from '../../balance/notfm';
 
 /**
  * คลังข้อมูลสถานะผลทั้งหมดในเกม
@@ -21,10 +22,23 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
     tags: ['debuff', 'mark'],
   },
 
+  // หมอผี (15 ต.ค. 2026): ยันต์ไม่ลดเอง ครบ WATER_RULES.sealAt แล้วผนึกการ์ดที่ผีถือไว้ 1 ใบ
+  yant: {
+    id: 'yant',
+    name: 'ยันต์',
+    description: 'ครบ 5 ชั้น ผนึกการ์ดที่ผีถือไว้ 1 ใบ (ใบที่ชาร์จมากที่สุด) ถ้าผีไม่ได้ถือการ์ด ผีมึนแทน',
+    defaultDuration: 99,
+    stackable: true,
+    maxStacks: 10,
+    tags: ['debuff', 'mark'],
+  },
+
   stun: {
     id: 'stun',
     name: 'มึน',
-    description: 'การ์ดโจมตีใบแรกของเทิร์นถัดไปถูกยกเลิก',
+    // One status, one word on both sides (owner, 15 Oct 2026): on a ghost it cancels the first
+    // attack card; on the player it costs AP next turn (GHOST_MECHANICS.stunApLoss).
+    description: `ผีมึน: การ์ดโจมตีใบแรกของเทิร์นถัดไปถูกยกเลิก · เรามึน: เทิร์นหน้าแต้ม −${GHOST_MECHANICS.stunApLoss}`,
     defaultDuration: 2,
     stackable: false,
     tags: ['debuff', 'restriction'],
@@ -97,7 +111,7 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   weakness: {
     id: 'weakness', 
     name: 'ความอ่อนแอ',
-    description: 'สร้างความเสียหายลดลง 50%',
+    description: 'ดาเมจที่ตีออกไปลดลง 25%',
     defaultDuration: 2,
     stackable: false,
     tags: ['debuff', 'damage_reduction'],
@@ -182,6 +196,8 @@ export const STATUS_EFFECTS_REGISTRY: Record<StatusEffectType, StatusEffectDefin
   },
 
   thorns:{id:'thorns',name:'หนามสะท้อน',description:'เมื่อรับการโจมตี สะท้อนความเสียหายตามจำนวนชั้น',defaultDuration:2,stackable:true,maxStacks:6,tags:['buff','protection']},
+  // ผีตายโหงนางรำ (15 Oct 2026): the ghost-side mirror of the นักมวย's จังหวะ, lasts one ghost turn.
+  dance:{id:'dance',name:'จังหวะรำ',description:'ทุกหมัดของผีเทิร์นนี้แรงขึ้นตามจำนวนชั้น หมดเมื่อจบเทิร์นผี',defaultDuration:1,stackable:true,maxStacks:6,tags:['buff','damage_boost']},
   dodge:{id:'dodge',name:'หลบครั้งถัดไป',description:'หลบการโจมตีถัดไปหนึ่งครั้ง ไม่หลบพิษหรือความเสียหายจากสถานะ',defaultDuration:1,stackable:true,maxStacks:2,tags:['buff','protection']},
   energy_boost: {
     id: 'energy_boost',

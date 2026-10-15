@@ -22,6 +22,8 @@ import {isCriticalOffer} from '../src/core/map/adventure';
 import type {ClassId} from '../src/core/classes';
 import type {Difficulty} from '../src/core/campaign/threeNight';
 import type {Command,CardData,Fx,GameState} from '../src/core/types';
+import {enemyHandCharges} from '../src/core/combat/ghostMechanics';
+import * as Water from '../src/core/cards/water';
 
 export type FightKind='normal'|'elite'|'boss';
 export type FightRecord={night:number;index:number;enemyId:string;kind:FightKind;turns:number;hpBefore:number;hpAfter:number;maxHp:number;won:boolean};
@@ -31,28 +33,41 @@ export type RunRecord={seed:string;classId:ClassId;difficulty:Difficulty;won:boo
 
 const fxValue=(fx:Fx)=>(fx.dmg??0)*(fx.hits??1)+(fx.block??0)*.6+(fx.draw??0)*4+(fx.mana??0)*2+(fx.heal??0)*.6+(fx.status??[]).reduce((n,e)=>n+e.stacks*2.5,0)+(fx.borrow??0)*5
  // นักมวยคาดเชือก
- +(fx.rhythm??0)*3+(fx.summon?11:0)+(fx.breakBlock??0)*.4+(fx.keepRhythm?1.5:0)+(fx.lockRhythm?5:0)+(fx.doubleNext?7:0)+(fx.sweep?2:0);
+ +(fx.rhythm??0)*3+(fx.summon?11:0)+(fx.breakBlock??0)*.4+(fx.keepRhythm?1.5:0)+(fx.lockRhythm?5:0)+(fx.doubleNext?7:0)+(fx.sweep?2:0)
+ // หมอผี (cards/water.ts)
+ +(fx.seal??0)*8+(fx.unCharge?4:0)-(fx.selfDamage??0)*.8+(fx.healMinions??0)*.3;
 /** Rough worth per resource spent; used for rewards, shop and removal. */
 export const cardValue=(c:CardData)=>{
  const fx=starFx(c);let v=fxValue(fx)+(c.conditional?fxValue(c.conditional.bonus)*.5:0)+(c.equip?8:0)+(c.counter?4:0)+(c.type==='prayer'?fxValue(fx)*.6:0)
-  +(c.after?fxValue(c.after.bonus)*.5:0)+(c.heavy?4:0)+(c.riposte?fxValue(c.riposte)*.6:0)+(c.spendRhythm?(c.spendRhythm.mode==='hits'?(fx.dmg??0)*3:(c.spendRhythm.perStack??0)*3):0)+(c.repeatIf?(fx.dmg??0)*.4:0)+(c.innate?2:0)+(c.move?1.5:0);
+  +(c.after?fxValue(c.after.bonus)*.5:0)+(c.heavy?4:0)+(c.riposte?fxValue(c.riposte)*.6:0)+(c.spendRhythm?(c.spendRhythm.mode==='hits'?(fx.dmg??0)*3:(c.spendRhythm.perStack??0)*3):0)+(c.repeatIf?(fx.dmg??0)*.4:0)+(c.innate?2:0)+(c.move?1.5:0)
+  +(c.splash?fxValue(Water.perStack(c.splash,5)):0)+(c.wakeYant?fxValue(Water.perStack(c.wakeYant,3)):0);
  if(c.exhaust)v*=.8;
  return v/Math.max(1,(c.ap??0)+(c.mana??0)/2.5);
 };
 
 /** Next card to play from what a player can see, or -1 to end the turn. */
 export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string):number{
- const playable=s.piles.hand.map((c,i)=>({c,i})).filter(({c})=>!playBlock(s,c));
+ // หมอผี: a player holds สาด / ปลุกยันต์ until there is something to throw (unless it kills).
+ const hold=(c:CardData)=>{
+  const ghost=(s.enemy?.hp??0)+(s.enemy?.block??0);
+  if(c.splash&&(c.splash.dmg??0)*s.player.mana<ghost&&s.player.mana<5)return true;
+  if(c.wakeYant&&Water.yantOn(s)<2)return true;
+  return false;
+ };
+ const playable=s.piles.hand.map((c,i)=>({c,i})).filter(({c})=>!playBlock(s,c)&&!(tactical&&hold(c)));
  if(!playable.length)return -1;
  if(!tactical)return playable[int(makeRng(decisionSeed),0,playable.length-1).value].i;
  const strength=s.enemy?.statusEffects?.find(e=>e.id==='strength')?.stacks??0;
  const rage=s.enemy?.statusEffects?.find(e=>e.id==='rage')?.stacks??0;
- const threat=((s.enemy?.maxAp??2)+1)*3.5+(strength+rage)*2;
+ // Night-1 ghosts (15 Oct 2026): a charging card back is public, so a player blocks for it.
+ const charged=(enemyHandCharges(s) as Array<number|null>).reduce<number>((t,n)=>t+(n??0)*3,0);
+ const threat=((s.enemy?.maxAp??2)+1)*3.5+(strength+rage)*2+charged;
+ const ghostGuard=!!s.fight?.enemyRipostes?.length,ghostRiposte=(s.fight?.enemyRipostes??[]).reduce((t,f)=>t+(f.dmg??0),0);
  const guardNeed=Math.max(0,threat-s.player.block);
  const low=s.player.hp<s.player.maxHp*.4;
  const score=(card:CardData)=>{
   // Free resource builders first: mana and equipment pay off for the rest of the fight.
-  if(card.type==='mana')return 100;
+  if(card.type==='mana')return (card.fx.selfDamage??0)>=s.player.hp-8?-1:100;
   if(card.type==='equipment')return 90;
   if(card.type==='counter')return 60;
   let c=cardFx(s,card);
@@ -72,7 +87,20 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
    if(card.repeatIf&&conditionMet(s,card.repeatIf,card))fighterBonus+=(c.dmg??0);
    if(s.turnFlags?.doubleNext)fighterBonus+=(c.dmg??0)*(c.hits??1);
   }
+  // หมอผี: สาด spends what is left after the price, ปลุกยันต์ eats the ghost's ยันต์, ของต่ำ costs HP.
+  const water=Math.max(0,s.player.mana-cardCost(s,card).mana);
+  if(card.splash){c=addFx(c,Water.perStack(card.splash,water));if(card.splash.sweep)c={...c,sweep:true};if(water<4&&s.piles.hand.some(h=>h!==card&&h.type==='mana'))fighterBonus-=8;}
+  const yantNow=Water.yantOn(s);
+  if(card.wakeYant){c=addFx(c,Water.perStack(card.wakeYant,yantNow));if(card.wakeYant.sweep)c={...c,sweep:true};}
+  const blood=Water.bloodCost(s,card,cardCost(s,card).mana);
   let v=Math.max(0,(c.dmg??0)*(c.hits??1)+fighterBonus-(s.enemy?.block??0)*.45)*1.2;
+  v-=blood*(low?1.6:.7)+(c.selfDamage??0)*(low?1.6:.7);
+  const yantAdd=(c.status??[]).filter(e=>e.id==='yant').reduce((n,e)=>n+e.stacks,0);
+  if(yantAdd&&yantNow+yantAdd>=5)v+=7+charged*.8;
+  if(c.seal)v+=c.seal*(7+charged*.8);
+  if(c.unCharge)v+=charged*.9;
+  // The ghost's สวน is on its status row: do not swing an attack its block swallows into it.
+  if(card.type==='attack'&&ghostGuard&&!(s.enemyMinions??[]).some(m=>m.taunt&&m.hp>0)&&((c.dmg??0)+fighterBonus)*(c.hits??1)<=(s.enemy?.block??0))v-=ghostRiposte*1.5+4;
   if(c.rhythm)v+=c.rhythm*2.5;
   if(c.keepRhythm&&!s.piles.hand.some(h=>h!==card&&h.type==='attack'))v+=rhythm*.6;
   if(c.lockRhythm)v+=3+rhythm*.5;
@@ -137,7 +165,7 @@ function chooseFightSkill(s:GameState):Command|undefined{
   muay_teacher:()=>hand.some(c=>!playBlock(s,c)&&cardValue(c)>=6),
   diamond_heart:()=>(s.fight?.hpLost??0)>=10,
   composure:()=>hp<.6||hand.some(c=>c.type==='spell'&&(c.mana??0)>=3),
-  consecrate:()=>hand.some(c=>c.type==='spell'),
+  consecrate:()=>hand.some(c=>c.type==='spell'&&(!c.splash||s.player.mana>=4)),
   metta:()=>s.player.hp<s.player.maxHp-8&&hand.some(c=>c.type==='attack'),
   samadhi:()=>(s.prayers?.length??0)>0||hp<.5,
   ghost_strength:()=>s.player.hp>20&&hand.length<=5,

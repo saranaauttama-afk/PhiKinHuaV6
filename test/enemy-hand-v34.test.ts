@@ -12,7 +12,7 @@ import {applyStatusEffect} from '../src/core/statusEffectsRuntime';
 import {NIGHT_ENEMY_DECKS} from '../src/core/campaign/enemyDecks';
 import {getAllMonsterIds} from '../src/core/monsters/thai-ghosts';
 import type {GameState} from '../src/core/types';
-const heal='phi_pop_v29_signature_support',multi='krahang_v29_signature',strength='krahang_v29_setup';
+const heal='pop_yai_v29_signature_support',multi='pop_yai_v29_double',strength='pop_yai_v29_setup';
 // A: free attack (6) · G: action, 1 AP, block 4 · X1/X2: filler copies for pile tests.
 const A='pisaj_fai_v29_signature',G='phi_krasue_v29_ward',X1='phi_pop_v29_ward',X2='nang_tanee_v29_ward';
 const cost=(id:string)=>enemyCardCost(enemyCardById(id)!);
@@ -73,10 +73,10 @@ describe('v34 decisions and ordinary interactions',()=>{
  it('plays a Strength setup before the multi-hit it boosts, in the same turn',()=>{
   const s=fixture([multi,strength]);s.enemyDrawPerTurn=0;const a=turn(s);
   expect(a.enemyLastPlayed).toEqual([strength,multi]);
-  const hits=a.pendingEvents!.filter(e=>e.t==='Damage'&&e.target==='player');expect(hits).toHaveLength(3);expect(hits.every(e=>(e as any).modified===3)).toBe(true);
+  const hits=a.pendingEvents!.filter(e=>e.t==='Damage'&&e.target==='player');expect(hits).toHaveLength(2);expect(hits.every(e=>(e as any).modified===3)).toBe(true);
  });
  it('orders poison before an affordable poison payoff; each hit resolves once',()=>{
-  const poison='phi_krasue_v29_signature_support',payoff='phi_krasue_v34_payoff';
+  const poison='phi_phrai_v29_signature_support',payoff='phi_phrai_v34_payoff';
   const s=fixture([payoff,poison]);s.enemy!.maxAp=3;s.enemyDrawPerTurn=0;
   const a=turn(s);expect(a.enemyLastPlayed).toEqual([poison,payoff]);
   const reveals=a.pendingEvents!.filter(e=>e.t==='EnemyCardRevealed');expect(reveals).toHaveLength(2);
@@ -131,9 +131,14 @@ describe('v34 migration and scope',()=>{
   expect(s.enemyPiles!.hand).toHaveLength(4);expect(s.enemyPiles!.discard).toEqual([G]);expect(inventory(s)).toHaveLength(5);
  });
  it('all 34 ghosts have valid owned decks with meaningful mixed effects',()=>{
+  // Night-1 ghosts were rebuilt 15 Oct 2026, nights 2–3 the same day (docs/ghosts/NIGHT1-DESIGN.md): 8–10 cards, 4–5 shared
+  // base cards + 3–4 signature cards. The rest keep the v34 10/12/15 decks until their night is redone.
   for(const id of getAllMonsterIds()){
-   const deck=NIGHT_ENEMY_DECKS[id];expect(deck,id).toBeDefined();expect([10,12,15]).toContain(deck.length);
-   for(const cardId of deck){const c=enemyCardById(cardId)!;expect(c,cardId).toBeDefined();expect(c.owner).toBe(id);expect(c.fx.dmg||c.fx.block||c.fx.heal||c.fx.status?.length||c.curseCard).toBeTruthy();}
+   const deck=NIGHT_ENEMY_DECKS[id];expect(deck,id).toBeDefined();
+   // Nights 2–3 (_n2_/_n3_, 15 Oct 2026) use the same format; bosses may carry 11.
+   if(deck.some(c=>/_n[123]_/.test(c)))expect(deck.length,id).toBeGreaterThanOrEqual(8),expect(deck.length,id).toBeLessThanOrEqual(11);
+   else expect([10,12,15]).toContain(deck.length);
+   for(const cardId of deck){const c=enemyCardById(cardId)!;expect(c,cardId).toBeDefined();expect(c.owner).toBe(id);expect(c.fx.dmg||c.fx.block||c.fx.heal||c.fx.status?.length||c.fx.summon||c.fx.steal||c.curseCard).toBeTruthy();}
   }
  });
  it('new runtime has no sequence tracking, meters or explicit combo handlers',()=>{

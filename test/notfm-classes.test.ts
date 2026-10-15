@@ -9,7 +9,7 @@ import { beginPlayerFight } from '../src/core/commands';
 import { playCard, resolvePrayers } from '../src/core/cards/play';
 import { cardCost } from '../src/core/cards/model';
 import { SKILLS, skillBlock, skillsFor, initSkills, skillParam } from '../src/core/skills';
-import { CLASS_PASSIVES } from '../src/core/balance/notfm';
+import { CLASS_PASSIVES, WATER_RULES } from '../src/core/balance/notfm';
 import { CHARACTER_CLASSES, ALL_CLASS_IDS } from '../src/core/classes';
 import { cardById } from '../src/core/pack';
 import { describeCard } from '../src/core/cards/describe';
@@ -87,13 +87,10 @@ describe('passive ประจำอาชีพ', () => {
     expect(CLASS_PASSIVES.warrior.rhythm).toBe(true);
   });
 
-  it('หมอผี: คาถาใบแรกของเทิร์นลดมานา ใบที่สองราคาเต็ม', () => {
-    const spell: CardData = { id: 'sp', name: 'sp', type: 'spell', mana: 3, fx: { dmg: 4 } };
-    const s = fight('shaman', [spell, { ...spell, instanceId: 'b' }], { playerMana: 10 });
-    expect(cardCost(s, s.piles.hand[0]).mana).toBe(3 - CLASS_PASSIVES.shaman.spellDiscount!);
-    playCard(s, 0, rng);
-    expect(s.player.mana).toBe(10 - 2);
-    expect(cardCost(s, s.piles.hand[0]).mana).toBe(3);
+  // Was 'ครูพักลักจำ' (first spell −1 mana) until the น้ำมนต์ rebuild, 15 Oct 2026 (test/mor-phi.test.ts).
+  it('หมอผี: passive ขันน้ำมนต์ประจำตัว ต้นเทิร์นได้น้ำมนต์', () => {
+    expect(CLASS_PASSIVES.shaman.water).toBe(true);
+    expect(CLASS_PASSIVES.shaman.triggers).toEqual([{ on: 'turnStart', fx: { mana: WATER_RULES.perTurn } }]);
   });
 
   it('แม่ชี: บทสวดสำเร็จแล้วฟื้นเลือด', () => {

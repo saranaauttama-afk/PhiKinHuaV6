@@ -1,4 +1,5 @@
 // test/notfm-enemy.test.ts — ghost cards follow the player card rules; rage; opening rules.
+import { minionDef } from '../src/core/combat/minions';
 import { describe, it, expect } from 'vitest';
 import type { GameState } from '../src/core/types';
 import type { PageOffer } from '../src/core/map/pages';
@@ -26,7 +27,9 @@ describe('ข้อมูลการ์ดผี', () => {
   const cards = allEnemyCards();
 
   it('ทุกใบในเด็คผีมีอยู่จริง และไม่มีใบที่ไม่ได้ใช้ค้างอยู่', () => {
-    const used = new Set(Object.values(NIGHT_ENEMY_DECKS).flat());
+    // A boss's second-phase deck (ghost_rules.json `phase2`) counts as used too.
+    const phase2 = ghostRuleIds().flatMap(id => ghostRule(id)?.phase2?.deck ?? []);
+    const used = new Set([...Object.values(NIGHT_ENEMY_DECKS).flat(), ...phase2]);
     for (const id of used) expect(enemyCardById(id), id).toBeDefined();
     expect(cards.filter(c => !used.has(c.id)).map(c => c.id)).toEqual([]);
   });
@@ -53,8 +56,8 @@ describe('ข้อมูลการ์ดผี', () => {
 
   it('ข้อความการ์ดผีอ่านจากฝั่งผี ไม่มี undefined', () => {
     for (const c of cards) expect(describeCard(c, 'enemy'), c.id).not.toMatch(/undefined|NaN/);
-    expect(describeCard(enemyCardById('phi_krasue_v29_signature')!, 'enemy')).toContain('เราติดพิษ');
-    expect(describeCard(enemyCardById('phi_krasue_v29_defense')!, 'enemy')).toContain('ผีติดหลบ');
+    expect(describeCard(enemyCardById('phi_phrai_v29_signature')!, 'enemy')).toContain('เราติดพิษ');
+    expect(describeCard(enemyCardById('phi_phrai_v29_defense')!, 'enemy')).toContain('ผีติดหลบ');
   });
 });
 
@@ -75,7 +78,7 @@ describe('ผีเล่นตามกติกาเดียวกับผ�
 
   it('ยืมการ์ดผีแล้วผลกลับทิศถูก: พิษที่ผีใส่เรา กลายเป็นพิษที่เราใส่ผี', () => {
     const { state: s } = makeCombatState({ enemyHp: 80, hand: [] });
-    s.cardHistory = []; s.enemyLastPlayed = ['phi_krasue_v29_signature'];
+    s.cardHistory = []; s.enemyLastPlayed = ['phi_phrai_v29_signature'];
     s.piles.hand = [{ ...cardFromBorrowCard(), instanceId: 'b1' }];
     playCard(s, 0, makeRng('b'));
     const borrowed = s.piles.hand.find(c => c.borrowed)!;
@@ -132,7 +135,9 @@ describe('กฎเปิดไฟต์', () => {
       expect(r.name.length, id).toBeGreaterThan(0);
       expect(r.fx.dmg, id).toBeUndefined();
       for (const e of r.fx.status ?? []) expect(statusIds.has(e.id), `${id} → ${e.id}`).toBe(true);
-      expect((r.fx.block ?? 0) + (r.fx.status?.length ?? 0), id).toBeGreaterThan(0);
+      // A rule may call a ลูกสมุน instead (night-1 ghosts, 15 Oct 2026); the minion must exist.
+      if (r.fx.summon) expect(minionDef(r.fx.summon)?.side, `${id} → ${r.fx.summon}`).toBe('enemy');
+      expect((r.fx.block ?? 0) + (r.fx.status?.length ?? 0) + (r.fx.summon ? 1 : 0), id).toBeGreaterThan(0);
     }
   });
 

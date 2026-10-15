@@ -22,6 +22,7 @@ import { baseNewState, startCombat } from '../src/core/commands';
 
 const rng = makeRng('muay');
 const HIT = 'phi_krasue_v29_strike'; // ghost attack 3
+const HIT6 = 'pisaj_fai_v29_signature'; // ghost attack 6
 const c = (id: string, star = 1): CardData => ({ ...cardById(id)!, star });
 
 function fight(hand: CardData[], over: Parameters<typeof makeCombatState>[0] = {}): GameState {
@@ -192,11 +193,13 @@ describe('ช้ำ ท่าหนัก มึน', () => {
 });
 
 describe('สวน', () => {
+  // A 6-damage hit into 6 block: the ghost AI only refuses hits the block is *greater* than
+  // (enemyPlan.ts rule 2), so this one lands on the block and the riposte fires.
   it('ตั้งการ์ดสวนหมัด: ผีตีแล้วเราไม่เสียเลือด → สวน 6', () => {
     const s = fight([c('gate_watch')]);
     play(s);
     const hp = s.enemy!.hp;
-    const after = runEnemyCards(s, [HIT]);
+    const after = runEnemyCards(s, [HIT6]);
     expect(after.player.hp).toBe(40);
     expect(hp - after.enemy!.hp).toBe(6);
   });
@@ -214,7 +217,7 @@ describe('สวน', () => {
     const s = fight([c('yantra_shorts'), c('gate_watch')]);
     play(s); play(s);
     const hp = s.enemy!.hp;
-    const after = runEnemyCards(s, [HIT]);
+    const after = runEnemyCards(s, [HIT6]);
     expect(hp - after.enemy!.hp).toBe(10);
   });
 });
@@ -380,9 +383,10 @@ describe('moveHint (hand hints)', () => {
 
 import { CLASS_BOOK_ORDER, classPlayable, ALL_CLASS_IDS } from '../src/core/classes';
 describe('store launch class gate', () => {
-  it('opens with นักมวย and only นักมวย can start; the book still lists every class', () => {
+  // หมอผี opened 15 Oct 2026 with its น้ำมนต์ card set (docs/mor-phi/DESIGN.md).
+  it('opens with นักมวย; นักมวย and หมอผี can start; the book still lists every class', () => {
     expect(CLASS_BOOK_ORDER[0]).toBe('warrior');
     expect([...CLASS_BOOK_ORDER].sort()).toEqual([...ALL_CLASS_IDS].sort());
-    expect(CLASS_BOOK_ORDER.filter(classPlayable)).toEqual(['warrior']);
+    expect(CLASS_BOOK_ORDER.filter(classPlayable)).toEqual(['warrior', 'shaman']);
   });
 });

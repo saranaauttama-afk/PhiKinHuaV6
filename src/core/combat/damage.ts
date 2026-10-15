@@ -77,6 +77,37 @@ export type DamageResult = {
   died: boolean;
 };
 
+/**
+ * What changed a hit, for the screen (owner playtest 15 Oct 2026: "the number is not what the card
+ * says and I cannot tell why"). `side` is whose badge it belongs to; `id` matches the status id
+ * (or 'rhythm' / 'armor' / 'composure'), so the HUD can shake that badge.
+ */
+export type DamagePart = { id: string; side: Side; label: string };
+
+/** The modifiers that applied to one hit — same rules as computeModifiedDamage. */
+export function damageParts(state: GameState, args: { from: Side; to: Side; source: DamageSource }, extra: DamagePart[] = []): DamagePart[] {
+  const rules = rulesFor(args.source), out: DamagePart[] = [...extra];
+  const atk = args.from === 'player' ? state.player : state.enemy, def = args.to === 'player' ? state.player : state.enemy;
+  const st = (who: typeof atk, id: string) => { const e = who?.statusEffects?.find(x => x.id === id); return e ? e.stacks ?? 1 : 0; };
+  if (rules.attackerMods) {
+    const strength = st(atk, 'strength'); if (strength) out.push({ id: 'strength', side: args.from, label: `แข็งแกร่ง +${strength}` });
+    if (args.from === 'enemy') {
+      const rage = st(atk, 'rage'); if (rage) out.push({ id: 'rage', side: 'enemy', label: `โกรธ +${rage}` });
+      const dance = st(atk, 'dance'); if (dance) out.push({ id: 'dance', side: 'enemy', label: `จังหวะรำ +${dance}` });
+    }
+    if (st(atk, 'weakness')) out.push({ id: 'weakness', side: args.from, label: 'อ่อนแอ −25%' });
+  }
+  const curse = st(def, 'curse'); if (curse) out.push({ id: 'curse', side: args.to, label: `คำสาป +${curse}` });
+  if (rules.defenderMods) {
+    if (st(def, 'vulnerable')) out.push({ id: 'vulnerable', side: args.to, label: 'เปราะบาง ×1.5' });
+    if (args.to === 'player' && args.from === 'enemy') {
+      const armor = require('../cards/passives').armor(state); if (armor) out.push({ id: 'armor', side: 'player', label: `เกราะติดตัว −${armor}` });
+      if (state.fight?.halfDamage) out.push({ id: 'composure', side: 'player', label: 'สำรวมจิต ครึ่งเดียว' });
+    }
+  }
+  return out;
+}
+
 /** vulnerable: "รับความเสียหายเพิ่ม 50%" ตาม registry */
 const VULNERABLE_MULTIPLIER = 1.5;
 
@@ -128,7 +159,7 @@ export function computeModifiedDamage(
  */
 export function dealDamage(
   state: GameState,
-  args: { from: Side; to: Side; raw: number; source: DamageSource }
+  args: { from: Side; to: Side; raw: number; source: DamageSource; parts?: DamagePart[] }
 ): DamageResult {
   const { from, to, raw } = args;
 
@@ -177,9 +208,14 @@ export function dealDamage(
     target: to,
     raw, modified, blocked, hpLoss, died,
     sourceKind,
+    ...(sourceKind === 'card' ? { parts: damageParts(state, args, args.parts) } : {}),
   });
   if (died) emit(state, { t: 'Died', who: to });
 
+  // A ghost that stole our cards drops one each time we make it bleed.
+  if (from === 'player' && to === 'enemy' && hpLoss > 0 && state.enemy && state.enemy.hp > 0 && state.fight?.ghostStolen?.length) require('./ghostMechanics').returnStolen(state);
+  // ผีตายโหง แค้นฝังใจ reads the player turn the ghost last lost HP on.
+  if (from === 'player' && to === 'enemy' && hpLoss > 0 && sourceKind !== 'status' && state.fight) state.fight.enemyHurtTurn = state.turn ?? 1;
   // A player hit that lands chips the boss's relic.
   if (from === 'player' && to === 'enemy' && isAttack && modified > 0) require('../campaign/bossRules').chipBossRelic(state);
   // ใจเพชร reads the HP lost this fight.

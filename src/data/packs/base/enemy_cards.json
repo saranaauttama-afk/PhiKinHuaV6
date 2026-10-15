@@ -46,75 +46,6 @@
   }
  },
  {
-  "id": "phi_krasue_v29_defense",
-  "owner": "phi-krasue",
-  "name": "ลอยหลบ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "dodge",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_krasue_v29_signature",
-  "owner": "phi-krasue",
-  "name": "น้ำลายพิษ",
-  "type": "attack",
-  "fx": {
-   "dmg": 1,
-   "status": [
-    {
-     "id": "poison",
-     "stacks": 2,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_krasue_v29_signature_support",
-  "owner": "phi-krasue",
-  "name": "ผีกระสือ · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "poison",
-     "stacks": 1,
-     "turns": 3,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_krasue_v29_setup",
-  "owner": "phi-krasue",
-  "name": "ผีกระสือ · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "phi_pop_v29_strike",
   "owner": "phi-pop",
   "name": "ผีปอบ · ตะปบ",
@@ -158,62 +89,6 @@
   "ap": 1,
   "fx": {
    "block": 4
-  }
- },
- {
-  "id": "phi_pop_v29_defense",
-  "owner": "phi-pop",
-  "name": "ซ่อนเขี้ยว",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "heal": 3
-  }
- },
- {
-  "id": "phi_pop_v29_signature",
-  "owner": "phi-pop",
-  "name": "กินของคาว",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "heal": 4
-  }
- },
- {
-  "id": "phi_pop_v29_signature_support",
-  "owner": "phi-pop",
-  "name": "ผีปอบ · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "heal": 6,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pop_v29_setup",
-  "owner": "phi-pop",
-  "name": "ผีปอบ · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
   }
  },
  {
@@ -263,77 +138,6 @@
   }
  },
  {
-  "id": "nang_tanee_v29_defense",
-  "owner": "nang-tanee",
-  "name": "โอบรัดกล้วย",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 2,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "nang_tanee_v29_signature",
-  "owner": "nang-tanee",
-  "name": "ใบตานีบัง",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "nang_tanee_v29_signature_support",
-  "owner": "nang-tanee",
-  "name": "นางตานี · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 3,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "nang_tanee_v29_setup",
-  "owner": "nang-tanee",
-  "name": "นางตานี · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "phi_nang_ram_v29_strike",
   "owner": "phi-nang-ram",
   "name": "ผีตายโหงนางรำ · ตะปบ",
@@ -380,76 +184,6 @@
   }
  },
  {
-  "id": "phi_nang_ram_v29_defense",
-  "owner": "phi-nang-ram",
-  "name": "ตั้งท่ารำ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_nang_ram_v29_signature",
-  "owner": "phi-nang-ram",
-  "name": "เสียงฉิ่ง",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "status": [
-    {
-     "id": "fear",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_nang_ram_v29_signature_support",
-  "owner": "phi-nang-ram",
-  "name": "ผีตายโหงนางรำ · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_nang_ram_v29_setup",
-  "owner": "phi-nang-ram",
-  "name": "ผีตายโหงนางรำ · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "phi_pong_kang_v29_strike",
   "owner": "phi-pong-kang",
   "name": "ผีป่าโป่งร้าง · ตะปบ",
@@ -481,78 +215,6 @@
      "stacks": 1,
      "turns": 1,
      "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pong_kang_v29_ward",
-  "owner": "phi-pong-kang",
-  "name": "ผีป่าโป่งร้าง · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4
-  }
- },
- {
-  "id": "phi_pong_kang_v29_defense",
-  "owner": "phi-pong-kang",
-  "name": "ปีนทางมืด",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "dodge",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pong_kang_v29_signature",
-  "owner": "phi-pong-kang",
-  "name": "วิ่งเข้าหา",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 3
-  }
- },
- {
-  "id": "phi_pong_kang_v29_signature_support",
-  "owner": "phi-pong-kang",
-  "name": "ผีป่าโป่งร้าง · อาถรรพ์ประจำตน",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pong_kang_v29_setup",
-  "owner": "phi-pong-kang",
-  "name": "ผีป่าโป่งร้าง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
     }
    ]
   }
@@ -604,75 +266,6 @@
   }
  },
  {
-  "id": "ngu_phi_sang_v29_defense",
-  "owner": "ngu-phi-sang",
-  "name": "ตาพร่า",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "dodge",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "ngu_phi_sang_v29_signature",
-  "owner": "ngu-phi-sang",
-  "name": "ไอของคาว",
-  "type": "attack",
-  "fx": {
-   "dmg": 1,
-   "status": [
-    {
-     "id": "poison",
-     "stacks": 2,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "ngu_phi_sang_v29_signature_support",
-  "owner": "ngu-phi-sang",
-  "name": "ผีโพงท้ายทุ่ง · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "poison",
-     "stacks": 1,
-     "turns": 3,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "ngu_phi_sang_v29_setup",
-  "owner": "ngu-phi-sang",
-  "name": "ผีโพงท้ายทุ่ง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "phi_pret_v29_strike",
   "owner": "phi-pret",
   "name": "ผีเปรต · ตะปบ",
@@ -716,76 +309,6 @@
   "ap": 1,
   "fx": {
    "block": 4
-  }
- },
- {
-  "id": "phi_pret_v29_defense",
-  "owner": "phi-pret",
-  "name": "ยืดแขนเปรต",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pret_v29_signature",
-  "owner": "phi-pret",
-  "name": "ปากเล็กหิวโหย",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "status": [
-    {
-     "id": "draw_reduction",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pret_v29_signature_support",
-  "owner": "phi-pret",
-  "name": "ผีเปรต · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "heal": 4,
-   "status": [
-    {
-     "id": "draw_reduction",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pret_v29_setup",
-  "owner": "phi-pret",
-  "name": "ผีเปรต · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
   }
  },
  {
@@ -835,68 +358,6 @@
   }
  },
  {
-  "id": "krahang_v29_defense",
-  "owner": "krahang",
-  "name": "สากฟาด",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "dodge",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "krahang_v29_signature",
-  "owner": "krahang",
-  "name": "กระด้งโฉบ",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 3
-  }
- },
- {
-  "id": "krahang_v29_signature_support",
-  "owner": "krahang",
-  "name": "กระหัง · อาถรรพ์ประจำตน",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "krahang_v29_setup",
-  "owner": "krahang",
-  "name": "กระหัง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "kuman_thong_v29_strike",
   "owner": "kuman-thong",
   "name": "ผีตายโหงชายทุ่ง · ตะปบ",
@@ -940,69 +401,6 @@
   "ap": 1,
   "fx": {
    "block": 4
-  }
- },
- {
-  "id": "kuman_thong_v29_defense",
-  "owner": "kuman-thong",
-  "name": "ซ่อนในหุ่น",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "kuman_thong_v29_signature",
-  "owner": "kuman-thong",
-  "name": "ซุกเถ้ากระดูก",
-  "type": "attack",
-  "fx": {
-   "dmg": 2
-  },
-  "curseCard": "curse_dread"
- },
- {
-  "id": "kuman_thong_v29_signature_support",
-  "owner": "kuman-thong",
-  "name": "ผีตายโหงชายทุ่ง · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "draw_reduction",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "kuman_thong_v29_setup",
-  "owner": "kuman-thong",
-  "name": "ผีตายโหงชายทุ่ง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
   }
  },
  {
@@ -1052,68 +450,6 @@
   }
  },
  {
-  "id": "phi_tai_hong_v29_defense",
-  "owner": "phi-tai-hong",
-  "name": "เรียกแรงอาฆาต",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_tai_hong_v29_signature",
-  "owner": "phi-tai-hong",
-  "name": "รอยแค้น",
-  "type": "attack",
-  "fx": {
-   "dmg": 5
-  }
- },
- {
-  "id": "phi_tai_hong_v29_signature_support",
-  "owner": "phi-tai-hong",
-  "name": "ผีตายโหง · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_tai_hong_v29_setup",
-  "owner": "phi-tai-hong",
-  "name": "ผีตายโหง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "phi_pa_v29_strike",
   "owner": "phi-pa",
   "name": "ผีป่า · ตะปบ",
@@ -1150,63 +486,6 @@
   }
  },
  {
-  "id": "phi_pa_v29_ward",
-  "owner": "phi-pa",
-  "name": "ผีป่า · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4
-  }
- },
- {
-  "id": "phi_pa_v29_defense",
-  "owner": "phi-pa",
-  "name": "หักกิ่งบัง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 5
-  }
- },
- {
-  "id": "phi_pa_v29_signature",
-  "owner": "phi-pa",
-  "name": "พุ่งจากพง",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 3
-  }
- },
- {
-  "id": "phi_pa_v29_signature_support",
-  "owner": "phi-pa",
-  "name": "ผีป่า · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2
-  }
- },
- {
-  "id": "phi_pa_v29_setup",
-  "owner": "phi-pa",
-  "name": "ผีป่า · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "mae_nak_v29_strike",
   "owner": "mae-nak",
   "name": "แม่นาค · ตะปบ",
@@ -1226,23 +505,6 @@
   }
  },
  {
-  "id": "mae_nak_v29_pierce",
-  "owner": "mae-nak",
-  "name": "แม่นาค · ทะลวง",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
   "id": "mae_nak_v29_ward",
   "owner": "mae-nak",
   "name": "แม่นาค · ตั้งรับ",
@@ -1250,77 +512,6 @@
   "ap": 1,
   "fx": {
    "block": 4
-  }
- },
- {
-  "id": "mae_nak_v29_defense",
-  "owner": "mae-nak",
-  "name": "กอดหวง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 2,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "mae_nak_v29_signature",
-  "owner": "mae-nak",
-  "name": "มือยาวรั้ง",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "mae_nak_v29_signature_support",
-  "owner": "mae-nak",
-  "name": "แม่นาค · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 3,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "mae_nak_v29_setup",
-  "owner": "mae-nak",
-  "name": "แม่นาค · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
   }
  },
  {
@@ -1367,27 +558,6 @@
   "ap": 1,
   "fx": {
    "block": 4
-  }
- },
- {
-  "id": "pop_yai_v29_defense",
-  "owner": "pop-yai",
-  "name": "สะสมความหิว",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "heal": 3
-  }
- },
- {
-  "id": "pop_yai_v29_signature",
-  "owner": "pop-yai",
-  "name": "กลืนเลือด",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "heal": 4
   }
  },
  {
@@ -1472,76 +642,6 @@
   }
  },
  {
-  "id": "phi_ha_ratri_v29_defense",
-  "owner": "phi-ha-ratri",
-  "name": "เงาราตรี",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 2,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_ha_ratri_v29_signature",
-  "owner": "phi-ha-ratri",
-  "name": "เสียงร้องห้าคืน",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "status": [
-    {
-     "id": "fear",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_ha_ratri_v29_signature_support",
-  "owner": "phi-ha-ratri",
-  "name": "ผีโขมด · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_ha_ratri_v29_setup",
-  "owner": "phi-ha-ratri",
-  "name": "ผีโขมด · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "asuragaya_v29_strike",
   "owner": "asuragaya",
   "name": "ผีกองกอย · ตะปบ",
@@ -1588,61 +688,6 @@
   }
  },
  {
-  "id": "asuragaya_v29_defense",
-  "owner": "asuragaya",
-  "name": "หมัดหนัก",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "asuragaya_v29_signature",
-  "owner": "asuragaya",
-  "name": "เกราะอสุรกาย",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "block": 2
-  }
- },
- {
-  "id": "asuragaya_v29_signature_support",
-  "owner": "asuragaya",
-  "name": "ผีกองกอย · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 7
-  }
- },
- {
-  "id": "asuragaya_v29_setup",
-  "owner": "asuragaya",
-  "name": "ผีกองกอย · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "yak_wat_jaeng_v29_strike",
   "owner": "yak-wat-jaeng",
   "name": "เปรตลานวัด · ตะปบ",
@@ -1662,23 +707,6 @@
   }
  },
  {
-  "id": "yak_wat_jaeng_v29_pierce",
-  "owner": "yak-wat-jaeng",
-  "name": "เปรตลานวัด · ทะลวง",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
   "id": "yak_wat_jaeng_v29_ward",
   "owner": "yak-wat-jaeng",
   "name": "เปรตลานวัด · ตั้งรับ",
@@ -1686,61 +714,6 @@
   "ap": 1,
   "fx": {
    "block": 4
-  }
- },
- {
-  "id": "yak_wat_jaeng_v29_defense",
-  "owner": "yak-wat-jaeng",
-  "name": "กระบองยักษ์",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "yak_wat_jaeng_v29_signature",
-  "owner": "yak-wat-jaeng",
-  "name": "ยืนเฝ้าประตู",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "block": 2
-  }
- },
- {
-  "id": "yak_wat_jaeng_v29_signature_support",
-  "owner": "yak-wat-jaeng",
-  "name": "เปรตลานวัด · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 7
-  }
- },
- {
-  "id": "yak_wat_jaeng_v29_setup",
-  "owner": "yak-wat-jaeng",
-  "name": "เปรตลานวัด · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
   }
  },
  {
@@ -1760,33 +733,6 @@
   "fx": {
    "dmg": 2,
    "hits": 2
-  }
- },
- {
-  "id": "phi_phrai_v29_pierce",
-  "owner": "phi-phrai",
-  "name": "ผีพราย · ทะลวง",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_phrai_v29_ward",
-  "owner": "phi-phrai",
-  "name": "ผีพราย · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4
   }
  },
  {
@@ -1842,23 +788,6 @@
   }
  },
  {
-  "id": "phi_phrai_v29_setup",
-  "owner": "phi-phrai",
-  "name": "ผีพราย · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "winyan_rerorn_v29_strike",
   "owner": "winyan-rerorn",
   "name": "ผีตายโหงเร่ร่อน · ตะปบ",
@@ -1902,86 +831,6 @@
   "ap": 1,
   "fx": {
    "block": 5
-  }
- },
- {
-  "id": "winyan_rerorn_v29_defense",
-  "owner": "winyan-rerorn",
-  "name": "ผ้าห่อเงา",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_rerorn_v29_signature",
-  "owner": "winyan-rerorn",
-  "name": "เสียงเร่ร่อน",
-  "type": "attack",
-  "fx": {
-   "dmg": 3
-  },
-  "curseCard": "curse_dread"
- },
- {
-  "id": "winyan_rerorn_v29_signature_support",
-  "owner": "winyan-rerorn",
-  "name": "ผีตายโหงเร่ร่อน · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_rerorn_v29_setup",
-  "owner": "winyan-rerorn",
-  "name": "ผีตายโหงเร่ร่อน · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_rerorn_v29_pressure",
-  "owner": "winyan-rerorn",
-  "name": "ผีตายโหงเร่ร่อน · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
   }
  },
  {
@@ -2042,93 +891,12 @@
   }
  },
  {
-  "id": "pisaj_fai_v29_defense",
-  "owner": "pisaj-fai",
-  "name": "คุไฟใต้เถ้า",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "pisaj_fai_v29_signature",
   "owner": "pisaj-fai",
   "name": "สะเก็ดไฟ",
   "type": "attack",
   "fx": {
    "dmg": 6
-  }
- },
- {
-  "id": "pisaj_fai_v29_signature_support",
-  "owner": "pisaj-fai",
-  "name": "โขมดดง · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "pisaj_fai_v29_setup",
-  "owner": "pisaj-fai",
-  "name": "โขมดดง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "pisaj_fai_v29_pressure",
-  "owner": "pisaj-fai",
-  "name": "โขมดดง · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "pisaj_fai_v29_recover",
-  "owner": "pisaj-fai",
-  "name": "โขมดดง · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 4,
-   "heal": 5
   }
  },
  {
@@ -2168,34 +936,6 @@
   }
  },
  {
-  "id": "jao_por_pa_v29_ward",
-  "owner": "jao-por-pa",
-  "name": "ผีป่าดงลึก · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 5
-  }
- },
- {
-  "id": "jao_por_pa_v29_defense",
-  "owner": "jao-por-pa",
-  "name": "เปลือกไม้คุ้ม",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 2,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "jao_por_pa_v29_signature",
   "owner": "jao-por-pa",
   "name": "รากไม้พัน",
@@ -2211,69 +951,6 @@
      "to": "enemy"
     }
    ]
-  }
- },
- {
-  "id": "jao_por_pa_v29_signature_support",
-  "owner": "jao-por-pa",
-  "name": "ผีป่าดงลึก · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 3,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "jao_por_pa_v29_setup",
-  "owner": "jao-por-pa",
-  "name": "ผีป่าดงลึก · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "jao_por_pa_v29_pressure",
-  "owner": "jao-por-pa",
-  "name": "ผีป่าดงลึก · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "jao_por_pa_v29_recover",
-  "owner": "jao-por-pa",
-  "name": "ผีป่าดงลึก · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 4,
-   "heal": 5
   }
  },
  {
@@ -2323,97 +1000,6 @@
   }
  },
  {
-  "id": "phi_nang_yai_v29_defense",
-  "owner": "phi-nang-yai",
-  "name": "ขึงจอผี",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_nang_yai_v29_signature",
-  "owner": "phi-nang-yai",
-  "name": "เงาหนังใหญ่",
-  "type": "attack",
-  "fx": {
-   "dmg": 3
-  },
-  "curseCard": "curse_dread"
- },
- {
-  "id": "phi_nang_yai_v29_signature_support",
-  "owner": "phi-nang-yai",
-  "name": "ผีตายโหงเรือนร้าง · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_nang_yai_v29_setup",
-  "owner": "phi-nang-yai",
-  "name": "ผีตายโหงเรือนร้าง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_nang_yai_v29_pressure",
-  "owner": "phi-nang-yai",
-  "name": "ผีตายโหงเรือนร้าง · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_nang_yai_v29_recover",
-  "owner": "phi-nang-yai",
-  "name": "ผีตายโหงเรือนร้าง · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 4,
-   "heal": 5
-  }
- },
- {
   "id": "winyan_dek_v29_strike",
   "owner": "winyan-dek",
   "name": "ผีตายโหงริมคลอง · ตะปบ",
@@ -2457,104 +1043,6 @@
   "ap": 1,
   "fx": {
    "block": 5
-  }
- },
- {
-  "id": "winyan_dek_v29_defense",
-  "owner": "winyan-dek",
-  "name": "เล่นซ่อนเงา",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_dek_v29_signature",
-  "owner": "winyan-dek",
-  "name": "เสียงร้องเด็ก",
-  "type": "attack",
-  "fx": {
-   "dmg": 3,
-   "status": [
-    {
-     "id": "fear",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_dek_v29_signature_support",
-  "owner": "winyan-dek",
-  "name": "ผีตายโหงริมคลอง · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_dek_v29_setup",
-  "owner": "winyan-dek",
-  "name": "ผีตายโหงริมคลอง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_dek_v29_pressure",
-  "owner": "winyan-dek",
-  "name": "ผีตายโหงริมคลอง · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "winyan_dek_v29_recover",
-  "owner": "winyan-dek",
-  "name": "ผีตายโหงริมคลอง · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 4,
-   "heal": 5
   }
  },
  {
@@ -2604,93 +1092,12 @@
   }
  },
  {
-  "id": "yak_dam_v29_defense",
-  "owner": "yak-dam",
-  "name": "เกร็งกายดำ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "yak_dam_v29_signature",
   "owner": "yak-dam",
   "name": "หมัดยักษ์ดำ",
   "type": "attack",
   "fx": {
    "dmg": 6
-  }
- },
- {
-  "id": "yak_dam_v29_signature_support",
-  "owner": "yak-dam",
-  "name": "กระหังครูอาคม · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "yak_dam_v29_setup",
-  "owner": "yak-dam",
-  "name": "กระหังครูอาคม · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "yak_dam_v29_pressure",
-  "owner": "yak-dam",
-  "name": "กระหังครูอาคม · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "yak_dam_v29_recover",
-  "owner": "yak-dam",
-  "name": "กระหังครูอาคม · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 4,
-   "heal": 5
   }
  },
  {
@@ -2740,104 +1147,6 @@
   }
  },
  {
-  "id": "phi_mae_mai_v29_defense",
-  "owner": "phi-mae-mai",
-  "name": "กอดเงามืด",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_mae_mai_v29_signature",
-  "owner": "phi-mae-mai",
-  "name": "เสียงเรียกชื่อ",
-  "type": "attack",
-  "fx": {
-   "dmg": 3,
-   "status": [
-    {
-     "id": "draw_reduction",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_mae_mai_v29_signature_support",
-  "owner": "phi-mae-mai",
-  "name": "ผีแม่ม่าย · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "heal": 4,
-   "status": [
-    {
-     "id": "draw_reduction",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_mae_mai_v29_setup",
-  "owner": "phi-mae-mai",
-  "name": "ผีแม่ม่าย · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_mae_mai_v29_pressure",
-  "owner": "phi-mae-mai",
-  "name": "ผีแม่ม่าย · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_mae_mai_v29_recover",
-  "owner": "phi-mae-mai",
-  "name": "ผีแม่ม่าย · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 4,
-   "heal": 5
-  }
- },
- {
   "id": "phra_upakut_v29_strike",
   "owner": "phra-upakut",
   "name": "เปรตหิวโหย · ตะปบ",
@@ -2881,89 +1190,6 @@
   "ap": 1,
   "fx": {
    "block": 5
-  }
- },
- {
-  "id": "phra_upakut_v29_defense",
-  "owner": "phra-upakut",
-  "name": "บ่วงทะเล",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 7,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phra_upakut_v29_signature",
-  "owner": "phra-upakut",
-  "name": "ม่านคลื่น",
-  "type": "attack",
-  "fx": {
-   "dmg": 3,
-   "block": 3
-  }
- },
- {
-  "id": "phra_upakut_v29_signature_support",
-  "owner": "phra-upakut",
-  "name": "เปรตหิวโหย · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 8
-  }
- },
- {
-  "id": "phra_upakut_v29_setup",
-  "owner": "phra-upakut",
-  "name": "เปรตหิวโหย · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phra_upakut_v29_pressure",
-  "owner": "phra-upakut",
-  "name": "เปรตหิวโหย · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 4,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phra_upakut_v29_recover",
-  "owner": "phra-upakut",
-  "name": "เปรตหิวโหย · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 4,
-   "heal": 5
   }
  },
  {
@@ -3437,68 +1663,6 @@
   }
  },
  {
-  "id": "night_head_collector_v29_defense",
-  "owner": "night-head-collector",
-  "name": "กระด้งบัง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "dodge",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "night_head_collector_v29_signature",
-  "owner": "night-head-collector",
-  "name": "ฉวยศีรษะ",
-  "type": "attack",
-  "fx": {
-   "dmg": 3,
-   "hits": 3
-  }
- },
- {
-  "id": "night_head_collector_v29_signature_support",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · อาถรรพ์ประจำตน",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_head_collector_v29_setup",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "night_head_collector_v29_pressure",
   "owner": "night-head-collector",
   "name": "กระหังหนองร้าง · กดดัน",
@@ -3513,45 +1677,6 @@
      "to": "enemy"
     }
    ]
-  }
- },
- {
-  "id": "night_head_collector_v29_recover",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "heal": 5
-  }
- },
- {
-  "id": "night_head_collector_v29_boundary",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · เขตต้องห้าม",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_head_collector_v29_execution",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · จู่โจมใหญ่",
-  "type": "attack",
-  "fx": {
-   "dmg": 6,
-   "hits": 2
   }
  },
  {
@@ -3591,34 +1716,6 @@
   }
  },
  {
-  "id": "night_bell_keeper_v29_ward",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 6
-  }
- },
- {
-  "id": "night_bell_keeper_v29_defense",
-  "owner": "night-bell-keeper",
-  "name": "ปิดเสียง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "night_bell_keeper_v29_signature",
   "owner": "night-bell-keeper",
   "name": "ระฆังปลุกผี",
@@ -3631,41 +1728,6 @@
      "stacks": 1,
      "turns": 1,
      "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_bell_keeper_v29_signature_support",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_bell_keeper_v29_setup",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
     }
    ]
   }
@@ -3685,45 +1747,6 @@
      "to": "enemy"
     }
    ]
-  }
- },
- {
-  "id": "night_bell_keeper_v29_recover",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "heal": 5
-  }
- },
- {
-  "id": "night_bell_keeper_v29_boundary",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · เขตต้องห้าม",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_bell_keeper_v29_execution",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · จู่โจมใหญ่",
-  "type": "attack",
-  "fx": {
-   "dmg": 6,
-   "hits": 2
   }
  },
  {
@@ -3763,34 +1786,6 @@
   }
  },
  {
-  "id": "night_root_lord_v29_ward",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 6
-  }
- },
- {
-  "id": "night_root_lord_v29_defense",
-  "owner": "night-root-lord",
-  "name": "เปลือกอาถรรพ์",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 2,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "night_root_lord_v29_signature",
   "owner": "night-root-lord",
   "name": "รากกลืนกาย",
@@ -3804,41 +1799,6 @@
      "stacks": 1,
      "turns": 2,
      "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_root_lord_v29_signature_support",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "thorns",
-     "stacks": 3,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "night_root_lord_v29_setup",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
     }
    ]
   }
@@ -3858,45 +1818,6 @@
      "to": "enemy"
     }
    ]
-  }
- },
- {
-  "id": "night_root_lord_v29_recover",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "heal": 5
-  }
- },
- {
-  "id": "night_root_lord_v29_boundary",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · เขตต้องห้าม",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_root_lord_v29_execution",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · จู่โจมใหญ่",
-  "type": "attack",
-  "fx": {
-   "dmg": 6,
-   "hits": 2
   }
  },
  {
@@ -3936,34 +1857,6 @@
   }
  },
  {
-  "id": "night_cave_mother_v29_ward",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 6
-  }
- },
- {
-  "id": "night_cave_mother_v29_defense",
-  "owner": "night-cave-mother",
-  "name": "ม่านถ้ำ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "night_cave_mother_v29_signature",
   "owner": "night-cave-mother",
   "name": "เถ้าลูกผี",
@@ -3972,97 +1865,6 @@
    "dmg": 4
   },
   "curseCard": "curse_dread"
- },
- {
-  "id": "night_cave_mother_v29_signature_support",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_cave_mother_v29_setup",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "night_cave_mother_v29_pressure",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_cave_mother_v29_recover",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "heal": 5
-  }
- },
- {
-  "id": "night_cave_mother_v29_boundary",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · เขตต้องห้าม",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_cave_mother_v29_execution",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · จู่โจมใหญ่",
-  "type": "attack",
-  "fx": {
-   "dmg": 6,
-   "hits": 2
-  }
  },
  {
   "id": "night_headless_king_v29_strike",
@@ -4111,121 +1913,12 @@
   }
  },
  {
-  "id": "night_headless_king_v29_defense",
-  "owner": "night-headless-king",
-  "name": "เกราะราชาผี",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4,
-   "status": [
-    {
-     "id": "regeneration",
-     "stacks": 2,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
   "id": "night_headless_king_v29_signature",
   "owner": "night-headless-king",
   "name": "คมตัดคอ",
   "type": "attack",
   "fx": {
    "dmg": 7
-  }
- },
- {
-  "id": "night_headless_king_v29_signature_support",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 3,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "night_headless_king_v29_setup",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "night_headless_king_v29_pressure",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · กดดัน",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_headless_king_v29_recover",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "heal": 5
-  }
- },
- {
-  "id": "night_headless_king_v29_boundary",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · เขตต้องห้าม",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "night_headless_king_v29_execution",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · จู่โจมใหญ่",
-  "type": "attack",
-  "fx": {
-   "dmg": 6,
-   "hits": 2
   }
  },
  {
@@ -4248,44 +1941,6 @@
   }
  },
  {
-  "id": "phi_kin_hua_v29_pierce",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · ทะลวง",
-  "type": "attack",
-  "fx": {
-   "dmg": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 1,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_kin_hua_v29_ward",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · ตั้งรับ",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 6
-  }
- },
- {
-  "id": "phi_kin_hua_v29_defense",
-  "owner": "phi-kin-hua",
-  "name": "อิ่มเลือด",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "block": 4,
-   "heal": 3
-  }
- },
- {
   "id": "phi_kin_hua_v29_signature",
   "owner": "phi-kin-hua",
   "name": "กลืนศีรษะ",
@@ -4293,41 +1948,6 @@
   "fx": {
    "dmg": 4,
    "heal": 4
-  }
- },
- {
-  "id": "phi_kin_hua_v29_signature_support",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · อาถรรพ์ประจำตน",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "heal": 6,
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 3,
-     "to": "self"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_kin_hua_v29_setup",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · รวบรวมแรง",
-  "type": "action",
-  "ap": 1,
-  "fx": {
-   "status": [
-    {
-     "id": "strength",
-     "stacks": 1,
-     "turns": 2,
-     "to": "self"
-    }
-   ]
   }
  },
  {
@@ -4348,197 +1968,6 @@
   }
  },
  {
-  "id": "phi_kin_hua_v29_recover",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · ถอยฟื้น",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 5,
-   "heal": 5
-  }
- },
- {
-  "id": "phi_kin_hua_v29_boundary",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · เขตต้องห้าม",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 6,
-   "status": [
-    {
-     "id": "vulnerable",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_kin_hua_v29_execution",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · จู่โจมใหญ่",
-  "type": "attack",
-  "fx": {
-   "dmg": 6,
-   "hits": 2
-  }
- },
- {
-  "id": "phi_krasue_v34_payoff",
-  "owner": "phi-krasue",
-  "name": "ผีกระสือ · พิษกัดซ้ำ",
-  "type": "attack",
-  "fx": {
-   "dmg": 4
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "poison"
-   },
-   "bonus": {
-    "dmg": 3
-   }
-  }
- },
- {
-  "id": "phi_pop_v34_payoff",
-  "owner": "phi-pop",
-  "name": "ผีปอบ · เขี้ยวหิวโหย",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "heal": 3
-  }
- },
- {
-  "id": "nang_tanee_v34_payoff",
-  "owner": "nang-tanee",
-  "name": "นางตานี · สวนเงารั้ง",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_block_at_least",
-    "value": 1
-   },
-   "bonus": {
-    "dmg": 1
-   }
-  }
- },
- {
-  "id": "phi_nang_ram_v34_payoff",
-  "owner": "phi-nang-ram",
-  "name": "ผีตายโหงนางรำ · เสียงหลอนซ้ำ",
-  "type": "attack",
-  "fx": {
-   "dmg": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "phi_pong_kang_v34_payoff",
-  "owner": "phi-pong-kang",
-  "name": "ผีป่าโป่งร้าง · ปีกฟาดซ้ำ",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 3,
-   "block": 1
-  }
- },
- {
-  "id": "ngu_phi_sang_v34_payoff",
-  "owner": "ngu-phi-sang",
-  "name": "ผีโพงท้ายทุ่ง · พิษกัดซ้ำ",
-  "type": "attack",
-  "fx": {
-   "dmg": 4
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "poison"
-   },
-   "bonus": {
-    "dmg": 3
-   }
-  }
- },
- {
-  "id": "phi_pret_v34_payoff",
-  "owner": "phi-pret",
-  "name": "ผีเปรต · ดูดแรงเฮือกท้าย",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "heal": 2
-  }
- },
- {
-  "id": "krahang_v34_payoff",
-  "owner": "krahang",
-  "name": "กระหัง · ปีกฟาดซ้ำ",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 3,
-   "block": 1
-  }
- },
- {
-  "id": "kuman_thong_v34_payoff",
-  "owner": "kuman-thong",
-  "name": "ผีตายโหงชายทุ่ง · เงารบกวน",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 2
-  }
- },
- {
-  "id": "phi_tai_hong_v34_payoff",
-  "owner": "phi-tai-hong",
-  "name": "ผีตายโหง · ซ้ำรอยแค้น",
-  "type": "attack",
-  "fx": {
-   "dmg": 4
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "vulnerable"
-   },
-   "bonus": {
-    "dmg": 3
-   }
-  }
- },
- {
-  "id": "phi_pa_v34_payoff",
-  "owner": "phi-pa",
-  "name": "ผีป่า · เรียกเงาพง",
-  "type": "action",
-  "ap": 2,
-  "fx": {
-   "block": 3
-  }
- },
- {
   "id": "mae_nak_v34_payoff",
   "owner": "mae-nak",
   "name": "แม่นาค · สวนเงารั้ง",
@@ -4546,71 +1975,6 @@
   "fx": {
    "dmg": 2,
    "hits": 3
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_block_at_least",
-    "value": 1
-   },
-   "bonus": {
-    "dmg": 1
-   }
-  }
- },
- {
-  "id": "pop_yai_v34_payoff",
-  "owner": "pop-yai",
-  "name": "ปอบใหญ่ · เขี้ยวหิวโหย",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "heal": 3
-  }
- },
- {
-  "id": "phi_ha_ratri_v34_payoff",
-  "owner": "phi-ha-ratri",
-  "name": "ผีโขมด · เสียงหลอนซ้ำ",
-  "type": "attack",
-  "fx": {
-   "dmg": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "asuragaya_v34_payoff",
-  "owner": "asuragaya",
-  "name": "ผีกองกอย · ฟาดจากกำบัง",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_block_at_least",
-    "value": 1
-   },
-   "bonus": {
-    "dmg": 1
-   }
-  }
- },
- {
-  "id": "yak_wat_jaeng_v34_payoff",
-  "owner": "yak-wat-jaeng",
-  "name": "เปรตลานวัด · ฟาดจากกำบัง",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2
   },
   "conditional": {
    "when": {
@@ -4637,143 +2001,6 @@
    },
    "bonus": {
     "dmg": 3
-   }
-  }
- },
- {
-  "id": "winyan_rerorn_v34_payoff",
-  "owner": "winyan-rerorn",
-  "name": "ผีตายโหงเร่ร่อน · อาคมตามเงา",
-  "type": "attack",
-  "fx": {
-   "dmg": 2
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "vulnerable"
-   },
-   "bonus": {
-    "dmg": 2
-   }
-  }
- },
- {
-  "id": "pisaj_fai_v34_payoff",
-  "owner": "pisaj-fai",
-  "name": "โขมดดง · ซ้ำรอยแค้น",
-  "type": "attack",
-  "fx": {
-   "dmg": 4
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "vulnerable"
-   },
-   "bonus": {
-    "dmg": 3
-   }
-  }
- },
- {
-  "id": "jao_por_pa_v34_payoff",
-  "owner": "jao-por-pa",
-  "name": "ผีป่าดงลึก · สวนเงารั้ง",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_block_at_least",
-    "value": 1
-   },
-   "bonus": {
-    "dmg": 1
-   }
-  }
- },
- {
-  "id": "phi_nang_yai_v34_payoff",
-  "owner": "phi-nang-yai",
-  "name": "ผีตายโหงเรือนร้าง · อาคมตามเงา",
-  "type": "attack",
-  "fx": {
-   "dmg": 2
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "vulnerable"
-   },
-   "bonus": {
-    "dmg": 2
-   }
-  }
- },
- {
-  "id": "winyan_dek_v34_payoff",
-  "owner": "winyan-dek",
-  "name": "ผีตายโหงริมคลอง · เสียงหลอนซ้ำ",
-  "type": "attack",
-  "fx": {
-   "dmg": 3,
-   "status": [
-    {
-     "id": "weakness",
-     "stacks": 1,
-     "turns": 2,
-     "to": "enemy"
-    }
-   ]
-  }
- },
- {
-  "id": "yak_dam_v34_payoff",
-  "owner": "yak-dam",
-  "name": "กระหังครูอาคม · ซ้ำรอยแค้น",
-  "type": "attack",
-  "fx": {
-   "dmg": 4
-  },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "vulnerable"
-   },
-   "bonus": {
-    "dmg": 3
-   }
-  }
- },
- {
-  "id": "phi_mae_mai_v34_payoff",
-  "owner": "phi-mae-mai",
-  "name": "ผีแม่ม่าย · ดูดแรงเฮือกท้าย",
-  "type": "attack",
-  "fx": {
-   "dmg": 5,
-   "heal": 2
-  }
- },
- {
-  "id": "phra_upakut_v34_payoff",
-  "owner": "phra-upakut",
-  "name": "เปรตหิวโหย · ฟาดจากกำบัง",
-  "type": "attack",
-  "fx": {
-   "dmg": 2,
-   "hits": 2
-  },
-  "conditional": {
-   "when": {
-    "kind": "player_block_at_least",
-    "value": 1
-   },
-   "bonus": {
-    "dmg": 1
    }
   }
  },
@@ -4824,20 +2051,26 @@
   }
  },
  {
-  "id": "night_head_collector_v34_payoff",
-  "owner": "night-head-collector",
-  "name": "กระหังหนองร้าง · ปีกฟาดซ้ำ",
-  "type": "attack",
+  "id": "phi_krasue_n1_float",
+  "owner": "phi-krasue",
+  "name": "หัวลอยหลบ",
+  "type": "action",
+  "ap": 1,
   "fx": {
-   "dmg": 2,
-   "hits": 2,
-   "block": 1
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 1,
+     "turns": 2,
+     "to": "self"
+    }
+   ]
   }
  },
  {
-  "id": "night_bell_keeper_v34_payoff",
-  "owner": "night-bell-keeper",
-  "name": "เปรตวัดร้าง · เสียงหลอนซ้ำ",
+  "id": "phi_krasue_n1_entrails",
+  "owner": "phi-krasue",
+  "name": "ไส้ห้อยรัด",
   "type": "attack",
   "fx": {
    "dmg": 3,
@@ -4852,9 +2085,104 @@
   }
  },
  {
-  "id": "night_root_lord_v34_payoff",
-  "owner": "night-root-lord",
-  "name": "ผีป่าไทรพันราก · สวนเงารั้ง",
+  "id": "phi_krasue_n1_drain",
+  "owner": "phi-krasue",
+  "name": "ดูดเลือด",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "drain": true
+  }
+ },
+ {
+  "id": "phi_pop_n1_gape",
+  "owner": "phi-pop",
+  "name": "อ้าปากรอ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4
+  },
+  "charge": {
+   "dmg": 3
+  }
+ },
+ {
+  "id": "phi_pop_n1_entrails",
+  "owner": "phi-pop",
+  "name": "กินเครื่องใน",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "heal": 3
+  }
+ },
+ {
+  "id": "phi_pop_n1_hunger",
+  "owner": "phi-pop",
+  "name": "ปอบหิว",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 2,
+     "to": "self"
+    }
+   ]
+  },
+  "conditional": {
+   "when": {
+    "kind": "foe_hp_below",
+    "value": 50
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "strength",
+      "stacks": 1,
+      "turns": 2,
+      "to": "self"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nang_tanee_n1_leafguard",
+  "owner": "nang-tanee",
+  "name": "ใบตานีบัง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "riposte": {
+   "dmg": 5
+  }
+ },
+ {
+  "id": "nang_tanee_n1_leafcut",
+  "owner": "nang-tanee",
+  "name": "ใบกล้วยบาด",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "thorns",
+     "stacks": 1,
+     "turns": 2,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "nang_tanee_n1_embrace",
+  "owner": "nang-tanee",
+  "name": "โอบรัด",
   "type": "attack",
   "fx": {
    "dmg": 2,
@@ -4862,44 +2190,290 @@
   },
   "conditional": {
    "when": {
-    "kind": "player_block_at_least",
+    "kind": "foe_block_at_least",
     "value": 1
    },
    "bonus": {
-    "dmg": 1
+    "hits": 1
    }
   }
  },
  {
-  "id": "night_cave_mother_v34_payoff",
-  "owner": "night-cave-mother",
-  "name": "พรายแอ่งถ้ำ · อาคมตามเงา",
+  "id": "phi_nang_ram_n1_overture",
+  "owner": "phi-nang-ram",
+  "name": "รำเบิกโรง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "dance",
+     "stacks": 1,
+     "turns": 1,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_nang_ram_n1_flow",
+  "owner": "phi-nang-ram",
+  "name": "ท่ารำต่อ",
+  "type": "attack",
+  "fx": {
+   "dmg": 2,
+   "hits": 2,
+   "status": [
+    {
+     "id": "dance",
+     "stacks": 1,
+     "turns": 1,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_nang_ram_n1_finger",
+  "owner": "phi-nang-ram",
+  "name": "จีบนิ้ว",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_pong_kang_n1_call",
+  "owner": "phi-pong-kang",
+  "name": "เรียกลิงโป่ง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "pong_monkey"
+  }
+ },
+ {
+  "id": "phi_pong_kang_n1_mud",
+  "owner": "phi-pong-kang",
+  "name": "ดินโป่งพอก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 6
+  }
+ },
+ {
+  "id": "phi_pong_kang_n1_pound",
+  "owner": "phi-pong-kang",
+  "name": "ทุบดิน",
+  "type": "attack",
+  "fx": {
+   "dmg": 6
+  }
+ },
+ {
+  "id": "ngu_phi_sang_n1_glow",
+  "owner": "ngu-phi-sang",
+  "name": "แสงโพง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "ngu_phi_sang_n1_fire",
+  "owner": "ngu-phi-sang",
+  "name": "ไฟผีโพง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "ngu_phi_sang_n1_burn",
+  "owner": "ngu-phi-sang",
+  "name": "เผา",
+  "type": "attack",
+  "fx": {
+   "dmg": 5
+  }
+ },
+ {
+  "id": "phi_pret_n1_slash",
+  "owner": "phi-pret",
+  "name": "แขนยาวกรีด",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_pret_n1_needle",
+  "owner": "phi-pret",
+  "name": "ปากเท่ารูเข็ม",
   "type": "attack",
   "fx": {
    "dmg": 2
   },
-  "conditional": {
-   "when": {
-    "kind": "enemy_has_status",
-    "statusId": "vulnerable"
-   },
-   "bonus": {
-    "dmg": 2
-   }
+  "perFoeStatus": {
+   "statusId": "vulnerable",
+   "dmg": 4
   }
  },
  {
-  "id": "night_headless_king_v34_payoff",
-  "owner": "night-headless-king",
-  "name": "ปอบครูอาคม · ซ้ำรอยแค้น",
+  "id": "phi_pret_n1_starve",
+  "owner": "phi-pret",
+  "name": "หิวโหย",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "heal": 4
+  },
+  "charge": {
+   "heal": 2
+  }
+ },
+ {
+  "id": "krahang_n1_winnow",
+  "owner": "krahang",
+  "name": "กางกระด้ง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 1,
+     "turns": 2,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "krahang_n1_swoop",
+  "owner": "krahang",
+  "name": "โฉบ",
   "type": "attack",
   "fx": {
-   "dmg": 4
+   "dmg": 6
+  },
+  "charge": {
+   "dmg": 3
+  }
+ },
+ {
+  "id": "krahang_n1_pestle",
+  "owner": "krahang",
+  "name": "สากตำ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "hits": 2
+  }
+ },
+ {
+  "id": "kuman_thong_n1_ashrise",
+  "owner": "kuman-thong",
+  "name": "เถ้ากระดูกลุก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "ash_bones"
+  }
+ },
+ {
+  "id": "kuman_thong_n1_ashcrawl",
+  "owner": "kuman-thong",
+  "name": "เถ้ากระดูกคลาน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "ash_crawler"
+  }
+ },
+ {
+  "id": "kuman_thong_n1_ashcurse",
+  "owner": "kuman-thong",
+  "name": "คำสาปเถ้า",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "curse",
+     "stacks": 1,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_tai_hong_n1_grudge",
+  "owner": "phi-tai-hong",
+  "name": "รอยแค้น",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5
+  },
+  "riposte": {
+   "dmg": 6,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_tai_hong_n1_rancor",
+  "owner": "phi-tai-hong",
+  "name": "แค้นฝังใจ",
+  "type": "attack",
+  "fx": {
+   "dmg": 5
   },
   "conditional": {
    "when": {
-    "kind": "enemy_has_status",
-    "statusId": "vulnerable"
+    "kind": "hurt_last_turn"
    },
    "bonus": {
     "dmg": 3
@@ -4907,13 +2481,967 @@
   }
  },
  {
-  "id": "phi_kin_hua_v34_payoff",
-  "owner": "phi-kin-hua",
-  "name": "ผีกินหัว · เขี้ยวหิวโหย",
+  "id": "phi_tai_hong_n1_baddeath",
+  "owner": "phi-tai-hong",
+  "name": "ตายไม่ดี",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3
+  },
+  "conditional": {
+   "when": {
+    "kind": "player_hp_below",
+    "value": 30
+   },
+   "bonus": {
+    "status": [
+     {
+      "id": "strength",
+      "stacks": 2,
+      "turns": 99,
+      "to": "self"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "phi_pa_n1_shade",
+  "owner": "phi-pa",
+  "name": "เรียกเงาป่า",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "forest_shade"
+  }
+ },
+ {
+  "id": "phi_pa_n1_thicket",
+  "owner": "phi-pa",
+  "name": "ป่าทึบ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 8
+  }
+ },
+ {
+  "id": "phi_pa_n1_whirl",
+  "owner": "phi-pa",
+  "name": "ลมป่าหวน",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "night_head_collector_n1_basket",
+  "owner": "night-head-collector",
+  "name": "เรียกหัวในกระด้ง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "basket_head"
+  }
+ },
+ {
+  "id": "night_head_collector_n1_snatch",
+  "owner": "night-head-collector",
+  "name": "ฉวยหัว",
+  "type": "attack",
+  "fx": {
+   "dmg": 10
+  },
+  "charge": {
+   "dmg": 4
+  }
+ },
+ {
+  "id": "night_head_collector_n1_guard",
+  "owner": "night-head-collector",
+  "name": "ตั้งกระด้งรับ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 10
+  },
+  "riposte": {
+   "dmg": 8
+  }
+ },
+ {
+  "id": "night_head_collector_n1_swoop",
+  "owner": "night-head-collector",
+  "name": "โฉบหนอง",
   "type": "attack",
   "fx": {
    "dmg": 5,
+   "hits": 2
+  }
+ },
+ {
+  "id": "mae_nak_n2_wait",
+  "owner": "mae-nak",
+  "name": "รอผัวที่ท่าน้ำ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 6
+  },
+  "riposte": {
+   "dmg": 7
+  }
+ },
+ {
+  "id": "mae_nak_n2_arm",
+  "owner": "mae-nak",
+  "name": "แขนยาว",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "breakBlock": 6
+  }
+ },
+ {
+  "id": "mae_nak_n2_lime",
+  "owner": "mae-nak",
+  "name": "ยื่นมือเก็บมะนาว",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "steal": 1
+  }
+ },
+ {
+  "id": "mae_nak_n2_baby",
+  "owner": "mae-nak",
+  "name": "เรียกลูกแดง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "luk_daeng"
+  }
+ },
+ {
+  "id": "pop_yai_n2_maw",
+  "owner": "pop-yai",
+  "name": "อ้าปากกว้าง",
+  "type": "attack",
+  "fx": {
+   "dmg": 6
+  },
+  "charge": {
+   "dmg": 4
+  }
+ },
+ {
+  "id": "pop_yai_n2_liver",
+  "owner": "pop-yai",
+  "name": "กินตับ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "drain": true
+  }
+ },
+ {
+  "id": "phi_ha_ratri_n2_lure",
+  "owner": "phi-ha-ratri",
+  "name": "ไฟโขมดล่อ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_ha_ratri_n2_spread",
+  "owner": "phi-ha-ratri",
+  "name": "เผาลาม",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_ha_ratri_n2_blaze",
+  "owner": "phi-ha-ratri",
+  "name": "ไฟลุก",
+  "type": "attack",
+  "fx": {
+   "dmg": 3
+  },
+  "perFoeStatus": {
+   "statusId": "poison",
+   "dmg": 1
+  }
+ },
+ {
+  "id": "asuragaya_n2_hop",
+  "owner": "asuragaya",
+  "name": "กระโดดขาเดียว",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4,
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 1,
+     "turns": 2,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "asuragaya_n2_koi",
+  "owner": "asuragaya",
+  "name": "กอยกอย",
+  "type": "attack",
+  "fx": {
+   "dmg": 7
+  },
+  "charge": {
+   "dmg": 3
+  }
+ },
+ {
+  "id": "asuragaya_n2_call",
+  "owner": "asuragaya",
+  "name": "เสียงเรียกกลางป่า",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "yak_wat_jaeng_n2_grip",
+  "owner": "yak-wat-jaeng",
+  "name": "มือยาวเกาะ",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "yak_wat_jaeng_n2_suck",
+  "owner": "yak-wat-jaeng",
+  "name": "ปากเข็มดูด",
+  "type": "attack",
+  "fx": {
+   "dmg": 3
+  },
+  "perFoeStatus": {
+   "statusId": "vulnerable",
+   "dmg": 5
+  }
+ },
+ {
+  "id": "yak_wat_jaeng_n2_merit",
+  "owner": "yak-wat-jaeng",
+  "name": "ขอส่วนบุญ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 3
+  },
+  "curseCard": "curse_bad_omen"
+ },
+ {
+  "id": "phi_phrai_n2_call",
+  "owner": "phi-phrai",
+  "name": "เรียกพรายน้ำ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "phrai_nam"
+  }
+ },
+ {
+  "id": "phi_phrai_n2_tears",
+  "owner": "phi-phrai",
+  "name": "น้ำตาพราย",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 2,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "winyan_rerorn_n2_grudge",
+  "owner": "winyan-rerorn",
+  "name": "แค้นเร่ร่อน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 8
+  },
+  "riposte": {
+   "dmg": 8
+  }
+ },
+ {
+  "id": "winyan_rerorn_n2_curse",
+  "owner": "winyan-rerorn",
+  "name": "สาปส่ง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 2
+  },
+  "curseCard": "curse_whisper"
+ },
+ {
+  "id": "winyan_rerorn_n2_follow",
+  "owner": "winyan-rerorn",
+  "name": "ตามติด",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "hits": 2
+  }
+ },
+ {
+  "id": "pisaj_fai_n2_pyre",
+  "owner": "pisaj-fai",
+  "name": "ไฟดงสุม",
+  "type": "attack",
+  "fx": {
+   "dmg": 8
+  },
+  "charge": {
+   "dmg": 4
+  }
+ },
+ {
+  "id": "pisaj_fai_n2_trick",
+  "owner": "pisaj-fai",
+  "name": "แสงหลอกตา",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "pisaj_fai_n2_sparks",
+  "owner": "pisaj-fai",
+  "name": "ไฟกระเด็น",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "hits": 2
+  }
+ },
+ {
+  "id": "jao_por_pa_n2_tiger",
+  "owner": "jao-por-pa",
+  "name": "เรียกเสือสมิง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "suea_saming"
+  }
+ },
+ {
+  "id": "jao_por_pa_n2_vine",
+  "owner": "jao-por-pa",
+  "name": "เรียกเถาวัลย์",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "thaowan"
+  }
+ },
+ {
+  "id": "jao_por_pa_n2_thicket",
+  "owner": "jao-por-pa",
+  "name": "ดงทึบ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 10
+  }
+ },
+ {
+  "id": "phi_nang_yai_n2_dance",
+  "owner": "phi-nang-yai",
+  "name": "ฟ้อนเรือนร้าง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "dance",
+     "stacks": 2,
+     "turns": 1,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_nang_yai_n2_nails",
+  "owner": "phi-nang-yai",
+  "name": "เล็บกรีด",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "hits": 2,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_nang_yai_n2_embrace",
+  "owner": "phi-nang-yai",
+  "name": "กอดตาย",
+  "type": "attack",
+  "fx": {
+   "dmg": 4
+  },
+  "perFoeStatus": {
+   "statusId": "vulnerable",
+   "dmg": 4
+  }
+ },
+ {
+  "id": "winyan_dek_n2_dive",
+  "owner": "winyan-dek",
+  "name": "ดำน้ำหนี",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5,
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 1,
+     "turns": 2,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "winyan_dek_n2_ankle",
+  "owner": "winyan-dek",
+  "name": "ดึงขา",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "drain": true
+  }
+ },
+ {
+  "id": "winyan_dek_n2_cold",
+  "owner": "winyan-dek",
+  "name": "น้ำเย็นยะเยือก",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "status": [
+    {
+     "id": "weakness",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "yak_dam_n2_wing",
+  "owner": "yak-dam",
+  "name": "ปีกกระด้งคุ้มกัน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 8
+  },
+  "riposte": {
+   "dmg": 7
+  }
+ },
+ {
+  "id": "yak_dam_n2_pestle",
+  "owner": "yak-dam",
+  "name": "สากอาคม",
+  "type": "attack",
+  "fx": {
+   "dmg": 9
+  },
+  "charge": {
+   "dmg": 4
+  }
+ },
+ {
+  "id": "yak_dam_n2_circle",
+  "owner": "yak-dam",
+  "name": "บินวน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "dodge",
+     "stacks": 1,
+     "turns": 2,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_mae_mai_n2_dream",
+  "owner": "phi-mae-mai",
+  "name": "เรียกชายในฝัน",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phi_mae_mai_n2_kiss",
+  "owner": "phi-mae-mai",
+  "name": "จุมพิตแม่ม่าย",
+  "type": "attack",
+  "fx": {
+   "dmg": 5,
+   "drain": true
+  }
+ },
+ {
+  "id": "phi_mae_mai_n2_mourn",
+  "owner": "phi-mae-mai",
+  "name": "ไว้ทุกข์",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 6,
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phra_upakut_n2_crave",
+  "owner": "phra-upakut",
+  "name": "หิวกระหาย",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "heal": 5
+  },
+  "charge": {
    "heal": 3
+  }
+ },
+ {
+  "id": "phra_upakut_n2_claw",
+  "owner": "phra-upakut",
+  "name": "เล็บเปรต",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "status": [
+    {
+     "id": "vulnerable",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phra_upakut_n2_gulp",
+  "owner": "phra-upakut",
+  "name": "กลืนกิน",
+  "type": "attack",
+  "fx": {
+   "dmg": 3
+  },
+  "perFoeStatus": {
+   "statusId": "vulnerable",
+   "dmg": 6
+  }
+ },
+ {
+  "id": "night_bell_keeper_n2_servant",
+  "owner": "night-bell-keeper",
+  "name": "เรียกเปรตบริวาร",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "pret_borivan"
+  }
+ },
+ {
+  "id": "night_bell_keeper_n2_ring",
+  "owner": "night-bell-keeper",
+  "name": "ตีระฆังเรียก",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 4
+  },
+  "curseCard": "curse_dread"
+ },
+ {
+  "id": "night_bell_keeper_n2_bowl",
+  "owner": "night-bell-keeper",
+  "name": "ขันบาตร",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 8
+  }
+ },
+ {
+  "id": "night_bell_keeper_n2_bigbell",
+  "owner": "night-bell-keeper",
+  "name": "เคาะระฆังใหญ่",
+  "type": "attack",
+  "fx": {
+   "dmg": 8
+  },
+  "charge": {
+   "dmg": 4
+  }
+ },
+ {
+  "id": "night_bell_keeper_n2_robe",
+  "owner": "night-bell-keeper",
+  "name": "จีวรขาด",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 10
+  },
+  "riposte": {
+   "dmg": 8
+  }
+ },
+ {
+  "id": "night_root_lord_n3_root",
+  "owner": "night-root-lord",
+  "name": "แผ่รากไทร",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "rak_sai"
+  }
+ },
+ {
+  "id": "night_root_lord_n3_bark",
+  "owner": "night-root-lord",
+  "name": "เปลือกไทร",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 9
+  }
+ },
+ {
+  "id": "night_root_lord_n3_hug",
+  "owner": "night-root-lord",
+  "name": "ไทรโอบ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 12
+  },
+  "riposte": {
+   "dmg": 10
+  }
+ },
+ {
+  "id": "night_root_lord_n3_branch",
+  "owner": "night-root-lord",
+  "name": "กิ่งฟาด",
+  "type": "attack",
+  "fx": {
+   "dmg": 4,
+   "hits": 3
+  }
+ },
+ {
+  "id": "night_cave_mother_n3_spring",
+  "owner": "night-cave-mother",
+  "name": "เรียกพรายน้ำ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "phrai_nam"
+  }
+ },
+ {
+  "id": "night_cave_mother_n3_mist",
+  "owner": "night-cave-mother",
+  "name": "ไอหมอกพิษ",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "poison",
+     "stacks": 3,
+     "turns": 3,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "night_cave_mother_n3_pool",
+  "owner": "night-cave-mother",
+  "name": "แช่แอ่งน้ำ",
+  "type": "action",
+  "ap": 2,
+  "fx": {
+   "block": 6,
+   "heal": 6
+  }
+ },
+ {
+  "id": "night_cave_mother_n3_wave",
+  "owner": "night-cave-mother",
+  "name": "คลื่นถ้ำ",
+  "type": "attack",
+  "fx": {
+   "dmg": 9
+  },
+  "charge": {
+   "dmg": 5
+  }
+ },
+ {
+  "id": "night_cave_mother_n3_echo",
+  "owner": "night-cave-mother",
+  "name": "เสียงก้อง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "night_headless_king_n3_spell",
+  "owner": "night-headless-king",
+  "name": "เวทปอบ",
+  "type": "attack",
+  "fx": {
+   "dmg": 8
+  },
+  "charge": {
+   "dmg": 4
+  }
+ },
+ {
+  "id": "night_headless_king_n3_glare",
+  "owner": "night-headless-king",
+  "name": "ตาปอบจ้อง",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
+  }
+ },
+ {
+  "id": "night_headless_king_n3_brew",
+  "owner": "night-headless-king",
+  "name": "ต้มยาอาคม",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 5,
+   "status": [
+    {
+     "id": "strength",
+     "stacks": 1,
+     "turns": 99,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "night_headless_king_n3_quick",
+  "owner": "night-headless-king",
+  "name": "ร่ายเวทเร็ว",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "dance",
+     "stacks": 2,
+     "turns": 1,
+     "to": "self"
+    }
+   ]
+  }
+ },
+ {
+  "id": "night_headless_king_n3_slash",
+  "owner": "night-headless-king",
+  "name": "ฟันอาคม",
+  "type": "attack",
+  "fx": {
+   "dmg": 3,
+   "hits": 4
+  }
+ },
+ {
+  "id": "phi_kin_hua_n3_head",
+  "owner": "phi-kin-hua",
+  "name": "ปล่อยหัวลอย",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "summon": "hua_loi"
+  }
+ },
+ {
+  "id": "phi_kin_hua_n3_swallow",
+  "owner": "phi-kin-hua",
+  "name": "กลืนหัว",
+  "type": "attack",
+  "fx": {
+   "dmg": 10
+  },
+  "charge": {
+   "dmg": 5
+  }
+ },
+ {
+  "id": "phi_kin_hua_n3_hide",
+  "owner": "phi-kin-hua",
+  "name": "ซ่อนหัว",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "block": 10
+  },
+  "riposte": {
+   "dmg": 9
+  }
+ },
+ {
+  "id": "phi_kin_hua_n3_last",
+  "owner": "phi-kin-hua",
+  "name": "กินหัวคำสุดท้าย",
+  "type": "attack",
+  "fx": {
+   "dmg": 6,
+   "hits": 2,
+   "drain": true
+  }
+ },
+ {
+  "id": "phi_kin_hua_n3_name",
+  "owner": "phi-kin-hua",
+  "name": "เรียกชื่อเจ้าของหัว",
+  "type": "action",
+  "ap": 1,
+  "fx": {
+   "status": [
+    {
+     "id": "stun",
+     "stacks": 1,
+     "turns": 2,
+     "to": "enemy"
+    }
+   ]
   }
  }
 ]

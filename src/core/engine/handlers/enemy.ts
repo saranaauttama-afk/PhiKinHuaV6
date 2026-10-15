@@ -29,6 +29,7 @@ export function buildAndShuffleEnemyDeck(s: GameState, r: RNG) {
   s.enemy.maxAp = s.enemy.maxAp ?? rules.ap;
   s.enemy.ap = 0;
   s.enemy.handCount = 0;
+  s.enemy.handCharges = undefined;
   s.enemyHandSize = rules.handSize;
   s.enemy.handSize = rules.handSize;
   s.enemyDrawPerTurn = undefined; s.enemyMaxRetained = undefined; s.enemyHandAges = []; s.enemyIdleTurns = 0;

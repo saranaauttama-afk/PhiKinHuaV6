@@ -11,14 +11,14 @@ import {CARD_TYPE_LABELS as TYPE_LABEL} from './typesRegistry';
 const statusName = (id: string) => STATUS_EFFECTS_REGISTRY[id as keyof typeof STATUS_EFFECTS_REGISTRY]?.name ?? id;
 
 /** Effect text. `side` is who owns the effect: 'enemy' words it from the ghost's side. */
-export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
+export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player', water = 'มานา'): string[] {
   const self = side === 'player' ? 'เรา' : 'ผี', other = side === 'player' ? 'ผี' : 'เรา';
   const out: string[] = [];
   if (fx.dmg) out.push(`โจมตี ${fx.dmg}${(fx.hits ?? 1) > 1 ? ` ×${fx.hits}` : ''}`);
   else if (fx.hits) out.push(`ตีเพิ่ม ${fx.hits} ครั้ง`);
   if (fx.block) out.push(`เกราะ ${fx.block}`);
   if (fx.heal) out.push(`ฟื้น ${fx.heal}`);
-  if (fx.mana) out.push(`มานา +${fx.mana}`);
+  if (fx.mana) out.push(`${water} +${fx.mana}`);
   if (fx.ap) out.push(`แต้ม +${fx.ap}`);
   for (const e of fx.status ?? []) {
     out.push(`${e.to === 'self' ? self : other}ติด${statusName(e.id)} ${e.stacks}${e.turns < 99 ? ` (${e.turns} เทิร์น)` : ''}`);
@@ -33,6 +33,12 @@ export function fxText(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
   if (fx.keepRhythm) out.push('จังหวะไม่หายเทิร์นนี้');
   if (fx.lockRhythm) out.push('จังหวะไม่หายจนจบไฟต์');
   if (fx.doubleNext) out.push('การ์ดโจมตีใบถัดไปเทิร์นนี้ทำงาน 2 ครั้ง');
+  if (fx.drain) out.push(`${self}ฟื้นเท่าที่ทะลุเกราะ${other}`);
+  if (fx.steal) out.push(`ขโมยการ์ดใบล่าสุดในมือ${other} ${fx.steal} ใบ (ตีเข้าเนื้อ 1 ครั้ง คืน 1 ใบ)`);
+  if (fx.seal) out.push(fx.seal === 1 ? 'ผนึกการ์ดที่ผีถือ 1 ใบ' : `ผนึกการ์ดที่ผีถือ ${fx.seal} ใบ`);
+  if (fx.unCharge) out.push('ล้างแรงชาร์จการ์ดที่ผีถือ');
+  if (fx.selfDamage) out.push(`เสียเลือด ${fx.selfDamage}`);
+  if (fx.healMinions) out.push(`ของเลี้ยงทุกตัวฟื้น ${fx.healMinions}`);
   if (fx.summon) {
     const m = require('../combat/minions');
     out.push(side === 'player' ? `เรียก${m.minionDef(fx.summon)?.name ?? fx.summon} (${m.minionText(fx.summon)})` : `เรียก${m.minionDef(fx.summon)?.name ?? fx.summon}`);
@@ -44,14 +50,14 @@ const COUNTER_WHEN = { enemy_attack: 'เมื่อผีโจมตี', ene
 const TRIGGER_WHEN: Record<Trigger['on'], string> = {
   battleStart: 'เริ่มไฟต์', equip: 'เมื่อสวม', turnStart: 'ต้นเทิร์น', turnEnd: 'ท้ายเทิร์น',
   discard:'เมื่อทิ้งท้ายเทิร์น', play: 'เมื่อเล่น', prayerDone: 'เมื่อบทสวดสำเร็จ',
-  rhythm: 'ทุกครั้งที่ได้จังหวะ', roundEnd: 'พักยก',
+  rhythm: 'ทุกครั้งที่ได้จังหวะ', roundEnd: 'พักยก', seal: 'ทุกครั้งที่ผนึกผี',
 };
 
-export function passiveText(p: Passive): string[] {
+export function passiveText(p: Passive, water = 'มานา'): string[] {
   const out = p.triggers.map(t => {
     const when = t.on === 'play' ? `เมื่อเล่นการ์ด${t.type ? TYPE_LABEL[t.type] : ''}${t.once ? 'ใบแรกของเทิร์น' : ''}` : TRIGGER_WHEN[t.on];
     const cond = t.when ? ` ${conditionText(t.when)}` : '';
-    return `${when}${cond}${t.once && t.on !== 'play' ? ' (เทิร์นละครั้ง)' : ''}: ${fxText(t.fx).join(' · ')}`;
+    return `${when}${cond}${t.once && t.on !== 'play' ? ' (เทิร์นละครั้ง)' : ''}: ${fxText(t.fx, 'player', water).join(' · ')}`;
   });
   if (p.armor) out.push(`รับดาเมจจากผีลดลง ${p.armor} ต่อครั้ง`);
   if (p.attackBonus) out.push(`การ์ดโจมตีแรงขึ้น ${p.attackBonus} ต่อครั้ง`);
@@ -62,6 +68,8 @@ export function passiveText(p: Passive): string[] {
   if (p.riposteBonus) out.push(`สวนทุกครั้ง +${p.riposteBonus} ดาเมจ`);
   if (p.damageCap) out.push(`โดนตีเกิน ${p.damageCap.over} ในครั้งเดียว ลดเหลือ ${p.damageCap.to}`);
   if (p.deathSave) out.push(`ถ้าจะตาย เหลือเลือด ${p.deathSave.hp} และเกราะ ${p.deathSave.block}`);
+  if (p.bowlBonus) out.push(`ขันจุน้ำมนต์ +${p.bowlBonus}`);
+  if (p.overflowDmg) out.push(`น้ำล้นขันทุก 1 ตีผี ${p.overflowDmg}`);
   return out;
 }
 
@@ -88,17 +96,32 @@ export function describeCard(card: CardData, side: 'player' | 'enemy' = 'player'
   }
   if (card.type === 'prayer') lead = 'รอ 1–3 เทิร์น ผล ×1/×2/×3: ';
   lead = fighterLead(card) + lead;
-  if (card.type === 'equipment' && card.equip) parts.push(...passiveText(card.equip));
+  const water = require('./water').cardResourceName(card) as string;
+  if (card.type === 'equipment' && card.equip) parts.push(...passiveText(card.equip, water));
   if (card.charges) parts.push(`ใช้ได้ ${card.charges} ครั้ง`);
   if (card.spendRhythm) parts.push(card.spendRhythm.mode === 'hits'
     ? 'ใช้จังหวะทั้งหมด: ตีครั้งละ ' + (fx.dmg ?? 0) + ' เท่าจำนวนจังหวะ'
     : `ใช้จังหวะทั้งหมด: +${card.spendRhythm.perStack} ดาเมจต่อจังหวะ`);
   const shown = card.spendRhythm?.mode === 'hits' ? { ...fx, dmg: undefined } : fx;
-  parts.push(...fxText(shown, side));
+  // หมอผี (cards/water.ts)
+  if (card.blood) parts.push(`ของต่ำ: น้ำมนต์ไม่พอ จ่ายเลือด ${require('../balance/notfm').WATER_RULES.bloodPerWater} ต่อ 1 ที่ขาด`);
+  if (card.splash) parts.push(`สาดน้ำมนต์ทั้งขัน: ต่อ 1 น้ำมนต์ ${perText(card.splash, side)}`);
+  if (card.wakeYant) parts.push(`ปลุกยันต์ทั้งหมดบนผี: ต่อ 1 ยันต์ ${perText(card.wakeYant, side)}`);
+  parts.push(...fxText(shown, side, water));
   if (card.after) parts.push(`ต่อจาก${require('./fighter').MOVE_NAMES[card.after.move]}: ${fxText(card.after.bonus, side).map(t => t.replace(/^โจมตี /, '+')).join(' · ')}`);
+  const ghost = card as { charge?: Fx; perFoeStatus?: { statusId: string; dmg: number } };
+  if (ghost.perFoeStatus) {
+    const p = ghost.perFoeStatus, who = side === 'player' ? 'ผี' : 'เรา';
+    const stacks = STATUS_EFFECTS_REGISTRY[p.statusId as keyof typeof STATUS_EFFECTS_REGISTRY]?.stackable;
+    parts.push(stacks ? `+${p.dmg} ต่อชั้น${statusName(p.statusId)}ของ${who}` : `ถ้า${who}ติด${statusName(p.statusId)} +${p.dmg}`);
+  }
+  if (ghost.charge) {
+    const max = require('../balance/notfm').GHOST_MECHANICS.chargeMaxTurns;
+    parts.push(`ชาร์จ: ${fxText(ghost.charge, side).map(t => t.replace(/^(โจมตี|เกราะ|ฟื้น) /, '$1 +')).join(' · ')} ต่อเทิร์นที่ถือไว้ (สูงสุด ${max})`);
+  }
   if (card.riposte) parts.push(`สวน: ${fxText(card.riposte, side).join(' · ')}`);
   if (card.repeatIf) parts.push(`${conditionText(card.repeatIf, side)}: ทำซ้ำอีกครั้ง`);
-  if (card.conditional) parts.push(`${conditionText(card.conditional.when, side)} +${fxText(card.conditional.bonus, side).join(' · ')}`);
+  if (card.conditional) parts.push(`${conditionText(card.conditional.when, side)} +${fxText(card.conditional.bonus, side, water).join(' · ')}`);
   const curse = (card as { curseCard?: string }).curseCard;
   if (curse) parts.push(`ใส่${require('../pack').curseById(curse)?.name ?? 'คำสาป'}ในกองทิ้งของเรา`);
   if (card.whileHeld) parts.push(`ถือไว้ท้ายเทิร์น: ${fxText(card.whileHeld).join(' · ')}`);
@@ -108,14 +131,21 @@ export function describeCard(card: CardData, side: 'player' | 'enemy' = 'player'
   return lead + parts.join(' · ');
 }
 
+/** One point of สาด / ปลุกยันต์ in words. */
+function perText(per: import('../types').PerStackFx, side: 'player' | 'enemy'): string {
+  const out = fxText({ dmg: per.dmg, block: per.block, heal: per.heal, mana: per.mana }, side, 'น้ำมนต์');
+  return out.join(' · ') + (per.sweep ? ' (โดนลูกสมุนของผีทุกตัวด้วย)' : '');
+}
+
 export function describeBlessing(b: BlessingDef): string {
   return b.desc ?? passiveText(b).join(' · ');
 }
 
-/** Cost label: ฟรี, n แต้ม or n มานา. */
+/** Cost label: ฟรี, n แต้ม or n มานา (n น้ำมนต์ for the shaman's cards). */
 export function costLabel(card: CardData, cost?: { ap: number; mana: number }): string {
   const ap = cost?.ap ?? card.ap ?? 0, mana = cost?.mana ?? card.mana ?? 0;
-  if (mana) return `${mana} มานา`;
+  if (mana) return `${mana} ${require('./water').cardResourceName(card)}`;
+  if (card.splash) return 'สาดทั้งขัน';
   if (ap) return `${ap} แต้ม`;
   return 'ฟรี';
 }

@@ -193,10 +193,15 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
     s.enemy.block = 0;
     if (s.fight) s.fight.ghostTurns += 1;
     require('../../campaign/nights').applyRage(s);
+    // Phase 2 first: a relic it breaks must not fire its rule on that same turn.
+    require('../../combat/ghostMechanics').checkGhostPhase(s,r);
     require('../../campaign/bossRules').applyBossRule(s);
     require('../../statusEffectsRuntime').processStatusEffectsOnTurnStart('enemy',s);
     r=settleCombat(s,r);
     if(s.phase!=='combat')return {state:s,rng:r};
+    // The ghost's สวน waited one player turn; a boss low enough changes phase before drawing.
+    const GM=require('../../combat/ghostMechanics');
+    GM.clearGhostRipostes(s);
 
     // Decide from the current public board and the real held cards once the turn starts.
     const handBeforeDraw=s.enemyPiles!.hand.length;
@@ -214,15 +219,20 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       if (s.phase !== 'combat') break;
 
       const original=indexes[playIndex];
-      const index=original==null?s.enemyPiles!.hand.indexOf(plannedId):original-consumed.filter(i=>i<original).length;
+      let index=original==null?s.enemyPiles!.hand.indexOf(plannedId):original-consumed.filter(i=>i<original).length;
+      // หมอผี ผนึก can take a held card mid-turn (a ยันต์ counter fired): find the planned card again;
+      // if it was the one sealed, it is simply not played.
+      if(index>=0&&s.enemyPiles!.hand[index]!==plannedId)index=s.enemyPiles!.hand.indexOf(plannedId);
       // Traps/counters can awaken the boss between reveals. Read the actual transformed copy.
       const cardId=s.enemyPiles!.hand[index];
       const def=enemyCardById(cardId);
       if(!def)continue;
       const historyBefore=historySnapshot(s),eventStart=s.pendingEvents?.length??0;
+      // ชาร์จ is read from the card's place in hand before it leaves the hand.
+      const charge=index>=0?GM.heldCharge(s,index):0;
       if(index<0||!consumeEnemyCard(s,index))continue;
       if(original!=null)consumed.push(original);
-      const shown=enemyCardFx(s,def);
+      const shown=enemyCardFx(s,def,charge);
       mimicGhostCard(s,def);
       s.enemyLastPlayed.push(cardId);
       emit(s, {
@@ -236,6 +246,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
         desc: describeCard({ ...def, conditional: undefined, fx: { ...shown, dmg: undefined, hits: undefined, block: undefined } }, 'enemy') || undefined,
         block: shown.block ?? 0,
         cost: enemyCardCost(def),
+        ...(charge?{charge}:{}),
       });
 
       // มึน: the ghost's first attack card this turn is lost.
@@ -258,10 +269,10 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
       }
 
       const hpBefore=s.player.hp;
-      require('../../combat/enemyCardEffects').resolveEnemyCard(s, def);
+      require('../../combat/enemyCardEffects').resolveEnemyCard(s, def, charge);
       recordCardHistory(s,'enemy',historyCard,historyBefore,eventStart,undefined,{ap:enemyCardCost(def),mana:0});
       // สวน: armed ripostes answer the ghost's next attack card.
-      if(def.type==='attack'&&s.phase==='combat')r=require('../../cards/fighter').resolveRipostes(s,hpBefore,!!enemyCardFx(s,def).dmg,r);
+      if(def.type==='attack'&&s.phase==='combat')r=require('../../cards/fighter').resolveRipostes(s,hpBefore,!!shown.dmg,r);
 
       r = settleCombat(s, r);
     }
@@ -270,7 +281,7 @@ export function resolveEnemyTurn(s: GameState, _cmd: Extract<Command, { type: 'R
   if(s.phase==='combat'){require('../../combat/minions').ghostMinionsAct(s);r=settleCombat(s,r);}
   finishEnemyHand(s,s.enemyLastPlayed?.length??0);
   if(s.phase==='combat'){processStatusEffectsOnTurnEnd('enemy',s);r=settleCombat(s,r);}
-  if(s.enemy)s.enemy.handCount=s.enemyPiles?.hand.length??0;
+  if(s.enemy){s.enemy.handCount=s.enemyPiles?.hand.length??0;require('../../combat/ghostMechanics').syncHandCharges(s);}
   emit(s, { t: 'TurnEnded', who: 'enemy' });
 
   // ไม่ประกาศแผนล่วงหน้าอีกแล้ว — ล้างทิ้งเพื่อไม่ให้ค้างเป็นข้อมูลเก่า

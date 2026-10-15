@@ -34,7 +34,10 @@ export function playCard(s: GameState, index: number, rng: RNG, wait = 1): { rng
 
   const cost = cardCost(s, card);
   s.player.ap -= cost.ap;
-  s.player.mana -= cost.mana;
+  // ของต่ำ (cards/water.ts): water the bowl lacks is paid in HP.
+  const blood = require('./water').bloodCost(s, card, cost.mana);
+  s.player.mana = Math.max(0, s.player.mana - cost.mana);
+  if (blood) require('./fx').selfDamage(s, blood);
   countCardPlayed(s, card);
   s.piles.hand.splice(index, 1);
   s.log.push(`เล่น ${card.name}`);
@@ -55,8 +58,16 @@ export function playCard(s: GameState, index: number, rng: RNG, wait = 1): { rng
     }
     default: {
       (card.exhaust || card.borrowed ? s.piles.exhaust : s.piles.discard).push(card);
-      if (card.type === 'attack') { rng = playAttack(s, card, rng); break; }
-      const fx = cardFx(s, card);
+      if (card.type === 'attack') {
+        const GM = require('../combat/ghostMechanics');
+        const ghostSide = GM.ghostSideHp(s);
+        rng = playAttack(s, card, rng);
+        // สวนของผี: the ghost answers an attack card that did not hurt its side.
+        GM.resolveGhostRipostes(s, ghostSide);
+        break;
+      }
+      // หมอผี: สาด spends the bowl, ปลุกยันต์ eats the ghost's ยันต์ (cards/water.ts).
+      const fx = card.splash || card.wakeYant ? require('./water').waterFx(s, card, cardFx(s, card)) : cardFx(s, card);
       // ปลุกเสก: the next spell's effect is multiplied.
       let mult = 1;
       if (card.type === 'spell' && s.fight?.nextSpellMult) { mult = s.fight.nextSpellMult; s.fight.nextSpellMult = undefined; }
@@ -87,7 +98,8 @@ function starRiposte(card: CardData) {
 function playAttack(s: GameState, card: CardData, rng: RNG): RNG {
   const F = require('./fighter');
   rng = F.onAttackStart(s, card, rng);
-  const fx = F.attackFx(s, card, cardFx(s, card));
+  const base = card.splash || card.wakeYant ? require('./water').waterFx(s, card, cardFx(s, card)) : cardFx(s, card);
+  const fx = F.attackFx(s, card, base);
   const ctx = { sourceId: card.id, type: 'attack' as const, move: card.move };
   const heavy = card.heavy ? F.consumeBruise(s) : 0;
   rng = applyFx(s, fx, { ...ctx, firstHitBonus: heavy }, rng);

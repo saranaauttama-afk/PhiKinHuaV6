@@ -1,3 +1,4 @@
+import {CLASS_RESOURCES} from '../src/core/balance/notfm';
 import {describe,it,expect} from 'vitest';
 import {baseNewState,beginPlayerFight} from '../src/core/commands';
 import {applyCommand} from '../src/core/reducer';
@@ -101,7 +102,7 @@ describe('Phase 7 Pandora rules and resource growth',()=>{
  for(const option of ['ap','mana','draw'] as const)it(`level ${option} is selectable, persists and is capped`,()=>{
   // Mana level-ups only exist for classes that use mana (นักมวย/แม่ชี never see them).
   const d=run('p7',option==='mana'?'shaman':'warrior');d.s.phase='levelup';d.s.levelUp={cards:[],offers:[option]};d.go({type:'ChooseLevelUpOption',option,index:0});expect(d.s.levelUp!.consumed).toBe(true);
-  expect(d.s.player[option==='ap'?'maxAp':option==='mana'?'startMana':'drawPerTurn']).toBe(option==='mana'?6:3);
+  expect(d.s.player[option==='ap'?'maxAp':option==='mana'?'startMana':'drawPerTurn']).toBe(option==='mana'?CLASS_RESOURCES.shaman.startMana+2:3); // หมอผี starts with CLASS_RESOURCES น้ำมนต์ (docs/mor-phi), +2 from the level-up
   const s=d.s;s.player.maxAp=3;s.player.startMana=10;s.player.drawPerTurn=4;for(let i=0;i<25;i++)expect(rollLevelOffers(s,makeRng('caps'+i)).list).not.toContain(option);
  });
  it('no existing card is milestone-gated: new players keep the full Phase 6 class pool',()=>{

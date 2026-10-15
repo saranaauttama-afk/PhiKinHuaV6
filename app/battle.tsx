@@ -48,7 +48,7 @@ import BlessingView from './components/BlessingView';
 import { useCombatTimeline } from './components/battle/useCombatTimeline';
 import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash';
 import { useAppFonts } from './useAppFonts';
-import { palette, surface, tint, layer, font } from './theme';
+import { palette, surface, tint, layer, font, fighterColors } from './theme';
 
 import Settings from './components/Settings';
 import StartPage from './components/StartPage';
@@ -109,8 +109,18 @@ export default function BattlePage() {
 
   const [hoveredCardId,  setHoveredCardId]  = React.useState<string | null>(null);
   const [playedCardIds,  setPlayedCardIds]  = React.useState<string[]>([]);
-  const [damagePopups,      setDamagePopups]      = React.useState<{ id: string; damage: number }[]>([]);
-  const [enemyDamagePopups, setEnemyDamagePopups] = React.useState<{ id: string; damage: number }[]>([]);
+  const [damagePopups,      setDamagePopups]      = React.useState<{ id: string; damage: number; parts?: string[] }[]>([]);
+  const [enemyDamagePopups, setEnemyDamagePopups] = React.useState<{ id: string; damage: number; parts?: string[] }[]>([]);
+  // Badges that just changed a hit give a small shake (owner playtest 15 Oct 2026), per side.
+  const [pulse, setPulse] = React.useState<{ player?: { ids: string[]; key: string }; enemy?: { ids: string[]; key: string } }>({});
+  const pulseFrom = React.useCallback((ev: CombatEvent) => {
+    if (ev.t !== 'Damage' || !ev.parts?.length) return;
+    const key = eventKey(ev);
+    const of = (side: 'player' | 'enemy') => { const ids = ev.parts!.filter(p => p.side === side).map(p => p.id); return ids.length ? { ids, key } : undefined; };
+    setPulse(prev => ({ player: of('player') ?? prev.player, enemy: of('enemy') ?? prev.enemy }));
+  }, []);
+  // พักยก banner (owner playtest: say when a round ends and what it did).
+  const [roundBanner, setRoundBanner] = React.useState<{ key: string; text: string } | null>(null);
   const [statGainPopups, setStatGainPopups] = React.useState<{ id: string; statType: 'block' | 'energy'; side: 'player' | 'enemy'; amount: number }[]>([]);
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
   const [historyAtTurnStart,setHistoryAtTurnStart]=React.useState<CardHistoryEntry[]>([]);
@@ -222,7 +232,8 @@ export default function BattlePage() {
     for (const ev of after.pendingEvents ?? []) {
       if (ev.t === 'Damage' && ev.target === 'enemy' && ev.hpLoss > 0) {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง — เดิมโชว์ค่าบนการ์ดซึ่งไม่หัก block/buff
-        setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss }]);
+        setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss, parts: ev.parts?.map(p => p.label) }]);
+        pulseFrom(ev);
         const shakeTimer = setTimeout(() => monsterRef.current?.shake(), 250);
         cardFadeTimers.current.push(shakeTimer);
       } else if (ev.t === 'BlockGained' && ev.target === 'player') {
@@ -304,7 +315,31 @@ export default function BattlePage() {
         break;
       }
 
-      case 'HeavyHit': case 'Riposte': case 'RoundEnd': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
+      case 'RoundEnd': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        const who = require('../src/core/cards/fighter').roundBeneficiaries(gameState).filter((x: string) => x.endsWith('(พักยก)'));
+        const key = `round-${currentEvent.round}-${gameState.turn}`;
+        setRoundBanner({ key, text: `พักยก · จบยก ${currentEvent.round}${who.length ? `\n${who.map((x: string) => x.replace(' (พักยก)', '')).join(', ')} ทำงาน` : ''}` });
+        const t = setTimeout(() => setRoundBanner(b => b?.key === key ? null : b), 1400);
+        cardFadeTimers.current.push(t);
+        break;
+      }
+
+      // หมอผี: ผนึก and สายสิญจน์ get a short banner so the player sees what left the ghost's hand.
+      case 'GhostSealed': case 'GhostUnCharged': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        const key = `seal-${eventKey(currentEvent)}`;
+        const text = currentEvent.t === 'GhostSealed'
+          ? (currentEvent.name === 'มึน' ? 'ผนึก! ผีไม่ได้ถือการ์ด จึงมึนแทน' : `ผนึก! ${currentEvent.name} ถูกขังไม่ได้เล่น`)
+          : 'สายสิญจน์ · แรงชาร์จของผีหายหมด';
+        setRoundBanner({ key, text });
+        const t = setTimeout(() => setRoundBanner(b => b?.key === key ? null : b), 1300);
+        cardFadeTimers.current.push(t);
+        break;
+      }
+
+      case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen': case 'WaterOverflow':
+      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;
       }
@@ -314,8 +349,9 @@ export default function BattlePage() {
         // เสียงกรงเล็บดังทุกครั้งที่ผีตีด้วยการ์ด แม้เกราะจะกันไว้หมดก็ตาม
         if (currentEvent.target === 'player' && currentEvent.sourceKind === 'card') playSfx('ghostAttack');
         else for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        pulseFrom(currentEvent);
         if (currentEvent.hpLoss <= 0) break;
-        const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss };
+        const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss, parts: currentEvent.parts?.map(p => p.label) };
         if (currentEvent.target === 'player') flashRef.current?.flash();
         else monsterRef.current?.shake();
         if (currentEvent.target === 'player') setDamagePopups(prev => [...prev, popup]);
@@ -363,7 +399,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').enemyMinionBadges(gameState)]} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
+        <MonsterArea pulse={pulse.enemy} relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').ghostMechanicBadges(gameState)]} handCharges={enemy?.handCharges} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
@@ -400,6 +436,7 @@ export default function BattlePage() {
             <DamagePopup
               key={popup.id}
               damage={popup.damage}
+              parts={popup.parts}
               onDone={() => setEnemyDamagePopups(prev => prev.filter(p => p.id !== popup.id))}
             />
           ))}
@@ -414,11 +451,17 @@ export default function BattlePage() {
             <DamagePopup
               key={popup.id}
               damage={popup.damage}
+              parts={popup.parts}
               onDone={() => setDamagePopups(prev => prev.filter(p => p.id !== popup.id))}
             />
           ))}
         </View>
 
+        {roundBanner && <View testID="round-banner" pointerEvents="none" style={{ position: 'absolute', top: battleLayout.hudTop - 70, left: 24, right: 24, alignItems: 'center', zIndex: layer.popup }}>
+          <RitualSurface kind="quietSlate" style={{ paddingHorizontal: 18, paddingVertical: 8 }}>
+            <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hint, textAlign: 'center' }}>{roundBanner.text}</Text>
+          </RitualSurface>
+        </View>}
         {statGainPopups.map(p => (
           <StatGainPopup
             key={p.id}
@@ -440,10 +483,12 @@ export default function BattlePage() {
         />}
 
         {!victoryIntro&&gameState.phase==='combat'&&<MinionRow minions={gameState.minions??[]}/>}
+        {/* The ghost's ลูกสมุน stand as figures on its other side (was a status badge until 15 Oct 2026). */}
+        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" minions={gameState.enemyMinions??[]}/>}
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
-          statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges}/>:null}
+          statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges} pulse={pulse.player}/>:null}
           helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>dispatch({type:'UseSkill',id,index})}/>}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
@@ -452,6 +497,7 @@ export default function BattlePage() {
           ap={player.ap}
           maxAp={player.maxAp}
           mana={player.mana}
+          manaMax={require('../src/core/cards/water').usesWater(gameState)?require('../src/core/cards/water').bowlMax(gameState):undefined}
           block={player.block}
           handCount={gameState.piles.hand.filter(c=>c.id!=='qa_phra_prathan').length} handMax={player.handMax} retain={retainLimit(gameState)} drawPerTurn={player.drawPerTurn} opening={require('../src/core/cards/hand').openingHandSize(gameState)}
           drawCount={drawCount}
