@@ -59,6 +59,16 @@ export const CHARACTER_CLASSES: Record<ClassId, CharacterClass> = {
 
 export const ALL_CLASS_IDS = Object.keys(CHARACTER_CLASSES) as ClassId[];
 
+/**
+ * Store launch (owner, 15 Oct 2026): only นักมวยคาดเชือก has the full NOTFM-level card set, so it
+ * opens the book and is the only class a player can start. The others stay in the book, locked,
+ * until their own card sets are done (one class at a time). Engine, sims and old saves still use
+ * every class — this gate is for starting a new run only.
+ */
+export const CLASS_BOOK_ORDER: ClassId[] = ['warrior', 'shaman', 'nun', 'medium'];
+export const PLAYABLE_CLASSES: readonly ClassId[] = ['warrior'];
+export function classPlayable(id: ClassId): boolean { return PLAYABLE_CLASSES.includes(id); }
+
 export function getClass(id?: ClassId): CharacterClass {
   return CHARACTER_CLASSES[id ?? 'shaman'] ?? CHARACTER_CLASSES.shaman;
 }

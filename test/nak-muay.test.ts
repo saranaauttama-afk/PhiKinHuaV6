@@ -377,3 +377,12 @@ describe('moveHint (hand hints)', () => {
     expect(moveHint({ ...s, classId: 'nun' }, { move: 'kick' } as any).rhythm).toBe(false);
   });
 });
+
+import { CLASS_BOOK_ORDER, classPlayable, ALL_CLASS_IDS } from '../src/core/classes';
+describe('store launch class gate', () => {
+  it('opens with นักมวย and only นักมวย can start; the book still lists every class', () => {
+    expect(CLASS_BOOK_ORDER[0]).toBe('warrior');
+    expect([...CLASS_BOOK_ORDER].sort()).toEqual([...ALL_CLASS_IDS].sort());
+    expect(CLASS_BOOK_ORDER.filter(classPlayable)).toEqual(['warrior']);
+  });
+});
