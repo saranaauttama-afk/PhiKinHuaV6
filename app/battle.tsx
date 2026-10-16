@@ -14,6 +14,7 @@ import type { CombatEvent, CombatFrame, CardHistoryEntry } from '../src/core/typ
 
 import { combatFrame } from '../src/core/combat/damage';
 import {hitFeedback} from './components/battle/hitFeedback';
+import TurnBanner from './components/battle/TurnBanner';
 import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
 import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
@@ -500,6 +501,7 @@ export default function BattlePage() {
           ))}
         </View>
 
+        {(gameState.phase==='combat'||phase==='enemy')&&<TurnBanner side={phase} turn={gameState.turn} top={battleLayout.hudTop-70} suppressed={!!roundBanner}/>}
         {roundBanner && <View testID="round-banner" pointerEvents="none" style={{ position: 'absolute', top: battleLayout.hudTop - 70, left: 24, right: 24, alignItems: 'center', zIndex: layer.popup }}>
           <RitualSurface kind="quietSlate" style={{ paddingHorizontal: 18, paddingVertical: 8 }}>
             <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hint, textAlign: 'center' }}>{roundBanner.text}</Text>
