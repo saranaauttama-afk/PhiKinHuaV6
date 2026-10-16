@@ -2,7 +2,7 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { SFX, BEDS, type SfxId, type BedId } from './manifest';
-import { bedsFor, oneShotsFor, stepGain, ONE_SHOT_GAP_MS, type AudioMode } from './zones';
+import { bedsFor, oneShotsFor, stepGain, ONE_SHOT_GAP_MS, type AudioMode, type GhostKind } from './zones';
 
 /**
  * ระบบเสียงของเกม — ชั้นนี้เป็นภาพ/เสียงล้วน ไม่แตะกฎเกม
@@ -117,8 +117,8 @@ export function setBeds(ids: BedId[]) {
  * เสียงตามโซน (ชุด 3): หน้าจอบอกแค่ "อยู่ฉากไหน ทำอะไร" แล้วชั้นนี้เลือกเสียงพื้น + เสียงแทรกเอง
  * ดู src/audio/zones.ts
  */
-export function setSceneAudio(sceneId: string | undefined, mode: AudioMode) {
-  setBeds(bedsFor(sceneId, mode));
+export function setSceneAudio(sceneId: string | undefined, mode: AudioMode, kind: GhostKind = 'normal') {
+  setBeds(bedsFor(sceneId, mode, kind));
   setOneShots(oneShotsFor(sceneId, mode));
 }
 

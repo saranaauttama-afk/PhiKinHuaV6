@@ -4,6 +4,7 @@ import {RAGE} from '../src/core/balance/notfm';
 import {enemyDrawCadence} from '../src/core/combat/enemyHand';
 import {ghostLore} from '../src/core/monsters/folklore';
 import {battleScene,adventureSceneId} from './scenePresentation';
+import {enemyKind} from '../src/core/combat/enemyHand';
 import BattleBackdrop from './components/battle/BattleBackdrop';
 import {useBattleLayout} from './components/battle/battleLayout';
 import React from 'react';
@@ -425,7 +426,8 @@ export default function BattlePage() {
   const victoryIntro=!presentation && !dying && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   // เสียงตามโซน (ชุด 3): ตอนสู้ = ลมของโซน + กลอง · ชนะแล้วกลองหยุด เหลือลม · ออกจากฉากแล้วหน้าแผนที่ตั้งเสียงต่อเอง
   const audioScene=adventureSceneId(gameState);
-  React.useEffect(()=>{setSceneAudio(audioScene,victoryIntro||gameState.phase==='victory'?'victory':'battle');},[audioScene,victoryIntro,gameState.phase]);
+  const audioKind=enemyKind(gameState);
+  React.useEffect(()=>{setSceneAudio(audioScene,victoryIntro||gameState.phase==='victory'?'victory':'battle',audioKind);},[audioScene,victoryIntro,gameState.phase,audioKind]);
   React.useEffect(()=>{
     if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying&&!dying){dispatch({type:'CompleteNode'});router.replace('/');}
   },[gameState.phase,celebratedFight,timeline.isPlaying,dying]);

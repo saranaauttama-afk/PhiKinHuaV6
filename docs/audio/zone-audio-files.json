@@ -1,72 +1,142 @@
 [
  {
-  "id": "waterBattleBed",
-  "file": "assets/audio/ambience/water-battle-bed.mp3",
+  "id": "caveBed",
+  "file": "assets/audio/ambience/cave-bed.mp3",
+  "bed": true,
+  "lufs": -21.5,
+  "secs": 30.04
+ },
+ {
+  "id": "otherworldBed",
+  "file": "assets/audio/ambience/otherworld-bed.mp3",
   "bed": true,
   "lufs": -21.4,
   "secs": 30.04
  },
  {
-  "id": "cremationBattleBed",
-  "file": "assets/audio/ambience/cremation-battle-bed.mp3",
+  "id": "battleDrumBoss",
+  "file": "assets/audio/ambience/battle-drum-boss.mp3",
   "bed": true,
-  "lufs": -23.7,
-  "secs": 30.04
+  "lufs": -24.4,
+  "secs": 16.04
  },
  {
-  "id": "forestBattleBed",
-  "file": "assets/audio/ambience/forest-battle-bed.mp3",
-  "bed": true,
-  "lufs": -22.3,
-  "secs": 30.04
- },
- {
-  "id": "mountainBed",
-  "file": "assets/audio/ambience/mountain-bed.mp3",
+  "id": "caveBattleBed",
+  "file": "assets/audio/ambience/cave-battle-bed.mp3",
   "bed": true,
   "lufs": -21.5,
   "secs": 30.04
  },
  {
-  "id": "templeBattleBed",
-  "file": "assets/audio/ambience/temple-battle-bed.mp3",
+  "id": "otherworldBattleBed",
+  "file": "assets/audio/ambience/otherworld-battle-bed.mp3",
   "bed": true,
-  "lufs": -21.6,
+  "lufs": -21.4,
   "secs": 30.04
  },
  {
-  "id": "forestBed",
-  "file": "assets/audio/ambience/forest-bed.mp3",
+  "id": "battleDrumElite",
+  "file": "assets/audio/ambience/battle-drum-elite.mp3",
   "bed": true,
-  "lufs": -23.3,
-  "secs": 30.04
+  "lufs": -24.5,
+  "secs": 16.04
  },
  {
-  "id": "templeBed",
-  "file": "assets/audio/ambience/temple-bed.mp3",
-  "bed": true,
-  "lufs": -22.1,
-  "secs": 30.04
+  "id": "cremationDogNear",
+  "file": "assets/audio/sfx/cremation-dog-near-1.mp3",
+  "bed": false,
+  "lufs": -21.4,
+  "secs": 4.96
  },
  {
-  "id": "mountainBattleBed",
-  "file": "assets/audio/ambience/mountain-battle-bed.mp3",
-  "bed": true,
-  "lufs": -21.5,
-  "secs": 30.04
+  "id": "cremationOwl",
+  "file": "assets/audio/sfx/cremation-owl-1.mp3",
+  "bed": false,
+  "lufs": -21.1,
+  "secs": 0.5
  },
  {
-  "id": "cremationBed",
-  "file": "assets/audio/ambience/cremation-bed.mp3",
-  "bed": true,
+  "id": "templeBellFar",
+  "file": "assets/audio/sfx/temple-bell-far-1.mp3",
+  "bed": false,
   "lufs": -23.1,
-  "secs": 30.04
+  "secs": 6.03
  },
  {
-  "id": "waterBed",
-  "file": "assets/audio/ambience/water-bed.mp3",
-  "bed": true,
-  "lufs": -21.6,
-  "secs": 30.04
+  "id": "cremationEmber",
+  "file": "assets/audio/sfx/cremation-ember-1.mp3",
+  "bed": false,
+  "lufs": -20.0,
+  "secs": 2.01
+ },
+ {
+  "id": "forestBranchSnap",
+  "file": "assets/audio/sfx/forest-branch-snap-1.mp3",
+  "bed": false,
+  "lufs": -24.1,
+  "secs": 1.62
+ },
+ {
+  "id": "templeWindChime",
+  "file": "assets/audio/sfx/temple-wind-chime-1.mp3",
+  "bed": false,
+  "lufs": -22.8,
+  "secs": 3.97
+ },
+ {
+  "id": "templeBroom",
+  "file": "assets/audio/sfx/temple-broom-1.mp3",
+  "bed": false,
+  "lufs": -22.6,
+  "secs": 3.74
+ },
+ {
+  "id": "villageRooster",
+  "file": "assets/audio/sfx/village-rooster-1.mp3",
+  "bed": false,
+  "lufs": -21.9,
+  "secs": 2.4
+ },
+ {
+  "id": "templeChant",
+  "file": "assets/audio/sfx/temple-chant-1.mp3",
+  "bed": false,
+  "lufs": -21.4,
+  "secs": 6.03
+ },
+ {
+  "id": "cremationCrow",
+  "file": "assets/audio/sfx/cremation-crow-1.mp3",
+  "bed": false,
+  "lufs": -21.4,
+  "secs": 2.98
+ },
+ {
+  "id": "waterFishSplash",
+  "file": "assets/audio/sfx/water-fish-splash-1.mp3",
+  "bed": false,
+  "lufs": -22.0,
+  "secs": 2.04
+ },
+ {
+  "id": "villageDoorCreak",
+  "file": "assets/audio/sfx/village-door-creak-1.mp3",
+  "bed": false,
+  "lufs": -23.1,
+  "secs": 2.64
+ },
+ {
+  "id": "forestNightBird",
+  "file": "assets/audio/sfx/forest-night-bird-1.mp3",
+  "bed": false,
+  "lufs": -21.7,
+  "secs": 3.4
+ },
+ {
+  "id": "forestRustle",
+  "file": "assets/audio/sfx/forest-rustle-1.mp3",
+  "bed": false,
+  "lufs": -21.3,
+  "secs": 2.98
  }
 ]

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bedsFor, oneShotsFor, stepGain, zoneOf, BATTLE_DRUM, MAP_KEEPS_MUSIC } from '../src/audio/zones';
+import { bedsFor, oneShotsFor, stepGain, zoneOf, BATTLE_DRUM, BATTLE_DRUMS, MAP_KEEPS_MUSIC, ZONES } from '../src/audio/zones';
 import { BEDS, SFX } from '../src/audio/manifest';
 import { ADVENTURE_GEOGRAPHY } from '../app/scenePresentation';
 
@@ -23,15 +23,22 @@ describe('zone audio (ชุด 3)', () => {
     expect(bedsFor('01-village', 'victory')).toEqual(['villageBattleBed']);
   });
 
-  it('zones without their own files fall back to the village set', () => {
-    expect(bedsFor('12-cave-mouth', 'battle')).toEqual(['villageBattleBed', BATTLE_DRUM]);
+  it('every zone has its own beds; one-shots never borrow the village ones', () => {
     expect(bedsFor('08-stream', 'map')).toContain('waterBed');
     expect(bedsFor('06-bamboo-forest', 'battle')).toEqual(['forestBattleBed', BATTLE_DRUM]);
-    expect(oneShotsFor('08-stream', 'map')).toEqual(['villageDogHowl']);
+    expect(oneShotsFor('15-otherworld-gate', 'map')).not.toContain('villageDogHowl');
+    expect(bedsFor('12-cave-mouth', 'battle')).toEqual(['caveBattleBed', BATTLE_DRUM]);
+  });
+
+  it('drum follows the ghost kind', () => {
+    expect(bedsFor('01-village', 'battle', 'elite')).toEqual(['villageBattleBed', 'battleDrumElite']);
+    expect(bedsFor('15-otherworld-gate', 'battle', 'boss')).toEqual(['otherworldBattleBed', 'battleDrumBoss']);
+    expect(bedsFor('01-village', 'victory', 'boss')).toEqual(['villageBattleBed']);
   });
 
   it('one-shots only on the map', () => {
-    expect(oneShotsFor('01-village', 'map')).toEqual(['villageDogHowl']);
+    expect(oneShotsFor('01-village', 'map')).toContain('villageDogHowl');
+    expect(oneShotsFor('05-cremation-ground', 'map')).toContain('cremationOwl');
     expect(oneShotsFor('01-village', 'battle')).toEqual([]);
   });
 
@@ -39,7 +46,8 @@ describe('zone audio (ชุด 3)', () => {
     for (const scene of [...ADVENTURE_GEOGRAPHY, '16-secret-throne'])
       for (const mode of ['map', 'battle', 'victory'] as const)
         for (const id of bedsFor(scene, mode)) expect(BEDS[id].file).not.toBeNull();
-    expect(SFX.villageDogHowl.files.length).toBeGreaterThan(0);
+    for (const z of Object.values(ZONES)) for (const id of z.oneShots) expect(SFX[id].files.length).toBeGreaterThan(0);
+    for (const id of Object.values(BATTLE_DRUMS)) expect(BEDS[id].file).not.toBeNull();
   });
 
   it('fade steps move toward the target and never overshoot', () => {

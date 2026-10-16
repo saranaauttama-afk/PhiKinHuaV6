@@ -60,10 +60,12 @@ def main(src: Path):
         else:
             out = ROOT / 'assets/audio/sfx' / f'{kebab(sid)}-1.mp3'
             tmp = out.with_suffix('.tmp.wav')
-            run(['-i', str(f), '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,'
+            # Gain first: a very quiet source (e.g. a distant owl at −40 LUFS) sits under the −50 dB
+            # silence threshold and would be trimmed away entirely.
+            run(['-i', str(f), '-af', f'volume={gain:.1f}dB,silenceremove=start_periods=1:start_threshold=-50dB,areverse,'
                  'silenceremove=start_periods=1:start_threshold=-50dB,areverse', str(tmp)])
             d = duration(tmp)
-            run(['-i', str(tmp), '-af', f'afade=t=out:st={max(0, d - 0.3):.2f}:d=0.3,volume={gain:.1f}dB,'
+            run(['-i', str(tmp), '-af', f'afade=t=out:st={max(0, d - 0.3):.2f}:d=0.3,'
                  'alimiter=limit=0.75:level=false', '-ac', '1', '-ar', '44100', '-b:a', '96k', str(out)])
             tmp.unlink()
         report.append({'id': sid, 'file': str(out.relative_to(ROOT)), 'bed': is_bed,
