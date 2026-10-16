@@ -59,6 +59,8 @@ export type MonsterAreaHandle = {
   shake: () => void;
   /** Killing blow: a short shudder, then the ghost sinks and fades (owner playtest 16 Oct 2026). */
   die: () => void;
+  /** Beaten but still talking (ghost talk after a win): shudder, sag a little and dim. */
+  defeat: () => void;
 };
 
 const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterArea({
@@ -124,6 +126,14 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         withTiming(-8,  { duration: 60 }),
         withTiming(0,   { duration: 60 })
       );
+    },
+    defeat() {
+      monsterShakeX.value = withSequence(
+        withTiming(6,  { duration: 50 }), withTiming(-6, { duration: 50 }),
+        withTiming(4,  { duration: 50 }), withTiming(0,  { duration: 50 })
+      );
+      monsterFall.value = withDelay(200, withTiming(14, { duration: 500, easing: Easing.out(Easing.quad) }));
+      monsterFade.value = withDelay(200, withTiming(0.6, { duration: 500 }));
     },
     die() {
       monsterShakeX.value = withSequence(
