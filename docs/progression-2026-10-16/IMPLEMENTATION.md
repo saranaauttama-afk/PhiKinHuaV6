@@ -40,3 +40,20 @@ On difficulty 1, the first two fights were won in all 200 samples per class. The
 - Holdout seeds and difficulty 2/4, separate policies for six Common/Uncommon builds, starter-only and fixed-acquisition removal comparisons, and paired local battles at a shared checkpoint.
 - Telemetry for opening turns, effective HP, incoming burst, water/bruise cap hits, money spent and card provenance; a manual mobile playthrough to judge clarity and pacing.
 - Retune specific early ghosts, boss defenses, and core build access if the full-run pilot remains far below the draft's thresholds. Do not raise global AP/draw or change enemy AI in this branch to mask progression failures.
+
+## Route card access (16 Oct 2026, owner: "NOTFM มีร้านและหีบเยอะ")
+
+Cause found: v1 night 1 offered one card shop and a 50% chest before the first card reward (the night-1 boss), so the reduced starter fought seven fights with one or two new cards. `PROGRESSION_ROUTE` in `balance/deckProgression.ts` now gives warrior/shaman **2 guaranteed chests every night** (free pick 1 of 2) and **2 card shops on night 1**; nun/medium keep the old route.
+
+Bot `tactical`, seed `claude-audit`, 60 runs/cell. "main" is `358bab9`.
+
+| Class | d1 | d2 | d3 | d4 | d5 |
+|---|---|---|---|---|---|
+| Warrior main | 85% | 72% | 70% | 45% | 23% |
+| Warrior v1 | 43% | 43% | 25% | 12% | 2% |
+| Warrior v1 + route | 52% | 38% | 50% | 15% | 8% |
+| Shaman main | 82% | 65% | 78% | 60% | 17% |
+| Shaman v1 | 33% | 18% | 2% | 8% | 0% |
+| Shaman v1 + route | 35% | 15% | 17% | 5% | 0% |
+
+Decks end 2–3 cards larger. Survival improves (warrior d3 night-1 deaths 28 → 19 of 60) but remains far below main; most low-difficulty losses are now on night 2, whose ghost HP was not lowered for the new starters. The bot buys by generic card value and does not build toward one of the six paths, so it understates a deliberate player more for this design than for main. Balance acceptance is still open.
