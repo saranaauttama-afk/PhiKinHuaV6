@@ -110,7 +110,7 @@ jobs:
           disable-animations: true
           script: |
             adb install PhiKinHua-NOTFM-v1.0.64.apk
-            python scripts/android-feedback-smoke.py
+            python scripts/android-feedback-smoke.py || { python3 -c "import json;c=json.load(open('feedback-native-audit/results.json'))['checks'];print('::error::'+json.dumps(c[-1],ensure_ascii=False)[:6000])"; adb logcat -d -b crash | tail -60 | sed 's/^/::warning::CRASH /'; exit 1; }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
