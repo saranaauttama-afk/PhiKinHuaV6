@@ -9,12 +9,13 @@ import Animated, {
   Easing,
   withSequence,
   withDelay,
+  withRepeat,
   cancelAnimation,
   runOnJS
 } from 'react-native-reanimated';
 import {useGameSettings} from './Settings';
 import type { CardData } from '../../src/core/types';
-import { palette, surface, tint, layer, font } from '../theme';
+import { palette, surface, tint, layer, font, fighterColors } from '../theme';
 import {paper} from './Paper';
 import CandleSelection from './CandleSelection';
 import RitualSurface from './RitualSurface';
@@ -22,7 +23,7 @@ import CardBadges from './CardBadges';
 import CardTypeMark from './CardTypeMark';
 import {cardTypeWash} from './cardTypeWash';
 import { CardGlyphArt } from './DeckCard';
-import { cardSummary } from '../cardPresentation';
+import { cardFace } from '../cardPresentation';
 import { costLabel } from '../../src/core/cards/describe';
 import { isCardPlayDrag } from '../../src/ui/cardDrag';
 
@@ -65,6 +66,16 @@ export default function Card({
   const reducedMotion=useGameSettings(s=>s.reducedMotion);
   const entrance=useSharedValue(reducedMotion?1:0);
   React.useEffect(()=>{entrance.value=reducedMotion?1:withDelay(animationDelay,withTiming(1,{duration:380,easing:Easing.out(Easing.cubic)}));},[reducedMotion]);
+
+  // ยก (owner 16 Oct 2026): a round card glows while its bell bonus is live — the small bell ring
+  // alone was easy to miss in an overlapping hand. Round only; other conditions keep their marks.
+  const roundLive=moveHint?.round===true&&!disabled;
+  const glow=useSharedValue(0);
+  React.useEffect(()=>{
+    if(!roundLive){cancelAnimation(glow);glow.value=0;return;}
+    glow.value=reducedMotion?1:withRepeat(withSequence(withTiming(1,{duration:700}),withTiming(.45,{duration:700})),-1,true);
+  },[roundLive,reducedMotion]);
+  const glowStyle=useAnimatedStyle(()=>({opacity:glow.value}));
 
   const updateHoverState = (hovered: boolean) => {
     setIsHovered(hovered);
@@ -188,11 +199,12 @@ export default function Card({
         },
         animatedStyle
       ]}>
+      {roundLive&&<Animated.View testID="card-round-glow" pointerEvents="none" style={[{position:'absolute',top:-4,left:-4,right:-4,bottom:-4,borderRadius:14,borderWidth:3,borderColor:fighterColors.hint,shadowColor:fighterColors.hint,shadowOpacity:.9,shadowRadius:10,shadowOffset:{width:0,height:0},elevation:8},glowStyle]}/>}
       <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} hideWash={disabled?undefined:cardTypeWash[card.type]} style={{width:'100%',height:'100%',padding:9,paddingTop:headerPadding,paddingBottom:stampSize+4}}>
         <View style={{position:'absolute',top:badgeTop,left:Math.max(12,width*.14),right:Math.max(12,width*.14),zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact moveHint={moveHint}/></View>
         <Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:shortCard?11:12,lineHeight:titleLine,color:paper.ink,textAlign:'center'}}>{card.name}</Text>
         <View style={{alignItems:'center',marginVertical:2}}><CardGlyphArt card={card} size={illustrationSize} muted={disabled}/></View>
-        <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:shortCard?9:10,lineHeight:summaryLine,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardSummary(card)}</Text>
+        <Text numberOfLines={2} style={{fontFamily:font.ui,fontSize:shortCard?9:10,lineHeight:summaryLine,color:disabled?badgeColors.disabledInk:card.type==='attack'?paper.red:paper.ink,textAlign:'center'}}>{cardFace(card)}</Text>
         <View pointerEvents="none" style={{position:'absolute',right:Math.max(10,width*.1),bottom:5}}><CardTypeMark type={card.type} size={stampSize} ink={disabled?badgeColors.disabledInk:undefined}/></View>
         {card.exhaust&&<Text style={{position:'absolute',bottom:5,alignSelf:'center',fontFamily:font.ui,color:paper.red,fontSize:8}}>ใช้แล้วหาย</Text>}
       </RitualSurface></CandleSelection>

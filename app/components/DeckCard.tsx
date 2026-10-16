@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, Pressable, Text, View, StyleSheet, Platform } from 'react-native';
 import type { CardData } from '../../src/core/types';
 import { CARD_ART_SOURCES, GRAY_CARD_ART_SOURCES } from '../cardArt';
-import { cardGlyph, cardSummary } from '../cardPresentation';
+import { cardFace, cardGlyph, cardSummary } from '../cardPresentation';
 import RitualSurface from './RitualSurface';
 import { font, paper } from '../theme';
 import {costLabel,TYPE_LABEL} from '../../src/core/cards/describe';
@@ -34,8 +34,8 @@ export function CardFace({card,count,compact=false,equippedCount=0}:{card:CardDa
   <CardBadges card={card} compact={compact}/>
   <View style={styles.symbol}><CardGlyphArt card={card} size={compact?50:76}/></View>
   <Text style={[styles.name,compact&&{fontSize:11}]}>{card.name??card.id}</Text>
-  <Text style={[styles.summary,compact&&{fontSize:10,lineHeight:16},{color:card.type==='attack'?paper.red:paper.ink}]}>{cardSummary(card)}</Text>
-  {!compact&&!!card.flavor&&<Text style={styles.summary}>{card.flavor}</Text>}
+  <Text style={[styles.summary,compact&&{fontSize:10,lineHeight:16},{color:card.type==='attack'?paper.red:paper.ink}]}>{cardFace(card)}</Text>
+  {/* Flavor lives in the detail panel only (playtest 16 Oct 2026: faces were too long). */}
   {equippedCount>0&&<Text style={styles.note}>✓ สวม {equippedCount} ใบ</Text>}
   {count!=null&&<Text style={styles.note}>×{count} ใบ</Text>}
   <View pointerEvents="none" style={{position:'absolute',right:compact?14:18,bottom:compact?10:12}}><CardTypeMark type={card.type} size={compact?12:16}/></View>
