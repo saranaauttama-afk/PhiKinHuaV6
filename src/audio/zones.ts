@@ -20,11 +20,11 @@ type ZoneSound = { map: BedId | null; battle: BedId | null; oneShots: SfxId[] };
 
 export const ZONES: Record<ZoneId, ZoneSound> = {
   village: { map: 'villageBed', battle: 'villageBattleBed', oneShots: ['villageDogHowl'] },
-  temple: { map: null, battle: null, oneShots: [] },
-  cremation: { map: null, battle: null, oneShots: [] },
-  forest: { map: null, battle: null, oneShots: [] },
-  water: { map: null, battle: null, oneShots: [] },
-  mountain: { map: null, battle: null, oneShots: [] },
+  temple: { map: 'templeBed', battle: 'templeBattleBed', oneShots: [] },
+  cremation: { map: 'cremationBed', battle: 'cremationBattleBed', oneShots: [] },
+  forest: { map: 'forestBed', battle: 'forestBattleBed', oneShots: [] },
+  water: { map: 'waterBed', battle: 'waterBattleBed', oneShots: [] },
+  mountain: { map: 'mountainBed', battle: 'mountainBattleBed', oneShots: [] },
   cave: { map: null, battle: null, oneShots: [] },
   otherworld: { map: null, battle: null, oneShots: [] },
 };

@@ -36,6 +36,16 @@ export type BedId =
   // ชุด 3: เสียงพื้นตามโซน + กลองตอนสู้ (src/audio/zones.ts)
   | 'villageBed'
   | 'villageBattleBed'
+  | 'templeBed'
+  | 'templeBattleBed'
+  | 'cremationBed'
+  | 'cremationBattleBed'
+  | 'forestBed'
+  | 'forestBattleBed'
+  | 'waterBed'
+  | 'waterBattleBed'
+  | 'mountainBed'
+  | 'mountainBattleBed'
   | 'battleDrumNormal';
 
 type Source = number; // ผลของ require() สำหรับไฟล์ asset
@@ -80,6 +90,17 @@ export const BEDS: Record<BedId, { file: Source | null; volume: number }> = {
   // ชุด 3 (assets/audio/ambience/) — ElevenLabs SFX v2 ลูป, ตัดความถี่เกิน 10 kHz (ลดซ่า), ~−21 ถึง −24 LUFS
   villageBed: { file: require('../../assets/audio/ambience/village-bed.mp3'), volume: 0.45 },
   villageBattleBed: { file: require('../../assets/audio/ambience/village-battle-bed.mp3'), volume: 0.4 },
+  // ชุด 3 โซนอื่น (scripts/zone-audio.py, ~−21 ถึง −24 LUFS) — ค่า volume เท่าหมู่บ้าน
+  templeBed: { file: require('../../assets/audio/ambience/temple-bed.mp3'), volume: 0.45 },
+  templeBattleBed: { file: require('../../assets/audio/ambience/temple-battle-bed.mp3'), volume: 0.4 },
+  cremationBed: { file: require('../../assets/audio/ambience/cremation-bed.mp3'), volume: 0.45 },
+  cremationBattleBed: { file: require('../../assets/audio/ambience/cremation-battle-bed.mp3'), volume: 0.4 },
+  forestBed: { file: require('../../assets/audio/ambience/forest-bed.mp3'), volume: 0.45 },
+  forestBattleBed: { file: require('../../assets/audio/ambience/forest-battle-bed.mp3'), volume: 0.4 },
+  waterBed: { file: require('../../assets/audio/ambience/water-bed.mp3'), volume: 0.45 },
+  waterBattleBed: { file: require('../../assets/audio/ambience/water-battle-bed.mp3'), volume: 0.4 },
+  mountainBed: { file: require('../../assets/audio/ambience/mountain-bed.mp3'), volume: 0.45 },
+  mountainBattleBed: { file: require('../../assets/audio/ambience/mountain-battle-bed.mp3'), volume: 0.4 },
   battleDrumNormal: { file: require('../../assets/audio/ambience/battle-drum-normal.mp3'), volume: 0.55 },
 };
 

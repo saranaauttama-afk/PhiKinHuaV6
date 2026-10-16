@@ -1,0 +1,72 @@
+[
+ {
+  "id": "waterBattleBed",
+  "file": "assets/audio/ambience/water-battle-bed.mp3",
+  "bed": true,
+  "lufs": -21.4,
+  "secs": 30.04
+ },
+ {
+  "id": "cremationBattleBed",
+  "file": "assets/audio/ambience/cremation-battle-bed.mp3",
+  "bed": true,
+  "lufs": -23.7,
+  "secs": 30.04
+ },
+ {
+  "id": "forestBattleBed",
+  "file": "assets/audio/ambience/forest-battle-bed.mp3",
+  "bed": true,
+  "lufs": -22.3,
+  "secs": 30.04
+ },
+ {
+  "id": "mountainBed",
+  "file": "assets/audio/ambience/mountain-bed.mp3",
+  "bed": true,
+  "lufs": -21.5,
+  "secs": 30.04
+ },
+ {
+  "id": "templeBattleBed",
+  "file": "assets/audio/ambience/temple-battle-bed.mp3",
+  "bed": true,
+  "lufs": -21.6,
+  "secs": 30.04
+ },
+ {
+  "id": "forestBed",
+  "file": "assets/audio/ambience/forest-bed.mp3",
+  "bed": true,
+  "lufs": -23.3,
+  "secs": 30.04
+ },
+ {
+  "id": "templeBed",
+  "file": "assets/audio/ambience/temple-bed.mp3",
+  "bed": true,
+  "lufs": -22.1,
+  "secs": 30.04
+ },
+ {
+  "id": "mountainBattleBed",
+  "file": "assets/audio/ambience/mountain-battle-bed.mp3",
+  "bed": true,
+  "lufs": -21.5,
+  "secs": 30.04
+ },
+ {
+  "id": "cremationBed",
+  "file": "assets/audio/ambience/cremation-bed.mp3",
+  "bed": true,
+  "lufs": -23.1,
+  "secs": 30.04
+ },
+ {
+  "id": "waterBed",
+  "file": "assets/audio/ambience/water-bed.mp3",
+  "bed": true,
+  "lufs": -21.6,
+  "secs": 30.04
+ }
+]

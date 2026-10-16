@@ -25,6 +25,8 @@ describe('zone audio (ชุด 3)', () => {
 
   it('zones without their own files fall back to the village set', () => {
     expect(bedsFor('12-cave-mouth', 'battle')).toEqual(['villageBattleBed', BATTLE_DRUM]);
+    expect(bedsFor('08-stream', 'map')).toContain('waterBed');
+    expect(bedsFor('06-bamboo-forest', 'battle')).toEqual(['forestBattleBed', BATTLE_DRUM]);
     expect(oneShotsFor('08-stream', 'map')).toEqual(['villageDogHowl']);
   });
 
@@ -34,9 +36,9 @@ describe('zone audio (ชุด 3)', () => {
   });
 
   it('every bed/one-shot a zone names has a file', () => {
-    for (const mode of ['map', 'battle', 'victory'] as const) {
-      for (const id of bedsFor('01-village', mode)) expect(BEDS[id].file).not.toBeNull();
-    }
+    for (const scene of [...ADVENTURE_GEOGRAPHY, '16-secret-throne'])
+      for (const mode of ['map', 'battle', 'victory'] as const)
+        for (const id of bedsFor(scene, mode)) expect(BEDS[id].file).not.toBeNull();
     expect(SFX.villageDogHowl.files.length).toBeGreaterThan(0);
   });
 
