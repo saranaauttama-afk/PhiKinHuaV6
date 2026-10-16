@@ -60,7 +60,7 @@ export function chooseLevelUpOption(s: GameState, cmd: Extract<Command, { type: 
   } else if(cmd.option==='draw'){s.player.drawPerTurn++;finish(s,`จั่วต่อเทิร์น +1 (${s.player.drawPerTurn})`);
   } else if (cmd.option === 'slot') {
     s.equipmentSlotsMax = (s.equipmentSlotsMax ?? CARD_RULES.equipmentSlots) + 1;
-    finish(s, `ช่องอุปกรณ์ +1 (${s.equipmentSlotsMax})`);
+    finish(s, `ช่องเครื่องราง +1 (${s.equipmentSlotsMax})`);
   } else {
     s.player.retain = (s.player.retain ?? CARD_RULES.retain) + 1;
     finish(s, `เก็บการ์ดข้ามเทิร์น +1 (${s.player.retain})`);

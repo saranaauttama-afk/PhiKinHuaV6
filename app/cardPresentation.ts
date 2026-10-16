@@ -13,3 +13,5 @@ export function cardGlyph(card: CardData): CardGlyph {
   return 'breath';
 }
 export const cardSummary = (card: CardData): string => describeCard(card);
+/** Short keyword text for card faces (hand, deck grid, shops); detail panels keep cardSummary. */
+export const cardFace = (card: CardData): string => require('../src/core/cards/describe').cardFaceText(card);

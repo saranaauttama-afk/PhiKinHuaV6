@@ -59,6 +59,7 @@ function fire(s: GameState, src: Source, t: Trigger, index: number, rng: RNG): R
   }
   if (t.when && !conditionMet(s, t.when)) return rng;
   s.log.push(`${src.name} ทำงาน`);
+  if (src.key.startsWith('m:')) require('../combat/damage').emit(s, { t: 'MinionActed', side: 'player', uid: src.key.slice(2) });
   return applyFx(s, t.fx, { sourceId: src.key }, rng);
 }
 

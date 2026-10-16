@@ -23,7 +23,7 @@ export default function StatusStrip({effects,extra=[],compact=false,align='cente
  if(!list.length)return null;
  return <View testID="status-strip" style={{width:'100%',minWidth:0,overflow:'hidden'}}>
   <ScrollView testID="status-scroll" horizontal showsHorizontalScrollIndicator={contentWidth>viewportWidth+1} onLayout={e=>setViewportWidth(e.nativeEvent.layout.width)} onContentSizeChange={w=>setContentWidth(w)} style={{height:36,width:'100%'}} contentContainerStyle={{gap:4,alignItems:'center',flexGrow:1,justifyContent:'flex-start',paddingHorizontal:2}}>
-   {list.map(e=><BattleSeal key={e.id} testID={`battle-badge-${e.id}`} shakeKey={pulse&&pulse.ids.some(id=>e.id===`status:${id}`||e.id===id||e.id===`fighter:${id}`)?pulse.key:undefined} label={`ดู${e.name}`} hint={e.detail} onPress={()=>e.onPress?e.onPress():setOpen(e.id)} hitSize={36} tone={e.neutral?'neutral':e.bad?'negative':'positive'} count={e.count}>
+   {list.map(e=><BattleSeal key={e.id} testID={`battle-badge-${e.id}`} shakeKey={pulse&&pulse.ids.some(id=>e.id===`status:${id}`||e.id===id||e.id===`fighter:${id}`)?pulse.key:undefined} label={`ดู${e.name}`} hint={e.detail} onPress={()=>e.onPress?e.onPress():setOpen(e.id)} hitSize={36} shape={e.id.startsWith('equip:')?'square':'circle'} tone={e.neutral?'neutral':e.bad?'negative':'positive'} count={e.count}>
     {e.cardId&&CARD_ART_SOURCES[e.cardId]?<Image accessible={false} source={CARD_ART_SOURCES[e.cardId]} resizeMode="contain" style={{width:BATTLE_SEAL_ART_SIZE,height:BATTLE_SEAL_ART_SIZE}}/>:<StatusArt name={badgeSymbol(e)} size={BATTLE_SEAL_ART_SIZE}/>}
    </BattleSeal>)}
   </ScrollView>

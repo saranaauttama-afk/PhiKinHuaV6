@@ -15,7 +15,7 @@ export default function EquipmentPicker({state,onConfirm,onCancel,manage=false}:
    <QuietHeader title="เตรียมเครื่องราง" subtitle={`เลือกได้ ${slots} ชิ้น · สวมก่อนจั่วมือแรก · ใบที่สวมจะออกจากกองจั่ว`} onClose={onCancel} closeLabel="ย้อนกลับ"/>
    <Text testID="equipment-selection-count" style={{color:palette.moon,fontFamily:font.ui,textAlign:'center'}}>เลือกแล้ว {picks.length}/{slots} · ไม่เลือกก็เริ่มสู้ได้</Text>
    <ScrollView contentContainerStyle={{padding:16,gap:10}}>
-    {!state.masterDeck.some(c=>c.type==='equipment')&&<Text style={{color:palette.text,fontFamily:font.ui}}>ยังไม่มีอุปกรณ์ในสำรับ · หาได้จากร้านและรางวัล</Text>}
+    {!state.masterDeck.some(c=>c.type==='equipment')&&<Text style={{color:palette.text,fontFamily:font.ui}}>ยังไม่มีเครื่องรางในสำรับ · หาได้จากร้านและรางวัล</Text>}
     {state.masterDeck.map((card,i)=>card.type==='equipment'?<Pressable key={i} accessibilityRole="button" accessibilityLabel={`เลือกเครื่องราง ${card.name} ใบที่ ${i+1}`} accessibilityState={{selected:picks.includes(i),disabled:!picks.includes(i)&&picks.length>=slots}} disabled={!picks.includes(i)&&picks.length>=slots} onPress={()=>setPicks(p=>p.includes(i)?p.filter(x=>x!==i):[...p,i])}>
      <RitualSurface kind="occupationPage" style={{padding:22,opacity:picks.length>=slots&&!picks.includes(i)?.5:1}}>
       <Text style={{fontFamily:font.heading,color:paper.red}}>{picks.includes(i)?'✓ สวมก่อนสู้':'แตะเลือกสวม'}</Text><CardRow card={card} plain/>

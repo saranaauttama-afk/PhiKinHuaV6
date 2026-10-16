@@ -122,11 +122,35 @@ export default function BattlePage() {
   }, []);
   // พักยก banner (owner playtest: say when a round ends and what it did).
   const [roundBanner, setRoundBanner] = React.useState<{ key: string; text: string } | null>(null);
+  const [minionActed,setMinionActed]=React.useState<{uid:string;key:string}|null>(null);
+  // Block lost to a hit, shown on each side's block icon (owner playtest 16 Oct 2026).
+  const [playerBlockDelta,setPlayerBlockDelta]=React.useState<import('./components/battle/DeltaPopup').Delta|null>(null);
+  const [enemyBlockDelta,setEnemyBlockDelta]=React.useState<import('./components/battle/DeltaPopup').Delta|null>(null);
+  const showBlockLoss=(ev:{target:string;blocked?:number},key:string)=>{
+    if(!ev.blocked||ev.blocked<=0)return;
+    const d={key,amount:-ev.blocked};
+    if(ev.target==='player')setPlayerBlockDelta(d);else setEnemyBlockDelta(d);
+  };
   const [statGainPopups, setStatGainPopups] = React.useState<{ id: string; statType: 'block' | 'energy'; side: 'player' | 'enemy'; amount: number }[]>([]);
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
   const [historyAtTurnStart,setHistoryAtTurnStart]=React.useState<CardHistoryEntry[]>([]);
 
   const monsterRef = React.useRef<MonsterAreaHandle>(null);
+  // Ghost killed outside the ghost-turn timeline (our card, a skill, poison at turn start): hold
+  // the victory page while it shudders, sinks and fades (owner playtest 16 Oct 2026: it jumped
+  // straight to the summary). Set in the same event as the dispatch so the first victory render
+  // is already held. Deaths during the ghost turn play through the timeline's Died beat.
+  const [dying,setDying]=React.useState(false);
+  const holdForDeath=()=>{
+    const ph=useGame.getState().state.phase;
+    // Ghost talk first (owner 16 Oct 2026): the beaten ghost stays, dimmed, and speaks; it fades
+    // after the answer, which calls this again with the next post-battle phase.
+    if(ph==='talk'){const d=setTimeout(()=>monsterRef.current?.defeat(),250);cardFadeTimers.current.push(d);return;}
+    if(!['levelup','reward','victory'].includes(ph))return;
+    setDying(true);
+    const a=setTimeout(()=>monsterRef.current?.die(),250),b=setTimeout(()=>setDying(false),1350);
+    cardFadeTimers.current.push(a,b);
+  };
   const flashRef   = React.useRef<ScreenFlashHandle>(null);
   const timeline   = useCombatTimeline();
 
@@ -220,6 +244,7 @@ export default function BattlePage() {
     const prevMana = player.mana;
 
     dispatch({ type: 'PlayCard', index, wait });
+    holdForDeath();
 
     const t = setTimeout(
       () => setPlayedCardIds(prev => prev.filter(id => id !== identifier)),
@@ -231,6 +256,8 @@ export default function BattlePage() {
     const after = useGame.getState().state;
     for (const cue of cuesFor(after.pendingEvents ?? [])) playSfx(cue);
     for (const ev of after.pendingEvents ?? []) {
+      if (ev.t === 'Damage') showBlockLoss(ev, `bl-${eventKey(ev)}`);
+      if (ev.t === 'MinionActed') setMinionActed({ uid: ev.uid, key: eventKey(ev) });
       if (ev.t === 'Damage' && ev.target === 'enemy' && ev.hpLoss > 0) {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง — เดิมโชว์ค่าบนการ์ดซึ่งไม่หัก block/buff
         setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss, parts: ev.parts?.map(p => p.label) }]);
@@ -290,6 +317,7 @@ export default function BattlePage() {
       setPresentation(null);
       if (useGame.getState().state.phase === 'combat') {
         dispatch({ type: 'StartPlayerTurn' });
+        holdForDeath();
         turnLocked.current = false; setPhase('player');
       }
     });
@@ -339,8 +367,20 @@ export default function BattlePage() {
         break;
       }
 
+      case 'Died': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        // Fall only if the ghost is still dead at the end of this batch (a revive also passes 0 HP).
+        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) { if (gameState.phase === 'talk') monsterRef.current?.defeat(); else monsterRef.current?.die(); }
+        break;
+      }
+
+      case 'MinionActed': {
+        setMinionActed({ uid: currentEvent.uid, key: eventKey(currentEvent) });
+        break;
+      }
+
       case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen': case 'WaterOverflow':
-      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
+      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;
       }
@@ -351,6 +391,7 @@ export default function BattlePage() {
         if (currentEvent.target === 'player' && currentEvent.sourceKind === 'card') playSfx('ghostAttack');
         else for (const cue of cuesFor([currentEvent])) playSfx(cue);
         pulseFrom(currentEvent);
+        showBlockLoss(currentEvent, `bl-${eventKey(currentEvent)}`);
         if (currentEvent.hpLoss <= 0) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss, parts: currentEvent.parts?.map(p => p.label) };
         if (currentEvent.target === 'player') flashRef.current?.flash();
@@ -382,10 +423,10 @@ export default function BattlePage() {
     ...(gameState.fight?.extraTurn?[{id:'skill:extra',name:'เข้าสมาธิ',symbol:'check',neutral:true,detail:'จบเทิร์นนี้แล้วได้เทิร์นเพิ่ม ผีไม่ได้เล่น'}]:[]),
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${fxText(t.fx).join(' · ')}${t.negate?' · ยกเลิกการ์ดผี':''}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
   ];
-  const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
+  const victoryIntro=!presentation && !dying && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
-    if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying){dispatch({type:'CompleteNode'});router.replace('/');}
-  },[gameState.phase,celebratedFight,timeline.isPlaying]);
+    if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying&&!dying){dispatch({type:'CompleteNode'});router.replace('/');}
+  },[gameState.phase,celebratedFight,timeline.isPlaying,dying]);
   // hook ทั้งหมดต้องถูกเรียกก่อนถึงจะ return ได้ ไม่งั้นลำดับ hook เพี้ยน
   if (!fontsLoaded) return null;
   if(mainMenu)return <StartPage onStartGame={()=>{allowLeave.current=true;useGame.setState({state:baseNewState('')});router.replace({pathname:'/',params:{chooseClass:'1'}});}} onContinue={()=>{setMainMenu(false);}}/>;
@@ -400,7 +441,7 @@ export default function BattlePage() {
 
         <CardHistory entries={phase==='enemy'?[...historyAtTurnStart,...timeline.played.flatMap(e=>e.t==='CardResolved'?[e.entry]:[])].slice(-6):(gameState.cardHistory??[])}/>
 
-        <MonsterArea pulse={pulse.enemy} relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').ghostMechanicBadges(gameState)]} handCharges={enemy?.handCharges} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
+        <MonsterArea blockDelta={enemyBlockDelta} pulse={pulse.enemy} relic={bossRelicView(gameState)} minions={[...require('../src/core/combat/fightBadges').enemyDepthBadges(gameState),...require('../src/core/combat/fightBadges').ghostMechanicBadges(gameState)]} handCharges={enemy?.handCharges} rage={{startTurn:rageStartTurn(gameState),perTurn:RAGE.perTurn}}
           rules={gameState.pages?.adventure?.version===5}
           ref={monsterRef}
           monsterId={monsterId}
@@ -483,14 +524,16 @@ export default function BattlePage() {
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />}
 
-        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow minions={gameState.minions??[]}/>}
+        {/* Our ศิษย์ค่าย now stand in our own badge row (PlayerHUD minions). */}
         {/* The ghost's ลูกสมุน stand as figures on its other side (was a status badge until 15 Oct 2026). */}
-        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" minions={gameState.enemyMinions??[]}/>}
+        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" acted={minionActed} minions={presentation?.enemyMinions??gameState.enemyMinions??[]}/>}
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
+          blockDelta={playerBlockDelta}
+          minions={!victoryIntro&&gameState.phase==='combat'&&(presentation?.minions??gameState.minions??[]).length?<MinionRow inline acted={minionActed} minions={presentation?.minions??gameState.minions??[]}/>:null}
           statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges} pulse={pulse.player}/>:null}
-          helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>dispatch({type:'UseSkill',id,index})}/>}
+          helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>{dispatch({type:'UseSkill',id,index});holdForDeath();}}/>}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
           hp={player.hp}
@@ -539,12 +582,12 @@ export default function BattlePage() {
         )}
 
         {/* ผีพูดก่อนรางวัล: คำตอบเพิ่มความกล้าหรือบุญ */}
-        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'talk' && gameState.ghostTalk && (
-          <GhostTalkOverlay state={gameState} onAnswer={choice => dispatch({ type: 'AnswerGhostTalk', choice })} />
+        {!victoryIntro && !timeline.isPlaying && !dying && gameState.phase === 'talk' && gameState.ghostTalk && (
+          <GhostTalkOverlay state={gameState} onAnswer={choice => { dispatch({ type: 'AnswerGhostTalk', choice }); holdForDeath(); }} />
         )}
 
         {/* หลังรับทราบชัยชนะ จึงแสดงตัวเลือกเลเวลอัปที่ engine เตรียมไว้ */}
-        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'levelup' && gameState.levelUp && !gameState.levelUp.consumed && (
+        {!victoryIntro && !timeline.isPlaying && !dying && gameState.phase === 'levelup' && gameState.levelUp && !gameState.levelUp.consumed && (
           <LevelUpOverlay
             state={gameState}
             playerLevel={player.level}
@@ -556,7 +599,7 @@ export default function BattlePage() {
         )}
 
         {/* หลังรับทราบชัยชนะและเลือกอัปเกรด จึงแสดงการ์ดรางวัล */}
-        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'reward' && gameState.cardReward && (
+        {!victoryIntro && !timeline.isPlaying && !dying && gameState.phase === 'reward' && gameState.cardReward && (
           <CardRewardOverlay
             notice={gameState.levelUp?.result?.fight===(gameState.fightCount??0)?gameState.levelUp.result.text:undefined}
             choices={gameState.cardReward.choices}

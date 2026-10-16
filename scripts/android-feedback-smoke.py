@@ -35,7 +35,7 @@ try:
   tap_if('^เปิดหน้า'+cls+'$');tap('^เลือก'+cls+'$');tap_if('ออกเดินทาง');tap('ดูระดับอาถรรพ์ 1');tap('เริ่มรอบ · ระดับ 1');tap('^(ข้ามบทนี้|เดินทางต่อ)$')
   tap('^พรติดตัว 1:');assert not any(label(n)=='แตะพรเพื่ออ่านรายละเอียด' for n in nodes());shot(cls+'-starter');checks.append(cls+': starter selection shows effect')
   tap('^ยืนยันพร$');find('^สำรับ 10$');time.sleep(4)
-  tap('^สำรับ 10$');find('ช่องสวมอุปกรณ์');find('ยังไม่มีอุปกรณ์ในสำรับ');shot(cls+'-bag')
+  tap('^สำรับ 10$');find('ช่องสวมเครื่องราง');find('ยังไม่มีเครื่องรางในสำรับ');shot(cls+'-bag')
   tap('^พร \\(');assert any('พร' in label(n) for n in nodes());shot(cls+'-blessings');tap('^ปิด$');checks.append(cls+': bag tabs and empty equipment slots')
   deadline=time.monotonic()+30
   while time.monotonic()<deadline:

@@ -150,3 +150,111 @@ export function costLabel(card: CardData, cost?: { ap: number; mana: number }): 
   if (ap) return `${ap} แต้ม`;
   return 'ฟรี';
 }
+
+/**
+ * Short face text (owner playtest 16 Oct 2026: card faces were too long to read on a phone).
+ * Keywords and numbers only; the move, cost and type are already icons on the card, and the
+ * full sentence (describeCard) stays in every detail panel. Never used for rules decisions.
+ */
+export function cardFaceText(card: CardData, side: 'player' | 'enemy' = 'player'): string {
+  if (card.id === 'qa_phra_prathan') return 'ชนะทันที';
+  if (card.type === 'curse') return 'เล่นไม่ได้';
+  const fx = starFx(card), parts: string[] = [];
+  const MOVE = require('./fighter').MOVE_NAMES as Record<string, string>;
+  let lead = '';
+  if (card.type === 'counter' && card.counter) lead = `${({ enemy_attack: 'ผีตี', enemy_skill: 'ผีใช้วิชา', enemy_any: 'ผีเล่นการ์ด' } as const)[card.counter.trigger]}: ${card.counter.negate ? 'ยกเลิก · ' : ''}`;
+  if (card.type === 'prayer') lead = 'สวด ×1–3: ';
+  if (card.heavy) parts.push('ท่าหนัก');
+  if (card.type === 'equipment' && card.equip) parts.push(...faceTriggers(card.equip));
+  if (card.charges) parts.push(`ใช้ได้ ${card.charges}`);
+  if (card.spendRhythm) parts.push(card.spendRhythm.mode === 'hits' ? `ตี ${fx.dmg ?? 0} × จังหวะ` : `+${card.spendRhythm.perStack}/จังหวะ`);
+  if (card.blood) parts.push('ของต่ำ');
+  if (card.splash) parts.push(`สาดทั้งขัน: ${faceFx(perFx(card.splash)).join(' ')}/น้ำ${card.splash.sweep ? ' กวาด' : ''}`);
+  if (card.wakeYant) parts.push(`ปลุกยันต์: ${faceFx(perFx(card.wakeYant)).join(' ')}/ยันต์${card.wakeYant.sweep ? ' กวาด' : ''}`);
+  parts.push(...faceFx(card.spendRhythm?.mode === 'hits' ? { ...fx, dmg: undefined } : fx, side));
+  if (card.after) parts.push(`หลัง${MOVE[card.after.move]}: +${faceFx(card.after.bonus, side).join(' ')}`);
+  if (card.riposte) parts.push(`สวน ${faceFx(card.riposte, side).join(' ')}`);
+  if (card.repeatIf) parts.push(`${faceCondition(card.repeatIf)}: ซ้ำ`);
+  if (card.conditional) parts.push(`${faceCondition(card.conditional.when)}: +${faceFx(card.conditional.bonus, side).join(' ')}`);
+  if ((card as { curseCard?: string }).curseCard) parts.push('ใส่คำสาป');
+  if (card.whileHeld) parts.push(`ถือไว้: ${faceFx(card.whileHeld).join(' ')}`);
+  if (card.counter?.turns) parts.push(`${card.counter.turns} เทิร์น`);
+  if (card.limit === 'turn') parts.push('เทิร์นละครั้ง');
+  const text = lead + parts.join(' · ');
+  return card.class === 'warrior' ? text.replace(/ของเลี้ยง/g, 'ศิษย์ค่าย') : text;
+}
+
+const perFx = (p: import('../types').PerStackFx): Fx => ({ dmg: p.dmg, block: p.block, heal: p.heal, mana: p.mana });
+
+/** fxText in a few words. */
+function faceFx(fx: Fx, side: 'player' | 'enemy' = 'player'): string[] {
+  const out: string[] = [];
+  if (fx.dmg) out.push(`ตี ${fx.dmg}${(fx.hits ?? 1) > 1 ? `×${fx.hits}` : ''}`);
+  else if (fx.hits) out.push(`+${fx.hits} ครั้ง`);
+  if (fx.block) out.push(`เกราะ ${fx.block}`);
+  if (fx.heal) out.push(`ฟื้น ${fx.heal}`);
+  if (fx.mana) out.push(`น้ำ +${fx.mana}`);
+  if (fx.ap) out.push(`แต้ม +${fx.ap}`);
+  for (const e of fx.status ?? []) out.push(`${e.to === 'self' ? (side === 'player' ? 'ตัวเอง' : 'ผี') : ''}${statusName(e.id)} ${e.stacks}`);
+  if (fx.cleanse) out.push('ล้างสถานะ');
+  if (fx.cleanseOne) out.push('ล้างสถานะ 1');
+  if (fx.borrow) out.push(`ยืมการ์ดผี ${fx.borrow}`);
+  if (fx.draw) out.push(`จั่ว ${fx.draw}`);
+  if (fx.breakBlock) out.push(`ทำลายเกราะ ${fx.breakBlock}`);
+  if (fx.sweep) out.push('กวาด');
+  if (fx.rhythm) out.push(`จังหวะ +${fx.rhythm}`);
+  if (fx.keepRhythm) out.push('คงจังหวะ');
+  if (fx.lockRhythm) out.push('จังหวะไม่หาย');
+  if (fx.doubleNext) out.push('โจมตีใบถัดไป ×2');
+  if (fx.drain) out.push('ดูดเลือด');
+  if (fx.steal) out.push(`ขโมยการ์ด ${fx.steal}`);
+  if (fx.seal) out.push(`ผนึก ${fx.seal}`);
+  if (fx.unCharge) out.push('ล้างชาร์จ');
+  if (fx.selfDamage) out.push(`เสียเลือด ${fx.selfDamage}`);
+  if (fx.healMinions) out.push(`ของเลี้ยงฟื้น ${fx.healMinions}`);
+  if (fx.summon) out.push(`เรียก${require('../combat/minions').minionDef(fx.summon)?.name ?? fx.summon}`);
+  return out;
+}
+
+/** conditionText in a few words. */
+function faceCondition(c: import('./mechanics').CardCondition): string {
+  const st = (id: string) => statusName(id);
+  switch (c.kind) {
+    case 'round_last_turn': return 'ท้ายยก';
+    case 'rhythm_at_least': return `จังหวะ ≥${c.value}`;
+    case 'rhythm_at_most': return c.value === 0 ? 'ไม่มีจังหวะ' : `จังหวะ ≤${c.value}`;
+    case 'enemy_status_at_least': return `${st(c.statusId)} ≥${c.value}`;
+    case 'enemy_has_status': return `ผีติด${st(c.statusId)}`;
+    case 'water_at_least': return `น้ำ ≥${c.value}`;
+    case 'minions_at_least': return c.value <= 1 ? 'มีของเลี้ยง' : `ของเลี้ยง ≥${c.value}`;
+    case 'ghost_charging': return 'ผีชาร์จ';
+    case 'played_move': return `หลัง${require('./fighter').MOVE_NAMES[c.move]}`;
+    case 'player_hp_below': return `เลือด <${c.value}%`;
+    case 'foe_hp_below': return `ผีเลือด <${c.value}%`;
+    case 'player_block_at_least': return `เกราะ ≥${c.value}`;
+    case 'foe_block_at_least': return c.value <= 1 ? 'ผีมีเกราะ' : `ผีเกราะ ≥${c.value}`;
+    case 'moves_this_turn_at_least': return `ออก ${c.value} ท่า`;
+    case 'hand_empty': return 'มือว่าง';
+    case 'deck_at_most': return `สำรับ ≤${c.value}`;
+    case 'hurt_last_turn': return 'โดนตีเข้าเนื้อ';
+    default: return conditionText(c);
+  }
+}
+
+/** Equipment passives in a few words: when + effect. */
+function faceTriggers(p: Passive): string[] {
+  const WHEN: Partial<Record<Trigger['on'], string>> = { battleStart: 'เริ่มไฟต์', equip: 'สวม', turnStart: 'ต้นเทิร์น', turnEnd: 'ท้ายเทิร์น', play: 'เล่นการ์ด', roundEnd: 'พักยก', rhythm: 'ได้จังหวะ', seal: 'ผนึก', discard: 'ทิ้ง', prayerDone: 'สวดสำเร็จ' };
+  const out = p.triggers.map(t => `${t.on === 'play' && t.type ? `เล่น${TYPE_LABEL[t.type]}` : WHEN[t.on] ?? t.on}${t.when ? ` ${faceCondition(t.when)}` : ''}: ${faceFx(t.fx).join(' ')}`);
+  if (p.armor) out.push(`ลดดาเมจ ${p.armor}`);
+  if (p.attackBonus) out.push(`โจมตี +${p.attackBonus}`);
+  const MOVE = require('./fighter').MOVE_NAMES;
+  for (const [m, n] of Object.entries(p.moveBonus ?? {})) out.push(`${MOVE[m]} +${n}`);
+  for (const [m, n] of Object.entries(p.moveBruise ?? {})) out.push(`${MOVE[m]} ช้ำ +${n}`);
+  if (p.heavyPerBruise) out.push(`ท่าหนัก +${p.heavyPerBruise}/ช้ำ`);
+  if (p.riposteBonus) out.push(`สวน +${p.riposteBonus}`);
+  if (p.damageCap) out.push(`ดาเมจเกิน ${p.damageCap.over} → ${p.damageCap.to}`);
+  if (p.deathSave) out.push(`กันตาย (เลือด ${p.deathSave.hp})`);
+  if (p.bowlBonus) out.push(`ขัน +${p.bowlBonus}`);
+  if (p.overflowDmg) out.push(`น้ำล้น ตี ${p.overflowDmg}`);
+  return out;
+}
