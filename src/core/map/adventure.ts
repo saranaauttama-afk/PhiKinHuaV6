@@ -1,5 +1,6 @@
 import {routeFightQuota,nightEncounterCount,campaignBoss,ultimateRequired,difficultyOf,runEliteQuota} from '../campaign/threeNight';
 import {ECONOMY} from '../balance/notfm';
+import {progressionEnabled} from '../balance/deckProgression';
 import {next} from '../rng';
 import type {GameState} from '../types';
 import type {PageOffer} from './pages';
@@ -49,19 +50,21 @@ export function startAdventure(s:GameState,r:RNG):RNG {
  // Every night guarantees one of each stop (ECONOMY); the chest is a coin flip.
  const chestRoll=next(r);r=chestRoll.rng;
  const chest=chestRoll.value<ECONOMY.chestChance?[pick<PageOffer>([{kind:'treasure',shopId:''},{kind:'treasure_single',shopId:''}])]:[];
+ const progression=progressionEnabled(s.classId);
  const services:PageOffer[]=[
   {kind:'shop_card',shopId:''},
   {kind:'blessing',shopId:''},
-  {kind:'story_event',shopId:'',eventId:`run_story_${night}`},
+  ...(progression?[{kind:'shop_remove',shopId:'',phase:1} as PageOffer]:[{kind:'story_event',shopId:'',eventId:`run_story_${night}`} as PageOffer]),
   {kind:'shop_upgrade',shopId:'',phase:1},
   pick<PageOffer>([{kind:'well',shopId:''},{kind:'healing_shrine',shopId:''}]),
-  {kind:'shop_remove',shopId:'',phase:1},
+  ...(progression?[{kind:'story_event',shopId:'',eventId:`run_story_${night}`} as PageOffer]:[{kind:'shop_remove',shopId:'',phase:1} as PageOffer]),
   ...chest,
  ];
- // Spread the stops evenly between the fights, the shop after the first fight.
- const after=services.map((_,k)=>Math.max(1,Math.min(fights.length-1,Math.round((k+1)*fights.length/(services.length+1)))));
+ // The first shop in nights 2/3 is ready immediately; later stops open as the route deepens.
+ const after=progression?(night===1?[1,2,3,4,5,6,6]:[0,2,3,5,6,7,8]):services.map((_,k)=>Math.max(1,Math.min(fights.length-1,Math.round((k+1)*fights.length/(services.length+1)))));
  const kinds:PageOffer[]=[];
- for(let i=0;i<fights.length;i++){kinds.push(fights[i]);services.forEach((o,k)=>{if(after[k]===i+1)kinds.push(o);});if(i===2)kinds.push({kind:'next_event'});}
+ if(progression)services.forEach((o,k)=>{if(after[k]===0)kinds.push({...o,availableAfterWins:0});});
+ for(let i=0;i<fights.length;i++){kinds.push(fights[i]);services.forEach((o,k)=>{if(after[k]===i+1)kinds.push(progression?{...o,availableAfterWins:after[k]}:o);});if(i===2)kinds.push({kind:'next_event'});}
  const deck=kinds.map((offer,i)=>{const id=`adventure-${night}-${i}`;return {id,offer:'shopId' in offer?{...offer,shopId:id}:offer};});
  r=require('../events/story').rollNightStory(s,r);
  s.pages={pageIndex:0,adventure:{version:5,deck,cursor:0,slotIds:[null,null,null],pendingIds:[],deferredIds:[],resolvedIds:[],skippedIds:[],storyDone:false,fightsWon:0,boss:'locked',boardIndex:0,usedIds:[],serviceStates:{}},current:{offers:[],resolved:[]}};
@@ -99,7 +102,7 @@ function checkGate(s:GameState){
 export function settleAdventureSlot(s:GameState,ix:number,skipped=false):void {
  const a=s.pages?.adventure,p=s.pages?.current;if(!a||!p)return;
  const id=a.slotIds[ix],offer=p.offers[ix];
- if(!id||!offer||p.resolved[ix]||a.resolvedIds.includes(id)||a.skippedIds.includes(id))return;
+ if(!id||!offer||p.resolved[ix]||a.resolvedIds.includes(id)||a.skippedIds.includes(id)||a.fightsWon<(offer.availableAfterWins??0))return;
  if(skipped&&isCriticalOffer(offer))return;
  (skipped?a.skippedIds:a.resolvedIds).push(id);p.resolved[ix]=true;
  if(!skipped&&offer.kind==='monster')a.fightsWon++;
@@ -150,7 +153,7 @@ export function useIntersectionPage(s:GameState,ix:number):void {
  s.pages!._activeOfferIndex=undefined;s.pages!._shopUsed=false;
  advanceThreePageBoard(s);
 }
-const serviceFields=['shopStock','shopBoughtItems','mysticalWell','healingShrine','_singleTreasureRandomized','rewardReceipt','blessingStock'] as const;
+const serviceFields=['shopStock','shopBoughtItems','shopFocus','shopRerollUsed','mysticalWell','healingShrine','_singleTreasureRandomized','rewardReceipt','blessingStock'] as const;
 export function rememberAdventureService(s:GameState):void {
  if(!s.pages?.adventure||!s.currentShopId)return;
  const a=s.pages!.adventure!,saved:Record<string,unknown>={};

@@ -53,7 +53,7 @@ describe('อาชีพหมอผี', () => {
     const deck = buildStarterDeck(CHARACTER_CLASSES.shaman, CARD_LIST_WITH_STARTERS);
     expect(deck).toHaveLength(10);
     expect(deck.some(x => x.id === 'holy_water_splash')).toBe(true);
-    expect(deck.filter(x => x.id === 'meditation')).toHaveLength(2);
+    expect(deck.filter(x => x.id === 'meditation')).toHaveLength(1);
   });
 
   it('เริ่มไฟต์ด้วยน้ำมนต์ตั้งต้น และต้นเทิร์นถัดไปได้เพิ่ม', () => {
@@ -98,20 +98,20 @@ describe('ขันและน้ำล้นขัน', () => {
     expect(t.player.block).toBe(2 * WATER_RULES.overflowBlock);
   });
 
-  it('นั่งสมาธิปลุกเสกเป็นการ์ดฟรี ได้น้ำมนต์ 3', () => {
+  it('นั่งสมาธิปลุกเสกเป็นการ์ดฟรี ได้น้ำมนต์ 2', () => {
     const s = fight({ hand: [c('meditation')], water: 2 });
     expect(play(s)).toBe(true);
-    expect(s.player.mana).toBe(5);
+    expect(s.player.mana).toBe(4);
   });
 });
 
 describe('สาด', () => {
-  it('สาดน้ำมนต์ใช้น้ำทั้งขัน ตีตามจำนวนน้ำ', () => {
+  it('starter สาดน้ำมนต์ได้สูงสุด 3 และเก็บน้ำที่เหลือ', () => {
     const s = fight({ hand: [c('holy_water_splash')], water: 6 });
     const hp = s.enemy!.hp;
     expect(play(s)).toBe(true);
-    expect(s.player.mana).toBe(0);
-    expect(hp - s.enemy!.hp).toBe(6 * c('holy_water_splash').splash!.dmg!);
+    expect(s.player.mana).toBe(3);
+    expect(hp - s.enemy!.hp).toBe(3 * c('holy_water_splash').splash!.dmg!);
   });
 
   it('ไม่มีน้ำ สาดไม่ได้', () => {
@@ -127,12 +127,12 @@ describe('สาด', () => {
     t.fight!.nextSpellMult = 2;
     const hp = t.enemy!.hp;
     play(t);
-    expect(hp - t.enemy!.hp).toBe(2 * 4 * c('holy_water_splash').splash!.dmg!);
+    expect(hp - t.enemy!.hp).toBe(2 * 3 * c('holy_water_splash').splash!.dmg!);
   });
 
-  it('ข้อความบอกว่าสาดทั้งขัน', () => {
-    expect(describeCard(c('holy_water_splash'))).toContain('สาดน้ำมนต์ทั้งขัน');
-    expect(costLabel(c('holy_water_splash'))).toBe('สาดทั้งขัน');
+  it('ข้อความบอกขีดจำกัด starter', () => {
+    expect(describeCard(c('holy_water_splash'))).toContain('สูงสุด 3');
+    expect(costLabel(c('holy_water_splash'))).toContain('สูงสุด 3');
     expect(costLabel(c('flowing_chant'))).toBe('4 น้ำมนต์');
   });
 });
@@ -159,7 +159,7 @@ describe('ยันต์และผนึก', () => {
     applyFx(s, { status: [yant(4)] }, { sourceId: 't' }, rng);
     expect(s.enemyPiles!.hand).toHaveLength(1);
     play(s);
-    expect(s.enemyPiles!.hand).toHaveLength(0);
+    expect(s.enemyPiles!.hand).toHaveLength(1);
   });
 
   it('ปลุกยันต์ลุกไฟกินยันต์ทั้งหมด ตีต่อชั้น', () => {

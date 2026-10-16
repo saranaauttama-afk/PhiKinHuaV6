@@ -100,8 +100,8 @@ function playAttack(s: GameState, card: CardData, rng: RNG): RNG {
   rng = F.onAttackStart(s, card, rng);
   const base = card.splash || card.wakeYant ? require('./water').waterFx(s, card, cardFx(s, card)) : cardFx(s, card);
   const fx = F.attackFx(s, card, base);
-  const ctx = { sourceId: card.id, type: 'attack' as const, move: card.move };
-  const heavy = card.heavy ? F.consumeBruise(s) : 0;
+  const ctx = { sourceId: card.id, type: 'attack' as const, move: card.move, card };
+  const heavy = card.heavy ? F.consumeBruise(s, card) : 0;
   rng = applyFx(s, fx, { ...ctx, firstHitBonus: heavy }, rng);
   if (s.turnFlags.doubleNext && s.enemy && s.enemy.hp > 0) {
     s.turnFlags.doubleNext = false;

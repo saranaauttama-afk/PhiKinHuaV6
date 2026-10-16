@@ -1,4 +1,4 @@
-// test/notfm-economy.test.ts — phase 6: flat service prices, blessing stop, difficulty 1–5.
+// test/notfm-economy.test.ts — service budget, blessing stop, difficulty 1–5.
 import { describe, it, expect } from 'vitest';
 import { baseNewState } from '../src/core/commands';
 import { applyCommand } from '../src/core/reducer';
@@ -7,6 +7,7 @@ import type { Command, GameState } from '../src/core/types';
 import type { Difficulty } from '../src/core/campaign/threeNight';
 import { DIFFICULTY_RULES, campaignBoss } from '../src/core/campaign/threeNight';
 import { DIFFICULTY, ECONOMY, ENEMY_HP } from '../src/core/balance/notfm';
+import {PROGRESSION_SERVICES} from '../src/core/balance/deckProgression';
 import { START_GOLD } from '../src/core/balance';
 import { configureNightEnemy, rageActive } from '../src/core/campaign/nights';
 import { markedUp, removePrice, upgradePrice, wellHeal, shrineCost, healAmount } from '../src/core/engine/handlers/shops_events';
@@ -17,10 +18,11 @@ function run(difficulty: Difficulty = 1, seed = 'eco') {
   go({ type: 'NewRun', seed, classId: 'warrior', difficulty }); go({ type: 'SkipChapter' }); go({ type: 'ChooseStarterBlessing', index: Math.max(0,s.starter!.choices.findIndex(b=>!b.onGain)) });
   return { go, get s() { return s; } };
 }
-/** Open the night's stop of `kind` straight from the adventure deck. */
+/** Position a later service for an isolated shop transaction test. */
 function openStop(d: ReturnType<typeof run>, kind: string) {
   const s = d.s, a = s.pages!.adventure!, entry = a.deck.find(e => e.offer.kind === kind)!;
-  s.pages!.current!.offers[0] = entry.offer; s.pages!.current!.resolved[0] = false; a.slotIds[0] = entry.id;
+  // These tests isolate the shop; the real board gate is covered separately.
+  s.pages!.current!.offers[0] = { ...entry.offer, availableAfterWins: 0 }; s.pages!.current!.resolved[0] = false; a.slotIds[0] = entry.id;
   d.go({ type: 'ChooseOffer', index: 0 });
   expect(d.s.phase).toBe('shop');
 }
@@ -31,11 +33,11 @@ describe('เศรษฐกิจ', () => {
     expect(run().s.player.gold).toBe(ECONOMY.startGold);
   });
 
-  it('ร้านขายการ์ด 4 ใบกับอุปกรณ์ 1 ชิ้น', () => {
+  it('ร้านมีสี่ช่องพัฒนาสายและไม่ขาย starter', () => {
     const d = run(); openStop(d, 'shop_card');
     const stock = d.s.shopStock!.map(i => ('card' in i ? i.card : undefined)!);
-    expect(stock.filter(c => c.type === 'equipment')).toHaveLength(ECONOMY.shopStock.equipment);
-    expect(stock).toHaveLength(ECONOMY.shopStock.cards + ECONOMY.shopStock.equipment);
+    expect(stock).toHaveLength(4);
+    expect(stock.every(c => !c.progressionRole)).toBe(true);
   });
 
   it('ร้านไม่ขายพลังถาวรแล้ว (ย้ายไปเป็นรางวัลเลเวลอัปและพรแพนโดรา)', () => {
@@ -43,15 +45,15 @@ describe('เศรษฐกิจ', () => {
     expect(d.s.shopStock!.every(i => 'card' in i)).toBe(true);
   });
 
-  it('ปลุกเสกกับสละการ์ด: ใบแรกที่แต่ละจุดฟรี ใบต่อไป 40', () => {
+  it('ปลุกเสกกับสละการ์ด: ใบแรกฟรี ราคาต่อไป 30 และ 20', () => {
     const d = run(); openStop(d, 'shop_upgrade');
     expect(upgradePrice(d.s)).toBe(0);
     d.go({ type: 'ShopUpgradeBuy', index: 0 });
-    expect(upgradePrice(d.s)).toBe(ECONOMY.upgradePrice);
+    expect(upgradePrice(d.s)).toBe(PROGRESSION_SERVICES.upgrade[1]);
     const e = run(); openStop(e, 'shop_remove');
     expect(removePrice(e.s)).toBe(0);
     e.go({ type: 'ShopRemoveBuy', index: 0 });
-    expect(removePrice(e.s)).toBe(ECONOMY.removePrice);
+    expect(removePrice(e.s)).toBe(PROGRESSION_SERVICES.remove[1]);
   });
 
   it('ศาลพร: เลือก 1 จาก 3 แล้วหมด', () => {

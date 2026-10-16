@@ -9,7 +9,7 @@ import {
 } from '../src/core/engine/shared';
 import { starFx, starOf } from '../src/core/cards/model';
 import { upgradeCostForCount, removeCostForCount } from '../src/core/balance/economy';
-import { ECONOMY } from '../src/core/balance/notfm';
+import {PROGRESSION_SERVICES} from '../src/core/balance/deckProgression';
 import cardsJson from '../src/data/packs/base/cards.json';
 
 const CARDS = cardsJson as CardData[];
@@ -78,6 +78,7 @@ describe('ร้านปลุกเสก', () => {
   const shopState = (deck: CardData[], gold = 999): GameState => {
     const s: any = baseNewState('upgrade-shop');
     s.phase = 'shop';
+    s.classId = 'warrior';
     s.shopKind = 'upgrade';
     s.masterDeck = deck;
     s.player.gold = gold;
@@ -120,20 +121,20 @@ describe('ร้านปลุกเสก', () => {
     expect(dmgOf(out.masterDeck[0])).toBe(dmgAtCap);
   });
 
-  it('ใบแรกที่จุดนี้ฟรี ใบต่อไปราคาคงที่', () => {
+  it('ใบแรกฟรี ใบที่สอง 30 แล้วปิดจุดปลุก', () => {
     let s = shopState([attack(), attack({ id: 'b' })], 999);
     s = go(s, { type: 'ShopUpgradeBuy', index: 0 });
     expect(s.player.gold).toBe(999);
     s = go(s, { type: 'ShopUpgradeBuy', index: 1 });
-    expect(s.player.gold).toBe(999 - ECONOMY.upgradePrice);
+    expect(s.player.gold).toBe(999 - PROGRESSION_SERVICES.upgrade[1]);
     s = go(s, { type: 'ShopUpgradeBuy', index: 0 });
-    expect(s.player.gold).toBe(999 - 2 * ECONOMY.upgradePrice);
+    expect(s.player.gold).toBe(999 - PROGRESSION_SERVICES.upgrade[1]);
   });
 
-  it('ราคาไม่ไต่ขั้น', () => {
+  it('จำกัดสองครั้งต่อจุด', () => {
     expect(upgradeCostForCount(0)).toBe(0);
-    expect(upgradeCostForCount(1)).toBe(ECONOMY.upgradePrice);
-    expect(upgradeCostForCount(5)).toBe(ECONOMY.upgradePrice);
+    expect(upgradeCostForCount(1)).toBe(PROGRESSION_SERVICES.upgrade[1]);
+    expect(upgradeCostForCount(2)).toBe(Infinity);
   });
 });
 
@@ -141,6 +142,7 @@ describe('ร้านสละการ์ด', () => {
   const shopState = (deck: CardData[], gold = 999): GameState => {
     const s: any = baseNewState('remove-shop');
     s.phase = 'shop';
+    s.classId = 'warrior';
     s.shopKind = 'remove';
     s.masterDeck = deck;
     s.player.gold = gold;
@@ -160,13 +162,14 @@ describe('ร้านสละการ์ด', () => {
     expect(out.masterDeck.map(c => c.id)).toEqual(['a', 'c']);
   });
 
-  it('ใบแรกที่จุดนี้ฟรี ใบต่อไปราคาคงที่', () => {
+  it('ใบแรกฟรี ใบสอง 20 ใบสาม 35 และจำกัดสามใบ', () => {
     let s = shopState([attack({ id: 'a' }), attack({ id: 'b' }), attack({ id: 'c' })], 999);
     s = go(s, { type: 'ShopRemoveBuy', index: 0 });
     expect(s.player.gold).toBe(999);
     s = go(s, { type: 'ShopRemoveBuy', index: 0 });
-    expect(s.player.gold).toBe(999 - ECONOMY.removePrice);
-    expect(removeCostForCount(4)).toBe(ECONOMY.removePrice);
+    expect(s.player.gold).toBe(999 - PROGRESSION_SERVICES.remove[1]);
+    expect(removeCostForCount(2)).toBe(35);
+    expect(removeCostForCount(3)).toBe(Infinity);
   });
 });
 

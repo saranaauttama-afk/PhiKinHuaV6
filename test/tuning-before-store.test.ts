@@ -44,13 +44,13 @@ describe('tuning before store',()=>{
   expect(late.has('Rare')).toBe(true);
  });
 
- it('T5/T6: the night-1 card shop on the board has 3 items, none Rare or Legendary',()=>{
+ it('progression: the night-1 shop offers four cards, none Rare or Legendary',()=>{
   {
    const d=run();const s=d.s,a=s.pages!.adventure!,entry=a.deck.find(e=>e.offer.kind==='shop_card')!;
-   s.pages!.current!.offers[0]=entry.offer;s.pages!.current!.resolved[0]=false;a.slotIds[0]=entry.id;
+   s.pages!.current!.offers[0]={...entry.offer,availableAfterWins:0};s.pages!.current!.resolved[0]=false;a.slotIds[0]=entry.id;
    d.go({type:'ChooseOffer',index:0});
    expect(d.s.phase).toBe('shop');
-   expect(d.s.shopStock).toHaveLength(3);
+   expect(d.s.shopStock).toHaveLength(4);
    for(const it of d.s.shopStock!)expect(['Common','Uncommon']).toContain((it as any).card.rarity??'Common');
   }
  });

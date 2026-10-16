@@ -105,7 +105,9 @@ export function describeCard(card: CardData, side: 'player' | 'enemy' = 'player'
   const shown = card.spendRhythm?.mode === 'hits' ? { ...fx, dmg: undefined } : fx;
   // หมอผี (cards/water.ts)
   if (card.blood) parts.push(`ของต่ำ: น้ำมนต์ไม่พอ จ่ายเลือด ${require('../balance/notfm').WATER_RULES.bloodPerWater} ต่อ 1 ที่ขาด`);
-  if (card.splash) parts.push(`สาดน้ำมนต์ทั้งขัน: ต่อ 1 น้ำมนต์ ${perText(card.splash, side)}`);
+  if (card.splash) parts.push(`${card.splashWaterCap == null ? 'สาดน้ำมนต์ทั้งขัน' : `ใช้น้ำมนต์สูงสุด ${card.splashWaterCap}`}: ต่อ 1 น้ำมนต์ ${perText(card.splash, side)}`);
+  if (card.rhythmDamageCap != null) parts.push(`จังหวะเพิ่มดาเมจสูงสุด ${card.rhythmDamageCap} ต่อครั้ง`);
+  if (card.starterHeavy) parts.push(`ใช้ช้ำสูงสุด ${card.starterHeavy.maxStacks} ชั้น ชั้นละ ${card.starterHeavy.perStack}`);
   if (card.wakeYant) parts.push(`ปลุกยันต์ทั้งหมดบนผี: ต่อ 1 ยันต์ ${perText(card.wakeYant, side)}`);
   parts.push(...fxText(shown, side, water));
   if (card.after) parts.push(`ต่อจาก${require('./fighter').MOVE_NAMES[card.after.move]}: ${fxText(card.after.bonus, side).map(t => t.replace(/^โจมตี /, '+')).join(' · ')}`);
@@ -146,7 +148,7 @@ export function describeBlessing(b: BlessingDef): string {
 export function costLabel(card: CardData, cost?: { ap: number; mana: number }): string {
   const ap = cost?.ap ?? card.ap ?? 0, mana = cost?.mana ?? card.mana ?? 0;
   if (mana) return `${mana} ${require('./water').cardResourceName(card)}`;
-  if (card.splash) return 'สาดทั้งขัน';
+  if (card.splash) return card.splashWaterCap == null ? 'สาดทั้งขัน' : `ใช้น้ำสูงสุด ${card.splashWaterCap}`;
   if (ap) return `${ap} แต้ม`;
   return 'ฟรี';
 }

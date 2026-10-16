@@ -22,8 +22,8 @@ import type { RNG } from './rng';
 import {validAdventure} from './map/adventure';
 import {parseArchive} from './archive/progress';
 
-/** 3 = NOTFM rebuild. Every earlier save is unplayable and ignored. */
-export const SAVE_VERSION = 3;
+/** 4 = deck progression rebuild. Previous in-progress runs are intentionally incompatible. */
+export const SAVE_VERSION = 4;
 
 /**
  * คำสั่งที่ควรเซฟอัตโนมัติหลังทำ — จุดที่ "ความคืบหน้าเปลี่ยนจริง"
@@ -64,7 +64,7 @@ const DROP_ON_SAVE = [
 ] as const;
 
 export type SaveData = {
-  version: 3;
+  version: 4;
   /** Explicit settled player-turn snapshot; legacy map checkpoints remain unchanged. */
   battleRng?: RNG;
   mapRng?: RNG;

@@ -40,7 +40,7 @@ const fxValue=(fx:Fx)=>(fx.dmg??0)*(fx.hits??1)+(fx.block??0)*.6+(fx.draw??0)*4+
 export const cardValue=(c:CardData)=>{
  const fx=starFx(c);let v=fxValue(fx)+(c.conditional?fxValue(c.conditional.bonus)*.5:0)+(c.equip?8:0)+(c.counter?4:0)+(c.type==='prayer'?fxValue(fx)*.6:0)
   +(c.after?fxValue(c.after.bonus)*.5:0)+(c.heavy?4:0)+(c.riposte?fxValue(c.riposte)*.6:0)+(c.spendRhythm?(c.spendRhythm.mode==='hits'?(fx.dmg??0)*3:(c.spendRhythm.perStack??0)*3):0)+(c.repeatIf?(fx.dmg??0)*.4:0)+(c.innate?2:0)+(c.move?1.5:0)
-  +(c.splash?fxValue(Water.perStack(c.splash,5)):0)+(c.wakeYant?fxValue(Water.perStack(c.wakeYant,3)):0);
+  +(c.splash?fxValue(Water.perStack(c.splash,Math.min(5,c.splashWaterCap??Infinity))):0)+(c.wakeYant?fxValue(Water.perStack(c.wakeYant,3)):0);
  if(c.exhaust)v*=.8;
  return v/Math.max(1,(c.ap??0)+(c.mana??0)/2.5);
 };
@@ -50,7 +50,7 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
  // หมอผี: a player holds สาด / ปลุกยันต์ until there is something to throw (unless it kills).
  const hold=(c:CardData)=>{
   const ghost=(s.enemy?.hp??0)+(s.enemy?.block??0);
-  if(c.splash&&(c.splash.dmg??0)*s.player.mana<ghost&&s.player.mana<5)return true;
+  if(c.splash&&(c.splash.dmg??0)*Math.min(s.player.mana,c.splashWaterCap??Infinity)<ghost&&s.player.mana<Math.min(5,c.splashWaterCap??Infinity))return true;
   if(c.wakeYant&&Water.yantOn(s)<2)return true;
   return false;
  };
@@ -80,15 +80,15 @@ export function choosePilotCard(s:GameState,tactical:boolean,decisionSeed:string
    const gain=F.usesRhythm(s)&&card.move&&s.fight?.lastAttackMove&&s.fight.lastAttackMove!==card.move?1:0;
    let r=Math.min(8,rhythm+gain);
    if(card.spendRhythm){if(card.spendRhythm.mode==='hits')c={...c,hits:Math.max(1,r)};else c={...c,dmg:(c.dmg??0)+r*(card.spendRhythm.perStack??0)};fighterBonus-=r*1.6;r=0;}
-   fighterBonus+=r*(c.hits??1)+gain*2.5;
+   fighterBonus+=Math.min(r,card.rhythmDamageCap??Infinity)*(c.hits??1)+gain*2.5;
    const bruise=F.bruiseOn(s);
-   if(card.heavy){fighterBonus+=bruise*F.heavyPerBruise(s);if(!bruise&&s.piles.hand.some(h=>h!==card&&h.type==='attack'&&!h.heavy))fighterBonus-=4;}
+   if(card.heavy){fighterBonus+=Math.min(bruise,card.starterHeavy?.maxStacks??Infinity)*(card.starterHeavy?.perStack??F.heavyPerBruise(s));if(!bruise&&s.piles.hand.some(h=>h!==card&&h.type==='attack'&&!h.heavy))fighterBonus-=4;}
    if(card.spendRhythm&&rhythm<3&&s.piles.hand.length>1)fighterBonus-=6;
    if(card.repeatIf&&conditionMet(s,card.repeatIf,card))fighterBonus+=(c.dmg??0);
    if(s.turnFlags?.doubleNext)fighterBonus+=(c.dmg??0)*(c.hits??1);
   }
   // หมอผี: สาด spends what is left after the price, ปลุกยันต์ eats the ghost's ยันต์, ของต่ำ costs HP.
-  const water=Math.max(0,s.player.mana-cardCost(s,card).mana);
+  const water=Math.min(Math.max(0,s.player.mana-cardCost(s,card).mana),card.splashWaterCap??Infinity);
   if(card.splash){c=addFx(c,Water.perStack(card.splash,water));if(card.splash.sweep)c={...c,sweep:true};if(water<4&&s.piles.hand.some(h=>h!==card&&h.type==='mana'))fighterBonus-=8;}
   const yantNow=Water.yantOn(s);
   if(card.wakeYant){c=addFx(c,Water.perStack(card.wakeYant,yantNow));if(card.wakeYant.sweep)c={...c,sweep:true};}
@@ -240,9 +240,9 @@ export function playRun(seed:string,classId:ClassId,difficulty:Difficulty,opts:{
   if(s.phase==='map'&&s.pages?.adventure){
    if(tactical){const sk=chooseMapSkill(s);if(sk){go(sk);continue;}}
    const p=s.pages.current!,a=s.pages.adventure,offers=p.offers;
-   const open=(i:number)=>!!offers[i]&&!p.resolved[i];
+   const open=(i:number)=>!!offers[i]&&!p.resolved[i]&&a.fightsWon>=(offers[i].availableAfterWins??0);
    const prep=offers.findIndex((o,i)=>open(i)&&!a.usedIds.includes(a.slotIds[i]!)&&(o.kind==='treasure'||o.kind==='treasure_single'||o.kind==='story_event'||
-    o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75||o.kind==='shop_card'&&s.player.gold>=30||o.kind==='shop_equipment'&&s.player.gold>=40||
+    o.kind==='well'&&s.player.hp<s.player.maxHp-5||o.kind==='healing_shrine'&&s.player.hp<s.player.maxHp*.75||o.kind==='shop_card'&&s.player.gold>=20||o.kind==='shop_equipment'&&s.player.gold>=40||
     o.kind==='blessing'||o.kind==='shop_upgrade'||o.kind==='shop_remove'&&s.masterDeck.length>8));
    const ix=prep>=0?prep:offers.findIndex((o,i)=>open(i)&&isCriticalOffer(o));
    const other=offers.findIndex((_,i)=>open(i));

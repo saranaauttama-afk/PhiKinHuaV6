@@ -13,6 +13,12 @@ type CardJson = CardData & { starter?: number };
 
 /** Neutral pool + class pools, with starter counts (only class starters build decks). */
 export const CARD_LIST_WITH_STARTERS: CardJson[] = [...(cardsJson as any), ...(classCardsJson as any)];
+// Fail while loading a pack instead of letting a malformed cap create an infinite resource loop.
+for (const c of CARD_LIST_WITH_STARTERS) {
+  for (const n of [c.rhythmDamageCap, c.splashWaterCap, c.starterHeavy?.maxStacks, c.starterHeavy?.perStack])
+    if (n != null && (!Number.isSafeInteger(n) || n < 0)) throw Error(`Invalid progression cap on ${c.id}`);
+  if (c.starterHeavy && !c.heavy) throw Error(`Non-heavy card has starterHeavy: ${c.id}`);
+}
 
 /** การ์ดคำสาป: เข้าสำรับได้ทางเดียวคือถูกยัดเข้ามา ไม่อยู่ในร้านหรือรางวัล */
 export const CURSE_CARDS: CardData[] = curseCardsJson as any;

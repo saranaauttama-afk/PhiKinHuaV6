@@ -65,7 +65,7 @@ export function playBlock(s: GameState, card: CardData): string | null {
     if (!card.blood) return `${word}ไม่พอ`;
     if (W.bloodCost(s, card, cost.mana) >= s.player.hp) return 'เลือดไม่พอจ่าย';
   }
-  if (card.splash && s.player.mana - cost.mana < 1) return `ไม่มี${word}ให้สาด`;
+  if (card.splash && Math.min(s.player.mana - cost.mana, card.splashWaterCap ?? Infinity) < 1) return `ไม่มี${word}ให้สาด`;
   if (starFx(card).borrow && !lastEnemyCards(s, 1).length) return 'ผียังไม่ได้เล่นการ์ด';
   return null;
 }

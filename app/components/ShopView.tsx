@@ -23,6 +23,7 @@ import { BackHandler, Image, Modal, Pressable, ScrollView, Text, View } from 're
 import RewardReceiptView from './RewardReceiptView';
 import type { CardData, Command, GameState, ShopItem } from '../../src/core/types';
 import { SHOP_REROLL_COST } from '../../src/core/balance/economy';
+import {progressionEnabled,PROGRESSION_SERVICES} from '../../src/core/balance/deckProgression';
 import { ECONOMY } from '../../src/core/balance/notfm';
 import { canUpgrade, upgradeLevelOf, MAX_UPGRADE_LEVEL } from '../../src/core/engine/shared';
 import {QuietButton} from './QuietChrome';
@@ -112,18 +113,19 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
       <Lead>แตะการ์ดเพื่ออ่าน แล้วกดยืนยันซื้อ · ยังไม่เสียเบี้ยจนกว่าจะยืนยัน</Lead><Money state={state}/>
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{color:palette.moon,fontFamily:font.ui}}>{notice}</Text>}
       <View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>{stock.map((it,i)=>{const c=cardOf(it);return c&&<View testID={`shop-card-${i}`} key={`${c.id}-${i}`} style={{width:'48%',gap:4}}>
+        {'card' in it&&it.role&&<Text style={{fontFamily:font.ui,color:palette.moonDim,textAlign:'center',fontSize:12}}>{({replacement:'ไพ่ทดแทน',engine:'ตัวปูทาง',payoff:'ไพ่หลัก',support:'ตัวเสริม'} as const)[it.role]}</Text>}
         <View><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/></View>
         <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {shopPrice(state,it.price)} เบี้ย{shopPrice(state,it.price)<it.price?` (จาก ${it.price})`:''}</Text>
       </View>;})}</View>
-      <QuietButton label={`ขอดูของชุดใหม่ (${markedUp(state,SHOP_REROLL_COST)} เบี้ย)`} disabled={(state.player.gold??0)<markedUp(state,SHOP_REROLL_COST)} onPress={()=>{setSelected(null);dispatch({type:'ShopReroll'});}}/>
+      <QuietButton label={state.shopRerollUsed&&state.shopKind==='card'?'ดูของชุดใหม่แล้ว':`ขอดูของชุดใหม่ (${markedUp(state,progressionEnabled(state.classId)?SHOP_REROLL_COST:ECONOMY.rerollPrice)} เบี้ย)`} disabled={(progressionEnabled(state.classId)&&state.shopKind==='card'&&(state.shopRerollUsed||!stock.length))||(state.player.gold??0)<markedUp(state,progressionEnabled(state.classId)?SHOP_REROLL_COST:ECONOMY.rerollPrice)} onPress={()=>{setSelected(null);dispatch({type:'ShopReroll'});}}/>
     </Panel>;
   };
 
   const removeShop = () => {
     const cost=removePrice(state);
-    return <Panel title="ศาลาลืมเลือน"><Lead>เลือกและอ่านการ์ดก่อนยืนยันสละ · ใบแรกฟรี ใบต่อไป {markedUp(state,ECONOMY.removePrice)} เบี้ย</Lead><Money state={state}/>
+    return <Panel title="ศาลาลืมเลือน"><Lead>{progressionEnabled(state.classId)?`ลบได้สูงสุด 3 ใบต่อจุด · ฟรี / ${markedUp(state,20)} / ${markedUp(state,35)} เบี้ย`:`ใบแรกฟรี ใบต่อไป ${markedUp(state,ECONOMY.removePrice)} เบี้ย`}</Lead><Money state={state}/>
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{fontFamily:font.ui,color:palette.moon}}>{notice}</Text>}
-      <UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} remove price={()=>cost} disabledConfirm={(state.player.gold??0)<cost} onConfirm={index=>{if(!canRemoveCard(deck[index],deck.length)||(state.player.gold??0)<cost)return;const name=deck[index].name;dispatch({type:'ShopRemoveBuy',index});setSelected(null);setNotice(`สละ ${name} แล้ว`);}}/>
+      {progressionEnabled(state.classId)&&(state.shopBoughtItems?.length??0)>=3?<Lead>ใช้สิทธิ์ของจุดนี้ครบแล้ว</Lead>:<UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} remove price={()=>cost} disabledConfirm={(state.player.gold??0)<cost} onConfirm={index=>{if(!canRemoveCard(deck[index],deck.length)||(state.player.gold??0)<cost)return;const name=deck[index].name;dispatch({type:'ShopRemoveBuy',index});setSelected(null);setNotice(`สละ ${name} แล้ว`);}}/>}
     </Panel>;
   };
 
@@ -132,15 +134,15 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
     const price=upgradePrice(state);
     const available=!!card&&canUpgrade(card)&&(state.player.gold??0)>=price;
     return <Panel title="ช่างปลุกเสก">
-      <Lead>เลือกหนึ่งใบ ดูผลหลังปลุกเสก แล้วกดยืนยัน · ใบแรกฟรี ใบต่อไป {markedUp(state,ECONOMY.upgradePrice)} เบี้ย</Lead>
+      <Lead>{progressionEnabled(state.classId)?'อัปได้สูงสุด 2 ครั้งต่อจุด · ':''}ครั้งแรกฟรี ครั้งต่อไป {markedUp(state,progressionEnabled(state.classId)?PROGRESSION_SERVICES.upgrade[1]:ECONOMY.upgradePrice)} เบี้ย</Lead>
       <Money state={state}/>
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{fontFamily:font.ui,color:palette.moon,fontSize:14,lineHeight:24}}>{notice}</Text>}
-      <UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} price={()=>price} disabledConfirm={!available} onConfirm={index=>{
+      {progressionEnabled(state.classId)&&(state.shopBoughtItems?.length??0)>=2?<Lead>ใช้สิทธิ์ของจุดนี้ครบแล้ว</Lead>:<UpgradeCardPicker cards={deck} selected={selected} onSelect={setSelected} price={()=>price} disabledConfirm={!available} onConfirm={index=>{
         const target=deck[index];const cost=price;
         if(!canUpgrade(target)||(state.player.gold??0)<cost)return;
         const next=upgradeCard(target);dispatch({type:'ShopUpgradeBuy',index});
         setNotice(`ปลุกเสกสำเร็จ · ${next.name}\n${upgradeSummary(next)}`);setSelected(null);
-      }}/>
+      }}/>}
       {card&&!available&&<Text style={{fontFamily:font.ui,color:palette.bloodLit,fontSize:13}}>เบี้ยไม่พอ หรือการ์ดสุดขั้นแล้ว</Text>}
     </Panel>;
   };

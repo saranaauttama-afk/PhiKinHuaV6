@@ -19,7 +19,9 @@ function driver(seed='v32-shop'){
 describe('v32 reported regressions',()=>{
  it('a shop stays on the board while it has stock; selling out then leaving deals a new page into its slot',()=>{
   const d=driver(),p=d.s.pages!.current!,ix=p.offers.findIndex(o=>o.kind==='shop_card');expect(ix).toBeGreaterThanOrEqual(0);
-  const a=d.s.pages!.adventure!,board=structuredClone(a.slotIds),next=a.deck[a.cursor];d.s.player.gold=9999;
+  const a=d.s.pages!.adventure!,entry=a.deck.find(e=>e.id===a.slotIds[ix])!;
+  entry.offer={...entry.offer,availableAfterWins:0};p.offers[ix]=entry.offer;
+  const board=structuredClone(a.slotIds),next=a.deck[a.cursor];d.s.player.gold=9999;
   d.go({type:'ChooseOffer',index:ix});const stock=structuredClone(d.s.shopStock);d.go({type:'CompleteNode'});
   expect(d.s.pages!.adventure!.slotIds).toEqual(board);expect(validAdventure(fromSave(toSave(d.s,d.r)))).toBe(true);
   d.go({type:'ChooseOffer',index:ix});expect(d.s.shopStock).toEqual(stock);

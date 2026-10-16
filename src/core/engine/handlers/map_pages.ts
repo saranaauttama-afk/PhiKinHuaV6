@@ -117,6 +117,7 @@ export function choose(s: GameState, cmd: Extract<Command, { type: 'ChooseOffer'
   const ix = cmd.index;
   const offer: PageOffer | undefined = mp.current.offers[ix];
   if (!offer || mp.current.resolved[ix]) return { state: s, rng };
+  if (mp.adventure.fightsWon < (offer.availableAfterWins ?? 0)) return { state: s, rng };
   s.rewardReceipt=undefined;
   mp.adventure.enteredBoard=mp.adventure.boardIndex;
   if(restoreAdventureService(s,offer,ix))return {state:s,rng};
