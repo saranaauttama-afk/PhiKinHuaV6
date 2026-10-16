@@ -209,7 +209,7 @@ export default function Card({
         },
         animatedStyle
       ]}>
-      {readyLive&&<Animated.View testID="card-ready-glow" pointerEvents="none" style={[{position:'absolute',top:'-4%',left:'-4%',width:'108%',height:'108%'},readyStyle]}><Image source={require('../../assets/ui/candle-selection.webp')} resizeMode="stretch" style={{width:'100%',height:'100%'}}/></Animated.View>}
+      {readyLive&&<Animated.View testID="card-ready-glow" pointerEvents="none" style={[{position:'absolute',top:'-4%',left:'-4%',width:'108%',height:'108%'},readyStyle]}><Image source={require('../../assets/ui/card-ready-glow.webp')} resizeMode="stretch" style={{width:'100%',height:'100%'}}/></Animated.View>}
       {roundLive&&<Animated.View testID="card-round-glow" pointerEvents="none" style={[{position:'absolute',top:-4,left:-4,right:-4,bottom:-4,borderRadius:14,borderWidth:3,borderColor:fighterColors.hint,shadowColor:fighterColors.hint,shadowOpacity:.9,shadowRadius:10,shadowOffset:{width:0,height:0},elevation:8},glowStyle]}/>}
       <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} hideWash={disabled?undefined:cardTypeWash[card.type]} style={{width:'100%',height:'100%',padding:9,paddingTop:headerPadding,paddingBottom:stampSize+4}}>
         <View style={{position:'absolute',top:badgeTop,left:Math.max(12,width*.14),right:Math.max(12,width*.14),zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact moveHint={moveHint}/></View>

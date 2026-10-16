@@ -4,7 +4,16 @@ import {create} from 'zustand';
 import {healthBarColors} from '../../theme';
 export type FxId='incense_smoke'|'ash_fleck'|'victory_rays'|'battle_mist'|'firefly'|'ink_blood_drop'|'page_burn_edge'|'card_ready_glow';
 // Populated after generation; every effect remains usable while art is being produced.
-export const FX_ART:Partial<Record<FxId,ImageSourcePropType>>={};
+export const FX_ART:Partial<Record<FxId,ImageSourcePropType>>={
+ incense_smoke:require('../../../assets/fx/incense-smoke.webp'),
+ ash_fleck:require('../../../assets/fx/ash-fleck.webp'),
+ victory_rays:require('../../../assets/fx/victory-rays.webp'),
+ battle_mist:require('../../../assets/fx/battle-mist.webp'),
+ firefly:require('../../../assets/fx/firefly.webp'),
+ ink_blood_drop:require('../../../assets/fx/ink-blood-drop.webp'),
+ page_burn_edge:require('../../../assets/fx/page-burn-edge.webp'),
+ card_ready_glow:require('../../../assets/ui/card-ready-glow.webp'),
+};
 export function FxSprite({id,style}:{id:FxId;style?:StyleProp<ImageStyle>}){
  return FX_ART[id]?<Image accessible={false} source={FX_ART[id]} resizeMode="stretch" style={style}/>:<View pointerEvents="none" style={[{borderRadius:100,backgroundColor:healthBarColors.chip},style]}/>;
 }
