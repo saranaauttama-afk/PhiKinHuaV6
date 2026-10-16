@@ -1,5 +1,6 @@
 import React from 'react';
 import {Image,Modal,Pressable,Text,View} from 'react-native';
+import AshPuff from './AshPuff';
 import Animated,{useAnimatedStyle,useReducedMotion,useSharedValue,withSequence,withSpring,withTiming} from 'react-native-reanimated';
 import {useGameSettings} from '../Settings';
 import {combatUiColors} from '../../theme';
@@ -26,14 +27,25 @@ import {fighterColors,font,layer,palette} from '../../theme';
 export default function MinionRow({minions,size=60,side='player',inline=false,acted}:{minions:MinionState[];size?:number;side?:'player'|'enemy';inline?:boolean;
  /** The minion that just acted (MinionActed): it lunges toward its target and shakes. */acted?:{uid:string;key:string}|null}){
  const {hudTop}=useBattleLayout();
+ const enemy=side==='enemy';
+ const reduced=useGameSettings(s=>s.reducedMotion);
+ const [departing,setDeparting]=React.useState<MinionState[]>([]);
+ const previous=React.useRef(minions);
+ React.useEffect(()=>{
+  const lost=previous.current.filter(m=>!minions.some(n=>n.uid===m.uid)||minions.some(n=>n.uid===m.uid&&n.hp<=0));
+  previous.current=minions.filter(m=>m.hp>0);
+  if(!enemy||reduced||!lost.length)return;
+  setDeparting(lost);
+ },[minions,reduced]);
+ React.useEffect(()=>{if(!departing.length)return;const t=setTimeout(()=>setDeparting([]),500);return ()=>clearTimeout(t);},[departing]);
  const [open,setOpen]=React.useState<string|null>(null);
  const sel=minions.find(m=>m.uid===open);
  React.useEffect(()=>{if(open&&!sel)setOpen(null)},[open,sel]);
- if(!minions.length)return null;
- const enemy=side==='enemy';
+ if(!minions.length&&!departing.length)return null;
  const body=enemy?'ลูกสมุนของผี':'ศิษย์ค่าย';
  return <View testID={enemy?'enemy-minion-row':'minion-row'} pointerEvents="box-none" style={inline?{flexDirection:'row',gap:4,alignItems:'center',height:36}:{position:'absolute',...(enemy?{right:6,flexDirection:'row-reverse'}:{left:6,flexDirection:'row'}),top:hudTop-size-22,gap:2,zIndex:layer.control}}>
-  {minions.map(m=><Figure key={m.uid} m={m} size={inline?32:size} compact={inline} enemy={enemy} actKey={acted?.uid===m.uid?acted.key:undefined} onPress={()=>setOpen(m.uid)}/>)}
+  {!reduced&&departing.map(m=><DepartingFigure key={m.uid} m={m} size={size}/>)}
+  {minions.filter(m=>m.hp>0).map(m=><Figure key={m.uid} m={m} size={inline?32:size} compact={inline} enemy={enemy} actKey={acted?.uid===m.uid?acted.key:undefined} onPress={()=>setOpen(m.uid)}/>)}
   <Modal visible={!!sel} transparent animationType="fade" onRequestClose={()=>setOpen(null)}>
    <View style={{flex:1,backgroundColor:palette.scrimHeavy,justifyContent:'center',padding:24}}>
     <Pressable accessibilityLabel="ปิด" onPress={()=>setOpen(null)} style={{position:'absolute',top:0,bottom:0,left:0,right:0}}/>
@@ -57,10 +69,11 @@ function Figure({m,size,onPress,enemy=false,compact=false,actKey}:{m:MinionState
  const hitStyle=useAnimatedStyle(()=>({opacity:hit.value}));
  const scale=useSharedValue(reduce?1:.3),shake=useSharedValue(0),lastHp=React.useRef(m.hp);
  const lunge=useSharedValue(0);
+ React.useEffect(()=>{if(reduce){shake.value=0;lunge.value=0;hit.value=0;scale.value=1;}},[reduce]);
  // Acting: a quick lunge toward the other side (ours up toward the ghost, the ghost's down-left) plus a shake.
  React.useEffect(()=>{
   if(!actKey)return;
-  if(reduce){scale.value=withSequence(withTiming(1.15,{duration:120}),withTiming(1,{duration:160}));return;}
+  if(reduce){scale.value=1;return;}
   lunge.value=withSequence(withTiming(-10,{duration:110}),withTiming(0,{duration:180}));
   shake.value=withSequence(withTiming(-4,{duration:50}),withTiming(4,{duration:60}),withTiming(-2,{duration:50}),withTiming(0,{duration:50}));
  },[actKey]);
@@ -80,4 +93,11 @@ function Figure({m,size,onPress,enemy=false,compact=false,actKey}:{m:MinionState
    </View>
   </Animated.View>
  </Pressable>;
+}
+
+function DepartingFigure({m,size}:{m:MinionState;size:number}){
+ const opacity=useSharedValue(1);
+ React.useEffect(()=>{opacity.value=withTiming(0,{duration:450});},[]);
+ const style=useAnimatedStyle(()=>({opacity:opacity.value}));
+ return <View pointerEvents="none" style={{width:size,height:size}}><Animated.Image source={minionArt(m.id,true)} style={[{width:size,height:size},style]} resizeMode="contain"/><AshPuff size={size} duration={500} smoke={1} ash={0}/></View>;
 }
