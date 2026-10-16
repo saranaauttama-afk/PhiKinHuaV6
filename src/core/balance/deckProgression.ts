@@ -5,6 +5,20 @@ export const PROGRESSION_PRICES = {Common:20,Uncommon:35,Rare:60,Legendary:90} a
 export const PROGRESSION_SERVICES = {reroll:10,remove:[0,20,35],upgrade:[0,30]} as const;
 export const progressionEnabled = (classId?:ClassId) => classId==='warrior'||classId==='shaman';
 
+/**
+ * Card access along the route (owner 16 Oct 2026, "เหมือน NOTFM ที่ร้านและหีบเยอะ").
+ * The reduced starters only work if the deck grows early: in v1 night 1 offered one card shop
+ * and a 50% chest before the boss (the first card reward), so a weak starter fought 7 fights
+ * with 1–2 new cards. Chests are guaranteed (`treasure`: free pick 1 of 2) instead of a coin flip.
+ * Index = night − 1.
+ */
+export const PROGRESSION_ROUTE = {cardShops:[2,1,1], chests:[2,2,2]} as const;
+export function progressionRoute(classId:ClassId|undefined,night:number){
+ if(!progressionEnabled(classId))return;
+ const n=Math.max(1,Math.min(3,night))-1;
+ return {cardShops:PROGRESSION_ROUTE.cardShops[n],chests:PROGRESSION_ROUTE.chests[n]};
+}
+
 export type BuildFocus = 'warrior_rhythm'|'warrior_bruise'|'warrior_guard'|'shaman_water'|'shaman_yant'|'shaman_familiar';
 export const BUILD_CATALOG: Record<BuildFocus,{engine:readonly string[];payoff:readonly string[];support:readonly string[]}> = {
   "warrior_rhythm": {

@@ -1,6 +1,6 @@
 import {routeFightQuota,nightEncounterCount,campaignBoss,ultimateRequired,difficultyOf,runEliteQuota} from '../campaign/threeNight';
 import {ECONOMY} from '../balance/notfm';
-import {progressionEnabled} from '../balance/deckProgression';
+import {progressionEnabled,progressionRoute} from '../balance/deckProgression';
 import {next} from '../rng';
 import type {GameState} from '../types';
 import type {PageOffer} from './pages';
@@ -51,17 +51,36 @@ export function startAdventure(s:GameState,r:RNG):RNG {
  const chestRoll=next(r);r=chestRoll.rng;
  const chest=chestRoll.value<ECONOMY.chestChance?[pick<PageOffer>([{kind:'treasure',shopId:''},{kind:'treasure_single',shopId:''}])]:[];
  const progression=progressionEnabled(s.classId);
- const services:PageOffer[]=[
-  {kind:'shop_card',shopId:''},
-  {kind:'blessing',shopId:''},
-  ...(progression?[{kind:'shop_remove',shopId:'',phase:1} as PageOffer]:[{kind:'story_event',shopId:'',eventId:`run_story_${night}`} as PageOffer]),
-  {kind:'shop_upgrade',shopId:'',phase:1},
-  pick<PageOffer>([{kind:'well',shopId:''},{kind:'healing_shrine',shopId:''}]),
-  ...(progression?[{kind:'story_event',shopId:'',eventId:`run_story_${night}`} as PageOffer]:[{kind:'shop_remove',shopId:'',phase:1} as PageOffer]),
-  ...chest,
- ];
- // The first shop in nights 2/3 is ready immediately; later stops open as the route deepens.
- const after=progression?(night===1?[1,2,3,4,5,6,6]:[0,2,3,5,6,7,8]):services.map((_,k)=>Math.max(1,Math.min(fights.length-1,Math.round((k+1)*fights.length/(services.length+1)))));
+ let services:PageOffer[],after:number[];
+ if(progression){
+  // PROGRESSION_ROUTE: extra card shops and guaranteed chests, spread through the night.
+  // Each stop opens after `at` wins (0 = ready before the first fight).
+  const rt=progressionRoute(s.classId,night)!,last=fights.length-1;
+  const stops:Array<[PageOffer,number]>=[
+   [{kind:'shop_card',shopId:''},night===1?1:0],
+   [{kind:'treasure',shopId:''},2],
+   [{kind:'blessing',shopId:''},2],
+   [{kind:'shop_remove',shopId:'',phase:1} as PageOffer,3],
+   [{kind:'shop_upgrade',shopId:'',phase:1} as PageOffer,night===1?4:5],
+   [pick<PageOffer>([{kind:'well',shopId:''},{kind:'healing_shrine',shopId:''}]),night===1?5:6],
+   [{kind:'story_event',shopId:'',eventId:`run_story_${night}`} as PageOffer,night===1?6:7],
+  ];
+  for(let k=1;k<rt.cardShops;k++)stops.push([{kind:'shop_card',shopId:''},Math.min(last,4+k-1)]);
+  for(let k=1;k<rt.chests;k++)stops.push([{kind:'treasure',shopId:''},Math.min(last,night===1?5:6+k-1)]);
+  services=stops.map(x=>x[0]);after=stops.map(x=>Math.min(x[1],last));
+ }else{
+  services=[
+   {kind:'shop_card',shopId:''},
+   {kind:'blessing',shopId:''},
+   {kind:'story_event',shopId:'',eventId:`run_story_${night}`} as PageOffer,
+   {kind:'shop_upgrade',shopId:'',phase:1},
+   pick<PageOffer>([{kind:'well',shopId:''},{kind:'healing_shrine',shopId:''}]),
+   {kind:'shop_remove',shopId:'',phase:1},
+   ...chest,
+  ];
+  // Spread the stops evenly between the fights, the shop after the first fight.
+  after=services.map((_,k)=>Math.max(1,Math.min(fights.length-1,Math.round((k+1)*fights.length/(services.length+1)))));
+ }
  const kinds:PageOffer[]=[];
  if(progression)services.forEach((o,k)=>{if(after[k]===0)kinds.push({...o,availableAfterWins:0});});
  for(let i=0;i<fights.length;i++){kinds.push(fights[i]);services.forEach((o,k)=>{if(after[k]===i+1)kinds.push(progression?{...o,availableAfterWins:after[k]}:o);});if(i===2)kinds.push({kind:'next_event'});}
@@ -175,7 +194,7 @@ export function validAdventure(s:Partial<GameState>):boolean {
  const a=s.pages?.adventure,p=s.pages?.current,c=s.campaign;
  if(!a||a.version!==5||!p||!c||!Number.isInteger(c.difficulty)||c.difficulty!<1||c.difficulty!>5||!Number.isInteger(c.night)||c.night<1||c.night>3)return false;
  if(c.completedNights!==c.night-1+Number(a.boss==='ultimate'||a.boss==='done'))return false;
- if(!Array.isArray(a.deck)||(a.deck.length!==nightEncounterCount(s)&&a.deck.length!==nightEncounterCount(s)+1)||!Number.isInteger(a.cursor)||a.cursor<3||a.cursor>a.deck.length||!Number.isInteger(a.boardIndex)||a.boardIndex!<0)return false;
+ if(!Array.isArray(a.deck)||(()=>{const rt=progressionRoute(s.classId,s.campaign?.night??1),base=nightEncounterCount(s);return rt?a.deck.length!==base+rt.cardShops-1+rt.chests:a.deck.length!==base&&a.deck.length!==base+1;})()||!Number.isInteger(a.cursor)||a.cursor<3||a.cursor>a.deck.length||!Number.isInteger(a.boardIndex)||a.boardIndex!<0)return false;
  if(!Array.isArray(a.slotIds)||a.slotIds.length!==3||![a.resolvedIds,a.skippedIds,a.pendingIds,a.deferredIds,a.usedIds,p.offers,p.resolved].every(Array.isArray))return false;
  if(!a.deck.every(e=>e&&typeof e.id==='string'&&e.offer&&typeof e.offer.kind==='string'))return false;
  const ids=a.deck.map(e=>e.id),drawn=ids.slice(0,a.cursor),consumed=[...a.resolvedIds,...a.skippedIds];
@@ -187,7 +206,7 @@ export function validAdventure(s:Partial<GameState>):boolean {
  if(a.fightsWon!==finished.filter(e=>e.offer.kind==='monster').length||a.storyDone!==finished.some(e=>e.offer.kind==='story_event'&&e.offer.eventId===storyId(s)))return false;
  const services=a.deck.filter(e=>e.offer.kind!=='monster').map(e=>e.offer);
  const count=(...kinds:string[])=>services.filter(o=>kinds.includes(o.kind)).length;
- if(count('next_event')!==1||services.filter(o=>o.kind==='story_event'&&o.eventId===storyId(s)).length!==1||count('shop_card','shop_equipment')!==1||count('well','healing_shrine')!==1||count('shop_upgrade')!==1||count('shop_remove')!==1||count('blessing')!==1||count('treasure','treasure_single')!==a.deck.length-nightEncounterCount(s))return false;
+ if(count('next_event')!==1||services.filter(o=>o.kind==='story_event'&&o.eventId===storyId(s)).length!==1||count('shop_card','shop_equipment')!==(progressionRoute(s.classId,s.campaign?.night??1)?.cardShops??1)||count('well','healing_shrine')!==1||count('shop_upgrade')!==1||count('shop_remove')!==1||count('blessing')!==1||count('treasure','treasure_single')!==a.deck.length-nightEncounterCount(s)-((progressionRoute(s.classId,s.campaign?.night??1)?.cardShops??1)-1))return false;
  const active=a.slotIds.filter((id,i):id is string=>id!==null&&!p.resolved[i]),outstanding=[...active,...a.pendingIds];
  if(new Set(outstanding).size!==outstanding.length||a.pendingIds.some(id=>!a.deferredIds.includes(id)||consumed.includes(id)))return false;
  if(a.usedIds.some(id=>!drawn.includes(id)||isCriticalOffer(a.deck.find(e=>e.id===id)!.offer)))return false;
