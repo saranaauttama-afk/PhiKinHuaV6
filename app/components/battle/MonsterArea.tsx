@@ -9,6 +9,8 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
+  withDelay,
+  Easing,
   cancelAnimation,
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -55,6 +57,8 @@ type Props = {
 
 export type MonsterAreaHandle = {
   shake: () => void;
+  /** Killing blow: a short shudder, then the ghost sinks and fades (owner playtest 16 Oct 2026). */
+  die: () => void;
 };
 
 const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterArea({
@@ -79,6 +83,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const monsterY      = useSharedValue(0);
   const monsterX      = useSharedValue(0);
   const monsterShakeX = useSharedValue(0);
+  const monsterFall   = useSharedValue(0);
+  const monsterFade   = useSharedValue(1);
 
   React.useEffect(() => {
     monsterY.value = withRepeat(
@@ -101,9 +107,13 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const floatStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: monsterX.value + monsterShakeX.value },
-      { translateY: monsterY.value },
+      { translateY: monsterY.value + monsterFall.value },
     ] as any,
+    opacity: monsterFade.value,
   }));
+
+  // A new ghost (next fight, or the screen reused) starts standing.
+  React.useEffect(() => { monsterFall.value = 0; monsterFade.value = 1; }, [id]);
 
   useImperativeHandle(ref, () => ({
     shake() {
@@ -114,6 +124,15 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
         withTiming(-8,  { duration: 60 }),
         withTiming(0,   { duration: 60 })
       );
+    },
+    die() {
+      monsterShakeX.value = withSequence(
+        withTiming(6,  { duration: 50 }), withTiming(-6, { duration: 50 }),
+        withTiming(5,  { duration: 50 }), withTiming(-5, { duration: 50 }),
+        withTiming(3,  { duration: 50 }), withTiming(0,  { duration: 50 })
+      );
+      monsterFall.value = withDelay(300, withTiming(70, { duration: 650, easing: Easing.in(Easing.quad) }));
+      monsterFade.value = withDelay(300, withTiming(0, { duration: 650 }));
     },
   }));
 

@@ -15,7 +15,7 @@ import {
 } from './status-effects';
 
 export function combatFrame(state: GameState) {
-  return JSON.parse(JSON.stringify({ player: state.player, enemy: state.enemy, historySeq: state.cardHistorySeq ?? 0 }));
+  return JSON.parse(JSON.stringify({ player: state.player, enemy: state.enemy, historySeq: state.cardHistorySeq ?? 0, minions: state.minions ?? [], enemyMinions: state.enemyMinions ?? [] }));
 }
 
 /** ปล่อย event ให้ view เอาไปเล่นเป็นอนิเมชั่น (ดู CombatEvent ใน types.ts) */

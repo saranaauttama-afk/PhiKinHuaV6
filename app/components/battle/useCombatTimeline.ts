@@ -22,7 +22,7 @@ const DURATION: Record<CombatEvent['t'], number> = {
   Healed: 350,
   // Emitted since the audio pass (15 Oct 2026); kept short so ghost turns do not drag.
   StatusApplied: 120,
-  Died: 500,
+  Died: 1100, // ghost shudders, sinks and fades before the summary (MonsterArea.die)
   TurnEnded: 150,
   RhythmChanged: 0,
   HeavyHit: 0,

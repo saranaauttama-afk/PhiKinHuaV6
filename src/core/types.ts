@@ -353,6 +353,8 @@ export type CardHistoryEntry = {
 
 export type CombatFrame = {
   player: GameState["player"]; enemy: GameState["enemy"]; historySeq?: number;
+  /** Both minion rows at this beat, so a summon appears when its card plays, not at the start of the ghost turn. */
+  minions?: MinionState[]; enemyMinions?: MinionState[];
 };
 
 export type CombatEvent = (
