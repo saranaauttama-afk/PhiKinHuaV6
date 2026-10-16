@@ -339,8 +339,15 @@ export default function BattlePage() {
         break;
       }
 
+      case 'Died': {
+        for (const cue of cuesFor([currentEvent])) playSfx(cue);
+        // Fall only if the ghost is still dead at the end of this batch (a revive also passes 0 HP).
+        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) monsterRef.current?.die();
+        break;
+      }
+
       case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen': case 'WaterOverflow':
-      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': case 'Died': {
+      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;
       }
@@ -483,9 +490,9 @@ export default function BattlePage() {
           onHoverChange={(card, isHovered) => setHoveredCardId(isHovered ? (card.instanceId ?? card.id) : null)}
         />}
 
-        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow minions={gameState.minions??[]}/>}
+        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow minions={presentation?.minions??gameState.minions??[]}/>}
         {/* The ghost's ลูกสมุน stand as figures on its other side (was a status badge until 15 Oct 2026). */}
-        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" minions={gameState.enemyMinions??[]}/>}
+        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" minions={presentation?.enemyMinions??gameState.enemyMinions??[]}/>}
 
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}

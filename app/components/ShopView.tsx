@@ -249,7 +249,8 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
   return <View style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:layer.overlay}}>
     <SceneArrival instant sceneKey={`rest-${state.currentShopId??kind}`} source={background}>
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
-        {state.pages?.adventure?.version===5&&<View style={{position:'absolute',top:pad.top+4,right:8,zIndex:layer.control}}><CloseSeal testID="shop-destroy-page" label="ปิดและทำลายเพจร้าน" onPress={()=>dispatch({type:'DeleteShop'})}/></View>}
+        {state.pages?.adventure?.version===5&&<View style={{position:'absolute',top:pad.top+4,right:8,zIndex:layer.control}}>{/* Playtest 16 Oct 2026: players read this X as "close" and lost unused shops/chests. It now
+            leaves like กลับจุดพัก / back; destroying a page stays on the board's own destroy action. */}<CloseSeal testID="shop-close-page" label="ปิดร้าน (ร้านยังอยู่บนกระดาน)" onPress={()=>dispatch({type:'CompleteNode'})}/></View>}
         <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+48,paddingBottom:24,gap:12}}>
           <Image testID="destination-object" accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>
           <RewardReceiptView receipt={state.rewardReceipt}/>
