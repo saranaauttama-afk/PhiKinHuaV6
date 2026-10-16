@@ -26,7 +26,8 @@ import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
 import SceneArrival from './components/SceneArrival';
 import LoadingScreen from './components/LoadingScreen';
-import { mapScene } from './scenePresentation';
+import { mapScene, adventureSceneId } from './scenePresentation';
+import { setSceneAudio, setMenuAudio } from '../src/audio/audio';
 import {paper} from './components/Paper';
 import BlessingView from './components/BlessingView';
 import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
@@ -74,6 +75,12 @@ export default function Home() {
   useEffect(() => {
     if (['combat','victory','talk','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
   },[state.phase,state.enemy?.id,state.chapter]);
+
+  // เสียงตามโซน (ชุด 3): หน้าเมนูเปิดแค่เพลง · แผนที่/ร้าน/อีเวนต์ใช้เสียงพื้นของโซนที่ยืนอยู่ (src/audio/zones.ts)
+  const audioScreen=screenForState(state,{pickingClass});
+  const onMenu=audioScreen!=='map'||journalOpen||archiveOpen||!!nightClass;
+  const audioScene=onMenu?undefined:adventureSceneId(state);
+  useEffect(()=>{if(onMenu)setMenuAudio();else setSceneAudio(audioScene,'map');},[onMenu,audioScene]);
 
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];

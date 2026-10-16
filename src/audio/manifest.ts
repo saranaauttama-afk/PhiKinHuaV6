@@ -26,9 +26,17 @@ export type SfxId =
   | 'heal'
   | 'debuff'
   | 'turnStart'
-  | 'uiTap';
+  | 'uiTap'
+  // ชุด 3 (16 ต.ค. 2026): เสียงแทรกตามโซน — สุ่มเล่นบนแผนที่ (src/audio/zones.ts)
+  | 'villageDogHowl';
 
-export type BedId = 'music' | 'ambienceNight1';
+export type BedId =
+  | 'music'
+  | 'ambienceNight1'
+  // ชุด 3: เสียงพื้นตามโซน + กลองตอนสู้ (src/audio/zones.ts)
+  | 'villageBed'
+  | 'villageBattleBed'
+  | 'battleDrumNormal';
 
 type Source = number; // ผลของ require() สำหรับไฟล์ asset
 
@@ -59,13 +67,20 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
   debuff: { files: [require('../../assets/audio/sfx/debuff-1.mp3')], volume: 0.6 },
   turnStart: { files: [require('../../assets/audio/sfx/turn-start-1.mp3')], volume: 0.4 },
   uiTap: { files: [require('../../assets/audio/sfx/ui-tap-1.mp3')], volume: 0.35 },
+  // ชุด 3 — เสียงแทรกบรรยากาศ ดังตามสวิตช์ "เพลง/เสียงพื้น" ไม่ใช่สวิตช์เสียงเอฟเฟกต์ (เป็นส่วนของฉาก)
+  villageDogHowl: { files: [require('../../assets/audio/sfx/village-dog-howl-1.mp3')], volume: 0.4 },
 };
 
 /** เสียงพื้นที่เล่นวนยาว ๆ — ตั้งให้เบากว่าเสียงเอฟเฟกต์มาก */
 export const BEDS: Record<BedId, { file: Source | null; volume: number }> = {
   // เพลงชั่วคราวจาก AI — จะเปลี่ยนเป็นเพลงไทยจากเครื่องดนตรีจริงทีหลัง
   music: { file: require('../../assets/audio/music-thai-temp.mp3'), volume: 0.35 },
+  // เลิกใช้ในฉากสู้แล้ว (ชุด 3 ใช้เสียงตามโซนแทน) — เก็บไฟล์ไว้เผื่อใช้กับโซนที่ยังไม่มีเสียง
   ambienceNight1: { file: require('../../assets/audio/ambience-night-1.mp3'), volume: 0.22 },
+  // ชุด 3 (assets/audio/ambience/) — ElevenLabs SFX v2 ลูป, ตัดความถี่เกิน 10 kHz (ลดซ่า), ~−21 ถึง −24 LUFS
+  villageBed: { file: require('../../assets/audio/ambience/village-bed.mp3'), volume: 0.45 },
+  villageBattleBed: { file: require('../../assets/audio/ambience/village-battle-bed.mp3'), volume: 0.4 },
+  battleDrumNormal: { file: require('../../assets/audio/ambience/battle-drum-normal.mp3'), volume: 0.55 },
 };
 
 /** บอสที่มีเสียงเปิดตัวแล้ว (monsterId → SfxId) */

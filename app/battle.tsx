@@ -3,7 +3,7 @@ import {rageStartTurn} from '../src/core/campaign/nights';
 import {RAGE} from '../src/core/balance/notfm';
 import {enemyDrawCadence} from '../src/core/combat/enemyHand';
 import {ghostLore} from '../src/core/monsters/folklore';
-import {battleScene} from './scenePresentation';
+import {battleScene,adventureSceneId} from './scenePresentation';
 import BattleBackdrop from './components/battle/BattleBackdrop';
 import {useBattleLayout} from './components/battle/battleLayout';
 import React from 'react';
@@ -30,7 +30,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
-import {playSfx,setBeds} from '../src/audio/audio';
+import {playSfx,setSceneAudio} from '../src/audio/audio';
 import {BOSS_INTRO} from '../src/audio/manifest';
 import {cuesFor} from '../src/audio/cues';
 import TurnEndDiscard from './components/battle/TurnEndDiscard';
@@ -177,7 +177,6 @@ export default function BattlePage() {
   const playerHand = gameState.piles.hand;
 
   // เสียง: ในฉากต่อสู้มีเสียงบรรยากาศกลางคืนซ้อนใต้เพลง ออกจากฉากแล้วเหลือแต่เพลง
-  React.useEffect(()=>{setBeds(['music','ambienceNight1']);return ()=>setBeds(['music']);},[]);
   // บอสที่มีเสียงเปิดตัว ดังครั้งเดียวตอนเข้าฉาก
   React.useEffect(()=>{const intro=BOSS_INTRO[String(monsterId??'')];if(intro)playSfx(intro);},[monsterId]);
   // จั่วการ์ด = มือเพิ่มขึ้น (ทั้งต้นเทิร์นและการ์ดที่ให้จั่ว) ดังครั้งเดียวต่อครั้งที่มือเพิ่ม
@@ -424,6 +423,9 @@ export default function BattlePage() {
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${fxText(t.fx).join(' · ')}${t.negate?' · ยกเลิกการ์ดผี':''}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
   ];
   const victoryIntro=!presentation && !dying && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
+  // เสียงตามโซน (ชุด 3): ตอนสู้ = ลมของโซน + กลอง · ชนะแล้วกลองหยุด เหลือลม · ออกจากฉากแล้วหน้าแผนที่ตั้งเสียงต่อเอง
+  const audioScene=adventureSceneId(gameState);
+  React.useEffect(()=>{setSceneAudio(audioScene,victoryIntro||gameState.phase==='victory'?'victory':'battle');},[audioScene,victoryIntro,gameState.phase]);
   React.useEffect(()=>{
     if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying&&!dying){dispatch({type:'CompleteNode'});router.replace('/');}
   },[gameState.phase,celebratedFight,timeline.isPlaying,dying]);

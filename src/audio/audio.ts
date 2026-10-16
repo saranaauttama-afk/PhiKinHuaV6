@@ -2,6 +2,7 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { SFX, BEDS, type SfxId, type BedId } from './manifest';
+import { bedsFor, oneShotsFor, stepGain, ONE_SHOT_GAP_MS, type AudioMode } from './zones';
 
 /**
  * ระบบเสียงของเกม — ชั้นนี้เป็นภาพ/เสียงล้วน ไม่แตะกฎเกม
@@ -90,6 +91,10 @@ if (typeof window !== 'undefined' && typeof window.addEventListener === 'functio
 /** เล่นเสียงเอฟเฟกต์ — ถ้ามีหลายไฟล์จะสุ่ม และไม่เล่นไฟล์เดิมซ้ำติดกัน */
 export function playSfx(id: SfxId) {
   if (!useAudioSettings.getState().sfxOn || !foreground) return;
+  playPlayer(id);
+}
+
+function playPlayer(id: SfxId) {
   const players = sfxPlayers.get(id);
   if (!players || players.length === 0) return;
   let i = Math.floor(Math.random() * players.length);
@@ -102,25 +107,100 @@ export function playSfx(id: SfxId) {
   } catch {}
 }
 
-/** หน้าจอบอกว่าต้องการเสียงพื้นอะไรบ้าง เช่น ['music'] หรือ ['music','ambienceNight1'] */
+/** หน้าจอบอกว่าต้องการเสียงพื้นอะไรบ้าง เช่น ['music'] หรือ ['villageBed'] — เปลี่ยนแบบเฟดข้าม */
 export function setBeds(ids: BedId[]) {
   wantedBeds = new Set(ids);
   syncBeds();
+}
+
+/**
+ * เสียงตามโซน (ชุด 3): หน้าจอบอกแค่ "อยู่ฉากไหน ทำอะไร" แล้วชั้นนี้เลือกเสียงพื้น + เสียงแทรกเอง
+ * ดู src/audio/zones.ts
+ */
+export function setSceneAudio(sceneId: string | undefined, mode: AudioMode) {
+  setBeds(bedsFor(sceneId, mode));
+  setOneShots(oneShotsFor(sceneId, mode));
 }
 
 /** เรียกจาก AppState — แอปไปเบื้องหลังต้องเงียบ */
 export function setAudioForeground(active: boolean) {
   foreground = active;
   syncBeds();
+  scheduleOneShot();
+}
+
+// ---- เฟดข้ามเสียงพื้น ----
+/** เวลาเฟดข้าม: ราวเท่ากล้องเดินเข้าฉาก (SceneArrival) และพอให้ไม่รู้สึกว่าเสียงถูกตัด */
+const FADE_MS = 1500;
+const FADE_TICK_MS = 50;
+/** เกนปัจจุบันของแต่ละเสียงพื้น 0..1 (คูณกับ volume ใน manifest) */
+const bedGain = new Map<BedId, number>();
+let fadeTimer: ReturnType<typeof setInterval> | null = null;
+
+function bedTarget(id: BedId) {
+  return useAudioSettings.getState().musicOn && foreground && wantedBeds.has(id) ? 1 : 0;
+}
+
+function applyGain(id: BedId, p: AudioPlayer, g: number) {
+  try {
+    p.volume = BEDS[id].volume * g;
+    if (g > 0 && !p.playing) quiet(p.play());
+    else if (g <= 0 && p.playing) p.pause();
+  } catch {}
 }
 
 function syncBeds() {
-  const musicOn = useAudioSettings.getState().musicOn;
+  // ไปเบื้องหลัง / ปิดเพลง: เงียบทันที ไม่ค่อย ๆ เฟด (ผู้เล่นสั่งให้เงียบ)
+  const instant = !foreground || !useAudioSettings.getState().musicOn;
   for (const [id, p] of bedPlayers) {
-    const should = musicOn && foreground && wantedBeds.has(id);
-    try {
-      if (should && !p.playing) quiet(p.play());
-      else if (!should && p.playing) p.pause();
-    } catch {}
+    if (instant) { bedGain.set(id, 0); applyGain(id, p, 0); }
   }
+  if (instant) { if (fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; } return; }
+  if (fadeTimer) return;
+  fadeTimer = setInterval(() => {
+    let moving = false;
+    for (const [id, p] of bedPlayers) {
+      const cur = bedGain.get(id) ?? 0, target = bedTarget(id);
+      if (cur === target) { if (target > 0 && !p.playing) applyGain(id, p, cur); continue; }
+      const next = stepGain(cur, target, FADE_TICK_MS, FADE_MS);
+      bedGain.set(id, next);
+      applyGain(id, p, next);
+      moving = moving || next !== target;
+    }
+    if (!moving && fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; }
+  }, FADE_TICK_MS);
+}
+
+// ---- เสียงแทรกนาน ๆ ที (หมาหอน ฯลฯ) ----
+let oneShotIds: SfxId[] = [];
+let oneShotTimer: ReturnType<typeof setTimeout> | null = null;
+let lastOneShot: SfxId | null = null;
+
+function setOneShots(ids: SfxId[]) {
+  const same = ids.length === oneShotIds.length && ids.every((id, i) => id === oneShotIds[i]);
+  oneShotIds = ids;
+  if (!same) { if (oneShotTimer) { clearTimeout(oneShotTimer); oneShotTimer = null; } }
+  scheduleOneShot();
+}
+
+function scheduleOneShot() {
+  if (oneShotTimer || !oneShotIds.length || !foreground) return;
+  const [min, max] = ONE_SHOT_GAP_MS;
+  oneShotTimer = setTimeout(() => {
+    oneShotTimer = null;
+    // เป็นส่วนของฉาก จึงดังตามสวิตช์เพลง/เสียงพื้น ไม่ใช่สวิตช์เสียงเอฟเฟกต์
+    if (foreground && useAudioSettings.getState().musicOn && oneShotIds.length) {
+      const pool = oneShotIds.length > 1 ? oneShotIds.filter(id => id !== lastOneShot) : oneShotIds;
+      const id = pool[Math.floor(Math.random() * pool.length)];
+      lastOneShot = id;
+      playPlayer(id);
+    }
+    scheduleOneShot();
+  }, min + Math.random() * (max - min));
+}
+
+/** หน้าเมนู/เลือกอาชีพ/บทจบ: เพลงอย่างเดียว ไม่มีเสียงโซน */
+export function setMenuAudio() {
+  setBeds(['music']);
+  setOneShots([]);
 }
