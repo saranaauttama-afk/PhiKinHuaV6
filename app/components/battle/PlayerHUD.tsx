@@ -5,10 +5,10 @@ import SealPotButton from './SealPotButton';
 import RitualSurface from '../RitualSurface';
 import {QuietButton} from '../QuietChrome';
 import {font,palette} from '../../theme';
-type Props={blessings?:React.ReactNode;minions?:React.ReactNode;/** Block lost to a hit (DeltaPopup on the block icon). */blockDelta?:import('./DeltaPopup').Delta|null;helpers?:React.ReactNode;statuses?:React.ReactNode;hp:number;maxHp:number;ap:number;maxAp:number;mana:number;/** หมอผี: the bowl (น้ำมนต์ x/max); unset for classes without one. */manaMax?:number;block:number;drawCount:number;discardCount?:number;classId?:string;handCount?:number;handMax?:number;retain?:number;drawPerTurn?:number;opening?:number;onEndTurn:()=>void;onOpenPiles?:()=>void;isEnemyTurn?:boolean;hudFlashKey?:number};
+type Props={hitKey?:string;blessings?:React.ReactNode;minions?:React.ReactNode;/** Block lost to a hit (DeltaPopup on the block icon). */blockDelta?:import('./DeltaPopup').Delta|null;helpers?:React.ReactNode;statuses?:React.ReactNode;hp:number;maxHp:number;ap:number;maxAp:number;mana:number;/** หมอผี: the bowl (น้ำมนต์ x/max); unset for classes without one. */manaMax?:number;block:number;drawCount:number;discardCount?:number;classId?:string;handCount?:number;handMax?:number;retain?:number;drawPerTurn?:number;opening?:number;onEndTurn:()=>void;onOpenPiles?:()=>void;isEnemyTurn?:boolean;hudFlashKey?:number};
 export default function PlayerHUD(p:Props){
  const [details,setDetails]=React.useState(false);return <>
- <QuietPlayerHud compact classId={p.classId} hp={p.hp} maxHp={p.maxHp}
+ <QuietPlayerHud hitKey={p.hitKey} compact classId={p.classId} hp={p.hp} maxHp={p.maxHp}
  stats={<><HudStat icon="energy" text={`${p.ap}/${p.maxAp}`} label="แต้มต่อเทิร์น" onPress={()=>setDetails(true)}/><HudStat icon={p.manaMax?'water_bowl':'mana'} text={p.manaMax?`${p.mana}/${p.manaMax}`:`${p.mana}`} label={p.manaMax?`น้ำมนต์ในขัน ${p.mana}/${p.manaMax}`:'มานา'} onPress={()=>setDetails(true)}/><HudStat icon="block" text={`${p.block}`} label="เกราะ" delta={p.blockDelta} onPress={()=>setDetails(true)}/><HudStat icon="hand" text={`${p.handCount??0}/${p.retain??2}`} label={`ในมือ ${p.handCount??0} · มือสูงสุดท้ายเทิร์น ${p.retain??2}`} onPress={()=>setDetails(true)}/></>}
  action={<SealPotButton compact disabled={p.isEnemyTurn} onPress={p.onEndTurn}/>}
  blessings={p.blessings}

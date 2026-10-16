@@ -11,11 +11,12 @@ describe('zone audio (ชุด 3)', () => {
     expect(zoneOf(undefined)).toBe('village');
   });
 
-  it('map plays the zone bed (plus temp music while kept), never the drum', () => {
+  it('map plays the zone bed, no music (cut 16 Oct), never the drum', () => {
     const beds = bedsFor('01-village', 'map');
     expect(beds).toContain('villageBed');
     expect(beds).not.toContain(BATTLE_DRUM);
-    expect(beds.includes('music')).toBe(MAP_KEEPS_MUSIC);
+    expect(MAP_KEEPS_MUSIC).toBe(false);
+    expect(beds).not.toContain('music');
   });
 
   it('battle drops the music and adds wind + drum; victory keeps the wind, stops the drum', () => {

@@ -53,6 +53,8 @@ export type TimelineState = {
 
 export function useCombatTimeline(opts?: { speed?: number }) {
   const speed = opts?.speed ?? 1;
+  // Keep a revealed card and its timeline on the same speed for this whole batch.
+  const [playbackSpeed,setPlaybackSpeed]=React.useState(speed);
 
   const [state, setState] = React.useState<TimelineState>({
     current: null,
@@ -83,6 +85,7 @@ export function useCombatTimeline(opts?: { speed?: number }) {
   const play = React.useCallback(
     (events: CombatEvent[], onDone?: () => void) => {
       clearTimer();
+      setPlaybackSpeed(speed);
       doneRef.current = onDone ?? null;
 
       if (events.length === 0) {
@@ -115,5 +118,5 @@ export function useCombatTimeline(opts?: { speed?: number }) {
    */
   const skip = React.useCallback(() => finish(), [finish]);
 
-  return { ...state, play, skip };
+  return { ...state, speed:playbackSpeed, play, skip };
 }

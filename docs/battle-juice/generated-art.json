@@ -1,0 +1,201 @@
+[
+  {
+    "id": "incense_smoke",
+    "path": "assets/fx/incense-smoke.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: A single soft curling plume of pale grey incense smoke rising upward, wispy ink-wash edges, fading out at the top, centred, nothing else. Generate on a 1024x1024 canvas.",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      384
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "8f9837508e7320e0a06b9ed2478d95dc2388ce77d969a2c1da354ad0f78093cf"
+  },
+  {
+    "id": "ash_fleck",
+    "path": "assets/fx/ash-fleck.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: One tiny irregular flake of burnt paper ash, grey-black with a faint glowing ember-orange edge, centred, lots of empty space. Generate on a 1024x1024 canvas.",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      128,
+      128
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "240502dae768fe2eb2622725d35f62d075d224aa3bfa7534e51283671cea1fe7"
+  },
+  {
+    "id": "victory_rays",
+    "path": "assets/fx/victory-rays.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: Radiating sun-ray burst drawn as thick hand-inked wedges in faded ochre on transparent, like old Thai temple-mural halo rays, symmetric around the centre, outer ends fading out. Generate on a 1024x1024 canvas.",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      768,
+      768
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "8e7d87264bea621b974d488e28980d82b191261ada63669521355db5bf73caf5"
+  },
+  {
+    "id": "battle_mist",
+    "path": "assets/fx/battle-mist.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: A long horizontal band of low ground mist, soft pale blue-grey ink-wash wisps, seamlessly tileable left-to-right, densest along the bottom edge and fading to nothing at the top. Generate a 1536x384 panorama or closest wide aspect ratio; all canvas background must be transparent, mist only, matching left and right edge density.",
+    "sourceSize": [
+      2172,
+      724
+    ],
+    "normalizedSize": [
+      1536,
+      384
+    ],
+    "size": [
+      1024,
+      256
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "a3465202055705a868c264d67108f2d40a3fcb74781bff2dee9136d842d50bae",
+    "processing": "Crop nearest supported 3:1 panorama to bottom 4:1 band, normalize to 1536x384, downsample to 1024x256. Runtime alternates original/mirrored tiles to remove the join."
+  },
+  {
+    "id": "firefly",
+    "path": "assets/fx/firefly.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: A single tiny soft glowing firefly dot, pale yellow-green core with a faint halo, no insect body detail, centred. Generate on a 1024x1024 canvas.",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      64,
+      64
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "87fb0bb632af4d90de050b4a612e9c7b8337604bc98f645694e3cfdb2fb3a411"
+  },
+  {
+    "id": "ink_blood_drop",
+    "path": "assets/fx/ink-blood-drop.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: One small splattered drop of dark blood-red ink with a couple of tiny satellite specks, flat printed look, no gore. Generate on a 1024x1024 canvas.",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      128,
+      128
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "b3be0ba0ea09a1f4071be988d9771cac3ab331b6b7a11845cee2ade8ffe448c9"
+  },
+  {
+    "id": "page_burn_edge",
+    "path": "assets/fx/page-burn-edge.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: A horizontal ragged burning edge of old paper: charred black wavy line with a thin glowing ember-orange rim along the top, transparent above and below, tileable left-to-right. Only the narrow burning edge; no complete sheet or background. Generate on a 1024x1024 canvas.",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      512,
+      256
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "97deec17734bf96df1136d34ee28ebf694302b3b0c7648984cfa029ecb321b97"
+  },
+  {
+    "id": "card_ready_glow",
+    "path": "assets/ui/card-ready-glow.webp",
+    "prompt": "Thai one-baht horror pulp comic effect sprite, matching the existing ผีกินหัว card art: rough black ink linework with coarse cross-hatching where it fits, muted vintage print colours (bone white, ash grey, faded ochre, brick/blood red), hand-drawn feel, transparent background (real alpha), no text, no letters, no logos, no frame, no border, no gradient background, no 3D render, no lens flare, not cute, not anime.\nSubject: A soft warm candle-light glow outline shaped like a rounded portrait card frame, hollow transparent centre, faded gold, glow strongest at the edges and fading outward. This is an effect outline, not a physical frame. Generate on a 1024x1024 canvas, with the outline in portrait 3:4 proportions centred inside it.",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "normalizedSize": [
+      1024,
+      1024
+    ],
+    "size": [
+      384,
+      512
+    ],
+    "mode": "built-in image_gen",
+    "alpha": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "085664bf185dc2242e355097a61af6562139b87438df8080a47286360076a0b4",
+    "cropAfterNormalization": [
+      128,
+      0,
+      896,
+      1024
+    ]
+  }
+]

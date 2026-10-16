@@ -1,4 +1,5 @@
 import React from 'react';
+import {useGameSettings} from '../Settings';
 import { StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -24,10 +25,12 @@ export type ScreenFlashHandle = { flash: () => void };
 
 const ScreenFlash = React.forwardRef<ScreenFlashHandle, { color?: string }>(
   function ScreenFlash({ color = tint.bloodSoft }, ref) {
+    const reduced=useGameSettings(s=>s.reducedMotion);
     const opacity = useSharedValue(0);
 
     React.useImperativeHandle(ref, () => ({
       flash() {
+        if(reduced)return;
         opacity.value = withSequence(
           withTiming(0.35, { duration: 120, easing: Easing.out(Easing.cubic) }),
           withTiming(0, { duration: 280, easing: Easing.out(Easing.cubic) })

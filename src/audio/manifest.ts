@@ -138,7 +138,8 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
 /** เสียงพื้นที่เล่นวนยาว ๆ — ตั้งให้เบากว่าเสียงเอฟเฟกต์มาก */
 export const BEDS: Record<BedId, { file: Source | null; volume: number }> = {
   // เพลงชั่วคราวจาก AI — จะเปลี่ยนเป็นเพลงไทยจากเครื่องดนตรีจริงทีหลัง
-  music: { file: require('../../assets/audio/music-thai-temp.mp3'), volume: 0.35 },
+  // ตัดออก 16 ต.ค. 2026 (เจ้าของ): เกมใช้เสียงบรรยากาศล้วน — file null = ไม่ถูกรวมใน APK (ไฟล์ยังอยู่ใน assets ถ้าจะกลับมาใช้)
+  music: { file: null, volume: 0.35 },
   // เลิกใช้ในฉากสู้แล้ว (ชุด 3 ใช้เสียงตามโซนแทน) — เก็บไฟล์ไว้เผื่อใช้กับโซนที่ยังไม่มีเสียง
   ambienceNight1: { file: require('../../assets/audio/ambience-night-1.mp3'), volume: 0.22 },
   // ชุด 3 (assets/audio/ambience/) — ElevenLabs SFX v2 ลูป, ตัดความถี่เกิน 10 kHz (ลดซ่า), ~−21 ถึง −24 LUFS

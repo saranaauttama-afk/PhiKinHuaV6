@@ -7,10 +7,10 @@ import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {useGameSettings} from './components/Settings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import {initAudio,setAudioForeground,setBeds} from '../src/audio/audio';
+import {initAudio,setAudioForeground,setMenuAudio} from '../src/audio/audio';
 
 export default function RootLayout() {
-  React.useEffect(()=>{void useGameSettings.getState().hydrate();initAudio();setBeds(['music']);},[]);
+  React.useEffect(()=>{void useGameSettings.getState().hydrate();initAudio();setMenuAudio();},[]);
   React.useEffect(()=>{
     const active=()=>{const on=AppState.currentState==='active'&&(Platform.OS!=='web'||!document.hidden);useGame.getState().setForeground(on);setAudioForeground(on);};
     active();const sub=AppState.addEventListener('change',active);

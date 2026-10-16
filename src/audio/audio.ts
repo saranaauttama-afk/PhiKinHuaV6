@@ -2,7 +2,7 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { SFX, BEDS, type SfxId, type BedId } from './manifest';
-import { bedsFor, oneShotsFor, stepGain, ONE_SHOT_GAP_MS, type AudioMode, type GhostKind } from './zones';
+import { bedsFor, oneShotsFor, stepGain, ONE_SHOT_GAP_MS, MENU_BEDS, type AudioMode, type GhostKind } from './zones';
 
 /**
  * ระบบเสียงของเกม — ชั้นนี้เป็นภาพ/เสียงล้วน ไม่แตะกฎเกม
@@ -199,8 +199,8 @@ function scheduleOneShot() {
   }, min + Math.random() * (max - min));
 }
 
-/** หน้าเมนู/เลือกอาชีพ/บทจบ: เพลงอย่างเดียว ไม่มีเสียงโซน */
+/** หน้าเมนู/เลือกอาชีพ/บทจบ: เสียงหมู่บ้านกลางคืน ไม่มีเสียงแทรก */
 export function setMenuAudio() {
-  setBeds(['music']);
+  setBeds(MENU_BEDS);
   setOneShots([]);
 }

@@ -34,6 +34,7 @@ interface CardProps {
   onPress?: () => void;
   disabled?: boolean;
   selected?: boolean;
+  ready?: boolean;
   onDragPlay?: () => void;
   onHoverChange?: (isHovered: boolean) => void;
   isPlayed?: boolean;
@@ -51,6 +52,7 @@ export default function Card({
   onPress,
   disabled = false,
   selected = false,
+  ready = false,
   onDragPlay,
   onHoverChange,
   isPlayed = false,
@@ -75,6 +77,14 @@ export default function Card({
     if(!roundLive){cancelAnimation(glow);glow.value=0;return;}
     glow.value=reducedMotion?1:withRepeat(withSequence(withTiming(1,{duration:700}),withTiming(.45,{duration:700})),-1,true);
   },[roundLive,reducedMotion]);
+  const readyLive=ready&&!disabled&&!selected&&!roundLive;
+  const readyGlow=useSharedValue(.35);
+  React.useEffect(()=>{
+    cancelAnimation(readyGlow);
+    readyGlow.value=readyLive?(reducedMotion?.5:withRepeat(withSequence(withTiming(.7,{duration:800}),withTiming(.35,{duration:800})),-1,false)):0;
+    return ()=>cancelAnimation(readyGlow);
+  },[readyLive,reducedMotion]);
+  const readyStyle=useAnimatedStyle(()=>({opacity:readyGlow.value}));
   const glowStyle=useAnimatedStyle(()=>({opacity:glow.value}));
 
   const updateHoverState = (hovered: boolean) => {
@@ -199,6 +209,7 @@ export default function Card({
         },
         animatedStyle
       ]}>
+      {readyLive&&<Animated.View testID="card-ready-glow" pointerEvents="none" style={[{position:'absolute',top:'-4%',left:'-4%',width:'108%',height:'108%'},readyStyle]}><Image source={require('../../assets/ui/card-ready-glow.webp')} resizeMode="stretch" style={{width:'100%',height:'100%'}}/></Animated.View>}
       {roundLive&&<Animated.View testID="card-round-glow" pointerEvents="none" style={[{position:'absolute',top:-4,left:-4,right:-4,bottom:-4,borderRadius:14,borderWidth:3,borderColor:fighterColors.hint,shadowColor:fighterColors.hint,shadowOpacity:.9,shadowRadius:10,shadowOffset:{width:0,height:0},elevation:8},glowStyle]}/>}
       <CandleSelection selected={selected}><RitualSurface kind={disabled?"hideGray":"hideCard"} hideWash={disabled?undefined:cardTypeWash[card.type]} style={{width:'100%',height:'100%',padding:9,paddingTop:headerPadding,paddingBottom:stampSize+4}}>
         <View style={{position:'absolute',top:badgeTop,left:Math.max(12,width*.14),right:Math.max(12,width*.14),zIndex:layer.badge}}><CardBadges card={card} cost={costNow} compact moveHint={moveHint}/></View>

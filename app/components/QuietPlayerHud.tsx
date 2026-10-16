@@ -1,4 +1,7 @@
 import React from 'react';
+import Animated,{cancelAnimation,useAnimatedStyle,useSharedValue,withSequence,withTiming} from 'react-native-reanimated';
+import {useGameSettings} from './Settings';
+import BloodBurst from './battle/BloodBurst';
 import {Image,Pressable,Text,View,useWindowDimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RitualSurface,{chalk} from './RitualSurface';
@@ -13,7 +16,14 @@ export function HudStat({icon,text,onPress,label,delta}:{icon:StatSymbol;text:st
  const content=<><StatIcon name={icon} size={18}/><Text style={{fontFamily:font.heading,fontSize:12,color:chalk}}>{text}</Text><DeltaPopup delta={delta}/></>;
  return onPress?<Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</Pressable>:<View accessible accessibilityLabel={label} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</View>;
 }
-export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,minions,compact=false}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;minions?:React.ReactNode;compact?:boolean}){
+export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,minions,compact=false,hitKey}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;minions?:React.ReactNode;compact?:boolean;hitKey?:string}){
+ const reduced=useGameSettings(s=>s.reducedMotion),shake=useSharedValue(0);
+ React.useEffect(()=>{
+  cancelAnimation(shake);shake.value=0;
+  if(hitKey&&!reduced)shake.value=withSequence(withTiming(6,{duration:45}),withTiming(-6,{duration:55}),withTiming(3,{duration:45}),withTiming(0,{duration:55}));
+  return ()=>cancelAnimation(shake);
+ },[hitKey,reduced]);
+ const hitStyle=useAnimatedStyle(()=>({transform:[{translateX:shake.value}]}));
  const pad=useSafeAreaInsets(),{width:screenW}=useWindowDimensions(),narrow=screenW<360;
  return <View testID="player-hud" pointerEvents="box-none" style={{position:'absolute',bottom:pad.bottom+4,left:8,right:8,zIndex:layer.statusBar}}>
   {/* Owner layout 16 Oct 2026: statuses/equipment on the left, blessings apart at the far right. */}
@@ -22,7 +32,7 @@ export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action
    <View testID="battle-player-statuses" style={{flex:1,minWidth:0}}>{extras}</View>
    {blessings&&<View testID="battle-player-blessings" style={{width:44,flexShrink:0}}>{blessings}</View>}
   </View>}
-  <RitualSurface kind="quietSlate" style={{height:compact?PLAYER_BATTLE_HUD_HEIGHT:extras||blessings?114:76,paddingHorizontal:8,paddingVertical:6,gap:2}}>
+  <Animated.View style={hitStyle}><RitualSurface kind="quietSlate" style={{height:compact?PLAYER_BATTLE_HUD_HEIGHT:extras||blessings?114:76,paddingHorizontal:8,paddingVertical:6,gap:2}}>
    {compact?<View style={{flexDirection:'row',alignItems:'center',gap:8,flex:1}}>
     {/* Bigger portrait with the skills under it, so the stat row can sit closer together. */}
     <View testID="battle-hud-portrait-column" style={{width:62,height:'100%',alignItems:'center',justifyContent:'space-between'}}>
@@ -45,6 +55,6 @@ export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action
     {action}
    </View>}
    {!compact&&(extras||blessings)&&<View style={{height:36,flexDirection:'row',alignItems:'center',gap:4}}><View style={{flex:2,flexDirection:'row',gap:2,alignItems:'center',minWidth:0}}>{extras}</View>{blessings&&<View style={{flex:1,minWidth:0}}>{blessings}</View>}</View>}
-  </RitualSurface>
+  </RitualSurface>{hitKey&&!reduced&&<BloodBurst key={hitKey}/>}</Animated.View>
  </View>;
 }

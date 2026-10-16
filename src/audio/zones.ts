@@ -60,8 +60,10 @@ export const BATTLE_DRUMS: Record<GhostKind, BedId> = {
 };
 export const BATTLE_DRUM: BedId = BATTLE_DRUMS.normal;
 
-/** แผนที่ยังเปิดเพลงชั่วคราวเบา ๆ ใต้เสียงโซน — รอเจ้าของตัดสินว่าจะเก็บหรือตัด */
-export const MAP_KEEPS_MUSIC = true;
+/** เจ้าของตัดเพลงไทยชั่วคราวออกทั้งเกม (16 ต.ค. 2026) — เหลือเสียงบรรยากาศล้วน */
+export const MAP_KEEPS_MUSIC = false;
+/** หน้าเมนู: เสียงหมู่บ้านกลางคืน (คืนแรกเริ่มที่นี่) แทนเพลง */
+export const MENU_BEDS: BedId[] = ['villageBed'];
 
 /** เสียงแทรกสุ่มทุก 40–90 วินาที (เบา ไกล ไม่ให้ถี่จนกลายเป็นลูป) */
 export const ONE_SHOT_GAP_MS: [number, number] = [40_000, 90_000];

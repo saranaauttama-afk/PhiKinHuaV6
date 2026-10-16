@@ -1,5 +1,6 @@
 import {pulpColors} from '../../theme';
 import React from 'react';
+import {useGameSettings} from '../Settings';
 import { View, Image, Text } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -40,6 +41,7 @@ const easeBack = Easing.out(Easing.back(1.4));
 const easeIn   = Easing.in(Easing.quad);
 
 interface Props {
+  speed?:number;
   card: { id?: string; name: string; damage: number; block: number; cost?: number; hits?: number; desc?: string };
   ownerId?:string;
   ownerIndex?:number;
@@ -53,8 +55,9 @@ interface Props {
 }
 
 export default function EnemyHandCard({
-  card, cardIndex, totalCards, delay, playing, onAttackPeak, ownerId, ownerIndex=0,ownerCount=1,
+  speed=1,card, cardIndex, totalCards, delay, playing, onAttackPeak, ownerId, ownerIndex=0,ownerCount=1,
 }: Props) {
+  const reduced=useGameSettings(s=>s.reducedMotion);
   const layout = useBattleLayout();
 
   const lane=enemyLane(layout,ownerIndex,ownerCount);
@@ -78,45 +81,50 @@ export default function EnemyHandCard({
   React.useEffect(() => {
     if (playing) return;
     const t = setTimeout(() => {
-      posY.value    = withTiming(0, { duration: PHASE_ENTER, easing: easeOut });
-      opacity.value = withTiming(1, { duration: 350 });
-    }, delay);
+      posY.value    = withTiming(0, { duration: PHASE_ENTER/speed, easing: easeOut });
+      opacity.value = withTiming(1, { duration: 350/speed });
+    }, reduced?0:delay/speed);
     return () => clearTimeout(t);
-  }, [playing,centerX,centerY,peakScale,idlePosX,idlePosY]);
+  }, [playing,centerX,centerY,peakScale,idlePosX,idlePosY,speed,reduced]);
 
   // Phase 2: when playing=true → flip, rise, hold, exit
   React.useEffect(() => {
     if (!playing) return;
 
+    if(reduced){
+      posX.value=0;posY.value=0;scale.value=peakScale;flip.value=1;opacity.value=1;
+      const timer=setTimeout(()=>{opacity.value=withTiming(0,{duration:100});},(PHASE_FLIP+PHASE_RISE+PHASE_HOLD)/speed);
+      return ()=>clearTimeout(timer);
+    }
     opacity.value = 1;
-    flip.value = withTiming(1, { duration: PHASE_FLIP, easing: easeOut });
+    flip.value = withTiming(1, { duration: PHASE_FLIP/speed, easing: easeOut });
 
     posX.value = withSequence(
-      withTiming(idlePosX-centerX, { duration: PHASE_FLIP }),
-      withTiming(0,  { duration: PHASE_RISE, easing: easeBack }),
+      withTiming(idlePosX-centerX, { duration: PHASE_FLIP/speed }),
+      withTiming(0,  { duration: PHASE_RISE/speed, easing: easeBack }),
     );
 
     posY.value = withSequence(
-      withTiming(idlePosY-centerY, { duration: PHASE_FLIP }),
-      withTiming(0,  { duration: PHASE_RISE, easing: easeBack }),
+      withTiming(idlePosY-centerY, { duration: PHASE_FLIP/speed }),
+      withTiming(0,  { duration: PHASE_RISE/speed, easing: easeBack }),
     );
 
     scale.value = withSequence(
-      withTiming(Math.min(.12,peakScale*.65), { duration: PHASE_FLIP }),
-      withTiming(peakScale,  { duration: PHASE_RISE, easing: easeBack }),
-      withTiming(peakScale,  { duration: PHASE_HOLD }),
-      withTiming(peakScale*1.12,{ duration: PHASE_EXIT, easing: easeOut }),
+      withTiming(Math.min(.12,peakScale*.65), { duration: PHASE_FLIP/speed }),
+      withTiming(peakScale,  { duration: PHASE_RISE/speed, easing: easeBack }),
+      withTiming(peakScale,  { duration: PHASE_HOLD/speed }),
+      withTiming(peakScale*1.12,{ duration: PHASE_EXIT/speed, easing: easeOut }),
     );
 
     // A timed opacity sequence collapses to zero under Android reduced motion.
     // Keep the revealed information visible for the same JS timeline dwell time.
     opacity.value = 1;
     const exitTimer = setTimeout(() => {
-      opacity.value = withTiming(0, { duration: PHASE_EXIT, easing: easeIn });
-    }, PHASE_FLIP + PHASE_RISE + PHASE_HOLD);
+      opacity.value = withTiming(0, { duration: PHASE_EXIT/speed, easing: easeIn });
+    }, (PHASE_FLIP + PHASE_RISE + PHASE_HOLD)/speed);
     return () => clearTimeout(exitTimer);
 
-  }, [playing,centerX,centerY,peakScale,idlePosX,idlePosY]);
+  }, [playing,centerX,centerY,peakScale,idlePosX,idlePosY,speed,reduced]);
 
   const containerStyle = useAnimatedStyle(() => ({
     width: CARD_W,

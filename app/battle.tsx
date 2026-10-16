@@ -8,12 +8,15 @@ import {enemyKind} from '../src/core/combat/enemyHand';
 import BattleBackdrop from './components/battle/BattleBackdrop';
 import {useBattleLayout} from './components/battle/battleLayout';
 import React from 'react';
+import Animated,{cancelAnimation,useAnimatedStyle,useSharedValue,withSequence,withTiming} from 'react-native-reanimated';
 import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
 import type { CombatEvent, CombatFrame, CardHistoryEntry } from '../src/core/types';
 
 import { combatFrame } from '../src/core/combat/damage';
+import {hitFeedback} from './components/battle/hitFeedback';
+import TurnBanner from './components/battle/TurnBanner';
 import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
 import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
@@ -52,7 +55,7 @@ import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash'
 import { useAppFonts } from './useAppFonts';
 import { palette, surface, tint, layer, font, fighterColors } from './theme';
 
-import Settings from './components/Settings';
+import Settings,{useGameSettings} from './components/Settings';
 import StartPage from './components/StartPage';
 import RitualSurface from './components/RitualSurface';
 import CloseSeal from './components/CloseSeal';
@@ -153,7 +156,19 @@ export default function BattlePage() {
     cardFadeTimers.current.push(a,b);
   };
   const flashRef   = React.useRef<ScreenFlashHandle>(null);
-  const timeline   = useCombatTimeline();
+  const enemySpeed=useGameSettings(s=>s.enemySpeed);
+  const timeline   = useCombatTimeline({speed:enemySpeed});
+  const reducedMotion=useGameSettings(s=>s.reducedMotion);
+  const [playerHit,setPlayerHit]=React.useState<string>();
+  const screenX=useSharedValue(0),heavyPending=React.useRef(false);
+  React.useEffect(()=>{if(reducedMotion){cancelAnimation(screenX);screenX.value=0;}return ()=>cancelAnimation(screenX);},[reducedMotion]);
+  const screenStyle=useAnimatedStyle(()=>({transform:[{translateX:screenX.value}]}));
+  const showPlayerHit=(ev:CombatEvent,heavy=false)=>{
+    const feedback=hitFeedback(ev,player.maxHp,heavy);
+    if(!feedback.player)return;
+    setPlayerHit(eventKey(ev));flashRef.current?.flash();
+    if(feedback.heavy&&!reducedMotion)screenX.value=withSequence(withTiming(4,{duration:45}),withTiming(-4,{duration:55}),withTiming(0,{duration:70}));
+  };
 
   // timer ของเอฟเฟกต์เล็กๆ ฝั่งผู้เล่น (เฟดการ์ด, สั่นมอนสเตอร์) — ล้างตอน unmount
   const cardFadeTimers = React.useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -256,9 +271,10 @@ export default function BattlePage() {
     const after = useGame.getState().state;
     for (const cue of cuesFor(after.pendingEvents ?? [])) playSfx(cue);
     for (const ev of after.pendingEvents ?? []) {
+      if(ev.t==='Damage'&&ev.target==='player')showPlayerHit(ev);
       if (ev.t === 'Damage') showBlockLoss(ev, `bl-${eventKey(ev)}`);
       if (ev.t === 'MinionActed') setMinionActed({ uid: ev.uid, key: eventKey(ev) });
-      if (ev.t === 'Damage' && ev.target === 'enemy' && ev.hpLoss > 0) {
+      if (ev.t === 'Damage' && hitFeedback(ev,player.maxHp).enemy) {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง — เดิมโชว์ค่าบนการ์ดซึ่งไม่หัก block/buff
         setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss, parts: ev.parts?.map(p => p.label) }]);
         pulseFrom(ev);
@@ -370,7 +386,7 @@ export default function BattlePage() {
       case 'Died': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         // Fall only if the ghost is still dead at the end of this batch (a revive also passes 0 HP).
-        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) { if (gameState.phase === 'talk') monsterRef.current?.defeat(); else monsterRef.current?.die(); }
+        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) { if (gameState.phase === 'talk') monsterRef.current?.defeat(timeline.speed); else monsterRef.current?.die(timeline.speed); }
         break;
       }
 
@@ -380,21 +396,24 @@ export default function BattlePage() {
       }
 
       case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen': case 'WaterOverflow':
-      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': {
+      case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;
       }
 
+      case 'HeavyHit': {heavyPending.current=true;for(const cue of cuesFor([currentEvent]))playSfx(cue);break;}
       case 'Damage': {
+        const heavy=heavyPending.current;heavyPending.current=false;
         // ตัวเลขที่โชว์คือ HP ที่หายจริง ไม่ใช่ค่าบนการ์ด
         // เสียงกรงเล็บดังทุกครั้งที่ผีตีด้วยการ์ด แม้เกราะจะกันไว้หมดก็ตาม
         if (currentEvent.target === 'player' && currentEvent.sourceKind === 'card') playSfx('ghostAttack');
         else for (const cue of cuesFor([currentEvent])) playSfx(cue);
         pulseFrom(currentEvent);
         showBlockLoss(currentEvent, `bl-${eventKey(currentEvent)}`);
-        if (currentEvent.hpLoss <= 0) break;
+        const feedback=hitFeedback(currentEvent,player.maxHp);
+        if (!feedback.player&&!feedback.enemy) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss, parts: currentEvent.parts?.map(p => p.label) };
-        if (currentEvent.target === 'player') flashRef.current?.flash();
+        if (currentEvent.target === 'player') showPlayerHit(currentEvent,heavy);
         else monsterRef.current?.shake();
         if (currentEvent.target === 'player') setDamagePopups(prev => [...prev, popup]);
         else setEnemyDamagePopups(prev => [...prev, popup]);
@@ -436,7 +455,7 @@ export default function BattlePage() {
   if(mainMenu)return <StartPage onStartGame={()=>{allowLeave.current=true;useGame.setState({state:baseNewState('')});router.replace({pathname:'/',params:{chooseClass:'1'}});}} onContinue={()=>{setMainMenu(false);}}/>;
 
   return (
-    <View style={{ flex: 1 }}>
+    <Animated.View style={[{flex:1},screenStyle]}>
       <BattleBackdrop source={battleScene(gameState).source}>
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
           <CloseSeal label="พักการต่อสู้" onPress={openPause}/>
@@ -461,9 +480,8 @@ export default function BattlePage() {
 
         {/* Enemy hand cards — absolute overlay, same card does slide-in + flip + rise */}
         {enemyHandCards.map(c => (
-          <EnemyHandCard
+          <EnemyHandCard speed={timeline.speed}
             key={c.key}
-            onAttackPeak={() => flashRef.current?.flash()}
             card={c.card}
             ownerId={c.card.ownerId}
             cardIndex={c.cardIndex}
@@ -503,6 +521,7 @@ export default function BattlePage() {
           ))}
         </View>
 
+        {(gameState.phase==='combat'||phase==='enemy')&&<TurnBanner side={phase} turn={gameState.turn} top={battleLayout.hudTop-70} suppressed={!!roundBanner}/>}
         {roundBanner && <View testID="round-banner" pointerEvents="none" style={{ position: 'absolute', top: battleLayout.hudTop - 70, left: 24, right: 24, alignItems: 'center', zIndex: layer.popup }}>
           <RitualSurface kind="quietSlate" style={{ paddingHorizontal: 18, paddingVertical: 8 }}>
             <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hint, textAlign: 'center' }}>{roundBanner.text}</Text>
@@ -530,9 +549,9 @@ export default function BattlePage() {
 
         {/* Our ศิษย์ค่าย now stand in our own badge row (PlayerHUD minions). */}
         {/* The ghost's ลูกสมุน stand as figures on its other side (was a status badge until 15 Oct 2026). */}
-        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" acted={minionActed} minions={presentation?.enemyMinions??gameState.enemyMinions??[]}/>}
+        {!victoryIntro&&(gameState.phase==='combat'||phase==='enemy')&&<MinionRow side="enemy" acted={minionActed} minions={presentation?.enemyMinions??gameState.enemyMinions??[]}/>}
 
-        <PlayerHUD
+        <PlayerHUD hitKey={playerHit}
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
           blockDelta={playerBlockDelta}
           minions={!victoryIntro&&gameState.phase==='combat'&&(presentation?.minions??gameState.minions??[]).length?<MinionRow inline acted={minionActed} minions={presentation?.minions??gameState.minions??[]}/>:null}
@@ -647,6 +666,6 @@ export default function BattlePage() {
           </View>
         </Modal>
       </BattleBackdrop>
-    </View>
+    </Animated.View>
   );
 }
