@@ -2,7 +2,7 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { SFX, BEDS, type SfxId, type BedId } from './manifest';
-import { bedsFor, oneShotsFor, stepGain, ONE_SHOT_GAP_MS, MENU_BEDS, type AudioMode, type GhostKind } from './zones';
+import { bedsFor, oneShotsFor, stepGain, ONE_SHOT_GAP_MS, MENU_BEDS, ZONES, type AudioMode, type GhostKind } from './zones';
 
 /**
  * ระบบเสียงของเกม — ชั้นนี้เป็นภาพ/เสียงล้วน ไม่แตะกฎเกม
@@ -50,28 +50,51 @@ let wantedBeds = new Set<BedId>();
 let foreground = true;
 let started = false;
 
+/**
+ * เสียงแทรกตามโซนกับเสียงพื้นไม่ถูกโหลดตอนเปิดแอป (16 ต.ค. 2026):
+ * ชุด 3 มีไฟล์ ~45 เสียงแทรก + ~19 ลูป — สร้าง native player ทั้งหมดตอนเปิดแอปทำให้ Android สะดุด
+ * (เทสต์ emulator ใน CI พัง) จึงโหลดเฉพาะเสียงต่อสู้ที่ต้องดังทันที ที่เหลือสร้างเมื่อใช้และปล่อยเมื่อเลิกใช้
+ */
+const LAZY_SFX = new Set<SfxId>(Object.values(ZONES).flatMap(z => z.oneShots));
+
+function makeSfx(id: SfxId): AudioPlayer[] {
+  const { files, volume } = SFX[id];
+  return files.flatMap(f => {
+    try { const p = createAudioPlayer(f); p.volume = volume; return [p]; } catch { return []; }
+  });
+}
+
+function releaseSfx(id: SfxId) {
+  for (const p of sfxPlayers.get(id) ?? []) { try { p.remove(); } catch {} }
+  sfxPlayers.delete(id);
+}
+
+function bedPlayer(id: BedId): AudioPlayer | undefined {
+  const existing = bedPlayers.get(id);
+  if (existing) return existing;
+  const { file, volume } = BEDS[id];
+  if (file == null) return undefined;
+  try {
+    const p = createAudioPlayer(file);
+    p.loop = true;
+    p.volume = 0;
+    bedPlayers.set(id, p);
+    return p;
+  } catch { return undefined; }
+}
+
+function releaseBed(id: BedId) {
+  const p = bedPlayers.get(id);
+  if (p) { try { p.pause(); p.remove(); } catch {} }
+  bedPlayers.delete(id);
+  bedGain.delete(id);
+}
+
 export function initAudio() {
   if (started) return;
   started = true;
   void setAudioModeAsync({ playsInSilentMode: false, shouldPlayInBackground: false }).catch(() => {});
-  for (const id of Object.keys(SFX) as SfxId[]) {
-    const { files, volume } = SFX[id];
-    sfxPlayers.set(id, files.map(f => {
-      const p = createAudioPlayer(f);
-      p.volume = volume;
-      return p;
-    }));
-  }
-  for (const id of Object.keys(BEDS) as BedId[]) {
-    const { file, volume } = BEDS[id];
-    if (file == null) continue;
-    try {
-      const p = createAudioPlayer(file);
-      p.loop = true;
-      p.volume = volume;
-      bedPlayers.set(id, p);
-    } catch {}
-  }
+  for (const id of Object.keys(SFX) as SfxId[]) if (!LAZY_SFX.has(id)) sfxPlayers.set(id, makeSfx(id));
   void useAudioSettings.getState().hydrate();
 }
 
@@ -95,6 +118,8 @@ export function playSfx(id: SfxId) {
 }
 
 function playPlayer(id: SfxId) {
+  if (!started) return;
+  if (!sfxPlayers.has(id)) sfxPlayers.set(id, makeSfx(id));
   const players = sfxPlayers.get(id);
   if (!players || players.length === 0) return;
   let i = Math.floor(Math.random() * players.length);
@@ -150,22 +175,31 @@ function applyGain(id: BedId, p: AudioPlayer, g: number) {
 }
 
 function syncBeds() {
+  if (!started) return;
   // ไปเบื้องหลัง / ปิดเพลง: เงียบทันที ไม่ค่อย ๆ เฟด (ผู้เล่นสั่งให้เงียบ)
   const instant = !foreground || !useAudioSettings.getState().musicOn;
-  for (const [id, p] of bedPlayers) {
-    if (instant) { bedGain.set(id, 0); applyGain(id, p, 0); }
+  if (instant) {
+    for (const [id, p] of bedPlayers) { bedGain.set(id, 0); applyGain(id, p, 0); }
+    if (fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; }
+    return;
   }
-  if (instant) { if (fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; } return; }
   if (fadeTimer) return;
   fadeTimer = setInterval(() => {
     let moving = false;
-    for (const [id, p] of bedPlayers) {
-      const cur = bedGain.get(id) ?? 0, target = bedTarget(id);
+    for (const id of new Set<BedId>([...wantedBeds, ...bedPlayers.keys()])) {
+      const target = bedTarget(id), cur = bedGain.get(id) ?? 0;
+      if (target === 0 && cur === 0) {
+        // เฟดออกจบแล้ว — ปล่อย native player (ลูปที่ไม่ได้ใช้ไม่ควรค้างในหน่วยความจำ)
+        if (bedPlayers.has(id)) releaseBed(id);
+        continue;
+      }
+      const p = bedPlayer(id);
+      if (!p) continue;
       if (cur === target) { if (target > 0 && !p.playing) applyGain(id, p, cur); continue; }
       const next = stepGain(cur, target, FADE_TICK_MS, FADE_MS);
       bedGain.set(id, next);
       applyGain(id, p, next);
-      moving = moving || next !== target;
+      moving = true;
     }
     if (!moving && fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; }
   }, FADE_TICK_MS);
@@ -178,6 +212,7 @@ let lastOneShot: SfxId | null = null;
 
 function setOneShots(ids: SfxId[]) {
   const same = ids.length === oneShotIds.length && ids.every((id, i) => id === oneShotIds[i]);
+  if (!same) for (const id of oneShotIds) if (!ids.includes(id) && LAZY_SFX.has(id)) releaseSfx(id);
   oneShotIds = ids;
   if (!same) { if (oneShotTimer) { clearTimeout(oneShotTimer); oneShotTimer = null; } }
   scheduleOneShot();
