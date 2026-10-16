@@ -127,6 +127,17 @@ export default function BattlePage() {
   const [historyAtTurnStart,setHistoryAtTurnStart]=React.useState<CardHistoryEntry[]>([]);
 
   const monsterRef = React.useRef<MonsterAreaHandle>(null);
+  // Ghost killed outside the ghost-turn timeline (our card, a skill, poison at turn start): hold
+  // the victory page while it shudders, sinks and fades (owner playtest 16 Oct 2026: it jumped
+  // straight to the summary). Set in the same event as the dispatch so the first victory render
+  // is already held. Deaths during the ghost turn play through the timeline's Died beat.
+  const [dying,setDying]=React.useState(false);
+  const holdForDeath=()=>{
+    if(!['talk','levelup','reward','victory'].includes(useGame.getState().state.phase))return;
+    setDying(true);
+    const a=setTimeout(()=>monsterRef.current?.die(),250),b=setTimeout(()=>setDying(false),1350);
+    cardFadeTimers.current.push(a,b);
+  };
   const flashRef   = React.useRef<ScreenFlashHandle>(null);
   const timeline   = useCombatTimeline();
 
@@ -220,6 +231,7 @@ export default function BattlePage() {
     const prevMana = player.mana;
 
     dispatch({ type: 'PlayCard', index, wait });
+    holdForDeath();
 
     const t = setTimeout(
       () => setPlayedCardIds(prev => prev.filter(id => id !== identifier)),
@@ -290,6 +302,7 @@ export default function BattlePage() {
       setPresentation(null);
       if (useGame.getState().state.phase === 'combat') {
         dispatch({ type: 'StartPlayerTurn' });
+        holdForDeath();
         turnLocked.current = false; setPhase('player');
       }
     });
@@ -389,10 +402,10 @@ export default function BattlePage() {
     ...(gameState.fight?.extraTurn?[{id:'skill:extra',name:'เข้าสมาธิ',symbol:'check',neutral:true,detail:'จบเทิร์นนี้แล้วได้เทิร์นเพิ่ม ผีไม่ได้เล่น'}]:[]),
     ...(gameState.traps??[]).map((t,i)=>({id:`trap:${t.cardId}:${i}`,name:t.name,symbol:'ดัก',neutral:true,detail:`${fxText(t.fx).join(' · ')}${t.negate?' · ยกเลิกการ์ดผี':''}\n${t.trigger==='enemy_attack'?'รอผีโจมตี':t.trigger==='enemy_skill'?'รอผีตั้งรับ':'รอผีเล่นการ์ด'}${t.turnsLeft!=null?` · เหลือ ${t.turnsLeft} เทิร์น`:''}`})),
   ];
-  const victoryIntro=!presentation && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
+  const victoryIntro=!presentation && !dying && needsVictoryIntro(gameState.phase,gameState.fightCount??0,celebratedFight)&&!timeline.isPlaying;
   React.useEffect(()=>{
-    if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying){dispatch({type:'CompleteNode'});router.replace('/');}
-  },[gameState.phase,celebratedFight,timeline.isPlaying]);
+    if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying&&!dying){dispatch({type:'CompleteNode'});router.replace('/');}
+  },[gameState.phase,celebratedFight,timeline.isPlaying,dying]);
   // hook ทั้งหมดต้องถูกเรียกก่อนถึงจะ return ได้ ไม่งั้นลำดับ hook เพี้ยน
   if (!fontsLoaded) return null;
   if(mainMenu)return <StartPage onStartGame={()=>{allowLeave.current=true;useGame.setState({state:baseNewState('')});router.replace({pathname:'/',params:{chooseClass:'1'}});}} onContinue={()=>{setMainMenu(false);}}/>;
@@ -497,7 +510,7 @@ export default function BattlePage() {
         <PlayerHUD
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
           statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges} pulse={pulse.player}/>:null}
-          helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>dispatch({type:'UseSkill',id,index})}/>}
+          helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>{dispatch({type:'UseSkill',id,index});holdForDeath();}}/>}
           classId={gameState.classId}
           discardCount={gameState.piles.discard.length}
           hp={player.hp}
@@ -546,12 +559,12 @@ export default function BattlePage() {
         )}
 
         {/* ผีพูดก่อนรางวัล: คำตอบเพิ่มความกล้าหรือบุญ */}
-        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'talk' && gameState.ghostTalk && (
+        {!victoryIntro && !timeline.isPlaying && !dying && gameState.phase === 'talk' && gameState.ghostTalk && (
           <GhostTalkOverlay state={gameState} onAnswer={choice => dispatch({ type: 'AnswerGhostTalk', choice })} />
         )}
 
         {/* หลังรับทราบชัยชนะ จึงแสดงตัวเลือกเลเวลอัปที่ engine เตรียมไว้ */}
-        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'levelup' && gameState.levelUp && !gameState.levelUp.consumed && (
+        {!victoryIntro && !timeline.isPlaying && !dying && gameState.phase === 'levelup' && gameState.levelUp && !gameState.levelUp.consumed && (
           <LevelUpOverlay
             state={gameState}
             playerLevel={player.level}
@@ -563,7 +576,7 @@ export default function BattlePage() {
         )}
 
         {/* หลังรับทราบชัยชนะและเลือกอัปเกรด จึงแสดงการ์ดรางวัล */}
-        {!victoryIntro && !timeline.isPlaying && gameState.phase === 'reward' && gameState.cardReward && (
+        {!victoryIntro && !timeline.isPlaying && !dying && gameState.phase === 'reward' && gameState.cardReward && (
           <CardRewardOverlay
             notice={gameState.levelUp?.result?.fight===(gameState.fightCount??0)?gameState.levelUp.result.text:undefined}
             choices={gameState.cardReward.choices}
