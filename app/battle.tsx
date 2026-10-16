@@ -133,7 +133,11 @@ export default function BattlePage() {
   // is already held. Deaths during the ghost turn play through the timeline's Died beat.
   const [dying,setDying]=React.useState(false);
   const holdForDeath=()=>{
-    if(!['talk','levelup','reward','victory'].includes(useGame.getState().state.phase))return;
+    const ph=useGame.getState().state.phase;
+    // Ghost talk first (owner 16 Oct 2026): the beaten ghost stays, dimmed, and speaks; it fades
+    // after the answer, which calls this again with the next post-battle phase.
+    if(ph==='talk'){const d=setTimeout(()=>monsterRef.current?.defeat(),250);cardFadeTimers.current.push(d);return;}
+    if(!['levelup','reward','victory'].includes(ph))return;
     setDying(true);
     const a=setTimeout(()=>monsterRef.current?.die(),250),b=setTimeout(()=>setDying(false),1350);
     cardFadeTimers.current.push(a,b);
@@ -355,7 +359,7 @@ export default function BattlePage() {
       case 'Died': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         // Fall only if the ghost is still dead at the end of this batch (a revive also passes 0 HP).
-        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) monsterRef.current?.die();
+        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) { if (gameState.phase === 'talk') monsterRef.current?.defeat(); else monsterRef.current?.die(); }
         break;
       }
 
@@ -560,7 +564,7 @@ export default function BattlePage() {
 
         {/* ผีพูดก่อนรางวัล: คำตอบเพิ่มความกล้าหรือบุญ */}
         {!victoryIntro && !timeline.isPlaying && !dying && gameState.phase === 'talk' && gameState.ghostTalk && (
-          <GhostTalkOverlay state={gameState} onAnswer={choice => dispatch({ type: 'AnswerGhostTalk', choice })} />
+          <GhostTalkOverlay state={gameState} onAnswer={choice => { dispatch({ type: 'AnswerGhostTalk', choice }); holdForDeath(); }} />
         )}
 
         {/* หลังรับทราบชัยชนะ จึงแสดงตัวเลือกเลเวลอัปที่ engine เตรียมไว้ */}
