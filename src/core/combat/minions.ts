@@ -18,6 +18,13 @@ export type MinionDef = {
   passive?: Passive; act?: Fx; taunt?: boolean; turns?: number; desc?: string;
   /** Ghost minion: while it stands, the ghost's held ชาร์จ cards gain this many extra steps per turn. */
   chargeBoost?: number;
+  /**
+   * Ghost minion: resolves once, the moment it is summoned (ลงสนามแล้วทำทันที).
+   * Owner decision 16 Oct 2026: a 5–10 HP taunt that only acted at the end of the ghost turn
+   * was killed by the player's next single hit before it mattered. No countdown was added —
+   * the arrival effect is the summon's payoff; it still dies to one hit.
+   */
+  arrive?: Fx;
 };
 
 export const MINION_DEFS: MinionDef[] = minionsJson as any;
@@ -55,6 +62,11 @@ export function summonMinion(s: GameState, side: 'player' | 'enemy', id: string)
   list.push(m);
   s.log.push(side === 'player' ? `เรียก ${def.name} เข้าข้างเวที` : `ผีเรียก ${def.name}`);
   emit(s, { t: 'MinionSummoned', side, uid: m.uid, id });
+  if (side === 'enemy' && def.arrive && s.phase === 'combat' && s.player.hp > 0) {
+    const { applyEnemyFx } = require('./enemyCardEffects');
+    s.log.push(`${def.name} ลงสนาม`);
+    applyEnemyFx(s, def.arrive, 'minion:' + id);
+  }
   return m;
 }
 

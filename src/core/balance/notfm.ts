@@ -82,7 +82,12 @@ export const PRAYER_MULT = [1, 2, 3] as const;
 /** Class starting resources (passives and skills are separate). */
 export const CLASS_RESOURCES: Record<ClassId, { hp: number; startMana: number }> = {
   warrior: { hp: 60, startMana: 0 },
-  shaman: { hp: 60, startMana: 4 },
+  // 16 Oct 2026: 4 → 2. Owner playtest: night 1 too easy — turn 1 นั่งสมาธิ (+3) + สาดน้ำมนต์ (5/น้ำ)
+  // dealt 35, one-shotting night-1 ghosts (sim: 2.7 turns per night-1 fight vs นักมวย 3.8, HP net gain).
+  // At 2 the turn-1 burst is 25. 1 was also simulated: it dropped หมอผี below นักมวย at every level
+  // (two seeds, 120 runs/cell) — next step if phone play still finds night 1 easy.
+  // See docs/minions-shaman-2026-10-16/README.md.
+  shaman: { hp: 60, startMana: 2 },
   nun: { hp: 56, startMana: 0 },
   medium: { hp: 60, startMana: 6 },
 };
