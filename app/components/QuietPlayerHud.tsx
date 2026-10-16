@@ -7,16 +7,18 @@ import HealthBar from './HealthBar';
 import InkIcon,{type InkSymbol} from './InkIcon';
 import {font,layer} from '../theme';
 import {PLAYER_BATTLE_HUD_HEIGHT} from '../battleGeometry';
+import DeltaPopup,{type Delta} from './battle/DeltaPopup';
 export const playerPortraits:Record<string,number>={warrior:require('../../assets/ui/battle-portraits/warrior.png'),shaman:require('../../assets/ui/battle-portraits/shaman.png'),nun:require('../../assets/ui/battle-portraits/nun.png'),medium:require('../../assets/ui/battle-portraits/medium.png')};
-export function HudStat({icon,text,onPress,label}:{icon:StatSymbol;text:string;onPress?:()=>void;label?:string}){
- const content=<><StatIcon name={icon} size={18}/><Text style={{fontFamily:font.heading,fontSize:12,color:chalk}}>{text}</Text></>;
+export function HudStat({icon,text,onPress,label,delta}:{icon:StatSymbol;text:string;onPress?:()=>void;label?:string;delta?:Delta|null}){
+ const content=<><StatIcon name={icon} size={18}/><Text style={{fontFamily:font.heading,fontSize:12,color:chalk}}>{text}</Text><DeltaPopup delta={delta}/></>;
  return onPress?<Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</Pressable>:<View accessible accessibilityLabel={label} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</View>;
 }
-export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,compact=false}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;compact?:boolean}){
+export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,minions,compact=false}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;minions?:React.ReactNode;compact?:boolean}){
  const pad=useSafeAreaInsets(),{width:screenW}=useWindowDimensions(),narrow=screenW<360;
  return <View testID="player-hud" pointerEvents="box-none" style={{position:'absolute',bottom:pad.bottom+4,left:8,right:8,zIndex:layer.statusBar}}>
   {/* Owner layout 16 Oct 2026: statuses/equipment on the left, blessings apart at the far right. */}
-  {compact&&(extras||blessings)&&<View style={{height:36,marginBottom:4,flexDirection:'row',alignItems:'center',gap:6}}>
+  {compact&&(extras||blessings||minions)&&<View style={{height:36,marginBottom:4,flexDirection:'row',alignItems:'center',gap:6}}>
+   {minions&&<View testID="battle-player-minions" style={{flexShrink:0}}>{minions}</View>}
    <View testID="battle-player-statuses" style={{flex:1,minWidth:0}}>{extras}</View>
    {blessings&&<View testID="battle-player-blessings" style={{width:44,flexShrink:0}}>{blessings}</View>}
   </View>}

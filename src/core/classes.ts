@@ -42,7 +42,7 @@ export function classPassiveText(id: ClassId): string {
     const R = require('./balance/notfm').FIGHTER_RULES;
     lines.push(`ออกท่าไม่ซ้ำกับท่าก่อนหน้า จังหวะ +${R.perNewMove} · จังหวะ 1 = การ์ดโจมตี +${R.dmgPerStack} ดาเมจ (สูงสุด ${R.rhythmMax}) · จบเทิร์นโดยไม่ได้ตี จังหวะหายหมด`);
   }
-  return lines.join(' · ').replace('เมื่อสวม: ', 'สวมอุปกรณ์แต่ละชิ้น: ');
+  return lines.join(' · ').replace('เมื่อสวม: ', 'สวมเครื่องรางแต่ละชิ้น: ');
 }
 
 const make = (id: ClassId, name: string, title: string, desc: string): CharacterClass => ({

@@ -22,7 +22,7 @@ const OPTIONS: Array<{ id: LevelOption; title: string; detail: string }> = [
   { id: 'card', title: 'การ์ดใหม่', detail: 'เลือก 1 ใบจาก 3 ใบเข้าสำรับ' },
   { id: 'upgrade', title: 'ปลุกเสก', detail: `เพิ่มดาวการ์ด ${LEVEL_UP.upgrades} ครั้ง` },
   { id: 'remove', title: 'สละการ์ด', detail: 'ถอดการ์ด 1 ใบออกจากสำรับ' },
-  { id: 'slot', title: 'ช่องอุปกรณ์', detail: 'ใส่อุปกรณ์พร้อมกันได้เพิ่ม 1 ชิ้น' },
+  { id: 'slot', title: 'ช่องเครื่องราง', detail: 'สวมเครื่องรางพร้อมกันได้เพิ่ม 1 ชิ้น' },
   { id: 'retain', title: 'เก็บการ์ด', detail: 'เก็บการ์ดข้ามเทิร์นได้เพิ่ม 1 ใบ' },
 ];
 
