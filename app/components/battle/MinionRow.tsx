@@ -1,6 +1,8 @@
 import React from 'react';
 import {Image,Modal,Pressable,Text,View} from 'react-native';
 import Animated,{useAnimatedStyle,useReducedMotion,useSharedValue,withSequence,withSpring,withTiming} from 'react-native-reanimated';
+import {useGameSettings} from '../Settings';
+import {combatUiColors} from '../../theme';
 import type {MinionState} from '../../../src/core/types';
 import {minionDef} from '../../../src/core/combat/minions';
 import {STATUS_ART} from './StatusArt';
@@ -49,7 +51,10 @@ function minionArt(id:string,enemy:boolean){
 }
 
 function Figure({m,size,onPress,enemy=false,compact=false,actKey}:{m:MinionState;size:number;onPress:()=>void;enemy?:boolean;compact?:boolean;actKey?:string}){
- const reduce=useReducedMotion();
+ const systemReduce=useReducedMotion();
+ const reduce=useGameSettings(s=>s.reducedMotion)||systemReduce;
+ const hit=useSharedValue(0);
+ const hitStyle=useAnimatedStyle(()=>({opacity:hit.value}));
  const scale=useSharedValue(reduce?1:.3),shake=useSharedValue(0),lastHp=React.useRef(m.hp);
  const lunge=useSharedValue(0);
  // Acting: a quick lunge toward the other side (ours up toward the ghost, the ghost's down-left) plus a shake.
@@ -61,7 +66,7 @@ function Figure({m,size,onPress,enemy=false,compact=false,actKey}:{m:MinionState
  },[actKey]);
  React.useEffect(()=>{if(!reduce)scale.value=withSpring(1,{damping:9,stiffness:160});},[]);
  React.useEffect(()=>{
-  if(m.hp<lastHp.current&&!reduce)shake.value=withSequence(withTiming(-5,{duration:50}),withTiming(5,{duration:60}),withTiming(-3,{duration:50}),withTiming(0,{duration:50}));
+  if(m.hp<lastHp.current&&!reduce){hit.value=withSequence(withTiming(.85,{duration:40}),withTiming(0,{duration:180}));shake.value=withSequence(withTiming(-5,{duration:50}),withTiming(5,{duration:60}),withTiming(-3,{duration:50}),withTiming(0,{duration:50}));}
   lastHp.current=m.hp;
  },[m.hp]);
  const style=useAnimatedStyle(()=>({transform:[{translateX:shake.value+(enemy?lunge.value:0)},{translateY:enemy?-lunge.value*.4:lunge.value},{scale:scale.value}]}));
@@ -69,6 +74,7 @@ function Figure({m,size,onPress,enemy=false,compact=false,actKey}:{m:MinionState
  return <Pressable testID={`${enemy?'enemy-':''}minion-${m.id}`} accessibilityRole="button" accessibilityLabel={`${enemy?'ลูกสมุนของผี ':''}${m.name} เลือด ${m.hp}/${m.maxHp}${m.taunt?' รับหมัดแทนผี':''}`} onPress={onPress} hitSlop={4}>
   <Animated.View style={[{width:size,alignItems:'center'},style]}>
    {minionArt(m.id,enemy)?<Image source={minionArt(m.id,enemy)} style={{width:size,height:size}} resizeMode="contain"/>:<View style={{width:size,height:size}}/>}
+   {minionArt(m.id,enemy)&&<Animated.View pointerEvents="none" style={[{position:'absolute',top:0,left:0},hitStyle]}><Image source={minionArt(m.id,enemy)} style={{width:size,height:size,tintColor:combatUiColors.hitFlash}} resizeMode="contain"/></Animated.View>}
    <View style={compact?{position:'absolute',bottom:-4,paddingHorizontal:4,borderRadius:7,backgroundColor:fighterColors.plate,borderWidth:1,borderColor:low?fighterColors.plateLow:fighterColors.plateLine}:{marginTop:-8,paddingHorizontal:6,borderRadius:8,backgroundColor:fighterColors.plate,borderWidth:1,borderColor:low?fighterColors.plateLow:fighterColors.plateLine}}>
     <Text style={{fontFamily:font.heading,fontSize:compact?9:12,lineHeight:compact?12:undefined,color:low?fighterColors.hpLow:fighterColors.hpText}}>{m.hp}/{m.maxHp}{m.turnsLeft!=null?` · ${m.turnsLeft}`:''}</Text>
    </View>

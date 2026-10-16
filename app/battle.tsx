@@ -13,6 +13,7 @@ import { useGame } from '../src/store/gameStore';
 import type { CombatEvent, CombatFrame, CardHistoryEntry } from '../src/core/types';
 
 import { combatFrame } from '../src/core/combat/damage';
+import {hitFeedback} from './components/battle/hitFeedback';
 import MonsterArea, { MonsterAreaHandle } from './components/battle/MonsterArea';
 import PlayerHand from './components/battle/PlayerHand';
 import PlayerHUD from './components/battle/PlayerHUD';
@@ -258,7 +259,7 @@ export default function BattlePage() {
     for (const ev of after.pendingEvents ?? []) {
       if (ev.t === 'Damage') showBlockLoss(ev, `bl-${eventKey(ev)}`);
       if (ev.t === 'MinionActed') setMinionActed({ uid: ev.uid, key: eventKey(ev) });
-      if (ev.t === 'Damage' && ev.target === 'enemy' && ev.hpLoss > 0) {
+      if (ev.t === 'Damage' && hitFeedback(ev,player.maxHp).enemy) {
         // ตัวเลขที่โชว์คือ HP ที่หายจริง — เดิมโชว์ค่าบนการ์ดซึ่งไม่หัก block/buff
         setEnemyDamagePopups(prev => [...prev, { id: `dmg-${eventKey(ev)}`, damage: ev.hpLoss, parts: ev.parts?.map(p => p.label) }]);
         pulseFrom(ev);
@@ -392,7 +393,7 @@ export default function BattlePage() {
         else for (const cue of cuesFor([currentEvent])) playSfx(cue);
         pulseFrom(currentEvent);
         showBlockLoss(currentEvent, `bl-${eventKey(currentEvent)}`);
-        if (currentEvent.hpLoss <= 0) break;
+        if (!hitFeedback(currentEvent,player.maxHp).player && !hitFeedback(currentEvent,player.maxHp).enemy) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss, parts: currentEvent.parts?.map(p => p.label) };
         if (currentEvent.target === 'player') flashRef.current?.flash();
         else monsterRef.current?.shake();

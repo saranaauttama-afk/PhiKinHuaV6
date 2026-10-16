@@ -18,6 +18,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {enemyLane} from '../../battleGeometry';
 import { useBattleLayout } from './battleLayout';
 import GhostArt from '../GhostArt';
+import {useGameSettings} from '../Settings';
 import EnemyHandRack from './EnemyHandRack';
 import {ghostLore} from '../../../src/core/monsters/folklore';
 import {paper} from '../Paper';
@@ -27,7 +28,7 @@ import HealthBar from '../HealthBar';
 import {enemyBattleRule} from '../../../src/core/campaign/enemyRules';
 import StatusStrip from './StatusStrip';
 import type { StatusEffect } from '../../../src/core/types_extended';
-import { palette, space, surface, tint, layer, quietUiColors } from '../../theme';
+import { palette, space, surface, tint, layer, quietUiColors, combatUiColors } from '../../theme';
 
 type Props = {
   /** Ghost block lost to our hit (DeltaPopup on its block icon). */
@@ -86,6 +87,9 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const layout = useBattleLayout();
   const safe = useSafeAreaInsets();
 
+  const reduced=useGameSettings(s=>s.reducedMotion);
+  const hit=useSharedValue(0);
+  const hitStyle=useAnimatedStyle(()=>({opacity:hit.value}));
   const monsterY      = useSharedValue(0);
   const monsterX      = useSharedValue(0);
   const monsterShakeX = useSharedValue(0);
@@ -93,6 +97,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
   const monsterFade   = useSharedValue(1);
 
   React.useEffect(() => {
+    if(reduced){monsterY.value=0;monsterX.value=0;return;}
     monsterY.value = withRepeat(
       withSequence(withTiming(8, { duration: 2000 }), withTiming(-8, { duration: 2000 })),
       -1, true
@@ -108,7 +113,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
       cancelAnimation(monsterY);
       cancelAnimation(monsterX);
     };
-  }, []);
+  }, [reduced]);
 
   const floatStyle = useAnimatedStyle(() => ({
     transform: [
@@ -123,6 +128,8 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
 
   useImperativeHandle(ref, () => ({
     shake() {
+      if(reduced)return;
+      hit.value=withSequence(withTiming(.85,{duration:40}),withTiming(0,{duration:180}));
       monsterShakeX.value = withSequence(
         withTiming(10,  { duration: 60 }),
         withTiming(-10, { duration: 60 }),
@@ -155,6 +162,7 @@ const MonsterArea = React.forwardRef<MonsterAreaHandle, Props>(function MonsterA
    {actors.map((actor,index)=>{const lane=enemyLane(layout,index,actors.length);return <View key={actor.id} pointerEvents="box-none" style={{position:'absolute',top:0,left:0,right:0,bottom:0}}>
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={[floatStyle,{position:'absolute',top:layout.monsterTop,left:lane.artX}]}>
      <GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize}/>
+     <Animated.View pointerEvents="none" style={[{position:'absolute',inset:0},hitStyle]}><GhostArt id={actor.id} width={lane.artWidth} height={lane.artSize} silhouette tint={combatUiColors.hitFlash}/></Animated.View>
     </Animated.View>
     <EnemyHandRack count={actor.handCount??0} slots={actors.length===1?handSlots:undefined} charges={actors.length===1?handCharges:undefined} ownerIndex={index} ownerCount={actors.length}/>
     <View testID={`enemy-hud-${index}`} style={{position:'absolute',top:layout.hudTop,left:lane.hudX,width:lane.hudWidth}}>
