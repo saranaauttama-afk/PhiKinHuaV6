@@ -171,9 +171,12 @@ export function cardFaceText(card: CardData, side: 'player' | 'enemy' = 'player'
   if (card.charges) parts.push(`ใช้ได้ ${card.charges}`);
   if (card.spendRhythm) parts.push(card.spendRhythm.mode === 'hits' ? `ตี ${fx.dmg ?? 0} × จังหวะ` : `+${card.spendRhythm.perStack}/จังหวะ`);
   if (card.blood) parts.push('ของต่ำ');
-  if (card.splash) parts.push(`สาดทั้งขัน: ${faceFx(perFx(card.splash)).join(' ')}/น้ำ${card.splash.sweep ? ' กวาด' : ''}`);
+  if (card.splash) parts.push(`${card.splashWaterCap == null ? 'สาดทั้งขัน' : `สาด ≤${card.splashWaterCap} น้ำ`}: ${faceFx(perFx(card.splash)).join(' ')}/น้ำ${card.splash.sweep ? ' กวาด' : ''}`);
   if (card.wakeYant) parts.push(`ปลุกยันต์: ${faceFx(perFx(card.wakeYant)).join(' ')}/ยันต์${card.wakeYant.sweep ? ' กวาด' : ''}`);
   parts.push(...faceFx(card.spendRhythm?.mode === 'hits' ? { ...fx, dmg: undefined } : fx, side));
+  // Starter caps (deck progression): the full sentence stays in describeCard.
+  if (card.rhythmDamageCap != null) parts.push(`จังหวะ ≤${card.rhythmDamageCap}`);
+  if (card.starterHeavy) parts.push(`กินช้ำ ≤${card.starterHeavy.maxStacks}`);
   if (card.after) parts.push(`หลัง${MOVE[card.after.move]}: +${faceFx(card.after.bonus, side).join(' ')}`);
   if (card.riposte) parts.push(`สวน ${faceFx(card.riposte, side).join(' ')}`);
   if (card.repeatIf) parts.push(`${faceCondition(card.repeatIf)}: ซ้ำ`);
