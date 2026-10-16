@@ -1,4 +1,6 @@
 import React from 'react';
+import PageBurn from './battle/PageBurn';
+import {schedulePageChoice} from './battle/pageChoice';
 import {Animated,Easing,Image,Pressable,ScrollView,Text,View,useWindowDimensions} from 'react-native';
 import type {PageOffer} from '../../src/core/map/pages';
 import {describeOffer,ghostTierLabel} from './offerDisplay';
@@ -21,6 +23,17 @@ const enterLabel=(o:PageOffer,i:number)=>o.kind==='monster'||o.kind==='boss'?'�
 /** Selection and confirmation are siblings inside a stable frame, not nested buttons. */
 export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCount=0,onDestroy,usedIds=[],appearanceKey='',runKey='',depth}:{runKey?:string;depth?:number;offers:PageOffer[];resolved:boolean[];slotIds:(string|null)[];onEnter:(offer:PageOffer,index:number)=>void;skipCount?:number;onDestroy?:(index:number)=>void;usedIds?:string[];appearanceKey?:string}){
  const reduced=useGameSettings(s=>s.reducedMotion);
+ const [burning,setBurning]=React.useState<number|null>(null);
+ const pending=React.useRef<{cancel:()=>void;finish:()=>void}|null>(null);
+ const choose=(i:number,callback:()=>void)=>{
+  if(pending.current)return;
+  if(reduced){callback();setSelected(null);return;}
+  setBurning(i);
+  const finish=()=>{pending.current=null;setBurning(null);setSelected(null);callback();};
+  pending.current={finish,cancel:schedulePageChoice(reduced,finish)};
+ };
+ React.useEffect(()=>{if(reduced&&pending.current){const task=pending.current;task.cancel();task.finish();}},[reduced]);
+ React.useEffect(()=>{setBurning(null);return ()=>{pending.current?.cancel();pending.current=null;};},[slotIds.join('|')]);
  const [selected,setSelected]=React.useState<number|null>(null);
  const {height,width}=useWindowDimensions();
  const [viewport,setViewport]=React.useState({width,height:height-140});
@@ -31,9 +44,10 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCo
  return <ScrollView testID="adventure-choices" style={{flex:1}} onLayout={e=>{const {width,height}=e.nativeEvent.layout;setViewport(v=>v.width===width&&v.height===height?v:{width,height})}} contentContainerStyle={{paddingHorizontal:12,paddingTop:topSpace,paddingBottom:10,flexGrow:1}}>
   <View testID="adventure-row" style={{flexDirection:'row',gap:8,justifyContent:'center'}}>
    {offers.map((o,i)=>!o||resolved[i]?<View key={'empty-'+i} style={{width:cardWidth}}/>:<PageFade key={slotIds[i]??i} pageId={slotIds[i]?`${runKey}|${slotIds[i]}`:undefined} appearanceKey={appearanceKey} delay={i*80} reduced={reduced} testID={'adventure-frame-'+i} style={{width:cardWidth,height:cardHeight}}>
+    <PageBurn active={burning===i} dim={burning!==null&&burning!==i} reduced={reduced} width={cardWidth} height={cardHeight}>
     <Image accessible={false} source={frame} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight}}/>
     <Image accessible={false} source={frame} tintColor={palette.bloodLit} resizeMode="stretch" style={{position:'absolute',width:cardWidth,height:cardHeight,opacity:selected===i?.28:0}}/>
-    {selected===i&&!!onDestroy&&(depth??0)>=(o.availableAfterWins??0)&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<View style={{position:'absolute',top:-4,right:-4,zIndex:layer.control}}><CloseSeal testID={'adventure-destroy-'+i} label={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{onDestroy(i);setSelected(null)}}/></View>}
+    {selected===i&&!!onDestroy&&(depth??0)>=(o.availableAfterWins??0)&&o.kind!=='monster'&&o.kind!=='boss'&&o.kind!=='story_event'&&o.kind!=='next_event'&&<View style={{position:'absolute',top:-4,right:-4,zIndex:layer.control}}><CloseSeal testID={'adventure-destroy-'+i} label={'ทำลายเพจ '+describeOffer(o,i).name} onPress={()=>{choose(i,()=>onDestroy(i))}}/></View>}
     <View style={{paddingTop:18,paddingHorizontal:8,alignItems:'center'}}>
      <Pressable testID={'adventure-slot-'+i} accessibilityRole="button" accessibilityLabel={describeOffer(o,i).name+' · '+(ghostTierLabel(o,depth)??pageLabel(o))} accessibilityHint="แตะเลือก แล้วใช้ปุ่มในกรอบเพื่อยืนยัน" accessibilityState={{selected:selected===i}} onPress={()=>{setSelected(selected===i?null:i)}} style={({pressed})=>({width:'100%',alignItems:'center',opacity:pressed?.8:1})}>
       {ghostTierLabel(o,depth)?<View style={{height:42,justifyContent:'center',alignItems:'center'}}>
@@ -44,12 +58,12 @@ export default function AdventureChoices({offers,resolved,slotIds,onEnter,skipCo
       <Text testID={'adventure-clue-'+i} numberOfLines={3} style={{height:52,marginTop:8,fontFamily:font.ui,fontSize:11,lineHeight:16,color:palette.text,textAlign:'center',textAlignVertical:'center'}}>{(depth??0)<(o.availableAfterWins??0)?`เปิดหลังปราบผี ${o.availableAfterWins} ตัวในคืนนี้`:usedIds.includes(slotIds[i]??'')?'ใช้แล้ว · กลับเข้าได้\nปิดเพจด้วยกากบาทเมื่อพร้อม':encounterClue(o)}</Text>
      </Pressable>
      <View testID={'adventure-action-'+i} style={{height:44,width:'100%',marginTop:3,justifyContent:'center'}}>
-      {selected===i?<Pressable testID={'adventure-enter-'+i} accessibilityRole="button" accessibilityLabel={enterLabel(o,i)} accessibilityState={{disabled:(depth??0)<(o.availableAfterWins??0)}} disabled={(depth??0)<(o.availableAfterWins??0)} onPress={()=>{onEnter(o,i);setSelected(null);}} style={({pressed})=>({height:44,justifyContent:'center',alignItems:'center',opacity:pressed?.75:1})}>
+      {selected===i?<Pressable testID={'adventure-enter-'+i} accessibilityRole="button" accessibilityLabel={enterLabel(o,i)} accessibilityState={{disabled:(depth??0)<(o.availableAfterWins??0)}} disabled={(depth??0)<(o.availableAfterWins??0)} onPress={()=>{choose(i,()=>onEnter(o,i));}} style={({pressed})=>({height:44,justifyContent:'center',alignItems:'center',opacity:pressed?.75:1})}>
        <RitualSurface kind="hudPaper" style={{height:44,width:'100%',padding:4,alignItems:'center',justifyContent:'center'}}><View pointerEvents="none" style={{flexDirection:'row',alignItems:'center',gap:4}}><InkIcon name={iconFor(o)} size={18} color={palette.ink}/><Text numberOfLines={2} style={{fontFamily:font.heading,fontSize:13,lineHeight:17,color:palette.ink,textAlign:'center'}}>{(depth??0)<(o.availableAfterWins??0)?'ยังไม่เปิด':kindLabel(o)}</Text></View></RitualSurface>
       </Pressable>:<View pointerEvents="none" style={{alignItems:'center',gap:2}}><InkIcon name={iconFor(o)} color={palette.textDim} size={17}/><Text style={{fontFamily:font.ui,fontSize:10,color:palette.textDim,textAlign:'center'}}>{pageLabel(o)}</Text></View>}
      </View>
     </View>
-   </PageFade>)}
+   </PageBurn></PageFade>)}
   </View>
   <View style={{flex:1,minHeight:20}}/>
  </ScrollView>;
