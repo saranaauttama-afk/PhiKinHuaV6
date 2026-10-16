@@ -11,8 +11,8 @@ import BattleSeal,{BATTLE_SEAL_ART_SIZE} from './BattleSeal';
 export default function BlessingSeals({blessings}:{blessings?:BlessingDef[]}) {
  const [open,setOpen]=React.useState<string|null>(null);const [all,setAll]=React.useState(false);
  const rows=groupBlessings(blessings??[]);const selected=rows.find(r=>r.blessing.id===open);
- return <View testID="player-blessing-seals" style={{height:44,width:'100%',alignItems:'flex-end'}}>
-  <BattleSeal testID="blessing-seals-more" label={`ดูพรทั้งหมด ${blessings?.length??0} พร`} onPress={()=>setAll(true)} count={blessings?.length??0}>
+ return <View testID="player-blessing-seals" style={{height:36,width:'100%',alignItems:'flex-end',justifyContent:'center'}}>
+  <BattleSeal hitSize={36} testID="blessing-seals-more" label={`ดูพรทั้งหมด ${blessings?.length??0} พร`} onPress={()=>setAll(true)} count={blessings?.length??0}>
    <Image accessible={false} source={require('../../../assets/ui/blessing-amulet.png')} resizeMode="contain" style={{width:BATTLE_SEAL_ART_SIZE,height:BATTLE_SEAL_ART_SIZE}}/>
   </BattleSeal>
   <Modal visible={all} transparent animationType="fade" onRequestClose={()=>setAll(false)}>
