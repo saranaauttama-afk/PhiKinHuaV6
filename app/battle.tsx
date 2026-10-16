@@ -155,7 +155,8 @@ export default function BattlePage() {
     cardFadeTimers.current.push(a,b);
   };
   const flashRef   = React.useRef<ScreenFlashHandle>(null);
-  const timeline   = useCombatTimeline();
+  const enemySpeed=useGameSettings(s=>s.enemySpeed);
+  const timeline   = useCombatTimeline({speed:enemySpeed});
   const reducedMotion=useGameSettings(s=>s.reducedMotion);
   const [playerHit,setPlayerHit]=React.useState<string>();
   const screenX=useSharedValue(0),heavyPending=React.useRef(false);
@@ -385,7 +386,7 @@ export default function BattlePage() {
       case 'Died': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         // Fall only if the ghost is still dead at the end of this batch (a revive also passes 0 HP).
-        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) { if (gameState.phase === 'talk') monsterRef.current?.defeat(); else monsterRef.current?.die(); }
+        if (currentEvent.who === 'enemy' && ((gameState.enemy?.hp ?? 0) <= 0 || gameState.phase === 'victory')) { if (gameState.phase === 'talk') monsterRef.current?.defeat(timeline.speed); else monsterRef.current?.die(timeline.speed); }
         break;
       }
 
@@ -409,7 +410,8 @@ export default function BattlePage() {
         else for (const cue of cuesFor([currentEvent])) playSfx(cue);
         pulseFrom(currentEvent);
         showBlockLoss(currentEvent, `bl-${eventKey(currentEvent)}`);
-        if (!hitFeedback(currentEvent,player.maxHp).player && !hitFeedback(currentEvent,player.maxHp).enemy) break;
+        const feedback=hitFeedback(currentEvent,player.maxHp);
+        if (!feedback.player&&!feedback.enemy) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss, parts: currentEvent.parts?.map(p => p.label) };
         if (currentEvent.target === 'player') showPlayerHit(currentEvent,heavy);
         else monsterRef.current?.shake();
@@ -474,7 +476,7 @@ export default function BattlePage() {
 
         {/* Enemy hand cards — absolute overlay, same card does slide-in + flip + rise */}
         {enemyHandCards.map(c => (
-          <EnemyHandCard
+          <EnemyHandCard speed={timeline.speed}
             key={c.key}
             card={c.card}
             ownerId={c.card.ownerId}
@@ -543,7 +545,7 @@ export default function BattlePage() {
 
         {/* Our ศิษย์ค่าย now stand in our own badge row (PlayerHUD minions). */}
         {/* The ghost's ลูกสมุน stand as figures on its other side (was a status badge until 15 Oct 2026). */}
-        {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" acted={minionActed} minions={presentation?.enemyMinions??gameState.enemyMinions??[]}/>}
+        {!victoryIntro&&(gameState.phase==='combat'||phase==='enemy')&&<MinionRow side="enemy" acted={minionActed} minions={presentation?.enemyMinions??gameState.enemyMinions??[]}/>}
 
         <PlayerHUD hitKey={playerHit}
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
