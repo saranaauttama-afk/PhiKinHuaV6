@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image,Pressable,Text,View} from 'react-native';
+import {Image,Pressable,Text,View,useWindowDimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RitualSurface,{chalk} from './RitualSurface';
 import StatIcon,{type StatSymbol} from './StatIcon';
@@ -13,7 +13,7 @@ export function HudStat({icon,text,onPress,label}:{icon:StatSymbol;text:string;o
  return onPress?<Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</Pressable>:<View accessible accessibilityLabel={label} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</View>;
 }
 export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,compact=false}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;compact?:boolean}){
- const pad=useSafeAreaInsets();
+ const pad=useSafeAreaInsets(),{width:screenW}=useWindowDimensions(),narrow=screenW<360;
  return <View testID="player-hud" pointerEvents="box-none" style={{position:'absolute',bottom:pad.bottom+4,left:8,right:8,zIndex:layer.statusBar}}>
   {/* Owner layout 16 Oct 2026: statuses/equipment on the left, blessings apart at the far right. */}
   {compact&&(extras||blessings)&&<View style={{height:36,marginBottom:4,flexDirection:'row',alignItems:'center',gap:6}}>
@@ -23,9 +23,9 @@ export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action
   <RitualSurface kind="quietSlate" style={{height:compact?PLAYER_BATTLE_HUD_HEIGHT:extras||blessings?114:76,paddingHorizontal:8,paddingVertical:6,gap:2}}>
    {compact?<View style={{flexDirection:'row',alignItems:'center',gap:8,flex:1}}>
     {/* Bigger portrait with the skills under it, so the stat row can sit closer together. */}
-    <View testID="battle-hud-portrait-column" style={{width:68,height:'100%',alignItems:'center',justifyContent:'space-between'}}>
+    <View testID="battle-hud-portrait-column" style={{width:62,height:'100%',alignItems:'center',justifyContent:'space-between'}}>
      {/* Head-and-shoulders crop (portraits are 4:5): the face is bigger in the same HUD height. */}
-     <Pressable disabled={!onPortrait} accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={onPortrait} style={{width:62,height:helpers?54:86,overflow:'hidden',borderRadius:6}}><Image accessible={false} source={playerPortraits[classId??'shaman']} resizeMode="cover" style={{width:62,height:78}}/></Pressable>
+     <Pressable disabled={!onPortrait} accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={onPortrait} style={{width:58,height:helpers?54:86,overflow:'hidden',borderRadius:6}}><Image accessible={false} source={playerPortraits[classId??'shaman']} resizeMode="cover" style={{width:58,height:73}}/></Pressable>
      {helpers&&<View style={{height:32,justifyContent:'center'}}>{helpers}</View>}
     </View>
     <View style={{flex:1,minWidth:0}}>
@@ -33,7 +33,7 @@ export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action
       <View testID="battle-player-health" style={{flex:1,minWidth:0}}><HealthBar hp={hp} maxHp={maxHp} compact/></View>
      </View>
      <View testID="battle-hud-bottom-row" style={{height:44,flexDirection:'row',alignItems:'center',gap:6}}>
-      <View style={{flex:1,minWidth:0,flexDirection:'row',alignItems:'center',justifyContent:'flex-start',gap:14}}>{stats}</View>
+      <View style={{flex:1,minWidth:0,flexDirection:'row',alignItems:'center',justifyContent:'flex-start',gap:narrow?4:12}}>{stats}</View>
       {action}
      </View>
     </View>
