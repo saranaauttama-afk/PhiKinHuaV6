@@ -20,10 +20,13 @@ describe('ข้อความหน้าการ์ดแบบสั้น'
   });
   it('ตัวอย่างคำย่อ', () => {
     const face = (id: string) => cardFaceText({ ...cardById(id)!, star: 1 });
-    expect(face('jab')).toBe('ตี 5 · ช้ำ 1');
+    expect(face('threaded_needle')).toBe('ตี 4 · ผีชาร์จ: +ยันต์ 2');
     expect(face('bruise_guard')).toBe('เกราะ 7 · สวน ตี 5 · ช้ำ ≥3: +เกราะ 5');
     expect(face('corner_towel')).toBe('เกราะ 4 · ศิษย์ค่ายฟื้น 4 · ท้ายยก: +เกราะ 4');
-    expect(face('holy_water_splash')).toBe('สาดทั้งขัน: ตี 5/น้ำ');
+    for (const c of all) {
+      if ((c as any).rhythmDamageCap != null) expect(cardFaceText(c), c.id).toContain(`จังหวะ ≤${(c as any).rhythmDamageCap}`);
+      if ((c as any).splashWaterCap != null) expect(cardFaceText(c), c.id).toContain(`สาด ≤${(c as any).splashWaterCap} น้ำ`);
+    }
   });
   it('ไม่มี flavor บนหน้าการ์ด', () => {
     for (const c of all.filter(c => c.flavor)) expect(cardFaceText(c)).not.toContain(c.flavor);
