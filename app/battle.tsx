@@ -7,6 +7,7 @@ import {battleScene} from './scenePresentation';
 import BattleBackdrop from './components/battle/BattleBackdrop';
 import {useBattleLayout} from './components/battle/battleLayout';
 import React from 'react';
+import Animated,{cancelAnimation,useAnimatedStyle,useSharedValue,withSequence,withTiming} from 'react-native-reanimated';
 import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
@@ -53,7 +54,7 @@ import ScreenFlash, { ScreenFlashHandle } from './components/battle/ScreenFlash'
 import { useAppFonts } from './useAppFonts';
 import { palette, surface, tint, layer, font, fighterColors } from './theme';
 
-import Settings from './components/Settings';
+import Settings,{useGameSettings} from './components/Settings';
 import StartPage from './components/StartPage';
 import RitualSurface from './components/RitualSurface';
 import CloseSeal from './components/CloseSeal';
@@ -155,6 +156,17 @@ export default function BattlePage() {
   };
   const flashRef   = React.useRef<ScreenFlashHandle>(null);
   const timeline   = useCombatTimeline();
+  const reducedMotion=useGameSettings(s=>s.reducedMotion);
+  const [playerHit,setPlayerHit]=React.useState<string>();
+  const screenX=useSharedValue(0),heavyPending=React.useRef(false);
+  React.useEffect(()=>{if(reducedMotion){cancelAnimation(screenX);screenX.value=0;}return ()=>cancelAnimation(screenX);},[reducedMotion]);
+  const screenStyle=useAnimatedStyle(()=>({transform:[{translateX:screenX.value}]}));
+  const showPlayerHit=(ev:CombatEvent,heavy=false)=>{
+    const feedback=hitFeedback(ev,player.maxHp,heavy);
+    if(!feedback.player)return;
+    setPlayerHit(eventKey(ev));flashRef.current?.flash();
+    if(feedback.heavy&&!reducedMotion)screenX.value=withSequence(withTiming(4,{duration:45}),withTiming(-4,{duration:55}),withTiming(0,{duration:70}));
+  };
 
   // timer ของเอฟเฟกต์เล็กๆ ฝั่งผู้เล่น (เฟดการ์ด, สั่นมอนสเตอร์) — ล้างตอน unmount
   const cardFadeTimers = React.useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -258,6 +270,7 @@ export default function BattlePage() {
     const after = useGame.getState().state;
     for (const cue of cuesFor(after.pendingEvents ?? [])) playSfx(cue);
     for (const ev of after.pendingEvents ?? []) {
+      if(ev.t==='Damage'&&ev.target==='player')showPlayerHit(ev);
       if (ev.t === 'Damage') showBlockLoss(ev, `bl-${eventKey(ev)}`);
       if (ev.t === 'MinionActed') setMinionActed({ uid: ev.uid, key: eventKey(ev) });
       if (ev.t === 'Damage' && hitFeedback(ev,player.maxHp).enemy) {
@@ -382,12 +395,14 @@ export default function BattlePage() {
       }
 
       case 'GhostGuard': case 'GhostRiposte': case 'PlayerStunned': case 'GhostPhase': case 'CardStolen': case 'WaterOverflow':
-      case 'HeavyHit': case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': {
+      case 'Riposte': case 'MinionSummoned': case 'RhythmChanged': case 'Healed': case 'StatusApplied': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
         break;
       }
 
+      case 'HeavyHit': {heavyPending.current=true;for(const cue of cuesFor([currentEvent]))playSfx(cue);break;}
       case 'Damage': {
+        const heavy=heavyPending.current;heavyPending.current=false;
         // ตัวเลขที่โชว์คือ HP ที่หายจริง ไม่ใช่ค่าบนการ์ด
         // เสียงกรงเล็บดังทุกครั้งที่ผีตีด้วยการ์ด แม้เกราะจะกันไว้หมดก็ตาม
         if (currentEvent.target === 'player' && currentEvent.sourceKind === 'card') playSfx('ghostAttack');
@@ -396,7 +411,7 @@ export default function BattlePage() {
         showBlockLoss(currentEvent, `bl-${eventKey(currentEvent)}`);
         if (!hitFeedback(currentEvent,player.maxHp).player && !hitFeedback(currentEvent,player.maxHp).enemy) break;
         const popup = { id: `dmg-${eventKey(currentEvent)}`, damage: currentEvent.hpLoss, parts: currentEvent.parts?.map(p => p.label) };
-        if (currentEvent.target === 'player') flashRef.current?.flash();
+        if (currentEvent.target === 'player') showPlayerHit(currentEvent,heavy);
         else monsterRef.current?.shake();
         if (currentEvent.target === 'player') setDamagePopups(prev => [...prev, popup]);
         else setEnemyDamagePopups(prev => [...prev, popup]);
@@ -434,7 +449,7 @@ export default function BattlePage() {
   if(mainMenu)return <StartPage onStartGame={()=>{allowLeave.current=true;useGame.setState({state:baseNewState('')});router.replace({pathname:'/',params:{chooseClass:'1'}});}} onContinue={()=>{setMainMenu(false);}}/>;
 
   return (
-    <View style={{ flex: 1 }}>
+    <Animated.View style={[{flex:1},screenStyle]}>
       <BattleBackdrop source={battleScene(gameState).source}>
         <View style={{ position: 'absolute', top: safe.top + 8, right: 10, zIndex: layer.statusBar }}>
           <CloseSeal label="พักการต่อสู้" onPress={openPause}/>
@@ -461,7 +476,6 @@ export default function BattlePage() {
         {enemyHandCards.map(c => (
           <EnemyHandCard
             key={c.key}
-            onAttackPeak={() => flashRef.current?.flash()}
             card={c.card}
             ownerId={c.card.ownerId}
             cardIndex={c.cardIndex}
@@ -531,7 +545,7 @@ export default function BattlePage() {
         {/* The ghost's ลูกสมุน stand as figures on its other side (was a status badge until 15 Oct 2026). */}
         {!victoryIntro&&gameState.phase==='combat'&&<MinionRow side="enemy" acted={minionActed} minions={presentation?.enemyMinions??gameState.enemyMinions??[]}/>}
 
-        <PlayerHUD
+        <PlayerHUD hitKey={playerHit}
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
           blockDelta={playerBlockDelta}
           minions={!victoryIntro&&gameState.phase==='combat'&&(presentation?.minions??gameState.minions??[]).length?<MinionRow inline acted={minionActed} minions={presentation?.minions??gameState.minions??[]}/>:null}
@@ -646,6 +660,6 @@ export default function BattlePage() {
           </View>
         </Modal>
       </BattleBackdrop>
-    </View>
+    </Animated.View>
   );
 }
