@@ -11,7 +11,7 @@ export default function AshPuff({size=180,duration=1000,smoke=3,ash=8}:{size?:nu
  React.useEffect(()=>{const t=setTimeout(()=>setActive(false),duration);return ()=>clearTimeout(t);},[duration]);
  const slots=useParticleSlots(smoke+ash,active&&!reduced);
  if(reduced||!active)return null;
- return <View pointerEvents="none" testID="ash-puff" style={{position:'absolute',width:size,height:size,left:0,bottom:0,zIndex:layer.decor}}>
+ return <View collapsable={false} pointerEvents="none" testID="ash-puff" style={{position:'absolute',width:size,height:size,left:0,bottom:0,zIndex:layer.decor}}>
   {Array.from({length:slots},(_,i)=><Wisp key={i} index={i} smoke={i<smoke} size={size} duration={duration}/>)}
  </View>;
 }

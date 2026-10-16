@@ -9,7 +9,7 @@ export default function BloodBurst(){
  React.useEffect(()=>{const t=setTimeout(()=>setActive(false),450);return ()=>clearTimeout(t);},[]);
  const slots=useParticleSlots(5,active&&!reduced);
  if(!active||reduced)return null;
- return <View testID="player-ink-burst" pointerEvents="none" style={{position:'absolute',left:34,top:35,width:1,height:1,zIndex:layer.decor}}>{Array.from({length:slots},(_,i)=><Drop key={i} index={i}/>)}</View>;
+ return <View collapsable={false} testID="player-ink-burst" pointerEvents="none" style={{position:'absolute',left:34,top:35,width:1,height:1,zIndex:layer.decor}}>{Array.from({length:slots},(_,i)=><Drop key={i} index={i}/>)}</View>;
 }
 function Drop({index}:{index:number}){
  const p=useSharedValue(0);

@@ -84,6 +84,7 @@ J10 ส่วน `expo-haptics` **ไม่ได้ทำ** ตามขอบ�
 ## แก้หลัง merge (Claude, 16 ต.ค. 2026)
 - **J8 ทำแอป Android ปิดตัว** ทันทีที่กดเลือกเพจบนแผนที่ (เทสต์ emulator 1.0.64 เห็นหน้า home ของเครื่องแทน "จบเทิร์น")
   หาด้วยการรันเทสต์ Android แยกทีละ commit: J1–J7 ผ่าน, เริ่มพังที่ `7638b4b` (J8) · web ผ่านตลอด
-- สาเหตุที่เชื่อ: `PageBurn` ใช้ RN `Animated` แบบ JS driver (`height`, `bottom`) ซ้อนอยู่ใน `PageFade` ที่ใช้ RN `Animated` แบบ native driver
-- แก้: เขียน `PageBurn` ใหม่ด้วย Reanimated (เหมือนเอฟเฟกต์อื่นทั้งหมดที่ผ่านบน Android) — พฤติกรรมเดิม: ตัดกระดาษจากล่างขึ้นบน 600 ms + ขอบไหม้ + ขี้เถ้า
-- บทเรียน: งานอนิเมชั่นใหม่ใช้ Reanimated เท่านั้น อย่าผสม RN `Animated` JS driver ในวิวที่มี native driver
+- crash log จริง (ดึงผ่าน annotation ของ CI): `IllegalStateException: addViewAt: failed to insert view [..] into parent [..] at index 1` (Fabric `SurfaceMountingManager`)
+- สาเหตุ: ตอนเริ่มไหม้ `PageBurn` แทรกขอบไหม้/ขี้เถ้าเป็นลูกใหม่เข้าไปใน container ที่ Fabric "flatten" ทิ้งไปแล้ว (และรอบแก้แรกยังสลับชนิดวิว View↔Animated.View อีก) — เป็นบั๊กที่รู้กันของ React Native New Architecture บน Android ไม่เกิดบน web
+- แก้: `PageBurn` โครงไม่เปลี่ยนรูปเลย (container ทุกชั้น `collapsable={false}`, ตัวตัดกระดาษเป็น Animated.View ตัวเดิมตลอด, ชั้นเอฟเฟกต์มีอยู่เสมอ) + ใส่ `collapsable={false}` ให้ container ของเอฟเฟกต์ที่โผล่/หายระหว่างเล่น: `AshPuff`, `BloodBurst`, ผีใน `MonsterArea` (ควันตอนตาย), `DepartingFigure`, รัศมีหน้าชนะ, HUD ที่สั่น
+- บทเรียน (ส่งต่อ AI ตัวอื่น): **ทุก View ที่จะมีลูกโผล่/หายตามเงื่อนไขระหว่างเล่น ให้ใส่ `collapsable={false}`** และอย่าสลับชนิดวิวของ wrapper; เทสต์ web ไม่เจอบั๊กนี้ ต้องดู native smoke

@@ -213,11 +213,11 @@ const GhostFigure=React.forwardRef<MonsterAreaHandle,{id:string;index:number;wid
     },
   }));
 
-  return <View pointerEvents="none" style={{position:'absolute',top,left,width,height}}>
+  return <View collapsable={false} pointerEvents="none" style={{position:'absolute',top,left,width,height}}>
     <Animated.View pointerEvents="none" testID={`enemy-art-${index}`} style={floatStyle}>
       <GhostArt id={id} width={width} height={height}/>
       <Animated.View pointerEvents="none" style={[{position:'absolute',inset:0},hitStyle]}><GhostArt id={id} width={width} height={height} silhouette tint={combatUiColors.hitFlash}/></Animated.View>
     </Animated.View>
-    {death>0&&!reduced&&<View pointerEvents="none" style={{position:'absolute',left:(width-Math.min(width,height))/2,bottom:0,width:Math.min(width,height),height:Math.min(width,height)}}><AshPuff key={death} size={Math.min(width,height)} duration={1000/deathSpeed.current}/></View>}
+    {death>0&&!reduced&&<View collapsable={false} pointerEvents="none" style={{position:'absolute',left:(width-Math.min(width,height))/2,bottom:0,width:Math.min(width,height),height:Math.min(width,height)}}><AshPuff key={death} size={Math.min(width,height)} duration={1000/deathSpeed.current}/></View>}
   </View>;
 });

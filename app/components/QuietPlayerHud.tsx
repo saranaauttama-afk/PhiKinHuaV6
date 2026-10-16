@@ -32,7 +32,7 @@ export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action
    <View testID="battle-player-statuses" style={{flex:1,minWidth:0}}>{extras}</View>
    {blessings&&<View testID="battle-player-blessings" style={{width:44,flexShrink:0}}>{blessings}</View>}
   </View>}
-  <Animated.View style={hitStyle}><RitualSurface kind="quietSlate" style={{height:compact?PLAYER_BATTLE_HUD_HEIGHT:extras||blessings?114:76,paddingHorizontal:8,paddingVertical:6,gap:2}}>
+  <Animated.View collapsable={false} style={hitStyle}><RitualSurface kind="quietSlate" style={{height:compact?PLAYER_BATTLE_HUD_HEIGHT:extras||blessings?114:76,paddingHorizontal:8,paddingVertical:6,gap:2}}>
    {compact?<View style={{flexDirection:'row',alignItems:'center',gap:8,flex:1}}>
     {/* Bigger portrait with the skills under it, so the stat row can sit closer together. */}
     <View testID="battle-hud-portrait-column" style={{width:62,height:'100%',alignItems:'center',justifyContent:'space-between'}}>

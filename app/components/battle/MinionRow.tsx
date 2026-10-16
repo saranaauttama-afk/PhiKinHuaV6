@@ -99,5 +99,5 @@ function DepartingFigure({m,size}:{m:MinionState;size:number}){
  const opacity=useSharedValue(1);
  React.useEffect(()=>{opacity.value=withTiming(0,{duration:450});},[]);
  const style=useAnimatedStyle(()=>({opacity:opacity.value}));
- return <View pointerEvents="none" style={{width:size,height:size}}><Animated.Image source={minionArt(m.id,true)} style={[{width:size,height:size},style]} resizeMode="contain"/><AshPuff size={size} duration={500} smoke={1} ash={0}/></View>;
+ return <View collapsable={false} pointerEvents="none" style={{width:size,height:size}}><Animated.Image source={minionArt(m.id,true)} style={[{width:size,height:size},style]} resizeMode="contain"/><AshPuff size={size} duration={500} smoke={1} ash={0}/></View>;
 }
