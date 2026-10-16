@@ -23,10 +23,10 @@ export const ZONES: Record<ZoneId, ZoneSound> = {
   temple: { map: 'templeBed', battle: 'templeBattleBed', oneShots: ['templeWindChime', 'templeBellFar', 'templeChant', 'templeBroom'] },
   cremation: { map: 'cremationBed', battle: 'cremationBattleBed', oneShots: ['cremationOwl', 'cremationEmber', 'cremationDogNear', 'cremationCrow'] },
   forest: { map: 'forestBed', battle: 'forestBattleBed', oneShots: ['forestBranchSnap', 'forestNightBird', 'forestRustle'] },
-  water: { map: 'waterBed', battle: 'waterBattleBed', oneShots: ['waterFishSplash'] },
-  mountain: { map: 'mountainBed', battle: 'mountainBattleBed', oneShots: [] },
-  cave: { map: 'caveBed', battle: 'caveBattleBed', oneShots: [] },
-  otherworld: { map: 'otherworldBed', battle: 'otherworldBattleBed', oneShots: [] },
+  water: { map: 'waterBed', battle: 'waterBattleBed', oneShots: ['waterFishSplash', 'waterWading', 'waterFrogsStop'] },
+  mountain: { map: 'mountainBed', battle: 'mountainBattleBed', oneShots: ['mountainFlagFlap', 'mountainShrineBell', 'mountainRockfall'] },
+  cave: { map: 'caveBed', battle: 'caveBattleBed', oneShots: ['caveBats', 'caveRockEcho', 'caveBreath'] },
+  otherworld: { map: 'otherworldBed', battle: 'otherworldBattleBed', oneShots: ['otherworldWhispers', 'otherworldReverseGong'] },
 };
 
 const FALLBACK_ZONE: ZoneId = 'village';

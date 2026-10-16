@@ -138,5 +138,75 @@
   "bed": false,
   "lufs": -21.3,
   "secs": 2.98
+ },
+ {
+  "id": "mountainFlagFlap",
+  "file": "assets/audio/sfx/mountain-flag-flap-1.mp3",
+  "bed": false,
+  "lufs": -23.0,
+  "secs": 2.46
+ },
+ {
+  "id": "otherworldReverseGong",
+  "file": "assets/audio/sfx/otherworld-reverse-gong-1.mp3",
+  "bed": false,
+  "lufs": -22.9,
+  "secs": 2.46
+ },
+ {
+  "id": "caveBreath",
+  "file": "assets/audio/sfx/cave-breath-1.mp3",
+  "bed": false,
+  "lufs": -21.6,
+  "secs": 3.27
+ },
+ {
+  "id": "otherworldWhispers",
+  "file": "assets/audio/sfx/otherworld-whispers-1.mp3",
+  "bed": false,
+  "lufs": -21.3,
+  "secs": 5.04
+ },
+ {
+  "id": "waterFrogsStop",
+  "file": "assets/audio/sfx/water-frogs-stop-1.mp3",
+  "bed": false,
+  "lufs": -21.3,
+  "secs": 4.05
+ },
+ {
+  "id": "caveRockEcho",
+  "file": "assets/audio/sfx/cave-rock-echo-1.mp3",
+  "bed": false,
+  "lufs": -22.1,
+  "secs": 3.03
+ },
+ {
+  "id": "caveBats",
+  "file": "assets/audio/sfx/cave-bats-1.mp3",
+  "bed": false,
+  "lufs": -23.1,
+  "secs": 2.17
+ },
+ {
+  "id": "mountainRockfall",
+  "file": "assets/audio/sfx/mountain-rockfall-1.mp3",
+  "bed": false,
+  "lufs": -25.1,
+  "secs": 1.62
+ },
+ {
+  "id": "waterWading",
+  "file": "assets/audio/sfx/water-wading-1.mp3",
+  "bed": false,
+  "lufs": -21.8,
+  "secs": 3.76
+ },
+ {
+  "id": "mountainShrineBell",
+  "file": "assets/audio/sfx/mountain-shrine-bell-1.mp3",
+  "bed": false,
+  "lufs": -20.8,
+  "secs": 2.27
  }
 ]

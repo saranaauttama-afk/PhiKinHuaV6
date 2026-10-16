@@ -42,7 +42,17 @@ export type SfxId =
   | 'forestBranchSnap'
   | 'forestNightBird'
   | 'forestRustle'
-  | 'waterFishSplash';
+  | 'waterFishSplash'
+  | 'waterWading'
+  | 'waterFrogsStop'
+  | 'mountainFlagFlap'
+  | 'mountainShrineBell'
+  | 'mountainRockfall'
+  | 'caveBats'
+  | 'caveRockEcho'
+  | 'caveBreath'
+  | 'otherworldWhispers'
+  | 'otherworldReverseGong';
 
 export type BedId =
   | 'music'
@@ -113,6 +123,16 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
   forestNightBird: { files: [require('../../assets/audio/sfx/forest-night-bird-1.mp3')], volume: 0.4 },
   forestRustle: { files: [require('../../assets/audio/sfx/forest-rustle-1.mp3')], volume: 0.4 },
   waterFishSplash: { files: [require('../../assets/audio/sfx/water-fish-splash-1.mp3')], volume: 0.4 },
+  waterWading: { files: [require('../../assets/audio/sfx/water-wading-1.mp3')], volume: 0.4 },
+  waterFrogsStop: { files: [require('../../assets/audio/sfx/water-frogs-stop-1.mp3')], volume: 0.4 },
+  mountainFlagFlap: { files: [require('../../assets/audio/sfx/mountain-flag-flap-1.mp3')], volume: 0.4 },
+  mountainShrineBell: { files: [require('../../assets/audio/sfx/mountain-shrine-bell-1.mp3')], volume: 0.4 },
+  mountainRockfall: { files: [require('../../assets/audio/sfx/mountain-rockfall-1.mp3')], volume: 0.4 },
+  caveBats: { files: [require('../../assets/audio/sfx/cave-bats-1.mp3')], volume: 0.4 },
+  caveRockEcho: { files: [require('../../assets/audio/sfx/cave-rock-echo-1.mp3')], volume: 0.4 },
+  caveBreath: { files: [require('../../assets/audio/sfx/cave-breath-1.mp3')], volume: 0.4 },
+  otherworldWhispers: { files: [require('../../assets/audio/sfx/otherworld-whispers-1.mp3')], volume: 0.4 },
+  otherworldReverseGong: { files: [require('../../assets/audio/sfx/otherworld-reverse-gong-1.mp3')], volume: 0.4 },
 };
 
 /** เสียงพื้นที่เล่นวนยาว ๆ — ตั้งให้เบากว่าเสียงเอฟเฟกต์มาก */
