@@ -72,14 +72,14 @@ jobs:
           "$BT/apksigner" verify --verbose --print-certs "$APK" > apk-audit/signature.txt
           "$BT/zipalign" -c -P 16 -v 4 "$APK" > apk-audit/zipalign.txt
           "$BT/aapt" dump badging "$APK" > apk-audit/package.txt
-          grep "package: name='com.phikinhua.episode' versionCode='61' versionName='1.0.60'" apk-audit/package.txt
-          cp "$APK" PhiKinHua-NOTFM-v1.0.60.apk
-          sha256sum PhiKinHua-NOTFM-v1.0.60.apk > apk-audit/sha256.txt
+          grep "package: name='com.phikinhua.episode' versionCode='62' versionName='1.0.61'" apk-audit/package.txt
+          cp "$APK" PhiKinHua-NOTFM-v1.0.61.apk
+          sha256sum PhiKinHua-NOTFM-v1.0.61.apk > apk-audit/sha256.txt
           git rev-parse HEAD > apk-audit/source-commit.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PhiKinHua-NOTFM-APK
-          path: PhiKinHua-NOTFM-v1.0.60.apk
+          path: PhiKinHua-NOTFM-v1.0.61.apk
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@v4
@@ -109,7 +109,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb install PhiKinHua-NOTFM-v1.0.60.apk
+            adb install PhiKinHua-NOTFM-v1.0.61.apk
             python scripts/android-feedback-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
