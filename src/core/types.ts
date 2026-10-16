@@ -390,6 +390,8 @@ export type CombatEvent = (
   /** พักยก: the end of round `round`. */
   | { t: 'RoundEnd'; round: number }
   | { t: 'MinionSummoned'; side: CombatEventTarget; uid: string; id: string }
+  /** A minion acts (ghost minion arrival/end of turn, our ศิษย์ค่าย trigger): the view gives it a lunge. */
+  | { t: 'MinionActed'; side: CombatEventTarget; uid: string }
   | { t: 'MinionDamaged'; side: CombatEventTarget; uid: string; amount: number }
   /** The ghost armed สวน (waits for the player's next attack card). */
   | { t: 'GhostGuard' }

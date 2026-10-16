@@ -19,7 +19,7 @@ const traits:Record<string,string>={hunger:'กัดกินพลังชี
 export function encounterClue(o:PageOffer):string{
  if(o.kind==='monster'||o.kind==='boss')return traits[ENEMY_ARCHETYPES[o.enemyId]]??'วิญญาณขวางทาง\nเตรียมพร้อมต่อสู้';
  switch(o.kind){
-  case 'shop_card':return 'การ์ด อุปกรณ์\nและพลังถาวร';
+  case 'shop_card':return 'การ์ด เครื่องราง\nและพลังถาวร';
   case 'blessing':return 'ขอพรติดตัว\nเลือก 1 จาก 3';
   case 'shop_equipment':return 'เลือกซื้อเครื่องราง\nเสริมพลังระหว่างทาง';
   case 'well':return 'ดื่มน้ำจากบ่อ\nฟื้นพลังชีวิต';

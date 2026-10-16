@@ -29,6 +29,7 @@ const DURATION: Record<CombatEvent['t'], number> = {
   Riposte: 350,
   RoundEnd: 600,
   MinionSummoned: 250,
+  MinionActed: 300,
   MinionDamaged: 200,
   GhostGuard: 250,
   GhostRiposte: 350,

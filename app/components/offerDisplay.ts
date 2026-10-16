@@ -61,7 +61,7 @@ export function describeOffer(offer: PageOffer, index: number): OfferDisplay {
     }
 
     case 'shop_card':
-      return { ...base, type: 'shop_card', name: 'ร้านค้า', description: 'ซื้อการ์ด อุปกรณ์ และพลังถาวร' };
+      return { ...base, type: 'shop_card', name: 'ร้านค้า', description: 'ซื้อการ์ด เครื่องราง และพลังถาวร' };
 
     case 'blessing':
       return { ...base, type: 'blessing', name: 'ศาลพร', description: 'รับพรติดตัว เลือก 1 จาก 3' };

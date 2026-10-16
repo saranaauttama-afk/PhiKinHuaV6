@@ -39,7 +39,7 @@ export default function NightSelectScreen({classId,onStart,onBack}:{classId:Clas
     </View>
     {!ready&&<Text style={copy}>กำลังเปิดสมุดบันทึก…</Text>}
     {!!(error||localError)&&<><Text style={{...copy,color:paper.red}}>{error||localError}</Text><BookButton label="ลองบันทึกอีกครั้ง" onPress={()=>{void retry().catch(()=>{});}}/></>}
-    <Text style={{...copy,fontSize:10,lineHeight:17}}>สำรับ พร อุปกรณ์ และเบี้ยเดินต่อทั้งสามคืน · จบรอบแล้วเริ่มใหม่ด้วยสำรับอาชีพ · ชนะเพื่อปลดระดับถัดไปของอาชีพนี้</Text>
+    <Text style={{...copy,fontSize:10,lineHeight:17}}>สำรับ พร เครื่องราง และเบี้ยเดินต่อทั้งสามคืน · จบรอบแล้วเริ่มใหม่ด้วยสำรับอาชีพ · ชนะเพื่อปลดระดับถัดไปของอาชีพนี้</Text>
     <Pressable accessibilityRole="button" accessibilityLabel="สมุดบันทึกและของปลดล็อก" onPress={()=>setShowJournal(true)} style={{minHeight:40,justifyContent:'center'}}><Text style={{fontFamily:font.heading,fontSize:11,color:paper.red,textAlign:'center',textDecorationLine:'underline'}}>สมุดบันทึกและของปลดล็อก ›</Text></Pressable>
    </ScrollView>
   </BookPage>}</BookStage>

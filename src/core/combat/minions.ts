@@ -65,6 +65,7 @@ export function summonMinion(s: GameState, side: 'player' | 'enemy', id: string)
   if (side === 'enemy' && def.arrive && s.phase === 'combat' && s.player.hp > 0) {
     const { applyEnemyFx } = require('./enemyCardEffects');
     s.log.push(`${def.name} ลงสนาม`);
+    emit(s, { t: 'MinionActed', side: 'enemy', uid: m.uid });
     applyEnemyFx(s, def.arrive, 'minion:' + id);
   }
   return m;
@@ -101,7 +102,7 @@ export function ghostMinionsAct(s: GameState): void {
   const { applyEnemyFx } = require('./enemyCardEffects');
   for (const m of [...(s.enemyMinions ?? [])]) {
     if (s.phase !== 'combat' || s.player.hp <= 0) break;
-    if (m.act) { s.log.push(`${m.name} ลงมือ`); applyEnemyFx(s, m.act, 'minion:' + m.id); }
+    if (m.act) { s.log.push(`${m.name} ลงมือ`); emit(s, { t: 'MinionActed', side: 'enemy', uid: m.uid }); applyEnemyFx(s, m.act, 'minion:' + m.id); }
   }
   tick(s, 'enemy');
 }
