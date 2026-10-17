@@ -35,7 +35,19 @@ export function configureNightEnemy(s:GameState):void{
  const depth=boss?0:nightDepth(s);
  const {ENEMY_DEPTH}=require('../balance/notfm');
  s.enemy.depth=depth;
- s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*(boss?ENEMY_HP.bossNight:ENEMY_HP.night)[s.campaign.night-1]*(d>=DIFFICULTY.hpFrom?1+DIFFICULTY.hpPct/100:1)*(1+ENEMY_DEPTH.hpPct*depth/100));
+ if(s.classId==='warrior'||s.classId==='shaman'){
+  // Deck progression: a short early fight, then a rising HP wall that rewards building a deck.
+  // This replaces the old night/depth HP multipliers, never compounds them.
+  const night=s.campaign.night;
+  const hp=boss?(s.enemy.id==='phi-kin-hua'?240:[36,100,180][night-1])
+    :elite?([32,62,90][night-1]+2*depth)
+    :night===1?12+2*(tier-1)+Math.round(1.5*depth)
+    :night===2?35+2*(tier-2)+2*depth
+    :58+3*(tier-3)+3*depth;
+  s.enemy.hp=s.enemy.maxHp=Math.round(hp*(d>=DIFFICULTY.hpFrom?1+DIFFICULTY.hpPct/100:1));
+ }else{
+  s.enemy.hp=s.enemy.maxHp=Math.round(baseHp*(boss?ENEMY_HP.bossNight:ENEMY_HP.night)[s.campaign.night-1]*(d>=DIFFICULTY.hpFrom?1+DIFFICULTY.hpPct/100:1)*(1+ENEMY_DEPTH.hpPct*depth/100));
+ }
  const rules=ENEMY_RULES[boss?'boss':elite?'elite':'normal'];
  s.enemy.maxAp=rules.ap+(depth>=ENEMY_DEPTH.apFrom?1:0);s.enemy.handSize=rules.handSize;
  if(NIGHT_ENEMY_DECKS[s.enemy.id])s.enemy.deck=[...NIGHT_ENEMY_DECKS[s.enemy.id]];

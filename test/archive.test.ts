@@ -30,7 +30,7 @@ describe('archive catalog and real discoveries',()=>{
   expect(archiveProgress(next).ghosts[id].seen).toBe(1);expect(Object.keys(r.s.discovery!.ghosts).length).toBeGreaterThan(1);
  });
  it('viewing or leaving a shop does not discover its stock; buying records only the acquired card',()=>{
-  const r=run();const a=r.s.pages!.adventure!,shop=a.deck.find(e=>e.offer.kind==='shop_card')!;r.s.pages!.current!.offers[1]=shop.offer;r.s.pages!.current!.resolved[1]=false;a.slotIds[1]=shop.id;r.step({type:'ChooseOffer',index:1});const stock=r.s.shopStock!;
+  const r=run();const a=r.s.pages!.adventure!,shop=a.deck.find(e=>e.offer.kind==='shop_card')!;r.s.pages!.current!.offers[1]={...shop.offer,availableAfterWins:0};r.s.pages!.current!.resolved[1]=false;a.slotIds[1]=shop.id;r.step({type:'ChooseOffer',index:1});const stock=r.s.shopStock!;
   const unowned=stock.find(x=>'card' in x&&!r.s.discovery!.cards[x.card.id]);
   if(!unowned||!('card' in unowned))throw Error('Fixture needs unowned stock');
   expect(r.s.discovery!.cards[unowned.card.id]).toBeUndefined();r.s.player.gold=999;

@@ -56,10 +56,15 @@ export function spendAllRhythm(s: GameState): number {
 }
 
 /** Flat damage added to each hit of an attack card from rhythm and move bonuses. */
-export function fighterAttackBonus(s: GameState, move?: Move): number {
-  const rhythm = rhythmOf(s) * FIGHTER_RULES.dmgPerStack;
+export function fighterAttackBonus(s: GameState, move?: Move, card?: CardData): number {
+  const rhythm = rhythmDamage(s, card);
   const byMove = move ? sumOf(s, p => p.moveBonus?.[move]) : 0;
   return rhythm + byMove;
+}
+
+export function rhythmDamage(s: GameState, card?: CardData): number {
+  const full = rhythmOf(s) * FIGHTER_RULES.dmgPerStack;
+  return card?.rhythmDamageCap == null ? full : Math.min(full, card.rhythmDamageCap);
 }
 
 /** Damage per ช้ำ when a heavy move consumes it (best source wins). */
@@ -72,12 +77,15 @@ export function bruiseOn(s: GameState): number {
 }
 
 /** ท่าหนัก: remove every ช้ำ and return the damage it adds to the first hit. */
-export function consumeBruise(s: GameState): number {
+export function consumeBruise(s: GameState, card?: CardData): number {
   const n = bruiseOn(s);
   if (!n || !s.enemy) return 0;
-  s.enemy.statusEffects = (s.enemy.statusEffects ?? []).filter(e => e.id !== 'bruise');
-  const dmg = n * heavyPerBruise(s);
-  s.log.push(`ท่าหนัก: ช้ำ ${n} → +${dmg}`);
+  const consumed = Math.min(n, card?.starterHeavy?.maxStacks ?? n);
+  const bruise = s.enemy.statusEffects?.find(e => e.id === 'bruise');
+  if (bruise) bruise.stacks = n - consumed;
+  if (!bruise?.stacks) s.enemy.statusEffects = (s.enemy.statusEffects ?? []).filter(e => e !== bruise);
+  const dmg = consumed * (card?.starterHeavy?.perStack ?? heavyPerBruise(s));
+  s.log.push(`ท่าหนัก: ช้ำ ${consumed} → +${dmg}`);
   require('../combat/damage').emit(s, { t: 'HeavyHit', bonus: dmg });
   return dmg;
 }
@@ -216,7 +224,7 @@ export function moveHint(s: Partial<GameState>, card: CardData): { rhythm: boole
   // ยก: the card's bonus is live on the last turn of a round (owner playtest: say when ยก matters).
   const round = roundCard(card) ? isRoundLastTurn(s) : undefined;
   // หมอผี: สาด / ปลุกยันต์ show how many points they would use right now (×N on the card).
-  const stack = card.splash ? Math.max(0, (s.player?.mana ?? 0) - (card.mana ?? 0)) : card.wakeYant ? require('./water').yantOn(s) : undefined;
+  const stack = card.splash ? Math.min(Math.max(0, (s.player?.mana ?? 0) - (card.mana ?? 0)), card.splashWaterCap ?? Infinity) : card.wakeYant ? require('./water').yantOn(s) : undefined;
   return { rhythm, after, ...(round != null ? { round } : {}), ...(stack != null ? { stack } : {}) };
 }
 

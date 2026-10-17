@@ -133,6 +133,8 @@ export type CardData = {
   copied?: boolean;
   /** หมอผี สาด: spend all น้ำมนต์ (at least 1); the effect is per point spent. */
   splash?: PerStackFx;
+  /** Water used by this splash; unspecified splashes still empty the bowl. */
+  splashWaterCap?: number;
   /** หมอผี ปลุกยันต์: consume every ยันต์ on the ghost; the effect is per stack. */
   wakeYant?: PerStackFx;
   /** หมอผี ของต่ำ: missing น้ำมนต์ is paid with HP (WATER_RULES.bloodPerWater each). */
@@ -149,6 +151,12 @@ export type CardData = {
   after?: { move: Move; bonus: Fx };
   /** ท่าหนัก: consumes all ช้ำ on the ghost for extra damage on the first hit. */
   heavy?: boolean;
+  /** Per-card ceiling on the rhythm part of each hit; other bonuses remain uncapped. */
+  rhythmDamageCap?: number;
+  /** A small heavy move consumes only this many bruise stacks. */
+  starterHeavy?: { maxStacks: number; perStack: number };
+  /** Shop metadata; has no combat effect. */
+  progressionRole?: 'basic' | 'bridge';
   /** ติดมือ: always in the opening hand. */
   innate?: boolean;
   /**
@@ -310,7 +318,7 @@ export type EventState =
 
 // ===== Shop / Pages =====
 export type ShopItem = 
-  | { card: CardData; price: number }
+  | { card: CardData; price: number; role?: 'replacement'|'engine'|'payoff'|'support' }
   | { equipment: any; price: number };
 export type ShopKind = 'card' | 'remove' | 'upgrade' | 'equipment' | 'healing' | 'well' | 'treasure' | 'treasure_single' | 'blessing';
 
@@ -345,6 +353,8 @@ export type CardHistoryEntry = {
 
 export type CombatFrame = {
   player: GameState["player"]; enemy: GameState["enemy"]; historySeq?: number;
+  /** Both minion rows at this beat, so a summon appears when its card plays, not at the start of the ghost turn. */
+  minions?: MinionState[]; enemyMinions?: MinionState[];
 };
 
 export type CombatEvent = (
@@ -380,6 +390,8 @@ export type CombatEvent = (
   /** พักยก: the end of round `round`. */
   | { t: 'RoundEnd'; round: number }
   | { t: 'MinionSummoned'; side: CombatEventTarget; uid: string; id: string }
+  /** A minion acts (ghost minion arrival/end of turn, our ศิษย์ค่าย trigger): the view gives it a lunge. */
+  | { t: 'MinionActed'; side: CombatEventTarget; uid: string }
   | { t: 'MinionDamaged'; side: CombatEventTarget; uid: string; amount: number }
   /** The ghost armed สวน (waits for the player's next attack card). */
   | { t: 'GhostGuard' }
@@ -518,6 +530,9 @@ export type GameState = {
   shopKind?: ShopKind;
   shopStock?: ShopItem[];
   shopBoughtItems?: ShopItem[]; // Track items bought in current shop session
+  shopFocus?: import('./balance/deckProgression').BuildFocus;
+  shopFocusHistory?: import('./balance/deckProgression').BuildFocus[];
+  shopRerollUsed?: boolean;
   currentShopId?: string; // Track current shop ID for persistence
   event?: EventState;
 

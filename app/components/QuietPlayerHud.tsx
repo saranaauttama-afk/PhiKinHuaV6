@@ -1,5 +1,8 @@
 import React from 'react';
-import {Image,Pressable,Text,View} from 'react-native';
+import Animated,{cancelAnimation,useAnimatedStyle,useSharedValue,withSequence,withTiming} from 'react-native-reanimated';
+import {useGameSettings} from './Settings';
+import BloodBurst from './battle/BloodBurst';
+import {Image,Pressable,Text,View,useWindowDimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RitualSurface,{chalk} from './RitualSurface';
 import StatIcon,{type StatSymbol} from './StatIcon';
@@ -7,26 +10,42 @@ import HealthBar from './HealthBar';
 import InkIcon,{type InkSymbol} from './InkIcon';
 import {font,layer} from '../theme';
 import {PLAYER_BATTLE_HUD_HEIGHT} from '../battleGeometry';
+import DeltaPopup,{type Delta} from './battle/DeltaPopup';
 export const playerPortraits:Record<string,number>={warrior:require('../../assets/ui/battle-portraits/warrior.png'),shaman:require('../../assets/ui/battle-portraits/shaman.png'),nun:require('../../assets/ui/battle-portraits/nun.png'),medium:require('../../assets/ui/battle-portraits/medium.png')};
-export function HudStat({icon,text,onPress,label}:{icon:StatSymbol;text:string;onPress?:()=>void;label?:string}){
- const content=<><StatIcon name={icon} size={18}/><Text style={{fontFamily:font.heading,fontSize:12,color:chalk}}>{text}</Text></>;
+export function HudStat({icon,text,onPress,label,delta}:{icon:StatSymbol;text:string;onPress?:()=>void;label?:string;delta?:Delta|null}){
+ const content=<><StatIcon name={icon} size={18}/><Text style={{fontFamily:font.heading,fontSize:12,color:chalk}}>{text}</Text><DeltaPopup delta={delta}/></>;
  return onPress?<Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</Pressable>:<View accessible accessibilityLabel={label} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</View>;
 }
-export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,compact=false}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;compact?:boolean}){
- const pad=useSafeAreaInsets();
+export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,minions,compact=false,hitKey,hpPopup}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;minions?:React.ReactNode;compact?:boolean;hitKey?:string;hpPopup?:React.ReactNode}){
+ const reduced=useGameSettings(s=>s.reducedMotion),shake=useSharedValue(0);
+ React.useEffect(()=>{
+  cancelAnimation(shake);shake.value=0;
+  if(hitKey&&!reduced)shake.value=withSequence(withTiming(6,{duration:45}),withTiming(-6,{duration:55}),withTiming(3,{duration:45}),withTiming(0,{duration:55}));
+  return ()=>cancelAnimation(shake);
+ },[hitKey,reduced]);
+ const hitStyle=useAnimatedStyle(()=>({transform:[{translateX:shake.value}]}));
+ const pad=useSafeAreaInsets(),{width:screenW}=useWindowDimensions(),narrow=screenW<360;
  return <View testID="player-hud" pointerEvents="box-none" style={{position:'absolute',bottom:pad.bottom+4,left:8,right:8,zIndex:layer.statusBar}}>
-  {compact&&extras&&<View testID="battle-player-statuses" style={{height:36,marginBottom:4,minWidth:0}}>{extras}</View>}
-  <RitualSurface kind="quietSlate" style={{height:compact?PLAYER_BATTLE_HUD_HEIGHT:extras||blessings?114:76,paddingHorizontal:8,paddingVertical:6,gap:2}}>
+  {/* Owner layout 16 Oct 2026: statuses/equipment on the left, blessings apart at the far right. */}
+  {compact&&(extras||blessings||minions)&&<View style={{height:36,marginBottom:4,flexDirection:'row',alignItems:'center',gap:6}}>
+   {minions&&<View testID="battle-player-minions" style={{flexShrink:0}}>{minions}</View>}
+   <View testID="battle-player-statuses" style={{flex:1,minWidth:0}}>{extras}</View>
+   {blessings&&<View testID="battle-player-blessings" style={{width:44,flexShrink:0}}>{blessings}</View>}
+  </View>}
+  <Animated.View collapsable={false} style={hitStyle}><RitualSurface kind="quietSlate" style={{height:compact?PLAYER_BATTLE_HUD_HEIGHT:extras||blessings?114:76,paddingHorizontal:8,paddingVertical:6,gap:2}}>
    {compact?<View style={{flexDirection:'row',alignItems:'center',gap:8,flex:1}}>
-    <Pressable disabled={!onPortrait} accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={onPortrait} style={{width:40,height:84}}><Image accessible={false} source={playerPortraits[classId??'shaman']} resizeMode="contain" style={{width:40,height:84}}/></Pressable>
+    {/* Bigger portrait with the skills under it, so the stat row can sit closer together. */}
+    <View testID="battle-hud-portrait-column" style={{width:62,height:'100%',alignItems:'center',justifyContent:'space-between'}}>
+     {/* Head-and-shoulders crop (portraits are 4:5): the face is bigger in the same HUD height. */}
+     <Pressable disabled={!onPortrait} accessibilityRole="button" accessibilityLabel="ข้อมูลผู้เดินทาง" onPress={onPortrait} style={{width:58,height:helpers?54:86,overflow:'hidden',borderRadius:6}}><Image accessible={false} source={playerPortraits[classId??'shaman']} resizeMode="cover" style={{width:58,height:73}}/></Pressable>
+     {helpers&&<View style={{height:32,justifyContent:'center'}}>{helpers}</View>}
+    </View>
     <View style={{flex:1,minWidth:0}}>
      <View testID="battle-hud-top-row" style={{height:44,flexDirection:'row',alignItems:'center',gap:4}}>
-      <View testID="battle-player-health" style={{flex:1,minWidth:0}}><HealthBar hp={hp} maxHp={maxHp} compact/></View>
-      {helpers&&<View style={{flexShrink:0}}>{helpers}</View>}
-      {blessings&&<View style={{width:44,flexShrink:0}}>{blessings}</View>}
+      <View collapsable={false} testID="battle-player-health" style={{flex:1,minWidth:0}}><HealthBar hp={hp} maxHp={maxHp} compact/><View collapsable={false} pointerEvents="none" style={{position:'absolute',left:0,right:0,bottom:4,alignItems:'center',zIndex:layer.popup}}>{hpPopup}</View></View>
      </View>
      <View testID="battle-hud-bottom-row" style={{height:44,flexDirection:'row',alignItems:'center',gap:6}}>
-      <View style={{flex:1,minWidth:0,flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:2}}>{stats}</View>
+      <View style={{flex:1,minWidth:0,flexDirection:'row',alignItems:'center',justifyContent:'flex-start',gap:narrow?4:12}}>{stats}</View>
       {action}
      </View>
     </View>
@@ -36,6 +55,6 @@ export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action
     {action}
    </View>}
    {!compact&&(extras||blessings)&&<View style={{height:36,flexDirection:'row',alignItems:'center',gap:4}}><View style={{flex:2,flexDirection:'row',gap:2,alignItems:'center',minWidth:0}}>{extras}</View>{blessings&&<View style={{flex:1,minWidth:0}}>{blessings}</View>}</View>}
-  </RitualSurface>
+  </RitualSurface>{hitKey&&!reduced&&<BloodBurst key={hitKey}/>}</Animated.View>
  </View>;
 }

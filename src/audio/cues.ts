@@ -24,8 +24,9 @@ export function cuesFor(events: CombatEvent[]): SfxId[] {
       case 'Riposte': case 'GhostRiposte': out.add('riposte'); break;
       case 'GhostGuard': out.add('block'); break;
       case 'PlayerStunned': out.add('stun'); break;
-      case 'GhostPhase': out.add('roundBell'); break;
-      case 'CardStolen': out.add(e.back ? 'block' : 'debuff'); break;
+      // ชุด 4: บอสเข้าช่วง 2 = ผีกรีด (เดิมระฆัง)
+      case 'GhostPhase': out.add('ghostScreech'); break;
+      case 'CardStolen': out.add(e.back ? 'block' : 'ghostWhisper'); break;
       case 'RoundEnd': out.add('roundBell'); break;
       case 'MinionSummoned': out.add('minionSummon'); break;
       // หมอผี (15 Oct 2026): reuse existing sounds until the owner records shaman ones.
@@ -36,7 +37,8 @@ export function cuesFor(events: CombatEvent[]): SfxId[] {
         if (e.target === 'enemy' && e.effectId === 'stun') out.add('stun');
         if (e.target === 'player' && DEBUFFS.has(e.effectId)) out.add('debuff');
         break;
-      case 'Died': out.add(e.who === 'enemy' ? 'ghostDeath' : 'playerDeath'); break;
+      // ชุด 4: ผีตาย = เสียงตายเดิม + โหยหวนจางหาย
+      case 'Died': if (e.who === 'enemy') { out.add('ghostDeath'); out.add('ghostWail'); } else out.add('playerDeath'); break;
     }
   }
   if (out.has('heavyHit')) out.delete('playerHit');

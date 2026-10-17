@@ -14,6 +14,8 @@ export type FxContext = {
   mult?: number;
   /** นักมวย: move of the attack card (move bonuses). */
   move?: Move;
+  /** Preserve card-specific damage ceilings through repeats and echoes. */
+  card?: CardData;
   /** Extra damage on the first hit only (ท่าหนัก). */
   firstHitBonus?: number;
 };
@@ -52,9 +54,9 @@ export function applyFx(s: GameState, fx: Fx, ctx: FxContext, rng: RNG): RNG {
   if (eff.dmg && s.enemy) {
     const ghostHp = s.enemy.hp;
     const passiveBonus = ctx.type === 'attack' ? require('./passives').attackBonus(s) : 0;
-    const fighterBonus = ctx.type === 'attack' ? require('./fighter').fighterAttackBonus(s, ctx.move) : 0;
+    const fighterBonus = ctx.type === 'attack' ? require('./fighter').fighterAttackBonus(s, ctx.move, ctx.card) : 0;
     const bonus = passiveBonus + fighterBonus;
-    const rhythm = ctx.type === 'attack' ? require('./fighter').rhythmOf(s) * require('../balance/notfm').FIGHTER_RULES.dmgPerStack : 0;
+    const rhythm = ctx.type === 'attack' ? require('./fighter').rhythmDamage(s, ctx.card) : 0;
     const extra = (h: number) => [
       ...(rhythm ? [{ id: 'rhythm', side: 'player' as const, label: `จังหวะ +${rhythm}` }] : []),
       ...(fighterBonus - rhythm ? [{ id: 'equipment', side: 'player' as const, label: `ของขลัง +${fighterBonus - rhythm}` }] : []),

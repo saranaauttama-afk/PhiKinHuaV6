@@ -26,7 +26,7 @@ function dealStop(d: ReturnType<typeof run>, kind: string) {
   const e = a.deck.find(x => x.offer.kind === kind)!, k = a.deck.indexOf(e);
   // Swap it into the first board so the board stays valid.
   [a.deck[0], a.deck[k]] = [a.deck[k], a.deck[0]];
-  a.slotIds[0] = e.id; p.offers[0] = e.offer; p.resolved[0] = false;
+  a.slotIds[0] = e.id; p.offers[0] = { ...e.offer, availableAfterWins: 0 }; p.resolved[0] = false;
   return 0;
 }
 

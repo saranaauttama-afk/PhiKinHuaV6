@@ -82,7 +82,7 @@ describe('ข้อมูล', () => {
   });
 
   it('หมัดเดี่ยวโดนลูกสมุนตัวที่มาก่อน', () => {
-    const s = fight({ hand: [c('jab')] });
+    const s = fight({ hand: [c('straight_punch')] });
     s.enemyMinions = [
       { uid: 'a', id: 'ash_bones', name: 'เถ้ากระดูก', hp: 5, maxHp: 5, side: 'enemy', passive: { triggers: [] }, taunt: true },
       { uid: 'b', id: 'ash_crawler', name: 'เถ้ากระดูกคลาน', hp: 5, maxHp: 5, side: 'enemy', passive: { triggers: [] }, taunt: true },
@@ -142,10 +142,10 @@ describe('สวนของผี', () => {
   });
 
   it('ตีทะลุเกราะ → ผีสวนไม่ทัน และสวนถูกใช้ไปแล้ว', () => {
-    const s = fight({ hand: [c('straight_knee'), c('jab')] });
+    const s = fight({ hand: [c('straight_punch'), c('jab')] });
     s.enemy!.block = 5; s.fight!.enemyRipostes = [{ dmg: 5 }];
     const hp = s.player.hp;
-    play(s);                                // knee 7 > block 5
+    play(s);                                // bought punch 7 > block 5
     expect(s.player.hp).toBe(hp);
     expect(s.fight!.enemyRipostes).toEqual([]);
     s.enemy!.block = 10; play(s);           // no riposte left to answer this one
@@ -158,7 +158,7 @@ describe('สวนของผี', () => {
     s.fight!.enemyRipostes = [{ dmg: 5 }];
     const hp = s.player.hp;
     play(s);
-    expect(s.enemyMinions[0].hp).toBe(3);
+    expect(s.enemyMinions[0].hp).toBe(5);
     expect(s.player.hp).toBe(hp);
   });
 

@@ -99,3 +99,18 @@ describe('ลูกสมุนผีลงสนามแล้วทำทั�
     expect(enemySummonValue(s, 'pong_monkey')).toBeGreaterThan(none);
   });
 });
+
+import { combatFrame } from '../src/core/combat/damage';
+describe('ภาพเล่นซ้ำเทิร์นผี', () => {
+  it('เฟรมเก็บแถวสมุน: สมุนโผล่ตอนการ์ดเรียกถูกเล่น ไม่ใช่ตั้งแต่ต้นเทิร์นผี', () => {
+    const s = fight();
+    const before = combatFrame(s);
+    summonMinion(s, 'enemy', 'pong_monkey');
+    const after = combatFrame(s);
+    expect(before.enemyMinions).toEqual([]);
+    expect(after.enemyMinions!.map((m: any) => m.id)).toEqual(['pong_monkey']);
+    // the frame is a copy: later changes do not leak into an earlier beat
+    s.enemyMinions![0].hp = 1;
+    expect(after.enemyMinions![0].hp).toBe(6);
+  });
+});

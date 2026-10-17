@@ -63,12 +63,12 @@ export function gainWater(s: GameState, n: number): void {
 }
 
 /** สาด: spend all น้ำมนต์; returns how much. */
-export function spendAllWater(s: GameState): number {
-  const n = Math.max(0, s.player.mana);
-  s.player.mana = 0;
+export function spendAllWater(s: GameState, cap = Infinity): number {
+  const n = Math.min(Math.max(0, s.player.mana), cap);
+  s.player.mana -= n;
   if (n) {
     s.log.push(`สาดน้ำมนต์ ${n}`);
-    require('../combat/damage').emit(s, { t: 'WaterChanged', value: 0 });
+    require('../combat/damage').emit(s, { t: 'WaterChanged', value: s.player.mana });
   }
   return n;
 }
@@ -108,7 +108,7 @@ export function waterFx(s: GameState, card: CardData, base: Fx): Fx {
   let fx: Fx = { ...base };
   const add = require('./mechanics').addFx;
   if (card.splash) {
-    const n = spendAllWater(s);
+    const n = spendAllWater(s, card.splashWaterCap ?? Infinity);
     fx = add(fx, perStack(card.splash, n));
     if (card.splash.sweep) fx.sweep = true;
   }

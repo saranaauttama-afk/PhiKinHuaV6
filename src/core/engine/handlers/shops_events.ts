@@ -2,10 +2,11 @@
 import type { Command, GameState } from '../../types';
 import {canRemoveCard} from '../shared';
 import type { RNG } from '../../rng';
-import { rollShopStock } from '../../shop';
+import { rollShopStock, rollProgressionShop } from '../../shop';
 import { applyRemoveCard, rollGamble, rollTreasure } from '../../events';
 import { removeCostForCount, upgradeCostForCount } from '../../balance/economy';
 import { SHOP_REROLL_COST } from '../../balance/economy';
+import {progressionEnabled} from '../../balance/deckProgression';
 import { DIFFICULTY, ECONOMY } from '../../balance/notfm';
 import { rollTwoBlessings } from '../../level';
 import { upgradeCard, canUpgrade, upgradeLevelOf, grantBlessing } from '../shared';
@@ -18,6 +19,12 @@ function stockFor(s: GameState, r: RNG, size: number, only?: (c: import('../../t
 
 /** The night shop: class cards plus equipment (ECONOMY.shopStock). */
 function nightShopStock(s: GameState, r: RNG) {
+  if (s.classId === 'warrior' || s.classId === 'shaman') {
+    const out = rollProgressionShop(s, r, s.shopFocus);
+    if (out.focus && !s.shopFocus) (s.shopFocusHistory ??= []).push(out.focus);
+    s.shopFocus = out.focus;
+    return { rng: out.rng, items: out.items };
+  }
   const cards = stockFor(s, r, ECONOMY.shopStock.cards, c => c.type !== 'equipment'); r = cards.rng;
   const gear = stockFor(s, r, ECONOMY.shopStock.equipment, c => c.type === 'equipment'); r = gear.rng;
   return { rng: r, items: [...cards.items, ...gear.items] };
@@ -35,8 +42,8 @@ export function healAmount(s: Partial<GameState>, amount: number): number {
 
 /** Upgrades or removals already done at the stop that is open now. */
 export function stopUses(s: Partial<GameState>): number { return s.shopBoughtItems?.length ?? 0; }
-export function removePrice(s: Partial<GameState>): number { return markedUp(s, removeCostForCount(stopUses(s))); }
-export function upgradePrice(s: Partial<GameState>): number { return markedUp(s, upgradeCostForCount(stopUses(s))); }
+export function removePrice(s: Partial<GameState>): number { return markedUp(s, removeCostForCount(stopUses(s),progressionEnabled(s.classId))); }
+export function upgradePrice(s: Partial<GameState>): number { return markedUp(s, upgradeCostForCount(stopUses(s),progressionEnabled(s.classId))); }
 
 /** The night's blessing stop: pick one of ECONOMY.blessingChoices. */
 export function openBlessingStop(s: GameState, r: RNG): { state: GameState; rng: RNG } {
@@ -61,13 +68,23 @@ export function takeShopBlessing(s: GameState, cmd: Extract<Command, { type: 'Ta
 export function shopReroll(s: GameState, _cmd: Extract<Command, { type: 'ShopReroll' }>, r: RNG) {
   if (s.phase !== 'shop') return { state: s, rng: r };
   if (s.shopKind !== 'card' && s.shopKind !== 'equipment') return { state: s, rng: r };
-  const cost = markedUp(s, SHOP_REROLL_COST);
+  if (progressionEnabled(s.classId) && s.shopKind === 'card' && !s.shopStock?.length) return { state: s, rng: r };
+  if (progressionEnabled(s.classId) && s.shopRerollUsed && s.shopKind === 'card') return { state: s, rng: r };
+  const cost = markedUp(s, progressionEnabled(s.classId)?SHOP_REROLL_COST:ECONOMY.rerollPrice);
   if ((s.player.gold ?? 0) < cost) {
     s.log.push('Shop: Not enough gold to reroll');
     return { state: s, rng: r };
   }
   s.player.gold -= cost;
-  { const out = s.shopKind === 'equipment' ? stockFor(s, r, 3, c => c.type === 'equipment') : nightShopStock(s, r); r = out.rng; s.shopStock = out.items; }
+  if (s.shopKind === 'card' && s.shopFocus) {
+    const sold = (s.shopBoughtItems ?? []).filter(item => 'card' in item).map(item => item.card.id);
+    const remainingRoles = new Set((s.shopStock ?? []).filter(item => 'card' in item).map(item => item.role));
+    const out = rollProgressionShop(s, r, s.shopFocus, sold); r = out.rng;
+    s.shopStock = out.items.filter(item => 'card' in item && remainingRoles.has(item.role));
+    s.shopRerollUsed = true;
+  } else {
+    const out = s.shopKind === 'equipment' ? stockFor(s, r, 3, c => c.type === 'equipment') : nightShopStock(s, r); r = out.rng; s.shopStock = out.items;
+  }
   s.log.push(`Shop: rerolled (-${cost}g)`);
   return { state: s, rng: r };
 }
@@ -119,6 +136,7 @@ export function takeShop(s: GameState, cmd: Extract<Command, { type: 'TakeShop' 
 
 export function shopRemoveBuy(s: GameState, cmd: Extract<Command, { type: 'ShopRemoveBuy' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'remove') return { state: s, rng: r };
+  if (progressionEnabled(s.classId) && stopUses(s) >= 3) return { state: s, rng: r };
   const count = (s.runCounters?.removeShopCount ?? 0);
   const price = removePrice(s);
   if ((s.player.gold ?? 0) < price) {
@@ -159,6 +177,7 @@ export function doWellDismiss(s: GameState, _cmd: Extract<Command, { type: 'DoWe
 
 export function shopUpgradeBuy(s: GameState, cmd: Extract<Command, { type: 'ShopUpgradeBuy' }>, r: RNG) {
   if (s.phase !== 'shop' || s.shopKind !== 'upgrade') return { state: s, rng: r };
+  if (progressionEnabled(s.classId) && stopUses(s) >= 2) return { state: s, rng: r };
   const i = cmd.index;
   if (!Number.isInteger(i) || i < 0 || i >= (s.masterDeck?.length ?? 0)) return { state: s, rng: r };
 
@@ -249,6 +268,7 @@ export function eventTreasureOpen(s: GameState, _cmd: Extract<Command, { type: '
 
 // === Openers used by map_pages ==============================================
 export function openShopCard(s: GameState, r: RNG): { state: GameState; rng: RNG } {
+  s.shopFocus = undefined; s.shopRerollUsed = false;
   const out = nightShopStock(s, r); r = out.rng;
   s.shopStock = out.items;
   s.shopKind = 'card';

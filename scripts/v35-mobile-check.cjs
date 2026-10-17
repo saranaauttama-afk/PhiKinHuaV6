@@ -38,12 +38,12 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.cwd(),proc
    await p.goto('http://127.0.0.1:8136');await p.getByRole('button',{name:/^เล่นต่อ/}).click();
    const shopIndex=save.state.pages.current.offers.findIndex(o=>o.kind==='shop_card');assert(shopIndex>=0);
    await p.getByTestId('adventure-slot-'+shopIndex).click();const enter=p.getByTestId('adventure-enter-'+shopIndex);assert((await box(enter)).height>=44);await enter.click();
-   await p.getByTestId('shop-destroy-page').waitFor();const stock=await p.getByTestId('shop-card-0').count();assert(stock>0);
+   await p.getByTestId('shop-close-page').waitFor();const stock=await p.getByTestId('shop-card-0').count();assert(stock>0);
    await p.getByTestId('shop-card-0').click();await p.getByRole('button',{name:/^ยืนยันซื้อ \d+ เบี้ย$/}).click();
    await p.getByRole('button',{name:'กลับจุดพัก',exact:true}).click();await p.getByTestId('adventure-slot-'+shopIndex).waitFor();
-   await p.getByTestId('adventure-slot-'+shopIndex).click();await p.getByTestId('adventure-enter-'+shopIndex).click();await p.getByTestId('shop-destroy-page').waitFor();
-   assert.equal(await p.getByTestId('shop-card-2').count(),0);await p.getByTestId('shop-destroy-page').click();await p.getByTestId('adventure-choices').waitFor();assert.equal(await p.getByTestId('adventure-slot-'+shopIndex).count(),0);
-   reports.push({viewport,check:'themed encounter entry, shop purchase, persistent return and explicit X',result:'passed'});await ctx.close();
+   await p.getByTestId('adventure-slot-'+shopIndex).click();await p.getByTestId('adventure-enter-'+shopIndex).click();await p.getByTestId('shop-close-page').waitFor();
+   assert.equal(await p.getByTestId('shop-card-2').count(),0);await p.getByTestId('shop-close-page').click();await p.getByTestId('adventure-choices').waitFor();assert.equal(await p.getByTestId('adventure-slot-'+shopIndex).count(),1);
+   reports.push({viewport,check:'themed encounter entry, shop purchase, persistent return and X keeps the shop',result:'passed'});await ctx.close();
   }
   assert.deepEqual(errors,[]);console.log('PASS',reports.length,'v35 mobile checks; no captures');
  }finally{fs.mkdirSync('backlog-audit',{recursive:true});fs.writeFileSync('backlog-audit/v35-mobile-ui.json',JSON.stringify({reports,errors,screenshots:false},null,2));await browser.close();await new Promise(r=>server.close(r));}

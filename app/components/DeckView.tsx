@@ -39,7 +39,14 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
 
   const deck = state.masterDeck ?? [];
 
-  const rows = groupCards(deck);
+  // Owner 17 Oct 2026: no tappable type filter. Every card shows at once, in groups with a plain
+  // text heading each: เครื่องราง first, then the other types in their usual order.
+  const groupOrder = ['equipment' as CardData['type'], ...TYPE_ORDER.filter(t => t !== 'equipment')];
+  const groups = groupOrder.map(type => ({ type, cards: deck.filter(c => c.type === type) })).filter(g => g.cards.length > 0);
+  const known = new Set(groupOrder);
+  const other = deck.filter(c => !known.has(c.type));
+  if (other.length) groups.push({ type: other[0].type, cards: other });
+  const equippedFor = (r: { card: CardData }) => (state.phase==='combat'?(state.equipped??[]):loadoutIndices(state).map(i=>deck[i])).filter(c=>c.id===r.card.id&&(c.star??1)===(r.card.star??1)).length;
 
 
   return (
@@ -71,17 +78,17 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
          </RitualSurface>)}
         </View>:<>
         <RitualSurface kind="quietSlate" style={{padding:12,gap:8}}>
-         <Text style={{color:palette.moon,fontFamily:font.heading,fontSize:15}}>ช่องสวมอุปกรณ์ · {state.equipmentSlotsMax??1} ช่อง</Text>
+         <Text style={{color:palette.moon,fontFamily:font.heading,fontSize:15}}>ช่องสวมเครื่องราง · {state.equipmentSlotsMax??1} ช่อง</Text>
          <View style={{flexDirection:'row',flexWrap:'wrap',gap:8}}>
           {Array.from({length:state.equipmentSlotsMax??1},(_,i)=>{
            const inFight=['combat','victory','reward','levelup','defeat'].includes(state.phase);
            const card=inFight?state.equipped?.[i]:deck[loadoutIndices(state)[i]];
-           return <Pressable key={i} testID={`bag-equipment-slot-${i}`} accessibilityRole="button" accessibilityLabel={card?`ช่อง ${i+1} ${card.name}`:`ช่องอุปกรณ์ว่าง ${i+1}`} onPress={()=>{if(inFight){if(card)setSelected({card,count:1})}else setManage(true)}} style={{width:78,minHeight:90,padding:6,alignItems:'center',justifyContent:'center',borderWidth:1,borderColor:palette.moonDim}}>
+           return <Pressable key={i} testID={`bag-equipment-slot-${i}`} accessibilityRole="button" accessibilityLabel={card?`ช่อง ${i+1} ${card.name}`:`ช่องเครื่องรางว่าง ${i+1}`} onPress={()=>{if(inFight){if(card)setSelected({card,count:1})}else setManage(true)}} style={{width:78,minHeight:90,padding:6,alignItems:'center',justifyContent:'center',borderWidth:1,borderColor:palette.moonDim}}>
             {card?<><CardGlyphArt card={card} size={40}/><Text style={{color:palette.moon,fontFamily:font.ui,fontSize:10,textAlign:'center'}}>✓ {card.name}</Text></>:<><Text style={{color:palette.moon,fontSize:28}}>+</Text><Text style={{color:palette.text,fontFamily:font.ui,fontSize:10}}>ช่องว่าง</Text></>}
            </Pressable>;
           })}
          </View>
-         {!deck.some(c=>c.type==='equipment')&&<Text style={{color:palette.text,fontFamily:font.ui,fontSize:12}}>ยังไม่มีอุปกรณ์ในสำรับ · หาได้จากร้านและรางวัล</Text>}
+         {!deck.some(c=>c.type==='equipment')&&<Text style={{color:palette.text,fontFamily:font.ui,fontSize:12}}>ยังไม่มีเครื่องรางในสำรับ · หาได้จากร้านและรางวัล</Text>}
          <Text style={{color:palette.text,fontFamily:font.ui,fontSize:11}}>สวมก่อนสู้ · ไพ่ที่สวมจะออกจากกองจั่ว</Text>
         </RitualSurface>
         {deck.length === 0 && (
@@ -94,11 +101,13 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
         )}
 
 
-        <View style={{flexDirection:'row',flexWrap:'wrap',gap:7}}>
-         {TYPE_ORDER.map(type=>{const total=deck.filter(c=>c.type===type).length;return total?<Text key={type} style={{color:palette.moon,fontFamily:font.ui,fontSize:11}}>{TYPE_LABEL[type]} ({total} ใบ)</Text>:null})}
-        </View>
-        <View testID="bag-card-grid" style={{flexDirection:'row',flexWrap:'wrap',gap:7,rowGap:12}}>
-         {rows.map((r,i)=><DeckCard compact key={`${r.card.id}-${i}`} card={r.card} equippedCount={(state.phase==='combat'?(state.equipped??[]):loadoutIndices(state).map(i=>deck[i])).filter(c=>c.id===r.card.id&&(c.star??1)===(r.card.star??1)).length} count={r.count} onPress={()=>setSelected(r)}/>)}
+        <View testID="bag-card-grid" style={{gap:16}}>
+         {groups.map(g=><View key={g.type} testID={`bag-group-${g.type}`} style={{gap:8}}>
+          <Text accessibilityRole="header" style={{color:palette.moon,fontFamily:font.heading,fontSize:15}}>{TYPE_LABEL[g.type]??'อื่น ๆ'} ({g.cards.length} ใบ)</Text>
+          <View style={{flexDirection:'row',flexWrap:'wrap',gap:7,rowGap:12}}>
+           {groupCards(g.cards).map((r,i)=><DeckCard compact key={`${r.card.id}-${i}`} card={r.card} equippedCount={equippedFor(r)} count={r.count} onPress={()=>setSelected(r)}/>)}
+          </View>
+         </View>)}
         </View>
         </>}
       </ScrollView>

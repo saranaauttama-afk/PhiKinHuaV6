@@ -35,7 +35,7 @@ try:
   tap_if('^เปิดหน้า'+cls+'$');tap('^เลือก'+cls+'$');tap_if('ออกเดินทาง');tap('ดูระดับอาถรรพ์ 1');tap('เริ่มรอบ · ระดับ 1');tap('^(ข้ามบทนี้|เดินทางต่อ)$')
   tap('^พรติดตัว 1:');assert not any(label(n)=='แตะพรเพื่ออ่านรายละเอียด' for n in nodes());shot(cls+'-starter');checks.append(cls+': starter selection shows effect')
   tap('^ยืนยันพร$');find('^สำรับ 10$');time.sleep(4)
-  tap('^สำรับ 10$');find('ช่องสวมอุปกรณ์');find('ยังไม่มีอุปกรณ์ในสำรับ');shot(cls+'-bag')
+  tap('^สำรับ 10$');find('ช่องสวมเครื่องราง');find('ยังไม่มีเครื่องรางในสำรับ');shot(cls+'-bag')
   tap('^พร \\(');assert any('พร' in label(n) for n in nodes());shot(cls+'-blessings');tap('^ปิด$');checks.append(cls+': bag tabs and empty equipment slots')
   deadline=time.monotonic()+30
   while time.monotonic()<deadline:
@@ -48,7 +48,12 @@ try:
   tap('^สกิล ');find('พักสกิล');shot(cls+'-skill');tap('^ปิด$');shot(cls+'-battle');checks.append(cls+': real combat hand details and class skill artwork/details')
  print('PASS',len(checks),'native checks',flush=True)
 except Exception as e:
- checks.append({'failed':type(e).__name__+': '+str(e)});shot('failure');raise
+ checks.append({'failed':type(e).__name__+': '+str(e)});print('::error title=native smoke::'+(type(e).__name__+': '+str(e)).replace('\n',' ')[:3000],flush=True);
+ try:
+  lc=adb('logcat','-d','-b','crash');lc=lc or '\n'.join(l for l in adb('logcat','-d').splitlines() if 'ReactNativeJS' in l or 'FATAL' in l or 'AndroidRuntime' in l)
+  print('::error title=native crash log::'+lc[-3500:].replace('\n',' | '),flush=True)
+ except Exception as le:print('::error title=native crash log::unavailable '+str(le),flush=True)
+ shot('failure');raise
 finally:
  (out/'results.json').write_text(json.dumps({'api':36,'syntheticFixtures':False,'checks':checks},ensure_ascii=False,indent=2))
  (out/'logcat.txt').write_text(adb('logcat','-d'))

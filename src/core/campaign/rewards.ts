@@ -18,7 +18,7 @@ export function rollNightCards(s:GameState,rng:RNG):{list:CardData[];rng:RNG}{
  const weights:Record<string,number>=ECONOMY.rewardRarity[night-1];
  const rarities=(Object.keys(weights) as Array<keyof typeof BY_RARITY>).filter(k=>weights[k]>0);
  const allowed=new Set(poolFor(cls.id,s.campaign?.milestoneLevel??0).map(c=>c.id));
- const pool=rarities.flatMap(k=>BY_RARITY[k]).filter(c=>allowed.has(c.id));
+ const pool=rarities.flatMap(k=>BY_RARITY[k]).filter(c=>allowed.has(c.id)&&!c.progressionRole);
  // Each rarity gets its weight, shared by that rarity's cards in the lane.
  const weighted=(lane:CardData[]):CardData=>{
   const rar=(c:CardData)=>c.rarity??'Common';

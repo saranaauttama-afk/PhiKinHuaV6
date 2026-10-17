@@ -22,13 +22,14 @@ const DURATION: Record<CombatEvent['t'], number> = {
   Healed: 350,
   // Emitted since the audio pass (15 Oct 2026); kept short so ghost turns do not drag.
   StatusApplied: 120,
-  Died: 500,
+  Died: 1100, // ghost shudders, sinks and fades before the summary (MonsterArea.die)
   TurnEnded: 150,
   RhythmChanged: 0,
   HeavyHit: 0,
   Riposte: 350,
   RoundEnd: 600,
   MinionSummoned: 250,
+  MinionActed: 300,
   MinionDamaged: 200,
   GhostGuard: 250,
   GhostRiposte: 350,
@@ -52,6 +53,8 @@ export type TimelineState = {
 
 export function useCombatTimeline(opts?: { speed?: number }) {
   const speed = opts?.speed ?? 1;
+  // Keep a revealed card and its timeline on the same speed for this whole batch.
+  const [playbackSpeed,setPlaybackSpeed]=React.useState(speed);
 
   const [state, setState] = React.useState<TimelineState>({
     current: null,
@@ -82,6 +85,7 @@ export function useCombatTimeline(opts?: { speed?: number }) {
   const play = React.useCallback(
     (events: CombatEvent[], onDone?: () => void) => {
       clearTimer();
+      setPlaybackSpeed(speed);
       doneRef.current = onDone ?? null;
 
       if (events.length === 0) {
@@ -114,5 +118,5 @@ export function useCombatTimeline(opts?: { speed?: number }) {
    */
   const skip = React.useCallback(() => finish(), [finish]);
 
-  return { ...state, play, skip };
+  return { ...state, speed:playbackSpeed, play, skip };
 }

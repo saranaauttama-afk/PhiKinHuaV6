@@ -190,7 +190,7 @@ export const paperSurface={panel:paper.light,panelRaise:'#efdfb4',panelSunk:'#d4
 export const pulpColors = {'selectedPaper': '#f2dba5', 'healthTrack': '#b8a17b', 'routeCurrent': '#e6b963', 'primaryPaper': '#e8c77b', 'pressedPaper': '#c1a675', 'expTrack': '#b7a17b', 'expFill': '#705231', 'sceneInk': '#14100a', 'switchOff': '#998566', 'switchOn': '#7b4b28', 'lanternGlow': '#bc793c', 'enemyBack': '#453126', 'enemyInk': '#bda16d', 'bone': '#e8dcc0', 'black': '#000', 'paperEdge': '#917448', 'paperSpeck': '#725436', 'paperWear': '#886a3d', 'storySceneShade': 'rgba(12,9,5,.2)', 'storyTextShade': 'rgba(12,9,5,.78)', 'loadingShade': 'rgba(12,9,5,.25)', 'mapShade': 'rgba(12,9,5,.32)', 'settingsShade': 'rgba(12,9,5,.95)', 'menuShade': 'rgba(12,9,5,.15)', 'eventTextShade': 'rgba(12,9,5,.76)'} as const;
 
 /** Pigments sampled from the ritual UI raster artwork. */
-export const combatUiColors={statusDebuff:'#5c211c',statusBuff:'#302b1b',rewardShade:'rgba(12,9,5,.38)'} as const;
+export const combatUiColors={hitFlash:'#b8463a',statusDebuff:'#5c211c',statusBuff:'#302b1b',rewardShade:'rgba(12,9,5,.38)'} as const;
 
 export const ritualColors={chalk:"#f2e7ca",circle:"#b45139",current:"#d78161",label:"#edac8a",chalkWash:"rgba(242,231,202,.08)",shadow:"#110c07"} as const;
 
@@ -216,7 +216,7 @@ export const hudPictogramColors={equipment:'#376b61',energy:'#ebbe65',mana:'#9ac
 /** Card-type ink for type marks (approved comic UI v1.0.47). */
 export const cardTypeInkColors={strike:'#8d3f2f',arcane:'#48596c',gear:'#826333',curse:'#38302c'} as const;
 /** Health bar track and fill edges. */
-export const healthBarColors={track:'#282017',fillTop:'#b35b46',fillBottom:'#63251d'} as const;
+export const healthBarColors={chip:'#c8b786',track:'#282017',fillTop:'#b35b46',fillBottom:'#63251d'} as const;
 /** Occupation book pages (class select). */
 export const occupationBookColors={ink:'#191610',cream:'#efdbb1',red:'#983e2e',backdrop:'#21160f',disabled:'#8f887a',selected:'#e8cf94'} as const;
 /** Night-1 ghost mechanics on the ghost's side (ชาร์จ glow on held card backs). */

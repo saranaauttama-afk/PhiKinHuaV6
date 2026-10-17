@@ -26,9 +26,64 @@ export type SfxId =
   | 'heal'
   | 'debuff'
   | 'turnStart'
-  | 'uiTap';
+  | 'uiTap'
+  // ชุด 3 (16 ต.ค. 2026): เสียงแทรกตามโซน — สุ่มเล่นบนแผนที่ (src/audio/zones.ts)
+  | 'villageDogHowl'
+  | 'villageDoorCreak'
+  | 'villageRooster'
+  | 'templeWindChime'
+  | 'templeBellFar'
+  | 'templeChant'
+  | 'templeBroom'
+  | 'cremationOwl'
+  | 'cremationEmber'
+  | 'cremationDogNear'
+  | 'cremationCrow'
+  | 'forestBranchSnap'
+  | 'forestNightBird'
+  | 'forestRustle'
+  | 'waterFishSplash'
+  | 'waterWading'
+  | 'waterFrogsStop'
+  | 'mountainFlagFlap'
+  | 'mountainShrineBell'
+  | 'mountainRockfall'
+  | 'caveBats'
+  | 'caveRockEcho'
+  | 'caveBreath'
+  | 'otherworldWhispers'
+  | 'otherworldReverseGong'
+  // ชุด 4 (17 ต.ค. 2026): เสียงผีและชาวบ้าน — ดู docs/audio/AUDIO.md
+  | 'ghostWhisper'
+  | 'ghostScreech'
+  | 'ghostWail'
+  | 'villagerSob'
+  | 'villagerPrayer'
+  | 'villagerFear';
 
-export type BedId = 'music' | 'ambienceNight1';
+export type BedId =
+  | 'music'
+  | 'ambienceNight1'
+  // ชุด 3: เสียงพื้นตามโซน + กลองตอนสู้ (src/audio/zones.ts)
+  | 'villageBed'
+  | 'villageBattleBed'
+  | 'templeBed'
+  | 'templeBattleBed'
+  | 'cremationBed'
+  | 'cremationBattleBed'
+  | 'forestBed'
+  | 'forestBattleBed'
+  | 'waterBed'
+  | 'waterBattleBed'
+  | 'mountainBed'
+  | 'mountainBattleBed'
+  | 'caveBed'
+  | 'caveBattleBed'
+  | 'otherworldBed'
+  | 'otherworldBattleBed'
+  | 'battleDrumNormal'
+  | 'battleDrumElite'
+  | 'battleDrumBoss';
 
 type Source = number; // ผลของ require() สำหรับไฟล์ asset
 
@@ -45,7 +100,8 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
   },
   bossIntroHeadCollector: { files: [require('../../assets/audio/boss-intro-head-collector.mp3')], volume: 0.9 },
   // ชุด 2 (assets/audio/sfx/) — ตัดเงียบ, mono 96k, ปรับดัง ~−18 LUFS แล้ว; volume ด้านล่างคุมความดังเทียบกัน
-  playerHit: { files: [require('../../assets/audio/sfx/player-hit-1.mp3')], volume: 0.75 },
+  // 17 ต.ค.: เจ้าของบอกไม่ได้ยินเสียงหมัด — ไฟล์เดิมบางและเบา (−25 LUFS) → หมัดใหม่ 3 แบบสุ่มสลับ ~−15 ถึง −20 LUFS
+  playerHit: { files: [require('../../assets/audio/sfx/player-hit-1.mp3'), require('../../assets/audio/sfx/player-hit-2.mp3'), require('../../assets/audio/sfx/player-hit-3.mp3')], volume: 0.9 },
   heavyHit: { files: [require('../../assets/audio/sfx/heavy-hit-1.mp3')], volume: 0.9 },
   block: { files: [require('../../assets/audio/sfx/block-1.mp3')], volume: 0.55 },
   riposte: { files: [require('../../assets/audio/sfx/riposte-1.mp3')], volume: 0.8 },
@@ -59,13 +115,70 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
   debuff: { files: [require('../../assets/audio/sfx/debuff-1.mp3')], volume: 0.6 },
   turnStart: { files: [require('../../assets/audio/sfx/turn-start-1.mp3')], volume: 0.4 },
   uiTap: { files: [require('../../assets/audio/sfx/ui-tap-1.mp3')], volume: 0.35 },
+  // ชุด 3 — เสียงแทรกบรรยากาศ ดังตามสวิตช์ "เพลง/เสียงพื้น" ไม่ใช่สวิตช์เสียงเอฟเฟกต์ (เป็นส่วนของฉาก)
+  villageDogHowl: { files: [require('../../assets/audio/sfx/village-dog-howl-1.mp3')], volume: 0.4 },
+  villageDoorCreak: { files: [require('../../assets/audio/sfx/village-door-creak-1.mp3')], volume: 0.4 },
+  villageRooster: { files: [require('../../assets/audio/sfx/village-rooster-1.mp3')], volume: 0.4 },
+  templeWindChime: { files: [require('../../assets/audio/sfx/temple-wind-chime-1.mp3')], volume: 0.4 },
+  templeBellFar: { files: [require('../../assets/audio/sfx/temple-bell-far-1.mp3')], volume: 0.4 },
+  templeChant: { files: [require('../../assets/audio/sfx/temple-chant-1.mp3')], volume: 0.4 },
+  templeBroom: { files: [require('../../assets/audio/sfx/temple-broom-1.mp3')], volume: 0.4 },
+  cremationOwl: { files: [require('../../assets/audio/sfx/cremation-owl-1.mp3')], volume: 0.4 },
+  cremationEmber: { files: [require('../../assets/audio/sfx/cremation-ember-1.mp3')], volume: 0.4 },
+  cremationDogNear: { files: [require('../../assets/audio/sfx/cremation-dog-near-1.mp3')], volume: 0.4 },
+  cremationCrow: { files: [require('../../assets/audio/sfx/cremation-crow-1.mp3')], volume: 0.4 },
+  forestBranchSnap: { files: [require('../../assets/audio/sfx/forest-branch-snap-1.mp3')], volume: 0.4 },
+  forestNightBird: { files: [require('../../assets/audio/sfx/forest-night-bird-1.mp3')], volume: 0.4 },
+  forestRustle: { files: [require('../../assets/audio/sfx/forest-rustle-1.mp3')], volume: 0.4 },
+  waterFishSplash: { files: [require('../../assets/audio/sfx/water-fish-splash-1.mp3')], volume: 0.4 },
+  waterWading: { files: [require('../../assets/audio/sfx/water-wading-1.mp3')], volume: 0.4 },
+  waterFrogsStop: { files: [require('../../assets/audio/sfx/water-frogs-stop-1.mp3')], volume: 0.4 },
+  mountainFlagFlap: { files: [require('../../assets/audio/sfx/mountain-flag-flap-1.mp3')], volume: 0.4 },
+  mountainShrineBell: { files: [require('../../assets/audio/sfx/mountain-shrine-bell-1.mp3')], volume: 0.4 },
+  mountainRockfall: { files: [require('../../assets/audio/sfx/mountain-rockfall-1.mp3')], volume: 0.4 },
+  caveBats: { files: [require('../../assets/audio/sfx/cave-bats-1.mp3')], volume: 0.4 },
+  caveRockEcho: { files: [require('../../assets/audio/sfx/cave-rock-echo-1.mp3')], volume: 0.4 },
+  caveBreath: { files: [require('../../assets/audio/sfx/cave-breath-1.mp3')], volume: 0.4 },
+  otherworldWhispers: { files: [require('../../assets/audio/sfx/otherworld-whispers-1.mp3')], volume: 0.4 },
+  otherworldReverseGong: { files: [require('../../assets/audio/sfx/otherworld-reverse-gong-1.mp3')], volume: 0.4 },
+  ghostWhisper: { files: [require('../../assets/audio/sfx/ghost-whisper-1.mp3')], volume: 0.45 },
+  ghostScreech: { files: [require('../../assets/audio/sfx/ghost-screech-1.mp3')], volume: 0.75 },
+  ghostWail: { files: [require('../../assets/audio/sfx/ghost-wail-1.mp3')], volume: 0.6 },
+  villagerSob: { files: [require('../../assets/audio/sfx/villager-sob-1.mp3')], volume: 0.4 },
+  villagerPrayer: { files: [require('../../assets/audio/sfx/villager-prayer-1.mp3')], volume: 0.4 },
+  villagerFear: { files: [require('../../assets/audio/sfx/villager-fear-1.mp3')], volume: 0.55 },
 };
 
 /** เสียงพื้นที่เล่นวนยาว ๆ — ตั้งให้เบากว่าเสียงเอฟเฟกต์มาก */
 export const BEDS: Record<BedId, { file: Source | null; volume: number }> = {
   // เพลงชั่วคราวจาก AI — จะเปลี่ยนเป็นเพลงไทยจากเครื่องดนตรีจริงทีหลัง
-  music: { file: require('../../assets/audio/music-thai-temp.mp3'), volume: 0.35 },
+  // ตัดออก 16 ต.ค. 2026 (เจ้าของ): เกมใช้เสียงบรรยากาศล้วน — file null = ไม่ถูกรวมใน APK (ไฟล์ยังอยู่ใน assets ถ้าจะกลับมาใช้)
+  music: { file: null, volume: 0.35 },
+  // เลิกใช้ในฉากสู้แล้ว (ชุด 3 ใช้เสียงตามโซนแทน) — เก็บไฟล์ไว้เผื่อใช้กับโซนที่ยังไม่มีเสียง
   ambienceNight1: { file: require('../../assets/audio/ambience-night-1.mp3'), volume: 0.22 },
+  // ชุด 3 (assets/audio/ambience/) — ElevenLabs SFX v2 ลูป, ตัดความถี่เกิน 10 kHz (ลดซ่า), ~−21 ถึง −24 LUFS
+  villageBed: { file: require('../../assets/audio/ambience/village-bed.mp3'), volume: 0.45 },
+  villageBattleBed: { file: require('../../assets/audio/ambience/village-battle-bed.mp3'), volume: 0.3 },
+  // ชุด 3 โซนอื่น (scripts/zone-audio.py, ~−21 ถึง −24 LUFS) — ค่า volume เท่าหมู่บ้าน
+  templeBed: { file: require('../../assets/audio/ambience/temple-bed.mp3'), volume: 0.45 },
+  templeBattleBed: { file: require('../../assets/audio/ambience/temple-battle-bed.mp3'), volume: 0.3 },
+  cremationBed: { file: require('../../assets/audio/ambience/cremation-bed.mp3'), volume: 0.45 },
+  cremationBattleBed: { file: require('../../assets/audio/ambience/cremation-battle-bed.mp3'), volume: 0.3 },
+  forestBed: { file: require('../../assets/audio/ambience/forest-bed.mp3'), volume: 0.45 },
+  forestBattleBed: { file: require('../../assets/audio/ambience/forest-battle-bed.mp3'), volume: 0.3 },
+  waterBed: { file: require('../../assets/audio/ambience/water-bed.mp3'), volume: 0.45 },
+  waterBattleBed: { file: require('../../assets/audio/ambience/water-battle-bed.mp3'), volume: 0.3 },
+  mountainBed: { file: require('../../assets/audio/ambience/mountain-bed.mp3'), volume: 0.45 },
+  mountainBattleBed: { file: require('../../assets/audio/ambience/mountain-battle-bed.mp3'), volume: 0.3 },
+  caveBed: { file: require('../../assets/audio/ambience/cave-bed.mp3'), volume: 0.45 },
+  caveBattleBed: { file: require('../../assets/audio/ambience/cave-battle-bed.mp3'), volume: 0.3 },
+  otherworldBed: { file: require('../../assets/audio/ambience/otherworld-bed.mp3'), volume: 0.45 },
+  otherworldBattleBed: { file: require('../../assets/audio/ambience/otherworld-battle-bed.mp3'), volume: 0.3 },
+  // 17 ต.ค. (เจ้าของ: กลองไม่ขึ้น/ไม่ตื่นเต้น): กลองธรรมดาเดิมตีแค่ 2 ครั้งใน 16 วิ → ใช้กลองผีเก่งที่ตีสม่ำเสมอ ช้าลงเป็น ~64 bpm,
+  // ทุกกลองดันเป็น −19 LUFS และลมตอนสู้ลดเหลือ 0.3 ให้กลองนำ
+  battleDrumNormal: { file: require('../../assets/audio/ambience/battle-drum-normal.mp3'), volume: 0.8 },
+  battleDrumElite: { file: require('../../assets/audio/ambience/battle-drum-elite.mp3'), volume: 0.8 },
+  battleDrumBoss: { file: require('../../assets/audio/ambience/battle-drum-boss.mp3'), volume: 0.85 },
 };
 
 /** บอสที่มีเสียงเปิดตัวแล้ว (monsterId → SfxId) */

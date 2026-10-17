@@ -1,4 +1,5 @@
 import {describe,it,expect} from 'vitest';
+import {PROGRESSION_ROUTE} from '../src/core/balance/deckProgression';
 import {baseNewState} from '../src/core/commands';
 import {applyCommand} from '../src/core/reducer';
 import {makeRng} from '../src/core/rng';
@@ -48,10 +49,25 @@ describe('three-night continuous runs',()=>{
   }
   expect(ghosts).toHaveLength(27);expect(new Set(ghosts).size).toBe(27);expect(d.s.runSummary?.won).toBe(true);expect(d.s.fightCount).toBe(runFightTotal(level));expect(d.s.campaign!.night).toBe(3);expect(d.s.campaign!.completedNights).toBe(3);expect(quotas).toEqual([7,10,10]);expect(bosses).toHaveLength(level===5?4:3);expect(bosses.includes(ULTIMATE_BOSS.id)).toBe(level===5);expect(d.s.runSummary!.beatSecretBoss).toBe(level===5);expect(stages.every((n,i)=>i===0||n>=stages[i-1])).toBe(true);expect(isPlayableSave(toSave(d.s,d.r))).toBe(false);
  });
+ it('warrior/shaman route: guaranteed chests and extra card shops per PROGRESSION_ROUTE (16 Oct 2026)',()=>{
+  for(const cls of ['warrior','shaman'] as const)for(const difficulty of [1,3,5] as const)for(let seed=0;seed<10;seed++){
+   const d=driver(difficulty,cls,'route-'+seed);
+   for(const night of [1,2,3] as const){d.s.campaign!.night=night;d.s.campaign!.completedNights=night-1;startAdventure(d.s,d.r);
+    const deck=d.s.pages!.adventure!.deck,of=(...k:string[])=>deck.filter(e=>k.includes(e.offer.kind));
+    expect(of('monster')).toHaveLength(night===1?7:10);
+    expect(of('shop_card')).toHaveLength(PROGRESSION_ROUTE.cardShops[night-1]);
+    expect(of('treasure','treasure_single')).toHaveLength(PROGRESSION_ROUTE.chests[night-1]);
+    for(const kind of ['blessing','shop_upgrade','shop_remove','story_event','next_event'])expect(of(kind),kind).toHaveLength(1);
+    expect(of('well','healing_shrine')).toHaveLength(1);
+    expect(validAdventure(d.s)).toBe(true);
+   }
+  }
+ });
  it('every night guarantees shop, blessing, story, upgrade, healing and removal, with at most one chest',()=>{
   let chestTotal=0;
   for(const difficulty of [1,2,3,4,5] as const)for(let seed=0;seed<40;seed++){
-   const d=driver(difficulty,'warrior','quota-'+seed);let services=0,stories=0;
+   // nun keeps the pre-progression route (deckProgression.progressionEnabled).
+   const d=driver(difficulty,'nun','quota-'+seed);let services=0,stories=0;
    for(const night of [1,2,3] as const){d.s.campaign!.night=night;d.s.campaign!.completedNights=night-1;startAdventure(d.s,d.r);
     const deck=d.s.pages!.adventure!.deck,monsters=deck.filter(e=>e.offer.kind==='monster');expect(monsters).toHaveLength(night===1?7:10);expect(new Set(monsters.map(e=>(e.offer as any).enemyId)).size).toBe(monsters.length);expect(monsters.filter(e=>(e.offer as any).tier==='elite')).toHaveLength(runEliteQuota(night,difficulty));expect(deck.filter(e=>e.offer.kind==='story_event')).toHaveLength(1);stories++;
     const optional=deck.filter(e=>e.offer.kind!=='monster'&&e.offer.kind!=='story_event'&&e.offer.kind!=='next_event');const chests=optional.filter(e=>['treasure','treasure_single'].includes(e.offer.kind)).length;services+=chests;expect(chests).toBeLessThanOrEqual(1);for(const kind of ['shop_card','blessing','shop_upgrade','shop_remove'])expect(optional.filter(e=>e.offer.kind===kind),kind).toHaveLength(1);expect(optional.filter(e=>['well','healing_shrine'].includes(e.offer.kind))).toHaveLength(1);expect(optional).toHaveLength(5+chests);

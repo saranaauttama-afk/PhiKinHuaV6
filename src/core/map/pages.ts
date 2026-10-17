@@ -1,7 +1,7 @@
 // src/core/map/pages.ts — offers shown on the three-slot adventure board.
 import type { Adventure } from './adventure';
 
-export type PageOffer =
+export type PageOffer = (
   | { kind: 'monster', tier: 'normal' | 'elite', enemyId: string }
   | { kind: 'shop_card'; shopId: string }
   | { kind: 'shop_equipment'; shopId: string }
@@ -14,7 +14,8 @@ export type PageOffer =
   | { kind: 'treasure_single'; shopId: string }
   | { kind: 'story_event'; shopId: string; eventId: string }
   | { kind: 'next_event' }
-  | { kind: 'boss', bossType: 'final' | 'secret', enemyId: string };
+  | { kind: 'boss', bossType: 'final' | 'secret', enemyId: string }
+) & { availableAfterWins?: number };
 
 export type MapStatePages = {
   adventure?: Adventure;

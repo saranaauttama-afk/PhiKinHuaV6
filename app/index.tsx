@@ -1,4 +1,3 @@
-import EquipmentPicker from './components/EquipmentPicker';
 // app/index.tsx — Clean version for redesign
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -26,7 +25,8 @@ import StoryEventView from './components/StoryEventView';
 import ChapterView from './components/ChapterView';
 import SceneArrival from './components/SceneArrival';
 import LoadingScreen from './components/LoadingScreen';
-import { mapScene } from './scenePresentation';
+import { mapScene, adventureSceneId } from './scenePresentation';
+import { setSceneAudio, setMenuAudio } from '../src/audio/audio';
 import {paper} from './components/Paper';
 import BlessingView from './components/BlessingView';
 import PlayerStatusBar, { STATUS_BAR_SPACE } from './components/PlayerStatusBar';
@@ -50,7 +50,6 @@ export default function Home() {
   const [journalOpen,setJournalOpen]=useState(false);
   const [archiveOpen,setArchiveOpen]=useState(false);
   const [pickingClass, setPickingClass] = useState(chooseClass==='1');
-  const [equipmentOffer,setEquipmentOffer]=useState<number|null>(null);
   const [bagTab,setBagTab]=useState<'deck'|'blessings'>('deck');
 
   const [fontsLoaded] = useAppFonts();
@@ -75,12 +74,18 @@ export default function Home() {
     if (['combat','victory','talk','levelup','reward'].includes(state.phase) && state.enemy && !state.chapter) router.replace({pathname:'/battle',params:{monsterId:state.enemy.id,monsterName:state.enemy.name}});
   },[state.phase,state.enemy?.id,state.chapter]);
 
+  // เสียงตามโซน (ชุด 3): หน้าเมนูเปิดแค่เพลง · แผนที่/ร้าน/อีเวนต์ใช้เสียงพื้นของโซนที่ยืนอยู่ (src/audio/zones.ts)
+  const audioScreen=screenForState(state,{pickingClass});
+  const onMenu=audioScreen!=='map'||journalOpen||archiveOpen||!!nightClass;
+  const audioScene=onMenu?undefined:adventureSceneId(state);
+  useEffect(()=>{if(onMenu)setMenuAudio();else setSceneAudio(audioScene,'map');},[onMenu,audioScene]);
+
   const page   = state.pages?.current;
   const offers = page?.offers ?? [];
 
   /** เลือก encounter — คอมแบตไปหน้าต่อสู้ ที่เหลือ engine เปลี่ยน phase เอง */
   const enterOffer = (offer: PageOffer, index: number) => {
-    if((offer.kind==='monster'||offer.kind==='boss')&&state.masterDeck.some(c=>c.type==='equipment')){setEquipmentOffer(index);return;}
+    // Owner 17 Oct 2026: equipment is worn from the deck page only; fights start with that loadout (map_pages.ts falls back to loadoutIndices).
     dispatch({ type: 'ChooseOffer', index });
 
     // Restored and newly entered fights share the combat redirect above.
@@ -178,7 +183,7 @@ export default function Home() {
       <SceneArrival instant={state.pages?.adventure?.enteredBoard===state.pages?.adventure?.boardIndex} sceneKey={`${location.key}:board-${state.pages?.adventure?.boardIndex}`} source={location.source}>
         <Scrim style={{ paddingTop: pad.top }}>
 
-          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices appearanceKey={`${state.phase}:${state.fightCount??0}`} runKey={`${state.seed}:${state.campaign?.night??0}`} depth={state.pages?.adventure?.fightsWon} offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
+          <View style={{flex:1,paddingBottom:STATUS_BAR_SPACE+pad.bottom}}><AdventureChoices appearanceKey={`${state.phase}:${state.fightCount??0}`} runKey={`${state.seed}:${state.campaign?.night??0}`} depth={state.pages?.adventure?.fightsWon} offers={offers} resolved={page?.resolved??[]} slotIds={state.pages?.adventure?.slotIds??offers.map((_,i)=>String(i))} onEnter={enterOffer} usedIds={state.pages?.adventure?.usedIds} consumedIds={state.pages?.adventure?.resolvedIds} onDestroy={index=>dispatch({type:'DeleteShopFromMap',index})} skipCount={skippableSlots(state).length}/></View>
 
           {/* Game Components — คอมแบตอยู่ที่ app/battle.tsx แล้ว ไม่ได้อยู่ตรงนี้ */}
           {/* MapView เดิมถูกลบทิ้ง — เป็นแผงดีบั๊กภาษาอังกฤษที่โชว์ตัวเลข pool
@@ -203,7 +208,6 @@ export default function Home() {
 
       {/* สำรับเป็นจอทับเต็มจอ วางนอก Scrim เพื่อให้อยู่เหนือทุกอย่าง
           เดิมวางเป็นบล็อกไหลอยู่ในคอลัมน์กลางแผนที่ จึงล้นออกนอกจอ */}
-      {equipmentOffer!==null&&<EquipmentPicker state={state} onCancel={()=>setEquipmentOffer(null)} onConfirm={equipmentIndices=>{const index=equipmentOffer;setEquipmentOffer(null);dispatch({type:'ChooseOffer',index,equipmentIndices});}}/>}
       <DeckView state={state} dispatch={dispatch} initialTab={bagTab} />
 
 

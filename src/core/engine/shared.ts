@@ -5,7 +5,7 @@ import { nextExpForLevel, expForMonster, goldForMonster } from '../balance/progr
 import { rollThreeCards } from '../level';
 import { LEVEL_UP, CARD_RULES } from '../balance/notfm';
 import { rollCardReward } from '../cards/reward';
-import { starOf } from '../cards/model';
+import { starOf, starFx } from '../cards/model';
 import { STAR_RULES } from '../balance/notfm';
 import { getMonsterById, type ThaiGhostData } from '../monsters/thai-ghosts';
 
@@ -95,7 +95,24 @@ export function upgradeLevelOf(c: CardData): number {
   return starOf(c) - 1;
 }
 export function canUpgrade(c: CardData): boolean {
-  return c.type !== 'curse' && !c.borrowed && starOf(c) < STAR_RULES.maxStar;
+  if (c.type === 'curse' || c.borrowed || starOf(c) >= STAR_RULES.maxStar) return false;
+  // A paid upgrade must change a card rule, not just the star drawn on its face.
+  // Compare definitions rather than the current fight state (healing at full HP still has value).
+  const before = starOf(c), next = before + 1;
+  const effect = (star: number) => {
+    const card = { ...c, star };
+    const riposte = card.riposte;
+    const mult = STAR_RULES.mult[star - 1];
+    return JSON.stringify({
+      fx: starFx(card),
+      riposte: riposte && {
+        ...riposte,
+        dmg: riposte.dmg == null ? undefined : Math.round(riposte.dmg * mult),
+        block: riposte.block == null ? undefined : Math.round(riposte.block * mult),
+      },
+    });
+  };
+  return effect(before) !== effect(next);
 }
 /** One more star. Numbers follow `STAR_RULES` or the card's own star values. */
 export function upgradeCard(c: CardData): CardData {

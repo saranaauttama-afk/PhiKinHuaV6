@@ -355,10 +355,19 @@
   "rarity": "Common",
   "class": "shaman",
   "fx": {
-   "dmg": 6
+   "dmg": 3
   },
-  "starter": 1,
-  "flavor": "ไผ่เผาไฟปลายแหลม"
+  "starter": 3,
+  "flavor": "ไผ่เผาไฟปลายแหลม",
+  "stars": [
+   {
+    "dmg": 4
+   },
+   {
+    "dmg": 5
+   }
+  ],
+  "progressionRole": "basic"
  },
  {
   "id": "bamboo_volley",
@@ -379,18 +388,19 @@
   "rarity": "Common",
   "class": "shaman",
   "fx": {
-   "dmg": 5,
-   "status": [
-    {
-     "id": "yant",
-     "stacks": 1,
-     "turns": 99,
-     "to": "enemy"
-    }
-   ]
+   "dmg": 3
   },
-  "starter": 2,
-  "flavor": "เข็มเสกปักลงเงาผี ทิ้งรอยยันต์ไว้"
+  "starter": 1,
+  "flavor": "เข็มเสกปักลงเงาผี ทิ้งรอยยันต์ไว้",
+  "stars": [
+   {
+    "dmg": 4
+   },
+   {
+    "dmg": 5
+   }
+  ],
+  "progressionRole": "bridge"
  },
  {
   "id": "paper_yant",
@@ -506,12 +516,23 @@
   "rarity": "Common",
   "class": "shaman",
   "fx": {
-   "mana": 3,
+   "mana": 2,
    "draw": 1
   },
   "limit": "turn",
-  "starter": 2,
-  "flavor": "ใจนิ่ง น้ำในขันก็ขลัง"
+  "starter": 1,
+  "flavor": "ใจนิ่ง น้ำในขันก็ขลัง",
+  "stars": [
+   {
+    "mana": 3,
+    "draw": 1
+   },
+   {
+    "mana": 4,
+    "draw": 1
+   }
+  ],
+  "progressionRole": "bridge"
  },
  {
   "id": "ghost_possession",
@@ -544,13 +565,25 @@
   "type": "spell",
   "rarity": "Common",
   "class": "shaman",
-  "fx": {},
+  "fx": {
+   "dmg": 0
+  },
   "mana": 0,
   "splash": {
-   "dmg": 5
+   "dmg": 3
   },
   "starter": 1,
-  "flavor": "สาดทั้งขัน ไม่เหลือสักหยด"
+  "flavor": "ตวงน้ำมนต์สามส่วนสาดใส่ผี เหลือไว้ใช้คาถาต่อ",
+  "stars": [
+   {
+    "dmg": 2
+   },
+   {
+    "dmg": 4
+   }
+  ],
+  "progressionRole": "bridge",
+  "splashWaterCap": 3
  },
  {
   "id": "sprinkle",
@@ -559,12 +592,23 @@
   "rarity": "Common",
   "class": "shaman",
   "fx": {
-   "block": 7,
-   "heal": 2
+   "block": 4,
+   "heal": 1
   },
   "mana": 1,
   "starter": 1,
-  "flavor": "ใบมะยมจุ่มน้ำมนต์ประพรมรอบตัว"
+  "flavor": "ใบมะยมจุ่มน้ำมนต์ประพรมรอบตัว",
+  "stars": [
+   {
+    "block": 5,
+    "heal": 1
+   },
+   {
+    "block": 6,
+    "heal": 1
+   }
+  ],
+  "progressionRole": "bridge"
  },
  {
   "id": "boil_water",
@@ -775,7 +819,6 @@
    ]
   },
   "mana": 2,
-  "starter": 1,
   "flavor": "คำสาปทำให้ผีเจ็บทุกครั้งที่โดน"
  },
  {
@@ -907,11 +950,20 @@
   "rarity": "Common",
   "class": "shaman",
   "fx": {
-   "block": 7
+   "block": 4
   },
   "ap": 1,
   "starter": 2,
-  "flavor": "ตั้งรับด้วยผ้าชุบน้ำมนต์"
+  "flavor": "ตั้งรับด้วยผ้าชุบน้ำมนต์",
+  "stars": [
+   {
+    "block": 5
+   },
+   {
+    "block": 6
+   }
+  ],
+  "progressionRole": "basic"
  },
  {
   "id": "fill_bowl",
@@ -921,10 +973,22 @@
   "class": "shaman",
   "fx": {
    "mana": 2,
-   "block": 4
+   "block": 2
   },
   "ap": 1,
-  "flavor": "ตักน้ำบ่อวัดใส่ขันแล้วเสกต่อ"
+  "flavor": "ตักน้ำบ่อวัดใส่ขันแล้วเสกต่อ",
+  "starter": 1,
+  "stars": [
+   {
+    "mana": 2,
+    "block": 3
+   },
+   {
+    "mana": 2,
+    "block": 4
+   }
+  ],
+  "progressionRole": "bridge"
  },
  {
   "id": "full_bowl",
@@ -1271,8 +1335,8 @@
     "dmg": 3
    }
   },
-  "starter": 4,
-  "flavor": "จักรหมุนแรงขึ้นเมื่อใจนิ่ง"
+  "flavor": "จักรหมุนแรงขึ้นเมื่อใจนิ่ง",
+  "starter": 4
  },
  {
   "id": "sprinkle_water",
@@ -1291,8 +1355,8 @@
     }
    ]
   },
-  "starter": 1,
-  "flavor": "พรมใส่ตรงๆ"
+  "flavor": "พรมใส่ตรงๆ",
+  "starter": 1
  },
  {
   "id": "chant_sutra",
@@ -1304,8 +1368,8 @@
   "fx": {
    "block": 7
   },
-  "starter": 3,
-  "flavor": "สวดบทป้องกัน"
+  "flavor": "สวดบทป้องกัน",
+  "starter": 3
  },
  {
   "id": "holy_water",
@@ -1317,8 +1381,8 @@
   "fx": {
    "heal": 4
   },
-  "starter": 1,
-  "flavor": "รอให้น้ำมนต์ซึม ยิ่งรอยิ่งได้ผล"
+  "flavor": "รอให้น้ำมนต์ซึม ยิ่งรอยิ่งได้ผล",
+  "starter": 1
  },
  {
   "id": "candle_vigil",
@@ -1422,8 +1486,8 @@
    "dmg": 7,
    "heal": 3
   },
-  "starter": 1,
-  "flavor": "สิ่งที่มันทำไว้ย้อนกลับเข้าตัว"
+  "flavor": "สิ่งที่มันทำไว้ย้อนกลับเข้าตัว",
+  "starter": 1
  },
  {
   "id": "last_rite",
@@ -1628,8 +1692,8 @@
   "fx": {
    "dmg": 6
   },
-  "starter": 4,
-  "flavor": "เสียงกระซิบบอกว่าต้องตีตรงไหน"
+  "flavor": "เสียงกระซิบบอกว่าต้องตีตรงไหน",
+  "starter": 4
  },
  {
   "id": "salt_in_wound",
@@ -1649,8 +1713,8 @@
     "dmg": 6
    }
   },
-  "starter": 1,
-  "flavor": "ซ้ำตรงที่พิษกัด"
+  "flavor": "ซ้ำตรงที่พิษกัด",
+  "starter": 1
  },
  {
   "id": "yantra_cloth",
@@ -1665,8 +1729,8 @@
   "whileHeld": {
    "block": 2
   },
-  "starter": 2,
-  "flavor": "คลี่ผ้ายันต์บังกาย"
+  "flavor": "คลี่ผ้ายันต์บังกาย",
+  "starter": 2
  },
  {
   "id": "phrai_oil",
@@ -1686,8 +1750,8 @@
     }
    ]
   },
-  "starter": 2,
-  "flavor": "ป้ายน้ำมันพรายใส่ผี"
+  "flavor": "ป้ายน้ำมันพรายใส่ผี",
+  "starter": 2
  },
  {
   "id": "borrow_breath",
@@ -1700,8 +1764,8 @@
    "block": 7,
    "borrow": 1
   },
-  "starter": 1,
-  "flavor": "เลียนท่าที่ผีเพิ่งใช้ ได้สำเนาเข้ามือ"
+  "flavor": "เลียนท่าที่ผีเพิ่งใช้ ได้สำเนาเข้ามือ",
+  "starter": 1
  },
  {
   "id": "ghost_hand",
@@ -1975,7 +2039,53 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "dmg": 5,
+   "dmg": 3
+  },
+  "move": "punch",
+  "starter": 2,
+  "flavor": "หมัดเบาที่ทำให้ผีเริ่มช้ำ",
+  "stars": [
+   {
+    "dmg": 4
+   },
+   {
+    "dmg": 5
+   }
+  ],
+  "progressionRole": "basic",
+  "rhythmDamageCap": 2
+ },
+ {
+  "id": "low_kick",
+  "name": "เตะตัดขา",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4
+  },
+  "move": "kick",
+  "starter": 1,
+  "flavor": "เตะต่ำให้ผีเสียหลัก",
+  "stars": [
+   {
+    "dmg": 5
+   },
+   {
+    "dmg": 6
+   }
+  ],
+  "progressionRole": "basic",
+  "rhythmDamageCap": 2
+ },
+ {
+  "id": "straight_knee",
+  "name": "เข่าตรง",
+  "type": "attack",
+  "rarity": "Common",
+  "class": "warrior",
+  "fx": {
+   "dmg": 4,
    "status": [
     {
      "id": "bruise",
@@ -1985,48 +2095,35 @@
     }
    ]
   },
-  "move": "punch",
-  "starter": 2,
-  "flavor": "หมัดเบาที่ทำให้ผีเริ่มช้ำ"
- },
- {
-  "id": "low_kick",
-  "name": "เตะตัดขา",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 6
-  },
-  "move": "kick",
-  "after": {
-   "move": "punch",
-   "bonus": {
+  "move": "knee",
+  "starter": 1,
+  "flavor": "เข่าพุ่งตรงเข้ากลางลำตัว",
+  "stars": [
+   {
+    "dmg": 5,
     "status": [
      {
-      "id": "weakness",
+      "id": "bruise",
       "stacks": 1,
-      "turns": 2,
+      "turns": 99,
+      "to": "enemy"
+     }
+    ]
+   },
+   {
+    "dmg": 6,
+    "status": [
+     {
+      "id": "bruise",
+      "stacks": 1,
+      "turns": 99,
       "to": "enemy"
      }
     ]
    }
-  },
-  "starter": 1,
-  "flavor": "เตะต่ำให้ผีเสียหลัก"
- },
- {
-  "id": "straight_knee",
-  "name": "เข่าตรง",
-  "type": "attack",
-  "rarity": "Common",
-  "class": "warrior",
-  "fx": {
-   "dmg": 7
-  },
-  "move": "knee",
-  "starter": 1,
-  "flavor": "เข่าพุ่งตรงเข้ากลางลำตัว"
+  ],
+  "progressionRole": "bridge",
+  "rhythmDamageCap": 2
  },
  {
   "id": "slant_elbow",
@@ -2035,12 +2132,26 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "dmg": 6
+   "dmg": 4
   },
   "move": "elbow",
   "heavy": true,
   "starter": 1,
-  "flavor": "ศอกปิดท้ายที่เก็บรอยช้ำทั้งหมด"
+  "flavor": "ศอกปิดท้ายที่เก็บรอยช้ำทั้งหมด",
+  "stars": [
+   {
+    "dmg": 5
+   },
+   {
+    "dmg": 6
+   }
+  ],
+  "progressionRole": "basic",
+  "rhythmDamageCap": 2,
+  "starterHeavy": {
+   "maxStacks": 2,
+   "perStack": 2
+  }
  },
  {
   "id": "straight_punch",
@@ -2407,11 +2518,20 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "block": 7
+   "block": 4
   },
   "ap": 1,
   "starter": 3,
-  "flavor": "ยกการ์ดสูงแบบมวยโบราณ"
+  "flavor": "ยกการ์ดสูงแบบมวยโบราณ",
+  "stars": [
+   {
+    "block": 5
+   },
+   {
+    "block": 6
+   }
+  ],
+  "progressionRole": "basic"
  },
  {
   "id": "shin_block",
@@ -2420,12 +2540,23 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "block": 5,
+   "block": 3,
    "keepRhythm": true
   },
   "ap": 1,
   "starter": 1,
-  "flavor": "ถอยฉากสลับเท้าโดยไม่เสียจังหวะ"
+  "flavor": "ถอยฉากสลับเท้าโดยไม่เสียจังหวะ",
+  "stars": [
+   {
+    "block": 4,
+    "keepRhythm": true
+   },
+   {
+    "block": 5,
+    "keepRhythm": true
+   }
+  ],
+  "progressionRole": "bridge"
  },
  {
   "id": "wai_khru",
@@ -2434,14 +2565,25 @@
   "rarity": "Common",
   "class": "warrior",
   "fx": {
-   "block": 4,
-   "rhythm": 2
+   "block": 2,
+   "rhythm": 1
   },
   "ap": 1,
   "innate": true,
   "exhaust": true,
   "starter": 1,
-  "flavor": "รำไหว้ครูก่อนขึ้นสังเวียน"
+  "flavor": "รำไหว้ครูก่อนขึ้นสังเวียน",
+  "stars": [
+   {
+    "block": 3,
+    "rhythm": 1
+   },
+   {
+    "block": 4,
+    "rhythm": 1
+   }
+  ],
+  "progressionRole": "bridge"
  },
  {
   "id": "gate_watch",
