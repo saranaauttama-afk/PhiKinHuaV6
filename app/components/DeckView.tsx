@@ -34,15 +34,19 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
   const [manage,setManage]=React.useState(false);
   React.useEffect(()=>{if(state.deckOpen)setTab(initialTab);else setManage(false)},[state.deckOpen,initialTab]);
   const [selected, setSelected] = React.useState<{ card: CardData; count: number } | null>(null);
-  // Type filter (owner 16 Oct 2026): ทั้งหมด first, then each type present in the deck.
-  const [filter,setFilter]=React.useState<CardData['type']|'all'>('all');
-  React.useEffect(() => { if (!state.deckOpen) { setSelected(null); setFilter('all'); } }, [state.deckOpen]);
+  React.useEffect(() => { if (!state.deckOpen) setSelected(null); }, [state.deckOpen]);
   if (!state.deckOpen) return null;
 
   const deck = state.masterDeck ?? [];
 
-  const shown = filter==='all' ? deck : deck.filter(c=>c.type===filter);
-  const rows = groupCards(shown);
+  // Owner 17 Oct 2026: no tappable type filter. Every card shows at once, in groups with a plain
+  // text heading each: เครื่องราง first, then the other types in their usual order.
+  const groupOrder = ['equipment' as CardData['type'], ...TYPE_ORDER.filter(t => t !== 'equipment')];
+  const groups = groupOrder.map(type => ({ type, cards: deck.filter(c => c.type === type) })).filter(g => g.cards.length > 0);
+  const known = new Set(groupOrder);
+  const other = deck.filter(c => !known.has(c.type));
+  if (other.length) groups.push({ type: other[0].type, cards: other });
+  const equippedFor = (r: { card: CardData }) => (state.phase==='combat'?(state.equipped??[]):loadoutIndices(state).map(i=>deck[i])).filter(c=>c.id===r.card.id&&(c.star??1)===(r.card.star??1)).length;
 
 
   return (
@@ -97,16 +101,13 @@ export default function DeckView({ state, dispatch, initialTab='deck' }: Props) 
         )}
 
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} testID="bag-type-filter" contentContainerStyle={{gap:6,paddingVertical:2}}>
-         {[{key:'all' as const,label:'ทั้งหมด',total:deck.length},...TYPE_ORDER.map(type=>({key:type,label:TYPE_LABEL[type],total:deck.filter(c=>c.type===type).length})).filter(x=>x.total>0)].map(x=>{
-          const on=filter===x.key;
-          return <Pressable key={x.key} testID={`bag-filter-${x.key}`} accessibilityRole="button" accessibilityState={{selected:on}} accessibilityLabel={`${x.label} (${x.total} ใบ)`} onPress={()=>setFilter(x.key)}
-           style={({pressed})=>({minHeight:34,paddingHorizontal:12,justifyContent:'center',borderRadius:17,borderWidth:1,borderColor:on?paper.line:palette.moonDim,backgroundColor:on?paper.light:'transparent',opacity:pressed?.75:1})}>
-           <Text style={{color:on?paper.ink:palette.moon,fontFamily:on?font.heading:font.ui,fontSize:12}}>{x.label} ({x.total} ใบ)</Text>
-          </Pressable>;})}
-        </ScrollView>
-        <View testID="bag-card-grid" style={{flexDirection:'row',flexWrap:'wrap',gap:7,rowGap:12}}>
-         {rows.map((r,i)=><DeckCard compact key={`${r.card.id}-${i}`} card={r.card} equippedCount={(state.phase==='combat'?(state.equipped??[]):loadoutIndices(state).map(i=>deck[i])).filter(c=>c.id===r.card.id&&(c.star??1)===(r.card.star??1)).length} count={r.count} onPress={()=>setSelected(r)}/>)}
+        <View testID="bag-card-grid" style={{gap:16}}>
+         {groups.map(g=><View key={g.type} testID={`bag-group-${g.type}`} style={{gap:8}}>
+          <Text accessibilityRole="header" style={{color:palette.moon,fontFamily:font.heading,fontSize:15}}>{TYPE_LABEL[g.type]??'อื่น ๆ'} ({g.cards.length} ใบ)</Text>
+          <View style={{flexDirection:'row',flexWrap:'wrap',gap:7,rowGap:12}}>
+           {groupCards(g.cards).map((r,i)=><DeckCard compact key={`${r.card.id}-${i}`} card={r.card} equippedCount={equippedFor(r)} count={r.count} onPress={()=>setSelected(r)}/>)}
+          </View>
+         </View>)}
         </View>
         </>}
       </ScrollView>

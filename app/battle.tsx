@@ -8,7 +8,7 @@ import {enemyKind} from '../src/core/combat/enemyHand';
 import BattleBackdrop from './components/battle/BattleBackdrop';
 import {useBattleLayout} from './components/battle/battleLayout';
 import React from 'react';
-import Animated,{cancelAnimation,useAnimatedStyle,useSharedValue,withSequence,withTiming} from 'react-native-reanimated';
+import Animated,{cancelAnimation,useAnimatedStyle,useSharedValue,withSequence,withTiming,ZoomIn,FadeOut} from 'react-native-reanimated';
 import { View, ImageBackground, Pressable, Image, Text, Modal, BackHandler, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useGame } from '../src/store/gameStore';
@@ -32,6 +32,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
+import StatIcon from './components/StatIcon';
 import {playSfx,setSceneAudio} from '../src/audio/audio';
 import {battleStartFor} from '../src/audio/zones';
 import {BOSS_INTRO} from '../src/audio/manifest';
@@ -124,7 +125,9 @@ export default function BattlePage() {
     setPulse(prev => ({ player: of('player') ?? prev.player, enemy: of('enemy') ?? prev.enemy }));
   }, []);
   // พักยก banner (owner playtest: say when a round ends and what it did).
-  const [roundBanner, setRoundBanner] = React.useState<{ key: string; text: string } | null>(null);
+  const [roundBanner, setRoundBanner] = React.useState<{ key: string; round: number; who: string[] } | null>(null);
+  // Short one-line notes (หมอผี ผนึก / สายสิญจน์) keep the small plate.
+  const [noteBanner, setNoteBanner] = React.useState<{ key: string; text: string } | null>(null);
   const [minionActed,setMinionActed]=React.useState<{uid:string;key:string}|null>(null);
   // Block lost to a hit, shown on each side's block icon (owner playtest 16 Oct 2026).
   const [playerBlockDelta,setPlayerBlockDelta]=React.useState<import('./components/battle/DeltaPopup').Delta|null>(null);
@@ -363,11 +366,13 @@ export default function BattlePage() {
       }
 
       case 'RoundEnd': {
+        // Owner 17 Oct 2026: ยก/พักยก is the นักมวย's rhythm; other classes get no round banner.
+        if (!require('../src/core/cards/fighter').usesRhythm(gameState)) break;
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
-        const who = require('../src/core/cards/fighter').roundBeneficiaries(gameState).filter((x: string) => x.endsWith('(พักยก)'));
+        const who = require('../src/core/cards/fighter').roundBeneficiaries(gameState).filter((x: string) => x.endsWith('(พักยก)')).map((x: string) => x.replace(' (พักยก)', ''));
         const key = `round-${currentEvent.round}-${gameState.turn}`;
-        setRoundBanner({ key, text: `พักยก · จบยก ${currentEvent.round}${who.length ? `\n${who.map((x: string) => x.replace(' (พักยก)', '')).join(', ')} ทำงาน` : ''}` });
-        const t = setTimeout(() => setRoundBanner(b => b?.key === key ? null : b), 1400);
+        setRoundBanner({ key, round: currentEvent.round, who });
+        const t = setTimeout(() => setRoundBanner(b => b?.key === key ? null : b), 2200);
         cardFadeTimers.current.push(t);
         break;
       }
@@ -379,8 +384,8 @@ export default function BattlePage() {
         const text = currentEvent.t === 'GhostSealed'
           ? (currentEvent.name === 'มึน' ? 'ผนึก! ผีไม่ได้ถือการ์ด จึงมึนแทน' : `ผนึก! ${currentEvent.name} ถูกขังไม่ได้เล่น`)
           : 'สายสิญจน์ · แรงชาร์จของผีหายหมด';
-        setRoundBanner({ key, text });
-        const t = setTimeout(() => setRoundBanner(b => b?.key === key ? null : b), 1300);
+        setNoteBanner({ key, text });
+        const t = setTimeout(() => setNoteBanner(b => b?.key === key ? null : b), 1300);
         cardFadeTimers.current.push(t);
         break;
       }
@@ -506,11 +511,22 @@ export default function BattlePage() {
         </View>
 
         {/* Owner 17 Oct 2026: both turn banners (ตาผี, then ตาเรา) sat on the ghost's feet and did not fit — removed. */}
-        {roundBanner && <View testID="round-banner" pointerEvents="none" style={{ position: 'absolute', top: battleLayout.hudTop - 70, left: 24, right: 24, alignItems: 'center', zIndex: layer.popup }}>
+        {noteBanner && <View testID="note-banner" pointerEvents="none" style={{ position: 'absolute', top: battleLayout.hudTop - 70, left: 24, right: 24, alignItems: 'center', zIndex: layer.popup }}>
           <RitualSurface kind="quietSlate" style={{ paddingHorizontal: 18, paddingVertical: 8 }}>
-            <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hint, textAlign: 'center' }}>{roundBanner.text}</Text>
+            <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hint, textAlign: 'center' }}>{noteBanner.text}</Text>
           </RitualSurface>
         </View>}
+        {/* พักยก (owner 17 Oct 2026): it was a small plate over the ghost that nobody noticed. Now a
+            full-width band across the middle of the scene for ~2 s: big title, which round ends and
+            starts, what fired, and the one-line rule, so the ยก system explains itself. */}
+        {roundBanner && <Animated.View key={roundBanner.key} entering={ZoomIn.duration(220)} exiting={FadeOut.duration(250)} testID="round-banner" pointerEvents="none" style={{ position: 'absolute', top: '38%', left: 0, right: 0, alignItems: 'stretch', zIndex: layer.popup }}>
+          <View style={{ backgroundColor: fighterColors.plate, borderTopWidth: 2, borderBottomWidth: 2, borderColor: fighterColors.hint, paddingVertical: 14, paddingHorizontal: 20, alignItems: 'center', gap: 4 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}><StatIcon name="bell" size={30}/><Text style={{ fontFamily: font.display, fontSize: 30, color: fighterColors.hint }}>พักยก</Text><StatIcon name="bell" size={30}/></View>
+            <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hpText, textAlign: 'center' }}>จบยก {roundBanner.round} · เทิร์นหน้าเริ่มยก {roundBanner.round + 1}</Text>
+            {roundBanner.who.length > 0 && <Text style={{ fontFamily: font.ui, fontSize: 14, color: fighterColors.hint, textAlign: 'center' }}>{roundBanner.who.join(', ')} ทำงาน</Text>}
+            <Text style={{ fontFamily: font.ui, fontSize: 12, color: fighterColors.hpText, opacity: 0.8, textAlign: 'center' }}>ทุก {require('../src/core/balance/notfm').FIGHTER_RULES.roundTurns} เทิร์นคือ 1 ยก · การ์ดรูประฆังได้โบนัสในเทิร์นสุดท้ายของยก</Text>
+          </View>
+        </Animated.View>}
 
         {(gameState.phase==='combat'||!!presentation||timeline.isPlaying)&&<PlayerHand
           state={gameState}

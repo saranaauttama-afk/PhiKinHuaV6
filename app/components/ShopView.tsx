@@ -95,11 +95,21 @@ function Lead({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Shop slot roles (src/core/shop.ts). Owner 17 Oct 2026: the labels alone were unclear; tapping one explains it. */
+const ROLE_LABEL = { replacement: 'ไพ่ทดแทน', engine: 'ตัวปูทาง', payoff: 'ไพ่หลัก', support: 'ตัวเสริม' } as const;
+const ROLE_HELP: Record<keyof typeof ROLE_LABEL, string> = {
+  replacement: 'การ์ดที่เก่งกว่าการ์ดพื้นฐานตอนเริ่มเกม ซื้อมาใช้แทน แล้วไปสละใบพื้นฐานทิ้ง สำรับจะคมขึ้น',
+  engine: 'การ์ดตั้งเงื่อนไขหรือสะสมแรงไว้ก่อน ร้านแต่ละร้านเลือกแนวสำรับมาหนึ่งแนว ตัวปูทางคือจุดเริ่มของแนวนั้น',
+  payoff: 'ท่าที่ได้ผลแรงที่สุดเมื่อในสำรับมีตัวปูทางแนวเดียวกัน ยิ่งมีตัวปูทางมาก ยิ่งคุ้ม',
+  support: 'ช่วยแนวนั้นในด้านอื่น เช่น ตั้งรับหรือเครื่องราง ช่องนี้เริ่มมีของหายากตั้งแต่คืนที่ 2',
+};
+
 export default function ShopView({ state, dispatch }: ShopViewProps) {
   const pad = useScreenPadding();
   const [selected,setSelected]=React.useState<number|null>(null);
   React.useEffect(()=>{const sub=BackHandler.addEventListener('hardwareBackPress',()=>{if(selected!==null)setSelected(null);else dispatch({type:'CompleteNode'});return true;});return ()=>sub.remove();},[selected,dispatch]);
   const [notice,setNotice]=React.useState('');
+  const [roleHelp,setRoleHelp]=React.useState<keyof typeof ROLE_LABEL|null>(null);
   React.useEffect(()=>{setSelected(null);setNotice('');},[state.phase,state.shopKind,state.currentShopId]);
   if (state.phase !== 'shop') return null;
   const kind = state.shopKind;
@@ -113,7 +123,7 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
       <Lead>แตะการ์ดเพื่ออ่าน แล้วกดยืนยันซื้อ · ยังไม่เสียเบี้ยจนกว่าจะยืนยัน</Lead><Money state={state}/>
       {!!notice&&<Text accessibilityLiveRegion="polite" style={{color:palette.moon,fontFamily:font.ui}}>{notice}</Text>}
       <View style={{flexDirection:'row',gap:10,flexWrap:'wrap'}}>{stock.map((it,i)=>{const c=cardOf(it);return c&&<View testID={`shop-card-${i}`} key={`${c.id}-${i}`} style={{width:'48%',gap:4}}>
-        {'card' in it&&it.role&&<Text style={{fontFamily:font.ui,color:palette.moonDim,textAlign:'center',fontSize:12}}>{({replacement:'ไพ่ทดแทน',engine:'ตัวปูทาง',payoff:'ไพ่หลัก',support:'ตัวเสริม'} as const)[it.role]}</Text>}
+        {'card' in it&&it.role&&<Pressable testID={`shop-role-${i}`} accessibilityRole="button" accessibilityLabel={`${ROLE_LABEL[it.role]} คืออะไร`} onPress={()=>setRoleHelp(it.role!)} style={{minHeight:32,justifyContent:'center'}}><Text style={{fontFamily:font.ui,color:palette.moonDim,textAlign:'center',fontSize:12,textDecorationLine:'underline'}}>{ROLE_LABEL[it.role]} ⓘ</Text></Pressable>}
         <View><DeckCard fullWidth card={c} selected={selected===i} dim={selected!==null&&selected!==i} onPress={()=>setSelected(i)}/></View>
         <Text style={{color:palette.moon,fontFamily:font.heading,textAlign:'center',fontSize:14}}>ราคา {shopPrice(state,it.price)} เบี้ย{shopPrice(state,it.price)<it.price?` (จาก ${it.price})`:''}</Text>
       </View>;})}</View>
@@ -253,9 +263,10 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
       <View style={{flex:1,backgroundColor:surface.glassDim}}>
         {state.pages?.adventure?.version===5&&<View style={{position:'absolute',top:pad.top+4,right:8,zIndex:layer.control}}>{/* Playtest 16 Oct 2026: players read this X as "close" and lost unused shops/chests. It now
             leaves like กลับจุดพัก / back; destroying a page stays on the board's own destroy action. */}<CloseSeal testID="shop-close-page" label="ปิดร้าน (ร้านยังอยู่บนกระดาน)" onPress={()=>dispatch({type:'CompleteNode'})}/></View>}
-        <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+48,paddingBottom:24,gap:12}}>
+        <ScrollView style={{flex:1}} contentContainerStyle={{paddingHorizontal:16,paddingTop:pad.top+48,paddingBottom:purchaseCard?280:24,gap:12}}>
           <Image testID="destination-object" accessible={false} source={object} resizeMode="contain" style={{width:'100%',height:kind==='healing'||kind==='well'?150:100}}/>
-          <RewardReceiptView receipt={state.rewardReceipt}/>
+          {/* Owner 17 Oct 2026: card shops don't announce what was just bought (it pushed the shop down). */}
+          {kind!=='card'&&kind!=='equipment'&&<RewardReceiptView receipt={state.rewardReceipt}/>}
           {kind === 'card'            && cardShop()}
           {kind === 'equipment'       && cardShop('ร้านเครื่องราง')}
           {kind === 'remove'          && removeShop()}
@@ -266,19 +277,27 @@ export default function ShopView({ state, dispatch }: ShopViewProps) {
           {kind === 'treasure_single' && treasure(true)}
           {kind === 'blessing'        && blessingStop()}
         </ScrollView>
-        {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{marginHorizontal:16,gap:10,maxHeight:'45%'}}>
+        {purchaseCard&&purchaseItem&&<RitualSurface testID="shop-purchase-confirmation" kind="occupationPage" style={{position:'absolute',left:16,right:16,bottom:pad.bottom+76,gap:10,maxHeight:'45%',zIndex:layer.control}}>
          <ScrollView style={{flexShrink:1}} contentContainerStyle={{gap:6,paddingBottom:4}}>
          <Text numberOfLines={2} style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>ยืนยันซื้อ {purchaseCard.name}</Text>
          <Text testID="shop-card-type" style={{fontFamily:font.ui,color:paper.ink,fontSize:12}}>ประเภท: {cardTypeLabel(purchaseCard)}</Text>
          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13,lineHeight:20}}>{describeCard(purchaseCard)}{purchaseCard.flavor?` · ${purchaseCard.flavor}`:''}</Text>
          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13}}>ราคา {shopPrice(state,purchaseItem.price)} เบี้ย · มี {state.player.gold} เบี้ย{state.player.gold<shopPrice(state,purchaseItem.price)?' · เบี้ยไม่พอ':''}</Text>
          </ScrollView>
-         <View style={{flexDirection:'row',gap:8}}><QuietButton label={`ยืนยันซื้อ ${shopPrice(state,purchaseItem.price)} เบี้ย`} primary disabled={state.player.gold<shopPrice(state,purchaseItem.price)} style={{flex:2}} onPress={()=>{if(selected===null||state.player.gold<shopPrice(state,purchaseItem.price))return;dispatch({type:'TakeShop',index:selected});setSelected(null);setNotice(`ซื้อ ${purchaseCard.name} แล้ว`);}}/><QuietButton label="ยกเลิก" style={{flex:1}} onPress={()=>setSelected(null)}/></View>
+         <View style={{flexDirection:'row',gap:8}}><QuietButton label={`ยืนยันซื้อ ${shopPrice(state,purchaseItem.price)} เบี้ย`} primary disabled={state.player.gold<shopPrice(state,purchaseItem.price)} style={{flex:2}} onPress={()=>{if(selected===null||state.player.gold<shopPrice(state,purchaseItem.price))return;dispatch({type:'TakeShop',index:selected});setSelected(null);}}/><QuietButton label="ยกเลิก" style={{flex:1}} onPress={()=>setSelected(null)}/></View>
         </RitualSurface>}
         <View style={{paddingHorizontal:16,paddingTop:8,paddingBottom:pad.bottom+12}}>
           <QuietButton label="กลับจุดพัก" primary onPress={()=>dispatch({type:'CompleteNode'})}/>
         </View>
       </View>
     </SceneArrival>
+    <Modal visible={!!roleHelp} transparent animationType="fade" onRequestClose={()=>setRoleHelp(null)}>
+      <Pressable testID="shop-role-help" accessibilityLabel="ปิดคำอธิบาย" onPress={()=>setRoleHelp(null)} style={{flex:1,backgroundColor:palette.scrim,alignItems:'center',justifyContent:'center',padding:24}}>
+        {roleHelp&&<RitualSurface kind="occupationPage" style={{padding:22,gap:8,maxWidth:360}}>
+          <Text accessibilityRole="header" style={{fontFamily:font.heading,color:paper.ink,fontSize:18}}>{ROLE_LABEL[roleHelp]}</Text>
+          <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:15,lineHeight:24}}>{ROLE_HELP[roleHelp]}</Text>
+        </RitualSurface>}
+      </Pressable>
+    </Modal>
   </View>;
 }
