@@ -94,23 +94,43 @@ describe('battle juice production presentation',()=>{
   let tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-slot-0').props.onPress();tree=render(()=>AdventureChoices(props));
   find(tree,e=>e.props?.testID==='adventure-destroy-0').props.onPress();expect(onDestroy).toHaveBeenCalledWith(0);expect(vi.getTimerCount()).toBe(0);
  });
- it('J8 replacing a page cancels its pending choice',()=>{
-  const onEnter=vi.fn();const props:any={offers:[{kind:'shop_card'}],resolved:[false],slotIds:['old-page'],onEnter};
-  let tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-slot-0').props.onPress();tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-enter-0').props.onPress();
-  props.slotIds=['new-page'];render(()=>AdventureChoices(props));vi.advanceTimersByTime(600);expect(onEnter).not.toHaveBeenCalled();
- });
- it('J8 normal choice waits exactly 600ms, accepts once, and cancels on unmount',()=>{
-  const onEnter=vi.fn();const props:any={offers:[{kind:'shop_card'}],resolved:[false],slotIds:['page-2'],onEnter};
+ // Owner playtest 17 Oct 2026: choosing a page never burns it; it burns once it is used up.
+ it('J8 entering a page is immediate (no burn, no timer), even with motion on',()=>{
+  const onEnter=vi.fn();const props:any={offers:[{kind:'monster',enemyId:'x'}],resolved:[false],slotIds:['ghost-page'],onEnter};
   let tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-slot-0').props.onPress();tree=render(()=>AdventureChoices(props));
-  const enter=find(tree,e=>e.props?.testID==='adventure-enter-0').props.onPress;enter();enter();
-  vi.advanceTimersByTime(599);expect(onEnter).not.toHaveBeenCalled();vi.advanceTimersByTime(1);expect(onEnter).toHaveBeenCalledTimes(1);
-  enter();dispose();vi.advanceTimersByTime(600);expect(onEnter).toHaveBeenCalledTimes(1);
+  const timers=vi.getTimerCount();find(tree,e=>e.props?.testID==='adventure-enter-0').props.onPress();
+  expect(onEnter).toHaveBeenCalledTimes(1);expect(vi.getTimerCount()).toBe(timers);
  });
- it('J8 changing reduced motion during the burn completes once immediately',()=>{
-  const onEnter=vi.fn();const props:any={offers:[{kind:'shop_card'}],resolved:[false],slotIds:['page-3'],onEnter};
-  let tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-slot-0').props.onPress();tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-enter-0').props.onPress();
+ it('J8 replacing a page cancels a pending destroy',()=>{
+  const onDestroy=vi.fn();const props:any={offers:[{kind:'shop_card'}],resolved:[false],slotIds:['old-page'],onEnter:vi.fn(),onDestroy};
+  let tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-slot-0').props.onPress();tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-destroy-0').props.onPress();
+  props.slotIds=['new-page'];render(()=>AdventureChoices(props));vi.advanceTimersByTime(600);expect(onDestroy).not.toHaveBeenCalled();
+ });
+ it('J8 destroy burns for exactly 600ms, accepts once, and cancels on unmount',()=>{
+  const onDestroy=vi.fn();const props:any={offers:[{kind:'shop_card'}],resolved:[false],slotIds:['page-2'],onEnter:vi.fn(),onDestroy};
+  let tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-slot-0').props.onPress();tree=render(()=>AdventureChoices(props));
+  const destroy=find(tree,e=>e.props?.testID==='adventure-destroy-0').props.onPress;destroy();destroy();
+  vi.advanceTimersByTime(599);expect(onDestroy).not.toHaveBeenCalled();vi.advanceTimersByTime(1);expect(onDestroy).toHaveBeenCalledTimes(1);
+  destroy();dispose();vi.advanceTimersByTime(600);expect(onDestroy).toHaveBeenCalledTimes(1);
+ });
+ it('J8 changing reduced motion during a destroy burn completes once immediately',()=>{
+  const onDestroy=vi.fn();const props:any={offers:[{kind:'shop_card'}],resolved:[false],slotIds:['page-3'],onEnter:vi.fn(),onDestroy};
+  let tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-slot-0').props.onPress();tree=render(()=>AdventureChoices(props));find(tree,e=>e.props?.testID==='adventure-destroy-0').props.onPress();
   vi.advanceTimersByTime(120);useGameSettings.setState({reducedMotion:true});render(()=>AdventureChoices(props));
-  expect(onEnter).toHaveBeenCalledTimes(1);vi.advanceTimersByTime(600);expect(onEnter).toHaveBeenCalledTimes(1);
+  expect(onDestroy).toHaveBeenCalledTimes(1);vi.advanceTimersByTime(600);expect(onDestroy).toHaveBeenCalledTimes(1);
+ });
+ it('J8 a page used up since the map last showed it burns once on return, then the new page shows',()=>{
+  const props:any={runKey:'burn-run',offers:[{kind:'monster',enemyId:'old-ghost'}],resolved:[false],slotIds:['ghost-a'],onEnter:vi.fn(),consumedIds:[]};
+  render(()=>AdventureChoices(props));
+  // ghost beaten: engine marks ghost-a resolved and deals a new page into the slot
+  props.offers=[{kind:'shop_card'}];props.slotIds=['shop-b'];props.consumedIds=['ghost-a'];
+  let tree=render(()=>AdventureChoices(props));
+  expect(find(tree,e=>e.key==='ghost-a')).toBeTruthy();
+  vi.advanceTimersByTime(700);tree=render(()=>AdventureChoices(props));
+  expect(find(tree,e=>e.key==='shop-b')).toBeTruthy();
+  // a page that was only left (not consumed) never burns
+  props.offers=[{kind:'shop_card'}];props.slotIds=['shop-c'];tree=render(()=>AdventureChoices(props));
+  expect(find(tree,e=>e.key==='shop-c')).toBeTruthy();
  });
  it('cancelled page choices never dispatch',()=>{
   const action=vi.fn();const cancel=schedulePageChoice(false,action);cancel();vi.advanceTimersByTime(600);expect(action).not.toHaveBeenCalled();

@@ -25,7 +25,6 @@ import EnemyHandCard from './components/battle/EnemyHandCard';
 import MinionRow from './components/battle/MinionRow';
 import CardHistory from './components/battle/CardHistory';
 import DamagePopup from './components/battle/DamagePopup';
-import StatGainPopup from './components/battle/StatGainPopup';
 import PrayerWaitPicker from './components/battle/PrayerWaitPicker';
 import SkillButtons from './components/battle/SkillButtons';
 import VictoryOverlay from './components/battle/VictoryOverlay';
@@ -135,7 +134,14 @@ export default function BattlePage() {
     const d={key,amount:-ev.blocked};
     if(ev.target==='player')setPlayerBlockDelta(d);else setEnemyBlockDelta(d);
   };
-  const [statGainPopups, setStatGainPopups] = React.useState<{ id: string; statType: 'block' | 'energy'; side: 'player' | 'enemy'; amount: number }[]>([]);
+  // Owner playtest 17 Oct 2026: every number pops from its own stat (block gain/loss on the block icon,
+  // mana on the mana icon, our HP loss on our HP bar) — no more fixed mid-screen popups.
+  const [playerManaDelta,setPlayerManaDelta]=React.useState<import('./components/battle/DeltaPopup').Delta|null>(null);
+  const showBlockGain=(target:string,amount:number,key:string)=>{
+    if(amount<=0)return;
+    const d={key,amount};
+    if(target==='player')setPlayerBlockDelta(d);else setEnemyBlockDelta(d);
+  };
   const [enemyHandCards, setEnemyHandCards] = React.useState<EnemyHandCardData[]>([]);
   const [historyAtTurnStart,setHistoryAtTurnStart]=React.useState<CardHistoryEntry[]>([]);
 
@@ -280,21 +286,15 @@ export default function BattlePage() {
         pulseFrom(ev);
         const shakeTimer = setTimeout(() => monsterRef.current?.shake(), 250);
         cardFadeTimers.current.push(shakeTimer);
-      } else if (ev.t === 'BlockGained' && ev.target === 'player') {
-        setStatGainPopups(prev => [...prev, {
-          id: `block-${eventKey(ev)}`,
-          statType: 'block', side: 'player', amount: ev.amount,
-        }]);
+      } else if (ev.t === 'BlockGained') {
+        showBlockGain(ev.target, ev.amount, `bg-${eventKey(ev)}`);
       }
     }
 
     // Mana has no event of its own; compare before and after.
     const nextMana = after.player.mana;
     if (nextMana > prevMana) {
-      setStatGainPopups(prev => [...prev, {
-        id: `mana-${Date.now()}`,
-        statType: 'energy', side: 'player', amount: nextMana - prevMana,
-      }]);
+      setPlayerManaDelta({ key: `mana-${Date.now()}`, amount: nextMana - prevMana });
     }
   };
 
@@ -422,12 +422,7 @@ export default function BattlePage() {
 
       case 'BlockGained': {
         for (const cue of cuesFor([currentEvent])) playSfx(cue);
-        setStatGainPopups(prev => [...prev, {
-          id: `block-${eventKey(currentEvent)}`,
-          statType: 'block',
-          side: currentEvent.target,
-          amount: currentEvent.amount,
-        }]);
+        showBlockGain(currentEvent.target, currentEvent.amount, `bg-${eventKey(currentEvent)}`);
         break;
       }
     }
@@ -506,36 +501,13 @@ export default function BattlePage() {
           ))}
         </View>
 
-        {/* Player takes damage — ใกล้ Player HUD */}
-        <View
-          pointerEvents="none"
-          style={{ position: 'absolute', bottom: safe.bottom + 100, left: 0, right: 0, alignItems: 'center', zIndex: layer.popup }}
-        >
-          {damagePopups.map(popup => (
-            <DamagePopup
-              key={popup.id}
-              damage={popup.damage}
-              parts={popup.parts}
-              onDone={() => setDamagePopups(prev => prev.filter(p => p.id !== popup.id))}
-            />
-          ))}
-        </View>
-
-        {(gameState.phase==='combat'||phase==='enemy')&&<TurnBanner side={phase} turn={gameState.turn} top={battleLayout.hudTop-70} suppressed={!!roundBanner}/>}
+        {/* Owner 17 Oct 2026: the ghost-turn banner sat on the ghost's feet and did not fit — removed. */}
+        {gameState.phase==='combat'&&phase==='player'&&<TurnBanner side={phase} turn={gameState.turn} top={battleLayout.hudTop-70} suppressed={!!roundBanner}/>}
         {roundBanner && <View testID="round-banner" pointerEvents="none" style={{ position: 'absolute', top: battleLayout.hudTop - 70, left: 24, right: 24, alignItems: 'center', zIndex: layer.popup }}>
           <RitualSurface kind="quietSlate" style={{ paddingHorizontal: 18, paddingVertical: 8 }}>
             <Text style={{ fontFamily: font.heading, fontSize: 16, color: fighterColors.hint, textAlign: 'center' }}>{roundBanner.text}</Text>
           </RitualSurface>
         </View>}
-        {statGainPopups.map(p => (
-          <StatGainPopup
-            key={p.id}
-            amount={p.amount}
-            statType={p.statType}
-            side={p.side}
-            onDone={() => setStatGainPopups(prev => prev.filter(x => x.id !== p.id))}
-          />
-        ))}
 
         {(gameState.phase==='combat'||!!presentation||timeline.isPlaying)&&<PlayerHand
           state={gameState}
@@ -554,6 +526,15 @@ export default function BattlePage() {
         <PlayerHUD hitKey={playerHit}
           blessings={!victoryIntro&&<BlessingSeals blessings={gameState.blessings}/>}
           blockDelta={playerBlockDelta}
+          manaDelta={playerManaDelta}
+          hpPopup={damagePopups.map(popup => (
+            <DamagePopup
+              key={popup.id}
+              damage={popup.damage}
+              parts={popup.parts}
+              onDone={() => setDamagePopups(prev => prev.filter(p => p.id !== popup.id))}
+            />
+          ))}
           minions={!victoryIntro&&gameState.phase==='combat'&&(presentation?.minions??gameState.minions??[]).length?<MinionRow inline acted={minionActed} minions={presentation?.minions??gameState.minions??[]}/>:null}
           statuses={!victoryIntro&&(badges.length||player.statusEffects?.length)?<StatusStrip effects={player.statusEffects} extra={badges} pulse={pulse.player}/>:null}
           helpers={!victoryIntro&&<SkillButtons state={gameState} enabled={!paused && phase === 'player' && gameState.phase === 'combat'} onUse={(id,index)=>{dispatch({type:'UseSkill',id,index});holdForDeath();}}/>}

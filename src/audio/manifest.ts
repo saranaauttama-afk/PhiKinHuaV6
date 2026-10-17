@@ -144,25 +144,27 @@ export const BEDS: Record<BedId, { file: Source | null; volume: number }> = {
   ambienceNight1: { file: require('../../assets/audio/ambience-night-1.mp3'), volume: 0.22 },
   // ชุด 3 (assets/audio/ambience/) — ElevenLabs SFX v2 ลูป, ตัดความถี่เกิน 10 kHz (ลดซ่า), ~−21 ถึง −24 LUFS
   villageBed: { file: require('../../assets/audio/ambience/village-bed.mp3'), volume: 0.45 },
-  villageBattleBed: { file: require('../../assets/audio/ambience/village-battle-bed.mp3'), volume: 0.4 },
+  villageBattleBed: { file: require('../../assets/audio/ambience/village-battle-bed.mp3'), volume: 0.3 },
   // ชุด 3 โซนอื่น (scripts/zone-audio.py, ~−21 ถึง −24 LUFS) — ค่า volume เท่าหมู่บ้าน
   templeBed: { file: require('../../assets/audio/ambience/temple-bed.mp3'), volume: 0.45 },
-  templeBattleBed: { file: require('../../assets/audio/ambience/temple-battle-bed.mp3'), volume: 0.4 },
+  templeBattleBed: { file: require('../../assets/audio/ambience/temple-battle-bed.mp3'), volume: 0.3 },
   cremationBed: { file: require('../../assets/audio/ambience/cremation-bed.mp3'), volume: 0.45 },
-  cremationBattleBed: { file: require('../../assets/audio/ambience/cremation-battle-bed.mp3'), volume: 0.4 },
+  cremationBattleBed: { file: require('../../assets/audio/ambience/cremation-battle-bed.mp3'), volume: 0.3 },
   forestBed: { file: require('../../assets/audio/ambience/forest-bed.mp3'), volume: 0.45 },
-  forestBattleBed: { file: require('../../assets/audio/ambience/forest-battle-bed.mp3'), volume: 0.4 },
+  forestBattleBed: { file: require('../../assets/audio/ambience/forest-battle-bed.mp3'), volume: 0.3 },
   waterBed: { file: require('../../assets/audio/ambience/water-bed.mp3'), volume: 0.45 },
-  waterBattleBed: { file: require('../../assets/audio/ambience/water-battle-bed.mp3'), volume: 0.4 },
+  waterBattleBed: { file: require('../../assets/audio/ambience/water-battle-bed.mp3'), volume: 0.3 },
   mountainBed: { file: require('../../assets/audio/ambience/mountain-bed.mp3'), volume: 0.45 },
-  mountainBattleBed: { file: require('../../assets/audio/ambience/mountain-battle-bed.mp3'), volume: 0.4 },
+  mountainBattleBed: { file: require('../../assets/audio/ambience/mountain-battle-bed.mp3'), volume: 0.3 },
   caveBed: { file: require('../../assets/audio/ambience/cave-bed.mp3'), volume: 0.45 },
-  caveBattleBed: { file: require('../../assets/audio/ambience/cave-battle-bed.mp3'), volume: 0.4 },
+  caveBattleBed: { file: require('../../assets/audio/ambience/cave-battle-bed.mp3'), volume: 0.3 },
   otherworldBed: { file: require('../../assets/audio/ambience/otherworld-bed.mp3'), volume: 0.45 },
-  otherworldBattleBed: { file: require('../../assets/audio/ambience/otherworld-battle-bed.mp3'), volume: 0.4 },
-  battleDrumNormal: { file: require('../../assets/audio/ambience/battle-drum-normal.mp3'), volume: 0.55 },
-  battleDrumElite: { file: require('../../assets/audio/ambience/battle-drum-elite.mp3'), volume: 0.55 },
-  battleDrumBoss: { file: require('../../assets/audio/ambience/battle-drum-boss.mp3'), volume: 0.6 },
+  otherworldBattleBed: { file: require('../../assets/audio/ambience/otherworld-battle-bed.mp3'), volume: 0.3 },
+  // 17 ต.ค. (เจ้าของ: กลองไม่ขึ้น/ไม่ตื่นเต้น): กลองธรรมดาเดิมตีแค่ 2 ครั้งใน 16 วิ → ใช้กลองผีเก่งที่ตีสม่ำเสมอ ช้าลงเป็น ~64 bpm,
+  // ทุกกลองดันเป็น −19 LUFS และลมตอนสู้ลดเหลือ 0.3 ให้กลองนำ
+  battleDrumNormal: { file: require('../../assets/audio/ambience/battle-drum-normal.mp3'), volume: 0.8 },
+  battleDrumElite: { file: require('../../assets/audio/ambience/battle-drum-elite.mp3'), volume: 0.8 },
+  battleDrumBoss: { file: require('../../assets/audio/ambience/battle-drum-boss.mp3'), volume: 0.85 },
 };
 
 /** บอสที่มีเสียงเปิดตัวแล้ว (monsterId → SfxId) */

@@ -16,7 +16,7 @@ export function HudStat({icon,text,onPress,label,delta}:{icon:StatSymbol;text:st
  const content=<><StatIcon name={icon} size={18}/><Text style={{fontFamily:font.heading,fontSize:12,color:chalk}}>{text}</Text><DeltaPopup delta={delta}/></>;
  return onPress?<Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</Pressable>:<View accessible accessibilityLabel={label} style={{minHeight:44,flexDirection:'row',gap:3,alignItems:'center'}}>{content}</View>;
 }
-export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,minions,compact=false,hitKey}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;minions?:React.ReactNode;compact?:boolean;hitKey?:string}){
+export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action,extras,helpers,blessings,minions,compact=false,hitKey,hpPopup}:{classId?:string;hp:number;maxHp:number;onPortrait?:()=>void;stats:React.ReactNode;action?:React.ReactNode;extras?:React.ReactNode;helpers?:React.ReactNode;blessings?:React.ReactNode;minions?:React.ReactNode;compact?:boolean;hitKey?:string;hpPopup?:React.ReactNode}){
  const reduced=useGameSettings(s=>s.reducedMotion),shake=useSharedValue(0);
  React.useEffect(()=>{
   cancelAnimation(shake);shake.value=0;
@@ -42,7 +42,7 @@ export default function QuietPlayerHud({classId,hp,maxHp,onPortrait,stats,action
     </View>
     <View style={{flex:1,minWidth:0}}>
      <View testID="battle-hud-top-row" style={{height:44,flexDirection:'row',alignItems:'center',gap:4}}>
-      <View testID="battle-player-health" style={{flex:1,minWidth:0}}><HealthBar hp={hp} maxHp={maxHp} compact/></View>
+      <View collapsable={false} testID="battle-player-health" style={{flex:1,minWidth:0}}><HealthBar hp={hp} maxHp={maxHp} compact/><View collapsable={false} pointerEvents="none" style={{position:'absolute',left:0,right:0,bottom:4,alignItems:'center',zIndex:layer.popup}}>{hpPopup}</View></View>
      </View>
      <View testID="battle-hud-bottom-row" style={{height:44,flexDirection:'row',alignItems:'center',gap:6}}>
       <View style={{flex:1,minWidth:0,flexDirection:'row',alignItems:'center',justifyContent:'flex-start',gap:narrow?4:12}}>{stats}</View>

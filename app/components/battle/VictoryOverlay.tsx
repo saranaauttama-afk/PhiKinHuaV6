@@ -1,7 +1,6 @@
 import React from 'react';
 import Animated,{cancelAnimation,Easing,useAnimatedStyle,useSharedValue,withDelay,withRepeat,withSequence,withTiming} from 'react-native-reanimated';
 import {useGameSettings} from '../Settings';
-import AshPuff from './AshPuff';
 import {FxSprite} from './fxArt';
 import {Image,Text,View,useWindowDimensions} from 'react-native';
 import PostBattleSurface from './PostBattleSurface';
@@ -36,7 +35,7 @@ export default function VictoryOverlay(p:Props){
  return <PostBattleSurface>
   <Animated.View style={entranceStyle}><RitualSurface kind="occupationPage" style={{paddingHorizontal:24,paddingVertical:24,gap:12}}>
    <Animated.Text accessibilityRole="header" style={[{fontFamily:font.display,fontSize:36,color:paper.red,textAlign:'center'},stampStyle]}>ชนะศึก</Animated.Text>
-   <View collapsable={false} style={{height:Math.min(220,height*.26),alignItems:'center'}}><Animated.View pointerEvents="none" style={[{position:'absolute',height:'100%',aspectRatio:1},rayStyle]}><FxSprite id="victory_rays" style={{width:'100%',height:'100%'}}/></Animated.View>{!still&&<AshPuff size={Math.min(220,height*.26)} duration={1000} smoke={2} ash={0}/>}<Image source={artSource(`class/${classId}`)} resizeMode="contain" style={{width:'100%',height:'100%'}}/></View>
+   <View collapsable={false} style={{height:Math.min(220,height*.26),alignItems:'center'}}><Animated.View pointerEvents="none" style={[{position:'absolute',height:'100%',aspectRatio:1},rayStyle]}><FxSprite id="victory_rays" style={{width:'100%',height:'100%'}}/></Animated.View>{/* No smoke here: the ghost already burned to incense on death (owner 17 Oct 2026: smoke showed twice). */}<Image source={artSource(`class/${classId}`)} resizeMode="contain" style={{width:'100%',height:'100%'}}/></View>
    <Text style={{fontFamily:font.ui,color:paper.ink,fontSize:13,textAlign:'center'}}>{p.enemyName} ถูกปราบแล้ว</Text>
    <View style={{flexDirection:'row',justifyContent:'space-around',paddingVertical:10,borderTopWidth:1,borderColor:paper.line}}>
     <View style={{flexDirection:'row',alignItems:'center',gap:6}}><InkIcon name="gold" size={26}/><Text style={{fontFamily:font.heading,color:paper.ink,fontSize:16}}>เบี้ย +{gold}</Text></View>
