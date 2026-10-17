@@ -48,7 +48,12 @@ try:
   tap('^สกิล ');find('พักสกิล');shot(cls+'-skill');tap('^ปิด$');shot(cls+'-battle');checks.append(cls+': real combat hand details and class skill artwork/details')
  print('PASS',len(checks),'native checks',flush=True)
 except Exception as e:
- checks.append({'failed':type(e).__name__+': '+str(e)});print('::error title=native smoke::'+(type(e).__name__+': '+str(e)).replace('\n',' ')[:3000],flush=True);shot('failure');raise
+ checks.append({'failed':type(e).__name__+': '+str(e)});print('::error title=native smoke::'+(type(e).__name__+': '+str(e)).replace('\n',' ')[:3000],flush=True);
+ try:
+  lc=adb('logcat','-d','-b','crash');lc=lc or '\n'.join(l for l in adb('logcat','-d').splitlines() if 'ReactNativeJS' in l or 'FATAL' in l or 'AndroidRuntime' in l)
+  print('::error title=native crash log::'+lc[-3500:].replace('\n',' | '),flush=True)
+ except Exception as le:print('::error title=native crash log::unavailable '+str(le),flush=True)
+ shot('failure');raise
 finally:
  (out/'results.json').write_text(json.dumps({'api':36,'syntheticFixtures':False,'checks':checks},ensure_ascii=False,indent=2))
  (out/'logcat.txt').write_text(adb('logcat','-d'))
