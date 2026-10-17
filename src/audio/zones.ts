@@ -16,16 +16,17 @@ import type { BedId, SfxId } from './manifest';
  */
 export type ZoneId = 'village' | 'temple' | 'cremation' | 'forest' | 'water' | 'mountain' | 'cave' | 'otherworld';
 
-type ZoneSound = { map: BedId | null; battle: BedId | null; oneShots: SfxId[] };
+/** `battleStart`: played once when a fight begins in this zone (e.g. villagers bolting their doors). */
+type ZoneSound = { map: BedId | null; battle: BedId | null; oneShots: SfxId[]; battleStart?: SfxId };
 
 export const ZONES: Record<ZoneId, ZoneSound> = {
-  village: { map: 'villageBed', battle: 'villageBattleBed', oneShots: ['villageDogHowl', 'villageDoorCreak', 'villageRooster'] },
-  temple: { map: 'templeBed', battle: 'templeBattleBed', oneShots: ['templeWindChime', 'templeBellFar', 'templeChant', 'templeBroom'] },
-  cremation: { map: 'cremationBed', battle: 'cremationBattleBed', oneShots: ['cremationOwl', 'cremationEmber', 'cremationDogNear', 'cremationCrow'] },
+  village: { map: 'villageBed', battle: 'villageBattleBed', oneShots: ['villageDogHowl', 'villageDoorCreak', 'villageRooster', 'villagerSob', 'villagerPrayer'], battleStart: 'villagerFear' },
+  temple: { map: 'templeBed', battle: 'templeBattleBed', oneShots: ['templeWindChime', 'templeBellFar', 'templeChant', 'templeBroom', 'villagerPrayer', 'ghostWhisper'] },
+  cremation: { map: 'cremationBed', battle: 'cremationBattleBed', oneShots: ['cremationOwl', 'cremationEmber', 'cremationDogNear', 'cremationCrow', 'ghostWhisper'] },
   forest: { map: 'forestBed', battle: 'forestBattleBed', oneShots: ['forestBranchSnap', 'forestNightBird', 'forestRustle'] },
   water: { map: 'waterBed', battle: 'waterBattleBed', oneShots: ['waterFishSplash', 'waterWading', 'waterFrogsStop'] },
   mountain: { map: 'mountainBed', battle: 'mountainBattleBed', oneShots: ['mountainFlagFlap', 'mountainShrineBell', 'mountainRockfall'] },
-  cave: { map: 'caveBed', battle: 'caveBattleBed', oneShots: ['caveBats', 'caveRockEcho', 'caveBreath'] },
+  cave: { map: 'caveBed', battle: 'caveBattleBed', oneShots: ['caveBats', 'caveRockEcho', 'caveBreath', 'ghostWhisper'] },
   otherworld: { map: 'otherworldBed', battle: 'otherworldBattleBed', oneShots: ['otherworldWhispers', 'otherworldReverseGong'] },
 };
 
@@ -106,4 +107,9 @@ export function stepGain(current: number, target: number, dtMs: number, fadeMs: 
   if (fadeMs <= 0) return target;
   const step = dtMs / fadeMs;
   return current < target ? Math.min(target, current + step) : Math.max(target, current - step);
+}
+
+/** เสียงตอนเริ่มไฟต์ของโซน (ชุด 4): ชาวบ้านตกใจปิดประตูเฉพาะในหมู่บ้าน — คนมีแค่หมู่บ้านกับวัด ที่อื่นเงียบจากคน */
+export function battleStartFor(sceneId: string | undefined): SfxId | undefined {
+  return ZONES[zoneOf(sceneId)].battleStart;
 }

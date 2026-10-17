@@ -208,5 +208,47 @@
   "bed": false,
   "lufs": -20.8,
   "secs": 2.27
+ },
+ {
+  "id": "villagerPrayer",
+  "file": "assets/audio/sfx/villager-prayer-1.mp3",
+  "bed": false,
+  "lufs": -21.4,
+  "secs": 4.75
+ },
+ {
+  "id": "ghostWhisper",
+  "file": "assets/audio/sfx/ghost-whisper-1.mp3",
+  "bed": false,
+  "lufs": -21.4,
+  "secs": 4.05
+ },
+ {
+  "id": "villagerSob",
+  "file": "assets/audio/sfx/villager-sob-1.mp3",
+  "bed": false,
+  "lufs": -25.3,
+  "secs": 0.52
+ },
+ {
+  "id": "ghostScreech",
+  "file": "assets/audio/sfx/ghost-screech-1.mp3",
+  "bed": false,
+  "lufs": -23.2,
+  "secs": 1.75
+ },
+ {
+  "id": "ghostWail",
+  "file": "assets/audio/sfx/ghost-wail-1.mp3",
+  "bed": false,
+  "lufs": -24.1,
+  "secs": 4.41
+ },
+ {
+  "id": "villagerFear",
+  "file": "assets/audio/sfx/villager-fear-1.mp3",
+  "bed": false,
+  "lufs": -22.5,
+  "secs": 5.04
  }
 ]

@@ -52,7 +52,14 @@ export type SfxId =
   | 'caveRockEcho'
   | 'caveBreath'
   | 'otherworldWhispers'
-  | 'otherworldReverseGong';
+  | 'otherworldReverseGong'
+  // ชุด 4 (17 ต.ค. 2026): เสียงผีและชาวบ้าน — ดู docs/audio/AUDIO.md
+  | 'ghostWhisper'
+  | 'ghostScreech'
+  | 'ghostWail'
+  | 'villagerSob'
+  | 'villagerPrayer'
+  | 'villagerFear';
 
 export type BedId =
   | 'music'
@@ -93,7 +100,8 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
   },
   bossIntroHeadCollector: { files: [require('../../assets/audio/boss-intro-head-collector.mp3')], volume: 0.9 },
   // ชุด 2 (assets/audio/sfx/) — ตัดเงียบ, mono 96k, ปรับดัง ~−18 LUFS แล้ว; volume ด้านล่างคุมความดังเทียบกัน
-  playerHit: { files: [require('../../assets/audio/sfx/player-hit-1.mp3')], volume: 0.75 },
+  // 17 ต.ค.: เจ้าของบอกไม่ได้ยินเสียงหมัด — ไฟล์เดิมบางและเบา (−25 LUFS) → หมัดใหม่ 3 แบบสุ่มสลับ ~−15 ถึง −20 LUFS
+  playerHit: { files: [require('../../assets/audio/sfx/player-hit-1.mp3'), require('../../assets/audio/sfx/player-hit-2.mp3'), require('../../assets/audio/sfx/player-hit-3.mp3')], volume: 0.9 },
   heavyHit: { files: [require('../../assets/audio/sfx/heavy-hit-1.mp3')], volume: 0.9 },
   block: { files: [require('../../assets/audio/sfx/block-1.mp3')], volume: 0.55 },
   riposte: { files: [require('../../assets/audio/sfx/riposte-1.mp3')], volume: 0.8 },
@@ -133,6 +141,12 @@ export const SFX: Record<SfxId, { files: Source[]; volume: number }> = {
   caveBreath: { files: [require('../../assets/audio/sfx/cave-breath-1.mp3')], volume: 0.4 },
   otherworldWhispers: { files: [require('../../assets/audio/sfx/otherworld-whispers-1.mp3')], volume: 0.4 },
   otherworldReverseGong: { files: [require('../../assets/audio/sfx/otherworld-reverse-gong-1.mp3')], volume: 0.4 },
+  ghostWhisper: { files: [require('../../assets/audio/sfx/ghost-whisper-1.mp3')], volume: 0.45 },
+  ghostScreech: { files: [require('../../assets/audio/sfx/ghost-screech-1.mp3')], volume: 0.75 },
+  ghostWail: { files: [require('../../assets/audio/sfx/ghost-wail-1.mp3')], volume: 0.6 },
+  villagerSob: { files: [require('../../assets/audio/sfx/villager-sob-1.mp3')], volume: 0.4 },
+  villagerPrayer: { files: [require('../../assets/audio/sfx/villager-prayer-1.mp3')], volume: 0.4 },
+  villagerFear: { files: [require('../../assets/audio/sfx/villager-fear-1.mp3')], volume: 0.55 },
 };
 
 /** เสียงพื้นที่เล่นวนยาว ๆ — ตั้งให้เบากว่าเสียงเอฟเฟกต์มาก */

@@ -33,6 +33,7 @@ import DefeatOverlay from './components/battle/DefeatOverlay';
 import LevelUpOverlay from './components/battle/LevelUpOverlay';
 import GhostTalkOverlay from './components/battle/GhostTalkOverlay';
 import {playSfx,setSceneAudio} from '../src/audio/audio';
+import {battleStartFor} from '../src/audio/zones';
 import {BOSS_INTRO} from '../src/audio/manifest';
 import {cuesFor} from '../src/audio/cues';
 import TurnEndDiscard from './components/battle/TurnEndDiscard';
@@ -172,6 +173,8 @@ export default function BattlePage() {
     const feedback=hitFeedback(ev,player.maxHp,heavy);
     if(!feedback.player)return;
     setPlayerHit(eventKey(ev));flashRef.current?.flash();
+    // ชุด 4: ผีตีเข้าเนื้อแรง (≥25% เลือด หรือท่าหนัก) = ผีกรีด — ไม่ทุกหมัด กันชิน
+    if(feedback.heavy)playSfx('ghostScreech');
     if(feedback.heavy&&!reducedMotion)screenX.value=withSequence(withTiming(4,{duration:45}),withTiming(-4,{duration:55}),withTiming(0,{duration:70}));
   };
 
@@ -440,6 +443,8 @@ export default function BattlePage() {
   // เสียงตามโซน (ชุด 3): ตอนสู้ = ลมของโซน + กลอง · ชนะแล้วกลองหยุด เหลือลม · ออกจากฉากแล้วหน้าแผนที่ตั้งเสียงต่อเอง
   const audioScene=adventureSceneId(gameState);
   const audioKind=enemyKind(gameState);
+  // ชุด 4: เริ่มไฟต์ในหมู่บ้าน ชาวบ้านตกใจลงกลอนประตู — ครั้งเดียวต่อไฟต์
+  React.useEffect(()=>{const id=battleStartFor(audioScene);if(id&&gameState.phase==='combat')playSfx(id);},[gameState.fightCount]);
   React.useEffect(()=>{setSceneAudio(audioScene,victoryIntro||gameState.phase==='victory'?'victory':'battle',audioKind);},[audioScene,victoryIntro,gameState.phase,audioKind]);
   React.useEffect(()=>{
     if(gameState.phase==='victory'&&celebratedFight===(gameState.fightCount??0)&&!timeline.isPlaying&&!dying){dispatch({type:'CompleteNode'});router.replace('/');}
